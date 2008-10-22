@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id: pom.xml 31558 2008-09-21 13:14:27Z christian.mueller $              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>modules</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+  
+  <profiles>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <modules>
+        <module>epsg-access</module>      
+      </modules>
+    </profile>
+    <profile>
+      <id>Java 1.4 Specific Plugins</id>
+      <activation>
+        <jdk>1.4</jdk>
+      </activation>
+      <modules>
+         <module>arcgrid</module>
+      </modules>
+    </profile>
+    <!--profile>
+      <id>Java 5 Specific Plugins</id>
+      <activation>
+        <jdk>1.5</jdk>
+      </activation>
+      <modules>
+         <module>arcgrid</module>
+      </modules>
+    </profile-->
+
+  </profiles>
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>plugin</artifactId>
+  <packaging>pom</packaging>
+  <name>Geotools plugins</name>
+  <description>
+    Geotools plugins.
+  </description>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Modules included in the build                           -->
+  <!-- =========================================================== --> 
+  <modules>
+    <module>arcgrid</module>
+    <module>arcsde</module>
+    <module>db2</module>
+    <module>epsg-access</module>
+    <module>epsg-extension</module>
+    <module>epsg-hsql</module>
+    <module>epsg-postgresql</module>
+    <module>epsg-wkt</module>
+    <module>geotiff</module>
+    <module>gtopo30</module>
+    <module>image</module>
+    <module>imagemosaic</module>
+    <module>imagepyramid</module>
+    <module>imagemosaic-jdbc</module>
+    <module>postgis</module>
+    <module>property</module>
+    <module>referencing3D</module>
+    <module>shapefile</module>
+    <module>wfs</module>
+    <module>wms</module>
+  </modules>
+
+</project>
+

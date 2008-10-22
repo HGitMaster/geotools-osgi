@@ -1,0 +1,27 @@
+Version 300
+Charset "WindowsLatin1"
+Delimiter ","
+CoordSys Earth Projection 8, 87, "m", 9, 0, 0.9996, 1500000, 0 Bounds (-6746230.6469, -9998287.38389) (9746230.6469, 9998287.38389)
+Columns 2
+  ID Integer
+  CAPTION Char(64)
+Data
+
+Text
+    "This is text 1"
+    1515290.03 5033828.93 1515640.52 5033889.78
+    Font ("Arial",1,0,0)
+
+Text
+    "...And text 2\nwith a CRLF char"
+    1516511.11 5032920.22 1516968.71 5033041.92
+    Font ("Arial",0,0,0)
+    Angle 270
+
+Text
+    "...and text 3"
+    1514928.98 5032425.28 1515454.76 5032498.3
+    Font ("Verdana",1,0,0)
+    Angle 34
+    Justify Center
+

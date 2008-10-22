@@ -1,0 +1,11 @@
+.project
+.settings
+.classpath
+.jetproperties
+.wtpmodules
+target
+bin
+cobertura.ser
+nbproject
+nbactions.xml
+private

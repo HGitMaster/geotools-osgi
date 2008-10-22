@@ -1,0 +1,199 @@
+<%@ jet package="org.geotools.maven.xmlcodegen.templates" 
+    imports="java.util.* java.io.* org.geotools.xml.* 
+        org.geotools.maven.xmlcodegen.* org.opengis.feature.type.Schema 
+        org.opengis.feature.type.AttributeType org.opengis.feature.type.Name
+        org.opengis.feature.type.ComplexType org.opengis.feature.type.AttributeDescriptor 
+        org.opengis.feature.type.PropertyDescriptor org.apache.xml.serialize.* org.eclipse.xsd.*" class="SchemaClassTemplate" %>
+
+<%  
+    Object[] arguments = (Object[]) argument;
+    Schema schema = (Schema) arguments[0];
+    String prefix = (String) arguments[1];
+    prefix = prefix.toUpperCase();
+    
+    SchemaGenerator sg = (SchemaGenerator) arguments[2];
+    List types = sg.sort();
+%>
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.ComplexType;
+
+import org.geotools.feature.Name;
+import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.type.AttributeTypeImpl;
+import org.geotools.feature.type.ComplexTypeImpl;
+import org.geotools.feature.type.SchemaImpl;
+import org.geotools.feature.type.Name;
+
+<%
+    HashMap ns2import = new HashMap();
+    for (Iterator itr = sg.getImports().iterator(); itr.hasNext();) {
+        Schema imported = (Schema)itr.next();
+        String fullClassName = imported.getClass().getName();
+        String className = fullClassName.substring(fullClassName.lastIndexOf(".")+1);
+        
+        ns2import.put(imported.getURI(), className);
+%>
+import <%=fullClassName%>;
+<%
+    }
+%>
+
+public class <%=prefix%>Schema extends SchemaImpl {
+
+<%
+    for (Iterator itr = types.iterator(); itr.hasNext();) {
+        AttributeType type = (AttributeType) itr.next();
+        Name name = type.getName();
+
+        String uri = name.getNamespaceURI();
+        String local = name.getLocalPart();
+        
+        String binding = type.getBinding().getName() + ".class";
+        String isIdentified = type.isIdentified() ? "true" : "false";
+        String isAbstract = type.isAbstract() ? "true" : "false";
+        
+        String restrictions = "Collections.EMPTY_SET";
+        String superType = "null";
+        
+        if (type.getSuper() != null) {
+            superType = type.getSuper().getName()
+                .getLocalPart().toUpperCase() + "_TYPE";
+            String superURI = type.getSuper().getName().getNamespaceURI();
+            if (!uri.equals(superURI)) {
+                superType = ns2import.get(superURI) + "." + superType;
+            }
+        }
+        
+        String description = "null";
+%>
+    /**
+     * <p>
+     *  <pre>
+     *   <code>
+<%
+      XSDTypeDefinition xsdType = sg.getXSDType(type);
+      OutputFormat output = new OutputFormat();
+      output.setOmitXMLDeclaration(true);
+      output.setIndenting(true);
+
+      StringWriter writer = new StringWriter();
+      XMLSerializer serializer = new XMLSerializer(writer,output);
+    
+      try {
+        serializer.serialize(xsdType.getElement());
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+        return null;
+      }
+      
+      String[] lines = writer.getBuffer().toString().split("\n");
+      for (int i = 0; i < lines.length; i++) {
+%>
+     *  <%=lines[i].replaceAll("<","&lt;").replaceAll(">","&gt;")%>
+<%
+      }
+%>
+     *
+     *    </code>
+     *   </pre>
+     * </p>
+     *
+     * @generated
+     */
+<%
+        if (type instanceof ComplexType) {
+            ComplexType cType = (ComplexType)type;
+
+            if (!cType.getProperties().isEmpty()) {
+%>
+    private static List <%=local.toUpperCase()%>_TYPE_schema = new ArrayList();
+    static {
+<%
+                for (Iterator adItr = cType.getProperties().iterator(); adItr.hasNext();) {
+                    PropertyDescriptor pd = (PropertyDescriptor) adItr.next();
+                    if ( !(pd instanceof AttributeDescriptor) ) {
+                        continue;
+                    }
+                    
+                    AttributeDescriptor ad = (AttributeDescriptor) pd;
+                    
+                    AttributeType adType = ad.getType();
+                    
+                    String adTypeName = adType.getName().getLocalPart().toUpperCase() + 
+                        "_TYPE";
+                    String adTypeURI = adType.getName().getNamespaceURI();
+                    if (!uri.equals(adTypeURI)) {
+                        adTypeName = ns2import.get(adTypeURI) + "." + adTypeName;
+                    }
+                    String adName = "new Name(\"" + ad.getName().getNamespaceURI() + 
+                        "\",\"" + ad.getName().getLocalPart() + "\")";
+                    String min = ad.getMinOccurs() + "";
+                    String max = ad.getMaxOccurs() + "";
+                    String isNillable = ad.isNillable() ? "true" : "false";         
+%>
+            <%=local.toUpperCase()%>_TYPE_schema.add(
+                new AttributeDescriptorImpl(
+                    <%=adTypeName%>,<%=adName%>,<%=min%>,<%=max%>,<%=isNillable%>,null
+                )
+            );
+<%
+                }
+%>
+    }
+    public static final ComplexType <%=local.toUpperCase()%>_TYPE = 
+        new ComplexTypeImpl(
+            new Name("<%=uri%>","<%=local%>"), <%=local.toUpperCase()%>_TYPE_schema, <%=isIdentified%>,
+            <%=isAbstract%>,<%=restrictions%>,<%=superType%>, <%=description%>
+        );
+<%
+            }
+            else {
+%>
+    public static final ComplexType <%=local.toUpperCase()%>_TYPE = 
+        new ComplexTypeImpl(
+            new Name("<%=uri%>","<%=local%>"), Collections.EMPTY_LIST, <%=isIdentified%>,
+            <%=isAbstract%>,<%=restrictions%>,<%=superType%>, <%=description%>
+        );
+<%          
+            }
+%>
+    
+<%      
+        }
+        else {
+%>
+    public static final AttributeType <%=local.toUpperCase()%>_TYPE = 
+        new AttributeTypeImpl(
+            new Name("<%=uri%>","<%=local%>"), <%=binding%>, <%=isIdentified%>,
+            <%=isAbstract%>,<%=restrictions%>,<%=superType%>, <%=description%>
+        );
+<%      
+        }
+%>
+
+<%
+    }
+%>
+
+    public <%=prefix%>Schema() {
+        super("<%=schema.getURI()%>");
+        
+<%
+    for (Iterator itr = types.iterator(); itr.hasNext();) {
+        AttributeType type = (AttributeType) itr.next();
+        Name name = type.getName();
+
+        String local = name.getLocalPart();
+%>
+        put(new Name("<%=schema.getURI()%>","<%=local%>"),<%=local.toUpperCase()%>_TYPE);
+<%
+    }
+%>
+    }
+}

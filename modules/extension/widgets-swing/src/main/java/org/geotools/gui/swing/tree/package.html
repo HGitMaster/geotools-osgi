@@ -1,0 +1,14 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>package org.geotools.gui.swing.tree</TITLE>
+  </HEAD>
+  <BODY>
+  Workaround for the missing {@code javax.swing.tree.TreeNode.getUserObject()}
+  method. Sun seem to have forgotten this method in the first <cite>Swing</cite>
+  draft. Unfortunately, since {@link javax.swing.tree.TreeNode} is an interface,
+  Sun can't fix it without breaking compatibility. We have to fix it ourselves,
+  which is the main purpose of this package.
+  </BODY>
+</HTML>

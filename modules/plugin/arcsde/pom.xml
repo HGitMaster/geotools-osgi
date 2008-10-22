@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+     ======================================================================= -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>plugin</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>arcsde-plugin</artifactId>
+  <packaging>pom</packaging>
+  <name>ArcSDE plugin</name>
+  <description> Root project for arcsde plugin. </description>
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <name>Saul Farber</name>
+      <id>saul.farber</id>
+      <email>Saul.Farber@state.ma.us</email>
+      <organization></organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@users.sourceforge.net</email>
+      <organization>TOPP</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <properties>
+    <!-- default SDE version is 9.0.  These jars are freely available (err,
+        at least they're available on maven.geotools.fr and were down-
+        loaded without a click-through license.  If you have newer jars
+        and you wish to develop against them, then you need to inject
+        them yourself, and then set the sde.version maven property -->
+    <sde.version>9.0</sde.version>
+  </properties>
+
+
+  <!-- =========================================================== -->
+  <!--     Modules included in the build                           -->
+  <!-- =========================================================== -->
+  <modules>
+    <module>datastore</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>autoSDEDummyJars</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>haveSDEJars</name>
+          <value>false</value>
+        </property>
+      </activation>
+      <modules>
+        <module>sde-dummy</module>
+      </modules>
+    </profile>
+    <profile>
+      <!-- apparently there hase to be an alternate profile, even if it
+        doesn't do anything, in order to de-activate the above profile
+        if -DhaveSDEJars=true is passed in -->
+      <id>haveSDEJars</id>
+      <activation>
+        <property>
+          <name>haveSDEJars</name>
+          <value>true</value>
+        </property>
+      </activation>
+    </profile>
+  </profiles>
+
+</project>

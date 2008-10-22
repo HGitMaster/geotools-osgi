@@ -1,0 +1,34 @@
+MODULE EXAMPLE
+~~~~~~~~~~~~~~
+
+  Module Maintainer: <YOUR NAME>
+
+  IP Review:
+
+    * <REVIEWER 1 NAME> - August 6th, 2006
+
+    * <REVIEWER 2 NAME> - July 24th, 2007: removed dependencies on third party JDBC drivers
+
+    * <REVIEWER 3 NAME> - June 2008
+
+  STATUS: Clean
+
+  This module was adapted from the postgis module in GT 2.0 We will record the
+  (C) range as 2002-2006 with the understanding that it may in fact be earlier.
+
+
+* org.geotools.example
+  ~~~~~~~~~~~~~~~~~~~~
+  Contains the first JDBC based DataStore implementation from GeoTools 2.0
+  (aka 2003), based on earlier DataSource API (2002).
+
+
+* org.geotools.example2
+  ~~~~~~~~~~~~~~~~~~~~~
+
+  Header contains following reference to NASA:
+
+---------------------------------------------------------------------------------
+This file is derived from NGA/NASA software available for unlimited distribution.
+See http://earth-info.nima.mil/GandG/wgs84/gravitymod/.
+---------------------------------------------------------------------------------

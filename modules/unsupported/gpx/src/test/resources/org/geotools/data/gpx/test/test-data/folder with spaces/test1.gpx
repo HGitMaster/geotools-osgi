@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="GPS TrackMaker" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1
+http://www.topografix.com/GPX/1/1/gpx.xsd"><metadata><link href="http://www.gpstm.com"><text>Geo Studio Tecnology Ltd</text></link><time>2007-07-19T01:06:23Z</time><bounds minlat="1.000000" minlon="26.000000" maxlat="1.000000" maxlon="26.000000"/></metadata><wpt lat="1.000000000" lon="26.000000000"><ele>1980.000000</ele><time>2007-07-01T05:00:00Z</time><name>testpoint</name><cmt>This is a testpoint</cmt><desc>This is a testpoint</desc><sym>Animals</sym></wpt></gpx>

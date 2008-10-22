@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>package org.geotools.feature.collection</TITLE>
+  </HEAD>
+  <BODY>
+  Helper classes for implementing FeatureCollections. Please note that this is
+  mostly of interest to DataStore implementors who can use these classes
+  as a starting point for their providing their own content (backed by a
+  resultset or disk file etc.).
+  <p>
+  <h3>Meaning of FeatureCollections</h3>
+  <p>
+  FeatureCollections can be grouped into the following categories:
+  <ul>
+  <li><b>FeatureCollection</b> - providing access to a set of Features, both bounds and
+  count are supported (although you are warned that both may be O(N))
+  <li><b>RandomFeatureAccess</b> - provides access to Feature by ID
+  <li><b>FeatureList</b> - provides access to sorted set of Features
+  </ul>
+  You can use the <b>instanceof</b> operator to check before casting although
+  the API will be explicit where appropriate. Please note that the API may be
+  explicit in Javadocs due to the limitations of Java 1.4.
+  <ul>
+  <li>Explicit: FeatureCollection.sort( SortBy ) returns a FeatureList
+  <li>Explict: FeatureCollection.filter( Filter ) returns a FeatureCollection
+  <li>Implicit: FeatureList.filter( Filter ) returns a FeatureCollection, impled
+      that this instance also is an instnaceof FeatureList
+  </ul>
+  Where possible we have placed this kind of thing into the GeoAPI
+  FeatureCollection interface where Java5 can make these ideas exact.
+  </p>
+  
+  <h3>Use of SortBy and Filter</h3>
+  
+  You can explicitly obtain a FeatureList by using a sort( SortBy ) on an
+  FeatureCollection. You can also obtain a "sub" feature collection by using
+  a filter( Filter ). In both these cases the resulting construct is considered
+  a "view" onto the origional FeatureCollection (which in the case of a
+  DataStore will represent contents located externally).
+  <pre bgcolor=gray><code>
+  FeatureList list = featureCollection.filter( filter ).sort( sort );  
+  </code></pre>
+  <p>
+  In addition to working directly with a "view" you can often use this
+  technique to stage an opperation such as addAll or remove.
+  <pre></code>
+  collection.addAll( list.filter( filter ) );
+  list.filter( filter ).remove();
+  </code></pre>
+  <p>
+  
+  <h4>Seperation Of Concerns</h4>
+  <p>
+  By using the sub collection opperations such as sort and filter you can
+  carefully define set of data you wish to query against. This seperation of
+  concerns can be maintained by ensuring the use of Expression when accessing
+  content, and not acceing content directly.
+  </p>
+  <p>
+  This seperation of concerns is manditory for geotools library code, and
+  is strongly recommended for client code.
+  </p>
+  
+  <h3>Choosing a FeatureCollection Implementation for Client Code</h3>
+  <p>
+  The most basic FeatureCollection available in this package is the one that
+  store information completly in memory. This is designed to be used by end
+  users and is available for construction via a FeatureFactory (or
+  SimpleFeatureFactory as required).
+  <p>
+  A common request involves using a MemoryFeatureCollection to cache
+  information for display. You are warned that this approach will often fail
+  in real GIS useage where the quantity of information can not be limited
+  by memory.
+  </p>
+  
+  <h3>Implementing a FeatureCollection Implementation as a Data Provider</h3>
+  <p>
+  As a Data provideder you are expected to extend the AbstractFeatureCollection
+  classes provided here to make the most performant implementation of feature
+  access you can.
+  </p>
+  You are responsible for providing the following:
+  <ul>
+  <li>All FeatureCollection Implementation: required to represent all content on
+      accessed with Transaction.AUTO_COMMIT, bounds and count information provided
+      by metadata. This implementation is mostly used to defined sub collections
+      via filter and sort methods.
+  <li>"Sub"FeatureCollection Implementation: produced in response to a filter or sort method
+      should be either lazy, or backed by a result set obtained by the first
+      opperation. A cache may be emplyed for information such as bounds and
+      count.
+  <li>FeatureList Implementation: if for file or feature result can be sorted (either via an
+      initial SQL request or via consulting an attribute index file) you can "out"
+      this capability to your end users by use of a FeatureList.
+  <li>Getting Spatial with your Collections: many spatial file formats can make
+      use of a spatial index (or SFSQL class) to provide an optimized experience.
+      If possible please engage this early and often as we are spatial library,
+      on a related note GeometryAttribute and Feature both support the settings
+      of bounds, if this information is available please make use of it to prevent
+      the running an expensive bounds calculation in software.
+  </ul>
+  Although not recommended as general practice some implementations will be forced
+  to "burn memory" by making use of the FeatureCollection Implementations
+  intented for client code for manipulations such as sorting. If this applies to
+  use please try to set yourself up to be lazy - it may be that the user will
+  perform additional sub collection calls. 
+  
+  <h3>A word about Simple Features</h3>
+  <p>
+  The SimpleFeature interface is by no means required, it only represents
+  a set of additional methods that can be defined safely when the content
+  is a flat ordered list of atomic types with no multiplicity as dictated
+  exactly in agreement with their type definition.
+  </p>
+  <p>
+  What does this mean for a FeatureCollection? For a SimpleFeatureCollection
+  no attributes are supported at the SimpleFeatureCollectionType level, and the
+  content members are restricted to a belonging single SimpleFeatureType.
+  </p>
+  
+  <h3>References</h2>
+  The following links will be of interest:
+  <ul>
+  <li>Simple Features for SQL
+  </ul>  
+  @author Jody Garnett, Refractions Research
+  @since GeoTools 2.2.
+  </BODY>
+</HTML>

@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>Windows installation with MS-Access database</TITLE>
+  </HEAD>
+  <BODY>
+  <H1>Windows installation with MS-Access database</H1>
+  <P ALIGN="justify">The EPSG database is available in MS-Access format. Installing this database
+  is the recommanded way to get the EPSG factory running. You don't need the MS-Access software;
+  only the ODBC driver for MS-Access is required, and this driver is usually bundled with all
+  Windows installation. Steps to follow:</P>
+  
+  <ul>
+    <li><p>Download the MS-Access EPSG database from <A HREF="http://www.epsg.org">http://www.epsg.org</A>
+        and copy the <code>EPSG_v6.mdb</code> anywhere in yours file system. You can rename it at yours
+        convenience.</p></li>
+
+    <li><p>Open the <cite>ODBC data sources</cite> dialog box from the Windows's Control Panel.</p></li>
+
+    <li><p>Click the <cite>Add...</cite> button and select <cite>Microsoft Access Driver (*.mdb)</cite>.</p></li>
+
+    <li><p>In the <cite>Data source</cite> field, enter <code>EPSG</code>.</p></li>
+
+    <li><p>Click on the <cite>Select...</cite> button and select yours (potentially renamed)
+        <code>EPSG_v6.mdb</code> file.</p></li>
+
+    <li><p>Make sure that the JAR file from <code>plugin/epsg-access</code> (which contains only the
+        <code>AccessDataSource</code> class and its <code>META-INF/services/</code> registration)
+        is in yours classpath.</p></li>
+  </ul>
+  </BODY>
+</HTML>

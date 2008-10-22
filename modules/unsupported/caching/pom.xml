@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================
+        Maven Project Configuration File
+
+        The Geotools Project
+            http://www.geotools.org/
+
+        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>unsupported</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt-caching</artifactId>
+  <packaging>jar</packaging>
+  <name>Caching</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/caching/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/caching/
+    </connection>
+    <url>http://svn.geotools.org/trunk/modules/unsupported/caching/</url>
+  </scm>
+
+  <description>
+    Google Summer of Code 2007 project : Caching data in uDig.
+    This project aims at providing utilities to cache features from remote DataStores in order to leverage subsequent related queries.
+    The other goal is to allow client to get data from place-holder DataStores in the low or no bandwidth scenario. 
+  </description>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <id>chrisr</id>
+      <name>Christophe ROUSSON</name>
+      <roles>
+        <role>Java developer</role>
+      </roles>
+      <organization>Université Laval - Département des Sciences géomatiques</organization>
+      <organizationUrl>http://www.scg.ulaval.ca</organizationUrl>
+      <email>christophe.rousson@gmail.com</email>
+      <timezone>EDT</timezone>
+    </developer>
+  </developers>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+<!--    <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>unsupported</artifactId>
+        <version>${project.version}</version>
+    </dependency> -->
+<!--    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-hsql</artifactId>
+      <version>${project.version}</version>
+    </dependency> -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-shapefile-renderer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-mappane</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>net.sourceforge.groboutils</groupId>
+      <artifactId>groboutils-core</artifactId>
+      <version>5</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <plugins>
+      <!-- ====    Code Formatting  ============================== -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jalopy-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+            <convention>resources/jalopy-geotools.xml</convention>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <!-- <goal>format</goal> -->
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+

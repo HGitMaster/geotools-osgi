@@ -1,0 +1,11 @@
+<archetype>
+  <id>example</id>
+  <sources>
+    <source>src/main/java/DemoBase.java</source>
+    <source>src/main/java/DemoData.java</source>
+    <source>src/main/java/DemoGUI.java</source>
+  </sources>
+  <testSources>
+    <source>src/test/java/DemoTest.java</source>
+  </testSources>
+</archetype>

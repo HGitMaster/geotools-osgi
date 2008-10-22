@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+  Maven Project Configuration File                                        
+  
+  The Geotools Project                                                    
+  http://www.geotools.org/                                            
+  
+  Version: $Id: pom.xml 31514 2008-09-15 08:36:50Z bencd $              
+  ======================================================================= -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>community-schemas</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+
+
+  <groupId>org.geotools</groupId>
+  <artifactId>gt-community-schema-ds</artifactId>
+  <name>Community Schemas DataStore</name>
+  <url>http://maven.geotools.fr/reports/main/</url>
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds
+    </connection>
+    <url>http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds</url>
+  </scm>
+  <description>
+    The main module contains the key interfaces and default implementations that are used by other GeoTools modules.
+  </description>
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers></developers>
+
+  <contributors></contributors>
+  <!-- ==================================================== -->
+  <!--     Dependencies                                     -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>commons-digester</groupId>
+      <artifactId>commons-digester</artifactId>
+      <version>1.7</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-collections</groupId>
+          <artifactId>commons-collections</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <!-- override transitive dependency from commons-digester 1.7
+        which depends on commons-collections 2.1, since xml (SchemaIndexImpl)
+        depends on commons-collections 3.1 -->
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.1</version>
+    </dependency>
+    <dependency>
+      <!-- override transitive dependency from commons-digester 1.7
+        which depends on commons-collections 2.1, since xml (SchemaIndexImpl)
+        depends on commons-collections 3.1 -->
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.7.0</version>
+    </dependency>
+
+<!--
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-jdbc-regfunc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-fm</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+-->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-data</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-cql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>gt-xsd-gml3</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-property</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-postgis</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>xpp3</groupId>
+      <artifactId>xpp3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xml</groupId>
+      <artifactId>xml-commons-resolver</artifactId>
+      <version>1.2</version>
+    </dependency>
+  </dependencies>
+
+
+  <!-- ==================================================== -->
+  <!--     Compilation (including non-standard plugins)     -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/TimeSeriesStressTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+          <include>**/*.xsd</include>
+        </includes>
+      </testResource>
+    </testResources>
+  </build>
+</project>

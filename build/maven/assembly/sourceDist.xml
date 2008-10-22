@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ======================================================================
+       Assembly descriptor for sources code. This descriptor is a modified
+       copy of the Maven "project" predefined descriptor published there:
+
+       http://maven.apache.org/plugins/maven-assembly-plugin/descriptor-refs.html#project
+
+       It will creates a "gt2-${project.version}-src.zip" file.  This file
+       will contains a "gt2-${project.version}" root directory, which will
+       contains the whole project minus SVN and "target" directories.
+
+       $Id: sourceDist.xml 31202 2008-08-21 09:06:17Z jgarnett $
+       $URL: http://gtsvn.refractions.net/trunk/build/maven/assembly/sourceDist.xml $
+     ====================================================================== -->
+
+<assembly>
+  <id>project</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>.</directory>
+      <outputDirectory></outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <excludes>
+        <exclude>**/target/**</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+</assembly>

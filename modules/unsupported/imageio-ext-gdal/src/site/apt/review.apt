@@ -1,0 +1,40 @@
+IMAGEIO-EXT-GDAL
+~~~~~~~~~~~~~~~~
+
+  IP Review:
+
+  * Daniele Romagnoli June 2008
+
+  STATUS: DIRTY
+      Code is clean.
+      Data is waiting for checks.
+        http://jira.codehaus.org/browse/GEOT-1905
+
+  This module is the set of geotools plugins leveraging on imageio-ext project 
+  which provides access to several raster data formats leveraging on GDAL.
+
+
+* Important Note
+  ~~~~~~~~~~~~~~
+  The ECW/JP2KECW plugin shall not be used within a server application to DECODE ECW format.
+  The ECW EULA (read this at http://www.geo-solutions.it/doc/readme/ECWEULA.txt)
+  explicitly prohibits that type of use unless you have paid a lincesing fee to Leica to use ECW SDK on a server.
+  In case you dont agree the ECW EULA, stop using this module.
+
+
+* Data Credits
+  ~~~~~~~~~~~~
+
+** MrSID data credit:
+   ftp://data.massgis.state.ma.us/pub/wave/noaasid/n13250i.sid.
+   MassGIS sample data available at http://www.mass.gov/mgis/download.htm
+   Office of Geographic and Environmental Information (MassGIS), Commonwealth of Massachusetts Executive Office of Environmental Affairs
+
+** DTED data credit:
+   n43.dt0:
+   Freely available at: http://download.osgeo.org/gdal/data/dted/
+
+** JP2 data credit / ECW data credit
+   sample.jp2 / sample.ecw: 
+   data generated with gdal_translate utility, from small_world.tif, freely available at:
+   http://download.osgeo.org/gdal/data/gtiff/

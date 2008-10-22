@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>unsupported</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt-mif</artifactId>
+  <packaging>jar</packaging>
+  <name>MapInfo MIF format module</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/mif/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/mif/
+    </connection>
+    <url>http://svn.geotools.org/trunk/modules/unsupported/mif/</url>
+  </scm>
+
+  <description>
+    (todo)
+  </description>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <name>Luca Sigfrido Percich</name>
+      <id>lpercich</id>
+      <email>luca.percich@ama-mi.it</email>
+      <organization>AMA-MI</organization>
+      <roles>
+        <role>Module Mantainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>    
+    <developer>
+      <name>Ray Gallagher</name>
+      <id>omyar</id>
+      <email>omyar@users.sourceforge.net</email>
+      <organization>none</organization>
+      <roles>
+        <role>Former Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jianhui Jin</name>
+      <id></id>
+      <email></email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

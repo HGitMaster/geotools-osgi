@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>library</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+  
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt-render</artifactId>
+  <packaging>jar</packaging>
+  <name>Render</name>
+  <url>http://maven.geotools.fr/reports/modules/library/render/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/trunk/modules/library/render/
+    </connection>
+    <url>http://svn.geotools.org/trunk/modules/library/render/</url>
+  </scm>
+
+  <description>
+    The render module contains a renderer built around the interface in
+    api and main. This is a first class geotools module as creating a
+    visual representation of features is considered key to most geospatial
+    applications.
+  </description>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <name>Jesse Eichar</name>
+      <id>jeichar</id>
+      <email>jeichar@refractions.net</email>
+      <organization>Refraction Research Inc.</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Andrea Aime</name>
+      <id>aaime</id>
+      <email>andrea.aime@alice.it</email>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Simone Giannecchini</name>
+      <id>simboss</id>
+      <email>simboss1@gmail.com</email>
+      <organization>GeoSolutions SAS</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-coverage</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-cql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>it.geosolutions.imageio-ext</groupId>
+      <artifactId>imageio-ext-arcgrid</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_codec</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- 
+         FROM HERE ON, BATIK DEPENDENCIES - I'VE TRIED WITH 1.6-1 BUT
+         TEST DID NOT PASS WITH STRANGE CLASSPATH PROBLEMS 
+         Since these are many, I've decided to make the ones not required
+         for compiling optionals...
+    -->
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-transcoder</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-util</artifactId>
+    </dependency>
+    <dependency>
+       <groupId>xerces</groupId>
+       <artifactId>xercesImpl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis-xerces</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-svg-dom</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-dom</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-css</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-bridge</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-gvt</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-ext</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-xml</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-script</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-awt-util</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-parser</artifactId>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+  
+
+</project>

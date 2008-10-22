@@ -1,0 +1,54 @@
+Plugin GeoMedia
+~~~~~~~~~~~~~~~
+
+  Module Maintainer: Julian Ray
+
+  IP review:
+
+    * Jody Garnett, July 10th, 2006
+
+    * Adrian Custer, June 2008
+
+
+  STATUS: CLEAN, lgpl only due to mixed headers
+    Code has mixed headers
+    No Data
+
+  The headers indicate that this code is not copyright the GeoTools PMC,
+  as such I do not feel I have permission to change anything, and am not sure
+  if the GeoTools community wishes to take responsibility for distribution.
+
+-------------------------------------------------------------------------
+/*
+ *    GeoLBS - OpenSource Location Based Servces toolkit
+ *    (C) 2004, Julian J. Ray, All Rights Reserved
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+-------------------------------------------------------------------------
+
+ Actions:
+
+ * I have emailed the module maintainer
+
+ * will strike this module from the release process until we hear back.
+
+
+* org.geotools.data.geomedia
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    * most files (C) 2004, Julian J. Ray, All Rights Reserved
+
+* org.geotools.data.geomedia.attributeio
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    * most files (C) 2004, Julian J. Ray, All Rights Reserved

@@ -1,0 +1,23 @@
+Demo Introduction
+~~~~~~~~~~~~~~~~~~
+
+  Module Maintainer: Adrian Custer
+
+  IP Review:
+
+    * Adrian Custer, October 6th, 2006
+
+    * updated, June 2008-
+    
+  Status: CLEAN
+
+
+
+* org.geotools.demo.introduction
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  This is the base demonstration application, used to illustrate the use of each
+  of the subsystems of the Geotools library. This code should be considered part
+  of the tutorials and is not intended to be useful for deployment.
+
+    * All files in this module are placed in the public domain so that the code
+      may be cut and pasted into any user application.

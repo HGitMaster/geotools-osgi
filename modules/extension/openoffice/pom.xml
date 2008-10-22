@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>extension</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+  
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt-openoffice</artifactId>
+  <packaging>jar</packaging>
+  <name>Bridges to OpenOffice suite</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/openoffice/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/trunk/modules/extension/openoffice/
+    </connection>
+    <url>http://svn.geotools.org/trunk/modules/extension/openoffice/</url>
+  </scm>
+
+  <description>
+    Provides some Geotools's fonctionalities as OpenOffice plugins. For 
+    example, the plugin provides coordinate operation services as formulas 
+    inside the Calc spreadsheet.
+  </description>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <contributors>
+    <contributor>
+      <name>Richard Deplanque</name>
+      <organization>Université de Nouvelle-Calédonie</organization>
+      <timezone>+11</timezone>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-referencing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>        <!-- Overrides the HSQL dependency (from epsg-hsql) with     -->
+      <artifactId>hsqldb</artifactId>  <!-- "provided" scope instead of "runtime", because the HSQL -->
+      <scope>provided</scope>          <!-- engine is already included in OpenOffice environment.   -->
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>org.openoffice</groupId>
+      <artifactId>juh</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
+    </dependency>
+    <dependency>
+      <groupId>org.openoffice</groupId>
+      <artifactId>jurt</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
+    </dependency>
+    <dependency>
+      <groupId>org.openoffice</groupId>
+      <artifactId>ridl</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
+    </dependency>
+    <dependency>
+      <groupId>org.openoffice</groupId>
+      <artifactId>unoil</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
+    </dependency>
+  </dependencies>
+
+
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <plugins>
+      <!-- Copies the OpenOffice-generated .class files -->
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>javamaker</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Add a manifest entry for the class which registers -->
+      <!-- our add-in to OpenOffice -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <RegistrationClassName>
+                org.geotools.openoffice.Registration
+              </RegistrationClassName>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Creates the oxt file -->
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>unopkg</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <oxtName>geotools-${project.version}</oxtName>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>unopkg</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+
+</project>

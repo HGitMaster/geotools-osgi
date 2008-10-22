@@ -1,0 +1,71 @@
+<!--
+   Copyright 2003-2004 The Apache Software Foundation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<html>
+<head>
+<title>Developers guide for Jakarta Commons "Events" Package</title>
+<head>
+<body bgcolor="white">
+
+
+<div align="center">
+<h1>The Jakarta Commons <em>Events</em> Package</h1>
+<h2>Developers Guide</h2>
+$Id: DEVELOPERS-GUIDE.html 25075 2007-04-09 19:20:46Z desruisseaux $<br>
+<a href="#Introduction">[Introduction]</a>
+<a href="#CodingStandards">[Coding standards]</a>
+<a href="#DevelopmentGuide">[Development guide]</a>
+<br><br>
+</div>
+
+
+<a name="Introduction"></a>
+<h3>1.  INTRODUCTION</h3>
+
+<p>The <em>Events</em> package contains a set of Java classes that enable
+other classes, notably collections, to be observed. In other words, any changes
+made to a class can be observed by listeners.
+This document outlines the coding and development standards to use.
+</p>
+
+
+<a name="CodingStandards"></a>
+<h3>2.  CODING STANDARDS</h3>
+
+<p>
+Events will follow the Sun coding standards. In particular:
+</p>
+<ul>
+<li>no tabs - indent using 4 spaces
+<li>brackets around each block - includes single line if and loop statements
+<li>open bracket at end of line
+<li>single space after keywords and cast
+</ul>
+
+
+<a name="DevelopmentGuide"></a>
+<h3>3.  DEVELOPMENT GUIDE</h3>
+
+<p>
+The Events package shall build upon other Java designs.
+The Java collections framework will be used as the basis for collections design.
+Event handling will be based on Java event design.
+This paragraph does not prevent alternative implementations, however these should be additional.
+</p>
+
+</body>
+</html>
+
+

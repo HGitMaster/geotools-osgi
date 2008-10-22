@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        User Prototype Configuration File                                            
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+  
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <packaging>jar</packaging>
+    <version>${version}</version>
+    <name>An example project</name>
+    <url>http://www.example.org</url>
+    
+    <!-- TODO: Change the library number dependency to be a soft link rather 
+         than a hard link to 2.6-SNAPSHOT as it is here.                     -->
+    <dependencies>
+      <!--dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+        <scope>test</scope>
+      </dependency-->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>referencing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>mappane</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools.demo</groupId>
+      <artifactId>mappane</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>wfs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>postgis</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    </dependencies>
+    
+    <build>
+      <!--finalName>gt-${artifactId}-${version}</finalName-->
+      
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+            <archive>
+              <manifest>
+                <mainClass>org.example.geotools.base.DemoBase</mainClass>
+                <addClasspath>true</addClasspath>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+      </plugins>
+      
+      <resources>
+        <resource>
+          <directory>.</directory>
+          <includes>
+            <include>LICENSE*</include>
+            <include>*README*</include>
+          </includes>
+        </resource>
+        <resource>
+          <!-- targetPath>data</targetPath -->
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**</include>
+          </includes>
+        </resource>
+      </resources>
+      
+    </build>
+    
+  </project>

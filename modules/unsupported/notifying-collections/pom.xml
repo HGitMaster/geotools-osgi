@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ===========================================================================
+         Project configuration file for the Geotools 2 project
+         http://www.geotools.org/
+
+         Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $
+     =========================================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>unsupported</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- ==================================================== -->
+  <!--     Module description                               -->
+  <!-- ==================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt-notifying-collections</artifactId>
+  <packaging>jar</packaging>
+  <name>Notifying Collections</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/notifying-collections/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/notifying-collections/
+    </connection>
+    <url>http://svn.geotools.org/trunk/modules/unsupported/notifying-collections/</url>
+  </scm>
+
+  <description>
+	  Commons Events is a set of classes to enable 
+	  changes to objects to be observed.  It includes 
+	  wrappers for other classes, notably collections, 
+	  and the associated events and event handling 
+	  mechanisms.
+  </description>
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers>
+    <developer>
+      <name>Stephen Colebourne</name>
+      <id>scolebourne</id>
+    </developer>
+  </developers>
+
+  <contributors>
+  </contributors>
+
+
+  <!-- ==================================================== -->
+  <!--     Dependencies                                     -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections-testframework</artifactId>
+      <version>3.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>provided</scope>   <!-- Needed for compilation, not for running -->
+    </dependency>
+  </dependencies>
+
+
+  <!-- ==================================================== -->
+  <!--     Compilation (including non-standard plugins)     -->
+  <!-- ==================================================== -->
+  <build>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.2</version>
+          <configuration>
+             <includes>
+                <include>**/AllTestSuite.java</include>
+             </includes>
+          </configuration>
+        </plugin>
+      </plugins>
+  </build>
+
+</project>

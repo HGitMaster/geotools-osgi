@@ -1,0 +1,21 @@
+PLUGIN TIGER
+~~~~~~~~~~~~
+
+  Module Maintainer: Julian Ray
+
+  IP Review:
+
+  * Jody Garnett August 7th, 2006
+
+  * Adrian Custer, June 2008
+
+
+  STATUS: Clean LGPL only.
+
+  Copyright includes:
+    Copyright (C) 2003-2004, Julian J. Ray, All Rights Reserved
+
+
+* org.getoools.data.tiger
+  ~~~~~~~~~~~~~~~~~~~~~~~
+  DataStore access to the tiger file format.

@@ -1,0 +1,10 @@
+This module was lifted from the Apache Jakarta project.  It 
+is part of their "dormant" section of the commons.  This 
+means that there are no releases of the code and the only
+way to get it is to check it out of the Apache SVN 
+server.
+
+This code is revision 411337 of:
+https://svn.apache.org/repos/asf/jakarta/commons/dormant/events/trunk
+
+Bryce Nordgren

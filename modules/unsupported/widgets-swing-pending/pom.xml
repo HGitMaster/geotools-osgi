@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================
+        Maven Project Configuration File
+
+        The Geotools Project
+            http://www.geotools.org/
+
+        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>unsupported</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt-widgets-swing-pending</artifactId>
+  <packaging>jar</packaging>
+  <name>Widgets-swing-pending</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/widgets-swing-pending/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/widgets-swing-pending/
+    </connection>
+    <url>http://svn.geotools.org/trunk/modules/unsupported/widgets-swing-pending/</url>
+  </scm>
+
+  <description>Swing widgets, coming from project AlterSIG. Will be added in module swing widgets once cleaned up.</description>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <id>johann.sorel</id>
+      <name>Johann Sorel</name>
+      <email>sorel.johann@inbox.com</email>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Mangement                                    -->
+  <!-- =========================================================== -->
+  <dependencies>
+      
+    <!-- commons-jxpath-1.2.jar -->
+    <dependency>
+      <groupId>commons-jxpath</groupId>
+      <artifactId>commons-jxpath</artifactId>
+      <version>1.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xerces</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>servletapi</groupId>
+          <artifactId>servletapi</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- api-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- coverage-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-coverage</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+<!-- epsg-hsql-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- geotiff-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-geotiff</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-image</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-legacy</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- main-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- mappane-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-mappane</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- metadata-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-metadata</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-cql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-oracle-spatial</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-postgis</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- referencing-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-referencing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- render-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-render</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- shapefile-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- shapefile-renderer-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-shapefile-renderer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- xml-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-xml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- xml-filter-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>gt-xsd-filter</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- xml-gml2-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>gt-xsd-gml2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-widgets-swing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- xml-sld-2.6-SNAPSHOT.jar -->
+    <dependency>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>gt-xsd-sld</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- jts-wrapper -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-jts-wrapper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- picocontainer-1.2.jar -->
+    <dependency>
+      <groupId>picocontainer</groupId>
+      <artifactId>picocontainer</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+    <!-- xml-apis-1.3.03.jar -->
+    <dependency>
+     <groupId>xml-apis</groupId>
+     <artifactId>xml-apis</artifactId>
+     <version>1.3.03</version>
+   </dependency>
+
+    <!-- WFS datastore -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-wfs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- WMS datastore -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-wms</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- process -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-process</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- swing-layout.jar -->
+    <dependency>
+      <groupId>org.jdesktop</groupId>
+      <artifactId>swing-layout</artifactId>
+      <version>1.0.2</version>
+    </dependency>
+
+    <!-- swingx-2007_09_02.jar -->
+    <dependency>
+      <groupId>org.swinglabs</groupId>
+      <artifactId>swingx</artifactId>
+      <version>0.8-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+
+
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!--         copies all JARs in a single directory.              -->
+  <!-- =========================================================== -->
+  <build>
+
+    <plugins>
+      <!-- ====    Compilation      ============================== -->
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- ====    Switch commenting to skip tests    = -->
+          <skip>${allow.test.skip}</skip>
+          <!-- skip>true</skip> -->
+          <includes>
+            <include></include>
+          </includes>
+          <excludes>
+            <exclude></exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+
+  </build>
+
+</project>

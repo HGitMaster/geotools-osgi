@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+     ======================================================================= -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>arcsde-plugin</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt-arcsde</artifactId>
+  <packaging>jar</packaging>
+  <name>ArcSDE DataStore plugin</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/arcsde/datastore/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/
+    </connection>
+    <url>http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/</url>
+  </scm>
+
+  <description> ArcSDE DataStore plugin. </description>
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@users.sourceforge.net</email>
+      <organization>TOPP</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Saul Farber</name>
+      <id>saul.farber</id>
+      <email>Saul.Farber@state.ma.us</email>
+      <organization></organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Chris Dillard</name>
+      <email>cdillard@polexis.com</email>
+      <organization>Polexis</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Jake Fear</name>
+      <email>jfear@polexis.com</email>
+      <organization>Polexis</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>jsqlparser</groupId>
+      <artifactId>jsqlparser</artifactId>
+      <version>0.3.14</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-jdbc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!--
+    This dependency was being used by FilterTest, which anyway
+    is not being executed as it relies in non available data.
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-jts-wrapper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+     -->
+    <dependency>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-coverage</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-cql</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-wkt</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-render</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+
+  <!-- =========================================================== -->
+  <!--     Profile Configuration                                   -->
+  <!-- =========================================================== -->
+  <profiles>
+    <profile>
+      <id>autoSDEDummyJars</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>haveSDEJars</name>
+          <value>false</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-sde-dummy</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <!-- if we're using the dummy api, we should disable all tests -->
+              <excludes>
+                <exclude>**/*.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>haveSDEJars</id>
+      <activation>
+        <property>
+          <name>haveSDEJars</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.esri</groupId>
+          <artifactId>jsde_sdk</artifactId>
+          <version>${sde.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>com.esri</groupId>
+          <artifactId>jsde_jpe_sdk</artifactId>
+          <version>${sde.version}</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <!-- You need two things to run these tests successfully
+                1)  The esri ArcSDE jars installed.  The 9.0 jars are freely available
+                so as long as you have #2, you can rely on those ones.  If you have
+                jsde jars other than 9.0 you need to inject them into
+                maven manually and set the sde.version property in the parent pom
+                or on the command line.
+                2)  A properly configured testparams.properties file.  Make
+                sure it correctly references your SDE server with usernames and passwords
+                in there correctly.
+                
+                Since if you're building with the *real* SDE jars from SVN, I'd suggest
+                you enable these tests, just to make sure the SDE plugin is actually
+                correctly working right now!
+              -->
+              <includes>
+                <include>**/*Test.java</include>
+              </includes>
+              <excludes>
+                <!-- These tests are currently broken.  Don't enable them -->
+                <exclude>**/FilterTest.java</exclude>
+                <exclude>**/gce/**</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- this profile auto-drags in the ArcSDE 9.2 dependecy
+           on the icu4j libraries -->
+      <activation>
+        <property>
+          <name>sde.version</name>
+          <value>9.2</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.esri</groupId>
+          <artifactId>jsde_icu4j</artifactId>
+          <version>${sde.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+</project>

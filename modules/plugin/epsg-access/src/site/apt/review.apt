@@ -1,0 +1,27 @@
+PLUGIN EPSG ACCESS
+~~~~~~~~~~~~~~~~~~
+
+  Module Maintainer: Martin Desruisseaux
+
+  IP Review:
+
+    * Jody Garnett, July 8th, 2006
+
+    * Adrian Custer, July 2008
+
+
+  STATUS: CLEAN
+
+
+  Their is *no data* included with this module, instead a single Access.html file
+  is included with the javadocs describing what needs to be done to download and
+  set up the access database.
+
+
+* org.geotools.referencing.factory.epsg
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Module created in 2005 to allow for the use of the EPSG access database as
+  available via download. The file itself is not included.
+
+    * added a package.html explaining purpose and linking to provided Access.html
+      instructions

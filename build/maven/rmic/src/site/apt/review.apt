@@ -1,0 +1,16 @@
+MAVEN RMIC
+~~~~~~~~~~~
+
+  Module Maintainer: Martin
+
+  IP Review:
+
+    * Jody Garnett, August 6th, 2006
+
+
+
+* org.geotools.maven
+  ~~~~~~~~~~~~~~~~~~
+  An RMI compiler.
+
+    * updated header

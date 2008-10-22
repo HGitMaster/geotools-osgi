@@ -1,0 +1,36 @@
+MODULE DUMMY/JAXB
+~~~~~~~~~~~~~~~~~~
+
+  Module Developer: Cédric Briançon
+
+  IP Review:
+ 
+    * Adrian Custer, May 2008
+
+  The classes should probably have a (c) Sun line in each but, since they are 
+  meant to be removed for Java 6, aka OpenJava, we can skip the work.
+
+
+
+
+* javax.xml.bind
+  ~~~~~~~~~~~~~~
+  Derived from JDK 7 source code, which is licensed under the GPL version 2 with 
+  CLASSPATH exception. See the OpenJDK project.
+  This is a temporary package with no purpose other than getting GeoTools code to 
+  compile with Java 5. This package is not used for execution, is not distributed 
+  in any of the released Geotools JAR files, and will be deleted as soon as 
+  Geotools moves to target Java 6.
+
+  This package is composed of 40 classes whose implementation should never 
+  change.
+
+  Revision 29737: Adds GPL + classpath exception licence.
+
+
+
+* com.sun.xml.internal.bind.marshaller
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Implementation of a "Dummy" class, in order to differentiate the right class 
+  to manage namespaces, coming from the JAXB APIs, and the one present in this 
+  package.

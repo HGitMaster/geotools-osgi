@@ -1,0 +1,389 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
+options {
+   STATIC=false;
+   NODE_SCOPE_HOOK=true;
+   NODE_DEFAULT_VOID=true;
+   MULTI=false;
+   NODE_PACKAGE="org.geotools.filter.parser";
+   VISITOR=true;
+}
+
+PARSER_BEGIN(ExpressionParser)
+
+package org.geotools.filter.parser;
+
+/**
+ * ExpressionParser is the result of a javacc jjtree grammar.
+ * 
+ * @author  Ian Schneider
+ */
+public class ExpressionParser {
+  public void jjtreeOpenNodeScope(Node n) throws ParseException {
+ 
+  }
+
+  public void jjtreeCloseNodeScope(Node n) throws ParseException {
+
+  }
+
+  public static void main(String args[]) throws ParseException {
+    ExpressionParser parser = new ExpressionParser(System.in);
+    try {
+      SimpleNode n = (SimpleNode) parser.CompilationUnit();
+      n.dump("");
+      System.out.println("Thank you.");
+    } catch (Exception e) {
+      System.out.println("Oops.");
+      System.out.println(e.getMessage());
+      e.printStackTrace();
+    }
+  }
+}
+
+PARSER_END(ExpressionParser)
+
+
+SKIP : /* WHITE SPACE */
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+MORE:
+{
+  < "'" > : IN_SQ
+| < "\""> : IN_DQ
+}
+
+<IN_SQ>
+TOKEN:
+{ 
+  <SQ_STRING : "'"> { matchedToken.image = image.substring(1,image.length() -1); } : DEFAULT
+}
+
+<IN_DQ>
+TOKEN:
+{
+  <DQ_STRING : "\""> { matchedToken.image = image.substring(1,image.length() -1); } : DEFAULT
+}
+
+<IN_SQ>
+MORE:
+{
+  < ("\\" ("\\"|"'")) | ~[]>
+}
+
+<IN_DQ>
+MORE:
+{
+  < ("\\" ("\\"|"\"")) | ~[]>
+}
+
+TOKEN [IGNORE_CASE]:  /* keywords */
+{
+   < AND: "and" | "&&"> |
+   < OR: "or" | "||"> |
+   < NOT: "not" | "!"> |
+   < EQ: "eq" | "==" | "="> |
+   < NEQ: "neq" | "!=" > |
+   < GT: "gt" | ">" > |
+   < LT: "lt" | "<" > |
+   < GTE: "gte" | ">="> |
+   < LTE: "lte" | "<="> |
+   < TRUE: "true"> |
+   < FALSE: "false">
+}
+
+TOKEN [IGNORE_CASE]: /* geometry markers */
+{
+  < POINT: "point"> |
+  < LINESTRING: "linestring"> |
+  < POLYGON: "polygon"> |
+  < MULTIPOINT: "multipoint"> |
+  < MULTILINESTRING: "multilinestring"> |
+  < MULTIPOLYGON: "multipolygon"> |
+  < GEOMETRYCOLLECTION: "geometrycollection">
+}
+
+TOKEN:
+{
+  < LP: "("> |
+  < RP: ")"> |
+  < LSP: "["> |
+  < RSP: "]">
+}
+
+// Note, because float and int can technically have the same grammar,
+// put int first to make token manager have preference for it...
+TOKEN : /* Literals */
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* > |
+  //< PATH: <IDENTIFIER> ( "/" <IDENTIFIER> )* > |
+  < INTEGER_LITERAL: ("-")? (<DIGIT>)+ > |
+  < FLOATING_LITERAL:
+    ("-")?
+    ( ( <DIGIT> )* "." ( <DIGIT> )+ (<EXPONENT>)? ) |
+    ( ( <DIGIT> )+ ("." ( <DIGIT> )*)? (<EXPONENT>)? )
+  > |
+  < #LETTER: [ "a"-"z", "A"-"Z" , "_"] > |
+  < #DIGIT: [ "0"-"9"] > |
+  < #EXPONENT: ["e","E"] (["+","-"])? (<DIGIT>)+ >
+}
+
+/*
+ * Program structuring syntax follows.
+ */
+
+Node CompilationUnit() :
+{}
+{
+   (Expression()) *
+   <EOF>
+   {return jjtree.rootNode();}
+}
+
+void Expression() #void:
+{}
+{
+  OrExpression()
+}
+
+void OrExpression() #void :
+{}
+{
+  AndExpression()
+  ( <OR> AndExpression() #OrNode(2) )*
+}
+
+void AndExpression() #void :
+{}
+{
+  EqualityExpression()
+  ( <AND> EqualityExpression() #AndNode(2) )*
+}
+
+void EqualityExpression() #void :
+{}
+{
+  RelationalExpression()
+  (
+     <EQ> RelationalExpression() #EQNode(2)
+   |
+     <NEQ> RelationalExpression() #NENode(2)
+  )*
+}
+
+void RelationalExpression() #void :
+{}
+{
+  AdditiveExpression()
+  (
+    LOOKAHEAD(3) (<LT> AdditiveExpression() <LT> AdditiveExpression() #BetweenNode(3))
+  |
+    (
+        <LT> AdditiveExpression() #LTNode(2)
+    |
+        <GT> AdditiveExpression() #GTNode(2)
+    |
+        <LTE> AdditiveExpression() #LENode(2)
+    |
+        <GTE> AdditiveExpression() #GENode(2)
+    )*
+  )
+}
+
+void AdditiveExpression() #void :
+{}
+{
+  MultiplicativeExpression()
+  (
+    "+" MultiplicativeExpression() #AddNode(2)
+   |
+    "-" MultiplicativeExpression() #SubtractNode(2)
+  )*
+}
+
+void MultiplicativeExpression() #void :
+{}
+{
+  
+  UnaryExpression()
+  (
+    "*" UnaryExpression() #MulNode(2)
+   |
+    "/" UnaryExpression() #DivNode(2)
+  )*
+}
+
+void UnaryExpression() #void:
+{}
+{
+  <NOT> ("(" Expression() ")" | "[" Expression() "]") #NotNode(1)
+  | PrimaryExpression()
+}
+
+void PrimaryExpression() #void :
+{}
+{
+
+  LOOKAHEAD(2) Literal() |
+  "(" Expression() ")" |
+  "[" Expression() "]" |
+  Evaluate()
+}
+
+void Evaluate() #void:
+{}
+{
+  LOOKAHEAD(2)
+  Function() |
+  Attribute()
+}
+
+void Attribute() #AttNode:
+{}
+{
+  <IDENTIFIER>
+}
+
+void Literal() #void :
+{}
+{
+  IntegerLiteral() |
+  FloatingLiteral() |
+  BooleanLiteral() |
+  StringLiteral() |
+  Geometry() 
+}
+
+void IntegerLiteral() #IntegerNode:
+{}
+{
+  <INTEGER_LITERAL>
+}
+
+void FloatingLiteral() #FloatingNode:
+{}
+{
+  <FLOATING_LITERAL>
+}
+
+void BooleanLiteral() #void :
+{}
+{
+  <TRUE> #TrueNode |
+  <FALSE> #FalseNode
+}
+
+void StringLiteral() #StringNode :
+{}
+{
+  jjtThis.token = <SQ_STRING> | jjtThis.token = <DQ_STRING>
+}
+
+
+void Function() #FunctionNode:
+{}
+{
+  jjtThis.token = <IDENTIFIER> "("
+  FunctionArg() ("," FunctionArg() ) *
+  ")"
+}
+
+void FunctionArg() #void:
+{}
+{
+  Literal() | Attribute()
+}
+
+void Geometry() #void:
+{}
+{
+  Point() |
+  LineString() |
+  Polygon() |
+  MultiPoint() |
+  MultiLineString() |
+  MultiPolygon() |
+  GeometryCollection()
+}
+
+void Coord() #void:
+{}
+{
+  (<FLOATING_LITERAL> | <INTEGER_LITERAL>) (<FLOATING_LITERAL> | <INTEGER_LITERAL>) [(<FLOATING_LITERAL> | <INTEGER_LITERAL>)]
+}
+
+void Coords() #void:
+{}
+{
+  "(" Coord() ("," Coord())* ")"
+}
+
+void CoordsList() #void:
+{}
+{
+  "(" Coords() ("," Coords())* ")"
+}
+
+void Point() #WKTNode:
+{} 
+{
+  jjtThis.token = <POINT> "(" Coord() ")"
+}
+
+void LineString() #WKTNode:
+{}
+{
+  jjtThis.token = <LINESTRING> Coords() 
+}
+
+void Polygon() #WKTNode:
+{}
+{
+  jjtThis.token = <POLYGON> CoordsList() 
+}
+
+void MultiPoint() #WKTNode:
+{}
+{
+  jjtThis.token = <MULTIPOINT> CoordsList()
+}
+
+void MultiLineString() #WKTNode:
+{}
+{
+  jjtThis.token = <MULTILINESTRING> CoordsList()
+}
+
+void MultiPolygon() #WKTNode:
+{}
+{
+  jjtThis.token = <MULTIPOLYGON> CoordsList()
+}
+
+void GeometryCollection() #WKTNode:
+{}
+{
+  jjtThis.token = <GEOMETRYCOLLECTION> "(" Geometry() ("," Geometry())* ")"
+}
+

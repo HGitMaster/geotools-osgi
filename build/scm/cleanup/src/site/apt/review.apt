@@ -1,0 +1,10 @@
+SCM CLEANUP
+-----------
+
+  IP Review:
+
+    * Adrian, June 2008
+
+  This is one file to parse and clean SVN dump files, 
+  
+  written by Cedric Briancon, covered by Geomatys.fr copyright assignment.

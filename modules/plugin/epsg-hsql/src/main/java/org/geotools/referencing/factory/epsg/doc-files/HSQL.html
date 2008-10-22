@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>Creating EPSG database for HSQL</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Creating EPSG database for HSQL</H1>
+    <TABLE WIDTH="75%" BORDER="1" CELLPADDING="15" BGCOLOR="khaki"><TR><TD>
+      <P ALIGN="justify">The following instructions are for <STRONG>module maintainers</STRONG>.
+      They explain how to update the <CODE>epsg-hsql</CODE> plugin with latest EPSG database.
+      Users don't need to read this page - the <CODE>epsg-hsql</CODE> plugin should work "out
+      of the box" without any particular action required.</P>
+    </TD></TR></TABLE>
+    <P ALIGN="justify">The following gives some hints for creating a HSQL database
+    and populate it with EPSG data from the SQL scripts.</P>
+    <UL>
+      <LI><P>Copy the <CODE><A HREF="sqltool.rc">sqltool.rc</A></CODE> file in the developper's
+      home directory and edit it URL path provided in this file.</P></LI>
+
+      <LI><P>Prepare a copy of EPSG's SQL scripts and modify them for HSQL syntax. The
+      following <A HREF="PrepareForHSQL.xml">Ant file</A> can be used for this purpose.
+      As a safety, add the following lines at the end of every scripts:</P>
+<BLOCKQUOTE><PRE>COMMIT;
+SHUTDOWN;</PRE></BLOCKQUOTE></LI>
+
+      <LI><P>There is one change that the above Ant script doesn't performs. Column creation in
+      the form "<CODE>columnName UNIQUE</CODE>" must move the "<CODE>UNIQUE</CODE>" keyword at
+      the end of table creation in the form "<CODE>UNIQUE (columnName)</CODE>". This change needs
+      to be done by hand in the "<CODE>EPSG_Tables.sql</CODE>" file. Example:</P>
+      <BLOCKQUOTE><TABLE BORDER="1">
+        <TR>
+          <TH>Before</TH>
+          <TH>After</TH>
+        </TR><TR VALIGN="TOP">
+          <TD><PRE>CREATE CACHED TABLE epsg_change (
+change_id     DOUBLE PRECISION NOT NULL UNIQUE,
+report_date   DATE NOT NULL,
+action        VARCHAR);</PRE></TD>
+          <TD><PRE>CREATE CACHED TABLE epsg_change (
+change_id     DOUBLE PRECISION NOT NULL,
+report_date   DATE NOT NULL,
+action        VARCHAR,
+UNIQUE(CHANGE_ID) );</PRE>
+          </TD>
+        </TR>
+      </TABLE></BLOCKQUOTE></LI>
+
+      <LI><P>Creates the database using the following commands:</P>
+<BLOCKQUOTE><PRE>java org.hsqldb.util.SqlTool --autoCommit EPSG-admin EPSG_Tables.sql
+java org.hsqldb.util.SqlTool --autoCommit EPSG-admin EPSG_Data.sql
+java org.hsqldb.util.SqlTool --autoCommit EPSG-admin EPSG_FKeys.sql
+java org.hsqldb.util.SqlTool --autoCommit EPSG-admin dump.sql</PRE></BLOCKQUOTE>
+
+      <P>where "<CODE>dump.sql</CODE>" is a small file containing the following
+      instructions:</P>
+<BLOCKQUOTE><PRE>SCRIPT 'EPSG.sql';
+SHUTDOWN COMPACT;</PRE></BLOCKQUOTE></LI>
+
+      <LI><P>Edit the <CODE>EPSG.sql</CODE> script as below:</P>
+      <UL>
+        <LI>Remove the <CODE>SET DELAY 60</CODE> statement; 60 is already the default.</LI>
+
+        <LI>Remove the <CODE>CREATE USER "SA"</CODE> and <CODE>GRANT DBA TO SA</CODE> statements.
+            This user will exists before the script is run.</LI>
+
+        <LI>Remove the <CODE>CREATE SCHEMA PUBLIC</CODE> and <CODE>SET SCHEMA PUBLIC</CODE> statements.
+            This schema will exists before the script is run.</LI>
+
+        <LI>In the table <CODE>EPSG_DATUM</CODE>, change the type of column <CODE>REALIZATION_EPOCH</CODE>
+            to <CODE>INTEGER</CODE>.</LI>
+
+        <LI>Copy all <CODE>ALTER TABLE &hellip; FOREIGN KEY</CODE> statements to the end of the script.</LI>
+
+        <LI>Remove all <CODE>CONSTRAINT &hellip; FOREIGN KEY</CODE> from the <CODE>CREATE TABLE</CODE>
+            statements at the begining of the script, and move them as <CODE>ALTER TABLE &hellip; FOREIGN KEY</CODE>
+            statements at the end of the script.</LI>
+            
+        <LI>Add the <CODE>CREATE INDEX &hellip;</CODE> statements <A HREF="IndexCreation.sql">provided here</A>
+                at the end of file. You may remove the comments, semi-collons and extra spaces for saving
+            spaces (they appears in the above file only for readability).</LI>
+
+        <LI>Add <CODE>SHUTDOWN COMPACT</CODE> statement at the end of file.</LI>
+
+      </UL></LI>
+
+      <LI><P>Run the following commands:</P>
+<BLOCKQUOTE><PRE>java org.geotools.referencing.factory.epsg.Compactor</PRE></BLOCKQUOTE></LI>
+
+      <LI><P>Copy the file created in the above step into the
+          <CODE>org.geotools.referencing.factory.epsg</CODE> package directory
+          using "<CODE>EPSG.sql</CODE>" filename.<P></LI>
+
+      <LI><P>Edit the version number in the <CODE>FactoryOnHSQL.VERSION</CODE> field.<P></LI>
+
+      <LI><P>Finally, create the JAR file as usual (<CODE>mvn install</CODE>),
+          which should includes the <CODE>EPSG.sql</CODE> script.<P></LI>
+    </UL>
+  </BODY>
+</HTML>
