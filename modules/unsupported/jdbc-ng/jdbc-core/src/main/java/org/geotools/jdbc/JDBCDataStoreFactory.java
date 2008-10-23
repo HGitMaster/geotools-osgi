@@ -25,12 +25,14 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataStore;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AbstractFeatureFactoryImpl;
 import org.geotools.feature.LenientFeatureFactoryImpl;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsBetween;
@@ -120,10 +122,10 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         }
 
         //factories
-        dataStore.setFilterFactory(new FilterFactoryImpl());
+        dataStore.setFilterFactory(CommonFactoryFinder.getFilterFactory(null));
         dataStore.setGeometryFactory(new GeometryFactory());
-        dataStore.setFeatureTypeFactory(new FeatureTypeFactoryImpl());
-        dataStore.setFeatureFactory(new LenientFeatureFactoryImpl());
+        dataStore.setFeatureTypeFactory(CommonFactoryFinder.getFeatureTypeFactory(null));
+        dataStore.setFeatureFactory(CommonFactoryFinder.getFeatureFactory(null));
 
         //call subclass hook and return
         return createDataStoreInternal(dataStore, params);
