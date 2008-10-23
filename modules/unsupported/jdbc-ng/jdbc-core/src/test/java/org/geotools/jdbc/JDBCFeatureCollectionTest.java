@@ -92,8 +92,15 @@ public abstract class JDBCFeatureCollectionTest extends JDBCTestSupport {
         assertNotNull(sub);
 
         assertEquals(1, sub.size());
-        assertEquals(new ReferencedEnvelope(1, 1, 1, 1, CRS.decode("EPSG:4326")), sub.getBounds());
-
+        
+        ReferencedEnvelope exp = new ReferencedEnvelope(1, 1, 1, 1, CRS.decode("EPSG:4326")); 
+        ReferencedEnvelope act = sub.getBounds();
+        
+        assertEquals(exp.getMinX(), act.getMinX(), 0.1);
+        assertEquals(exp.getMinY(), act.getMinY(), 0.1);
+        assertEquals(exp.getMaxX(), act.getMaxX(), 0.1);
+        assertEquals(exp.getMaxY(), act.getMaxY(), 0.1);
+        
         sub.clear();
         assertEquals(2, collection.size());
     }
