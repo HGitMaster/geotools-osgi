@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31670 2008-10-16 10:48:55Z aaime $              
+        Version: $Id: pom.xml 31708 2008-10-23 22:28:43Z jdeolive $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -75,17 +75,6 @@
       <groupId>org.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openplans</groupId>
-      <artifactId>spatialdbbox</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <exclusions>
-		<exclusion>
-		  <groupId>org.geotools</groupId>
-		  <artifactId>gt2-main</artifactId>
-		</exclusion>
-	  </exclusions>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
