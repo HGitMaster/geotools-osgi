@@ -217,7 +217,7 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
      * Subclasses may override.
      * </p>
      */
-    protected final void setProperty(EObject eObject, String property, Object value, boolean lax) {
+    protected void setProperty(EObject eObject, String property, Object value, boolean lax) {
         try {
             if (EMFUtils.has(eObject, property)) {
                 //dont do in lax mode since that means its a second pass
