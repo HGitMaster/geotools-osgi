@@ -135,6 +135,49 @@ public abstract class JDBCFeatureLockingTest extends JDBCTestSupport {
         tx.close();
     }
     
+    public void testLockFeaturesWithInvalidFilter() throws Exception {
+        
+        FeatureLock lock = FeatureLockFactory.generate(tname("ft1"), 60 * 60 * 1000);
+        
+        Transaction tx = new DefaultTransaction();
+        store.setTransaction( tx );
+        store.setFeatureLock(lock);
+        
+        //lock features
+        FilterFactory ff = dataStore.getFilterFactory();
+        PropertyIsEqualTo f = ff.equals(ff.property(aname("invalidProperty")), ff.literal(1));
+        
+        try {
+            store.lockFeatures( f );
+            fail("Should have failed with an exception, the filter is not valid");
+        } catch(Exception e) {
+            // fine
+        }
+        
+        tx.close();
+    }
+    
+    public void testLockFeaturesWithInvalidQuery() throws Exception {
+        FeatureLock lock = FeatureLockFactory.generate(tname("ft1"), 60 * 60 * 1000);
+        
+        Transaction tx = new DefaultTransaction();
+        store.setTransaction( tx );
+        store.setFeatureLock(lock);
+        
+        //lock features
+        FilterFactory ff = dataStore.getFilterFactory();
+        PropertyIsEqualTo f = ff.equals(ff.property(aname("invalidProperty")), ff.literal(1));
+        
+        try {
+            store.lockFeatures( new DefaultQuery(store.getSchema().getTypeName(), f) );
+            fail("Should have failed with an exception, the filter is not valid");
+        } catch(Exception e) {
+            // fine
+        }
+        
+        tx.close();
+    }
+    
     public void testUnlockFeatures() throws Exception {
         FeatureLock lock = 
             FeatureLockFactory.generate(tname("ft1"), 60 * 60 * 1000);
@@ -177,6 +220,32 @@ public abstract class JDBCFeatureLockingTest extends JDBCTestSupport {
         
         writer.write();
         writer.close();
+        tx.close();
+    }
+    
+    public void testUnlockFeaturesInvalidFilter() throws Exception {
+        FeatureLock lock = 
+            FeatureLockFactory.generate(tname("ft1"), 60 * 60 * 1000);
+        
+        Transaction tx = new DefaultTransaction();
+        store.setTransaction( tx );
+        store.setFeatureLock(lock);
+        tx.addAuthorization(lock.getAuthorization());
+        
+        store.lockFeatures();
+        
+        // uhnlock features
+        FilterFactory ff = dataStore.getFilterFactory();
+        PropertyIsEqualTo f = ff.equals(ff.property(aname("invalidProperty")), ff.literal(1));
+        
+        try {
+            store.unLockFeatures(new DefaultQuery(store.getSchema().getTypeName(), f) );
+            fail("Should have failed with an exception, the filter is not valid");
+        } catch(Exception e) {
+            // fine
+        }
+
+        store.unLockFeatures();
         tx.close();
     }
 }

@@ -19,9 +19,13 @@ package org.geotools.jdbc;
 import java.util.Iterator;
 
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
+import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentFeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
@@ -116,6 +120,21 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         features.close(iterator);
     }
     
+    public void testGetFeaturesWithInvalidFilter() throws Exception {
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        PropertyIsEqualTo f = ff.equals(ff.property("invalidAttribute"), ff.literal(5));
+
+        // make sure a complaint related to the invalid filter is thrown here
+        try { 
+            FeatureIterator<SimpleFeature> fi = featureSource.getFeatures(f).features();
+            fi.close();
+            fail("This query should have failed, it contains an invalid filter");
+        } catch(Exception e) {
+            e.printStackTrace();
+            // fine
+        }
+    }
+    
     public void testGetFeaturesWithLogicFilter() throws Exception {
         FilterFactory ff = dataStore.getFilterFactory();
         PropertyIsEqualTo property = ff.equals(ff.property(aname("stringProperty")), ff.literal("one"));
@@ -155,6 +174,21 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         assertEquals(new Double(1.1), feature.getAttribute(0));
         assertNotNull( feature.getAttribute(1));
         features.close(iterator);
+    }
+    
+    public void testGetFeaturesWithInvalidQuery() {
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        PropertyIsEqualTo f = ff.equals(ff.property("invalidAttribute"), ff.literal(5));
+
+        // make sure a complaint related to the invalid filter is thrown here
+        try { 
+            FeatureIterator<SimpleFeature> fi = featureSource.getFeatures(new DefaultQuery("ft1", f)).features();
+            fi.close();
+            fail("This query should have failed, it contains an invalid filter");
+        } catch(Exception e) {
+            e.printStackTrace();
+            // fine
+        }
     }
 
     public void testGetFeaturesWithSort() throws Exception {

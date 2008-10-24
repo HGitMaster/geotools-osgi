@@ -290,7 +290,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         // to come up again
         Transaction t = new DefaultTransaction();
         SimpleFeatureType type = dataStore.getSchema(tname("river"));
-         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
 
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         FilterFunction_ceil ceil = new FilterFunction_ceil();
@@ -310,6 +310,26 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         assertFalse(reader.hasNext());
         reader.close();
         t.close();
+    }
+    
+    public void testGetFeatureInvalidFilter() throws Exception {
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        PropertyIsEqualTo f = ff.equals(ff.property("invalidAttribute"), ff.literal(5));
+
+        DefaultQuery q = new DefaultQuery(tname("river"));
+        q.setPropertyNames(new String[] { aname("geom") });
+        q.setFilter(f);
+
+        // make sure a complaint related to the invalid filter is thrown here
+        try { 
+            reader = dataStore.getFeatureReader(q, Transaction.AUTO_COMMIT);
+            reader.close();
+            fail("This query should have failed, it contains an invalid filter");
+        } catch(Exception e) {
+            // fine
+        }
     }
 
     public void testGetFeatureReaderMutability() throws IOException, IllegalAttributeException {
@@ -638,6 +658,23 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
         // assertTrue(writer instanceof FilteringFeatureWriter);
         assertEquals(1, count(writer));
+    }
+    
+    public void testGetFeatureWriterInvalidFilter() {
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
+
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        PropertyIsEqualTo f = ff.equals(ff.property("invalidAttribute"), ff.literal(5));
+
+        // make sure a complaint related to the invalid filter is thrown here
+        try { 
+            writer= dataStore.getFeatureWriter("river", f, Transaction.AUTO_COMMIT);
+            writer.close();
+            fail("This query should have failed, it contains an invalid filter");
+        } catch(Exception e) {
+            // fine
+        }
+
     }
 
     /**

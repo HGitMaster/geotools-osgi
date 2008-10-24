@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.geotools.data.CollectionFeatureReader;
 import org.geotools.data.FeatureReader;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -34,6 +35,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
+import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.identity.FeatureId;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -146,6 +148,37 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
 
         features.close(i);
     }
+    
+    public void testModifyFeaturesSingleAttribute() throws IOException {
+        SimpleFeatureType t = featureStore.getSchema();
+        featureStore.modifyFeatures(t.getDescriptor(aname("stringProperty")), "foo" , Filter.INCLUDE);
+
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureStore.getFeatures();
+        Iterator i = features.iterator();
+
+        assertTrue(i.hasNext());
+
+        while (i.hasNext()) {
+            SimpleFeature feature = (SimpleFeature) i.next();
+            assertEquals("foo", feature.getAttribute(aname("stringProperty")));
+        }
+
+        features.close(i);
+    }
+    
+    public void testModifyFeaturesInvalidFilter() throws IOException {
+        SimpleFeatureType t = featureStore.getSchema();
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        PropertyIsEqualTo f = ff.equals(ff.property("invalidAttribute"), ff.literal(5));
+        
+        try {
+            featureStore.modifyFeatures(new AttributeDescriptor[] { t.getDescriptor(aname("stringProperty")) },
+            new Object[] { "foo" }, f);
+            fail("This should have failed with an exception reporting the invalid filter");
+        } catch(Exception e) {
+            //  fine
+        }
+    }
 
     public void testRemoveFeatures() throws IOException {
         FilterFactory ff = dataStore.getFilterFactory();
@@ -159,5 +192,18 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
 
         featureStore.removeFeatures(Filter.INCLUDE);
         assertEquals(0, features.size());
+    }
+    
+    public void testRemoveFeaturesWithInvalidFilter() throws IOException {
+        SimpleFeatureType t = featureStore.getSchema();
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        PropertyIsEqualTo f = ff.equals(ff.property("invalidAttribute"), ff.literal(5));
+        
+        try {
+            featureStore.removeFeatures(f);
+            fail("This should have failed with an exception reporting the invalid filter");
+        } catch(Exception e) {
+            //  fine
+        }
     }
 }
