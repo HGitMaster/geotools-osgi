@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: FeatureTypeTypeImpl.java 29859 2008-04-09 04:42:44Z jdeolive $
+ * $Id: FeatureTypeTypeImpl.java 31719 2008-10-24 22:55:22Z groldan $
  */
 package net.opengis.wfs.impl;
 
@@ -31,6 +31,7 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
+import org.eclipse.emf.ecore.util.EDataTypeEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -149,24 +150,14 @@ public class FeatureTypeTypeImpl extends EObjectImpl implements FeatureTypeType 
 	protected String defaultSRS = DEFAULT_SRS_EDEFAULT;
 
 	/**
-     * The default value of the '{@link #getOtherSRS() <em>Other SRS</em>}' attribute.
+     * The cached value of the '{@link #getOtherSRS() <em>Other SRS</em>}' attribute list.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @see #getOtherSRS()
      * @generated
      * @ordered
      */
-	protected static final String OTHER_SRS_EDEFAULT = null;
-
-	/**
-     * The cached value of the '{@link #getOtherSRS() <em>Other SRS</em>}' attribute.
-     * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-     * @see #getOtherSRS()
-     * @generated
-     * @ordered
-     */
-	protected String otherSRS = OTHER_SRS_EDEFAULT;
+	protected EList otherSRS;
 
 	/**
      * The cached value of the '{@link #getNoSRS() <em>No SRS</em>}' containment reference.
@@ -337,20 +328,11 @@ public class FeatureTypeTypeImpl extends EObjectImpl implements FeatureTypeType 
 	 * <!-- end-user-doc -->
      * @generated
      */
-	public String getOtherSRS() {
+	public EList getOtherSRS() {
+        if (otherSRS == null) {
+            otherSRS = new EDataTypeEList(String.class, this, WfsPackage.FEATURE_TYPE_TYPE__OTHER_SRS);
+        }
         return otherSRS;
-    }
-
-	/**
-     * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-     * @generated
-     */
-	public void setOtherSRS(String newOtherSRS) {
-        String oldOtherSRS = otherSRS;
-        otherSRS = newOtherSRS;
-        if (eNotificationRequired())
-            eNotify(new ENotificationImpl(this, Notification.SET, WfsPackage.FEATURE_TYPE_TYPE__OTHER_SRS, oldOtherSRS, otherSRS));
     }
 
 	/**
@@ -586,7 +568,8 @@ public class FeatureTypeTypeImpl extends EObjectImpl implements FeatureTypeType 
                 setDefaultSRS((String)newValue);
                 return;
             case WfsPackage.FEATURE_TYPE_TYPE__OTHER_SRS:
-                setOtherSRS((String)newValue);
+                getOtherSRS().clear();
+                getOtherSRS().addAll((Collection)newValue);
                 return;
             case WfsPackage.FEATURE_TYPE_TYPE__NO_SRS:
                 setNoSRS((NoSRSType)newValue);
@@ -632,7 +615,7 @@ public class FeatureTypeTypeImpl extends EObjectImpl implements FeatureTypeType 
                 setDefaultSRS(DEFAULT_SRS_EDEFAULT);
                 return;
             case WfsPackage.FEATURE_TYPE_TYPE__OTHER_SRS:
-                setOtherSRS(OTHER_SRS_EDEFAULT);
+                getOtherSRS().clear();
                 return;
             case WfsPackage.FEATURE_TYPE_TYPE__NO_SRS:
                 setNoSRS((NoSRSType)null);
@@ -671,7 +654,7 @@ public class FeatureTypeTypeImpl extends EObjectImpl implements FeatureTypeType 
             case WfsPackage.FEATURE_TYPE_TYPE__DEFAULT_SRS:
                 return DEFAULT_SRS_EDEFAULT == null ? defaultSRS != null : !DEFAULT_SRS_EDEFAULT.equals(defaultSRS);
             case WfsPackage.FEATURE_TYPE_TYPE__OTHER_SRS:
-                return OTHER_SRS_EDEFAULT == null ? otherSRS != null : !OTHER_SRS_EDEFAULT.equals(otherSRS);
+                return otherSRS != null && !otherSRS.isEmpty();
             case WfsPackage.FEATURE_TYPE_TYPE__NO_SRS:
                 return noSRS != null;
             case WfsPackage.FEATURE_TYPE_TYPE__OPERATIONS:

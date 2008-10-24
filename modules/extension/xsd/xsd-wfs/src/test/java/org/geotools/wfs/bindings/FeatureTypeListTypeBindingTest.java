@@ -16,6 +16,7 @@
  */
 package org.geotools.wfs.bindings;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class FeatureTypeListTypeBindingTest extends WFSTestSupport {
             kwd.getKeyword().add("keword2");
             ft.getKeywords().add(kwd);
             ft.setDefaultSRS("urn:ogc:crs:EPSG:6.7:4326");
-            ft.setOtherSRS("urn:ogc:crs:EPSG:6.7:23030");
+            ft.getOtherSRS().add("urn:ogc:crs:EPSG:6.7:23030");
             ft.setOperations(factory.createOperationsType());
             OperationsType operations = ft.getOperations();
             List operationList = operations.getOperation();
@@ -83,7 +84,7 @@ public class FeatureTypeListTypeBindingTest extends WFSTestSupport {
             operationList.add(OperationType.UPDATE_LITERAL);
             operationList.add(OperationType.DELETE_LITERAL);
             OutputFormatListType outputFormat = factory.createOutputFormatListType();
-            outputFormat.setFormat("GML2");
+            outputFormat.getFormat().add("GML2");
             ft.setOutputFormats(outputFormat);
             WGS84BoundingBoxType bbox = Ows10Factory.eINSTANCE.createWGS84BoundingBoxType();
             bbox.setCrs("urn:ogc:crs:EPSG:6.7:4326");
@@ -168,8 +169,10 @@ public class FeatureTypeListTypeBindingTest extends WFSTestSupport {
         KeywordsType kw = (KeywordsType) ft.getKeywords().get(0);
         assertEquals(2, kw.getKeyword().size());
         assertEquals("urn:ogc:crs:EPSG:6.7:4326", ft.getDefaultSRS());
-        assertEquals("urn:ogc:crs:EPSG:6.7:23030", ft.getOtherSRS());
-        assertEquals("GML2", ft.getOutputFormats().getFormat());
+        assertEquals(1, ft.getOtherSRS().size());
+        assertEquals("urn:ogc:crs:EPSG:6.7:23030", ft.getOtherSRS().get(0));
+        assertEquals(1, ft.getOutputFormats().getFormat().size());
+        assertEquals("GML2", ft.getOutputFormats().getFormat().get(0));
         assertNotNull(ft.getWGS84BoundingBox());
     }
 }

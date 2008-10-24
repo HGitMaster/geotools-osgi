@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WfsPackage.java 30823 2008-06-26 22:01:56Z jdeolive $
+ * $Id: WfsPackage.java 31719 2008-10-24 22:55:22Z groldan $
  */
 package net.opengis.wfs;
 
@@ -702,7 +702,7 @@ public interface WfsPackage extends EPackage {
 	int FEATURE_TYPE_TYPE__DEFAULT_SRS = 4;
 
 	/**
-     * The feature id for the '<em><b>Other SRS</b></em>' attribute.
+     * The feature id for the '<em><b>Other SRS</b></em>' attribute list.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
@@ -1810,7 +1810,7 @@ public interface WfsPackage extends EPackage {
 	int OUTPUT_FORMAT_LIST_TYPE__GROUP = 0;
 
 	/**
-     * The feature id for the '<em><b>Format</b></em>' attribute.
+     * The feature id for the '<em><b>Format</b></em>' attribute list.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
@@ -3259,10 +3259,10 @@ public interface WfsPackage extends EPackage {
 	EAttribute getFeatureTypeType_DefaultSRS();
 
 	/**
-     * Returns the meta object for the attribute '{@link net.opengis.wfs.FeatureTypeType#getOtherSRS <em>Other SRS</em>}'.
+     * Returns the meta object for the attribute list '{@link net.opengis.wfs.FeatureTypeType#getOtherSRS <em>Other SRS</em>}'.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @return the meta object for the attribute '<em>Other SRS</em>'.
+     * @return the meta object for the attribute list '<em>Other SRS</em>'.
      * @see net.opengis.wfs.FeatureTypeType#getOtherSRS()
      * @see #getFeatureTypeType()
      * @generated
@@ -4021,10 +4021,10 @@ public interface WfsPackage extends EPackage {
 	EAttribute getOutputFormatListType_Group();
 
 	/**
-     * Returns the meta object for the attribute '{@link net.opengis.wfs.OutputFormatListType#getFormat <em>Format</em>}'.
+     * Returns the meta object for the attribute list '{@link net.opengis.wfs.OutputFormatListType#getFormat <em>Format</em>}'.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @return the meta object for the attribute '<em>Format</em>'.
+     * @return the meta object for the attribute list '<em>Format</em>'.
      * @see net.opengis.wfs.OutputFormatListType#getFormat()
      * @see #getOutputFormatListType()
      * @generated
@@ -5258,7 +5258,7 @@ public interface WfsPackage extends EPackage {
 		EAttribute FEATURE_TYPE_TYPE__DEFAULT_SRS = eINSTANCE.getFeatureTypeType_DefaultSRS();
 
 		/**
-         * The meta object literal for the '<em><b>Other SRS</b></em>' attribute feature.
+         * The meta object literal for the '<em><b>Other SRS</b></em>' attribute list feature.
          * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
          * @generated
@@ -5864,7 +5864,7 @@ public interface WfsPackage extends EPackage {
 		EAttribute OUTPUT_FORMAT_LIST_TYPE__GROUP = eINSTANCE.getOutputFormatListType_Group();
 
 		/**
-         * The meta object literal for the '<em><b>Format</b></em>' attribute feature.
+         * The meta object literal for the '<em><b>Format</b></em>' attribute list feature.
          * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
          * @generated

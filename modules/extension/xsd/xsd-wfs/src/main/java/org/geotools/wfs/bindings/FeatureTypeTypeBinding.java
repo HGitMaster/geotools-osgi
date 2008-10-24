@@ -16,11 +16,17 @@
  */
 package org.geotools.wfs.bindings;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import net.opengis.wfs.FeatureTypeType;
 import net.opengis.wfs.WfsFactory;
 
+import org.eclipse.emf.ecore.EObject;
 import org.geotools.wfs.WFS;
 import org.geotools.xml.AbstractComplexEMFBinding;
 
@@ -134,5 +140,24 @@ public class FeatureTypeTypeBinding extends AbstractComplexEMFBinding {
      */
     public Class getType() {
         return FeatureTypeType.class;
+    }
+    
+    @SuppressWarnings({ "unchecked", "nls" })
+    @Override
+    protected void setProperty(EObject eObject, String property, Object value, boolean lax) {
+        if ("OtherSRS".equals(property)) {
+            if (value instanceof Collection) {
+                Collection<URI> formatListAsUris = (Collection<URI>) value;
+                List<String> formatListAsString = new ArrayList<String>();
+                for (URI uri : formatListAsUris) {
+                    formatListAsString.add(uri.toString());
+                }
+                value = formatListAsString;
+            } else {
+                URI uri = (URI) value;
+                value = uri.toString();
+            }
+        }
+        super.setProperty(eObject, property, value, lax);
     }
 }

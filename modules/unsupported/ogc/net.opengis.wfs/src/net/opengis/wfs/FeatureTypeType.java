@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: FeatureTypeType.java 29859 2008-04-09 04:42:44Z jdeolive $
+ * $Id: FeatureTypeType.java 31719 2008-10-24 22:55:22Z groldan $
  */
 package net.opengis.wfs;
 
@@ -180,7 +180,8 @@ public interface FeatureTypeType extends EObject {
 	void setDefaultSRS(String value);
 
 	/**
-     * Returns the value of the '<em><b>Other SRS</b></em>' attribute.
+     * Returns the value of the '<em><b>Other SRS</b></em>' attribute list.
+     * The list contents are of type {@link java.lang.String}.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * <!-- begin-model-doc -->
@@ -194,24 +195,13 @@ public interface FeatureTypeType extends EObject {
      *                         must be considered when determining and declaring
      *                         the guaranteed data accuracy.
      * <!-- end-model-doc -->
-     * @return the value of the '<em>Other SRS</em>' attribute.
-     * @see #setOtherSRS(String)
+     * @return the value of the '<em>Other SRS</em>' attribute list.
      * @see net.opengis.wfs.WfsPackage#getFeatureTypeType_OtherSRS()
      * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.AnyURI"
      *        extendedMetaData="kind='element' name='OtherSRS' namespace='##targetNamespace'"
      * @generated
      */
-	String getOtherSRS();
-
-	/**
-     * Sets the value of the '{@link net.opengis.wfs.FeatureTypeType#getOtherSRS <em>Other SRS</em>}' attribute.
-     * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-     * @param value the new value of the '<em>Other SRS</em>' attribute.
-     * @see #getOtherSRS()
-     * @generated
-     */
-	void setOtherSRS(String value);
+	EList getOtherSRS();
 
 	/**
      * Returns the value of the '<em><b>No SRS</b></em>' containment reference.

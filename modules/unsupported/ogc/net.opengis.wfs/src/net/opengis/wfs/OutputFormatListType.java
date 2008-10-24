@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: OutputFormatListType.java 29859 2008-04-09 04:42:44Z jdeolive $
+ * $Id: OutputFormatListType.java 31719 2008-10-24 22:55:22Z groldan $
  */
 package net.opengis.wfs;
 
@@ -48,30 +48,20 @@ public interface OutputFormatListType extends EObject {
 	FeatureMap getGroup();
 
 	/**
-     * Returns the value of the '<em><b>Format</b></em>' attribute.
+     * Returns the value of the '<em><b>Format</b></em>' attribute list.
+     * The list contents are of type {@link java.lang.String}.
      * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Format</em>' attribute list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-     * @return the value of the '<em>Format</em>' attribute.
-     * @see #setFormat(String)
+     * @return the value of the '<em>Format</em>' attribute list.
      * @see net.opengis.wfs.WfsPackage#getOutputFormatListType_Format()
      * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true" transient="true" volatile="true" derived="true"
      *        extendedMetaData="kind='element' name='Format' namespace='##targetNamespace' group='#group:0'"
      * @generated
      */
-	String getFormat();
-
-	/**
-     * Sets the value of the '{@link net.opengis.wfs.OutputFormatListType#getFormat <em>Format</em>}' attribute.
-     * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-     * @param value the new value of the '<em>Format</em>' attribute.
-     * @see #getFormat()
-     * @generated
-     */
-	void setFormat(String value);
+	EList getFormat();
 
 } // OutputFormatListType

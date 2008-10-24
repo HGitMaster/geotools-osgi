@@ -2,15 +2,17 @@
  * <copyright>
  * </copyright>
  *
- * $Id: OutputFormatListTypeImpl.java 29859 2008-04-09 04:42:44Z jdeolive $
+ * $Id: OutputFormatListTypeImpl.java 31719 2008-10-24 22:55:22Z groldan $
  */
 package net.opengis.wfs.impl;
 
+import java.util.Collection;
 import net.opengis.wfs.OutputFormatListType;
 import net.opengis.wfs.WfsPackage;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
@@ -44,16 +46,6 @@ public class OutputFormatListTypeImpl extends EObjectImpl implements OutputForma
      * @ordered
      */
 	protected FeatureMap group;
-
-	/**
-     * The default value of the '{@link #getFormat() <em>Format</em>}' attribute.
-     * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-     * @see #getFormat()
-     * @generated
-     * @ordered
-     */
-	protected static final String FORMAT_EDEFAULT = null;
 
 	/**
      * <!-- begin-user-doc -->
@@ -90,17 +82,8 @@ public class OutputFormatListTypeImpl extends EObjectImpl implements OutputForma
 	 * <!-- end-user-doc -->
      * @generated
      */
-	public String getFormat() {
-        return (String)getGroup().get(WfsPackage.Literals.OUTPUT_FORMAT_LIST_TYPE__FORMAT, true);
-    }
-
-	/**
-     * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-     * @generated
-     */
-	public void setFormat(String newFormat) {
-        ((FeatureMap.Internal)getGroup()).set(WfsPackage.Literals.OUTPUT_FORMAT_LIST_TYPE__FORMAT, newFormat);
+	public EList getFormat() {
+        return getGroup().list(WfsPackage.Literals.OUTPUT_FORMAT_LIST_TYPE__FORMAT);
     }
 
 	/**
@@ -143,7 +126,8 @@ public class OutputFormatListTypeImpl extends EObjectImpl implements OutputForma
                 ((FeatureMap.Internal)getGroup()).set(newValue);
                 return;
             case WfsPackage.OUTPUT_FORMAT_LIST_TYPE__FORMAT:
-                setFormat((String)newValue);
+                getFormat().clear();
+                getFormat().addAll((Collection)newValue);
                 return;
         }
         super.eSet(featureID, newValue);
@@ -160,7 +144,7 @@ public class OutputFormatListTypeImpl extends EObjectImpl implements OutputForma
                 getGroup().clear();
                 return;
             case WfsPackage.OUTPUT_FORMAT_LIST_TYPE__FORMAT:
-                setFormat(FORMAT_EDEFAULT);
+                getFormat().clear();
                 return;
         }
         super.eUnset(featureID);
@@ -176,7 +160,7 @@ public class OutputFormatListTypeImpl extends EObjectImpl implements OutputForma
             case WfsPackage.OUTPUT_FORMAT_LIST_TYPE__GROUP:
                 return group != null && !group.isEmpty();
             case WfsPackage.OUTPUT_FORMAT_LIST_TYPE__FORMAT:
-                return FORMAT_EDEFAULT == null ? getFormat() != null : !FORMAT_EDEFAULT.equals(getFormat());
+                return !getFormat().isEmpty();
         }
         return super.eIsSet(featureID);
     }
