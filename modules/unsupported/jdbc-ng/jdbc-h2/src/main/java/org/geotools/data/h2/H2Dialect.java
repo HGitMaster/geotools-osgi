@@ -119,7 +119,7 @@ public class H2Dialect extends SQLDialect {
         }
     }
 
-    public void encodeGeometryEnvelope(String geometryColumn, StringBuffer sql) {
+    public void encodeGeometryEnvelope(String tableName, String geometryColumn, StringBuffer sql) {
         //TODO: change spatialdbbox to use envelope
         sql.append("envelope(");
         encodeColumnName(geometryColumn, sql);

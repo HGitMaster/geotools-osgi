@@ -462,15 +462,16 @@ public abstract class SQLDialect {
      * This method must also be sure to properly encode the name of the column
      * with the {@link #encodeColumnName(String, StringBuffer)} function.
      * </p>
+     * @param tableName 
      */
-    public abstract void encodeGeometryEnvelope(String geometryColumn, StringBuffer sql);
+    public abstract void encodeGeometryEnvelope(String tableName, String geometryColumn, StringBuffer sql);
 
     /**
      * Decodes the result of a spatial extent function in a SELECT statement.
      * <p>
      * This method is given direct access to a result set. The <tt>column</tt>
      * parameter is the index into the result set which contains the spatial
-     * extent value. The query for this value is build with the {@link #encodeGeometryEnvelope(String, StringBuffer)}
+     * extent value. The query for this value is build with the {@link #encodeGeometryEnvelope(String, String, StringBuffer)}
      * method.
      * </p>
      * <p>

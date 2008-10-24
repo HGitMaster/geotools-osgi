@@ -428,7 +428,7 @@ public class OracleDialect extends SQLDialect {
     }
     
     @Override
-    public void encodeGeometryEnvelope(String geometryColumn, StringBuffer sql) {
+    public void encodeGeometryEnvelope(String tableName, String geometryColumn, StringBuffer sql) {
         sql.append( "SDO_AGGR_MBR(");
         encodeColumnName(geometryColumn, sql);
         sql.append( ")");

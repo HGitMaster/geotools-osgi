@@ -2081,7 +2081,7 @@ public final class JDBCDataStore extends ContentDataStore
             //}
             if (attribute instanceof GeometryDescriptor) {
                 String geometryColumn = featureType.getGeometryDescriptor().getLocalName();
-                dialect.encodeGeometryEnvelope(geometryColumn, sql);
+                dialect.encodeGeometryEnvelope(featureType.getTypeName(), geometryColumn, sql);
                 sql.append(",");
             }
         }
@@ -2126,7 +2126,7 @@ public final class JDBCDataStore extends ContentDataStore
             //}
             if (attribute instanceof GeometryDescriptor) {
                 String geometryColumn = featureType.getGeometryDescriptor().getLocalName();
-                dialect.encodeGeometryEnvelope(geometryColumn, sql);
+                dialect.encodeGeometryEnvelope(featureType.getTypeName(), geometryColumn, sql);
                 sql.append(",");
             }
         }
