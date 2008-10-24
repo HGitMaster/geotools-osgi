@@ -453,9 +453,7 @@ public final class JDBCDataStore extends ContentDataStore
             closeSafe(cx);
         }
 
-        // create a content entry for the type
-        ContentEntry entry = new ContentEntry(this, featureType.getName());
-
+        // reset the type name cache, there's a new type name in town
         typeNameCache = null;
     }
 

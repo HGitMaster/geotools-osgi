@@ -19,6 +19,7 @@ package org.geotools.jdbc;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
@@ -31,7 +32,6 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -78,9 +78,12 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
 
         SimpleFeatureType ft2 = dataStore.getSchema(tname("ft2"));
         assertEquals(ft2, featureType);
+        // GEOT-2031
+        assertNotSame(ft2, featureType);
 
         Connection cx = dataStore.createConnection();
         Statement st = cx.createStatement();
+        ResultSet rs = null;
 
         try {
             StringBuffer sql = new StringBuffer();
@@ -92,12 +95,14 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
             }
 
             dataStore.getSQLDialect().encodeTableName("ft2", sql);
-            st.executeQuery(sql.toString());
+            rs = st.executeQuery(sql.toString());
         } catch (SQLException e) {
             throw e;
+        } finally {
+            if(rs != null)
+                rs.close();
+            st.close();
         }
-
-        st.close();
     }
 
     public void testGetFeatureSource() throws Exception {
