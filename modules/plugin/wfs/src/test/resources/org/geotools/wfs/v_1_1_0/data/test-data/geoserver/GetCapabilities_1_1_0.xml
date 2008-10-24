@@ -79,6 +79,7 @@
 			</ows:Parameter>
 			<ows:Parameter name="outputFormat">
 				<ows:Value>text/gml; subtype=gml/3.1.1</ows:Value>
+                <ows:Value>text/xml; subtype=gml/2.1.2</ows:Value>
 			</ows:Parameter>
 		</ows:Operation>
 		<ows:Operation name="LockFeature">
@@ -186,10 +187,10 @@
 			</OutputFormats>
 			<ows:WGS84BoundingBox>
 				<ows:LowerCorner>
-					-103.8725637911543 44.37740330855979
+					-103 44
 				</ows:LowerCorner>
 				<ows:UpperCorner>
-					-103.63794182141925 44.48804280772808
+					-102 45
 				</ows:UpperCorner>
 			</ows:WGS84BoundingBox>
 		</FeatureType>

@@ -11,7 +11,9 @@
   xmlns:hyd="http://www.fgdc.gov/framework/073004/hydro"
   xmlns:trans="http://www.fgdc.gov/framework/073004/transportation"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd http://www.opengis/net/ows http://schemas.opengis.net/ows/1.0.0/owsAll.xsd">
+  xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd">
+  <!-- got rid of the ows schema location to avoid triggering a schema download when running the test suite
+   xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd http://www.opengis/net/ows http://schemas.opengis.net/ows/1.0.0/owsAll.xsd"> -->
   <ows:ServiceIdentification>
     <ows:Title>USGS Framework Layer WFS</ows:Title>
     <ows:Abstract>A WFS serving USGS framework layers.</ows:Abstract>
@@ -392,6 +394,7 @@
       <Name>gubs:GovernmentalUnitCE</Name>
       <Title>Governmental Unit (County or Equivalent)</Title>
       <DefaultSRS>EPSG:4269</DefaultSRS>
+      <OtherSRS>EPSG:4326</OtherSRS>
       <ows:WGS84BoundingBox>
         <ows:LowerCorner>-179.14221197 18.9108417</ows:LowerCorner>
         <ows:UpperCorner>-66.94983061 71.35256069</ows:UpperCorner>

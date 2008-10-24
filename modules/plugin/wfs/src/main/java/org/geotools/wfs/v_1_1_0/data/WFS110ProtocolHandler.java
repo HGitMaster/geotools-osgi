@@ -16,9 +16,9 @@
  */
 package org.geotools.wfs.v_1_1_0.data;
 
-import static org.geotools.wfs.protocol.HttpMethod.GET;
-import static org.geotools.wfs.protocol.HttpMethod.POST;
-import static org.geotools.wfs.protocol.WFSOperationType.GET_FEATURE;
+import static org.geotools.data.wfs.HttpMethod.GET;
+import static org.geotools.data.wfs.HttpMethod.POST;
+import static org.geotools.data.wfs.WFSOperationType.GET_FEATURE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -75,6 +75,11 @@ import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.wfs.GetFeatureParser;
+import org.geotools.data.wfs.HttpMethod;
+import org.geotools.data.wfs.Version;
+import org.geotools.data.wfs.WFSOperationType;
+import org.geotools.data.wfs.WFSProtocol;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.v1_1.OGC;
@@ -87,9 +92,6 @@ import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSConfiguration;
 import org.geotools.wfs.protocol.ConnectionFactory;
-import org.geotools.wfs.protocol.HttpMethod;
-import org.geotools.wfs.protocol.Version;
-import org.geotools.wfs.protocol.WFSOperationType;
 import org.geotools.wfs.protocol.WFSProtocolHandler;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
@@ -114,14 +116,16 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 /**
- * Handles the interaction with a WFS 1.1 server by constructing the WFS 1.1
- * protocol specific requests.
+ * Handles the interaction with a WFS 1.1 server by constructing the WFS 1.1 protocol specific
+ * requests.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: WFS110ProtocolHandler.java 30991 2008-07-10 10:01:15Z groldan $
+ * @version $Id: WFS110ProtocolHandler.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL:
- *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/XmlSimpleFeatureParser.java $
+ *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0
+ *         /data/XmlSimpleFeatureParser.java $
+ * @deprecated we use {@link WFSProtocol} now
  */
 public class WFS110ProtocolHandler extends WFSProtocolHandler {
 
@@ -133,15 +137,14 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     private static final WFSConfiguration configuration = new WFSConfiguration();
 
     /**
-     * The WFS GetCapabilities document. Final by now, as we're not handling
-     * updatesequence, so will not ask the server for an updated capabilities
-     * during the life-time of this datastore.
+     * The WFS GetCapabilities document. Final by now, as we're not handling updatesequence, so will
+     * not ask the server for an updated capabilities during the life-time of this datastore.
      */
     private final WFSCapabilitiesType capabilities;
 
     /**
-     * Per featuretype name Map of capabilities feature type information. Not to
-     * be used directly but through {@link #getFeatureTypeInfo(String)}
+     * Per featuretype name Map of capabilities feature type information. Not to be used directly
+     * but through {@link #getFeatureTypeInfo(String)}
      */
     private final Map<String, FeatureTypeType> typeInfos;
 
@@ -155,8 +158,8 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     private boolean usePullParser;
 
     /**
-     * Creates the protocol handler by parsing the capabilities document from
-     * the provided input stream.
+     * Creates the protocol handler by parsing the capabilities document from the provided input
+     * stream.
      * 
      * @param capabilitiesReader
      * @param tryGzip
@@ -166,8 +169,8 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public WFS110ProtocolHandler(InputStream capabilitiesReader, ConnectionFactory connectionFac,
-            Integer maxFeatures) throws IOException {
+    public WFS110ProtocolHandler( InputStream capabilitiesReader, ConnectionFactory connectionFac,
+            Integer maxFeatures ) throws IOException {
         super(Version.v1_1_0, connectionFac);
         this.maxFeaturesHardLimit = maxFeatures;
         this.capabilities = parseCapabilities(capabilitiesReader);
@@ -176,7 +179,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
 
         final List<FeatureTypeType> ftypes = capabilities.getFeatureTypeList().getFeatureType();
         QName typeName;
-        for (FeatureTypeType ftype : ftypes) {
+        for( FeatureTypeType ftype : ftypes ) {
             typeName = ftype.getName();
             assert !("".equals(typeName.getPrefix()));
             String prefixedTypeName = typeName.getPrefix() + ":" + typeName.getLocalPart();
@@ -184,7 +187,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         }
     }
 
-    private WFSCapabilitiesType parseCapabilities(InputStream capabilitiesReader)
+    private WFSCapabilitiesType parseCapabilities( InputStream capabilitiesReader )
             throws IOException {
         final Parser parser = new Parser(configuration);
         final Object parsed;
@@ -205,27 +208,27 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * Returns the URL representing the service entry point for the required WFS
-     * operation and HTTP method.
+     * Returns the URL representing the service entry point for the required WFS operation and HTTP
+     * method.
      */
     @SuppressWarnings("unchecked")
     @Override
-    public URL getOperationURL(final WFSOperationType operation, final HttpMethod method)
+    public URL getOperationURL( final WFSOperationType operation, final HttpMethod method )
             throws UnsupportedOperationException {
         final OperationsMetadataType operationsMetadata = capabilities.getOperationsMetadata();
         final List<OperationType> operations = operationsMetadata.getOperation();
-        for (OperationType operationType : operations) {
+        for( OperationType operationType : operations ) {
             String operationName = operationType.getName();
             if (operation.getName().equalsIgnoreCase(operationName)) {
                 List<DCPType> dcps = operationType.getDCP();
-                for (DCPType dcp : dcps) {
+                for( DCPType dcp : dcps ) {
                     List<RequestMethodType> requests;
                     if (GET == method) {
                         requests = dcp.getHTTP().getGet();
                     } else {
                         requests = dcp.getHTTP().getPost();
                     }
-                    for (RequestMethodType req : requests) {
+                    for( RequestMethodType req : requests ) {
                         String href = req.getHref();
                         if (href != null) {
                             try {
@@ -245,11 +248,11 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * Checks whether the WFS capabilities provides a service entry point for
-     * the given operation and HTTP method.
+     * Checks whether the WFS capabilities provides a service entry point for the given operation
+     * and HTTP method.
      */
     @Override
-    public boolean supports(WFSOperationType operation, HttpMethod method) {
+    public boolean supports( WFSOperationType operation, HttpMethod method ) {
         try {
             getOperationURL(operation, method);
             return true;
@@ -272,21 +275,20 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * @param typeName
-     *            type name to return the keyword list for
+     * @param typeName type name to return the keyword list for
      * @return the keywords of {@code typeName} in the capabilities document
      */
     @SuppressWarnings("unchecked")
-    public Set<String> getKeywords(final String typeName) {
+    public Set<String> getKeywords( final String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         List<KeywordsType> ftKeywords = featureTypeInfo.getKeywords();
         return getKeyWords(ftKeywords);
     }
 
     @SuppressWarnings("unchecked")
-    private Set<String> getKeyWords(List<KeywordsType> keywordsList) {
+    private Set<String> getKeyWords( List<KeywordsType> keywordsList ) {
         Set<String> keywords = new HashSet<String>();
-        for (KeywordsType keys : keywordsList) {
+        for( KeywordsType keys : keywordsList ) {
             keywords.addAll(keys.getKeyword());
         }
         return keywords;
@@ -317,16 +319,14 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * Makes a {@code DescribeFeatureType} request for {@code typeName} feature
-     * type, parses the server response into a {@link SimpleFeatureType} and
-     * returns it.
+     * Makes a {@code DescribeFeatureType} request for {@code typeName} feature type, parses the
+     * server response into a {@link SimpleFeatureType} and returns it.
      * <p>
-     * Due to a current limitation widely spread through the GeoTools library,
-     * the parsed FeatureType will be adapted to share the same name than the
-     * Features produced for it. For example, if the actual feature type name is
-     * {@code Streams_Type} and the features name (i.e. which is the FeatureType
-     * name as stated in the WFS capabilities document) is {@code Stream}, the
-     * returned feature type name will also be {@code Stream}.
+     * Due to a current limitation widely spread through the GeoTools library, the parsed
+     * FeatureType will be adapted to share the same name than the Features produced for it. For
+     * example, if the actual feature type name is {@code Streams_Type} and the features name (i.e.
+     * which is the FeatureType name as stated in the WFS capabilities document) is {@code Stream},
+     * the returned feature type name will also be {@code Stream}.
      * </p>
      * 
      * @param typeName
@@ -334,7 +334,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public SimpleFeatureType parseDescribeFeatureType(final String typeName) throws IOException {
+    public SimpleFeatureType parseDescribeFeatureType( final String typeName ) throws IOException {
         final FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         final QName featureDescriptorName = featureTypeInfo.getName();
 
@@ -360,7 +360,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     @Override
-    public URL getDescribeFeatureTypeURLGet(final String typeName) throws MalformedURLException {
+    public URL getDescribeFeatureTypeURLGet( final String typeName ) throws MalformedURLException {
         URL v100StyleUrl = super.getDescribeFeatureTypeURLGet(typeName);
         FeatureTypeType typeInfo = getFeatureTypeInfo(typeName);
         QName name = typeInfo.getName();
@@ -382,7 +382,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         return v110StyleUrl;
     }
 
-    private Object parse(final URL url, final HttpMethod method) throws IOException {
+    private Object parse( final URL url, final HttpMethod method ) throws IOException {
 
         final HttpURLConnection connection = connectionFac.getConnection(url, method);
         String contentEncoding = connection.getContentEncoding();
@@ -417,30 +417,29 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         return typeNames.toArray(new String[typeNames.size()]);
     }
 
-    public String getFeatureTypeTitle(final String typeName) {
+    public String getFeatureTypeTitle( final String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         return featureTypeInfo.getTitle();
     }
 
-    public String getFeatureTypeAbstract(final String typeName) {
+    public String getFeatureTypeAbstract( final String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         return featureTypeInfo.getAbstract();
     }
 
     /**
-     * Returns the bounds of the given feature type stated in the capabilities
-     * document but in the feature type default CRS.
+     * Returns the bounds of the given feature type stated in the capabilities document but in the
+     * feature type default CRS.
      * 
      * @param typeName
-     * @return the {@code ows:WGS84BoundingBox} capabilities bounds for
-     *         {@code typeName} but in the native CRS (that is, transformed to
-     *         the CRS declared as the feature type's {@code DefaultSRS})
-     * @throws IllegalStateException
-     *             if the capabilities document does not supply the required
-     *             information.
+     * @return the {@code ows:WGS84BoundingBox} capabilities bounds for {@code typeName} but in the
+     *         native CRS (that is, transformed to the CRS declared as the feature type's {@code
+     *         DefaultSRS})
+     * @throws IllegalStateException if the capabilities document does not supply the required
+     *         information.
      */
     @SuppressWarnings("unchecked")
-    public ReferencedEnvelope getFeatureTypeBounds(final String typeName) {
+    public ReferencedEnvelope getFeatureTypeBounds( final String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         List<WGS84BoundingBoxType> bboxList = featureTypeInfo.getWGS84BoundingBox();
         if (bboxList != null && bboxList.size() > 0) {
@@ -470,7 +469,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
                 "The capabilities document does not supply the ows:WGS84BoundingBox element");
     }
 
-    public CoordinateReferenceSystem getFeatureTypeCRS(final String typeName) {
+    public CoordinateReferenceSystem getFeatureTypeCRS( final String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         String defaultSRS = featureTypeInfo.getDefaultSRS();
         try {
@@ -495,16 +494,14 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * Only returns the bounds of the query (ie, the bounds of the whole feature
-     * type) if the query has no filter set, otherwise the bounds may be too
-     * expensive to acquire.
+     * Only returns the bounds of the query (ie, the bounds of the whole feature type) if the query
+     * has no filter set, otherwise the bounds may be too expensive to acquire.
      * 
      * @param query
-     * @return The bounding box of the datasource in the CRS required by the
-     *         query, or {@code null} if unknown and too expensive for the
-     *         method to calculate or any errors occur.
+     * @return The bounding box of the datasource in the CRS required by the query, or {@code null}
+     *         if unknown and too expensive for the method to calculate or any errors occur.
      */
-    public ReferencedEnvelope getBounds(final Query query) throws IOException {
+    public ReferencedEnvelope getBounds( final Query query ) throws IOException {
         if (!Filter.INCLUDE.equals(query.getFilter())) {
             return null;
         }
@@ -532,14 +529,14 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * If the query is fully supported, makes a {@code GetFeature} request with
-     * {@code resultType=hits} and returns the counts returned by the server,
-     * otherwise returns {@code -1} as the result is too expensive to calculate.
+     * If the query is fully supported, makes a {@code GetFeature} request with {@code
+     * resultType=hits} and returns the counts returned by the server, otherwise returns {@code -1}
+     * as the result is too expensive to calculate.
      * 
      * @param query
      * @return
      */
-    public int getCount(final Query query) throws IOException {
+    public int getCount( final Query query ) throws IOException {
         final String typeName = query.getTypeName();
         // TODO: check if filter is fully supported, return -1 if not
         final Filter filter = query.getFilter();
@@ -561,7 +558,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
 
             String numberOfFeatures = null;
             // look for schema location
-            for (int i = 0; i < parser.getAttributeCount(); i++) {
+            for( int i = 0; i < parser.getAttributeCount(); i++ ) {
                 if ("numberOfFeatures".equals(parser.getAttributeName(i))) {
                     numberOfFeatures = parser.getAttributeValue(i);
                     break;
@@ -583,19 +580,19 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * Makes a WFS GetFeature request for the given geotools query and returns a
-     * feature reader whose content is accordingly limited by the query, even if
-     * the backend WFS can't cope up with the full query.
+     * Makes a WFS GetFeature request for the given geotools query and returns a feature reader
+     * whose content is accordingly limited by the query, even if the backend WFS can't cope up with
+     * the full query.
      * 
      * @param query
      * @param transaction
-     * @return a FeatureReader<SimpleFeatureType, SimpleFeature> correctly set
-     *         up to return the contents as per requested by the query
+     * @return a FeatureReader<SimpleFeatureType, SimpleFeature> correctly set up to return the
+     *         contents as per requested by the query
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
-            final Transaction transaction) throws IOException {
+    public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader( final Query query,
+            final Transaction transaction ) throws IOException {
         final SimpleFeatureType contentType = getQueryType(query);
 
         // by now encode the full query to be sent to the server.
@@ -626,11 +623,11 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
                 unsupportedFilter = Filter.EXCLUDE;
             } else {
                 // HACK: by now just sent the whole filter to the WFS
-                //supportedFilter = filter;
+                // supportedFilter = filter;
 
-                //Double HACK: cubewerx does not seem to understand the geometry filters
-                //we send other than bbox. By now grab all the features and apply the filter
-                //at runtime. This needs to be fixed/worked around asap though.
+                // Double HACK: cubewerx does not seem to understand the geometry filters
+                // we send other than bbox. By now grab all the features and apply the filter
+                // at runtime. This needs to be fixed/worked around asap though.
                 supportedFilter = Filter.INCLUDE;
                 unsupportedFilter = filter;
             }
@@ -674,7 +671,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         return reader;
     }
 
-    public SimpleFeatureType getQueryType(final Query query) throws IOException {
+    public SimpleFeatureType getQueryType( final Query query ) throws IOException {
         String typeName = query.getTypeName();
         final SimpleFeatureType featureType = getFeatureType(typeName);
         final CoordinateReferenceSystem coordinateSystemReproject = query
@@ -714,8 +711,8 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         return configuration;
     }
 
-    private InputStream sendGetFeatures(final Query query, final String typeName,
-            final Filter filter) throws IOException, MalformedURLException {
+    private InputStream sendGetFeatures( final Query query, final String typeName,
+            final Filter filter ) throws IOException, MalformedURLException {
         final InputStream responseStream;
 
         final FeatureTypeType typeInfo = getFeatureTypeInfo(typeName);
@@ -758,12 +755,9 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * 
      * @param typeName
      * @param propertyNames
-     * @param filter
-     *            the filter to apply to the request, shall not be
-     *            {@code Filter.EXCLUDE}
+     * @param filter the filter to apply to the request, shall not be {@code Filter.EXCLUDE}
      * @param crs
      * @param maxFeatures
      * @param sortBy
@@ -771,16 +765,16 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    private URL createGetFeatureGet(final String typeName, final List<String> propertyNames,
+    private URL createGetFeatureGet( final String typeName, final List<String> propertyNames,
             final Filter filter, final CoordinateReferenceSystem crs, final int maxFeatures,
-            final List<SortBy> sortBy, boolean hits) throws IOException {
+            final List<SortBy> sortBy, boolean hits ) throws IOException {
         final URL getFeatureGetUrl = getOperationURL(GET_FEATURE, GET);
         Map<String, String> kvpMap = new LinkedHashMap<String, String>();
         {
             String query = getFeatureGetUrl.getQuery();
             if (query != null) {
                 String[] split = query.split("&");
-                for (String kvp : split) {
+                for( String kvp : split ) {
                     String[] keyAndValue = kvp.split("=");
                     String key = keyAndValue[0];
                     if ("".equals(key)) {
@@ -820,13 +814,13 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
             // original types
             SimpleFeatureType featureType = getFeatureType(typeName);
             properties = new ArrayList<String>(featureType.getAttributeCount());
-            for (AttributeDescriptor att : featureType.getAttributeDescriptors()) {
+            for( AttributeDescriptor att : featureType.getAttributeDescriptors() ) {
                 properties.add(att.getLocalName());
             }
         }
         {
             StringBuffer sb = new StringBuffer();
-            for (Iterator<String> it = properties.iterator(); it.hasNext();) {
+            for( Iterator<String> it = properties.iterator(); it.hasNext(); ) {
                 sb.append(it.next());
                 if (it.hasNext()) {
                     sb.append(",");
@@ -846,7 +840,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
             if (filter instanceof Id) {
                 final Set<Identifier> identifiers = ((Id) filter).getIdentifiers();
                 StringBuffer idValues = new StringBuffer();
-                for (Iterator<Identifier> it = identifiers.iterator(); it.hasNext();) {
+                for( Iterator<Identifier> it = identifiers.iterator(); it.hasNext(); ) {
                     Object id = it.next().getID();
                     // REVISIT: should URL encode the id?
                     idValues.append(String.valueOf(id));
@@ -872,7 +866,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
             SortBy next;
             PropertyName propertyName;
             String sortOrder;
-            for (Iterator<SortBy> it = sortBy.iterator(); it.hasNext();) {
+            for( Iterator<SortBy> it = sortBy.iterator(); it.hasNext(); ) {
                 next = it.next();
                 propertyName = next.getPropertyName();
                 sortOrder = SortOrder.ASCENDING == next.getSortOrder() ? "A" : "D";
@@ -887,7 +881,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         }
 
         StringBuffer queryString = new StringBuffer();
-        for (Map.Entry<String, String> kvp : kvpMap.entrySet()) {
+        for( Map.Entry<String, String> kvp : kvpMap.entrySet() ) {
             queryString.append(kvp.getKey());
             queryString.append("=");
             queryString.append(kvp.getValue());
@@ -905,7 +899,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         return getFeatureRequest;
     }
 
-    public static String encodeGetFeatureGetFilter(final Filter filter) throws IOException {
+    public static String encodeGetFeatureGetFilter( final Filter filter ) throws IOException {
 
         OGCConfiguration filterConfig = new OGCConfiguration();
         Encoder encoder = new Encoder(filterConfig);
@@ -920,9 +914,8 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * Sends a POST request to {@code destination} whose content is the XML
-     * encoded representation of {@code object} and returns an input stream from
-     * which to get the server response.
+     * Sends a POST request to {@code destination} whose content is the XML encoded representation
+     * of {@code object} and returns an input stream from which to get the server response.
      * 
      * @param destination
      * @param object
@@ -930,7 +923,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
      * @return
      * @throws IOException
      */
-    private InputStream sendPost(final URL destination, final Object object, QName name)
+    private InputStream sendPost( final URL destination, final Object object, QName name )
             throws IOException {
         Encoder encoder = new Encoder(configuration);
         encoder.setNamespaceAware(true);
@@ -949,7 +942,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private GetFeatureType createGetFeature(QueryType wfsQuery, boolean hits) {
+    private GetFeatureType createGetFeature( QueryType wfsQuery, boolean hits ) {
         String outputFormat = null;
         String typeName = (String) wfsQuery.getTypeName().get(0);
 
@@ -963,35 +956,31 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         return request;
     }
 
-    private QueryType createWfsQuery(String typeName, Filter filter) {
+    private QueryType createWfsQuery( String typeName, Filter filter ) {
         return null;
     }
 
     /**
-     * Returns the feature type metadata object parsed from the capabilities
-     * document for the given {@code typeName}
+     * Returns the feature type metadata object parsed from the capabilities document for the given
+     * {@code typeName}
      * <p>
-     * NOTE: this method is package protected just to be also accessed by unit
-     * test.
+     * NOTE: this method is package protected just to be also accessed by unit test.
      * </p>
      * 
-     * @param typeName
-     *            the typeName as stated in the capabilities
-     *            {@code FeatureTypeList} to get the info for
-     * @return the WFS capabilities metadata {@link FeatureTypeType metadata}
-     *         for {@code typeName}
-     * @throws IllegalArgumentException
-     *             if {@code typeName} is not the name of a FeatureType stated
-     *             in the capabilities document.
+     * @param typeName the typeName as stated in the capabilities {@code FeatureTypeList} to get the
+     *        info for
+     * @return the WFS capabilities metadata {@link FeatureTypeType metadata} for {@code typeName}
+     * @throws IllegalArgumentException if {@code typeName} is not the name of a FeatureType stated
+     *         in the capabilities document.
      */
-    FeatureTypeType getFeatureTypeInfo(final String typeName) {
+    FeatureTypeType getFeatureTypeInfo( final String typeName ) {
         if (!typeInfos.containsKey(typeName)) {
             throw new IllegalArgumentException("Type name not found: " + typeName);
         }
         return typeInfos.get(typeName);
     }
 
-    public SimpleFeatureType getFeatureType(final String typeName) throws IOException {
+    public SimpleFeatureType getFeatureType( final String typeName ) throws IOException {
         if (featureTypeCache.containsKey(typeName)) {
             return featureTypeCache.get(typeName);
         }
@@ -1004,14 +993,12 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     }
 
     /**
-     * Sets whether to use {@link XmlSimpleFeatureParser} or
-     * {@link StreamingParserFeatureReader}
+     * Sets whether to use {@link XmlSimpleFeatureParser} or {@link StreamingParserFeatureReader}
      * 
-     * @param usePullParser
-     *            if {@code true}, {@code XmlSimpleFeatureParser} will be used
-     *            to parse GetFeature responses.
+     * @param usePullParser if {@code true}, {@code XmlSimpleFeatureParser} will be used to parse
+     *        GetFeature responses.
      */
-    public void setUsePullParser(boolean usePullParser) {
+    public void setUsePullParser( boolean usePullParser ) {
         this.usePullParser = usePullParser;
     }
 

@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.wfs.GetFeatureParser;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.gml3.GML;
 import org.geotools.referencing.CRS;
@@ -58,7 +59,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * GetFeature response.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: XmlSimpleFeatureParser.java 30985 2008-07-09 22:01:37Z groldan $
+ * @version $Id: XmlSimpleFeatureParser.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/XmlSimpleFeatureParser.java $

@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
@@ -29,7 +27,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
-import org.geotools.feature.NameImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -44,7 +41,7 @@ import org.opengis.filter.Filter;
  * </p>
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: WFSFeatureSource.java 31686 2008-10-21 15:13:28Z groldan $
+ * @version $Id: WFSFeatureSource.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0
@@ -55,26 +52,22 @@ public class WFSFeatureSource implements FeatureSource<SimpleFeatureType, Simple
 
     private String typeName;
 
-    private WFS110ProtocolHandler protocolHandler;
-
     private WFS_1_1_0_DataStore dataStore;
 
     private SimpleFeatureType featureType;
 
     private QueryCapabilities queryCapabilities;
 
-    public WFSFeatureSource( final WFS_1_1_0_DataStore dataStore, final String typeName,
-            final WFS110ProtocolHandler protocolHandler ) throws IOException {
+    public WFSFeatureSource( final WFS_1_1_0_DataStore dataStore, final String typeName )
+            throws IOException {
         this.typeName = typeName;
         this.dataStore = dataStore;
-        this.protocolHandler = protocolHandler;
         this.queryCapabilities = new QueryCapabilities();
         this.featureType = dataStore.getSchema(typeName);
     }
 
     public Name getName() {
-        QName name = protocolHandler.getFeatureTypeInfo(typeName).getName();
-        return new NameImpl(name.getNamespaceURI(), name.getLocalPart());
+        return featureType.getName();
     }
 
     /**
@@ -97,7 +90,7 @@ public class WFSFeatureSource implements FeatureSource<SimpleFeatureType, Simple
      * @return
      */
     public ResourceInfo getInfo() {
-        return new CapabilitiesResourceInfo(typeName, protocolHandler);
+        return new CapabilitiesResourceInfo(typeName, dataStore);
     }
 
     /**
@@ -125,7 +118,8 @@ public class WFSFeatureSource implements FeatureSource<SimpleFeatureType, Simple
      */
     public ReferencedEnvelope getBounds( Query query ) throws IOException {
         Query namedQuery = namedQuery(typeName, query);
-        return protocolHandler.getBounds(namedQuery);
+        ReferencedEnvelope bounds = dataStore.getBounds(namedQuery);
+        return bounds;
     }
 
     /**
@@ -133,7 +127,8 @@ public class WFSFeatureSource implements FeatureSource<SimpleFeatureType, Simple
      */
     public int getCount( Query query ) throws IOException {
         Query namedQuery = namedQuery(typeName, query);
-        return protocolHandler.getCount(namedQuery);
+        int count = dataStore.getCount(namedQuery);
+        return count;
     }
 
     /**
@@ -155,7 +150,7 @@ public class WFSFeatureSource implements FeatureSource<SimpleFeatureType, Simple
      */
     public WFSFeatureCollection getFeatures( final Query query ) throws IOException {
         Query namedQuery = namedQuery(typeName, query);
-        return new WFSFeatureCollection(protocolHandler, namedQuery);
+        return new WFSFeatureCollection(dataStore, namedQuery);
     }
 
     /**

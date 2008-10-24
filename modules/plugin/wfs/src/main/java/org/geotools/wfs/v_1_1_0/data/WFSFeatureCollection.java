@@ -36,14 +36,15 @@ import org.opengis.feature.type.Name;
 import org.opengis.geometry.BoundingBox;
 
 /**
- * A {@link FeatureCollection} whose iterators are based on the FeatureReaders
- * returned by a {@link WFS110ProtocolHandler}.
+ * A {@link FeatureCollection} whose iterators are based on the FeatureReaders returned by a
+ * {@link WFS110ProtocolHandler}.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: WFSFeatureCollection.java 30986 2008-07-09 22:08:46Z groldan $
+ * @version $Id: WFSFeatureCollection.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL:
- *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/XmlSimpleFeatureParser.java $
+ *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0
+ *         /data/XmlSimpleFeatureParser.java $
  */
 
 class WFSFeatureCollection extends DataFeatureCollection {
@@ -52,13 +53,12 @@ class WFSFeatureCollection extends DataFeatureCollection {
 
     private Query query;
 
-    private WFS110ProtocolHandler protocolHandler;
+    private WFS_1_1_0_DataStore dataStore;
 
     private SimpleFeatureType contentType;
 
     /**
-     * Cached size so multiple calls to {@link #getCount()} does not require
-     * multiple server calls
+     * Cached size so multiple calls to {@link #getCount()} does not require multiple server calls
      */
     private int cachedSize = -1;
 
@@ -68,17 +68,14 @@ class WFSFeatureCollection extends DataFeatureCollection {
     private ReferencedEnvelope cachedBounds = null;
 
     /**
-     * 
-     * @param protocolHandler
-     * @param query
-     *            properly named query
+     * @param dataStore
+     * @param query properly named query
      * @throws IOException
      */
-    public WFSFeatureCollection(WFS110ProtocolHandler protocolHandler, Query query)
-            throws IOException {
-        this.contentType = protocolHandler.getQueryType(query);
-        this.protocolHandler = protocolHandler;
+    public WFSFeatureCollection( WFS_1_1_0_DataStore dataStore, Query query ) throws IOException {
+        this.dataStore = dataStore;
         this.query = query;
+        this.contentType = dataStore.getQueryType(query);
     }
 
     @Override
@@ -87,12 +84,11 @@ class WFSFeatureCollection extends DataFeatureCollection {
     }
 
     /**
-     * Calculates and returns the aggregated bounds of the collection contents,
-     * potentially doing a full scan.
+     * Calculates and returns the aggregated bounds of the collection contents, potentially doing a
+     * full scan.
      * <p>
-     * As a bonuns, if a full scan needs to be done updates the cached
-     * collection size so a future call to {@link #getCount()} does not require
-     * an extra server call.
+     * As a bonuns, if a full scan needs to be done updates the cached collection size so a future
+     * call to {@link #getCount()} does not require an extra server call.
      * </p>
      */
     @Override
@@ -103,21 +99,21 @@ class WFSFeatureCollection extends DataFeatureCollection {
 
         ReferencedEnvelope bounds = null;
         try {
-            bounds = protocolHandler.getBounds(query);
+            bounds = dataStore.getBounds(query);
             if (bounds == null) {
                 // bad luck, do a full scan
                 final Name defaultgeom = contentType.getGeometryDescriptor().getName();
                 final DefaultQuery geomQuery = new DefaultQuery(this.query);
-                geomQuery.setPropertyNames(new String[] { defaultgeom.getLocalPart() });
+                geomQuery.setPropertyNames(new String[]{defaultgeom.getLocalPart()});
 
                 FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-                reader = protocolHandler.getFeatureReader(geomQuery, Transaction.AUTO_COMMIT);
+                reader = dataStore.getFeatureReader(geomQuery, Transaction.AUTO_COMMIT);
                 bounds = new ReferencedEnvelope(contentType.getCoordinateReferenceSystem());
                 try {
                     BoundingBox featureBounds;
                     // collect size to alleviate #getCount if needed
                     int collectionSize = 0;
-                    while (reader.hasNext()) {
+                    while( reader.hasNext() ) {
                         featureBounds = reader.next().getBounds();
                         bounds.expandToInclude(featureBounds.getMinX(), featureBounds.getMinY());
                         bounds.expandToInclude(featureBounds.getMaxX(), featureBounds.getMaxY());
@@ -140,9 +136,9 @@ class WFSFeatureCollection extends DataFeatureCollection {
     /**
      * Calculates the feature collection size, doing a full scan if needed.
      * <p>
-     * <b>WARN</b>: this method could be very inefficient if the size cannot be
-     * efficiently calculated. That is, it is not cached and
-     * {@link WFS110ProtocolHandler#getCount(Query)} returns {@code -1}.
+     * <b>WARN</b>: this method could be very inefficient if the size cannot be efficiently
+     * calculated. That is, it is not cached and {@link WFS110ProtocolHandler#getCount(Query)}
+     * returns {@code -1}.
      * </p>
      * 
      * @return the FeatureCollection<SimpleFeatureType, SimpleFeature> size.
@@ -154,7 +150,7 @@ class WFSFeatureCollection extends DataFeatureCollection {
         if (cachedSize != -1) {
             return cachedSize;
         }
-        cachedSize = protocolHandler.getCount(query);
+        cachedSize = dataStore.getCount(query);
         if (cachedSize == -1) {
             // no luck, cache both bounds and count with a full scan
             getBounds();
@@ -166,7 +162,7 @@ class WFSFeatureCollection extends DataFeatureCollection {
     @Override
     protected Iterator<SimpleFeature> openIterator() throws IOException {
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-        reader = protocolHandler.getFeatureReader(query, Transaction.AUTO_COMMIT);
+        reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
         return new FeatureReaderIterator<SimpleFeature>(reader);
     }
 }

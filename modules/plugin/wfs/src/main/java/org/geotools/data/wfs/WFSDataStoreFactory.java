@@ -16,8 +16,8 @@
  */
 package org.geotools.data.wfs;
 
-import static org.geotools.wfs.protocol.HttpMethod.GET;
-import static org.geotools.wfs.protocol.HttpMethod.POST;
+import static org.geotools.data.wfs.HttpMethod.GET;
+import static org.geotools.data.wfs.HttpMethod.POST;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,12 +44,10 @@ import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.protocol.ConnectionFactory;
 import org.geotools.wfs.protocol.DefaultConnectionFactory;
-import org.geotools.wfs.protocol.HttpMethod;
-import org.geotools.wfs.protocol.Version;
 import org.geotools.wfs.v_1_0_0.data.WFS100ProtocolHandler;
 import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
-import org.geotools.wfs.v_1_1_0.data.WFS110ProtocolHandler;
 import org.geotools.wfs.v_1_1_0.data.WFS_1_1_0_DataStore;
+import org.geotools.wfs.v_1_1_0.data.WFS_1_1_0_Protocol;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -73,7 +71,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 30983 2008-07-09 22:00:30Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31720 2008-10-24 22:57:22Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
@@ -354,17 +352,17 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             }
         } else {
             InputStream capsIn = new ByteArrayInputStream(wfsCapabilitiesRawData);
-            final WFS110ProtocolHandler protocolHandler = new WFS110ProtocolHandler(capsIn,
-                    connectionFac, maxFeatures);
+            HTTPProtocol http = new DefaultHTTPProtocol();
+            WFSProtocol wfs = new WFS_1_1_0_Protocol(capsIn, http);
 
             // ///////////////////////////////////
             // this is a meanwhile hack to test the StreamingParser vs pull parser approaches //
             Object pullParserParam = params.get("USE_PULL_PARSER");
             Boolean usePullParser = pullParserParam == null? Boolean.TRUE : Boolean.valueOf(pullParserParam.toString());
-            protocolHandler.setUsePullParser(usePullParser.booleanValue());
+            //protocolHandler.setUsePullParser(usePullParser.booleanValue());
             // ///////////////////////////////////
 
-            dataStore = new WFS_1_1_0_DataStore(protocolHandler);
+            dataStore = new WFS_1_1_0_DataStore(wfs);
         }
 
         perParameterSetDataStoreCache.put(new HashMap(params), dataStore);

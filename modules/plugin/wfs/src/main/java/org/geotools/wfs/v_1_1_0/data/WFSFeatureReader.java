@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
+import org.geotools.data.wfs.GetFeatureParser;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
@@ -30,7 +31,7 @@ import org.opengis.feature.type.FeatureType;
  * the WFS module.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: WFSFeatureReader.java 30666 2008-06-12 23:11:43Z acuster $
+ * @version $Id: WFSFeatureReader.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/WFSFeatureReader.java $
  * @see WFS110ProtocolHandler#getFeatureReader(org.geotools.data.Query,

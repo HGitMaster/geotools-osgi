@@ -22,12 +22,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 
+import org.geotools.data.wfs.HttpMethod;
+
 /**
  * Interface to abstract out the plain connection and stream set up against the
  * target WFS
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: ConnectionFactory.java 30666 2008-06-12 23:11:43Z acuster $
+ * @version $Id: ConnectionFactory.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/protocol/ConnectionFactory.java $
  */

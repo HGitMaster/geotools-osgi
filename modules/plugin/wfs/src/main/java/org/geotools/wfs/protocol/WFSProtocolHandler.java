@@ -16,8 +16,8 @@
  */
 package org.geotools.wfs.protocol;
 
-import static org.geotools.wfs.protocol.HttpMethod.GET;
-import static org.geotools.wfs.protocol.WFSOperationType.DESCRIBE_FEATURETYPE;
+import static org.geotools.data.wfs.HttpMethod.GET;
+import static org.geotools.data.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -25,6 +25,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import org.geotools.data.wfs.HttpMethod;
+import org.geotools.data.wfs.Version;
+import org.geotools.data.wfs.WFSOperationType;
 import org.geotools.util.logging.Logging;
 
 /**
@@ -32,7 +35,7 @@ import org.geotools.util.logging.Logging;
  * taking care of GZIP and authentication.
  * 
  * @author Gabriel Roldan
- * @version $Id: WFSProtocolHandler.java 30666 2008-06-12 23:11:43Z acuster $
+ * @version $Id: WFSProtocolHandler.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/io/WFSConnectionFactory.java $

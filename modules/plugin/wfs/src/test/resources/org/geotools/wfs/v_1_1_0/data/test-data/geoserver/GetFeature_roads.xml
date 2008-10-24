@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wfs:FeatureCollection numberOfFeatures="1"
 	timeStamp="2008-07-06T12:50:28.801+02:00"
-	xsi:schemaLocation="http://www.openplans.org/spearfish DescribeFeatureType_roads.xsd http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
+	xsi:schemaLocation="http://www.openplans.org/spearfish DescribeFeatureType_roads.xsd http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
 	xmlns:ogc="http://www.opengis.net/ogc"
 	xmlns:tiger="http://www.census.gov"
 	xmlns:wfs="http://www.opengis.net/wfs"

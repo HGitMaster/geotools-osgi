@@ -27,10 +27,15 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ResourceInfo;
+import org.geotools.data.wfs.DefaultHTTPProtocol;
+import org.geotools.data.wfs.HTTPProtocol;
+import org.geotools.data.wfs.WFSProtocol;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.test.TestData;
 import org.geotools.wfs.protocol.ConnectionFactory;
 import org.geotools.wfs.protocol.DefaultConnectionFactory;
+import org.junit.Before;
+import org.junit.experimental.theories.suppliers.TestedOn;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -39,12 +44,13 @@ import org.opengis.filter.Filter;
 
 /**
  * @author Gabriel Roldan
- * @version $Id: WFSFeatureSourceTest.java 30922 2008-07-05 19:58:35Z groldan $
+ * @version $Id: WFSFeatureSourceTest.java.txt 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/WFSFeatureSourceTest.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools
+ *         /wfs/v_1_1_0/data/WFSFeatureSourceTest.java $
  */
-public class WFSFeatureSourceTest extends DataTestSupport {
+public class WFSFeatureSourceTest {
 
     private WFS_1_1_0_DataStore geosStore;
 
@@ -54,27 +60,25 @@ public class WFSFeatureSourceTest extends DataTestSupport {
 
     private WFSFeatureSource govUnitsSource;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         protocolHandler = createTestProtocolHandler(GEOS_STATES.CAPABILITIES);
         geosStore = new WFS_1_1_0_DataStore(protocolHandler);
         statesSource = geosStore.getFeatureSource(GEOS_STATES.FEATURETYPENAME);
 
-        WFS110ProtocolHandler cubewerxProtocolHandler = createTestProtocolHandler(CUBEWERX_GOVUNITCE.CAPABILITIES);
+        WFSProtocol cubewerxProtocolHandler = createTestProtocolHandler(CUBEWERX_GOVUNITCE.CAPABILITIES);
         cubewerxStore = new WFS_1_1_0_DataStore(cubewerxProtocolHandler);
         govUnitsSource = cubewerxStore.getFeatureSource(CUBEWERX_GOVUNITCE.FEATURETYPENAME);
     }
 
-    private WFS110ProtocolHandler createTestProtocolHandler(final String capabilitiesFileName)
+    private WFSProtocol createTestProtocolHandler( final String capabilitiesFileName )
             throws IOException {
         InputStream stream = TestData.openStream(this, capabilitiesFileName);
-        ConnectionFactory cf = new DefaultConnectionFactory();
+        HTTPProtocol http = new DefaultHTTPProtocol();
 
-        WFS110ProtocolHandler protocolHandler = new WFS110ProtocolHandler(stream, cf, Integer
-                .valueOf(0)) {
+        WFSProtocol protocolHandler = new WFS_1_1_0_Protocol(stream, http){
             @Override
-            public URL getDescribeFeatureTypeURLGet(final String typeName)
-                    throws MalformedURLException {
+            public URL getDescribeFeatureTypeURLGet( final String typeName ) {
                 String schemaLocation;
                 if (GEOS_STATES.FEATURETYPENAME.equals(typeName)) {
                     schemaLocation = GEOS_STATES.SCHEMA;
@@ -99,7 +103,7 @@ public class WFSFeatureSourceTest extends DataTestSupport {
 
     public void testCreate() throws IOException {
         try {
-            new WFSFeatureSource(geosStore, "nonExistentTypeName", protocolHandler);
+            new WFSFeatureSource(geosStore, "nonExistentTypeName");
             fail("Expected IOException for a non existent type name");
         } catch (IllegalArgumentException e) {
             assertTrue(true);
@@ -126,16 +130,14 @@ public class WFSFeatureSourceTest extends DataTestSupport {
     }
 
     /**
-     * Test method for
-     * {@link WFSFeatureSource#getBounds(org.geotools.data.Query)}.
+     * Test method for {@link WFSFeatureSource#getBounds(org.geotools.data.Query)}.
      */
     public void testGetBoundsQuery() {
         fail("Not yet implemented");
     }
 
     /**
-     * Test method for
-     * {@link WFSFeatureSource#getCount(org.geotools.data.Query)}.
+     * Test method for {@link WFSFeatureSource#getCount(org.geotools.data.Query)}.
      */
     public void testGetCount() {
         fail("Not yet implemented");
@@ -154,7 +156,7 @@ public class WFSFeatureSourceTest extends DataTestSupport {
         assertTrue(iterator.hasNext());
         try {
             Feature feature;
-            while (iterator.hasNext()) {
+            while( iterator.hasNext() ) {
                 feature = iterator.next();
                 assertNotNull(feature);
             }
@@ -164,24 +166,24 @@ public class WFSFeatureSourceTest extends DataTestSupport {
     }
 
     /**
-     * Test method for
-     * {@link WFSFeatureSource#getFeatures(org.geotools.data.Query)}.
+     * Test method for {@link WFSFeatureSource#getFeatures(org.geotools.data.Query)}.
      * 
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
     public void testGetFeaturesQueryProperties() throws IOException {
-        String[] properties = { "the_geom" };
+        String[] properties = {"the_geom"};
         testGetFeaturesQueryProperties(statesSource, GEOS_STATES.FEATURETYPENAME, properties);
 
-        properties = new String[] { "geometry" };
+        properties = new String[]{"geometry"};
         testGetFeaturesQueryProperties(govUnitsSource, CUBEWERX_GOVUNITCE.FEATURETYPENAME,
                 properties);
     }
 
     @SuppressWarnings("unchecked")
-    private void testGetFeaturesQueryProperties(final FeatureSource<SimpleFeatureType, SimpleFeature> source, final String typeName,
-            final String[] propertyNames) throws IOException {
+    private void testGetFeaturesQueryProperties(
+            final FeatureSource<SimpleFeatureType, SimpleFeature> source, final String typeName,
+            final String[] propertyNames ) throws IOException {
 
         Query query = new DefaultQuery(typeName, Filter.INCLUDE, propertyNames);
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = source.getFeatures(query);
@@ -196,7 +198,7 @@ public class WFSFeatureSourceTest extends DataTestSupport {
         assertTrue(iterator.hasNext());
         try {
             Feature feature;
-            while (iterator.hasNext()) {
+            while( iterator.hasNext() ) {
                 feature = iterator.next();
                 assertNotNull(feature);
                 assertEquals(expectedPropertyCount, feature.getProperties().size());

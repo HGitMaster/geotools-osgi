@@ -16,7 +16,7 @@
  */
 package org.geotools.wfs.v_1_0_0.data;
 
-import static org.geotools.wfs.protocol.HttpMethod.GET;
+import static org.geotools.data.wfs.HttpMethod.GET;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,11 +28,11 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.data.wfs.HttpMethod;
+import org.geotools.data.wfs.Version;
+import org.geotools.data.wfs.WFSOperationType;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.protocol.ConnectionFactory;
-import org.geotools.wfs.protocol.HttpMethod;
-import org.geotools.wfs.protocol.Version;
-import org.geotools.wfs.protocol.WFSOperationType;
 import org.geotools.wfs.protocol.WFSProtocolHandler;
 import org.geotools.xml.DocumentFactory;
 import org.xml.sax.SAXException;

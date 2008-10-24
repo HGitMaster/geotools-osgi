@@ -14,10 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.wfs.v_1_1_0.data;
+package org.geotools.data.wfs;
 
 import java.io.IOException;
 
+import org.geotools.wfs.v_1_0_0.data.WFSFeatureReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -25,12 +26,12 @@ import org.opengis.feature.simple.SimpleFeature;
  * request from the underlying xml parsing technology in use.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: GetFeatureParser.java 30666 2008-06-12 23:11:43Z acuster $
+ * @version $Id: GetFeatureParser.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/GetFeatureParser.java $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/GetFeatureParser.java $
  * @see WFSFeatureReader
  */
-interface GetFeatureParser {
+public interface GetFeatureParser extends WFSResponseParser{
 
     /**
      * @return the next feature in the stream or {@code null} if there are no

@@ -23,6 +23,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.data.wfs.GetFeatureParser;
 import org.geotools.test.TestData;
 import org.geotools.wfs.WFSConfiguration;
 import org.geotools.xml.Configuration;
@@ -32,7 +33,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Test suite for the {@link StreamingParserFeatureReader} strategy.
  * 
  * @author Gabriel Roldan
- * @version $Id: StreamingParserFeatureReaderTest.java 31686 2008-10-21 15:13:28Z groldan $
+ * @version $Id: StreamingParserFeatureReaderTest.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools

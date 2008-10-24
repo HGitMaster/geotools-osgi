@@ -16,10 +16,10 @@
  */
 package org.geotools.wfs.v_1_1_0.data;
 
-import static org.geotools.wfs.protocol.HttpMethod.GET;
-import static org.geotools.wfs.protocol.HttpMethod.POST;
-import static org.geotools.wfs.protocol.WFSOperationType.DESCRIBE_FEATURETYPE;
-import static org.geotools.wfs.protocol.WFSOperationType.GET_CAPABILITIES;
+import static org.geotools.data.wfs.HttpMethod.GET;
+import static org.geotools.data.wfs.HttpMethod.POST;
+import static org.geotools.data.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
+import static org.geotools.data.wfs.WFSOperationType.GET_CAPABILITIES;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,13 +38,13 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
+import org.geotools.data.wfs.HttpMethod;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.test.TestData;
 import org.geotools.wfs.protocol.ConnectionFactory;
 import org.geotools.wfs.protocol.DefaultConnectionFactory;
-import org.geotools.wfs.protocol.HttpMethod;
 import org.geotools.xml.Configuration;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
@@ -115,7 +115,7 @@ public class WFS110ProtocolHandlerTest extends DataTestSupport {
 
     /**
      * Test method for
-     * {@link WFS110ProtocolHandler#supports(org.geotools.wfs.protocol.WFSOperationType, org.geotools.wfs.protocol.HttpMethod)}.
+     * {@link WFS110ProtocolHandler#supports(org.geotools.data.wfs.WFSOperationType, org.geotools.data.wfs.HttpMethod)}.
      * 
      * @throws IOException
      */
@@ -128,7 +128,7 @@ public class WFS110ProtocolHandlerTest extends DataTestSupport {
 
     /**
      * Test method for
-     * {@link WFS110ProtocolHandler#getOperationURL(org.geotools.wfs.protocol.WFSOperationType, org.geotools.wfs.protocol.HttpMethod)}.
+     * {@link WFS110ProtocolHandler#getOperationURL(org.geotools.data.wfs.WFSOperationType, org.geotools.data.wfs.HttpMethod)}.
      */
     public void testGetOperationURL() throws IOException {
         createProtocolHandler(DataTestSupport.GEOS_ARCHSITES.CAPABILITIES);

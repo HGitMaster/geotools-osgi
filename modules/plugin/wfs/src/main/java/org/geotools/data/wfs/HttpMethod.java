@@ -14,16 +14,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.wfs.protocol;
+package org.geotools.data.wfs;
 
 /**
  * Enumeration to specify the preferred HTTP method a WFS datastore to use then
  * accessing WFS operations.
  * 
  * @author Gabriel Roldan
- * @version $Id: HttpMethod.java 30666 2008-06-12 23:11:43Z acuster $
+ * @version $Id: HttpMethod.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/protocol/HttpMethod.java $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/HttpMethod.java $
  */
 public enum HttpMethod {
     GET, POST;

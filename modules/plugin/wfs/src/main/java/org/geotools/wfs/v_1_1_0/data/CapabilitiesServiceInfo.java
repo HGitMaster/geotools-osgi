@@ -16,9 +16,9 @@
  */
 package org.geotools.wfs.v_1_1_0.data;
 
-import static org.geotools.wfs.protocol.HttpMethod.GET;
-import static org.geotools.wfs.protocol.HttpMethod.POST;
-import static org.geotools.wfs.protocol.WFSOperationType.GET_CAPABILITIES;
+import static org.geotools.data.wfs.HttpMethod.GET;
+import static org.geotools.data.wfs.HttpMethod.POST;
+import static org.geotools.data.wfs.WFSOperationType.GET_CAPABILITIES;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,10 +37,11 @@ import org.geotools.util.logging.Logging;
  * Adapts a WFS capabilities document to {@link ServiceInfo}
  * 
  * @author Gabriel Roldan
- * @version $Id: CapabilitiesServiceInfo.java 30666 2008-06-12 23:11:43Z acuster $
+ * @version $Id: CapabilitiesServiceInfo.java 31720 2008-10-24 22:57:22Z groldan $
  * @since 2.5.x
  * @source $URL:
- *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/CapabilitiesServiceInfo.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
+ *         /wfs/v_1_1_0/data/CapabilitiesServiceInfo.java $
  */
 final class CapabilitiesServiceInfo implements WFSServiceInfo {
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
@@ -54,10 +55,10 @@ final class CapabilitiesServiceInfo implements WFSServiceInfo {
         }
     }
 
-    private WFS110ProtocolHandler protocolHandler;
+    private WFS_1_1_0_DataStore wfs;
 
-    public CapabilitiesServiceInfo(WFS110ProtocolHandler protocolHandler) {
-        this.protocolHandler = protocolHandler;
+    public CapabilitiesServiceInfo( WFS_1_1_0_DataStore service ) {
+        this.wfs = service;
     }
 
     /**
@@ -66,7 +67,7 @@ final class CapabilitiesServiceInfo implements WFSServiceInfo {
      * @see ServiceInfo#getDescription()
      */
     public String getDescription() {
-        return protocolHandler.getServiceAbstract();
+        return wfs.getServiceAbstract();
     }
 
     /**
@@ -83,14 +84,14 @@ final class CapabilitiesServiceInfo implements WFSServiceInfo {
      * @see ServiceInfo#getDescription()
      */
     public Set<String> getKeywords() {
-        return protocolHandler.getKeywords();
+        return wfs.getServiceKeywords();
     }
 
     /**
      * @see ServiceInfo#getPublisher()
      */
     public URI getPublisher() {
-        return protocolHandler.getServiceProviderUri();
+        return wfs.getServiceProviderUri();
     }
 
     /**
@@ -109,10 +110,10 @@ final class CapabilitiesServiceInfo implements WFSServiceInfo {
      */
     public URI getSource() {
         URL url;
-        if (protocolHandler.supports(GET_CAPABILITIES, GET)) {
-            url = protocolHandler.getOperationURL(GET_CAPABILITIES, GET);
+        if (wfs.supportsOperation(GET_CAPABILITIES, GET)) {
+            url = wfs.getOperationURL(GET_CAPABILITIES, GET);
         } else {
-            url = protocolHandler.getOperationURL(GET_CAPABILITIES, POST);
+            url = wfs.getOperationURL(GET_CAPABILITIES, POST);
         }
         try {
             return url.toURI();
@@ -126,13 +127,13 @@ final class CapabilitiesServiceInfo implements WFSServiceInfo {
      * @see ServiceInfo#getTitle()
      */
     public String getTitle() {
-        return protocolHandler.getServiceTitle();
+        return wfs.getServiceTitle();
     }
 
     /**
      * @see WFSServiceInfo#getVersion()
      */
     public String getVersion() {
-        return "1.1.0";
+        return wfs.getServiceVersion();
     }
 }

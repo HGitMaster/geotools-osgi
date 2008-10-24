@@ -16,19 +16,22 @@
  */
 package org.geotools.wfs.v_1_1_0.data;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringBufferInputStream;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.TestCase;
-
+import org.geotools.data.wfs.DefaultHTTPProtocol;
+import org.geotools.data.wfs.HTTPProtocol;
+import org.geotools.data.wfs.HTTPResponse;
+import org.geotools.data.wfs.WFSProtocol;
 import org.geotools.test.TestData;
-import org.geotools.wfs.protocol.ConnectionFactory;
-import org.geotools.wfs.protocol.DefaultConnectionFactory;
 
-public abstract class DataTestSupport extends TestCase {
+public final class DataTestSupport {
 
     /**
      * A class holding the type name and test data location for a feature type
@@ -40,8 +43,7 @@ public abstract class DataTestSupport extends TestCase {
         final String CAPABILITIES;
 
         /**
-         * Location of a test DescribeFeatureType response for the given feature
-         * type
+         * Location of a test DescribeFeatureType response for the given feature type
          */
         final String SCHEMA;
 
@@ -66,10 +68,9 @@ public abstract class DataTestSupport extends TestCase {
         final String DATA;
 
         /**
-         * 
          * @param folder
-         *            the folder name under {@code test-data} where the test
-         *            files for this feature type are stored
+         *            the folder name under {@code test-data} where the test files for this feature
+         *            type are stored
          * @param qName
          *            the qualified type name (ns + local name)
          * @param featureTypeName
@@ -109,13 +110,17 @@ public abstract class DataTestSupport extends TestCase {
 
     public static final TestDataType GEOS_ROADS = new TestDataType("geoserver", new QName(
             "http://www.openplans.org/spearfish", "roads"), "sf:roads", "EPSG:26713");
-    
+
     public static final TestDataType GEOS_STATES = new TestDataType("geoserver", new QName(
             "http://www.openplans.org/topp", "states"), "topp:states", "EPSG:4326");
 
-    public static final TestDataType GEOS_TASMANIA_CITIES = new TestDataType("geoserver", new QName(
-            "http://www.openplans.org/topp", "tasmania_cities"), "topp:tasmania_cities", "EPSG:4326");
-    
+    public static final TestDataType GEOS_TASMANIA_CITIES = new TestDataType("geoserver",
+            new QName("http://www.openplans.org/topp", "tasmania_cities"), "topp:tasmania_cities",
+            "EPSG:4326");
+
+    public static final TestDataType GEOS_TIGER_ROADS = new TestDataType("geoserver", new QName(
+            "http://www.census.gov", "tiger_roads"), "tiger:tiger_roads", "EPSG:4326");
+
     public static final TestDataType CUBEWERX_GOVUNITCE = new TestDataType("CubeWerx_nsdi",
             new QName("http://www.fgdc.gov/framework/073004/gubs", "GovernmentalUnitCE"),
             "gubs:GovernmentalUnitCE", "EPSG:4269");
@@ -124,52 +129,85 @@ public abstract class DataTestSupport extends TestCase {
             new QName("http://www.fgdc.gov/framework/073004/transportation", "RoadSeg"),
             "trans:RoadSeg", "EPSG:4269");
 
-    protected WFS110ProtocolHandler protocolHandler;
-
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        protocolHandler = null;
-    }
+    public static WFSProtocol protocolHandler;
 
     /**
-     * Creates the test {@link #protocolHandler} with a default connection
-     * factory that parses the capabilities object from the test xml file
-     * pointed out by {@code capabilitiesFileName}
+     * Creates the test {@link #protocolHandler} with a default connection factory that parses the
+     * capabilities object from the test xml file pointed out by {@code capabilitiesFileName}
      * <p>
      * Tests methods call this one to set up a protocolHandler to test
      * </p>
      * 
      * @param capabilitiesFileName
-     *            the relative path under {@code test-data} for the file
-     *            containing the WFS_Capabilities document.
+     *            the relative path under {@code test-data} for the file containing the
+     *            WFS_Capabilities document.
      * @throws IOException
      */
-    protected void createProtocolHandler(String capabilitiesFileName) throws IOException {
-        ConnectionFactory connFac = new DefaultConnectionFactory();
-        createProtocolHandler(capabilitiesFileName, connFac);
+    public static void createProtocolHandler(String capabilitiesFileName) throws IOException {
+        HTTPProtocol http = new DefaultHTTPProtocol();
+        createProtocolHandler(capabilitiesFileName, http);
     }
 
     /**
-     * Creates the test {@link #protocolHandler} with the provided connection
-     * factory that parses the capabilities object from the test xml file
-     * pointed out by {@code capabilitiesFileName}
+     * Creates the test {@link #protocolHandler} with the provided connection factory that parses
+     * the capabilities object from the test xml file pointed out by {@code capabilitiesFileName}
      * <p>
      * Tests methods call this one to set up a protocolHandler to test
      * </p>
      * 
      * @param capabilitiesFileName
-     *            the relative path under {@code test-data} for the file
-     *            containing the WFS_Capabilities document.
+     *            the relative path under {@code test-data} for the file containing the
+     *            WFS_Capabilities document.
      * @throws IOException
      */
-    protected void createProtocolHandler(String capabilitiesFileName, ConnectionFactory connFac)
+    public static void createProtocolHandler(String capabilitiesFileName, HTTPProtocol http)
             throws IOException {
-        InputStream stream = TestData.openStream(this, capabilitiesFileName);
-        protocolHandler = new WFS110ProtocolHandler(stream, connFac, Integer.valueOf(0));
+        InputStream stream = TestData.openStream(DataTestSupport.class, capabilitiesFileName);
+        protocolHandler = new WFS_1_1_0_Protocol(stream, http);
+    }
+
+    public static class TestHttpResponse implements HTTPResponse {
+
+        private String contentType;
+
+        private String charset;
+
+        private String bodyContent;
+
+        public TestHttpResponse(String contentType, String charset, String bodyContent) {
+            this.contentType = contentType;
+            this.charset = charset;
+            this.bodyContent = bodyContent;
+        }
+
+        public TestHttpResponse(String contentType, String charset, InputStream contentInputStream) {
+            this.contentType = contentType;
+            this.charset = charset;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(contentInputStream));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            try {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                    sb.append('\n');
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            this.bodyContent = sb.toString();
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
+
+        public String getResponseCharset() {
+            return charset;
+        }
+
+        public InputStream getResponseStream() throws IOException {
+            return bodyContent == null ? null : new StringBufferInputStream(bodyContent);
+        }
     }
 
 }

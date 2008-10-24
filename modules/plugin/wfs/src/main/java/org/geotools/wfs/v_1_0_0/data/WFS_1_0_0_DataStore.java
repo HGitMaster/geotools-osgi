@@ -17,8 +17,8 @@
  */
 package org.geotools.wfs.v_1_0_0.data;
 
-import static org.geotools.wfs.protocol.HttpMethod.GET;
-import static org.geotools.wfs.protocol.HttpMethod.POST;
+import static org.geotools.data.wfs.HttpMethod.GET;
+import static org.geotools.data.wfs.HttpMethod.POST;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -59,6 +59,7 @@ import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.data.wfs.HttpMethod;
 import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.WFSServiceInfo;
 import org.geotools.feature.SchemaException;
@@ -74,7 +75,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
-import org.geotools.wfs.protocol.HttpMethod;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.filter.FilterSchema;
