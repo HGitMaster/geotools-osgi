@@ -24,17 +24,21 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt-jdbc-ng</artifactId>
-  <packaging>pom</packaging>
-  <name>Next Generation JDBC DataStores</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/jdbc-ng/</url>
+  <artifactId>gt-jdbc-postgis</artifactId>
+  <packaging>jar</packaging>
+  <name>PostGIS DataStore</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/jdbc-ng/jdbc-postgis/</url>
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/
+      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/jdbc-postgis
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/</url>
+    <url>http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/jdbc-postgis</url>
   </scm>
+
+  <description>
+	DataStore for  Database.
+  </description>
 
   <licenses>
     <license>
@@ -61,11 +65,29 @@
     </developer>
   </developers>
 
-  <modules>
-    <module>jdbc-core</module>
-    <module>jdbc-h2</module>
-    <module>jdbc-mysql</module>
-    <module>jdbc-oracle</module>
-    <module>jdbc-postgis</module>
-  </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-jdbc-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-jdbc-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
 </project>
