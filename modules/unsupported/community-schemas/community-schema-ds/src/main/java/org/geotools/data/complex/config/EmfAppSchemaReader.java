@@ -91,7 +91,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: EmfAppSchemaReader.java 31607 2008-10-01 07:55:36Z bencd $
+ * @version $Id: EmfAppSchemaReader.java 31721 2008-10-27 08:18:47Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/EmfAppSchemaReader.java $
  * @since 2.4
@@ -264,7 +264,7 @@ public class EmfAppSchemaReader {
         // parse some of the instance document to find out the
         // schema location
         if (getCatalog() != null) {
-            String resolvedLocation = getCatalog().resolveSystem(location.toExternalForm());
+            String resolvedLocation = getCatalog().resolveURI(location.toExternalForm());
             if (resolvedLocation != null) {
                 location = new URL(resolvedLocation);
             }

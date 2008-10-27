@@ -64,7 +64,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: BoreholeTest.java 31611 2008-10-02 08:16:20Z bencd $
+ * @version $Id: BoreholeTest.java 31721 2008-10-27 08:18:47Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
  * @since 2.4
@@ -278,81 +278,71 @@ public class BoreholeTest extends TestCase {
     }
 
     public void testDataStore() throws Exception {
-        try {
-            DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
-            FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
-                    .getFeatureSource(typeName);
+        DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
+        FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
+                .getFeatureSource(typeName);
 
-            // make a getFeatures request with a nested properties filter.
-            // note that the expected result count is set to 65 since that's the
-            // number
-            // of results I get from a sql select on min_time_d = 'carnian'
-            final int EXPECTED_RESULT_COUNT = 10;
+        // make a getFeatures request with a nested properties filter.
+        // note that the expected result count is set to 65 since that's the
+        // number
+        // of results I get from a sql select on min_time_d = 'carnian'
+        final int EXPECTED_RESULT_COUNT = 10;
 
-            FeatureCollection<FeatureType, Feature> features = (FeatureCollection<FeatureType, Feature>) fSource
-                    .getFeatures();
+        FeatureCollection<FeatureType, Feature> features = (FeatureCollection<FeatureType, Feature>) fSource
+                .getFeatures();
 
-            int resultCount = getCount(features);
-            String msg = "be sure difference in result count is not due to different dataset."
-                    + " Query used should be min_time_d = 'carnian'";
-            assertEquals(msg, EXPECTED_RESULT_COUNT, resultCount);
+        int resultCount = getCount(features);
+        String msg = "be sure difference in result count is not due to different dataset."
+                + " Query used should be min_time_d = 'carnian'";
+        assertEquals(msg, EXPECTED_RESULT_COUNT, resultCount);
 
-            Feature feature;
-            int count = 0;
-            Iterator it = features.iterator();
-            for (; it.hasNext();) {
-                feature = (Feature) it.next();
-                count++;
-            }
-            features.close(it);
-            assertEquals(EXPECTED_RESULT_COUNT, count);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+        Feature feature;
+        int count = 0;
+        Iterator it = features.iterator();
+        for (; it.hasNext();) {
+            feature = (Feature) it.next();
+            count++;
         }
+        features.close(it);
+        assertEquals(EXPECTED_RESULT_COUNT, count);
     }
 
     public void testQueryXlinkProperty() throws Exception {
-        try {
-            final DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
-            final FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
-                    .getFeatureSource(typeName);
-            final String queryProperty = "sa:shape/geo:LineByVector/geo:origin/@xlink:href";
-            final String queryLiteral = "#bh.176909.start";
+        final DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
+        final FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
+                .getFeatureSource(typeName);
+        final String queryProperty = "sa:shape/geo:LineByVector/geo:origin/@xlink:href";
+        final String queryLiteral = "#bh.176909.start";
 
-            NamespaceSupport namespaces = new NamespaceSupport();
-            namespaces.declarePrefix("sa", SANS);
-            namespaces.declarePrefix("geo", GEONS);
-            namespaces.declarePrefix("xlink", XLINK.NAMESPACE);
+        NamespaceSupport namespaces = new NamespaceSupport();
+        namespaces.declarePrefix("sa", SANS);
+        namespaces.declarePrefix("geo", GEONS);
+        namespaces.declarePrefix("xlink", XLINK.NAMESPACE);
 
-            final FilterFactory2 ff = new FilterFactoryImplNamespaceAware(namespaces);
-            final PropertyName propertyName = ff.property(queryProperty);
-            final Literal literal = ff.literal(queryLiteral);
+        final FilterFactory2 ff = new FilterFactoryImplNamespaceAware(namespaces);
+        final PropertyName propertyName = ff.property(queryProperty);
+        final Literal literal = ff.literal(queryLiteral);
 
-            final Filter filter = ff.equals(propertyName, literal);
+        final Filter filter = ff.equals(propertyName, literal);
 
-            FeatureCollection<FeatureType, Feature> features = (FeatureCollection<FeatureType, Feature>) fSource
-                    .getFeatures(filter);
+        FeatureCollection<FeatureType, Feature> features = (FeatureCollection<FeatureType, Feature>) fSource
+                .getFeatures(filter);
 
-            // did the query work?
-            int resultCount = getCount(features);
-            assertEquals(1, resultCount);
+        // did the query work?
+        int resultCount = getCount(features);
+        assertEquals(1, resultCount);
 
-            // the datastore performed the query by unmapping the client property
-            // to its corresponding source expression, as defined in the AttributeMapping
-            // clientProperties.
-            // Now the Filter is able to evaluate the property name?
+        // the datastore performed the query by unmapping the client property
+        // to its corresponding source expression, as defined in the AttributeMapping
+        // clientProperties.
+        // Now the Filter is able to evaluate the property name?
 
-            // TODO: not sure why AttributePropertyHandler is not catching up at expression
-            // evaluation
-            // Feature feature = (Feature)features.iterator().next();
-            // String obtainedValue = (String) propertyName.evaluate(feature);
-            // assertNotNull(obtainedValue);
-            // assertEquals(queryLiteral, obtainedValue);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        // TODO: not sure why AttributePropertyHandler is not catching up at expression
+        // evaluation
+        // Feature feature = (Feature)features.iterator().next();
+        // String obtainedValue = (String) propertyName.evaluate(feature);
+        // assertNotNull(obtainedValue);
+        // assertEquals(queryLiteral, obtainedValue);
     }
 
     /**
@@ -361,26 +351,21 @@ public class BoreholeTest extends TestCase {
      * @throws Exception
      */
     public void testTraverseDeep() throws Exception {
-        try {
-            final DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
-            final FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
-                    .getFeatureSource(typeName);
-            final String queryProperty = "sa:shape/geo:LineByVector/geo:origin/@xlink:href";
-            final String queryLiteral = "#bh.176909.start";
+        final DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
+        final FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
+                .getFeatureSource(typeName);
+        final String queryProperty = "sa:shape/geo:LineByVector/geo:origin/@xlink:href";
+        final String queryLiteral = "#bh.176909.start";
 
-            NamespaceSupport namespaces = new NamespaceSupport();
-            namespaces.declarePrefix("sa", SANS);
-            namespaces.declarePrefix("geo", GEONS);
-            namespaces.declarePrefix("xlink", XLINK.NAMESPACE);
+        NamespaceSupport namespaces = new NamespaceSupport();
+        namespaces.declarePrefix("sa", SANS);
+        namespaces.declarePrefix("geo", GEONS);
+        namespaces.declarePrefix("xlink", XLINK.NAMESPACE);
 
-            FeatureCollection<FeatureType, Feature> features = (FeatureCollection) fSource
-                    .getFeatures();
-            Feature f = (Feature) features.iterator().next();
-            traverse(f);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        FeatureCollection<FeatureType, Feature> features = (FeatureCollection) fSource
+                .getFeatures();
+        Feature f = (Feature) features.iterator().next();
+        traverse(f);
     }
 
     private void traverse(Attribute f) {

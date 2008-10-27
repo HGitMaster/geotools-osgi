@@ -147,7 +147,8 @@ public class AttributeBuilder {
                 Property property = (Property) itr.next();
                 if (property instanceof Attribute) {
                     Attribute att = (Attribute) property;
-                    add(att.getIdentifier().toString(), att.getValue(), att.getName());
+                    add(att.getIdentifier() == null ? null : att.getIdentifier().toString(), att
+                            .getValue(), att.getName());
                 } else if (property instanceof Association) {
                     Association assoc = (Association) property;
                     associate(assoc.getValue(), assoc.getName());
@@ -159,9 +160,9 @@ public class AttributeBuilder {
             Feature feature = (Feature) attribute;
 
             if (feature.getDefaultGeometryProperty() != null) {
-               crs = feature.getDefaultGeometryProperty().getType().getCoordinateReferenceSystem();
-               defaultGeometry = feature.getDefaultGeometryProperty().getValue();
-             }
+                crs = feature.getDefaultGeometryProperty().getType().getCoordinateReferenceSystem();
+                defaultGeometry = feature.getDefaultGeometryProperty().getValue();
+            }
         }
 
     }
@@ -552,12 +553,12 @@ public class AttributeBuilder {
                     descriptor, id) : attributeFactory.createFeature((Collection) value,
                     (FeatureType) type, id);
         } else if (type instanceof ComplexType) {
-            return descriptor != null ? attributeFactory.createComplexAttribute(
-                    (Collection) value, descriptor, id) : attributeFactory.createComplexAttribute(
-                    (Collection) value, (ComplexType) type, id);
+            return descriptor != null ? attributeFactory.createComplexAttribute((Collection) value,
+                    descriptor, id) : attributeFactory.createComplexAttribute((Collection) value,
+                    (ComplexType) type, id);
         } else if (type instanceof GeometryType) {
-            return attributeFactory.createGeometryAttribute(value,
-                    (GeometryDescriptor) descriptor, id, getCRS());
+            return attributeFactory.createGeometryAttribute(value, (GeometryDescriptor) descriptor,
+                    id, getCRS());
         } else {
             return attributeFactory.createAttribute(value, descriptor, id);
         }
@@ -595,12 +596,12 @@ public class AttributeBuilder {
         // // if geometry, set the crs
         // if (built instanceof GeometryAttribute) {
         // ((GeometryAttribute) built).getDescriptor().setCRS(getCRS());
-        //        }
+        // }
 
         // if feature, set crs and default geometry
         if (built instanceof Feature) {
             Feature feature = (Feature) built;
-            //FIXME feature.setCRS(getCRS());
+            // FIXME feature.setCRS(getCRS());
             if (defaultGeometry != null) {
                 for (Iterator itr = feature.getProperties().iterator(); itr.hasNext();) {
                     Attribute att = (Attribute) itr.next();

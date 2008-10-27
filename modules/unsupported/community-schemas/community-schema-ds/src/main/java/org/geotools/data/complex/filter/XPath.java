@@ -29,12 +29,17 @@ import javax.xml.namespace.QName;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeBuilder;
+import org.geotools.feature.AttributeImpl;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.Types;
 import org.geotools.feature.ValidatingFeatureFactoryImpl;
+import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.util.CheckedArrayList;
+import org.geotools.xs.XSSchema;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.FeatureFactory;
+import org.opengis.feature.Property;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -42,7 +47,6 @@ import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.util.Cloneable;
 import org.xml.sax.helpers.NamespaceSupport;
@@ -58,8 +62,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XPath.java 31514 2008-09-15 08:36:50Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/filter/XPath.java $
+ * @version $Id: XPath.java 31721 2008-10-27 08:18:47Z bencd $
+ * @source $URL:
+ *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/filter/XPath.java $
  * @since 2.4
  */
 public class XPath {
@@ -579,20 +584,14 @@ public class XPath {
         throw new IllegalStateException();
     }
 
-    private Attribute setValue(final AttributeDescriptor descriptor, final String id, Object value,
-            final int index, final ComplexAttribute parent, final AttributeType targetNodeType) {
-
-        final Name attributeName = descriptor.getName();
-
+    private Attribute setValue(final AttributeDescriptor descriptor, final String id,
+            final Object value, final int index, final ComplexAttribute parent,
+            final AttributeType targetNodeType) {
         // adapt value to context
-        Literal literal = FF.literal(value);
-        Class binding = ((AttributeType) descriptor.getType()).getBinding();
-        value = literal.evaluate(value, binding);
-
+        Object convertedValue = convertValue(descriptor, value);
         Attribute leafAttribute = null;
-
+        final Name attributeName = descriptor.getName();
         Object currStepValue = parent.getProperties(attributeName);
-
         if (currStepValue instanceof Collection) {
             List values = new ArrayList((Collection) currStepValue);
             if (values.size() >= index) {
@@ -601,18 +600,17 @@ public class XPath {
         } else if (currStepValue instanceof Attribute) {
             leafAttribute = (Attribute) currStepValue;
         } else if (currStepValue != null) {
-            throw new IllegalStateException("Unkown addressed object. Xpath:" + attributeName
+            throw new IllegalStateException("Unknown addressed object. Xpath:" + attributeName
                     + ", addressed: " + currStepValue.getClass().getName() + " ["
                     + currStepValue.toString() + "]");
         }
-
         if (leafAttribute == null) {
             AttributeBuilder builder = new AttributeBuilder(featureFactory);
             builder.init(parent);
             if (targetNodeType != null) {
-                leafAttribute = builder.add(id, value, attributeName, targetNodeType);
+                leafAttribute = builder.add(id, convertedValue, attributeName, targetNodeType);
             } else {
-                leafAttribute = builder.add(id, value, attributeName);
+                leafAttribute = builder.add(id, convertedValue, attributeName);
             }
             List newValue = new ArrayList();
             newValue.addAll((Collection) parent.getValue());
@@ -620,10 +618,86 @@ public class XPath {
             parent.setValue(newValue);
         }
 
-        if (value != null) {
-            leafAttribute.setValue(value);
+        if (convertedValue != null) {
+            leafAttribute.setValue(convertedValue);
         }
         return leafAttribute;
+    }
+
+    /**
+     * Return value converted into a type suitable for this descriptor.
+     * 
+     * @param descriptor
+     * @param value
+     * @return
+     */
+    @SuppressWarnings("serial")
+    private Object convertValue(final AttributeDescriptor descriptor, final Object value) {
+        final AttributeType type = descriptor.getType();
+        Class<?> binding = type.getBinding();
+        if (type instanceof ComplexType && isSimpleContentType(type) && binding == Collection.class) {
+            return new ArrayList<Property>() {
+                {
+                    add(buildSimpleContent(type, value));
+                }
+            };
+        } else {
+            return FF.literal(value).evaluate(value, binding);
+        }
+    }
+
+    /**
+     * Return true if the type is either a simple type or has a simple type as its supertype. In
+     * particular, complex types with simple content will return true.
+     * 
+     * @param type
+     * @return
+     */
+    static boolean isSimpleContentType(AttributeType type) {
+        if (type == XSSchema.ANYSIMPLETYPE_TYPE) {
+            // should never happen as this type is abstract
+            throw new RuntimeException("Unexpected simple type");
+        }
+        AttributeType superType = type.getSuper();
+        if (superType == XSSchema.ANYSIMPLETYPE_TYPE) {
+            return true;
+        } else if (superType == null) {
+            return false;
+        } else {
+            return isSimpleContentType(superType);
+        }
+    }
+
+    /**
+     * Get base (non-collection) type of simple content.
+     * 
+     * @param type
+     * @return
+     */
+    static AttributeType getSimpleContentType(AttributeType type) {
+        Class<?> binding = type.getBinding();
+        if (binding == Collection.class) {
+            return getSimpleContentType(type.getSuper());
+        } else {
+            return type;
+        }
+    }
+
+    /**
+     * Create a fake property for simple content of a complex type.
+     * 
+     * @param type
+     * @param value
+     * @return
+     */
+    Attribute buildSimpleContent(AttributeType type, Object value) {
+        AttributeType simpleContentType = getSimpleContentType(type);
+        Object convertedValue = FF.literal(value).evaluate(value,
+                getSimpleContentType(type).getBinding());
+        Name name = new NameImpl(null, "simpleContent");
+        AttributeDescriptor descriptor = new AttributeDescriptorImpl(simpleContentType, name, 1, 1,
+                true, (Object) null);
+        return new AttributeImpl(convertedValue, descriptor, null);
     }
 
     public boolean isComplexType(final StepList attrXPath, final AttributeDescriptor featureType) {

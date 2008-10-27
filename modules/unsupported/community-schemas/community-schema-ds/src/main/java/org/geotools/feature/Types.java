@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
+import org.opengis.feature.IllegalAttributeException;
 import org.geotools.feature.type.AttributeTypeImpl;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
@@ -437,7 +438,8 @@ public class Types {
      *                 In the event that content violates any restrictions specified by the
      *                 attribute.
      */
-    public static void validate(Attribute attribute) throws IllegalAttributeException {
+    public static void validate(Attribute attribute)
+            throws IllegalAttributeException {
 
         validate(attribute, attribute.getValue());
     }
@@ -467,15 +469,18 @@ public class Types {
     }
 
     protected static void validate(AttributeType type, Attribute attribute,
-            Object attributeContent, boolean isSuper) throws IllegalAttributeException {
+            Object attributeContent, boolean isSuper)
+            throws IllegalAttributeException {
 
         if (type == null) {
-            throw new IllegalAttributeException("null type");
+            throw new IllegalAttributeException(attribute.getDescriptor(),
+                    "null type");
         }
 
         if (attributeContent == null) {
             if (!attribute.isNillable()) {
-                throw new IllegalAttributeException(type.getName() + " not nillable");
+                throw new IllegalAttributeException(attribute.getDescriptor(),
+                        type.getName() + " not nillable");
             }
             return;
         }
@@ -495,9 +500,9 @@ public class Types {
             Class clazz = attributeContent.getClass();
             Class binding = type.getBinding();
             if (binding != null && !binding.isAssignableFrom(clazz)) {
-                throw new IllegalAttributeException(clazz.getName()
-                        + " is not an acceptable class for " + type.getName()
-                        + " as it is not assignable from " + binding);
+                throw new IllegalAttributeException(attribute.getDescriptor(),
+                        clazz.getName() + " is not an acceptable class for " + type.getName()
+                                + " as it is not assignable from " + binding);
             }
         }
 
@@ -553,7 +558,7 @@ public class Types {
                     return userData;
                 }
 
-                public void validate() throws org.opengis.feature.IllegalAttributeException {
+                public void validate() throws IllegalAttributeException {
                     // do not care
                 }
 
@@ -562,7 +567,8 @@ public class Types {
             for (Iterator itr = type.getRestrictions().iterator(); itr.hasNext();) {
                 Filter f = (Filter) itr.next();
                 if (!f.evaluate(fake)) {
-                    throw new IllegalAttributeException("Attribute instance ("
+                    throw new IllegalAttributeException(attribute
+                            .getDescriptor(), "Attribute instance ("
                             + fake.getIdentifier().toString() + ")" + "fails to pass filter: " + f);
                 }
             }
@@ -630,7 +636,7 @@ public class Types {
         // empty is allows, in such a case, content should be empty
         if (type.getDescriptors().isEmpty()) {
             if (!content.isEmpty()) {
-                throw new IllegalAttributeException(
+                throw new IllegalAttributeException(attribute.getDescriptor(),
                         "Type indicates empty attribute collection, content does not");
             }
 
@@ -651,7 +657,8 @@ public class Types {
     }
 
     private static void processAll(Collection/* <AttributeDescriptor> */all,
-            Collection/* <Attribute> */content) throws IllegalAttributeException {
+            Collection/* <Attribute> */content)
+            throws IllegalAttributeException {
 
         // TODO: JD: this can be definitley be optimzed, as written its O(n^2)
 
@@ -673,14 +680,16 @@ public class Types {
             }
 
             if (occurences < ad.getMinOccurs() || occurences > ad.getMaxOccurs()) {
-                throw new IllegalAttributeException("Found " + occurences + " of " + ad.getName()
-                        + " when type" + "specifies between " + min + " and " + max);
+                throw new IllegalAttributeException(ad, "Found " + occurences
+                        + " of " + ad.getName() + " when type" + "specifies between " + min
+                        + " and " + max);
             }
         }
 
         if (!remaining.isEmpty()) {
-            throw new IllegalAttributeException(
-                    "Extra content found beyond the specified in the schema: " + remaining);
+            throw new IllegalAttributeException((AttributeDescriptor) remaining
+                    .iterator().next(), "Extra content found beyond the specified in the schema: "
+                    + remaining);
         }
 
     }

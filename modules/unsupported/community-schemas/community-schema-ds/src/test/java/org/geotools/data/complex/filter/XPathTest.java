@@ -29,6 +29,7 @@ import org.geotools.data.ComplexTestData;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
+import org.geotools.gml3.GMLSchema;
 import org.geotools.xlink.XLINK;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
@@ -38,7 +39,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XPathTest.java 31514 2008-09-15 08:36:50Z bencd $
+ * @version $Id: XPathTest.java 31721 2008-10-27 08:18:47Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/filter/XPathTest.java $
  * @since 2.4
@@ -155,6 +156,18 @@ public class XPathTest extends TestCase {
         assertTrue(step2.equals(step3));
         assertFalse(step2.equals(step4));
         assertFalse(step2.equals(step5));
+    }
+
+    /**
+     * Test that some simple-content and non-simple-content types are correctly detected.
+     */
+    public void testIsSimpleContentType() {
+        assertTrue(XPath.isSimpleContentType(GMLSchema.CODETYPE_TYPE));
+        assertTrue(XPath.isSimpleContentType(GMLSchema.MEASURETYPE_TYPE));
+        assertFalse(XPath.isSimpleContentType(GMLSchema.POINTTYPE_TYPE));
+        assertFalse(XPath.isSimpleContentType(GMLSchema.POINTPROPERTYTYPE_TYPE));
+        assertFalse(XPath.isSimpleContentType(GMLSchema.ABSTRACTFEATURETYPE_TYPE));
+        assertFalse(XPath.isSimpleContentType(GMLSchema.ABSTRACTFEATURECOLLECTIONTYPE_TYPE));
     }
 
 }

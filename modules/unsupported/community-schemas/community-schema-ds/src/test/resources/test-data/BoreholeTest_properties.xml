@@ -148,10 +148,15 @@
         -->
         <AttributeMapping>
           <targetAttribute>Borehole/sa:end</targetAttribute>
+          <sourceExpression>
+            <OCQL>SHAPE</OCQL>
+          </sourceExpression>
+          <!-- 
           <ClientProperty>
             <name>xlink:href</name>
             <value>'urn:x-ogc:def:nil:OGC:unknown'</value>
           </ClientProperty>
+          -->
         </AttributeMapping>
 
         <AttributeMapping>
