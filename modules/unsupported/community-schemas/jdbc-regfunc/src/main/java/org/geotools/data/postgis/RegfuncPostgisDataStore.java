@@ -32,8 +32,8 @@ import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.SQLEncoderPostgis;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * {@link DataStore} with support for registered functions, that is, functions that can be executed
@@ -150,8 +150,8 @@ public class RegfuncPostgisDataStore extends PostgisDataStore {
         SQLEncoderPostgis encoder = new RegfuncSQLEncoderPostgis();
         encoder.setSupportsGEOS(useGeos);
         encoder.setFIDMapper(typeHandler.getFIDMapper(typeName));
-        if (info.getSchema().getDefaultGeometry() != null) {
-            String geom = info.getSchema().getDefaultGeometry().getName();
+        if (info.getSchema().getGeometryDescriptor() != null) {
+            String geom = info.getSchema().getGeometryDescriptor().getLocalName();
             srid = info.getSRID(geom);
             encoder.setDefaultGeometry(geom);
         }
@@ -172,7 +172,7 @@ public class RegfuncPostgisDataStore extends PostgisDataStore {
     // Should be OK to allow super to use its SQLEncoderPostgis (no Regfunc)
     // because only used for permission checks.
     // @Override
-    protected FeatureType buildSchema(String typeName, FIDMapper mapper) throws IOException {
+    protected SimpleFeatureType buildSchema(String typeName, FIDMapper mapper) throws IOException {
         if (false) {
             // kept this code as probing for registered_functions goes here
             Connection conn = getConnection(Transaction.AUTO_COMMIT);

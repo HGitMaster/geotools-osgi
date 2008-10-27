@@ -29,10 +29,11 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.RegfuncFilterFactoryImpl;
 import org.geotools.filter.RegisteredFunction;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 
@@ -52,7 +53,7 @@ public class RegFuncPostgisDataStoreOnlineTest extends AbstractRegfuncPostgisOnl
      * @throws Exception
      */
     public void testNoFilter() throws Exception {
-        runFilterTest(null, new int[] { 3, 27, 41, 93 });
+        runFilterTest(Filter.INCLUDE, new int[] { 3, 27, 41, 93 });
     }
 
     /**
@@ -91,11 +92,18 @@ public class RegFuncPostgisDataStoreOnlineTest extends AbstractRegfuncPostgisOnl
      * @throws Exception
      */
     public void testBasaltFilterWrongFeatures() throws Exception {
+        // true if test unexpectedly passes
+        boolean failed = false;
         try {
             // should expect ids 3 and 27
             runFilterTest(buildFilter("basalt"), new int[] { 27 });
+            // cannot fail() here as would be caught
+            failed = true;
         } catch (AssertionFailedError e) {
             // success
+        }
+        if (failed) {
+            fail();
         }
     }
 
@@ -113,15 +121,16 @@ public class RegFuncPostgisDataStoreOnlineTest extends AbstractRegfuncPostgisOnl
         DataStore datastore = null;
         try {
             datastore = DataStoreFinder.getDataStore(getParams());
+            assertNotNull(datastore);
             Query query = new DefaultQuery(TEST_TABLE_NAME, filter);
-            FeatureReader reader = null;
+            FeatureReader<SimpleFeatureType, SimpleFeature> reader = null;
             try {
                 /*
                  * List of all the integer feature ids seen in the features returned for this query.
                  */
-                List/* <Integer> */featureIds = new ArrayList();
+                List<Integer> featureIds = new ArrayList<Integer>();
                 reader = datastore.getFeatureReader(query, Transaction.AUTO_COMMIT);
-                for (Feature feature = null; reader.hasNext();) {
+                for (SimpleFeature feature = null; reader.hasNext();) {
                     feature = reader.next();
                     /*
                      * Convert long feature id of the form test_table_name.1234 to the numeric id
