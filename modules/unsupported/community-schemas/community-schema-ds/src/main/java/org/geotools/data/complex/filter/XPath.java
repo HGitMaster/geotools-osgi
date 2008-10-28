@@ -34,6 +34,7 @@ import org.geotools.feature.NameImpl;
 import org.geotools.feature.Types;
 import org.geotools.feature.ValidatingFeatureFactoryImpl;
 import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.util.CheckedArrayList;
 import org.geotools.xs.XSSchema;
 import org.opengis.feature.Attribute;
@@ -62,7 +63,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XPath.java 31721 2008-10-27 08:18:47Z bencd $
+ * @version $Id: XPath.java 31723 2008-10-28 06:51:03Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/filter/XPath.java $
  * @since 2.4
@@ -86,7 +87,7 @@ public class XPath {
     public XPath() {
         this.FF = CommonFactoryFinder.getFilterFactory(null);
         this.featureFactory = new ValidatingFeatureFactoryImpl();
-        // this.descriptorFactory = new TypeFactoryImpl();
+        this.descriptorFactory = new FeatureTypeFactoryImpl();
     }
 
     public XPath(FilterFactory ff, FeatureFactory featureFactory) {
