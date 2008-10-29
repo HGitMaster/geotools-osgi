@@ -18,14 +18,11 @@
 package org.geotools.filter;
 
 import org.geotools.factory.Hints;
-import org.geotools.factory.Hints.Key;
+import org.geotools.filter.expression.FeaturePropertyAccessorFactory;
 import org.opengis.filter.expression.PropertyName;
 import org.xml.sax.helpers.NamespaceSupport;
 
 public class FilterFactoryImplNamespaceAware extends FilterFactoryImpl {
-
-    public static final Key NAMESPACE_CONTEXT = new Hints.Key(
-            org.xml.sax.helpers.NamespaceSupport.class);
 
     private Hints namespaceHints;
 
@@ -47,6 +44,7 @@ public class FilterFactoryImplNamespaceAware extends FilterFactoryImpl {
     }
 
     public void setNamepaceContext(NamespaceSupport namespaces) {
-        namespaceHints = new Hints(NAMESPACE_CONTEXT, namespaces);
+        // must use identical instance as Hints$Key equals is by identity
+        namespaceHints = new Hints(FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT, namespaces);
     }
 }

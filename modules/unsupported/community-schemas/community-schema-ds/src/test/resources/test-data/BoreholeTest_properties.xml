@@ -143,20 +143,19 @@
           </sourceExpression>
         </AttributeMapping>
 
-        <!-- 
-          REVISIT: complains saying that PointPropertyType is not nillable, which is wrong
-        -->
         <AttributeMapping>
           <targetAttribute>Borehole/sa:end</targetAttribute>
+          <!-- 
+            TODO: complains saying that PointPropertyType is not nillable, which is wrong
+            This is a dummy value
+          -->
           <sourceExpression>
             <OCQL>SHAPE</OCQL>
           </sourceExpression>
-          <!-- 
           <ClientProperty>
             <name>xlink:href</name>
             <value>'urn:x-ogc:def:nil:OGC:unknown'</value>
           </ClientProperty>
-          -->
         </AttributeMapping>
 
         <AttributeMapping>
@@ -180,6 +179,13 @@
 
         <AttributeMapping>
           <targetAttribute>Borehole/sa:shape/geo:LineByVector/geo:origin</targetAttribute>
+          <!--
+            TODO:  complains saying that PointPropertyType is not nillable, which is wrong
+            This is a dummy value
+          -->
+          <sourceExpression>
+            <OCQL>SHAPE</OCQL>
+          </sourceExpression>
           <ClientProperty>
             <name>xlink:href</name>
             <value>strConcat('#bh.', strConcat(BGS_ID, '.start'))</value>
@@ -230,8 +236,13 @@
 
         <AttributeMapping>
           <targetAttribute>xmml:log/xmml:IntervalLog/xmml:range/xmml:ListOfBands/xmml:categoryList[1]</targetAttribute>
+          <!-- TODO: not nillable? (some are null since grouping removed)
           <sourceExpression>
             <OCQL>LITHOSTRAT</OCQL>
+          </sourceExpression>
+          -->
+          <sourceExpression>
+            <OCQL>'missing'</OCQL>
           </sourceExpression>
           <ClientProperty>
             <name>swe:codeSpace</name>
@@ -260,8 +271,13 @@
 
         <AttributeMapping>
           <targetAttribute>xmml:log/xmml:IntervalLog/xmml:range/xmml:ListOfBands/xmml:categoryList[3]</targetAttribute>
+          <!-- TODO: not nillable? (some are null since grouping removed)
           <sourceExpression>
             <OCQL>BASE_BED_C</OCQL>
+          </sourceExpression>
+          -->
+          <sourceExpression>
+            <OCQL>'missing'</OCQL>
           </sourceExpression>
           <ClientProperty>
             <name>swe:codeSpace</name>
