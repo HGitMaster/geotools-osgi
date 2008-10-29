@@ -1134,14 +1134,14 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         assertFalse(isLocked(tname("road"), tname("road") + ".2"));
 
         assertEquals( 1, road1.lockFeatures(td.rd1Filter) );
-        assertTrue(isLocked(tname("road"), tname("road") + ".0"));
-        assertFalse(isLocked(tname("road"), tname("road") + ".1"));
-        assertFalse(isLocked(tname("road"), tname("road") + ".2"));
+        assertTrue(isLocked(tname("road"), tname("road") + "." + td.initialFidValue ));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue+1)));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue+2)));
 
         road2.lockFeatures(td.rd2Filter);
-        assertTrue(isLocked(tname("road"), tname("road") + ".0"));
-        assertTrue(isLocked(tname("road"), tname("road") + ".1"));
-        assertFalse(isLocked(tname("road"), tname("road") + ".2"));
+        assertTrue(isLocked(tname("road"), tname("road") + "." + td.initialFidValue));
+        assertTrue(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue+1)));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue+2)));
 
         try {
             road1.unLockFeatures(td.rd1Filter);
@@ -1158,15 +1158,15 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         }
 
         road1.unLockFeatures(td.rd1Filter);
-        assertFalse(isLocked(tname("road"), tname("road") + ".0"));
-        assertTrue(isLocked(tname("road"), tname("road") + ".1"));
-        assertFalse(isLocked(tname("road"), tname("road") + ".2"));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue)));
+        assertTrue(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue+1)));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue+2)));
 
         t2.addAuthorization(lockB.getAuthorization());
         road2.unLockFeatures(td.rd2Filter);
-        assertFalse(isLocked(tname("road"), tname("road") + ".0"));
-        assertFalse(isLocked(tname("road"), tname("road") + ".1"));
-        assertFalse(isLocked(tname("road"), tname("road") + ".2"));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue)));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue+1)));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue+2)));
 
         t1.close();
         t2.close();
@@ -1177,15 +1177,15 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
         FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource(tname("road"));
         road.setFeatureLock(lock);
-        assertFalse(isLocked(tname("road"), tname("road") + ".0"));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue)));
 
         road.lockFeatures(td.rd1Filter);
-        assertTrue(isLocked(tname("road"), tname("road") + ".0"));
+        assertTrue(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue)));
         long then = System.currentTimeMillis();
         do {
             Thread.sleep( 1000 );
         } while ( System.currentTimeMillis() - then < 1000 ); 
-        assertFalse(isLocked(tname("road"), tname("road") + ".0"));
+        assertFalse(isLocked(tname("road"), tname("road") + "." + (td.initialFidValue)));
     }
     
     int count(String typeName) throws IOException {
