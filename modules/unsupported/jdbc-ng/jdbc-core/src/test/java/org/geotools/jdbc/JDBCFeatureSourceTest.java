@@ -36,6 +36,7 @@ import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.spatial.BBOX;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
@@ -51,7 +52,7 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         SimpleFeatureType schema = featureSource.getSchema();
         assertEquals(tname("ft1"), schema.getTypeName());
         assertEquals(dataStore.getNamespaceURI(), schema.getName().getNamespaceURI());
-        assertEquals(CRS.decode("EPSG:4326"), schema.getCoordinateReferenceSystem());
+        assertTrue(areCRSEqual(CRS.decode("EPSG:4326"), schema.getCoordinateReferenceSystem()));
 
         assertEquals(4, schema.getAttributeCount());
         assertNotNull(schema.getDescriptor(aname("geometry")));
@@ -62,12 +63,12 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
 
     public void testBounds() throws Exception {
         ReferencedEnvelope bounds = featureSource.getBounds();
-        assertEquals(0d, bounds.getMinX());
-        assertEquals(0d, bounds.getMinY());
-        assertEquals(2d, bounds.getMaxX());
-        assertEquals(2d, bounds.getMaxY());
+        assertEquals(0l, Math.round(bounds.getMinX()));
+        assertEquals(0l, Math.round(bounds.getMinY()));
+        assertEquals(2l, Math.round(bounds.getMaxX()));
+        assertEquals(2l, Math.round(bounds.getMaxY()));
 
-        assertEquals(CRS.decode("EPSG:4326"), bounds.getCoordinateReferenceSystem());
+        assertTrue(areCRSEqual(CRS.decode("EPSG:4326"), bounds.getCoordinateReferenceSystem()));
     }
 
     public void testBoundsWithQuery() throws Exception {
@@ -78,12 +79,12 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         query.setFilter(filter);
 
         ReferencedEnvelope bounds = featureSource.getBounds(query);
-        assertEquals(1d, bounds.getMinX());
-        assertEquals(1d, bounds.getMinY());
-        assertEquals(1d, bounds.getMaxX());
-        assertEquals(1d, bounds.getMaxY());
+        assertEquals(1l, Math.round(bounds.getMinX()));
+        assertEquals(1l, Math.round(bounds.getMinY()));
+        assertEquals(1l, Math.round(bounds.getMaxX()));
+        assertEquals(1l, Math.round(bounds.getMaxY()));
 
-        assertEquals(CRS.decode("EPSG:4326"), bounds.getCoordinateReferenceSystem());
+        assertTrue(areCRSEqual(CRS.decode("EPSG:4326"), bounds.getCoordinateReferenceSystem()));
     }
 
     public void testCount() throws Exception {
@@ -254,4 +255,5 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         assertEquals(2, count);
         features.close(it);
     }
+    
 }

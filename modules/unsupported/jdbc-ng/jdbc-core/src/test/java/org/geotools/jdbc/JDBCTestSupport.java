@@ -33,6 +33,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -209,4 +210,15 @@ public abstract class JDBCTestSupport extends TestCase {
         }
         
     }
+    
+    protected boolean areCRSEqual(CoordinateReferenceSystem crs1, CoordinateReferenceSystem crs2) {
+    	
+    	if (crs1==null && crs2==null)
+    		return true;
+    	
+    	if (crs1==null ) return false;
+    		
+    	return crs1.equals(crs2); 
+   	}
+
 }
