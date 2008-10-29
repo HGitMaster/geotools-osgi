@@ -16,7 +16,7 @@
  */
 package org.geotools.wfs.protocol;
 
-import static org.geotools.data.wfs.HttpMethod.POST;
+import static org.geotools.data.wfs.protocol.http.HttpMethod.POST;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import org.geotools.data.wfs.HttpMethod;
+import org.geotools.data.wfs.protocol.http.HttpMethod;
 import org.geotools.util.logging.Logging;
 
 /**

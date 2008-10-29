@@ -16,9 +16,9 @@
  */
 package org.geotools.data.wfs.v1_1_0;
 
-import static org.geotools.data.wfs.HttpMethod.GET;
-import static org.geotools.data.wfs.HttpMethod.POST;
-import static org.geotools.data.wfs.WFSOperationType.GET_CAPABILITIES;
+import static org.geotools.data.wfs.protocol.http.HttpMethod.GET;
+import static org.geotools.data.wfs.protocol.http.HttpMethod.POST;
+import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.GET_CAPABILITIES;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,7 +37,7 @@ import org.geotools.util.logging.Logging;
  * Adapts a WFS capabilities document to {@link ServiceInfo}
  * 
  * @author Gabriel Roldan
- * @version $Id: CapabilitiesServiceInfo.java 31730 2008-10-29 13:29:21Z groldan $
+ * @version $Id: CapabilitiesServiceInfo.java 31731 2008-10-29 13:51:20Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools

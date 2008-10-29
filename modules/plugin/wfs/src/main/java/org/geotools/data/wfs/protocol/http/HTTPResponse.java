@@ -1,4 +1,4 @@
-package org.geotools.data.wfs;
+package org.geotools.data.wfs.protocol.http;
 
 import java.io.IOException;
 import java.io.InputStream;

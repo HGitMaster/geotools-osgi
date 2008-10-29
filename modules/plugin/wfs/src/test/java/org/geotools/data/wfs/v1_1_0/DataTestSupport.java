@@ -25,10 +25,10 @@ import java.io.StringBufferInputStream;
 
 import javax.xml.namespace.QName;
 
-import org.geotools.data.wfs.DefaultHTTPProtocol;
-import org.geotools.data.wfs.HTTPProtocol;
-import org.geotools.data.wfs.HTTPResponse;
-import org.geotools.data.wfs.WFSProtocol;
+import org.geotools.data.wfs.protocol.http.DefaultHTTPProtocol;
+import org.geotools.data.wfs.protocol.http.HTTPProtocol;
+import org.geotools.data.wfs.protocol.http.HTTPResponse;
+import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.test.TestData;
 
 public final class DataTestSupport {

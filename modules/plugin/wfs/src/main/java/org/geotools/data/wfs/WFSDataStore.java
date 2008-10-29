@@ -23,7 +23,7 @@ import org.geotools.data.DataStore;
  * {@link DataStore} extension interface to provide WFS specific extra information.
  * 
  * @author Gabriel Roldan
- * @version $Id: WFSDataStore.java 31686 2008-10-21 15:13:28Z groldan $
+ * @version $Id: WFSDataStore.java 31731 2008-10-29 13:51:20Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -34,7 +34,7 @@ public interface WFSDataStore extends DataStore {
      * Overrides {@link DataAccess#getInfo()} so it type narrows to a {@link WFSServiceInfo}
      * 
      * @return service information
-     * @see DataStore#getInfo()
+     * @see DataAccess#getInfo()
      */
     WFSServiceInfo getInfo();
 

@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.wfs.GetFeatureParser;
+import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
 import org.geotools.gml3.ApplicationSchemaConfiguration;
 import org.geotools.wfs.WFSConfiguration;
 import org.geotools.xml.Configuration;

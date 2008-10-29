@@ -23,7 +23,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 
-import org.geotools.data.wfs.GetFeatureParser;
+import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 public class XmlSimpleFeatureParserTest extends AbstractGetFeatureParserTest {

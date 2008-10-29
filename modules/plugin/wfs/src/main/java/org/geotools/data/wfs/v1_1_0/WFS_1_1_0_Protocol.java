@@ -1,8 +1,8 @@
 package org.geotools.data.wfs.v1_1_0;
 
-import static org.geotools.data.wfs.HttpMethod.GET;
-import static org.geotools.data.wfs.HttpMethod.POST;
-import static org.geotools.data.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
+import static org.geotools.data.wfs.protocol.http.HttpMethod.GET;
+import static org.geotools.data.wfs.protocol.http.HttpMethod.POST;
+import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,13 +43,13 @@ import net.opengis.wfs.WFSCapabilitiesType;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Query;
-import org.geotools.data.wfs.HTTPProtocol;
-import org.geotools.data.wfs.HTTPResponse;
-import org.geotools.data.wfs.HttpMethod;
-import org.geotools.data.wfs.Version;
-import org.geotools.data.wfs.WFSOperationType;
-import org.geotools.data.wfs.WFSProtocol;
-import org.geotools.data.wfs.WFSResponse;
+import org.geotools.data.wfs.protocol.http.HTTPProtocol;
+import org.geotools.data.wfs.protocol.http.HTTPResponse;
+import org.geotools.data.wfs.protocol.http.HttpMethod;
+import org.geotools.data.wfs.protocol.wfs.Version;
+import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
+import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
+import org.geotools.data.wfs.protocol.wfs.WFSResponse;
 import org.geotools.filter.v1_1.OGC;
 import org.geotools.filter.v1_1.OGCConfiguration;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -101,19 +101,28 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     private HTTPProtocol http;
 
     @SuppressWarnings("unchecked")
-    public WFS_1_1_0_Protocol(InputStream capabilitiesReader, HTTPProtocol http) throws IOException {
+    public WFS_1_1_0_Protocol( InputStream capabilitiesReader, HTTPProtocol http )
+            throws IOException {
         this.capabilities = parseCapabilities(capabilitiesReader);
         this.http = http;
         this.typeInfos = new HashMap<String, FeatureTypeType>();
 
         final List<FeatureTypeType> ftypes = capabilities.getFeatureTypeList().getFeatureType();
         QName typeName;
-        for (FeatureTypeType ftype : ftypes) {
+        for( FeatureTypeType ftype : ftypes ) {
             typeName = ftype.getName();
             assert !("".equals(typeName.getPrefix()));
             String prefixedTypeName = typeName.getPrefix() + ":" + typeName.getLocalPart();
             typeInfos.put(prefixedTypeName, ftype);
         }
+    }
+
+    /**
+     * @return {@code "text/xml; subtype=gml/3.1.1"}
+     * @see WFSProtocol#getDefaultOutputFormat()
+     */
+    public String getDefaultOutputFormat() {
+        return DEFAULT_OUTPUT_FORMAT;
     }
 
     /**
@@ -179,7 +188,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         List<DomainType> parameters = operationMetadata.getParameter();
 
         Set<String> outputFormats = new HashSet<String>();
-        for (DomainType param : parameters) {
+        for( DomainType param : parameters ) {
             String paramName = param.getName();
             if ("outputFormat".equals(paramName)) {
                 List value = param.getValue();
@@ -193,7 +202,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @see WFSProtocol#getSupportedOutputFormats(String)
      */
     @SuppressWarnings("unchecked")
-    public Set<String> getSupportedOutputFormats(String typeName) {
+    public Set<String> getSupportedOutputFormats( String typeName ) {
         final Set<String> serviceOutputFormats = getSupportedGetFeatureOutputFormats();
         final FeatureTypeType typeInfo = getFeatureTypeInfo(typeName);
         final OutputFormatListType outputFormats = typeInfo.getOutputFormats();
@@ -213,7 +222,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      */
     public Set<QName> getFeatureTypeNames() {
         Set<QName> typeNames = new HashSet<QName>();
-        for (FeatureTypeType typeInfo : typeInfos.values()) {
+        for( FeatureTypeType typeInfo : typeInfos.values() ) {
             QName name = typeInfo.getName();
             typeNames.add(name);
         }
@@ -223,7 +232,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getFeatureTypeName(String)
      */
-    public QName getFeatureTypeName(String typeName) {
+    public QName getFeatureTypeName( String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         QName name = featureTypeInfo.getName();
         return name;
@@ -239,14 +248,14 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#supportsOperation(WFSOperationType, HttpMethod)
      */
-    public boolean supportsOperation(WFSOperationType operation, HttpMethod method) {
+    public boolean supportsOperation( WFSOperationType operation, HttpMethod method ) {
         return null != getOperationURI(operation, method);
     }
 
     /**
      * @see WFSProtocol#getOperationURL(WFSOperationType, HttpMethod)
      */
-    public URL getOperationURL(WFSOperationType operation, HttpMethod method) {
+    public URL getOperationURL( WFSOperationType operation, HttpMethod method ) {
         String href = getOperationURI(operation, method);
         if (href != null) {
             try {
@@ -262,7 +271,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getFeatureTypeTitle(String)
      */
-    public String getFeatureTypeTitle(String typeName) {
+    public String getFeatureTypeTitle( String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         return featureTypeInfo.getTitle();
     }
@@ -270,7 +279,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getFeatureTypeAbstract(String)
      */
-    public String getFeatureTypeAbstract(String typeName) {
+    public String getFeatureTypeAbstract( String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         return featureTypeInfo.getAbstract();
     }
@@ -279,7 +288,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @see WFSProtocol#getFeatureTypeWGS84Bounds(String)
      */
     @SuppressWarnings("unchecked")
-    public ReferencedEnvelope getFeatureTypeWGS84Bounds(String typeName) {
+    public ReferencedEnvelope getFeatureTypeWGS84Bounds( String typeName ) {
         final FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         List<WGS84BoundingBoxType> bboxList = featureTypeInfo.getWGS84BoundingBox();
         if (bboxList != null && bboxList.size() > 0) {
@@ -303,7 +312,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getDefaultCRS(String)
      */
-    public String getDefaultCRS(String typeName) {
+    public String getDefaultCRS( String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         String defaultSRS = featureTypeInfo.getDefaultSRS();
         return defaultSRS;
@@ -313,7 +322,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @see WFSProtocol#getSupportedCRSIdentifiers(String)
      */
     @SuppressWarnings("unchecked")
-    public Set<String> getSupportedCRSIdentifiers(String typeName) {
+    public Set<String> getSupportedCRSIdentifiers( String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         // TODO: another wrong emf mapping: getOtherSRS():String? should be a list
         String defaultSRS = featureTypeInfo.getDefaultSRS();
@@ -329,7 +338,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @see WFSProtocol#getFeatureTypeKeywords(String)
      */
     @SuppressWarnings("unchecked")
-    public Set<String> getFeatureTypeKeywords(String typeName) {
+    public Set<String> getFeatureTypeKeywords( String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         List<KeywordsType> ftKeywords = featureTypeInfo.getKeywords();
         Set<String> ftypeKeywords = extractKeywords(ftKeywords);
@@ -339,7 +348,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getDescribeFeatureTypeURLGet(String)
      */
-    public URL getDescribeFeatureTypeURLGet(String typeName) {
+    public URL getDescribeFeatureTypeURLGet( String typeName ) {
         final String outputFormat = "text/xml; subtype=gml/3.1.1";
         return getDescribeFeatureTypeURLGet(typeName, outputFormat);
     }
@@ -348,8 +357,8 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @throws IOException
      * @see WFSProtocol#describeFeatureType(String, String)
      */
-    @SuppressWarnings( { "unchecked", "nls" })
-    public WFSResponse describeFeatureType(String typeName, String outputFormat, HttpMethod method)
+    @SuppressWarnings({"unchecked", "nls"})
+    public WFSResponse describeFeatureType( String typeName, String outputFormat, HttpMethod method )
             throws IOException {
         if (!supportsOperation(DESCRIBE_FEATURETYPE, method)) {
             throw new UnsupportedOperationException(
@@ -371,7 +380,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @see WFSProtocol#getFeatureHits(Query)
      */
     @SuppressWarnings("nls")
-    public int getFeatureHits(Query query) throws IOException {
+    public int getFeatureHits( Query query ) throws IOException {
         URL url = getOperationURL(WFSOperationType.GET_FEATURE, GET);
         Map<String, String> getFeatureKvp = buildGetFeatureParametersForGet(query,
                 DEFAULT_OUTPUT_FORMAT);
@@ -395,7 +404,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
             final String rootElementName = parser.getName();
             if ("FeatureCollection".equals(rootElementName)) {
                 String numberOfFeatures = null;
-                for (int i = 0; i < parser.getAttributeCount(); i++) {
+                for( int i = 0; i < parser.getAttributeCount(); i++ ) {
                     if ("numberOfFeatures".equals(parser.getAttributeName(i))) {
                         numberOfFeatures = parser.getAttributeValue(i);
                         break;
@@ -421,7 +430,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @see WFSProtocol#getFeature(Query, String)
      */
     @SuppressWarnings("nls")
-    public WFSResponse getFeature(Query query, String outputFormat, HttpMethod method)
+    public WFSResponse getFeature( Query query, String outputFormat, HttpMethod method )
             throws IOException {
         if (!supportsOperation(WFSOperationType.GET_FEATURE, method)) {
             throw new UnsupportedOperationException(
@@ -447,22 +456,20 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * NOTE: this method is package protected just to be also accessed by unit test.
      * </p>
      * 
-     * @param typeName
-     *            the typeName as stated in the capabilities {@code FeatureTypeList} to get the info
-     *            for
+     * @param typeName the typeName as stated in the capabilities {@code FeatureTypeList} to get the
+     *        info for
      * @return the WFS capabilities metadata {@link FeatureTypeType metadata} for {@code typeName}
-     * @throws IllegalArgumentException
-     *             if {@code typeName} is not the name of a FeatureType stated in the capabilities
-     *             document.
+     * @throws IllegalArgumentException if {@code typeName} is not the name of a FeatureType stated
+     *         in the capabilities document.
      */
-    private FeatureTypeType getFeatureTypeInfo(final String typeName) {
+    private FeatureTypeType getFeatureTypeInfo( final String typeName ) {
         if (!typeInfos.containsKey(typeName)) {
             throw new IllegalArgumentException("Type name not found: " + typeName);
         }
         return typeInfos.get(typeName);
     }
 
-    private WFSCapabilitiesType parseCapabilities(InputStream capabilitiesReader)
+    private WFSCapabilitiesType parseCapabilities( InputStream capabilitiesReader )
             throws IOException {
         final Parser parser = new Parser(configuration);
         final Object parsed;
@@ -483,20 +490,20 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     }
 
     @SuppressWarnings("unchecked")
-    private Set<String> extractKeywords(List<KeywordsType> keywordsList) {
+    private Set<String> extractKeywords( List<KeywordsType> keywordsList ) {
         Set<String> keywords = new HashSet<String>();
-        for (KeywordsType keys : keywordsList) {
+        for( KeywordsType keys : keywordsList ) {
             keywords.addAll(keys.getKeyword());
         }
         return keywords;
     }
 
     @SuppressWarnings("unchecked")
-    private OperationType getOperationMetadata(WFSOperationType operation) {
+    private OperationType getOperationMetadata( WFSOperationType operation ) {
         final OperationsMetadataType operationsMetadata = capabilities.getOperationsMetadata();
         final List<OperationType> operations = operationsMetadata.getOperation();
         final String expectedOperationName = operation.getName();
-        for (OperationType operationType : operations) {
+        for( OperationType operationType : operations ) {
             String operationName = operationType.getName();
             if (expectedOperationName.equalsIgnoreCase(operationName)) {
                 return operationType;
@@ -506,7 +513,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
                 + expectedOperationName + " in the capabilities document");
     }
 
-    private URL getDescribeFeatureTypeURLGet(String typeName, String outputFormat) {
+    private URL getDescribeFeatureTypeURLGet( String typeName, String outputFormat ) {
         final FeatureTypeType typeInfo = getFeatureTypeInfo(typeName);
 
         final URL describeFeatureTypeUrl = getOperationURL(DESCRIBE_FEATURETYPE, GET);
@@ -533,7 +540,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         return url;
     }
 
-    private WFSResponse issueGetRequest(URL url, Map<String, String> kvp) throws IOException {
+    private WFSResponse issueGetRequest( URL url, Map<String, String> kvp ) throws IOException {
         WFSResponse response;
         HTTPResponse httpResponse = http.issueGet(url, kvp);
 
@@ -546,7 +553,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     }
 
     @SuppressWarnings("nls")
-    private Map<String, String> buildGetFeatureParametersForGet(Query query, String outputFormat)
+    private Map<String, String> buildGetFeatureParametersForGet( Query query, String outputFormat )
             throws IOException {
         Map<String, String> map = new HashMap<String, String>();
         map.put("SERVICE", "WFS");
@@ -561,7 +568,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         if (!query.retrieveAllProperties()) {
             String[] propertyNames = query.getPropertyNames();
             StringBuilder pnames = new StringBuilder();
-            for (int i = 0; i < propertyNames.length; i++) {
+            for( int i = 0; i < propertyNames.length; i++ ) {
                 pnames.append(propertyNames[i]);
                 if (i < propertyNames.length - 1) {
                     pnames.append(',');
@@ -585,7 +592,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
             if (filter instanceof Id) {
                 final Set<Identifier> identifiers = ((Id) filter).getIdentifiers();
                 StringBuffer idValues = new StringBuffer();
-                for (Iterator<Identifier> it = identifiers.iterator(); it.hasNext();) {
+                for( Iterator<Identifier> it = identifiers.iterator(); it.hasNext(); ) {
                     Object id = it.next().getID();
                     // REVISIT: should URL encode the id?
                     idValues.append(String.valueOf(id));
@@ -603,7 +610,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         return map;
     }
 
-    private static String encodeGetFeatureGetFilter(final Filter filter) throws IOException {
+    private static String encodeGetFeatureGetFilter( final Filter filter ) throws IOException {
 
         OGCConfiguration filterConfig = new OGCConfiguration();
         Encoder encoder = new Encoder(filterConfig);
@@ -621,17 +628,17 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * Returns the operation URI for the given operation/http method as a String to avoid creating a
      * URL instance when not needed
      */
-    private String getOperationURI(WFSOperationType operation, HttpMethod method) {
+    private String getOperationURI( WFSOperationType operation, HttpMethod method ) {
         final OperationType operationType = getOperationMetadata(operation);
         final List<DCPType> dcps = operationType.getDCP();
-        for (DCPType dcp : dcps) {
+        for( DCPType dcp : dcps ) {
             List<RequestMethodType> requests;
             if (GET == method) {
                 requests = dcp.getHTTP().getGet();
             } else {
                 requests = dcp.getHTTP().getPost();
             }
-            for (RequestMethodType req : requests) {
+            for( RequestMethodType req : requests ) {
                 String href = req.getHref();
                 return href;
             }

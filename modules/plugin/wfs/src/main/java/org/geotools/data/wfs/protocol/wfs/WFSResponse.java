@@ -1,4 +1,4 @@
-package org.geotools.data.wfs;
+package org.geotools.data.wfs.protocol.wfs;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;

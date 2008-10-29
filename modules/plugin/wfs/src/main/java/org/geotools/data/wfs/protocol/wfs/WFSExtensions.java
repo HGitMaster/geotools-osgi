@@ -1,8 +1,9 @@
-package org.geotools.data.wfs;
+package org.geotools.data.wfs.protocol.wfs;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.geotools.data.wfs.WFSResponseParserFactory;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryNotFoundException;
 import org.geotools.factory.FactoryRegistry;

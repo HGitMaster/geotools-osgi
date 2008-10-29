@@ -1,7 +1,7 @@
 package org.geotools.data.wfs.v1_1_0;
-import static org.geotools.data.wfs.HttpMethod.GET;
-import static org.geotools.data.wfs.HttpMethod.POST;
-import static org.geotools.data.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
+import static org.geotools.data.wfs.protocol.http.HttpMethod.GET;
+import static org.geotools.data.wfs.protocol.http.HttpMethod.POST;
+import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.CUBEWERX_GOVUNITCE;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.CUBEWERX_ROADSEG;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.GEOS_ARCHSITES;
@@ -34,12 +34,12 @@ import javax.xml.namespace.QName;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
-import org.geotools.data.wfs.DefaultHTTPProtocol;
-import org.geotools.data.wfs.HTTPProtocol;
-import org.geotools.data.wfs.HTTPResponse;
-import org.geotools.data.wfs.HttpMethod;
-import org.geotools.data.wfs.Version;
-import org.geotools.data.wfs.WFSResponse;
+import org.geotools.data.wfs.protocol.http.DefaultHTTPProtocol;
+import org.geotools.data.wfs.protocol.http.HTTPProtocol;
+import org.geotools.data.wfs.protocol.http.HTTPResponse;
+import org.geotools.data.wfs.protocol.http.HttpMethod;
+import org.geotools.data.wfs.protocol.wfs.Version;
+import org.geotools.data.wfs.protocol.wfs.WFSResponse;
 import org.geotools.data.wfs.v1_1_0.DataTestSupport.TestHttpResponse;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -79,7 +79,7 @@ public class WFS_1_1_0_ProtocolTest {
 
     /**
      * Test method for
-     * {@link WFS_1_1_0_Protocol#WFS_1_1_0_Protocol(java.io.InputStream, org.geotools.data.wfs.HTTPProtocol)}
+     * {@link WFS_1_1_0_Protocol#WFS_1_1_0_Protocol(java.io.InputStream, org.geotools.data.wfs.protocol.http.HTTPProtocol)}
      * .
      * 
      * @throws IOException
@@ -307,7 +307,7 @@ public class WFS_1_1_0_ProtocolTest {
 
     /**
      * Test method for
-     * {@link WFS_1_1_0_Protocol#supportsOperation(org.geotools.data.wfs.WFSOperationType, org.geotools.data.wfs.HttpMethod)}
+     * {@link WFS_1_1_0_Protocol#supportsOperation(org.geotools.data.wfs.protocol.wfs.WFSOperationType, org.geotools.data.wfs.protocol.http.HttpMethod)}
      * .
      * 
      * @throws IOException
@@ -326,7 +326,7 @@ public class WFS_1_1_0_ProtocolTest {
 
     /**
      * Test method for
-     * {@link WFS_1_1_0_Protocol#getOperationURL(org.geotools.data.wfs.WFSOperationType, org.geotools.data.wfs.HttpMethod)}
+     * {@link WFS_1_1_0_Protocol#getOperationURL(org.geotools.data.wfs.protocol.wfs.WFSOperationType, org.geotools.data.wfs.protocol.http.HttpMethod)}
      * .
      * 
      * @throws IOException

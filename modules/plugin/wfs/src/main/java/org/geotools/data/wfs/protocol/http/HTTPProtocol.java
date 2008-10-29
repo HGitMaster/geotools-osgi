@@ -1,9 +1,10 @@
-package org.geotools.data.wfs;
+package org.geotools.data.wfs.protocol.http;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+
 
 public interface HTTPProtocol {
 

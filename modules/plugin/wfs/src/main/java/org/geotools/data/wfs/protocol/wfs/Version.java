@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.wfs;
+package org.geotools.data.wfs.protocol.wfs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ import java.util.List;
  * Enumeration for the supported WFS versions
  * 
  * @author Gabriel Roldan
- * @version $Id: Version.java 31720 2008-10-24 22:57:22Z groldan $
+ * @version $Id: Version.java 31731 2008-10-29 13:51:20Z groldan $
  * @since 2.5.x
  * @source $URL:
  *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/Version.java $

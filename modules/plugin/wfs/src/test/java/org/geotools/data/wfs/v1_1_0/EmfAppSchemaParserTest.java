@@ -34,9 +34,10 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
+ * Unit test suite for {@link EmfAppSchemaParser}
  * 
  * @author Gabriel Roldan
- * @version $Id: EmfAppSchemaParserTest.java 31730 2008-10-29 13:29:21Z groldan $
+ * @version $Id: EmfAppSchemaParserTest.java 31731 2008-10-29 13:51:20Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/EmfAppSchemaParserTest.java $
