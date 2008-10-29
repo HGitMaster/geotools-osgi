@@ -22,16 +22,24 @@ import org.geotools.filter.text.cql2.CQLException;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 
 /**
- * Builds an {@link BinarySpatialOperator}
+ * Builds an instance of one {@link BinarySpatialOperator} subclass.
  *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  */
-abstract class SpatialOperationBuilder {
-    
+class SpatialOperationBuilder {
 
     private final BuildResultStack resultStack;
     private final FilterFactory2 filterFactory;
@@ -52,17 +60,106 @@ abstract class SpatialOperationBuilder {
         this.filterFactory = (FilterFactory2)filterFactory;
     }
     
-    public BinarySpatialOperator build() throws CQLException{
+    private Expression[] buildParameters() throws CQLException{
 
-        Expression expr2 = resultStack.popExpression();
+        Expression[] params = new Expression[2];
+        
+        params[1] = resultStack.popExpression();
 
-        Expression expr1 = resultStack.popExpression();
-
-        return buildFilter(expr1, expr2) ;
+        params[0] = resultStack.popExpression();
+        
+        return params;
    }
+    
 
     protected BinarySpatialOperator buildFilter(Expression expr1, Expression expr2) {
         throw new UnsupportedOperationException("must be implemented");
-    };
+    }
+
+    protected Contains buildContains() throws CQLException {
+
+        Expression[] params = buildParameters();
+        
+        return getFilterFactory().contains(params[0], params[1]);
+    }
+
+    public Equals buildEquals() throws CQLException {
+
+        Expression[] params = buildParameters();
+        
+        return getFilterFactory().equal(params[0], params[1]);
+    }
+
+    public Disjoint buildDisjoint() throws CQLException {
+
+        Expression[] params = buildParameters();
+        
+        return getFilterFactory().disjoint(params[0], params[1]);
+    }
+
+    public Intersects buildIntersects() throws CQLException {
+        Expression[] params = buildParameters();
+        
+        return getFilterFactory().intersects(params[0], params[1]);
+    }
+
+    public Touches buildTouches() throws CQLException {
+
+        Expression[] params = buildParameters();
+        
+        return getFilterFactory().touches(params[0], params[1]);
+    }
+
+    public Crosses buildCrosses() throws CQLException {
+        
+        Expression[] params = buildParameters();
+        
+        return getFilterFactory().crosses(params[0], params[1]);
+    }
+
+    public Within buildWithin() throws CQLException {
+        
+        Expression[] params = buildParameters();
+        
+        return getFilterFactory().within(params[0], params[1]);
+    }
+
+    public Overlaps buildOverlaps() throws CQLException {
+        
+        Expression[] params = buildParameters();
+        
+        return getFilterFactory().overlaps(params[0], params[1]);
+    }
+
+    public BBOX buildBBoxWithCRS() throws CQLException{
+        
+        String crs = getResultStack().popStringValue();
+        assert crs != null;
+        BBOX bbox = buildBBox( crs);
+        return bbox;
+    }
+    
+    public  BBOX buildBBox() throws CQLException {
+        
+        BBOX bbox = buildBBox(null);
+        
+        return bbox;
+    }
+
+    private BBOX buildBBox(final String crs) throws CQLException{
+        
+        double maxY = getResultStack().popDoubleValue();
+        double maxX = getResultStack().popDoubleValue();
+        double minY = getResultStack().popDoubleValue();
+        double minX = getResultStack().popDoubleValue();
+
+        Expression expr = getResultStack().popExpression();
+
+        FilterFactory2 ff = (FilterFactory2)getFilterFactory();
+        
+        BBOX bbox = ff.bbox(
+                    expr, minX, minY, maxX, maxY, crs);
+        return bbox;
+    }
 
 }

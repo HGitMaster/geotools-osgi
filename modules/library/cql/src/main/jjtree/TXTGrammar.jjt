@@ -403,6 +403,7 @@ void IdList() #void:
 	<LP> IdValue()( <COMMA>  IdValue() )* <RP> 
 	
 } 
+
 void IdValue() #FEATURE_ID_NODE:
 {}
 {
@@ -424,6 +425,7 @@ void InPredicate() #void:
   	|	   				Attribute() <IN> InPredicateList() 		#In_Predicate_Node
   	
 }
+
 void InPredicateList() #void:
 {}
 {

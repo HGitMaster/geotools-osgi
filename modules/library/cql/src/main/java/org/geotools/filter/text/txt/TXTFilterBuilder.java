@@ -35,7 +35,6 @@ import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.BinarySpatialOperator;
@@ -175,16 +174,16 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
             exprList.add(expr);
         }
 
-        assert exprList.size() >= 1 : "must have one or more FeatureIds";
+        assert exprList.size() >= 1 : "must have one or more expressions";
 
-        // retrieve the attribute from stack
-        final PropertyName property = getResultStack().popPropertyName();
+        // retrieve the left hand expression from the stack 
+        final Expression leftHandExpr = getResultStack().popExpression();
 
         // makes one comparison for each expression in the expression list,
         // associated by the Or filter.
         List<Filter> filterList = new LinkedList<Filter>();
         for (Expression expression : exprList) {
-            PropertyIsEqualTo eq = getFilterFactory().equals(property,
+            PropertyIsEqualTo eq = getFilterFactory().equals(leftHandExpr,
                     expression);
             filterList.add(eq);
         }
@@ -340,9 +339,9 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
 
     public BinarySpatialOperator buildSpatialEqualFilter() throws CQLException {
 
-        SpatialEqualsBuilder builder = new SpatialEqualsBuilder(
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(
                 getResultStack(), getFilterFactory());
-        BinarySpatialOperator filter = builder.build();
+        BinarySpatialOperator filter = builder.buildEquals();
 
         return filter;
 
@@ -350,10 +349,10 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
 
     public BinarySpatialOperator buildSpatialDisjointFilter()
             throws CQLException {
-        SpatialDisjointBuilder builder = new SpatialDisjointBuilder(
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(
                 getResultStack(), getFilterFactory());
 
-        BinarySpatialOperator filter = builder.build();
+        BinarySpatialOperator filter = builder.buildDisjoint();
 
         return filter;
     }
@@ -361,10 +360,10 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
     public BinarySpatialOperator buildSpatialIntersectsFilter()
             throws CQLException {
 
-        SpatialIntersectsBuilder builder = new SpatialIntersectsBuilder(
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(
                 getResultStack(), getFilterFactory());
 
-        BinarySpatialOperator filter = builder.build();
+        BinarySpatialOperator filter = builder.buildIntersects();
 
         return filter;
     }
@@ -372,10 +371,10 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
     public BinarySpatialOperator buildSpatialTouchesFilter()
             throws CQLException {
 
-        SpatialTouchesBuilder builder = new SpatialTouchesBuilder(
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(
                 getResultStack(), getFilterFactory());
 
-        BinarySpatialOperator filter = builder.build();
+        BinarySpatialOperator filter = builder.buildTouches();
 
         return filter;
     }
@@ -383,10 +382,10 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
     public BinarySpatialOperator buildSpatialCrossesFilter()
             throws CQLException {
 
-        SpatialCrossesBuilder builder = new SpatialCrossesBuilder(
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(
                 getResultStack(), getFilterFactory());
 
-        BinarySpatialOperator filter = builder.build();
+        BinarySpatialOperator filter = builder.buildCrosses();
 
         return filter;
 
@@ -471,10 +470,10 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
 
     public BinarySpatialOperator buildSpatialWithinFilter() throws CQLException {
 
-        SpatialWithinBuilder builder = new SpatialWithinBuilder(
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(
                 getResultStack(), getFilterFactory());
 
-        BinarySpatialOperator filter = builder.build();
+        BinarySpatialOperator filter = builder.buildWithin();
 
         return filter;
     }
@@ -482,10 +481,10 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
     public BinarySpatialOperator buildSpatialContainsFilter()
             throws CQLException {
 
-        SpatialContainsBuilder builder = new SpatialContainsBuilder(
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(
                 getResultStack(), getFilterFactory());
 
-        BinarySpatialOperator filter = builder.build();
+        BinarySpatialOperator filter = builder.buildContains();
 
         return filter;
 
@@ -494,10 +493,10 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
     public BinarySpatialOperator buildSpatialOverlapsFilter()
             throws CQLException {
 
-        SpatialOverlapsBuilder builder = new SpatialOverlapsBuilder(
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(
                 getResultStack(), getFilterFactory());
 
-        BinarySpatialOperator filter = builder.build();
+        BinarySpatialOperator filter = builder.buildOverlaps();
 
         return filter;
     }
@@ -522,10 +521,10 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
 
     public org.opengis.filter.spatial.BBOX buildBBox() throws CQLException {
 
-        SpatialBBoxBuilder builder = new SpatialBBoxBuilder(getResultStack(),
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(getResultStack(),
                 getFilterFactory());
 
-        BBOX filter = builder.build();
+        BBOX filter = builder.buildBBox();
 
         return filter;
     }
@@ -533,10 +532,10 @@ final class TXTFilterBuilder extends CQLFilterBuilder {
     public org.opengis.filter.spatial.BBOX buildBBoxWithCRS()
             throws CQLException {
 
-        SpatialBBoxBuilder builder = new SpatialBBoxBuilder(getResultStack(),
+        SpatialOperationBuilder builder = new SpatialOperationBuilder(getResultStack(),
                 getFilterFactory());
 
-        BBOX filter = builder.buildWithCRS();
+        BBOX filter = builder.buildBBoxWithCRS();
 
         return filter;
     }
