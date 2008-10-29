@@ -20,7 +20,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +39,7 @@ public class WFSDataStoreFactoryTest extends TestCase {
 
     private Map<String, Serializable> params;
 
-    public WFSDataStoreFactoryTest(String name) {
+    public WFSDataStoreFactoryTest( String name ) {
         super(name);
     }
 
@@ -76,17 +79,17 @@ public class WFSDataStoreFactoryTest extends TestCase {
         testCreateDataStore_WFS_1_1_0(capabilitiesFile);
     }
 
-    private void testCreateDataStore_WFS_1_1_0(final String capabilitiesFile) throws IOException {
+    private void testCreateDataStore_WFS_1_1_0( final String capabilitiesFile ) throws IOException {
         // override caps loading not to set up an http connection at all but to
         // load the test file
-        final WFSDataStoreFactory dsf = new WFSDataStoreFactory() {
+        final WFSDataStoreFactory dsf = new WFSDataStoreFactory(){
             @Override
-            byte[] loadCapabilities(final URL capabilitiesUrl, final ConnectionFactory connectionFac)
-                    throws IOException {
+            byte[] loadCapabilities( final URL capabilitiesUrl,
+                    final ConnectionFactory connectionFac ) throws IOException {
                 InputStream in = capabilitiesUrl.openStream();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 int aByte;
-                while ((aByte = in.read()) != -1) {
+                while( (aByte = in.read()) != -1 ) {
                     out.write(aByte);
                 }
                 return out.toByteArray();
@@ -94,7 +97,7 @@ public class WFSDataStoreFactoryTest extends TestCase {
         };
         Map<String, Serializable> params = new HashMap<String, Serializable>();
         final URL capabilitiesUrl = TestData.getResource(this, capabilitiesFile);
-        if(capabilitiesUrl == null){
+        if (capabilitiesUrl == null) {
             throw new IllegalArgumentException(capabilitiesFile + " not found");
         }
         params.put(WFSDataStoreFactory.URL.key, capabilitiesUrl);
@@ -103,4 +106,34 @@ public class WFSDataStoreFactoryTest extends TestCase {
         assertTrue(dataStore instanceof WFS_1_1_0_DataStore);
     }
 
+    @SuppressWarnings("nls")
+    public void testCreateCapabilities() throws MalformedURLException, UnsupportedEncodingException {
+        final String parametrizedUrl = "https://excise.pyr.ec.gc.ca:8081/cgi-bin/mapserv.exe?map=/LocalApps/Mapsurfer/PYRWQMP.map&service=WFS&version=1.0.0&request=GetCapabilities";
+        URL url = WFSDataStoreFactory.createGetCapabilitiesRequest(new URL(parametrizedUrl));
+        assertNotNull(url);
+        assertEquals("https", url.getProtocol());
+        assertEquals("excise.pyr.ec.gc.ca", url.getHost());
+        assertEquals(8081, url.getPort());
+        assertEquals("/cgi-bin/mapserv.exe", url.getPath());
+
+        String query = url.getQuery();
+        assertNotNull(query);
+
+        Map<String, String> kvpMap = new HashMap<String, String>();
+        String[] kvpPairs = query.split("&");
+        for( String kvp : kvpPairs ) {
+            assertTrue(kvp.indexOf('=') > 0);
+            String[] split = kvp.split("=");
+            String param = split[0];
+            String value = split[1];
+            value = URLDecoder.decode(value, "UTF-8");
+            assertFalse(kvpMap.containsKey(param));
+            kvpMap.put(param.toUpperCase(), value);
+        }
+
+        assertEquals("/LocalApps/Mapsurfer/PYRWQMP.map", kvpMap.get("MAP"));
+        assertEquals("GetCapabilities", kvpMap.get("REQUEST"));
+        assertEquals("WFS", kvpMap.get("SERVICE"));
+        assertEquals("1.0.0", kvpMap.get("VERSION"));
+    }
 }
