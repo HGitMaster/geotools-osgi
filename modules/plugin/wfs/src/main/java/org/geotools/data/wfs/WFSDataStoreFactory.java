@@ -40,14 +40,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.wfs.v1_0_0.WFS100ProtocolHandler;
+import org.geotools.data.wfs.v1_0_0.WFS_1_0_0_DataStore;
+import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
+import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_Protocol;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.protocol.ConnectionFactory;
 import org.geotools.wfs.protocol.DefaultConnectionFactory;
-import org.geotools.wfs.v_1_0_0.data.WFS100ProtocolHandler;
-import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
-import org.geotools.wfs.v_1_1_0.data.WFS_1_1_0_DataStore;
-import org.geotools.wfs.v_1_1_0.data.WFS_1_1_0_Protocol;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -71,7 +71,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31729 2008-10-29 11:54:23Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31730 2008-10-29 13:29:21Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $

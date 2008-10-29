@@ -29,9 +29,9 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.test.TestData;
 import org.geotools.wfs.protocol.ConnectionFactory;
-import org.geotools.wfs.v_1_1_0.data.WFS_1_1_0_DataStore;
 
 public class WFSDataStoreFactoryTest extends TestCase {
 

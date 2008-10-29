@@ -18,7 +18,6 @@ package org.geotools.data.wfs;
 
 import java.io.IOException;
 
-import org.geotools.wfs.v_1_0_0.data.WFSFeatureReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -26,10 +25,9 @@ import org.opengis.feature.simple.SimpleFeature;
  * request from the underlying xml parsing technology in use.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: GetFeatureParser.java 31720 2008-10-24 22:57:22Z groldan $
+ * @version $Id: GetFeatureParser.java 31730 2008-10-29 13:29:21Z groldan $
  * @since 2.5.x
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/GetFeatureParser.java $
- * @see WFSFeatureReader
  */
 public interface GetFeatureParser extends WFSResponseParser{
 
