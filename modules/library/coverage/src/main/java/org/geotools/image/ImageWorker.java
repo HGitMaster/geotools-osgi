@@ -70,7 +70,7 @@ import org.geotools.resources.image.ImageUtilities;
  *
  * @since 2.3
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
- * @version $Id: ImageWorker.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @version $Id: ImageWorker.java 31735 2008-10-30 01:55:57Z simboss $
  * @author Simone Giannecchini
  * @author Bryce Nordgren
  * @author Martin Desruisseaux
@@ -1066,12 +1066,20 @@ public class ImageWorker {
             final IndexColorModel icm = (IndexColorModel) cm;
             final boolean gray     = ColorUtilities.isGrayPalette(icm, checkTransparent);
             final boolean alpha    = icm.hasAlpha();
-            final int     numBands = icm.getNumComponents();
-            final byte    data[][] = new byte[cm.getNumComponents()][icm.getMapSize()];
+            final int     numSourceBands = icm.getNumComponents();
+            /*
+             * If the image is grayscale, retain only the first band.
+             *
+             */            
+            final int     numDestinationBands = gray?(alpha?2:1):(alpha?4:3);
+            
+            final byte    data[][] = new byte[numDestinationBands][icm.getMapSize()];
             icm.getReds  (data[0]);
-            icm.getGreens(data[1]);
-            icm.getBlues (data[2]);
-            if (numBands == 4) {
+            if(numDestinationBands>=2)
+            	icm.getGreens(data[1]);
+            if(numDestinationBands>=3)
+            	icm.getBlues (data[2]);
+            if (numDestinationBands == 4) {
                 icm.getAlphas(data[3]);
             }
             final LookupTableJAI lut = new LookupTableJAI(data);
@@ -1080,21 +1088,28 @@ public class ImageWorker {
              * about tiling. If the user overrode the rendering hints with an
              * explict color model, keep the user's choice.
              */
-            final RenderingHints hints = getRenderingHints();
-            image = LookupDescriptor.create(image, lut, hints);
-            /*
-             * If the image is grayscale, retain only the first band.
-             *
-             * TODO: it would be better to merge this work with the previous "Lookup" so only
-             *       one image operation is performed instead of two.
-             */
-            if (gray) {
-                if (alpha) {
-                    retainBands(new int[] {0, 3});
-                } else {
-                    retainBands(1);
-                }
+            final RenderingHints hints = (RenderingHints) getRenderingHints();
+            final ImageLayout layout;
+            final Object candidate = hints.get(JAI.KEY_IMAGE_LAYOUT);
+            if (candidate instanceof ImageLayout) {
+            	layout= (ImageLayout) candidate;
             }
+            else
+            {
+            	layout= new ImageLayout(image);
+            	hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT,layout));
+            }
+            final ComponentColorModel destinationColorModel=new ComponentColorModel(
+            		numDestinationBands>=3?ColorSpace.getInstance(ColorSpace.CS_sRGB):ColorSpace.getInstance(ColorSpace.CS_GRAY),
+                    		alpha,
+                    		cm.isAlphaPremultiplied(),
+                    		cm.getTransparency(),
+                    		cm.getTransferType());
+            final SampleModel destinationSampleModel=destinationColorModel.createCompatibleSampleModel(image.getWidth(), image.getHeight());
+            layout.setColorModel(destinationColorModel);
+            layout.setSampleModel(destinationSampleModel);
+            image = LookupDescriptor.create(image, lut, hints);
+
         } else {
             // Most of the code adapted from jai-interests is in 'getRenderingHints(int)'.
             final int type = (cm instanceof DirectColorModel) ?
@@ -1767,6 +1782,7 @@ public class ImageWorker {
             }
         }
         image = BandMergeDescriptor.create(image, luImage, hints);
+        
         invalidateStatistics();
         return this;
     }

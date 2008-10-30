@@ -1514,10 +1514,10 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// /
 			ImageWorker w = new ImageWorker(preparationImage);
 			if (preparationImage.getColorModel() instanceof IndexColorModel) {
-				preparationImage = w.maskIndexColorModelByte(
+				preparationImage = w.makeColorTransparent(
 						outputTransparentColor).getPlanarImage();
 			} else
-				preparationImage = w.maskComponentColorModelByte(
+				preparationImage = w.makeColorTransparent(
 						outputTransparentColor).getPlanarImage();
 
 			////////////////////////////////////////////////////////////////////
@@ -1637,10 +1637,10 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			ImageWorker w = new ImageWorker(readyToMosaicImage);
 			if (readyToMosaicImage.getColorModel() instanceof IndexColorModel) {
 				readyToMosaicImage = w
-						.maskIndexColorModelByte(transparentColor)
+						.makeColorTransparent(transparentColor)
 						.getPlanarImage();
 			} else
-				readyToMosaicImage = w.maskComponentColorModelByte(
+				readyToMosaicImage = w.makeColorTransparent(
 						transparentColor).getPlanarImage();
 			alphaIndex = new int[] { readyToMosaicImage.getColorModel()
 					.getNumComponents() - 1 };
