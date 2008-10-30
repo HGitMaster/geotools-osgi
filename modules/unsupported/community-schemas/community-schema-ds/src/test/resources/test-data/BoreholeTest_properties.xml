@@ -236,7 +236,7 @@
 
         <AttributeMapping>
           <targetAttribute>xmml:log/xmml:IntervalLog/xmml:range/xmml:ListOfBands/xmml:categoryList[1]</targetAttribute>
-          <!-- TODO: not nillable? (some are null since grouping removed)
+          <!-- TODO: not nillable? All LITHOSTRAT are null
           <sourceExpression>
             <OCQL>LITHOSTRAT</OCQL>
           </sourceExpression>
@@ -271,13 +271,8 @@
 
         <AttributeMapping>
           <targetAttribute>xmml:log/xmml:IntervalLog/xmml:range/xmml:ListOfBands/xmml:categoryList[3]</targetAttribute>
-          <!-- TODO: not nillable? (some are null since grouping removed)
           <sourceExpression>
             <OCQL>BASE_BED_C</OCQL>
-          </sourceExpression>
-          -->
-          <sourceExpression>
-            <OCQL>'missing'</OCQL>
           </sourceExpression>
           <ClientProperty>
             <name>swe:codeSpace</name>

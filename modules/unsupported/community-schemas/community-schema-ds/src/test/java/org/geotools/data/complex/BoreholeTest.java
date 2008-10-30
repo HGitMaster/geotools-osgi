@@ -64,7 +64,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: BoreholeTest.java 31727 2008-10-29 07:20:31Z bencd $
+ * @version $Id: BoreholeTest.java 31736 2008-10-30 02:01:17Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
  * @since 2.4
@@ -312,7 +312,7 @@ public class BoreholeTest extends TestCase {
         final FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
                 .getFeatureSource(typeName);
         final String queryProperty = "sa:shape/geo:LineByVector/geo:origin/@xlink:href";
-        final String queryLiteral = "#bh.176909.start";
+        final String queryLiteral = "#bh.176909a.start";
 
         NamespaceSupport namespaces = new NamespaceSupport();
         namespaces.declarePrefix("sa", SANS);
@@ -330,9 +330,7 @@ public class BoreholeTest extends TestCase {
 
         // did the query work?
         int resultCount = getCount(features);
-        // we now expect two features because the old grouping implementation is disabled
-        // and because we have two property files rows with this id
-        assertEquals(2, resultCount);
+        assertEquals(1, resultCount);
 
         // the datastore performed the query by unmapping the client property
         // to its corresponding source expression, as defined in the AttributeMapping
@@ -357,7 +355,7 @@ public class BoreholeTest extends TestCase {
         final FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
                 .getFeatureSource(typeName);
         final String queryProperty = "sa:shape/geo:LineByVector/geo:origin/@xlink:href";
-        final String queryLiteral = "#bh.176909.start";
+        final String queryLiteral = "#bh.176909a.start";
 
         NamespaceSupport namespaces = new NamespaceSupport();
         namespaces.declarePrefix("sa", SANS);
