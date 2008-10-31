@@ -35,7 +35,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeBuilder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.SafeGmlIdFeatureFactoryImpl;
+import org.geotools.feature.ComplexFeatureFactoryImpl;
 import org.geotools.feature.Types;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.opengis.feature.Attribute;
@@ -60,7 +60,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * feature of the source type.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: MappingFeatureIterator.java 31721 2008-10-27 08:18:47Z bencd $
+ * @version $Id: MappingFeatureIterator.java 31741 2008-10-31 03:49:45Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/AbstractMappingFeatureIterator.java $
  * @since 2.4
@@ -121,7 +121,7 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
     public MappingFeatureIterator(ComplexDataStore store, FeatureTypeMapping mapping, Query query)
             throws IOException {
         this.store = store;
-        this.attf = new SafeGmlIdFeatureFactoryImpl();
+        this.attf = new ComplexFeatureFactoryImpl();
         Name name = mapping.getTargetFeature().getName();
         this.featureSource = store.getFeatureSource(name);
 

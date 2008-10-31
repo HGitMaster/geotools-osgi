@@ -19,7 +19,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * FeatureFactory that does not choke on null gml ids.
  * 
  */
-public class SafeGmlIdFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
+public class ComplexFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
 
     /*
      * @see org.geotools.feature.AbstractFeatureFactoryImpl#createAttribute(java.lang.Object,
