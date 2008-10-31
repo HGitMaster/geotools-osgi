@@ -22,23 +22,22 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import junit.framework.TestCase;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.DataStoreFactorySpi;
-import org.geotools.data.feature.FeatureAccess;
-import org.geotools.data.feature.FeatureSource2;
-import org.geotools.feature.iso.Types;
-import org.geotools.util.logging.Logging;
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.Types;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ComplexDataStoreFactoryTest.java 31374 2008-09-03 07:26:50Z bencd $
+ * @version $Id: ComplexDataStoreFactoryTest.java 31742 2008-10-31 06:00:25Z bencd $
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/ComplexDataStoreFactoryTest.java $
  * @since 2.4
  */
@@ -123,9 +122,9 @@ public class ComplexDataStoreFactoryTest extends TestCase {
      * @throws IOException
      */
     public void testCreateDataStore() throws IOException {
-        FeatureAccess ds = (FeatureAccess) factory.createDataStore(params);
+        DataAccess<FeatureType, Feature> ds = factory.createDataStore(params);
         assertNotNull(ds);
-        FeatureSource2 mappedSource = (FeatureSource2) ds.access(mappedTypeName);
+        FeatureSource<FeatureType, Feature> mappedSource = ds.getFeatureSource(mappedTypeName);
         assertNotNull(mappedSource);
         assertSame(ds, mappedSource.getDataStore());
     }
@@ -135,11 +134,11 @@ public class ComplexDataStoreFactoryTest extends TestCase {
      * @throws IOException
      */
     public void testFactoryLookup() throws IOException {
-        DataAccess ds = DataAccessFinder.createAccess(params);
+        DataAccess<FeatureType, Feature> ds = DataAccessFinder.getDataStore(params);
         assertNotNull(ds);
         assertTrue(ds instanceof ComplexDataStore);
 
-        FeatureSource2 mappedSource = (FeatureSource2) ds.access(mappedTypeName);
+        FeatureSource<FeatureType, Feature> mappedSource = ds.getFeatureSource(mappedTypeName);
         assertNotNull(mappedSource);
     }
 

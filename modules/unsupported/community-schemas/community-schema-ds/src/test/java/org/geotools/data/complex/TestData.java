@@ -17,22 +17,26 @@
 
 package org.geotools.data.complex;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.feature.memory.MemoryDataAccess;
+import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.TypeBuilder;
 import org.geotools.feature.Types;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
@@ -45,7 +49,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: TestData.java 31611 2008-10-02 08:16:20Z bencd $
+ * @version $Id: TestData.java 31742 2008-10-31 06:00:25Z bencd $
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/TestData.java $
  * @since 2.4
  */
@@ -75,7 +79,7 @@ public class TestData {
      * @return
      */
     public static FeatureType createComplexWaterQualityType() {
-        TypeFactoryImpl tfac = new TypeFactoryImpl();
+        FeatureTypeFactory tfac = new FeatureTypeFactoryImpl();
         TypeBuilder builder = new TypeBuilder(tfac);
 
         FeatureType wq_plusType;
@@ -118,7 +122,7 @@ public class TestData {
     }
 
     public static FeatureType createComplexWaterSampleType() {
-        TypeFactoryImpl tfac = new TypeFactoryImpl();
+        FeatureTypeFactory tfac = new FeatureTypeFactoryImpl();
         TypeBuilder builder = new TypeBuilder(tfac);
 
         FeatureType sampleType;
@@ -248,13 +252,13 @@ public class TestData {
      * @return
      * @throws Exception
      */
-    public static FeatureTypeMapping createMappingsGroupByStation(MemoryDataAccess simpleStore)
+    public static FeatureTypeMapping createMappingsGroupByStation(MemoryDataStore simpleStore)
             throws Exception {
         Name sourceTypeName = WATERSAMPLE_TYPENAME;
-        final FeatureSource2 wsSource = (FeatureSource2) simpleStore.access(sourceTypeName);
+        final FeatureSource<SimpleFeatureType, SimpleFeature> wsSource = simpleStore.getFeatureSource(sourceTypeName);
 
         FeatureType targetType = createComplexWaterQualityType();
-        TypeFactory tf = new TypeFactoryImpl();
+        FeatureTypeFactory tf = new FeatureTypeFactoryImpl();
         AttributeDescriptor targetFeature = tf.createAttributeDescriptor(targetType, targetType
                 .getName(), 0, Integer.MAX_VALUE, true, null);
 
@@ -308,19 +312,9 @@ public class TestData {
         mappings.add(new AttributeMapping(null, source, XPath.steps(targetFeature, target,
                 namespaces)));
 
-        FeatureTypeMapping mapper = new FeatureTypeMapping(wsSource, targetFeature, mappings,
+        return new FeatureTypeMapping(wsSource, targetFeature, mappings,
                 namespaces);
 
-        List/* <String> */groupingAttributes = new ArrayList/* <String> */();
-        groupingAttributes.add("station_no");
-        groupingAttributes.add("sitename");
-        groupingAttributes.add("anzlic_no");
-        groupingAttributes.add("project_no");
-        groupingAttributes.add("location");
-
-        mapper.setGroupByAttNames(groupingAttributes);
-
-        return mapper;
     }
 
     /**
@@ -410,38 +404,34 @@ public class TestData {
      * @return
      * @throws Exception
      */
-    public static MemoryDataAccess createDenormalizedWaterQualityResults() throws Exception {
-        MemoryDataAccess dataStore = new MemoryDataAccess();
-        SimpleTypeFactory tf = new SimpleTypeFactoryImpl();
-        SimpleTypeBuilder builder = new SimpleTypeBuilder(tf);
+    public static MemoryDataStore createDenormalizedWaterQualityResults() throws Exception {
+        MemoryDataStore dataStore = new MemoryDataStore();
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 
         builder.setName(TestData.WATERSAMPLE_TYPENAME.getLocalPart());
 
-        builder.addAttribute("station_no", String.class);
-        builder.addAttribute("sitename", String.class);
-        builder.addAttribute("anzlic_no", String.class);
-        builder.addAttribute("project_no", String.class);
-        builder.addAttribute("id", String.class);
-        builder.addAttribute("sample_collection_date", String.class);
-        builder.addAttribute("determinand_description", String.class);
-        builder.addAttribute("results_value", Float.class);
-        builder.addGeometry("location", Point.class);
+        builder.add("station_no", String.class);
+        builder.add("sitename", String.class);
+        builder.add("anzlic_no", String.class);
+        builder.add("project_no", String.class);
+        builder.add("id", String.class);
+        builder.add("sample_collection_date", String.class);
+        builder.add("determinand_description", String.class);
+        builder.add("results_value", Float.class);
+        builder.add("location", Point.class);
 
-        SimpleFeatureType type = builder.feature();
+        SimpleFeatureType type = builder.buildFeatureType();
 
-        dataStore.createSchemaInternal(type);
+        dataStore.createSchema(type);
 
         final int NUM_STATIONS = 10;
-        SimpleFeatureFactory af = new SimpleFeatureFactoryImpl();
         GeometryFactory gf = new GeometryFactory();
 
-        SimpleFeatureBuilder fb = new SimpleFeatureBuilder(new SimpleFeatureFactoryImpl());
+        SimpleFeatureBuilder fb = new SimpleFeatureBuilder(type);
         
         for (int groupValue = 1; groupValue <= NUM_STATIONS; groupValue++) {
 
             for (int measurement = 1; measurement <= groupValue; measurement++) {
-                fb.init();
-                fb.setType(type);
                 String fid = type.getName().getLocalPart() + "." + groupValue + "." + measurement;
                 
                 fb.add("station_no." + groupValue);
@@ -457,8 +447,8 @@ public class TestData {
 
                 fb.add(gf.createPoint(new Coordinate(groupValue, groupValue)));
 
-                SimpleFeature f = fb.feature(fid);
-                dataStore.addFeatureInternal(f);
+                SimpleFeature f = fb.buildFeature(fid);
+                dataStore.addFeature(f);
             }
         }
         return dataStore;

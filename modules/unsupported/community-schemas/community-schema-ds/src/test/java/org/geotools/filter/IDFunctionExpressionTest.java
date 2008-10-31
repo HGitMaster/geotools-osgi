@@ -22,8 +22,11 @@ import junit.framework.TestCase;
 import org.geotools.data.ComplexTestData;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeBuilder;
+import org.geotools.feature.ValidatingFeatureFactoryImpl;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.filter.expression.Function;
 
 /**
@@ -43,9 +46,9 @@ public class IDFunctionExpressionTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        TypeFactory typeFactory = new TypeFactoryImpl();
+        FeatureTypeFactory typeFactory = new FeatureTypeFactoryImpl();
         FeatureType type = ComplexTestData.createExample02MultipleMultivalued(typeFactory);
-        AttributeBuilder ab = new AttributeBuilder(new AttributeFactoryImpl());
+        AttributeBuilder ab = new AttributeBuilder(new ValidatingFeatureFactoryImpl());
         ab.setType(type);
         feature = (Feature) ab.build("test-id");
         idExpr = CommonFactoryFinder.getFilterFactory(null).function("getID", new org.opengis.filter.expression.Expression[0]);
@@ -56,7 +59,7 @@ public class IDFunctionExpressionTest extends TestCase {
     }
 
     public void testGetValue() throws Exception {
-        String fid = feature.getID();
+        Object fid = feature.getIdentifier();
         Object found = idExpr.evaluate(feature);
         assertNotNull(found);
         assertEquals(fid, found);

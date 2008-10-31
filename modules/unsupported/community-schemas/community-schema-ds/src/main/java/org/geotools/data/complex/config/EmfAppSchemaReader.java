@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.Stack;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -68,11 +67,9 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Schema;
 import org.opengis.filter.Filter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -91,7 +88,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: EmfAppSchemaReader.java 31721 2008-10-27 08:18:47Z bencd $
+ * @version $Id: EmfAppSchemaReader.java 31742 2008-10-31 06:00:25Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/EmfAppSchemaReader.java $
  * @since 2.4

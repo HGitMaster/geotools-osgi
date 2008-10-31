@@ -16,7 +16,12 @@ import org.opengis.filter.identity.GmlObjectId;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * FeatureFactory that does not choke on null gml ids.
+ * FeatureFactory that:
+ * 
+ * <ul>
+ * <li>does not choke on null gml ids
+ * <li>constructs containers for complex attributes with null values
+ * </ul>
  * 
  */
 public class ComplexFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {

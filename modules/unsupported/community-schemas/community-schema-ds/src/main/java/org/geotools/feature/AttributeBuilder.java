@@ -614,7 +614,6 @@ public class AttributeBuilder {
                 }
             }
         }
-
         properties().clear();
         return built;
     }

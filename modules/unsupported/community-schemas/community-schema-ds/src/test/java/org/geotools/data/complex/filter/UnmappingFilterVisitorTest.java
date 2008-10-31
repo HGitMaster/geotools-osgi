@@ -29,30 +29,33 @@ import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.ComplexDataStore;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.complex.TestData;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
-import org.geotools.data.feature.FeatureAccess;
-import org.geotools.data.feature.FeatureSource2;
-import org.geotools.data.feature.memory.MemoryDataAccess;
+import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.iso.TypeBuilder;
-import org.geotools.feature.iso.Types;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.NameImpl;
+import org.geotools.feature.TypeBuilder;
+import org.geotools.feature.Types;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
-import org.geotools.gml3.bindings.GML;
-import org.geotools.xlink.bindings.XLINK;
+import org.geotools.gml3.GML;
+import org.geotools.xlink.XLINK;
 import org.opengis.feature.Feature;
-import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeFactory;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -79,8 +82,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: UnmappingFilterVisitorTest.java 25884 2007-06-18 15:12:57Z
- *          groldan $
+ * @version $Id: UnmappingFilterVisitorTest.java 31742 2008-10-31 06:00:25Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/filter/UnmappingFilterVisitorTest.java $
  * @since 2.4
@@ -91,7 +93,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
 
     private UnmappingFilterVisitor visitor;
 
-    MemoryDataAccess dataStore;
+    MemoryDataStore dataStore;
 
     FeatureTypeMapping mapping;
 
@@ -112,17 +114,16 @@ public class UnmappingFilterVisitorTest extends TestCase {
     }
 
     /**
-     * Creates a mapping from the test case simple source to a complex type with
-     * an "areaOfInfluence" attribute, which is a buffer over the simple
-     * "location" attribute and another which is the concatenation of the
-     * attributes "anzlic_no" and "project_no"
+     * Creates a mapping from the test case simple source to a complex type with an
+     * "areaOfInfluence" attribute, which is a buffer over the simple "location" attribute and
+     * another which is the concatenation of the attributes "anzlic_no" and "project_no"
      * 
      * @return
      * @throws Exception
      */
     private FeatureTypeMapping createSampleDerivedAttributeMappings() throws Exception {
         // create the target type
-        TypeFactory tf = new org.geotools.feature.iso.type.TypeFactoryImpl();
+        FeatureTypeFactory tf = new FeatureTypeFactoryImpl();
         TypeBuilder builder = new TypeBuilder(tf);
 
         AttributeType areaOfInfluence = builder.name("areaOfInfluence").bind(Polygon.class)
@@ -153,16 +154,15 @@ public class UnmappingFilterVisitorTest extends TestCase {
         attMappings.add(new AttributeMapping(null, strConcat, XPath.steps(targetFeature,
                 "concatenated", namespaces)));
 
-        FeatureSource2 simpleSource = mapping.getSource();
+        FeatureSource<SimpleFeatureType, SimpleFeature> simpleSource = mapping.getSource();
         FeatureTypeMapping mapping = new FeatureTypeMapping(simpleSource, targetFeature,
                 attMappings, namespaces);
         return mapping;
     }
 
     /**
-     * Mapping specifies station_no --> wq_plus/@id. A FidFilter over wq_plus
-     * type should result in a compare equals filter over the station_no
-     * attribute of wq_ir_results simple type.
+     * Mapping specifies station_no --> wq_plus/@id. A FidFilter over wq_plus type should result in
+     * a compare equals filter over the station_no attribute of wq_ir_results simple type.
      */
     public void testUnrollFidMappedToAttribute() throws Exception {
         String fid = "station_no.1";
@@ -171,14 +171,14 @@ public class UnmappingFilterVisitorTest extends TestCase {
         Filter unrolled = (Filter) fidFilter.accept(visitor, null);
         assertNotNull(unrolled);
 
-        FeatureCollection results = (FeatureCollection) mapping.getSource().content(unrolled);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = mapping.getSource().getFeatures(unrolled);
         assertEquals(1, getCount(results));
 
-        Iterator features = results.iterator();
+        Iterator<SimpleFeature> features = results.iterator();
         SimpleFeature unmappedFeature = (SimpleFeature) features.next();
         results.close(features);
         assertNotNull(unmappedFeature);
-        Object object = unmappedFeature.getValue("station_no");
+        Object object = unmappedFeature.getProperty("station_no");
         assertEquals(fid, object);
     }
 
@@ -197,9 +197,9 @@ public class UnmappingFilterVisitorTest extends TestCase {
     }
 
     /**
-     * If no a specific mapping is defined for the feature id, the same feature
-     * id from the originating feature source is used. In such a case, an
-     * unrolled FidFilter should stay being a FidFilter.
+     * If no a specific mapping is defined for the feature id, the same feature id from the
+     * originating feature source is used. In such a case, an unrolled FidFilter should stay being a
+     * FidFilter.
      */
     public void testUnrollFidToFid() throws Exception {
 
@@ -224,12 +224,12 @@ public class UnmappingFilterVisitorTest extends TestCase {
 
         this.visitor = new UnmappingFilterVisitor(this.mapping);
 
-        FeatureCollection content = (FeatureCollection) mapping.getSource().content();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> content = mapping.getSource().getFeatures();
         Iterator iterator = content.iterator();
         Feature sourceFeature = (Feature) iterator.next();
         content.close(iterator);
 
-        String fid = sourceFeature.getID();
+        String fid = sourceFeature.getIdentifier().toString();
 
         Id fidFilter = ff.id(Collections.singleton(ff.featureId(fid)));
 
@@ -237,7 +237,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertNotNull(unrolled);
         assertTrue(unrolled instanceof Id);
 
-        FeatureCollection results = (FeatureCollection) mapping.getSource().content(unrolled);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = mapping.getSource().getFeatures(unrolled);
         assertEquals(1, getCount(results));
         iterator = results.iterator();
         SimpleFeature unmappedFeature = (SimpleFeature) iterator.next();
@@ -283,10 +283,11 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertTrue(arg0 instanceof PropertyName);
         assertEquals("location", ((PropertyName) arg0).getPropertyName());
     }
-    
+
     /**
      * An xpath expression may target a "client property" mapping (in xml land, an xml attribute
      * rather than a xml element).
+     * 
      * @throws Exception
      */
     public void testPropertyNameWithXlinkAttribute() throws Exception {
@@ -297,11 +298,11 @@ public class UnmappingFilterVisitorTest extends TestCase {
         dsParams.put("url", url.toExternalForm());
 
         final String XMMLNS = "http://www.opengis.net/xmml";
-        final Name typeName = new org.geotools.feature.Name(XMMLNS, "Borehole");
+        final Name typeName = new NameImpl(XMMLNS, "Borehole");
 
-        FeatureAccess mappingDataStore = (FeatureAccess) DataAccessFinder.createAccess(dsParams);
+        DataAccess<FeatureType, Feature> mappingDataStore = DataAccessFinder.getDataStore(dsParams);
         ComplexDataStore complexDs = (ComplexDataStore) mappingDataStore;
-        mapping = complexDs.getMapping(typeName.getLocalPart());
+        mapping = complexDs.getMapping(typeName);
 
         NamespaceSupport namespaces = new NamespaceSupport();
         namespaces.declarePrefix("gml", GML.NAMESPACE);
@@ -311,15 +312,14 @@ public class UnmappingFilterVisitorTest extends TestCase {
         FilterFactory2 ff = new FilterFactoryImplNamespaceAware(namespaces);
         String xpathExpression = "sa:shape/geo:LineByVector/geo:origin/@xlink:href";
         PropertyName propNameExpression = ff.property(xpathExpression);
-        
+
         visitor = new UnmappingFilterVisitor(mapping);
 
-        List /*<Expression>*/ unrolled = (List) propNameExpression.accept(visitor, null);
+        List /* <Expression> */unrolled = (List) propNameExpression.accept(visitor, null);
         assertNotNull(unrolled);
         assertEquals(1, unrolled.size());
         assertTrue(unrolled.get(0) instanceof Expression);
     }
-
 
     public void testBetweenFilter() throws Exception {
         PropertyIsBetween bf = ff.between(ff.property("measurement/result"), ff.literal(1), ff
@@ -356,23 +356,19 @@ public class UnmappingFilterVisitorTest extends TestCase {
     }
 
     /**
-     * There might be multiple mappings per propery name, like
-     * <code>gml:name[1] = att1</code>,
-     * <code>gml:name2 = strConcat(att2, att3)</code>,
-     * <code>gml:name[3] = "sampleValue</code>.
+     * There might be multiple mappings per propery name, like <code>gml:name[1] = att1</code>,
+     * <code>gml:name2 = strConcat(att2, att3)</code>, <code>gml:name[3] = "sampleValue</code>.
      * <p>
-     * In the BoreHole test mapping used here, the following mappings exist for
-     * gml:name:
+     * In the BoreHole test mapping used here, the following mappings exist for gml:name:
      * <ul>
-     * <li>gml:name[1] = strConcat( strConcat(QS, strConcat("/", RT)),
-     * strConcat(strConcat("/", NUMB), strConcat("/", BSUFF)) )</li>
+     * <li>gml:name[1] = strConcat( strConcat(QS, strConcat("/", RT)), strConcat(strConcat("/",
+     * NUMB), strConcat("/", BSUFF)) )</li>
      * <li>gml:name[2] = BGS_ID</li>
      * <li>gml:name[3] = NAME</li>
      * <li>gml:name[4] = ORIGINAL_N</li>
      * </ul>
      * 
-     * This means the "unrolled" filter for
-     * <code>gml:name = "SWADLINCOTE"</code> should be
+     * This means the "unrolled" filter for <code>gml:name = "SWADLINCOTE"</code> should be
      * <code>strConcat( strConcat(QS, ...) = "SWADLINCOTE" 
      *          OR BGS_ID = "SWADLINCOTE" 
      *          OR NAME = "SWADLINCOTE" 
@@ -389,11 +385,11 @@ public class UnmappingFilterVisitorTest extends TestCase {
         dsParams.put("url", url.toExternalForm());
 
         final String XMMLNS = "http://www.opengis.net/xmml";
-        final Name typeName = new org.geotools.feature.Name(XMMLNS, "Borehole");
+        final Name typeName = new NameImpl(XMMLNS, "Borehole");
 
-        FeatureAccess mappingDataStore = (FeatureAccess) DataAccessFinder.createAccess(dsParams);
+        DataAccess<FeatureType, Feature> mappingDataStore = DataAccessFinder.getDataStore(dsParams);
         ComplexDataStore complexDs = (ComplexDataStore) mappingDataStore;
-        mapping = complexDs.getMapping(typeName.getLocalPart());
+        mapping = complexDs.getMapping(typeName);
 
         NamespaceSupport namespaces = new NamespaceSupport();
         namespaces.declarePrefix("gml", GML.NAMESPACE);
@@ -500,7 +496,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         mapping = createSampleDerivedAttributeMappings();
         visitor = new UnmappingFilterVisitor(mapping);
         targetDescriptor = mapping.getTargetFeature();
-        targetType = (FeatureType) targetDescriptor.type();
+        targetType = (FeatureType) targetDescriptor.getType();
 
         Expression literalGeom = ff
                 .literal(new GeometryFactory().createPoint(new Coordinate(1, 1)));

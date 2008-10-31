@@ -18,6 +18,7 @@
 package org.geotools.data.complex;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,23 +34,32 @@ import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeBuilder;
+import org.geotools.feature.ComplexFeatureFactoryImpl;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.ComplexFeatureFactoryImpl;
+import org.geotools.feature.GeometryAttributeImpl;
 import org.geotools.feature.Types;
+import org.geotools.feature.type.GeometryDescriptorImpl;
+import org.geotools.feature.type.GeometryTypeImpl;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureFactory;
+import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.Property;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.NamespaceSupport;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A Feature iterator that operates over the FeatureSource of a
@@ -60,7 +70,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * feature of the source type.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: MappingFeatureIterator.java 31741 2008-10-31 03:49:45Z bencd $
+ * @version $Id: MappingFeatureIterator.java 31742 2008-10-31 06:00:25Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/AbstractMappingFeatureIterator.java $
  * @since 2.4
@@ -308,6 +318,9 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
             }
             setSingleValuedAttribute(target, sourceInstance, attMapping);
         }
+         if (target.getDefaultGeometryProperty() == null) {
+            setGeometry(target);
+        }
         featureCounter++;
         if (!hasNext()) {
             close();
@@ -315,4 +328,35 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         return target;
     }
 
+    /**
+     * Set the feature geometry to that of the first property bound to a JTS geometry
+     * 
+     * @param feature
+     */
+    private void setGeometry(Feature feature) {
+        // FIXME an ugly, ugly hack to smuggle a geometry into a feature
+        // FeatureImpl.getBounds and GMLSchema do not work together
+        for (final Property property : feature.getProperties()) {
+            if (Geometry.class.isAssignableFrom(property.getType().getBinding())) {
+                // need to manufacture a GeometryDescriptor so we can make a GeometryAttribute
+                // in which we can store the Geometry
+                AttributeType type = (AttributeType) property.getType();
+                GeometryType geometryType = new GeometryTypeImpl(type.getName(), type.getBinding(),
+                        null, type.isIdentified(), type.isAbstract(), type.getRestrictions(), type
+                                .getSuper(), type.getDescription());
+                AttributeDescriptor descriptor = (AttributeDescriptor) property.getDescriptor();
+                GeometryDescriptor geometryDescriptor = new GeometryDescriptorImpl(geometryType,
+                        descriptor.getName(), descriptor.getMinOccurs(), descriptor.getMaxOccurs(),
+                        property.isNillable(), null);
+                GeometryAttribute geometryAttribute = new GeometryAttributeImpl(
+                        property.getValue(), geometryDescriptor, null);
+                List<Property> properties = new ArrayList<Property>(feature.getProperties());
+                properties.remove(property);
+                properties.add(geometryAttribute);
+                feature.setValue(properties);
+                feature.setDefaultGeometryProperty(geometryAttribute);
+                break;
+            }
+        }
+    }
 }

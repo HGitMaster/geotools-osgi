@@ -33,12 +33,10 @@ import java.util.logging.Logger;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.ServiceInfo;
-import org.geotools.data.Transaction;
 import org.geotools.data.complex.filter.UnmappingFilterVisitor;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.complex.filter.XPath.StepList;
@@ -56,12 +54,10 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import com.sun.org.apache.bcel.internal.generic.StoreInstruction;
-
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ComplexDataStore.java 31611 2008-10-02 08:16:20Z bencd $
+ * @version $Id: ComplexDataStore.java 31742 2008-10-31 06:00:25Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/ComplexDataStore.java $
  * @since 2.4
@@ -94,8 +90,8 @@ public class ComplexDataStore implements DataAccess<FeatureType, Feature> {
      * refers to the name of one of the types this datastore produces by mapping another ones
      * through the definitions stored in its {@linkplain FeatureTypeMapping}s
      */
-    public String[] getTypeNames() throws IOException {
-        String[] typeNames = new String[mappings.size()];
+    public Name[] getTypeNames() throws IOException {
+        Name[] typeNames = new Name[mappings.size()];
         this.mappings.keySet().toArray(typeNames);
         return typeNames;
     }

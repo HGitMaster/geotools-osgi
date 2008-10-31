@@ -19,6 +19,7 @@ package org.geotools.data.complex;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,28 +28,29 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.complex.config.EmfAppSchemaReader;
-import org.geotools.data.feature.FeatureAccess;
-import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
-import org.geotools.feature.iso.FeatureCollections;
-import org.geotools.feature.iso.Types;
-import org.geotools.feature.iso.UserData;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.NameImpl;
+import org.geotools.feature.Types;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.filter.text.cql2.CQL;
-import org.geotools.xlink.bindings.XLINK;
+import org.geotools.xlink.XLINK;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
-import org.opengis.feature.FeatureCollection;
-import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -64,14 +66,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: TimeSeriesStressTest.java 31374 2008-09-03 07:26:50Z bencd $
+ * @version $Id: TimeSeriesStressTest.java 31742 2008-10-31 06:00:25Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
  * @since 2.4
  */
 public class TimeSeriesStressTest extends TestCase {
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(TimeSeriesStressTest.class.getPackage()
-            .getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger(TimeSeriesStressTest.class.getPackage().getName());
 
     private static final String AWNS = "http://www.water.gov.au/awdip";
 
@@ -85,19 +87,19 @@ public class TimeSeriesStressTest extends TestCase {
 
     private static final String GMLNS = "http://www.opengis.net/gml";
 
- //   private static final String GEONS = "http://www.seegrid.csiro.au/xml/geometry";
+    // private static final String GEONS = "http://www.seegrid.csiro.au/xml/geometry";
 
     final String schemaBase = "/test-data/";
 
     EmfAppSchemaReader reader;
 
-    private FeatureSource2 source;
+    private FeatureSource<FeatureType, Feature> source;
 
     /**
      * DOCUMENT ME!
      * 
      * @throws Exception
-     *             DOCUMENT ME!
+     *                 DOCUMENT ME!
      */
     protected void setUp() throws Exception {
         super.setUp();
@@ -110,7 +112,7 @@ public class TimeSeriesStressTest extends TestCase {
      * DOCUMENT ME!
      * 
      * @throws Exception
-     *             DOCUMENT ME!
+     *                 DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -120,11 +122,10 @@ public class TimeSeriesStressTest extends TestCase {
      * DOCUMENT ME!
      * 
      * @param location
-     *            schema location path discoverable through
-     *            getClass().getResource()
+     *                schema location path discoverable through getClass().getResource()
      * 
      * @throws IOException
-     *             DOCUMENT ME!
+     *                 DOCUMENT ME!
      */
     private void loadSchema(String location) throws IOException {
         // load needed GML types directly from the gml schemas
@@ -153,21 +154,18 @@ public class TimeSeriesStressTest extends TestCase {
         dsParams.put("dbtype", "complex");
         dsParams.put("url", url.toExternalForm());
 
-        final Name typeName = new org.geotools.feature.Name(AWNS, "SiteSinglePhenomTimeSeries");
+        final Name typeName = new NameImpl(AWNS, "SiteSinglePhenomTimeSeries");
 
-        FeatureAccess mappingDataStore = (FeatureAccess) DataAccessFinder.createAccess(dsParams);
+        DataAccess<FeatureType, Feature> mappingDataStore = DataAccessFinder.getDataStore(dsParams);
         assertNotNull(mappingDataStore);
 
-        AttributeDescriptor attDesc = (AttributeDescriptor) mappingDataStore.describe(typeName);
-        assertNotNull(attDesc);
-        assertTrue(attDesc.type() instanceof FeatureType);
+        FeatureType fType = mappingDataStore.getSchema(typeName);
+        assertNotNull(fType);
 
-        FeatureType fType = (FeatureType) attDesc.type();
-
-        FeatureSource2 fSource = (FeatureSource2) mappingDataStore.access(typeName);
+        FeatureSource<FeatureType, Feature> fSource = mappingDataStore.getFeatureSource(typeName);
 
         Filter filter = CQL.toFilter("gml:name = 'stat_id_3000'");
-        FeatureCollection features = (FeatureCollection) fSource.content(filter);
+        FeatureCollection<FeatureType, Feature> features = fSource.getFeatures(filter);
         final int expectedResults = 3000;
         final int EXPECTED_RESULT_COUNT = 1;
         final int numberOfRuns = 5;
@@ -227,7 +225,7 @@ public class TimeSeriesStressTest extends TestCase {
         Attribute sampledFeatureVal = (Attribute) sampledFeatureName.evaluate(feature);
         assertNotNull("sa:sampledFeature evaluated to null", sampledFeatureVal);
         assertNull(sampledFeatureVal.getValue());
-        Map attributes = (Map) ((UserData) sampledFeatureVal).getUserData(Attributes.class);
+        Map attributes = (Map) sampledFeatureVal.getUserData().get(Attributes.class);
         assertNotNull(attributes);
         Name xlinkTitle = name(XLINK.NAMESPACE, "title");
         assertTrue(attributes.containsKey(xlinkTitle));
@@ -256,32 +254,32 @@ public class TimeSeriesStressTest extends TestCase {
         Name geometryName = Types.typeName(CVNS, "geometry");
         Name valueName = Types.typeName(CVNS, "value");
 
-        List compactTimes = element.get(compactTimeValuePairName);
+        Collection<Property> compactTimes = element.getProperties(compactTimeValuePairName);
         assertNotNull(compactTimes);
         assertEquals(1, compactTimes.size());
 
-        ComplexAttribute compatTimeValuePair = (ComplexAttribute) compactTimes.get(0);
-        List geometries = compatTimeValuePair.get(geometryName);
-        List values = compatTimeValuePair.get(valueName);
+        ComplexAttribute compatTimeValuePair = (ComplexAttribute) compactTimes.iterator().next();
+        Collection<Property> geometries = compatTimeValuePair.getProperties(geometryName);
+        Collection<Property> values = compatTimeValuePair.getProperties(valueName);
 
         assertNotNull(geometries);
         assertNotNull(values);
         assertEquals(1, geometries.size());
         assertEquals(1, values.size());
 
-        Attribute geom = (Attribute) geometries.get(0);
-        Attribute value = (Attribute) values.get(0);
+        Attribute geom = (Attribute) geometries.iterator().next();
+        Attribute value = (Attribute) values.iterator().next();
 
         assertNotNull(geom.getValue());
         assertNotNull(value.getValue());
-        assertNotNull(((UserData) value).getUserData(Attributes.class));
+        assertNotNull(value.getUserData().get(Attributes.class));
 
         return cumulativeTime / numberOfRuns;
     }
 
     /**
-     * Runs numberOfCycles + 1, the first run does not count, returns the avg
-     * time it took to count the features.
+     * Runs numberOfCycles + 1, the first run does not count, returns the avg time it took to count
+     * the features.
      * 
      * @param features
      * @param expectedFeatureCount
@@ -297,7 +295,7 @@ public class TimeSeriesStressTest extends TestCase {
         for (int i = 0; i < numberOfCycles; i++) {
             timer.start();
             // int size = ((Collection)features).size();
-            int size = FeatureCollections.getSize(features);
+            int size = features.size();
             timer.stop();
             assertEquals(expectedFeatureCount, size);
 
@@ -355,12 +353,12 @@ public class TimeSeriesStressTest extends TestCase {
         params.put(PostgisDataStoreFactory.PORT.key, "5432");
         params.put(PostgisDataStoreFactory.USER.key, "postgres");
         params.put(PostgisDataStoreFactory.PASSWD.key, "postgres");
-        
+
         final DataStore ds = DataStoreFinder.getDataStore(params);
         final String typeSpec = "station_id:String,POSITION:Point,station_name:String,"
                 + "determinand_code:String,determinand_description:String,"
                 + "sample_time_position:java.util.Date,result:Double,units:String";
-        final org.geotools.feature.FeatureType schema = DataUtilities.createType("TimeSeriesTest",
+        final SimpleFeatureType schema = DataUtilities.createType("TimeSeriesTest",
                 typeSpec);
         LOGGER.info("Creating schema " + schema);
         ds.createSchema(schema);
@@ -390,15 +388,15 @@ public class TimeSeriesStressTest extends TestCase {
         populate(ds, schema, station_id, determinand_code, 12000);
     }
 
-    private static void populate(final DataStore ds, final org.geotools.feature.FeatureType schema,
+    private static void populate(final DataStore ds, final SimpleFeatureType schema,
             final String station_id, final String determinand_code, final int featureCount)
             throws Exception {
-        org.geotools.feature.Feature feature;
+        SimpleFeature feature;
         GeometryFactory gf = new GeometryFactory();
         LOGGER.info("Creating " + featureCount + " features for station_id " + station_id);
 
         Transaction transaction = new DefaultTransaction();
-        FeatureWriter fw = ds.getFeatureWriterAppend(schema.getTypeName(), transaction);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> fw = ds.getFeatureWriterAppend(schema.getTypeName(), transaction);
         for (double i = 0; i < featureCount; i++) {
             fw.hasNext();
             feature = fw.next();
