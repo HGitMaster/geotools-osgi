@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.filter.XPath;
-import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.TypeBuilder;
@@ -49,7 +48,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: TestData.java 31742 2008-10-31 06:00:25Z bencd $
+ * @version $Id: TestData.java 31743 2008-10-31 06:28:54Z bencd $
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/TestData.java $
  * @since 2.4
  */
