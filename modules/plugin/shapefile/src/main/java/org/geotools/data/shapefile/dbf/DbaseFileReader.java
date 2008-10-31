@@ -481,12 +481,6 @@ public class DbaseFileReader implements FileReader {
                 // set up the new indexes for start and end
                 charBuffer.position(start).limit(end + 1);
                 String s = charBuffer.toString();
-                // to support some foreign languages, such as Chinese, we have
-                // to convert
-                // from ISO-8859-1 to a user provided charset
-                if (!stringCharset.name().equals("ISO-8859-1"))
-                    s = new String(s.getBytes("ISO-8859-1"), stringCharset.name());
-                // this resets the limit...
                 charBuffer.clear();
                 object = s;
                 break;

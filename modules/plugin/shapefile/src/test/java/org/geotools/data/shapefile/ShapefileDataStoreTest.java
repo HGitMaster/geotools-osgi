@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/ShapefileDataStoreTest.java $
- * @version $Id: ShapefileDataStoreTest.java 30921 2008-07-05 07:51:23Z jgarnett $
+ * @version $Id: ShapefileDataStoreTest.java 31746 2008-10-31 14:03:55Z aaime $
  * @author Ian Schneider
  */
 public class ShapefileDataStoreTest extends TestCaseSupport {
@@ -126,7 +126,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc = loadFeatures(DANISH, Query.ALL);
         SimpleFeature first = firstFeature(fc);
 
-        // Charlï¿½tte, if you can read it with your OS charset
+        // Charlotte (but with the o is stroked)
         assertEquals("Charl\u00F8tte", first.getAttribute("TEKST1"));
     }
 
