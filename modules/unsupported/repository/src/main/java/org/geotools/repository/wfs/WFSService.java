@@ -18,14 +18,19 @@ package org.geotools.repository.wfs;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.Icon;
 
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.WFSDataStoreFactory;
+import org.geotools.data.wfs.WFSServiceInfo;
 import org.geotools.repository.AbstractService;
 import org.geotools.repository.Catalog;
 import org.geotools.repository.ResolveChangeEvent;
@@ -35,7 +40,6 @@ import org.geotools.repository.defaults.DefaultResolveChangeEvent;
 import org.geotools.repository.defaults.DefaultResolveDelta;
 import org.geotools.repository.defaults.DefaultServiceInfo;
 import org.geotools.util.ProgressListener;
-import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
 import org.geotools.xml.wfs.WFSSchema;
 
 
@@ -51,7 +55,7 @@ public class WFSService extends AbstractService {
     private List members = null;
     private ServiceInfo info = null;
     private Throwable msg = null;
-    private WFS_1_0_0_DataStore ds = null;
+    private WFSDataStore ds = null;
 
     public WFSService(Catalog parent, URI uri, Map params) {
         super(parent);
@@ -81,7 +85,7 @@ public class WFSService extends AbstractService {
             return this.members(monitor);
         }
 
-        if (adaptee.isAssignableFrom(WFS_1_0_0_DataStore.class)) {
+        if (adaptee.isAssignableFrom(WFSDataStore.class)) {
             return getDS();
         }
 
@@ -95,7 +99,7 @@ public class WFSService extends AbstractService {
 
         return (adaptee.isAssignableFrom(ServiceInfo.class)
         || adaptee.isAssignableFrom(List.class)
-        || adaptee.isAssignableFrom(WFS_1_0_0_DataStore.class));
+        || adaptee.isAssignableFrom(WFSDataStore.class));
     }
 
     public List members(ProgressListener monitor) throws IOException {
@@ -150,15 +154,15 @@ public class WFSService extends AbstractService {
         return params;
     }
 
-    WFS_1_0_0_DataStore getDS() throws IOException {
+    WFSDataStore getDS() throws IOException {
         if (ds == null) {
-            synchronized (WFS_1_0_0_DataStore.class) {
+            synchronized (WFSDataStore.class) {
                 if (ds == null) {
                     WFSDataStoreFactory dsf = new WFSDataStoreFactory();
 
                     if (dsf.canProcess(params)) {
                         try {
-                            ds = (WFS_1_0_0_DataStore) dsf.createDataStore(params);
+                            ds = (WFSDataStore) dsf.createDataStore(params);
                         } catch (IOException e) {
                             msg = e;
                             throw e;
@@ -206,13 +210,13 @@ public class WFSService extends AbstractService {
     }
 
     private class IServiceWFSInfo extends DefaultServiceInfo {
-        private WFSCapabilities caps = null;
+        private WFSServiceInfo caps = null;
 
-        IServiceWFSInfo(WFS_1_0_0_DataStore resource) {
+        IServiceWFSInfo(WFSDataStore resource) {
             super();
 
             try {
-                caps = resource.getCapabilities();
+                caps = resource.getInfo();
             } catch (Throwable t) {
                 t.printStackTrace();
                 caps = null;
@@ -223,10 +227,7 @@ public class WFSService extends AbstractService {
          * @see net.refractions.udig.catalog.IServiceInfo#getAbstract()
          */
         public String getAbstract() {
-            return (caps == null) ? null
-                                  : ((caps.getService() == null) ? null
-                                                                 : caps.getService()
-                                                                       .get_abstract());
+            return (caps == null) ? null : caps.getDescription();
         }
 
         /*
@@ -241,10 +242,8 @@ public class WFSService extends AbstractService {
          * @see net.refractions.udig.catalog.IServiceInfo#getKeywords()
          */
         public String[] getKeywords() {
-            return (caps == null) ? null
-                                  : ((caps.getService() == null) ? null
-                                                                 : caps.getService()
-                                                                       .getKeywordList());
+            Set<String> kws = caps == null? null : caps.getKeywords();
+            return (kws == null) ? null : new ArrayList<String>(kws).toArray(new String[kws.size()]);
         }
 
         /*
@@ -263,9 +262,7 @@ public class WFSService extends AbstractService {
         }
 
         public String getTitle() {
-            return ((caps == null) || (caps.getService() == null))
-            ? ((getIdentifier() == null) ? "BROKEN" : getIdentifier().toString())
-            : caps.getService().getTitle();
+            return (caps == null) ? "BROKEN" : caps.getTitle(); 
         }
     }
 }

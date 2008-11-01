@@ -85,7 +85,7 @@ import org.opengis.referencing.operation.TransformException;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStore.java 31731 2008-10-29 13:51:20Z groldan $
+ * @version $Id: WFS_1_1_0_DataStore.java 31752 2008-11-01 15:04:56Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -406,6 +406,10 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         return wfs.getFeatureTypeAbstract(typeName);
     }
 
+    public ReferencedEnvelope getFeatureTypeWGS84Bounds( String typeName ){
+        return wfs.getFeatureTypeWGS84Bounds(typeName);
+    }
+    
     public ReferencedEnvelope getFeatureTypeBounds( String typeName ) {
         final ReferencedEnvelope wgs84Bounds = wfs.getFeatureTypeWGS84Bounds(typeName);
         final CoordinateReferenceSystem ftypeCrs = getFeatureTypeCRS(typeName);

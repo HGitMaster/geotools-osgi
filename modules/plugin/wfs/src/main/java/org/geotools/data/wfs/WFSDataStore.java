@@ -16,14 +16,19 @@
  */
 package org.geotools.data.wfs;
 
+import java.net.URL;
+import java.util.Set;
+
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataStore;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * {@link DataStore} extension interface to provide WFS specific extra information.
  * 
  * @author Gabriel Roldan
- * @version $Id: WFSDataStore.java 31731 2008-10-29 13:51:20Z groldan $
+ * @version $Id: WFSDataStore.java 31752 2008-11-01 15:04:56Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -37,5 +42,19 @@ public interface WFSDataStore extends DataStore {
      * @see DataAccess#getInfo()
      */
     WFSServiceInfo getInfo();
+
+    public String getFeatureTypeTitle(String typeName);
+
+    public String getFeatureTypeAbstract(String typeName);
+
+    public ReferencedEnvelope getFeatureTypeWGS84Bounds(String typeName);
+
+    public ReferencedEnvelope getFeatureTypeBounds(String typeName);
+
+    public CoordinateReferenceSystem getFeatureTypeCRS(String typeName);
+
+    public Set<String> getFeatureTypeKeywords(String typeName);
+
+    public URL getDescribeFeatureTypeURL(String typeName);
 
 }

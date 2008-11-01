@@ -29,10 +29,12 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -900,5 +902,81 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     }
 
     public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
+    }
+
+    /**
+     * @see WFSDataStore#getDescribeFeatureTypeURL(String)
+     */
+    public URL getDescribeFeatureTypeURL(String typeName) {
+        try {
+            return protocolHandler.getDescribeFeatureTypeURLGet(typeName);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @see WFSDataStore#getFeatureTypeBounds(String)
+     */
+    public String getFeatureTypeAbstract(String typeName) {
+        try {
+            return getFeatureSource(typeName).getInfo().getDescription();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @see WFSDataStore#getFeatureTypeBounds(String)
+     */
+    public ReferencedEnvelope getFeatureTypeBounds(String typeName) {
+        try {
+            return getFeatureSource(typeName).getInfo().getBounds();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @see WFSDataStore#getFeatureTypeCRS(String)
+     */
+    public CoordinateReferenceSystem getFeatureTypeCRS(String typeName) {
+        try {
+            return getFeatureSource(typeName).getInfo().getCRS();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @see WFSDataStore#
+     */
+    public Set<String> getFeatureTypeKeywords(String typeName) {
+        try {
+            Set<String> keywords = getFeatureSource(typeName).getInfo().getKeywords();
+            return new HashSet<String>(keywords);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @see WFSDataStore#getFeatureTypeTitle(String)
+     */
+    public String getFeatureTypeTitle(String typeName) {
+        try {
+            return getFeatureSource(typeName).getInfo().getTitle();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @see WFSDataStore#getFeatureTypeWGS84Bounds(String)
+     */
+    public ReferencedEnvelope getFeatureTypeWGS84Bounds(String typeName) {
+        FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(capabilities, typeName);
+        Envelope latLongBoundingBox = fsd.getLatLongBoundingBox();
+        return new ReferencedEnvelope(latLongBoundingBox, DefaultGeographicCRS.WGS84);
     }
 }
