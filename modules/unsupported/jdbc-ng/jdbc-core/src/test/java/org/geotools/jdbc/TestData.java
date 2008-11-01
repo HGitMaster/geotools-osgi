@@ -22,7 +22,6 @@ import java.util.HashSet;
 import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
@@ -175,7 +174,8 @@ public class TestData {
         riverBounds.expandToInclude(ReferencedEnvelope.reference(riverFeatures[0].getBounds()));
         riverBounds.expandToInclude(ReferencedEnvelope.reference(riverFeatures[1].getBounds()));
 
-        rv1Filter = FilterFactoryFinder.createFilterFactory().createFidFilter(RIVER + ".rv1");
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        rv1Filter = ff.id(Collections.singleton(ff.featureId(RIVER + ".rv1")));
 
         //  9,5   11,5   
         //   +-----+
