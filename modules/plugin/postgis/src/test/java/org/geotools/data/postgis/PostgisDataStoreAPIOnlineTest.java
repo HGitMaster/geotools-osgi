@@ -69,6 +69,7 @@ import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
@@ -1682,10 +1683,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     public void testGetFeatureStoreModifyFeatures3() throws IOException {
         FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
 
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        CompareFilter filter = factory.createCompareFilter(Filter.COMPARE_EQUALS);
-        filter.addLeftValue(ff.createAttributeExpression("name"));
-        filter.addRightValue(ff.createLiteralExpression("r1"));
+        PropertyIsEqualTo filter = ff.equals(ff.property("name"), ff.literal("r1"));
 
         AttributeDescriptor name = roadType.getDescriptor("name");
         road.modifyFeatures(new AttributeDescriptor[] { name, }, new Object[] { "changed", }, filter);
