@@ -29,13 +29,12 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -62,6 +61,7 @@ import org.geotools.styling.UserLayer;
 import org.geotools.test.TestData;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -106,7 +106,7 @@ public class Rendering2DTest extends TestCase {
 
 	protected static final Map rendererHints = new HashMap();
 
-	protected static final FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
+	protected static final FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
 
 	{
 		rendererHints.put("optimizedDataLoadingEnabled", new Boolean(true));
@@ -117,7 +117,7 @@ public class Rendering2DTest extends TestCase {
 	}
 
 	Style loadTestStyle() throws IOException {
-		StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+		StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
 
 		URL surl = TestData.getResource(this, "test-sld.xml");
 		SLDParser stylereader = new SLDParser(factory, surl);
@@ -127,7 +127,7 @@ public class Rendering2DTest extends TestCase {
 	}
 
 	Style createTestStyle() throws IllegalFilterException {
-		StyleFactory sFac = StyleFactoryFinder.createStyleFactory();
+		StyleFactory sFac = CommonFactoryFinder.getStyleFactory(null);
 		// The following is complex, and should be built from
 		// an SLD document and not by hand
 		PointSymbolizer pointsym = sFac.createPointSymbolizer();
@@ -178,9 +178,9 @@ public class Rendering2DTest extends TestCase {
 			throws IllegalFilterException {
 		LineSymbolizer linesym = sFac.createLineSymbolizer();
 		Stroke myStroke = sFac.getDefaultStroke();
-		myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
+		myStroke.setColor(filterFactory.literal("#0000ff"));
 		myStroke
-				.setWidth(filterFactory.createLiteralExpression(new Integer(5)));
+				.setWidth(filterFactory.literal(new Integer(5)));
 		LOGGER.fine("got new Stroke " + myStroke);
 		linesym.setStroke(myStroke);
 		return linesym;
@@ -191,12 +191,12 @@ public class Rendering2DTest extends TestCase {
 		Stroke myStroke;
 		PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
 		Fill myFill = sFac.getDefaultFill();
-		myFill.setColor(filterFactory.createLiteralExpression("#ff0000"));
+		myFill.setColor(filterFactory.literal("#ff0000"));
 		polysym.setFill(myFill);
 		myStroke = sFac.getDefaultStroke();
-		myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
+		myStroke.setColor(filterFactory.literal("#0000ff"));
 		myStroke
-				.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
+				.setWidth(filterFactory.literal(new Integer(2)));
 		polysym.setStroke(myStroke);
 		return polysym;
 	}
@@ -206,12 +206,12 @@ public class Rendering2DTest extends TestCase {
 		Stroke myStroke;
 		PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
 		Fill myFill = sFac.getDefaultFill();
-		myFill.setColor(filterFactory.createLiteralExpression("#00ff00"));
+		myFill.setColor(filterFactory.literal("#00ff00"));
 		polysym.setFill(myFill);
 		myStroke = sFac.getDefaultStroke();
-		myStroke.setColor(filterFactory.createLiteralExpression("#00ff00"));
+		myStroke.setColor(filterFactory.literal("#00ff00"));
 		myStroke
-				.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
+				.setWidth(filterFactory.literal(new Integer(2)));
 		polysym.setStroke(myStroke);
 		return polysym;
 	}
@@ -920,9 +920,9 @@ public class Rendering2DTest extends TestCase {
 		linesym.setGeometryPropertyName("line");
 
 		Stroke myStroke = sFac.getDefaultStroke();
-		myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
+		myStroke.setColor(filterFactory.literal("#0000ff"));
 		myStroke
-				.setWidth(filterFactory.createLiteralExpression(new Integer(3)));
+				.setWidth(filterFactory.literal(new Integer(3)));
 		LOGGER.info("got new Stroke " + myStroke);
 		linesym.setStroke(myStroke);
 
@@ -935,7 +935,7 @@ public class Rendering2DTest extends TestCase {
 		PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
 		polysym.setGeometryPropertyName("polygon");
 		Fill myFill = sFac.getDefaultFill();
-		myFill.setColor(filterFactory.createLiteralExpression("#ff0000"));
+		myFill.setColor(filterFactory.literal("#ff0000"));
 		polysym.setFill(myFill);
 		polysym.setStroke(sFac.getDefaultStroke());
 		Rule rule = sFac.createRule();

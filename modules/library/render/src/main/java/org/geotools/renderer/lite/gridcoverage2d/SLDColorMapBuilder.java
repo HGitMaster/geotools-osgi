@@ -18,7 +18,6 @@ package org.geotools.renderer.lite.gridcoverage2d;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;

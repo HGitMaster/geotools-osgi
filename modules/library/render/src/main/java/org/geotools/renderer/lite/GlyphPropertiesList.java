@@ -18,9 +18,9 @@ package org.geotools.renderer.lite;
 
 import java.util.Vector;
 
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 /**
  *
@@ -31,7 +31,7 @@ public class GlyphPropertiesList {
     
     private Vector list = new Vector();
     private Vector names = new Vector();
-    private FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+    private FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
         
     /** Creates a new instance of GlyphPropertiesList */
     public GlyphPropertiesList() {
@@ -94,15 +94,15 @@ public class GlyphPropertiesList {
     }    
     
     private Expression stringToLiteral(String s){
-        return factory.createLiteralExpression(s);
+        return factory.literal(s);
     }   
     
     private Expression numberToLiteral(Double d){
-        return factory.createLiteralExpression(d.doubleValue());
+        return factory.literal(d.doubleValue());
     }
     
     private Expression numberToLiteral(Integer i){
-        return factory.createLiteralExpression(i.intValue());
+        return factory.literal(i.intValue());
     }
     
     public void setPropertyValue(String name, int value){
