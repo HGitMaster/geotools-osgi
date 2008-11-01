@@ -34,8 +34,7 @@ import junit.framework.TestCase;
 import org.geotools.TestData;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
@@ -51,6 +50,7 @@ import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -64,8 +64,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/shapefile-renderer/src/test/java/org/geotools/renderer/shape/TestUtilites.java $
  */
 public class TestUtilites {
-    static final FilterFactory filterFactory =
-    	FilterFactoryFinder.createFilterFactory();
+    static final FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
     public static boolean INTERACTIVE = false;
 
     public static IndexedShapefileDataStore getPolygons() throws IOException {
@@ -120,23 +119,18 @@ public class TestUtilites {
 
         LineSymbolizer linesym = sFac.createLineSymbolizer();
         Stroke myStroke = sFac.getDefaultStroke();
-        myStroke.setColor(TestUtilites.filterFactory.createLiteralExpression(
-                "#0000ff"));
-        myStroke.setWidth(TestUtilites.filterFactory.createLiteralExpression(
-                new Integer(5)));
+        myStroke.setColor(TestUtilites.filterFactory.literal("#0000ff"));
+        myStroke.setWidth(TestUtilites.filterFactory.literal(new Integer(5)));
         Rendering2DTest.LOGGER.fine("got new Stroke " + myStroke);
         linesym.setStroke(myStroke);
 
         PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
         Fill myFill = sFac.getDefaultFill();
-        myFill.setColor(TestUtilites.filterFactory.createLiteralExpression(
-                "#ff0000"));
+        myFill.setColor(TestUtilites.filterFactory.literal("#ff0000"));
         polysym.setFill(myFill);
         myStroke = sFac.getDefaultStroke();
-        myStroke.setColor(TestUtilites.filterFactory.createLiteralExpression(
-                "#0000ff"));
-        myStroke.setWidth(TestUtilites.filterFactory.createLiteralExpression(
-                new Integer(2)));
+        myStroke.setColor(TestUtilites.filterFactory.literal("#0000ff"));
+        myStroke.setWidth(TestUtilites.filterFactory.literal(new Integer(2)));
         polysym.setStroke(myStroke);
 
         Rule rule = sFac.createRule();

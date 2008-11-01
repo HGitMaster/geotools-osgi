@@ -17,6 +17,7 @@
 package org.geotools.renderer.shape;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import junit.framework.TestCase;
 
@@ -24,10 +25,6 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BBoxExpression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.renderer.RenderListener;
@@ -38,6 +35,8 @@ import org.opengis.filter.And;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
+import org.opengis.filter.identity.FeatureId;
+import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.DWithin;
 import org.opengis.filter.spatial.Intersects;
@@ -66,8 +65,9 @@ public class QueryTest extends TestCase {
     }
 
     public void testFidFilter() throws Exception {
+        FeatureId id = TestUtilites.filterFactory.featureId("theme1.2");
         Query q = new DefaultQuery("theme1",
-                TestUtilites.filterFactory.createFidFilter("theme1.2"));
+                TestUtilites.filterFactory.id(Collections.singleton(id)));
         map.getLayer(0).setQuery(q);
 
         ShapefileRenderer renderer = new ShapefileRenderer(map);
@@ -85,15 +85,8 @@ public class QueryTest extends TestCase {
     }
 
     public void testBBOXFilter() throws Exception {
-        BBoxExpression bbox = TestUtilites.filterFactory.createBBoxExpression(new Envelope(
-                    -4, -2, 0, -3));
         String geom = source.getSchema().getGeometryDescriptor().getLocalName();
-        AttributeExpression geomExpr = TestUtilites.filterFactory
-            .createAttributeExpression(source.getSchema(), geom);
-
-        GeometryFilter filter = TestUtilites.filterFactory.createGeometryFilter(Filter.GEOMETRY_INTERSECTS);
-        filter.addRightGeometry(bbox);
-        filter.addLeftGeometry(geomExpr);
+        BBOX filter = TestUtilites.filterFactory.bbox(geom, -4, -3, -2, 0, null);
 
         Query q = new DefaultQuery("theme1", filter);
         map.getLayer(0).setQuery(q);

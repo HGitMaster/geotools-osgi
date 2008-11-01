@@ -23,8 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -41,8 +41,6 @@ import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-
-import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -51,6 +49,8 @@ import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Id;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -208,8 +208,8 @@ public class ShapeRendererTest extends TestCase {
         store.setTransaction(t);
         FeatureCollection<SimpleFeatureType, SimpleFeature> collection = store.getFeatures();
         FeatureIterator<SimpleFeature> iter = collection.features();
-        FidFilter createFidFilter = TestUtilites.filterFactory.createFidFilter(iter
-                        .next().getID());
+        FeatureId id = TestUtilites.filterFactory.featureId(iter.next().getID());
+        Id createFidFilter = TestUtilites.filterFactory.id(Collections.singleton(id));
         collection.close(iter);
         store.removeFeatures(createFidFilter);
 
@@ -249,8 +249,8 @@ public class ShapeRendererTest extends TestCase {
         }
         iter.close();
 
-        store.removeFeatures(TestUtilites.filterFactory.createFidFilter(last
-                .getID()));
+        id = TestUtilites.filterFactory.featureId(last.getID());
+        store.removeFeatures(TestUtilites.filterFactory.id(Collections.singleton(id)));
 
         listener.count = 0;
         TestUtilites.showRender("testTransaction", renderer, 2000, env);
