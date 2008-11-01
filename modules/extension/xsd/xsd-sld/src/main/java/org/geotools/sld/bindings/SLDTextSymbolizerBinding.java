@@ -16,19 +16,20 @@
  */
 package org.geotools.sld.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import org.opengis.filter.expression.PropertyName;
-import org.geotools.filter.Expression;
+
 import org.geotools.styling.Fill;
 import org.geotools.styling.Font;
 import org.geotools.styling.Halo;
 import org.geotools.styling.LabelPlacement;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.TextSymbolizer;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.PropertyName;
+import org.picocontainer.MutablePicoContainer;
 
 
 /**

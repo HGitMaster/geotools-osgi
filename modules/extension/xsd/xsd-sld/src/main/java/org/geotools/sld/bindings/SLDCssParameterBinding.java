@@ -16,15 +16,17 @@
  */
 package org.geotools.sld.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import java.util.Iterator;
+
 import javax.xml.namespace.QName;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
+
 import org.geotools.sld.CssParameter;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.picocontainer.MutablePicoContainer;
 
 
 /**
@@ -120,7 +122,7 @@ public class SLDCssParameterBinding extends AbstractComplexBinding {
         String text = instance.getText();
 
         if ((text != null) && !"".equals(text)) {
-            Expression exp = filterFactory.createLiteralExpression(text);
+            Expression exp = filterFactory.literal(text);
 
             if (exp != null) {
                 parameter.getExpressions().add(exp);

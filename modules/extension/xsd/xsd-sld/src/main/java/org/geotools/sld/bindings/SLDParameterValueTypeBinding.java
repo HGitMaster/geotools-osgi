@@ -16,16 +16,16 @@
  */
 package org.geotools.sld.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.util.ArrayList;
 import java.util.Iterator;
+
 import javax.xml.namespace.QName;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.IllegalFilterException;
-import org.geotools.xml.*;
+
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.picocontainer.MutablePicoContainer;
 
 
 /**
@@ -111,7 +111,7 @@ public class SLDParameterValueTypeBinding extends AbstractComplexBinding {
         String text = instance.getText();
 
         if ((text != null) && !"".equals(text)) {
-            return filterFactory.createLiteralExpression(text);
+            return filterFactory.literal(text);
         }
 
         for (Iterator itr = node.getChildren().iterator(); itr.hasNext();) {

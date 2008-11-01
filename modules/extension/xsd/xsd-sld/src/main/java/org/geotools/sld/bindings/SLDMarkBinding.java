@@ -16,16 +16,17 @@
  */
 package org.geotools.sld.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import org.geotools.filter.FilterFactory;
+
 import org.geotools.styling.Fill;
 import org.geotools.styling.Mark;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.StyleFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.filter.FilterFactory;
+import org.picocontainer.MutablePicoContainer;
 
 
 /**
@@ -114,7 +115,7 @@ public class SLDMarkBinding extends AbstractComplexBinding {
         Mark mark = styleFactory.createMark();
 
         if (wkName != null) {
-            mark.setWellKnownName(filterFactory.createLiteralExpression(wkName));
+            mark.setWellKnownName(filterFactory.literal(wkName));
         }
 
         if (stroke != null) {

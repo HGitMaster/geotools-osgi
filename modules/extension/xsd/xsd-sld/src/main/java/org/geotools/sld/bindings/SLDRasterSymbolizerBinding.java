@@ -16,12 +16,8 @@
  */
 package org.geotools.sld.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import org.opengis.filter.expression.PropertyName;
-import org.geotools.filter.Expression;
+
 import org.geotools.styling.ChannelSelection;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.ContrastEnhancement;
@@ -30,7 +26,12 @@ import org.geotools.styling.OverlapBehavior;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.ShadedRelief;
 import org.geotools.styling.StyleFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.PropertyName;
+import org.picocontainer.MutablePicoContainer;
 
 
 /**

@@ -16,15 +16,16 @@
  */
 package org.geotools.sld.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
+
 import org.geotools.styling.ColorMapEntry;
 import org.geotools.styling.StyleFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.picocontainer.MutablePicoContainer;
 
 
 /**
@@ -103,18 +104,18 @@ public class SLDColorMapEntryBinding extends AbstractComplexBinding {
         throws Exception {
         ColorMapEntry entry = styleFactory.createColorMapEntry();
 
-        Expression color = filterFactory.createLiteralExpression((String) node.getAttributeValue(
+        Expression color = filterFactory.literal((String) node.getAttributeValue(
                     "color"));
         entry.setColor(color);
 
         if (node.getAttributeValue("opacity") != null) {
             Double opacity = (Double) node.getAttributeValue("opacity");
-            entry.setOpacity(filterFactory.createLiteralExpression(opacity.doubleValue()));
+            entry.setOpacity(filterFactory.literal(opacity.doubleValue()));
         }
 
         if (node.getAttributeValue("quantity") != null) {
             Double quantity = (Double) node.getAttributeValue("quantity");
-            entry.setQuantity(filterFactory.createLiteralExpression(quantity.doubleValue()));
+            entry.setQuantity(filterFactory.literal(quantity.doubleValue()));
         }
 
         if (node.getAttributeValue("label") != null) {

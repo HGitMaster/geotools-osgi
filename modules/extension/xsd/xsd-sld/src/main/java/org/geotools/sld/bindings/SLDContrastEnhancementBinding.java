@@ -16,11 +16,9 @@
  */
 package org.geotools.sld.bindings;
 
+import org.opengis.filter.FilterFactory;
 import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import org.geotools.filter.FilterFactory;
 import org.geotools.styling.ContrastEnhancement;
 import org.geotools.styling.StyleFactory;
 import org.geotools.xml.AbstractComplexBinding;
@@ -116,7 +114,7 @@ public class SLDContrastEnhancementBinding extends AbstractComplexBinding {
 
         if (node.getChildValue("GammaValue") != null) {
             Double gamma = (Double) node.getChildValue("GammaValue");
-            ce.setGammaValue(filterFactory.createLiteralExpression(gamma.doubleValue()));
+            ce.setGammaValue(filterFactory.literal(gamma.doubleValue()));
         }
 
         if (node.getChild("Normalize") != null) {
