@@ -1,0 +1,11 @@
+syntax:glob
+.svn
+.hgsvn
+.project
+.settings
+.classpath
+target
+bin
+*~
+*.log
+
