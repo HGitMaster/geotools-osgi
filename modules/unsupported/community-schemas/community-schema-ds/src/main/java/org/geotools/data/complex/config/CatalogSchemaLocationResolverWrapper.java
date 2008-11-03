@@ -17,6 +17,10 @@
 
 package org.geotools.data.complex.config;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import org.apache.xml.resolver.Catalog;
@@ -77,9 +81,9 @@ public class CatalogSchemaLocationResolverWrapper extends SchemaLocationResolver
          */
         String schemaLocation = CatalogUtilities.resolveSchemaLocation(catalog, location);
         if (schemaLocation != null) {
-            return schemaLocation;
+            return canonicalLocation(schemaLocation);
         } else {
-            return resolver.resolveSchemaLocation(schema, uri, location);
+            return canonicalLocation(resolver.resolveSchemaLocation(schema, uri, location));
         }
     }
 
@@ -97,6 +101,37 @@ public class CatalogSchemaLocationResolverWrapper extends SchemaLocationResolver
     @Override
     public String toString() {
         return super.toString() + " with catalog " + catalog;
+    }
+
+    /**
+     * Convert the schema file location URI to canonical form.
+     * 
+     * <p>
+     * 
+     * Canonicalisation is necessary to prevent infinite recursion when loading some schema families
+     * with relative import paths. You know who you are.
+     * 
+     * @param schemaLocation
+     *                a file URI string, for example "file:/whatever/./something.xsd"
+     * @return canonical form of the file path, for example "file:/whatever/something.xsd"
+     */
+    static String canonicalLocation(String schemaLocation) {
+        if (schemaLocation != null) {
+            try {
+                URI uri = new URI(schemaLocation);
+                if (uri.getScheme().equals("file")) {
+                    File file = new File(uri.getPath());
+                    if (file.exists()) {
+                        return file.getCanonicalFile().toURI().toString();
+                    }
+                }
+            } catch (URISyntaxException e) {
+                // ignore
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+        return schemaLocation;
     }
 
 }

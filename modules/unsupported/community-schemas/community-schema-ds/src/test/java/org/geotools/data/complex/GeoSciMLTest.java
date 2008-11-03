@@ -48,7 +48,7 @@ import org.opengis.feature.type.Name;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: GeoSciMLTest.java 31607 2008-10-01 07:55:36Z bencd $
+ * @version $Id: GeoSciMLTest.java 31754 2008-11-03 05:56:51Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
  * @since 2.4
@@ -206,11 +206,8 @@ public class GeoSciMLTest extends TestCase {
 
             DataAccess mappingDataStore = DataAccessFinder.getDataStore(dsParams);
             assertNotNull(mappingDataStore);
-            AttributeDescriptor mappedFeature = (AttributeDescriptor) mappingDataStore
-                    .getSchema(typeName);
-            assertNotNull(mappedFeature);
-            assertTrue(mappedFeature.getType() instanceof FeatureType);
-            FeatureType boreholeType = (FeatureType) mappedFeature.getType();
+            FeatureType boreholeType = mappingDataStore.getSchema(typeName);
+            assertNotNull(boreholeType);
 
             FeatureSource fSource = (FeatureSource) mappingDataStore.getFeatureSource(typeName);
 
