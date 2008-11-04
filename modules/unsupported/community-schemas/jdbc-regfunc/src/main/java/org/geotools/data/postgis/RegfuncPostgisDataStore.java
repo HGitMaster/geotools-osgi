@@ -32,6 +32,8 @@ import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.factory.Hints;
+import org.geotools.filter.RegfuncFilterFactoryImpl;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -44,6 +46,18 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * TODO: everything in this class should be pulled up into ancestor classes.
  */
 public class RegfuncPostgisDataStore extends PostgisDataStore {
+
+    /*
+     * SPI mechanism cannot be used as we only want one FilterFactory implementation system wide.
+     * Why provide more than one? Which one should be used? This would be SPI misuse.
+     * 
+     * FIXME: This should go away when registered function support is refactored into core. At the
+     * moment, this is required because otherwise DuplicatingFilterVisitor gets the wrong
+     * FeatureFactory.
+     */
+    static {
+        Hints.putSystemDefault(Hints.FILTER_FACTORY, new RegfuncFilterFactoryImpl());
+    }
 
     /**
      * Constructor.
