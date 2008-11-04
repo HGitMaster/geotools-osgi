@@ -26,6 +26,7 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.geotools.filter.FilterParsingUtils;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -99,34 +100,6 @@ public class FilterTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        Filter filter = (Filter) object;
-
-        //&lt;xsd:element ref="ogc:spatialOps"/&gt;
-        if (OGC.spatialOps.equals(name) && filter instanceof BinarySpatialOperator) {
-            return filter;
-        }
-
-        //&lt;xsd:element ref="ogc:comparisonOps"/&gt;
-        if (OGC.comparisonOps.equals(name) && filter instanceof BinaryComparisonOperator
-                //JD: extra check here because many of our spatial implementations
-            // extend both	
-                && !(filter instanceof BinarySpatialOperator)) {
-            return filter;
-        }
-
-        //&lt;xsd:element ref="ogc:logicOps"/&gt;
-        if (OGC.logicOps.equals(name) && filter instanceof BinaryLogicOperator) {
-            return filter;
-        }
-
-        //&lt;xsd:element maxOccurs="unbounded" ref="ogc:_Id"/&gt;
-        if (OGC._Id.equals(name) && filter instanceof Id) {
-            //unwrap
-            Id id = (Id) filter;
-
-            return id.getIdentifiers();
-        }
-
-        return null;
+        return FilterParsingUtils.Filter_getProperty(object, name);
     }
 }
