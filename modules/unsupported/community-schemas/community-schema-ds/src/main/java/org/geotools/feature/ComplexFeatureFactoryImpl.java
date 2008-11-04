@@ -12,6 +12,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.identity.GmlObjectId;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -32,7 +33,7 @@ public class ComplexFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
      */
     @Override
     public Attribute createAttribute(Object value, AttributeDescriptor descriptor, String id) {
-        return new AttributeImpl(value, descriptor, buildSafeGmlObjectID(id));
+        return new AttributeImpl(value, descriptor, buildSafeGmlObjectId(id));
     }
 
     /*
@@ -44,7 +45,7 @@ public class ComplexFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
     public GeometryAttribute createGeometryAttribute(Object value, GeometryDescriptor descriptor,
             String id, CoordinateReferenceSystem crs) {
 
-        return new GeometryAttributeImpl(value, descriptor, buildSafeGmlObjectID(id));
+        return new GeometryAttributeImpl(value, descriptor, buildSafeGmlObjectId(id));
     }
 
     /*
@@ -55,7 +56,7 @@ public class ComplexFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
     public ComplexAttribute createComplexAttribute(Collection value,
             AttributeDescriptor descriptor, String id) {
         return new ComplexAttributeImpl(buildCollectionIfNull(value), descriptor,
-                buildSafeGmlObjectID(id));
+                buildSafeGmlObjectId(id));
     }
 
     /*
@@ -65,7 +66,7 @@ public class ComplexFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
     @Override
     public ComplexAttribute createComplexAttribute(Collection value, ComplexType type, String id) {
         return new ComplexAttributeImpl(buildCollectionIfNull(value), type,
-                buildSafeGmlObjectID(id));
+                buildSafeGmlObjectId(id));
     }
 
     /*
@@ -74,7 +75,7 @@ public class ComplexFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
      */
     @Override
     public Feature createFeature(Collection value, AttributeDescriptor descriptor, String id) {
-        return new FeatureImpl(buildCollectionIfNull(value), descriptor, ff.featureId(id));
+        return new FeatureImpl(buildCollectionIfNull(value), descriptor, buildSafeFeatureId(id));
     }
 
     /*
@@ -83,14 +84,22 @@ public class ComplexFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
      */
     @Override
     public Feature createFeature(Collection value, FeatureType type, String id) {
-        return new FeatureImpl(buildCollectionIfNull(value), type, ff.featureId(id));
+        return new FeatureImpl(buildCollectionIfNull(value), type, buildSafeFeatureId(id));
     }
 
-    private GmlObjectId buildSafeGmlObjectID(String id) {
+    private GmlObjectId buildSafeGmlObjectId(String id) {
         if (id == null) {
             return null;
         } else {
             return ff.gmlObjectId(id);
+        }
+    }
+
+    private FeatureId buildSafeFeatureId(String id) {
+        if (id == null) {
+            return null;
+        } else {
+            return ff.featureId(id);
         }
     }
 
