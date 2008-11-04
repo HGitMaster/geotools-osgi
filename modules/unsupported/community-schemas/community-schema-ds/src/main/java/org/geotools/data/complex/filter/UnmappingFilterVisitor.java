@@ -33,8 +33,8 @@ import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Types;
+import org.geotools.filter.RegfuncFilterFactoryImpl;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.And;
@@ -104,7 +104,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: UnmappingFilterVisitor.java 31514 2008-09-15 08:36:50Z bencd $
+ * @version $Id: UnmappingFilterVisitor.java 31760 2008-11-04 06:42:06Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/filter/UnmappingFilterVisitor.java $
  * @since 2.4
@@ -119,11 +119,7 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
     // .getFilterFactory(null);
     // TODO: once Regfunc stuff pulled up into FilterFactoryImpl
     // the code below can be replaced by the original above.
-
-    // disabled regfunc
-    // private static final FilterFactory2 ff = new RegfuncFilterFactoryImpl(null);
-    private static final FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder
-            .getFilterFactory(null);
+    private static final FilterFactory2 ff = new RegfuncFilterFactoryImpl(null);
 
     /**
      * visit(*Expression) holds the unmapped expression here. Package visible just for unit tests
