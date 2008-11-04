@@ -32,9 +32,6 @@ import org.geotools.xml.SchemaLocationResolver;
  */
 public class CatalogSchemaLocationResolverWrapper extends SchemaLocationResolver {
 
-    private static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(CatalogSchemaLocationResolverWrapper.class.getPackage().getName());
-
     private final Catalog catalog;
 
     /*
@@ -100,7 +97,7 @@ public class CatalogSchemaLocationResolverWrapper extends SchemaLocationResolver
 
     @Override
     public String toString() {
-        return super.toString() + " with catalog " + catalog;
+        return resolver.toString();
     }
 
     /**
