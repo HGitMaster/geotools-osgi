@@ -82,7 +82,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: UnmappingFilterVisitorTest.java 31742 2008-10-31 06:00:25Z bencd $
+ * @version $Id: UnmappingFilterVisitorTest.java 31759 2008-11-04 06:27:41Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/filter/UnmappingFilterVisitorTest.java $
  * @since 2.4
@@ -178,7 +178,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         SimpleFeature unmappedFeature = (SimpleFeature) features.next();
         results.close(features);
         assertNotNull(unmappedFeature);
-        Object object = unmappedFeature.getProperty("station_no");
+        Object object = unmappedFeature.getProperty("station_no").getValue();
         assertEquals(fid, object);
     }
 
