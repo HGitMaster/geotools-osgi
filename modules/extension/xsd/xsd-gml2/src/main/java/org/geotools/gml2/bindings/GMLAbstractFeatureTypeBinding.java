@@ -25,6 +25,8 @@ import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.opengis.feature.simple.SimpleFeature;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -96,6 +98,12 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return GML2ParsingUtils.parseFeature(instance, node, value, ftCache, bwFactory);
     }
+    
+    @Override
+    public Element encode(Object object, Document document, Element value)
+            throws Exception {
+        return GML2EncodingUtils.AbstractFeatureType_encode(object, document, value);
+    }
 
     public Object getProperty(Object object, QName name)
         throws Exception {
@@ -120,9 +128,9 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
             return feature.getBounds();
         }
 
-        if (feature.getFeatureType().getDescriptor(name.getLocalPart()) != null) {
-            return feature.getAttribute(name.getLocalPart());
-        }
+//        if (feature.getFeatureType().getDescriptor(name.getLocalPart()) != null) {
+//            return feature.getAttribute(name.getLocalPart());
+//        }
 
         return null;
     }

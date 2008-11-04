@@ -31,6 +31,8 @@ import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.Encoder;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -173,5 +175,14 @@ public class GML3EncodingUtils {
         }
         
         return false;
+    }
+    
+    public static Element AbstractFeatureType_encode(Object object, Document document, Element value) {
+        return GML2EncodingUtils.AbstractFeatureType_encode(object, document, value);
+    }
+
+    public static Object AbstractFeatureType_getProperty(Object object,
+            QName name) {
+        return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name);
     }
 }

@@ -160,7 +160,8 @@ public class GMLConfiguration extends Configuration {
         super.configureContext(container);
 
         container.registerComponentInstance(new FeatureTypeCache());
-
+        container.registerComponentImplementation(FeaturePropertyExtractor.class);
+        
         container.registerComponentInstance(CoordinateSequenceFactory.class,
             CoordinateArraySequenceFactory.instance());
         container.registerComponentImplementation(GeometryFactory.class);
