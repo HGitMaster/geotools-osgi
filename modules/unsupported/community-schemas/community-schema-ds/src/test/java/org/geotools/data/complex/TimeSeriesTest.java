@@ -69,7 +69,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: TimeSeriesTest.java 31721 2008-10-27 08:18:47Z bencd $
+ * @version $Id: TimeSeriesTest.java 31758 2008-11-04 06:22:04Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
  * @since 2.4
@@ -364,7 +364,7 @@ public class TimeSeriesTest extends TestCase {
                 .containsKey(clientPropName));
 
         // now test the use of specific subtype overriding a general node type
-        attMapping = (AttributeMapping) attributeMappings.get(3);
+        attMapping = (AttributeMapping) attributeMappings.get(5);
         assertNotNull(attMapping);
         String expected = "aw:relatedObservation/aw:PhenomenonTimeSeries/om:observedProperty/swe:Phenomenon/gml:name";
         String actual = attMapping.getTargetXPath().toString();
@@ -397,8 +397,9 @@ public class TimeSeriesTest extends TestCase {
         }
         FeatureCollection features;
         // make a getFeatures request with a nested properties filter.
-        // note that the expected result count is 6 - 3 sites x 2 phenomena
-        final int EXPECTED_RESULT_COUNT = 6;
+        //
+        // was 6, but now 96 as one per line (no grouping)
+        final int EXPECTED_RESULT_COUNT = 96;
         {
             features = fSource.getFeatures();
 
@@ -413,12 +414,12 @@ public class TimeSeriesTest extends TestCase {
         FilterFactory ffac;
         {
             NamespaceSupport namespaces = new NamespaceSupport();
-
             namespaces.declarePrefix("aw", AWNS);
             namespaces.declarePrefix("om", OMNS);
             namespaces.declarePrefix("swe", SWENS);
             namespaces.declarePrefix("gml", GMLNS);
             namespaces.declarePrefix("sa", SANS);
+            namespaces.declarePrefix("cv", CVNS);
             // TODO: use commonfactoryfinder or the mechanism choosed
             // to pass namespace context to filter factory
             ffac = new FilterFactoryImplNamespaceAware(namespaces);
@@ -443,7 +444,7 @@ public class TimeSeriesTest extends TestCase {
                 PropertyName sampledFeatureName = ffac.property("sa:sampledFeature");
                 Attribute sampledFeatureVal = (Attribute) sampledFeatureName.evaluate(feature);
                 assertNotNull("sa:sampledFeature evaluated to null", sampledFeatureVal);
-                assertNull(sampledFeatureVal.getValue());
+                assertEquals(0, ((Collection) sampledFeatureVal.getValue()).size());
                 Map attributes = (Map) sampledFeatureVal.getUserData().get(Attributes.class);
                 assertNotNull(attributes);
                 Name xlinkTitle = name(XLINK.NAMESPACE, "title");
@@ -464,14 +465,15 @@ public class TimeSeriesTest extends TestCase {
                 final List elements = (List) ((Feature) timeCovVal).getValue();
                 if (count == 1)
                     assertEquals(1, elements.size());
-                else if (count == 2) {
-                    assertEquals(31, elements.size());
+                else if (count == 22) {  // 22nd feature, row TS2.22
+                    // no grouping
+                    assertEquals(1, elements.size());
 
                     Name compactTimeValuePairName = Types.typeName(CVNS, "CompactTimeValuePair");
                     Name geometryName = Types.typeName(CVNS, "geometry");
                     Name valueName = Types.typeName(CVNS, "value");
 
-                    ComplexAttribute element = (ComplexAttribute) elements.get(21);
+                    ComplexAttribute element = (ComplexAttribute) elements.get(0);
                     assertNotNull(element);
 
                     Collection compactTimes = element.getProperties(compactTimeValuePairName);
@@ -494,14 +496,14 @@ public class TimeSeriesTest extends TestCase {
                     assertNotNull(geom.getValue());
                     assertNotNull(value.getValue());
 
-                    Object valueContent = geom.getValue();
-                    Date sampleTimePosition = (Date) valueContent;// 0=2007-01-01,
-                    // 21=2007-01-22
+                    Object valueContent = ((ComplexAttribute) geom).getProperty("simpleContent").getValue();
+                    Date sampleTimePosition = (Date) valueContent;
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(sampleTimePosition);
+                    // see row TS2.22
                     assertEquals(2007, cal.get(Calendar.YEAR));
                     assertEquals(Calendar.JANUARY, cal.get(Calendar.MONTH));
-                    assertEquals(22, cal.get(Calendar.DAY_OF_MONTH));
+                    assertEquals(21, cal.get(Calendar.DAY_OF_MONTH));
                 }
             }
 

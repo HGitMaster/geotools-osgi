@@ -129,6 +129,21 @@
 
         </AttributeMapping>-->
 
+        <!-- aw:PhenomenonTimeSeries must be identified -->
+        <AttributeMapping>
+          <targetAttribute>aw:relatedObservation/aw:PhenomenonTimeSeries</targetAttribute>
+          <idExpression>
+            <OCQL>determinand_code</OCQL>
+          </idExpression>
+        </AttributeMapping>
+
+        <!-- swe:Phenomenon must be identified -->
+        <AttributeMapping>
+          <targetAttribute>aw:relatedObservation/aw:PhenomenonTimeSeries/om:observedProperty/swe:Phenomenon</targetAttribute>
+          <idExpression>
+            <OCQL>determinand_code</OCQL>
+          </idExpression>
+        </AttributeMapping>
 
         <AttributeMapping>
           <targetAttribute>aw:relatedObservation/aw:PhenomenonTimeSeries/om:observedProperty/swe:Phenomenon/gml:name</targetAttribute>
@@ -136,7 +151,6 @@
             <OCQL>determinand_code</OCQL>
           </sourceExpression>
         </AttributeMapping>
-
 
         <AttributeMapping>
           <targetAttribute>aw:relatedObservation/aw:PhenomenonTimeSeries/om:result</targetAttribute>
@@ -147,6 +161,15 @@
             <targetAttributeNode>om:CompactDiscreteTimeCoverageType</targetAttributeNode>
             
             </AttributeMapping>-->
+
+        <!-- cv:CompactDiscreteTimeCoverage must be identified -->
+        <AttributeMapping>
+          <targetAttribute>aw:relatedObservation/aw:PhenomenonTimeSeries/om:result/cv:CompactDiscreteTimeCoverage</targetAttribute>
+          <idExpression>
+            <OCQL>'missing'</OCQL>
+          </idExpression>
+        </AttributeMapping>
+
         <AttributeMapping>
           <targetAttribute>aw:relatedObservation/aw:PhenomenonTimeSeries/om:result/cv:CompactDiscreteTimeCoverage/cv:element</targetAttribute>
           <targetAttributeNode>cv:CompactTimeValuePairPropertyType</targetAttributeNode>
