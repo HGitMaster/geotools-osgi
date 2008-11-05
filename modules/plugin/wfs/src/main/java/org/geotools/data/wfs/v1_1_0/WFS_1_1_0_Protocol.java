@@ -51,7 +51,6 @@ import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
 import org.geotools.filter.v1_1.OGC;
-import org.geotools.filter.v1_1.OGCConfiguration;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -75,6 +74,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.6.x
  */
+@SuppressWarnings({"unchecked", "nls"})
 public class WFS_1_1_0_Protocol implements WFSProtocol {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
@@ -100,7 +100,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
 
     private HTTPProtocol http;
 
-    @SuppressWarnings("unchecked")
     public WFS_1_1_0_Protocol( InputStream capabilitiesReader, HTTPProtocol http )
             throws IOException {
         this.capabilities = parseCapabilities(capabilitiesReader);
@@ -150,7 +149,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getServiceKeywords()
      */
-    @SuppressWarnings("unchecked")
     public Set<String> getServiceKeywords() {
         List<KeywordsType> capsKeywords = capabilities.getServiceIdentification().getKeywords();
         return extractKeywords(capsKeywords);
@@ -182,7 +180,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getSupportedGetFeatureOutputFormats()
      */
-    @SuppressWarnings("unchecked")
     public Set<String> getSupportedGetFeatureOutputFormats() {
         OperationType operationMetadata = getOperationMetadata(WFSOperationType.GET_FEATURE);
         List<DomainType> parameters = operationMetadata.getParameter();
@@ -201,7 +198,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getSupportedOutputFormats(String)
      */
-    @SuppressWarnings("unchecked")
     public Set<String> getSupportedOutputFormats( String typeName ) {
         final Set<String> serviceOutputFormats = getSupportedGetFeatureOutputFormats();
         final FeatureTypeType typeInfo = getFeatureTypeInfo(typeName);
@@ -246,16 +242,18 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     }
 
     /**
-     * @see WFSProtocol#supportsOperation(WFSOperationType, HttpMethod)
+     * @see WFSProtocol#supportsOperation(WFSOperationType, boolean)
      */
-    public boolean supportsOperation( WFSOperationType operation, HttpMethod method ) {
+    public boolean supportsOperation( WFSOperationType operation, boolean post ) {
+        HttpMethod method = post ? POST : GET;
         return null != getOperationURI(operation, method);
     }
 
     /**
-     * @see WFSProtocol#getOperationURL(WFSOperationType, HttpMethod)
+     * @see WFSProtocol#getOperationURL(WFSOperationType, boolean)
      */
-    public URL getOperationURL( WFSOperationType operation, HttpMethod method ) {
+    public URL getOperationURL( WFSOperationType operation, boolean post ) {
+        HttpMethod method = post ? POST : GET;
         String href = getOperationURI(operation, method);
         if (href != null) {
             try {
@@ -287,7 +285,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getFeatureTypeWGS84Bounds(String)
      */
-    @SuppressWarnings("unchecked")
     public ReferencedEnvelope getFeatureTypeWGS84Bounds( String typeName ) {
         final FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         List<WGS84BoundingBoxType> bboxList = featureTypeInfo.getWGS84BoundingBox();
@@ -321,7 +318,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getSupportedCRSIdentifiers(String)
      */
-    @SuppressWarnings("unchecked")
     public Set<String> getSupportedCRSIdentifiers( String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         // TODO: another wrong emf mapping: getOtherSRS():String? should be a list
@@ -337,7 +333,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getFeatureTypeKeywords(String)
      */
-    @SuppressWarnings("unchecked")
     public Set<String> getFeatureTypeKeywords( String typeName ) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
         List<KeywordsType> ftKeywords = featureTypeInfo.getKeywords();
@@ -355,33 +350,34 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
 
     /**
      * @throws IOException
-     * @see WFSProtocol#describeFeatureType(String, String)
+     * @see WFSProtocol#describeFeatureTypeGET(String, String)
      */
-    @SuppressWarnings({"unchecked", "nls"})
-    public WFSResponse describeFeatureType( String typeName, String outputFormat, HttpMethod method )
+    public WFSResponse describeFeatureTypeGET( String typeName, String outputFormat )
             throws IOException {
-        if (!supportsOperation(DESCRIBE_FEATURETYPE, method)) {
+        if (!supportsOperation(DESCRIBE_FEATURETYPE, false)) {
             throw new UnsupportedOperationException(
-                    "The server does not support DescribeFeatureType for HTTP method " + method);
+                    "The server does not support DescribeFeatureType for HTTP method GET");
         }
 
-        WFSResponse response;
-        if (POST == method) {
-            throw new UnsupportedOperationException(
-                    "POST not implemented yet for DescribeFeatureType");
-        } else {
-            URL url = getDescribeFeatureTypeURLGet(typeName, outputFormat);
-            response = issueGetRequest(url, Collections.EMPTY_MAP);
-        }
+        URL url = getDescribeFeatureTypeURLGet(typeName, outputFormat);
+        WFSResponse response = issueGetRequest(url, Collections.EMPTY_MAP);
         return response;
     }
 
     /**
+     * @throws IOException
+     * @see WFSProtocol#describeFeatureTypePOST(String, String)
+     */
+    public WFSResponse describeFeatureTypePOST( String typeName, String outputFormat )
+            throws IOException {
+        throw new UnsupportedOperationException("POST not implemented yet for DescribeFeatureType");
+
+    }
+    /**
      * @see WFSProtocol#getFeatureHits(Query)
      */
-    @SuppressWarnings("nls")
     public int getFeatureHits( Query query ) throws IOException {
-        URL url = getOperationURL(WFSOperationType.GET_FEATURE, GET);
+        URL url = getOperationURL(WFSOperationType.GET_FEATURE, false);
         Map<String, String> getFeatureKvp = buildGetFeatureParametersForGet(query,
                 DEFAULT_OUTPUT_FORMAT);
 
@@ -427,26 +423,27 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     }
 
     /**
-     * @see WFSProtocol#getFeature(Query, String)
+     * @see WFSProtocol#getFeatureGET(Query, String)
      */
-    @SuppressWarnings("nls")
-    public WFSResponse getFeature( Query query, String outputFormat, HttpMethod method )
-            throws IOException {
-        if (!supportsOperation(WFSOperationType.GET_FEATURE, method)) {
+    public WFSResponse getFeatureGET( Query query, String outputFormat ) throws IOException {
+        if (!supportsOperation(WFSOperationType.GET_FEATURE, false)) {
             throw new UnsupportedOperationException(
-                    "The server does not support GetFeature for HTTP method " + method);
+                    "The server does not support GetFeature for HTTP method GET");
         }
 
-        WFSResponse response;
+        URL url = getOperationURL(WFSOperationType.GET_FEATURE, false);
+        Map<String, String> getFeatureKvp = buildGetFeatureParametersForGet(query, outputFormat);
 
-        if (POST == method) {
-            throw new UnsupportedOperationException("POST not implemented yet for GetFeature");
-        } else {
-            URL url = getOperationURL(WFSOperationType.GET_FEATURE, GET);
-            Map<String, String> getFeatureKvp = buildGetFeatureParametersForGet(query, outputFormat);
-            response = issueGetRequest(url, getFeatureKvp);
-        }
+        WFSResponse response = issueGetRequest(url, getFeatureKvp);
+
         return response;
+    }
+
+    /**
+     * @see WFSProtocol#getFeaturePOST(Query, String)
+     */
+    public WFSResponse getFeaturePOST( Query query, String outputFormat ) throws IOException {
+        throw new UnsupportedOperationException("POST not implemented yet for GetFeature");
     }
 
     /**
@@ -489,7 +486,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         return (WFSCapabilitiesType) parsed;
     }
 
-    @SuppressWarnings("unchecked")
     private Set<String> extractKeywords( List<KeywordsType> keywordsList ) {
         Set<String> keywords = new HashSet<String>();
         for( KeywordsType keys : keywordsList ) {
@@ -498,7 +494,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         return keywords;
     }
 
-    @SuppressWarnings("unchecked")
     private OperationType getOperationMetadata( WFSOperationType operation ) {
         final OperationsMetadataType operationsMetadata = capabilities.getOperationsMetadata();
         final List<OperationType> operations = operationsMetadata.getOperation();
@@ -516,7 +511,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     private URL getDescribeFeatureTypeURLGet( String typeName, String outputFormat ) {
         final FeatureTypeType typeInfo = getFeatureTypeInfo(typeName);
 
-        final URL describeFeatureTypeUrl = getOperationURL(DESCRIBE_FEATURETYPE, GET);
+        final URL describeFeatureTypeUrl = getOperationURL(DESCRIBE_FEATURETYPE, false);
 
         Map<String, String> kvp = new HashMap<String, String>();
         kvp.put("SERVICE", "WFS");
@@ -552,7 +547,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         return response;
     }
 
-    @SuppressWarnings("nls")
     private Map<String, String> buildGetFeatureParametersForGet( Query query, String outputFormat )
             throws IOException {
         Map<String, String> map = new HashMap<String, String>();
@@ -612,7 +606,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
 
     private static String encodeGetFeatureGetFilter( final Filter filter ) throws IOException {
 
-        OGCConfiguration filterConfig = new OGCConfiguration();
+        org.geotools.filter.v1_0.OGCConfiguration filterConfig = new org.geotools.filter.v1_0.OGCConfiguration();
         Encoder encoder = new Encoder(filterConfig);
         // do not write the xml declaration
         encoder.setOmitXMLDeclaration(true);

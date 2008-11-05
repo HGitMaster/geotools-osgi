@@ -76,7 +76,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31731 2008-10-29 13:51:20Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31769 2008-11-05 15:21:49Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
@@ -236,7 +236,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
     /**
      * Optional {@code Integer} parameter stating how many Feature instances to buffer at once. Only
-     * implemented for WFS 1.1.0 support.
+     * implemented for WFS 1.0.0 support.
      */
     public static final WFSFactoryParam<Integer> BUFFER_SIZE = parametersInfo[6];
 

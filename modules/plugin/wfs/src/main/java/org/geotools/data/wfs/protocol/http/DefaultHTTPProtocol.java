@@ -21,7 +21,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.geotools.util.logging.Logging;
 
 /**
- * 
  * @author Gabriel Roldan
  */
 public class DefaultHTTPProtocol implements HTTPProtocol {
@@ -36,7 +35,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
 
         private HttpMethodBase method;
 
-        public HTTPClientResponse(HttpMethodBase method) {
+        public HTTPClientResponse( HttpMethodBase method ) {
             this.method = method;
         }
 
@@ -54,7 +53,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         }
 
         public String getContentType() {
-            Header header = method.getRequestHeader("Content-Type");
+            Header header = method.getResponseHeader("Content-Type");
             String contentType = null;
             if (header != null) {
                 contentType = header.getValue();
@@ -69,38 +68,58 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
     }
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
+    private boolean tryGzip;
+    private String authUsername;
+    private String authPassword;
+    private int timeoutMillis;
 
-    private boolean gzipPostRequests;
-
-    private boolean gzipResponses;
-
-    public boolean isGzipPostRequests() {
-        return this.gzipPostRequests;
+    /**
+     * @see HTTPProtocol#isTryGzip()
+     */
+    public boolean isTryGzip() {
+        return this.tryGzip;
     }
 
-    public boolean isGzipResponses() {
-        return this.gzipResponses;
+    /**
+     * @see HTTPProtocol#setTryGzip(boolean)
+     */
+    public void setTryGzip( boolean tryGzip ) {
+        this.tryGzip = tryGzip;
     }
 
-    public void setGzipPostRequests(boolean gzipPostRequests) {
-        this.gzipPostRequests = gzipPostRequests;
+    /**
+     * @see HTTPProtocol#setAuth(String, String)
+     */
+    public void setAuth( String username, String password ) {
+        this.authUsername = username;
+        this.authPassword = password;
     }
 
-    public void setGzipResponses(boolean gzipResponses) {
-        this.gzipResponses = gzipResponses;
+    /**
+     * @see HTTPProtocol#
+     */
+    public int getTimeoutMillis() {
+        return this.timeoutMillis;
+    }
+
+    /**
+     * @see HTTPProtocol#setTimeoutMillis(int)
+     */
+    public void setTimeoutMillis( int milliseconds ) {
+        this.timeoutMillis = milliseconds;
     }
 
     /**
      * @see HTTPProtocol#createUrl(URL, Map)
      */
-    public URL createUrl(final URL baseUrl, final Map<String, String> queryStringKvp)
+    public URL createUrl( final URL baseUrl, final Map<String, String> queryStringKvp )
             throws MalformedURLException {
         final String query = baseUrl.getQuery();
         Map<String, String> finalKvpMap = new HashMap<String, String>(queryStringKvp);
         if (query != null) {
             Map<String, String> userParams = new CaseInsensitiveMap(queryStringKvp);
             String[] rawUrlKvpSet = query.split("&");
-            for (String rawUrlKvp : rawUrlKvpSet) {
+            for( String rawUrlKvp : rawUrlKvpSet ) {
                 int eqIdx = rawUrlKvp.indexOf('=');
                 String key, value;
                 if (eqIdx > 0) {
@@ -137,7 +156,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
 
         String key, value;
         try {
-            for (Map.Entry<String, String> kvp : finalKvpMap.entrySet()) {
+            for( Map.Entry<String, String> kvp : finalKvpMap.entrySet() ) {
                 key = kvp.getKey();
                 value = kvp.getValue();
                 if (value == null) {
@@ -160,7 +179,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
     }
 
     @SuppressWarnings("nls")
-    public HTTPResponse issueGet(final URL baseUrl, final Map<String, String> kvp)
+    public HTTPResponse issueGet( final URL baseUrl, final Map<String, String> kvp )
             throws IOException {
 
         final URL requestUrl = createUrl(baseUrl, kvp);
@@ -168,7 +187,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         String uri = requestUrl.toExternalForm();
         GetMethod request = new GetMethod(uri);
 
-        if (isGzipResponses()) {
+        if (isTryGzip()) {
             request.addRequestHeader("Accept-Encoding", "gzip");
         }
 
@@ -189,5 +208,4 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         HTTPResponse httpResponse = new HTTPClientResponse(request);
         return httpResponse;
     }
-
 }

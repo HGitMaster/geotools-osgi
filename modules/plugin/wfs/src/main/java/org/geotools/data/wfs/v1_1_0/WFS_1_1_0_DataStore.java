@@ -16,8 +16,6 @@
  */
 package org.geotools.data.wfs.v1_1_0;
 
-import static org.geotools.data.wfs.protocol.http.HttpMethod.GET;
-import static org.geotools.data.wfs.protocol.http.HttpMethod.POST;
 import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
 import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.GET_FEATURE;
 
@@ -33,7 +31,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.text.AbstractDocument.Content;
 import javax.xml.namespace.QName;
+
+import net.opengis.wfs.FeatureTypeType;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
@@ -52,21 +53,25 @@ import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.WFSServiceInfo;
-import org.geotools.data.wfs.protocol.http.HttpMethod;
+import org.geotools.data.wfs.protocol.wfs.ExceptionParserFactory;
 import org.geotools.data.wfs.protocol.wfs.ExceptionReportParser;
 import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
+import org.geotools.data.wfs.protocol.wfs.GetFeatureResponseParserFactory;
 import org.geotools.data.wfs.protocol.wfs.WFSExtensions;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
 import org.geotools.data.wfs.protocol.wfs.WFSResponseParser;
+import org.geotools.data.wfs.protocol.wfs.WFSResponseParserFactory;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
@@ -85,7 +90,7 @@ import org.opengis.referencing.operation.TransformException;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStore.java 31752 2008-11-01 15:04:56Z groldan $
+ * @version $Id: WFS_1_1_0_DataStore.java 31769 2008-11-05 15:21:49Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -140,12 +145,42 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
     public SimpleFeatureType getSchema( final String prefixedTypeName ) throws IOException {
         SimpleFeatureType ftype = byTypeNameTypes.get(prefixedTypeName);
         if (ftype == null) {
-            String outputFormat = DEFAULT_OUTPUT_FORMAT;
-            HttpMethod method = findWhichMethodToUseFor(DESCRIBE_FEATURETYPE);
-            WFSResponse response = wfs.describeFeatureType(prefixedTypeName, outputFormat, method);
+            // String outputFormat = DEFAULT_OUTPUT_FORMAT;
+            // WFSResponse response;
+            // if (useHttpPostFor(DESCRIBE_FEATURETYPE)) {
+            // response = wfs.describeFeatureTypePOST(prefixedTypeName, outputFormat);
+            // } else {
+            // response = wfs.describeFeatureTypeGET(prefixedTypeName, outputFormat);
+            // }
+            //
+            // WFSResponseParser parser = WFSExtensions.findParser(response);
 
-            throw new UnsupportedOperationException("finish implementing this method!");
-            // byTypeNameTypes.put(prefixedTypeName, ftype);
+            final QName featureDescriptorName;
+            try {
+                featureDescriptorName = wfs.getFeatureTypeName(prefixedTypeName);
+            } catch (IllegalArgumentException e) {
+                throw new SchemaNotFoundException(prefixedTypeName);
+            }
+
+            final URL describeUrl = wfs.getDescribeFeatureTypeURLGet(prefixedTypeName);
+
+            final SimpleFeatureType featureType;
+            CoordinateReferenceSystem crs = getFeatureTypeCRS(prefixedTypeName);
+            featureType = EmfAppSchemaParser.parseSimpleFeatureType(featureDescriptorName,
+                    describeUrl, crs);
+
+            // adapt the feature type name
+            SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+            builder.init(featureType);
+            builder.setName(prefixedTypeName);
+            builder.setNamespaceURI(featureDescriptorName.getNamespaceURI());
+            GeometryDescriptor defaultGeometry = featureType.getGeometryDescriptor();
+            if (defaultGeometry != null) {
+                builder.setDefaultGeometry(defaultGeometry.getLocalName());
+                builder.setCRS(defaultGeometry.getCoordinateReferenceSystem());
+            }
+            final SimpleFeatureType adaptedFeatureType = builder.buildFeatureType();
+            return adaptedFeatureType;
         }
         return ftype;
     }
@@ -218,22 +253,26 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         // TODO: handle output format preferences
         String outputFormat = DEFAULT_OUTPUT_FORMAT;
 
-        // TODO: split filters! WFSProtocol is not responsible of doing so
-        final HttpMethod method = findWhichMethodToUseFor(GET_FEATURE);
-        final WFSResponse response = wfs.getFeature(query, outputFormat, method);
+        final WFSResponse response = sendGetFeatures(query, outputFormat);
 
-        final WFSResponseParser parser = WFSExtensions.findParser(response);
-        if (parser instanceof ExceptionReportParser) {
-            IOException exception = ((ExceptionReportParser) parser).parse(response);
+        final WFSResponseParserFactory parserFactory = WFSExtensions.findParserFactory(response);
+        if (parserFactory instanceof ExceptionParserFactory) {
+            ExceptionParserFactory factory = (ExceptionParserFactory) parserFactory;
+            ExceptionReportParser parser = factory.createParser(response);
+            IOException exception = parser.parse(response);
             throw exception;
-        } else if (!(parser instanceof GetFeatureParser)) {
-            throw new IOException("Unknown parser for " + response + ": " + parser);
+        } else if (!(parserFactory instanceof GetFeatureResponseParserFactory)) {
+            throw new IOException("Unknown parser for " + response + ": " + parserFactory);
         }
 
+        final SimpleFeatureType contentType = getQueryType(query);
+
+        GetFeatureResponseParserFactory factory = (GetFeatureResponseParserFactory) parserFactory;
+        QName featureDescriptorName = wfs.getFeatureTypeName(query.getTypeName());
+        GetFeatureParser parser = factory
+                .createParser(contentType, response, featureDescriptorName);
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         reader = new WFSFeatureReader((GetFeatureParser) parser);
-
-        final SimpleFeatureType contentType = getQueryType(query);
 
         if (!reader.hasNext()) {
             return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(contentType);
@@ -257,6 +296,17 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
             reader = new MaxFeatureReader<SimpleFeatureType, SimpleFeature>(reader, maxFeatures);
         }
         return reader;
+    }
+
+    private WFSResponse sendGetFeatures( Query query, String outputFormat ) throws IOException {
+        // TODO: split filters! WFSProtocol is not responsible of doing so
+        final WFSResponse response;
+        if (useHttpPostFor(GET_FEATURE)) {
+            response = wfs.getFeaturePOST(query, outputFormat);
+        } else {
+            response = wfs.getFeatureGET(query, outputFormat);
+        }
+        return response;
     }
 
     /**
@@ -406,10 +456,10 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         return wfs.getFeatureTypeAbstract(typeName);
     }
 
-    public ReferencedEnvelope getFeatureTypeWGS84Bounds( String typeName ){
+    public ReferencedEnvelope getFeatureTypeWGS84Bounds( String typeName ) {
         return wfs.getFeatureTypeWGS84Bounds(typeName);
     }
-    
+
     public ReferencedEnvelope getFeatureTypeBounds( String typeName ) {
         final ReferencedEnvelope wgs84Bounds = wfs.getFeatureTypeWGS84Bounds(typeName);
         final CoordinateReferenceSystem ftypeCrs = getFeatureTypeCRS(typeName);
@@ -473,12 +523,12 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         return wfs.getServiceProviderUri();
     }
 
-    public boolean supportsOperation( WFSOperationType operation, HttpMethod method ) {
-        return wfs.supportsOperation(operation, method);
+    public boolean supportsOperation( WFSOperationType operation, boolean post ) {
+        return wfs.supportsOperation(operation, post);
     }
 
-    public URL getOperationURL( WFSOperationType operation, HttpMethod method ) {
-        return wfs.getOperationURL(operation, method);
+    public URL getOperationURL( WFSOperationType operation, boolean post ) {
+        return wfs.getOperationURL(operation, post);
     }
 
     public String getServiceTitle() {
@@ -540,17 +590,18 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
     }
 
     /**
-     * @return which http method to use depending on the {@link #preferPostOverGet} preference and
-     *         what the server actually supports
+     * @return
+     *         <code>true<code> if HTTP POST method should be used to issue the given WFS operation, <code>false</code>
+     *         if HTTP GET method should be used instead
      */
-    private HttpMethod findWhichMethodToUseFor( final WFSOperationType operation ) {
+    private boolean useHttpPostFor( final WFSOperationType operation ) {
         if (preferPostOverGet) {
-            if (wfs.supportsOperation(operation, POST)) {
-                return POST;
+            if (wfs.supportsOperation(operation, true)) {
+                return true;
             }
         }
-        if (wfs.supportsOperation(operation, GET)) {
-            return GET;
+        if (wfs.supportsOperation(operation, false)) {
+            return false;
         }
         throw new IllegalArgumentException("Neither POST nor GET method is supported for the "
                 + operation + " operation by the server");
