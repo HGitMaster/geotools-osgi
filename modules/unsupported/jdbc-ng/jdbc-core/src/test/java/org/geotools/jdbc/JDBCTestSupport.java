@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
+import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.feature.LenientFeatureFactoryImpl;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
@@ -118,18 +119,15 @@ public abstract class JDBCTestSupport extends TestCase {
 
         //create the dataStore
         //TODO: replace this with call to datastore factory
-        dataStore = new JDBCDataStore();
-        dataStore.setSQLDialect(setup.createSQLDialect(dataStore));
-        dataStore.setNamespaceURI("http://www.geotools.org/test");
-        dataStore.setDataSource(setup.getDataSource());
-        dataStore.setDatabaseSchema("geotools");
-        dataStore.setFilterFactory(new FilterFactoryImpl());
-        dataStore.setGeometryFactory(new GeometryFactory());
-        dataStore.setFeatureFactory(new LenientFeatureFactoryImpl());
-        dataStore.setFeatureTypeFactory(new FeatureTypeFactoryImpl());
-
-        setup.setUpDataStore(dataStore);
+        HashMap params = new HashMap();
+        params.put( JDBCDataStoreFactory.NAMESPACE.key, "http://www.geotools.org/test" );
+        params.put( JDBCDataStoreFactory.SCHEMA.key, "geotools" );
+        params.put( JDBCDataStoreFactory.DATASOURCE.key, setup.createDataSource() );
         
+        JDBCDataStoreFactory factory = setup.createDataStoreFactory();
+        dataStore = factory.createDataStore( params );
+        
+        setup.setUpDataStore(dataStore);
         dialect = dataStore.getSQLDialect();
     }
 

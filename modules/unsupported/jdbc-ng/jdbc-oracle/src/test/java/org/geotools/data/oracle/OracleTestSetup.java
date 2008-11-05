@@ -17,6 +17,7 @@
 package org.geotools.data.oracle;
 
 import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCTestSetup;
 import org.geotools.jdbc.SQLDialect;
 
@@ -31,8 +32,9 @@ public class OracleTestSetup extends JDBCTestSetup {
         return raw.toUpperCase();
     }
     
-    protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
-        return new OracleDialect(dataStore);
+    @Override
+    protected JDBCDataStoreFactory createDataStoreFactory() {
+        return new OracleNGDataStoreFactory();
     }
     
     protected void setUpDataStore(JDBCDataStore dataStore) {

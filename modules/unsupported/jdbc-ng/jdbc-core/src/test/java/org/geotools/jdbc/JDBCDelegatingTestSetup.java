@@ -44,8 +44,9 @@ public class JDBCDelegatingTestSetup extends JDBCTestSetup {
         delegate.initializeDataSource(ds, db);
     }
 
-    protected final SQLDialect createSQLDialect(JDBCDataStore dataStore) {
-        return delegate.createSQLDialect(dataStore);
+    @Override
+    protected JDBCDataStoreFactory createDataStoreFactory() {
+        return delegate.createDataStoreFactory();
     }
     
     @Override

@@ -16,10 +16,14 @@
  */
 package org.geotools.data.mysql;
 
+import java.sql.Connection;
+import java.util.Properties;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCTestSetup;
 import org.geotools.jdbc.SQLDialect;
 
@@ -32,10 +36,18 @@ import org.geotools.jdbc.SQLDialect;
  */
 public class MySQLTestSetup extends JDBCTestSetup {
   
-    protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
-        return new MySQLDialect(dataStore);
+    @Override
+    protected void initializeDataSource(BasicDataSource ds, Properties db) {
+        super.initializeDataSource(ds, db);
+        
+        ds.setDefaultTransactionIsolation( Connection.TRANSACTION_READ_COMMITTED );
     }
-
+    
+    @Override
+    protected JDBCDataStoreFactory createDataStoreFactory() {
+        return new MySQLDataStoreFactory();
+    }
+    
     protected void setUpData() throws Exception {
         //drop old data
         try {
