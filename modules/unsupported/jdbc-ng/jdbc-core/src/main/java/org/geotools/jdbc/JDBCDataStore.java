@@ -286,10 +286,10 @@ public final class JDBCDataStore extends ContentDataStore
      * @return The filter capabilities, never <code>null</code>.
      */
     public FilterCapabilities getFilterCapabilities() {
-        if(dialect.isUsingPreparedStatements())
-            return dialect.createPreparedFilterToSQL().getCapabilities();
+        if ( dialect instanceof PreparedStatementSQLDialect)
+            return ((PreparedStatementSQLDialect)dialect).createPreparedFilterToSQL().getCapabilities();
         else
-            return dialect.createFilterToSQL().getCapabilities();
+            return ((BasicSQLDialect)dialect).createFilterToSQL().getCapabilities();
     }
 
     /**
@@ -466,34 +466,41 @@ public final class JDBCDataStore extends ContentDataStore
         
             Connection cx = createConnection();
             try {
-                String sql = selectGeometrySQL(id.getID());
-                LOGGER.log(Level.FINE, "Get GML object: {0}", sql );
-                
                 try {
-                    Statement st = cx.createStatement();
+                    Statement st = null;
+                    ResultSet rs = null;
+                    
+                    if ( getSQLDialect() instanceof PreparedStatementSQLDialect ) {
+                        st = selectGeometrySQLPS(id.getID(), cx);
+                        rs = ((PreparedStatement)st).executeQuery();
+                    }
+                    else {
+                        String sql = selectGeometrySQL(id.getID());
+                        LOGGER.log(Level.FINE, "Get GML object: {0}", sql );
+                        
+                        st = cx.createStatement();
+                        rs = st.executeQuery( sql );
+                    }
+                    
                     try {
-                        ResultSet rs = st.executeQuery( sql );
-                        try {
-                            if ( rs.next() ) {
-                                //read the geometry
-                                Geometry g = getSQLDialect().decodeGeometryValue(
-                                    null, rs, "geometry", getGeometryFactory(), cx );
-                                
-                                //read the metadata
-                                String name = rs.getString( "name" );
-                                String desc = rs.getString( "description" );
-                                setGmlProperties(g, id.getID(),name,desc);
-                                
-                                return g;
-                            }
-                        }
-                        finally {
-                            closeSafe( rs );
+                        if ( rs.next() ) {
+                            //read the geometry
+                            Geometry g = getSQLDialect().decodeGeometryValue(
+                                null, rs, "geometry", getGeometryFactory(), cx );
+                            
+                            //read the metadata
+                            String name = rs.getString( "name" );
+                            String desc = rs.getString( "description" );
+                            setGmlProperties(g, id.getID(),name,desc);
+                            
+                            return g;
                         }
                     }
                     finally {
+                        closeSafe( rs );
                         closeSafe( st );
                     }
+                    
                 }
                 catch( SQLException e ) {
                     throw (IOException) new IOException().initCause( e );
@@ -789,7 +796,7 @@ public final class JDBCDataStore extends ContentDataStore
         Statement st = null;
         ResultSet rs = null;
         try {
-            if ( dialect.isUsingPreparedStatements() ) {
+            if ( dialect instanceof PreparedStatementSQLDialect ) {
                 st = selectBoundsSQLPS(featureType, filter, cx);
                 rs = ((PreparedStatement)st).executeQuery();
             }
@@ -843,7 +850,7 @@ public final class JDBCDataStore extends ContentDataStore
         Statement st = null;
         ResultSet rs = null;
         try {
-            if ( dialect.isUsingPreparedStatements() ) {
+            if ( dialect instanceof PreparedStatementSQLDialect ) {
                 st = selectCountSQLPS(featureType, filter, cx);
                 rs = ((PreparedStatement)st).executeQuery();
             }
@@ -892,7 +899,7 @@ public final class JDBCDataStore extends ContentDataStore
             Statement st = null;
 
             try {
-                if ( !dialect.isUsingPreparedStatements() ) {
+                if ( !(dialect instanceof PreparedStatementSQLDialect) ) {
                     st = cx.createStatement();    
                 }
                 
@@ -902,7 +909,7 @@ public final class JDBCDataStore extends ContentDataStore
                 for (Iterator f = features.iterator(); f.hasNext();) {
                     SimpleFeature feature = (SimpleFeature) f.next();
 
-                    if ( dialect.isUsingPreparedStatements() ) {
+                    if ( dialect instanceof PreparedStatementSQLDialect ) {
                         PreparedStatement ps = insertSQLPS( featureType, feature, nextKeyValues, cx );
                         try {
                             ps.execute();    
@@ -956,7 +963,7 @@ public final class JDBCDataStore extends ContentDataStore
             return;
         }
 
-        if ( dialect.isUsingPreparedStatements() ) {
+        if ( dialect instanceof PreparedStatementSQLDialect ) {
             try {
                 PreparedStatement ps = updateSQLPS(featureType, attributes, values, filter, cx);
                 try {
@@ -1008,7 +1015,7 @@ public final class JDBCDataStore extends ContentDataStore
         Statement st = null;
         try {
             try {
-                if ( dialect.isUsingPreparedStatements() ) {
+                if ( dialect instanceof PreparedStatementSQLDialect ) {
                     st = deleteSQLPS(featureType,filter,cx);
                     ((PreparedStatement)st).execute();
                 }
@@ -1433,6 +1440,8 @@ public final class JDBCDataStore extends ContentDataStore
      * @param column The column of the association
      */
     protected String selectRelationshipSQL(String table, String column) {
+        BasicSQLDialect dialect = (BasicSQLDialect) getSQLDialect();
+        
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
         dialect.encodeColumnName("table", sql);
@@ -1464,6 +1473,57 @@ public final class JDBCDataStore extends ContentDataStore
 
         return sql.toString();
     }
+    
+    /**
+     * Creates the prepared statement for a query against the relationship table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     * @param table The table of the association
+     * @param column The column of the association
+     */
+    protected PreparedStatement selectRelationshipSQLPS(String table, String column, Connection cx) 
+        throws SQLException {
+        PreparedStatementSQLDialect dialect = (PreparedStatementSQLDialect) getSQLDialect();
+        
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT ");
+        dialect.encodeColumnName("table", sql);
+        sql.append(",");
+        dialect.encodeColumnName("col", sql);
+
+        sql.append(" FROM ");
+        encodeTableName(FEATURE_RELATIONSHIP_TABLE, sql);
+
+        if (table != null) {
+            sql.append(" WHERE ");
+
+            dialect.encodeColumnName("table", sql);
+            sql.append(" = ? ");
+        }
+
+        if (column != null) {
+            if (table == null) {
+                sql.append(" WHERE ");
+            } else {
+                sql.append(" AND ");
+            }
+
+            dialect.encodeColumnName("col", sql);
+            sql.append(" = ? ");
+        }
+
+        LOGGER.fine( sql.toString() );
+        PreparedStatement ps = cx.prepareStatement(sql.toString());
+        if ( table != null ) {
+            ps.setString( 1, table );
+        }
+        if ( column != null ) {
+            ps.setString( table != null ? 2 : 1 , column );
+        }
+        return ps;
+    }
 
     /**
      * Creates the sql for the association table.
@@ -1474,6 +1534,8 @@ public final class JDBCDataStore extends ContentDataStore
      * @param fid The feature id of the association
      */
     protected String selectAssociationSQL(String fid) {
+        BasicSQLDialect dialect = (BasicSQLDialect) getSQLDialect();
+
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
         dialect.encodeColumnName("fid", sql);
@@ -1499,6 +1561,48 @@ public final class JDBCDataStore extends ContentDataStore
     }
 
     /**
+     * Creates the prepared statement for the association table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     * @param fid The feature id of the association
+     */
+    protected PreparedStatement selectAssociationSQLPS(String fid, Connection cx ) 
+        throws SQLException {
+        PreparedStatementSQLDialect dialect = (PreparedStatementSQLDialect) getSQLDialect();
+
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT ");
+        dialect.encodeColumnName("fid", sql);
+        sql.append(",");
+        dialect.encodeColumnName("rtable", sql);
+        sql.append(",");
+        dialect.encodeColumnName("rcol", sql);
+        sql.append(", ");
+        dialect.encodeColumnName("rfid", sql);
+
+        sql.append(" FROM ");
+        encodeTableName(FEATURE_ASSOCIATION_TABLE, sql);
+        
+        if (fid != null) {
+            sql.append(" WHERE ");
+
+            dialect.encodeColumnName("fid", sql);
+            sql.append(" = ?");
+            
+        }
+        
+        LOGGER.fine( sql.toString() );
+        PreparedStatement ps = cx.prepareStatement(sql.toString());
+        if ( fid != null ) {
+            ps.setString( 1, fid );
+        }
+        
+        return ps;
+    }
+    
+    /**
      * Creates the sql for a select from the geometry table.
      * <p>
      * This method is only called when {@link JDBCDataStore#isAssociations()}
@@ -1508,6 +1612,9 @@ public final class JDBCDataStore extends ContentDataStore
      *
      */
     protected String selectGeometrySQL(String gid) {
+        
+        BasicSQLDialect dialect = (BasicSQLDialect) getSQLDialect();
+        
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
         dialect.encodeColumnName("id", sql);
@@ -1534,6 +1641,48 @@ public final class JDBCDataStore extends ContentDataStore
     }
 
     /**
+     * Creates the prepared for a select from the geometry table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     * @param gid The geometry id to select for, may be <code>null</code>
+     *
+     */
+    protected PreparedStatement selectGeometrySQLPS(String gid,Connection cx) throws SQLException{
+        PreparedStatementSQLDialect dialect = (PreparedStatementSQLDialect) getSQLDialect();
+        
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT ");
+        dialect.encodeColumnName("id", sql);
+        sql.append(",");
+        dialect.encodeColumnName("name", sql);
+        sql.append(",");
+        dialect.encodeColumnName("description", sql);
+        sql.append(",");
+        dialect.encodeColumnName("type", sql);
+        sql.append(",");
+        dialect.encodeColumnName("geometry", sql);
+        sql.append(" FROM ");
+        encodeTableName( GEOMETRY_TABLE, sql );
+        
+        if (gid != null) {
+            sql.append(" WHERE ");
+
+            dialect.encodeColumnName("id", sql);
+            sql.append(" = ?");
+        }
+
+        LOGGER.fine( sql.toString() );
+        PreparedStatement ps = cx.prepareStatement(sql.toString());
+        if ( gid != null ) {
+            ps.setString( 1, gid );
+        }
+        
+        return ps;
+    }
+    
+    /**
      * Creates the sql for a select from the multi geometry table.
      * <p>
      * This method is only called when {@link JDBCDataStore#isAssociations()}
@@ -1542,6 +1691,8 @@ public final class JDBCDataStore extends ContentDataStore
      * @param gid The geometry id to select for, may be <code>null</code>.
      */
     protected String selectMultiGeometrySQL(String gid) {
+        BasicSQLDialect dialect = (BasicSQLDialect) getSQLDialect();
+        
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
         dialect.encodeColumnName("id", sql);
@@ -1562,6 +1713,45 @@ public final class JDBCDataStore extends ContentDataStore
         }
 
         return sql.toString();
+    }
+    
+    /**
+     * Creates the prepared statement for a select from the multi geometry table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     * @param gid The geometry id to select for, may be <code>null</code>.
+     */
+    protected PreparedStatement selectMultiGeometrySQLPS(String gid, Connection cx)
+        throws SQLException {
+        PreparedStatementSQLDialect dialect = (PreparedStatementSQLDialect) getSQLDialect();
+        
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT ");
+        dialect.encodeColumnName("id", sql);
+        sql.append(",");
+        dialect.encodeColumnName("mgid", sql);
+        sql.append(",");
+        dialect.encodeColumnName("ref", sql);
+
+        sql.append(" FROM ");
+        encodeTableName(MULTI_GEOMETRY_TABLE, sql);
+
+        if (gid != null) {
+            sql.append(" WHERE ");
+
+            dialect.encodeColumnName("id", sql);
+            sql.append(" = ?");
+        }
+
+        LOGGER.fine( sql.toString() );
+        PreparedStatement ps = cx.prepareStatement(sql.toString());
+        if (gid != null) {
+            ps.setString( 1, gid );
+        }
+
+        return ps;
     }
 
     /**
@@ -1590,6 +1780,8 @@ public final class JDBCDataStore extends ContentDataStore
      * @param gname The geometry name to select for, may be <code>null</code>
      */
     protected String selectGeometryAssociationSQL(String fid, String gid, String gname) {
+        BasicSQLDialect dialect = (BasicSQLDialect) getSQLDialect();
+        
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
         dialect.encodeColumnName("fid", sql);
@@ -1636,48 +1828,76 @@ public final class JDBCDataStore extends ContentDataStore
 
         return sql.toString();
     }
+    /**
+     * Creates the prepared statement for a select from the geometry association table.
+     * <p>
+     * </p>
+     * @param fid The fid to select for, may be <code>null</code>
+     * @param gid The geometry id to select for, may be <code>null</code>
+     * @param gname The geometry name to select for, may be <code>null</code>
+     */
+    protected PreparedStatement selectGeometryAssociationSQLPS(String fid, String gid, String gname, Connection cx)
+        throws SQLException {
+        PreparedStatementSQLDialect dialect = (PreparedStatementSQLDialect) getSQLDialect();
+        
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT ");
+        dialect.encodeColumnName("fid", sql);
+        sql.append(",");
+        dialect.encodeColumnName("gid", sql);
+        sql.append(",");
+        dialect.encodeColumnName("gname", sql);
+        sql.append(",");
+        dialect.encodeColumnName("ref", sql);
 
-    //    /**
-    //     * Creates the sql for the multi geometry table.
-    //     <p>
-    //     * This method is only called when {@link JDBCDataStore#isForeignKeyGeometries()}
-    //     * is true.
-    //     * </p>
-    //     */
-    //    protected String createMultiGeometryTableSQL( Connection cx ) throws SQLException {
-    //        String[] sqlTypeNames = getSQLTypeNames(
-    //            new Class[]{ String.class, String.class, }, cx
-    //        );
-    //        String[] columnNames = new String[]{ "gid", "rgid" };
-    //        
-    //        return createTableSQL( MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null );
-    //    }
-    //    
-    //    /**
-    //     * Creates the sql for a select from the multi geometry table.
-    //     * <p>
-    //     * 
-    //     * </p>
-    //     * @param gid The id of the multi geometry, not <code>null</code>.
-    //     */
-    //    protected String selectMultiGeometrySQL( String gid ) {
-    //        StringBuffer sql = new StringBuffer();
-    //        
-    //        sql.append( "SELECT " );
-    //        dialect.encodeColumnName( "gid", sql ); sql.append( ",");
-    //        dialect.encodeColumnName( "rgid", sql ); 
-    //        
-    //        sql.append( " FROM ");
-    //        dialect.encodeTableName( MULTI_GEOMETRY_TABLE, sql );
-    //        
-    //        sql.append( " WHERE " );
-    //        dialect.encodeColumnName( "gid", sql );
-    //        sql.append( " = " );
-    //        dialect.encodeValue( gid, String.class, sql );
-    //        
-    //        return sql.toString();    
-    //    }
+        sql.append(" FROM ");
+        encodeTableName(GEOMETRY_ASSOCIATION_TABLE, sql);
 
+        if (fid != null) {
+            sql.append(" WHERE ");
+            dialect.encodeColumnName("fid", sql);
+            sql.append(" = ? ");
+        }
+
+        if (gid != null) {
+            if (fid == null) {
+                sql.append(" WHERE ");
+            } else {
+                sql.append(" AND ");
+            }
+
+            dialect.encodeColumnName("gid", sql);
+            sql.append(" = ? ");
+        }
+
+        if (gname != null) {
+            if ((fid == null) && (gid == null)) {
+                sql.append(" WHERE ");
+            } else {
+                sql.append(" AND ");
+            }
+
+            dialect.encodeColumnName("gname", sql);
+            sql.append(" = ?");
+        }
+
+        LOGGER.fine( sql.toString() );
+        PreparedStatement ps = cx.prepareStatement(sql.toString());
+        if ( fid != null ) {
+            ps.setString( 1, fid );
+        }
+        
+        if ( gid != null ) {
+            ps.setString( fid != null ? 2 : 1, gid );
+        }
+        
+        if ( gname != null ) {
+            ps.setString( fid != null ? (gid != null ? 3 : 2 ) : (gid != null ? 2 : 1 ), gname );
+        }
+        
+        return ps;
+    }
+    
     /**
      * Helper method for building a 'CREATE TABLE' sql statement.
      */
@@ -2025,7 +2245,8 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected void setPreparedFilterValues( PreparedStatement ps, PreparedFilterToSQL toSQL, int offset, Connection cx ) 
         throws SQLException {
-        
+        PreparedStatementSQLDialect dialect = (PreparedStatementSQLDialect) getSQLDialect();
+       
         for ( int i = 0; i < toSQL.getLiteralValues().size(); i++) {
             Object value = toSQL.getLiteralValues().get(i);
             Class binding = toSQL.getLiteralTypes().get(i);
@@ -2266,6 +2487,8 @@ public final class JDBCDataStore extends ContentDataStore
      * @throws IOException 
      */
     protected String insertSQL(SimpleFeatureType featureType, SimpleFeature feature, List keyValues, Connection cx) {
+        BasicSQLDialect dialect = (BasicSQLDialect) getSQLDialect();
+        
         StringBuffer sql = new StringBuffer();
         sql.append("INSERT INTO ");
         encodeTableName(featureType.getTypeName(), sql);
@@ -2354,6 +2577,8 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected PreparedStatement insertSQLPS(SimpleFeatureType featureType, SimpleFeature feature, List keyValues, Connection cx) 
         throws IOException, SQLException {
+        PreparedStatementSQLDialect dialect = (PreparedStatementSQLDialect) getSQLDialect();
+        
         StringBuffer sql = new StringBuffer();
         sql.append("INSERT INTO ");
         encodeTableName(featureType.getTypeName(), sql);
@@ -2505,6 +2730,8 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected String updateSQL(SimpleFeatureType featureType, AttributeDescriptor[] attributes,
         Object[] values, Filter filter) {
+        BasicSQLDialect dialect = (BasicSQLDialect) getSQLDialect();
+        
         StringBuffer sql = new StringBuffer();
         sql.append("UPDATE ");
         encodeTableName(featureType.getTypeName(), sql);
@@ -2552,7 +2779,8 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected PreparedStatement updateSQLPS(SimpleFeatureType featureType, AttributeDescriptor[] attributes,
             Object[] values, Filter filter, Connection cx ) throws IOException, SQLException {
-       
+        PreparedStatementSQLDialect dialect = (PreparedStatementSQLDialect) getSQLDialect();
+        
         StringBuffer sql = new StringBuffer();
         sql.append("UPDATE ");
         encodeTableName(featureType.getTypeName(), sql);
@@ -2630,7 +2858,7 @@ public final class JDBCDataStore extends ContentDataStore
      * </p>
      */
     protected FilterToSQL createFilterToSQL(SimpleFeatureType featureType) {
-        return initializeFilterToSQL( dialect.createFilterToSQL(), featureType  );
+        return initializeFilterToSQL( ((BasicSQLDialect)dialect).createFilterToSQL(), featureType  );
     }
     
     /**
@@ -2639,7 +2867,7 @@ public final class JDBCDataStore extends ContentDataStore
      * 
      */
     protected PreparedFilterToSQL createPreparedFilterToSQL (SimpleFeatureType featureType) {
-        return initializeFilterToSQL( dialect.createPreparedFilterToSQL(), featureType );
+        return initializeFilterToSQL( ((PreparedStatementSQLDialect)dialect).createPreparedFilterToSQL(), featureType );
     }
     
     /**

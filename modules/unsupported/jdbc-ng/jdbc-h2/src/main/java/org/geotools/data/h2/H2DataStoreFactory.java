@@ -91,7 +91,8 @@ public class H2DataStoreFactory extends JDBCDataStoreFactory {
     }
 
     protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
-        return new H2Dialect(dataStore);
+        return new H2DialectBasic(dataStore);
+        //return new H2DialectPrepared(dataStore);
     }
 
     protected DataSource createDataSource(Map params) throws IOException {

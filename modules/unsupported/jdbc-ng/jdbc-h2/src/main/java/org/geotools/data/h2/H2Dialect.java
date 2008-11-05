@@ -16,10 +16,8 @@
  */
 package org.geotools.data.h2;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -36,13 +34,17 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.OutputStreamOutStream;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
-import com.vividsolutions.jts.io.WKBWriter;
 import com.vividsolutions.jts.io.WKTWriter;
 
-
+/**
+ * Delegate for {@link H2DialectBasic} and {@link H2DialectPrepared} which implements
+ * the common parts of the dialect api.
+ * 
+ * @author Justin Deoliveira, OpenGEO
+ *
+ */
 public class H2Dialect extends SQLDialect {
     
     public H2Dialect( JDBCDataStore dataStore ) {
@@ -65,12 +67,6 @@ public class H2Dialect extends SQLDialect {
         super.registerClassToSqlMappings(mappings);
 
         //geometries
-        /*
-           mappings.put(Geometry.class, new Integer(Types.OTHER));
-           mappings.put(Point.class, new Integer(Types.OTHER));
-           mappings.put(LineString.class, new Integer(Types.OTHER));
-           mappings.put(Polygon.class, new Integer(Types.OTHER));
-         */
 
         //TODO: only map geometry?
         mappings.put(Geometry.class, new Integer(Types.BLOB));
@@ -143,34 +139,7 @@ public class H2Dialect extends SQLDialect {
         sql.append(")");
     }
     
-    @Override
-    public void setGeometryValue(Geometry g, int srid,
-            Class binding, PreparedStatement ps, int column)
-            throws SQLException {
-        if ( g == null ) {
-            ps.setNull( column, Types.BLOB );
-            return;
-        }
-        
-        WKBWriter w = new WKBWriter();
-        
-        // write the geometry
-        try {
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            w.write( g , new OutputStreamOutStream( bytes ) );
-       
-            //supplement it with the srid
-            bytes.write( (byte)(srid >>> 24) );
-            bytes.write( (byte)(srid >> 16 & 0xff) );
-            bytes.write( (byte)(srid >> 8 & 0xff) );
-            bytes.write( (byte)(srid & 0xff) );
-            
-            ps.setBytes( column, bytes.toByteArray() );
-        } catch(IOException e) {
-            throw (SQLException) new SQLException("A problem occurred " +
-            		"while serializing the geometry").initCause(e);
-        }
-    }
+    
 
     public Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs, String column,
         GeometryFactory factory, Connection cx ) throws IOException, SQLException {

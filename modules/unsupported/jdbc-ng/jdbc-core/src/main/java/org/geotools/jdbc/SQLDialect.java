@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -518,54 +517,6 @@ public abstract class SQLDialect {
     }
 
     /**
-     * Encodes a geometry value in an sql statement.
-     * <p>
-     * An implementations should serialize <tt>value</tt> into some exchange
-     * format which will then be transported to the underlying database. For
-     * example, consider an implementation which converts a geometry into its
-     * well known text representation:
-     * <pre>
-     *   <code>
-     *   sql.append( "GeomFromText('" );
-     *   sql.append( new WKTWriter().write( value ) );
-     *   sql.append( ")" );
-     *   </code>
-     *  </pre>
-     * </p>
-     * <p>
-     *  The <tt>srid</tt> parameter is the spatial reference system identifier
-     *  of the geometry, or 0 if not known.
-     * </p>
-     */
-    public abstract void encodeGeometryValue(Geometry value, int srid, StringBuffer sql)
-        throws IOException;
-    
-    /**
-     * Allows the dialect to specify the placeholder for a geometry value in a INSERT or UPDATE
-     * statement. The default implementation simply appends <code>?</code> to the sql buffer,
-     * but specialized dialects might override to call decoding functions, perform casts,
-     * force the srid and so on.
-     * @param descriptor
-     * @param srid
-     * @param sql
-     */
-    public void prepareGeometryValue(Geometry geom, int srid, Class binding, StringBuffer sql) {
-        sql.append("?");
-    }
-
-    /**
-     * Sets the geometry value into the prepared statement. 
-     * @param g The geometry
-     * @param srid the geometry native srid (should be forced into the encoded geometry)
-     * @param binding the geometry type
-     * @param ps the prepared statement
-     * @param column the column index where the geometry is to be set
-     * @throws SQLException
-     */
-    public abstract void setGeometryValue(Geometry g, int srid,
-            Class binding, PreparedStatement ps, int column) throws SQLException;
-    
-    /**
      * Decodes a geometry value from the result of a query.
      * <p>
      * This method is given direct access to a result set. The <tt>column</tt>
@@ -673,101 +624,6 @@ public abstract class SQLDialect {
     }
 
     /**
-     * Encodes a value in an sql statement.
-     * <p>
-     * Subclasses may wish to override or extend this method to handle specific
-     * types. This default implementation does the following:
-     * <ol>
-     *   <li>The <tt>value</tt> is encoded via its {@link #toString()} representation.
-     *   <li>If <tt>type</tt> is a character type (extends {@link CharSequence}),
-     *   it is wrapped in single quotes (').
-     * </ol>
-     * </p>
-     *
-     */
-    public void encodeValue(Object value, Class type, StringBuffer sql) {
-        
-        //turn the value into a literal and use FilterToSQL to encode it
-        Literal literal = dataStore.getFilterFactory().literal( value );
-        FilterToSQL filterToSQL = dataStore.createFilterToSQL(null);
-        
-        StringWriter w = new StringWriter();
-        filterToSQL.setWriter(w);
-        
-        filterToSQL.visit(literal,type);
-        
-        sql.append( w.getBuffer().toString() );
-//        if (CharSequence.class.isAssignableFrom(type)) {
-//            sql.append("'").append(value).append("'");
-//        } else {
-//            sql.append(value);
-//        }
-    }
-    
-    public void setValue(Object value, Class binding, PreparedStatement ps,
-            int column, Connection cx) throws SQLException {
-        
-        //get the sql type
-        Integer sqlType = dataStore.getMapping( binding );
-        
-        //handl null case
-        if ( value == null ) {
-            ps.setNull( column, sqlType );
-            return;
-        }
-        
-        //convert the value if necessary
-        if ( ! binding.isInstance( value ) ) {
-            Object converted = Converters.convert(value, binding);
-            if ( converted != null ) {
-                value = converted;
-            }
-            else {
-                dataStore.getLogger().warning( "Unable to convert " + value + " to " + binding.getName() );
-            }
-        }
-        
-        switch( sqlType ) {
-            case Types.VARCHAR:
-                ps.setString( column, (String) value );
-                break;
-            case Types.BOOLEAN:
-                ps.setBoolean( column, (Boolean) value );
-                break;
-            case Types.SMALLINT:
-                ps.setShort( column, (Short) value );
-                break;
-            case Types.INTEGER:
-                ps.setInt( column, (Integer) value );
-                break;
-            case Types.BIGINT:
-                ps.setLong( column, (Long) value );
-                break;
-            case Types.REAL:
-                ps.setFloat( column, (Float) value );
-                break;
-            case Types.DOUBLE:
-                ps.setDouble( column, (Double) value );
-                break;
-            case Types.NUMERIC:
-                ps.setBigDecimal( column, (BigDecimal) value );
-                break;
-            case Types.DATE:
-                ps.setDate( column, (Date) value );
-                break;
-            case Types.TIME:
-                ps.setTime( column, (Time) value );
-                break;
-            case Types.TIMESTAMP:
-                ps.setTimestamp( column, (Timestamp) value );
-                break;
-            default:
-                ps.setObject( column, value );
-        }
-        
-    }
-
-    /**
      * Obtains the next value of the primary key of a column.
      * <p>
      * Implementations should determine the next value of a column for which 
@@ -839,31 +695,5 @@ public abstract class SQLDialect {
     public Object getNextSequenceValue(String schemaName, String sequenceName, Connection cx ) 
         throws SQLException {
         return null;
-    }
-    
-    /**
-     * Flag controlling wether prepared statements should be used.
-     */
-    public boolean isUsingPreparedStatements() {
-        return true;
-    }
-    
-    /**
-     * Creates the filter encoder to be used by the datastore when encoding 
-     * query predicates.
-     * <p>
-     * Sublcasses can override this method to return a subclass of {@link FilterToSQL}
-     * if need be.
-     * </p>
-     */
-    public FilterToSQL createFilterToSQL() {
-        FilterToSQL f2s = new FilterToSQL();
-        f2s.setCapabilities(BASE_DBMS_CAPABILITIES);
-        return f2s;
-    }
-    public PreparedFilterToSQL createPreparedFilterToSQL() {
-        PreparedFilterToSQL f2s = new PreparedFilterToSQL();
-        f2s.setCapabilities(BASE_DBMS_CAPABILITIES);
-        return f2s;
     }
 }

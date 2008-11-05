@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.PreparedStatementSQLDialect;
 import org.geotools.jdbc.SQLDialect;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -44,7 +45,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-public class PostGISDialect extends SQLDialect {
+public class PostGISDialect extends PreparedStatementSQLDialect {
 
     final static Map<String, Class> GEOM_TYPE_MAP = new HashMap<String, Class>() {
         {
@@ -74,11 +75,6 @@ public class PostGISDialect extends SQLDialect {
         return looseBBOXEnabled;
     }
     
-    @Override
-    public boolean isUsingPreparedStatements() {
-        return true;
-    }
-
     public void setLooseBBOXEnabled(boolean looseBBOXEnabled) {
         this.looseBBOXEnabled = looseBBOXEnabled;
     }
@@ -94,11 +90,6 @@ public class PostGISDialect extends SQLDialect {
         return (Geometry) new WKBAttributeIO(factory).read(rs, column);
     }
     
-    @Override
-    public void encodeGeometryValue(Geometry value, int srid, StringBuffer sql)
-            throws IOException {
-    }
-
     @Override
     public void setGeometryValue(Geometry g, int srid, Class binding,
             PreparedStatement ps, int column) throws SQLException {

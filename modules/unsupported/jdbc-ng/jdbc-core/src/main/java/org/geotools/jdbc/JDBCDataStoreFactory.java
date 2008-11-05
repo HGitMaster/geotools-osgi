@@ -79,6 +79,9 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
     /** parameter for namespace of the datastore */
     public static final Param NAMESPACE = new Param("namespace", String.class);
 
+    /** parameter for data source */
+    public static final Param DATASOURCE = new Param( "Data Source", DataSource.class, "Data Source", false );
+    
     public boolean canProcess(Map params) {
         if (!super.canProcess(params)) {
             return false; // was not in agreement with getParametersInfo
@@ -99,12 +102,21 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         }
     }
 
-    public final DataStore createDataStore(Map params)
+    public final JDBCDataStore createDataStore(Map params)
         throws IOException {
         JDBCDataStore dataStore = new JDBCDataStore();
 
-        //datasource + dialect
-        dataStore.setDataSource(createDataSource(params));
+        //datasource 
+        //check if the DATASOURCE parameter was supplied, it takes precendence
+        DataSource ds = (DataSource) DATASOURCE.lookUp( params );
+        if ( ds != null ) {
+            dataStore.setDataSource(ds);
+        }
+        else {
+            dataStore.setDataSource(createDataSource(params));
+        }
+
+        //dialect
         dataStore.setSQLDialect(createSQLDialect(dataStore));
 
         //namespace
@@ -124,7 +136,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         //factories
         dataStore.setFilterFactory(CommonFactoryFinder.getFilterFactory(null));
         dataStore.setGeometryFactory(new GeometryFactory());
-//        dataStore.setFeatureTypeFactory(CommonFactoryFinder.getFeatureTypeFactory(null));
+        dataStore.setFeatureTypeFactory(new FeatureTypeFactoryImpl());
         dataStore.setFeatureFactory(CommonFactoryFinder.getFeatureFactory(null));
 
         //call subclass hook and return
@@ -266,6 +278,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
      * </p>
      */
     protected DataSource createDataSource(Map params) throws IOException {
+        //create a datasource
         BasicDataSource dataSource = new BasicDataSource();
 
         //some defualt data source behaviour

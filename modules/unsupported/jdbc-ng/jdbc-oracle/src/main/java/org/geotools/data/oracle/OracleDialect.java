@@ -39,6 +39,7 @@ import org.geotools.data.oracle.sdo.SDOSqlDumper;
 import org.geotools.data.oracle.sdo.TT;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.PreparedFilterToSQL;
+import org.geotools.jdbc.PreparedStatementSQLDialect;
 import org.geotools.jdbc.SQLDialect;
 import org.geotools.referencing.CRS;
 import org.geotools.util.SoftValueHashMap;
@@ -69,7 +70,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Justin Deoliveira, OpenGEO
  * @author Andrea Aime, OpenGEO
  */
-public class OracleDialect extends SQLDialect {
+public class OracleDialect extends PreparedStatementSQLDialect {
     
     /**
      * A map from JTS Geometry type to Oracle geometry type. See Oracle Spatial documentation,
@@ -116,11 +117,6 @@ public class OracleDialect extends SQLDialect {
         this.looseBBOXEnabled = looseBBOXEnabled;
     }
     
-    
-    @Override
-    public boolean isUsingPreparedStatements() {
-        return true;
-    }   
     
     @Override
     public Class<?> getMapping(ResultSet columnMetaData, Connection cx) throws SQLException {
@@ -434,13 +430,6 @@ public class OracleDialect extends SQLDialect {
         sql.append( ")");
     }
 
-    @Override
-    public void encodeGeometryValue(Geometry value, int srid, StringBuffer sql)
-            throws IOException {
-        throw new UnsupportedOperationException("This method is supposed to be used with " +
-        		"non prepared statemetns, this dialect works only with prepared ones");
-    }
-    
     @Override
     public void postCreateTable(String schemaName,
             SimpleFeatureType featureType, Connection cx) throws SQLException {
