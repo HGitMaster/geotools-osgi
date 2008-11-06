@@ -1,7 +1,12 @@
 package org.geotools.data.wfs.v1_1_0.parsers;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.logging.Logger;
 
 import net.opengis.wfs.BaseRequestType;
@@ -64,7 +69,14 @@ public class Gml31GetFeatureResponseParserFactory implements WFSResponseParserFa
                 }
             }
 
-            String head = new String(buff, response.getCharacterEncoding());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    new ByteArrayInputStream(buff), response.getCharacterEncoding()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while( (line = reader.readLine()) != null ) {
+                sb.append(line).append('\n');
+            }
+            String head = sb.toString();
             LOGGER.fine("response head: " + head);
 
             pushbackIn.unread(buff, 0, readCount);
