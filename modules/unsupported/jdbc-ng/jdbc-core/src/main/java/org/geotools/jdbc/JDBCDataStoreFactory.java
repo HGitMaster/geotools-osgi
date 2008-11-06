@@ -65,7 +65,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
     public static final Param PORT = new Param("Port", Integer.class, "Port", true);
 
     /** parameter for database instance */
-    public static final Param DATABASE = new Param("Database", String.class, "Database");
+    public static final Param DATABASE = new Param("Database", String.class, "Database", false );
 
     /** parameter for database schema */
     public static final Param SCHEMA = new Param("Schema", String.class, "Schema", false);
@@ -81,6 +81,11 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
 
     /** parameter for data source */
     public static final Param DATASOURCE = new Param( "Data Source", DataSource.class, "Data Source", false );
+    
+    @Override
+    public String getDisplayName() {
+        return getDescription();
+    }
     
     public boolean canProcess(Map params) {
         if (!super.canProcess(params)) {
@@ -289,8 +294,19 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
 
         //jdbc url
         String host = (String) HOST.lookUp(params);
+        Integer port = (Integer) PORT.lookUp(params);
         String db = (String) DATABASE.lookUp(params);
-        dataSource.setUrl("jdbc:" + getDatabaseID() + "://" + host + "/" + db);
+        
+        String url = "jdbc:" + getDatabaseID() + "://" + host;
+        if ( port != null ) {
+            url += ":" + port;
+        }
+        
+        if ( db != null ) {
+            url += "/" + db; 
+        }
+        
+        dataSource.setUrl(url);
 
         //username
         String user = (String) USER.lookUp(params);
