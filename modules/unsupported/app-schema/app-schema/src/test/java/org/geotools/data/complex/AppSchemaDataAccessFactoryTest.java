@@ -37,7 +37,7 @@ import org.opengis.feature.type.Name;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessFactoryTest.java 31784 2008-11-06 06:20:21Z bencd $
+ * @version $Id: AppSchemaDataAccessFactoryTest.java 31787 2008-11-06 07:12:25Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/ComplexDataStoreFactoryTest.java $
  * @since 2.4
@@ -56,7 +56,7 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
         super.setUp();
         factory = new AppSchemaDataAccessFactory();
         params = new HashMap();
-        params.put("dbtype", "complex");
+        params.put("dbtype", "app-schema");
         URL resource = getClass().getResource("/test-data/roadsegments.xml");
         if (resource == null) {
             fail("Can't find resouce /test-data/roadsegments.xml");
@@ -81,7 +81,7 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
         } catch (IOException e) {
             // OK
         }
-        badParams.put("dbtype", "complex");
+        badParams.put("dbtype", "app-schema");
         try {
             factory.createDataStore(badParams);
             fail("allowed bad params");
@@ -174,7 +174,7 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
         params.put("url", "http://somesite.net/config.xml");
         assertFalse(factory.canProcess(params));
         params.remove("url");
-        params.put("dbtype", "complex");
+        params.put("dbtype", "app-schema");
         assertFalse(factory.canProcess(params));
 
         params.put("url", "http://somesite.net/config.xml");

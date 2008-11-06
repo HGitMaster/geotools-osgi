@@ -69,7 +69,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: TimeSeriesTest.java 31784 2008-11-06 06:20:21Z bencd $
+ * @version $Id: TimeSeriesTest.java 31787 2008-11-06 07:12:25Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
  * @since 2.4
@@ -383,7 +383,7 @@ public class TimeSeriesTest extends TestCase {
             // "file:/home/gabriel/svn/geoserver/trunk/configuration/community-schema-timeseries2/TimeSeriesTest_properties.xml";
             // URL url = new URL(configLocation);
 
-            dsParams.put("dbtype", "complex");
+            dsParams.put("dbtype", "app-schema");
             dsParams.put("url", url.toExternalForm());
 
             mappingDataStore = DataAccessFinder.getDataStore(dsParams);

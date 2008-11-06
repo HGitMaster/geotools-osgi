@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31744 2008-10-31 06:34:07Z bencd $              
+        Version: $Id: pom.xml 31787 2008-11-06 07:12:25Z bencd $              
      ======================================================================= --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                                 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -20,20 +20,20 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>community-schemas</artifactId>
+  <artifactId>app-schema</artifactId>
   <packaging>pom</packaging>
-  <name>Geotools community schemas support</name>
+  <name>Geotools application schema support</name>
   <url>http://maven.geotools.fr/reports/modules/unsupported/community-schemas</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/community-schemas
+      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/app-schema
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/community-schemas</url>
+    <url>http://svn.geotools.org/trunk/modules/unsupported/app-schema</url>
   </scm>
   
   <description>
-    Modules to support serving community defined FeatureTypes through DataStore GeoTools.
+    Modules to support serving application schema defined FeatureTypes through DataAccess GeoTools.
   </description>
 
   <licenses>
@@ -49,7 +49,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-  	<module>community-schema-ds</module>
+  	<module>app-schema</module>
   	<module>jdbc-regfunc</module>
   </modules>
   

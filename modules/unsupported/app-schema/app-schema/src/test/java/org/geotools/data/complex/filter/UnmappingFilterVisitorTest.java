@@ -82,7 +82,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: UnmappingFilterVisitorTest.java 31784 2008-11-06 06:20:21Z bencd $
+ * @version $Id: UnmappingFilterVisitorTest.java 31787 2008-11-06 07:12:25Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/filter/UnmappingFilterVisitorTest.java $
  * @since 2.4
@@ -297,7 +297,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         final String schemaBase = "/test-data/";
         final Map dsParams = new HashMap();
         final URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
-        dsParams.put("dbtype", "complex");
+        dsParams.put("dbtype", "app-schema");
         dsParams.put("url", url.toExternalForm());
 
         final String XMMLNS = "http://www.opengis.net/xmml";
@@ -384,7 +384,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         final String schemaBase = "/test-data/";
         final Map dsParams = new HashMap();
         final URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
-        dsParams.put("dbtype", "complex");
+        dsParams.put("dbtype", "app-schema");
         dsParams.put("url", url.toExternalForm());
 
         final String XMMLNS = "http://www.opengis.net/xmml";

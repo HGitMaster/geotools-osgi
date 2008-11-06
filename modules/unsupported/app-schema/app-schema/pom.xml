@@ -5,7 +5,7 @@
   The Geotools Project                                                    
   http://www.geotools.org/                                            
   
-  Version: $Id: pom.xml 31760 2008-11-04 06:42:06Z bencd $              
+  Version: $Id: pom.xml 31787 2008-11-06 07:12:25Z bencd $              
   ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
@@ -14,23 +14,23 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>community-schemas</artifactId>
+    <artifactId>app-schema</artifactId>
     <version>2.6-SNAPSHOT</version>
   </parent>
 
 
   <groupId>org.geotools</groupId>
-  <artifactId>gt-community-schema-ds</artifactId>
-  <name>Community Schemas DataStore</name>
+  <artifactId>gt-app-schema</artifactId>
+  <name>Application Schema DataAccess</name>
   <url>http://maven.geotools.fr/reports/main/</url>
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds
+      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/app-schema/app-schema
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds</url>
+    <url>http://svn.geotools.org/trunk/modules/unsupported/app-schema/app-schema</url>
   </scm>
   <description>
-    The main module contains the key interfaces and default implementations that are used by other GeoTools modules.
+    DataAccess to create FeatureTypes defined in application schema.
   </description>
 
 

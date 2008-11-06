@@ -47,7 +47,7 @@ import org.opengis.feature.type.Name;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: GeoSciMLTest.java 31784 2008-11-06 06:20:21Z bencd $
+ * @version $Id: GeoSciMLTest.java 31787 2008-11-06 07:12:25Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
  * @since 2.4
@@ -198,7 +198,7 @@ public class GeoSciMLTest extends TestCase {
             final Map dsParams = new HashMap();
             final URL url = getClass().getResource(schemaBase + "mappedPolygons.xml");
             assertNotNull(url);
-            dsParams.put("dbtype", "complex");
+            dsParams.put("dbtype", "app-schema");
             dsParams.put("url", url.toExternalForm());
 
             final Name typeName = Types.typeName(GSMLNS, "MappedFeature");
