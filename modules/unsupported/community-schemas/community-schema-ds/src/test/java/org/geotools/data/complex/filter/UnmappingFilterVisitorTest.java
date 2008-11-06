@@ -32,8 +32,8 @@ import junit.framework.TestCase;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.complex.AppSchemaDataAccess;
 import org.geotools.data.complex.AttributeMapping;
-import org.geotools.data.complex.ComplexDataStore;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.complex.TestData;
 import org.geotools.data.complex.filter.XPath.Step;
@@ -82,7 +82,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: UnmappingFilterVisitorTest.java 31759 2008-11-04 06:27:41Z bencd $
+ * @version $Id: UnmappingFilterVisitorTest.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/filter/UnmappingFilterVisitorTest.java $
  * @since 2.4
@@ -171,7 +171,8 @@ public class UnmappingFilterVisitorTest extends TestCase {
         Filter unrolled = (Filter) fidFilter.accept(visitor, null);
         assertNotNull(unrolled);
 
-        FeatureCollection<SimpleFeatureType, SimpleFeature> results = mapping.getSource().getFeatures(unrolled);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = mapping.getSource()
+                .getFeatures(unrolled);
         assertEquals(1, getCount(results));
 
         Iterator<SimpleFeature> features = results.iterator();
@@ -224,7 +225,8 @@ public class UnmappingFilterVisitorTest extends TestCase {
 
         this.visitor = new UnmappingFilterVisitor(this.mapping);
 
-        FeatureCollection<SimpleFeatureType, SimpleFeature> content = mapping.getSource().getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> content = mapping.getSource()
+                .getFeatures();
         Iterator iterator = content.iterator();
         Feature sourceFeature = (Feature) iterator.next();
         content.close(iterator);
@@ -237,7 +239,8 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertNotNull(unrolled);
         assertTrue(unrolled instanceof Id);
 
-        FeatureCollection<SimpleFeatureType, SimpleFeature> results = mapping.getSource().getFeatures(unrolled);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = mapping.getSource()
+                .getFeatures(unrolled);
         assertEquals(1, getCount(results));
         iterator = results.iterator();
         SimpleFeature unmappedFeature = (SimpleFeature) iterator.next();
@@ -301,7 +304,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         final Name typeName = new NameImpl(XMMLNS, "Borehole");
 
         DataAccess<FeatureType, Feature> mappingDataStore = DataAccessFinder.getDataStore(dsParams);
-        ComplexDataStore complexDs = (ComplexDataStore) mappingDataStore;
+        AppSchemaDataAccess complexDs = (AppSchemaDataAccess) mappingDataStore;
         mapping = complexDs.getMapping(typeName);
 
         NamespaceSupport namespaces = new NamespaceSupport();
@@ -388,7 +391,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         final Name typeName = new NameImpl(XMMLNS, "Borehole");
 
         DataAccess<FeatureType, Feature> mappingDataStore = DataAccessFinder.getDataStore(dsParams);
-        ComplexDataStore complexDs = (ComplexDataStore) mappingDataStore;
+        AppSchemaDataAccess complexDs = (AppSchemaDataAccess) mappingDataStore;
         mapping = complexDs.getMapping(typeName);
 
         NamespaceSupport namespaces = new NamespaceSupport();

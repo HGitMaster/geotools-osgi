@@ -32,14 +32,13 @@ import org.apache.xml.resolver.tools.ResolvingXMLReader;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
-import org.geotools.data.complex.config.ComplexDataStoreDTO;
+import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
+import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
 import org.geotools.data.complex.config.EmfAppSchemaReader;
 import org.geotools.data.complex.config.XMLConfigDigester;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.Types;
 import org.opengis.feature.Feature;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
@@ -48,7 +47,7 @@ import org.opengis.feature.type.Name;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: GeoSciMLTest.java 31754 2008-11-03 05:56:51Z bencd $
+ * @version $Id: GeoSciMLTest.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
  * @since 2.4
@@ -186,9 +185,9 @@ public class GeoSciMLTest extends TestCase {
         XMLConfigDigester reader = new XMLConfigDigester();
         final URL url = getClass().getResource(schemaBase + "mappedPolygons.xml");
 
-        ComplexDataStoreDTO config = reader.parse(url);
+        AppSchemaDataAccessDTO config = reader.parse(url);
 
-        Set mappings = ComplexDataStoreConfigurator.buildMappings(config);
+        Set mappings = AppSchemaDataAccessConfigurator.buildMappings(config);
 
         assertNotNull(mappings);
         assertEquals(1, mappings.size());

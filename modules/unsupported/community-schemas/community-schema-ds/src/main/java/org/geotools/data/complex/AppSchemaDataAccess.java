@@ -57,15 +57,15 @@ import org.xml.sax.helpers.NamespaceSupport;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ComplexDataStore.java 31742 2008-10-31 06:00:25Z bencd $
+ * @version $Id: AppSchemaDataAccess.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/ComplexDataStore.java $
  * @since 2.4
  */
-public class ComplexDataStore implements DataAccess<FeatureType, Feature> {
+public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
 
     private static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(ComplexDataStore.class.getPackage().getName());
+            .getLogger(AppSchemaDataAccess.class.getPackage().getName());
 
     private Map<Name, FeatureTypeMapping> mappings = Collections.emptyMap();
 
@@ -77,7 +77,7 @@ public class ComplexDataStore implements DataAccess<FeatureType, Feature> {
      *                a Set containing a {@linkplain FeatureTypeMapping} for each FeatureType this
      *                DataStore is going to hold.
      */
-    public ComplexDataStore(Set<FeatureTypeMapping> mappings) {
+    public AppSchemaDataAccess(Set<FeatureTypeMapping> mappings) {
         this.mappings = new HashMap<Name, FeatureTypeMapping>();
         for (FeatureTypeMapping mapping : mappings) {
             Name mappedElement = mapping.getTargetFeature().getName();
@@ -207,7 +207,7 @@ public class ComplexDataStore implements DataAccess<FeatureType, Feature> {
 
         if (!Query.ALL.equals(query)) {
             Filter complexFilter = query.getFilter();
-            Filter unrolledFilter = ComplexDataStore.unrollFilter(complexFilter, mapping);
+            Filter unrolledFilter = AppSchemaDataAccess.unrollFilter(complexFilter, mapping);
 
             List propNames = getSurrogatePropertyNames(query.getPropertyNames(), mapping);
 

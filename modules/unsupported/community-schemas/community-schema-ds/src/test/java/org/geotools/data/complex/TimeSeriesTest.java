@@ -41,8 +41,8 @@ import org.apache.xml.resolver.tools.ResolvingXMLReader;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
-import org.geotools.data.complex.config.ComplexDataStoreDTO;
+import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
+import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
 import org.geotools.data.complex.config.EmfAppSchemaReader;
 import org.geotools.data.complex.config.XMLConfigDigester;
 import org.geotools.feature.FeatureCollection;
@@ -69,7 +69,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: TimeSeriesTest.java 31758 2008-11-04 06:22:04Z bencd $
+ * @version $Id: TimeSeriesTest.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
  * @since 2.4
@@ -321,9 +321,9 @@ public class TimeSeriesTest extends TestCase {
         // "file:/home/gabriel/svn/geoserver/trunk/configuration/community-schema-timeseries2/TimeSeriesTest_properties.xml";
         // URL url = new URL(configLocation);
 
-        ComplexDataStoreDTO config = reader.parse(url);
+        AppSchemaDataAccessDTO config = reader.parse(url);
 
-        Set mappings = ComplexDataStoreConfigurator.buildMappings(config);
+        Set mappings = AppSchemaDataAccessConfigurator.buildMappings(config);
 
         assertNotNull(mappings);
         assertEquals(1, mappings.size());
@@ -465,7 +465,7 @@ public class TimeSeriesTest extends TestCase {
                 final List elements = (List) ((Feature) timeCovVal).getValue();
                 if (count == 1)
                     assertEquals(1, elements.size());
-                else if (count == 22) {  // 22nd feature, row TS2.22
+                else if (count == 22) { // 22nd feature, row TS2.22
                     // no grouping
                     assertEquals(1, elements.size());
 
@@ -496,7 +496,8 @@ public class TimeSeriesTest extends TestCase {
                     assertNotNull(geom.getValue());
                     assertNotNull(value.getValue());
 
-                    Object valueContent = ((ComplexAttribute) geom).getProperty("simpleContent").getValue();
+                    Object valueContent = ((ComplexAttribute) geom).getProperty("simpleContent")
+                            .getValue();
                     Date sampleTimePosition = (Date) valueContent;
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(sampleTimePosition);

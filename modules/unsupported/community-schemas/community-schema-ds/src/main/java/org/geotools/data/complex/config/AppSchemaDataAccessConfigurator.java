@@ -58,24 +58,25 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.expression.Expression;
 import org.xml.sax.helpers.NamespaceSupport;
+
 /**
  * Utility class to create a set of {@linkPlain org.geotools.data.complex.FeatureTypeMapping}
  * objects from a complex datastore's configuration object ({@link
- * org.geotools.data.complex.config.ComplexDataStoreDTO}).
+ * org.geotools.data.complex.config.AppSchemaDataAccessDTO}).
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ComplexDataStoreConfigurator.java 31514 2008-09-15 08:36:50Z bencd $
+ * @version $Id: AppSchemaDataAccessConfigurator.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/ComplexDataStoreConfigurator.java $
  * @since 2.4
  */
-public class ComplexDataStoreConfigurator {
+public class AppSchemaDataAccessConfigurator {
     /** DOCUMENT ME! */
     private static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(ComplexDataStoreConfigurator.class.getPackage().getName());
+            .getLogger(AppSchemaDataAccessConfigurator.class.getPackage().getName());
 
     /** DOCUMENT ME! */
-    private ComplexDataStoreDTO config;
+    private AppSchemaDataAccessDTO config;
 
     private Map typeRegistry;
 
@@ -95,7 +96,7 @@ public class ComplexDataStoreConfigurator {
      * @param config
      *                DOCUMENT ME!
      */
-    private ComplexDataStoreConfigurator(ComplexDataStoreDTO config) {
+    private AppSchemaDataAccessConfigurator(AppSchemaDataAccessDTO config) {
         this.config = config;
         namespaces = new NamespaceSupport();
         Map nsMap = config.getNamespaces();
@@ -125,10 +126,10 @@ public class ComplexDataStoreConfigurator {
      * @throws IOException
      *                 if any error occurs while creating the mappings
      */
-    public static Set buildMappings(ComplexDataStoreDTO config) throws IOException {
-        ComplexDataStoreConfigurator mappingsBuilder;
+    public static Set buildMappings(AppSchemaDataAccessDTO config) throws IOException {
+        AppSchemaDataAccessConfigurator mappingsBuilder;
 
-        mappingsBuilder = new ComplexDataStoreConfigurator(config);
+        mappingsBuilder = new AppSchemaDataAccessConfigurator(config);
         Set mappingObjects = mappingsBuilder.buildMappings();
 
         return mappingObjects;
@@ -280,13 +281,13 @@ public class ComplexDataStoreConfigurator {
                 expression = CQL.toExpression(sourceExpr);
             } catch (CQLException e) {
                 String formattedErrorMessage = e.getMessage();
-                ComplexDataStoreConfigurator.LOGGER.log(Level.SEVERE, formattedErrorMessage, e);
+                AppSchemaDataAccessConfigurator.LOGGER.log(Level.SEVERE, formattedErrorMessage, e);
                 throw new DataSourceException("Error parsing CQL expression " + sourceExpr + ":\n"
                         + formattedErrorMessage);
             } catch (Exception e) {
                 e.printStackTrace();
                 String msg = "parsing expression " + sourceExpr;
-                ComplexDataStoreConfigurator.LOGGER.log(Level.SEVERE, msg, e);
+                AppSchemaDataAccessConfigurator.LOGGER.log(Level.SEVERE, msg, e);
                 throw new DataSourceException(msg + ": " + e.getMessage(), e);
             }
         }
@@ -329,11 +330,11 @@ public class ComplexDataStoreConfigurator {
                     + dto);
         }
 
-        ComplexDataStoreConfigurator.LOGGER.fine("asking datastore " + sourceDataStore
+        AppSchemaDataAccessConfigurator.LOGGER.fine("asking datastore " + sourceDataStore
                 + " for source type " + typeName);
         Name name = degloseName(typeName);
         FeatureSource fSource = (FeatureSource) sourceDataStore.getFeatureSource(name);
-        ComplexDataStoreConfigurator.LOGGER.fine("found feature source for " + typeName);
+        AppSchemaDataAccessConfigurator.LOGGER.fine("found feature source for " + typeName);
         return fSource;
     }
 
@@ -350,7 +351,7 @@ public class ComplexDataStoreConfigurator {
      * @throws IOException
      */
     private void parseGmlSchemas() throws IOException {
-        ComplexDataStoreConfigurator.LOGGER.finer("about to parse target schemas");
+        AppSchemaDataAccessConfigurator.LOGGER.finer("about to parse target schemas");
 
         final URL baseUrl = new URL(config.getBaseSchemasUrl());
 
@@ -364,8 +365,8 @@ public class ComplexDataStoreConfigurator {
         for (Iterator it = schemaFiles.iterator(); it.hasNext();) {
             String schemaLocation = (String) it.next();
             final URL schemaUrl = resolveResourceLocation(baseUrl, schemaLocation);
-            ComplexDataStoreConfigurator.LOGGER
-                    .fine("parsing schema " + schemaUrl.toExternalForm());
+            AppSchemaDataAccessConfigurator.LOGGER.fine("parsing schema "
+                    + schemaUrl.toExternalForm());
 
             schemaParser.parse(schemaUrl);
         }
@@ -410,18 +411,18 @@ public class ComplexDataStoreConfigurator {
             throws MalformedURLException {
         final URL schemaUrl;
         if (schemaLocation.startsWith("file:") || schemaLocation.startsWith("http:")) {
-            ComplexDataStoreConfigurator.LOGGER.fine("using resource location as absolute path: "
-                    + schemaLocation);
+            AppSchemaDataAccessConfigurator.LOGGER
+                    .fine("using resource location as absolute path: " + schemaLocation);
             schemaUrl = new URL(schemaLocation);
         } else {
             if (baseUrl == null) {
                 schemaUrl = new URL(schemaLocation);
-                ComplexDataStoreConfigurator.LOGGER
+                AppSchemaDataAccessConfigurator.LOGGER
                         .warning("base url not provided, may be unable to locate" + schemaLocation
                                 + ". Path resolved to: " + schemaUrl.toExternalForm());
             } else {
-                ComplexDataStoreConfigurator.LOGGER.fine("using schema location " + schemaLocation
-                        + " as relative to " + baseUrl);
+                AppSchemaDataAccessConfigurator.LOGGER.fine("using schema location "
+                        + schemaLocation + " as relative to " + baseUrl);
                 schemaUrl = new URL(baseUrl, schemaLocation);
             }
         }
@@ -439,8 +440,8 @@ public class ComplexDataStoreConfigurator {
      *                 DOCUMENT ME!
      */
     private Map/* <String, FeatureAccess> */aquireSourceDatastores() throws IOException {
-        ComplexDataStoreConfigurator.LOGGER
-                .entering(getClass().getName(), "aquireSourceDatastores");
+        AppSchemaDataAccessConfigurator.LOGGER.entering(getClass().getName(),
+                "aquireSourceDatastores");
 
         final Map datastores = new HashMap();
         final List dsParams = config.getSourceDataStores();
@@ -454,7 +455,7 @@ public class ComplexDataStoreConfigurator {
 
             datastoreParams = resolveRelativePaths(datastoreParams);
 
-            ComplexDataStoreConfigurator.LOGGER.fine("looking for datastore " + id);
+            AppSchemaDataAccessConfigurator.LOGGER.fine("looking for datastore " + id);
 
             DataAccess dataStore = DataAccessFinder.getDataStore(datastoreParams);
 
@@ -463,7 +464,7 @@ public class ComplexDataStoreConfigurator {
                         + datastoreParams);
             }
 
-            ComplexDataStoreConfigurator.LOGGER.fine("got datastore " + dataStore);
+            AppSchemaDataAccessConfigurator.LOGGER.fine("got datastore " + dataStore);
             datastores.put(id, dataStore);
         }
 
@@ -510,7 +511,7 @@ public class ComplexDataStoreConfigurator {
 
     /**
      * Takes a prefixed attribute name and returns an {@link Name} by looking which namespace
-     * belongs the prefix to in {@link ComplexDataStoreDTO#getNamespaces()}.
+     * belongs the prefix to in {@link AppSchemaDataAccessDTO#getNamespaces()}.
      * 
      * @param prefixedName
      * @return

@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
  * DOCUMENT ME!
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XMLConfigDigester.java 31606 2008-10-01 02:22:26Z bencd $
+ * @version $Id: XMLConfigDigester.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/XMLConfigDigester.java $
  * @since 2.4
@@ -55,7 +55,7 @@ public class XMLConfigDigester {
 
     /**
      * Parses a complex datastore configuration file in xml format into a
-     * {@link ComplexDataStoreDTO}
+     * {@link AppSchemaDataAccessDTO}
      * 
      * @param dataStoreConfigUrl
      *                config file location
@@ -65,8 +65,8 @@ public class XMLConfigDigester {
      * @throws IOException
      *                 if an error occurs parsing the file
      */
-    public ComplexDataStoreDTO parse(URL dataStoreConfigUrl) throws IOException {
-        ComplexDataStoreDTO config = digest(dataStoreConfigUrl);
+    public AppSchemaDataAccessDTO parse(URL dataStoreConfigUrl) throws IOException {
+        AppSchemaDataAccessDTO config = digest(dataStoreConfigUrl);
         return config;
     }
 
@@ -83,7 +83,7 @@ public class XMLConfigDigester {
      * @throws NullPointerException
      *                 DOCUMENT ME!
      */
-    private ComplexDataStoreDTO digest(final URL dataStoreConfigUrl) throws IOException {
+    private AppSchemaDataAccessDTO digest(final URL dataStoreConfigUrl) throws IOException {
         if (dataStoreConfigUrl == null) {
             throw new NullPointerException("datastore config url");
         }
@@ -107,7 +107,7 @@ public class XMLConfigDigester {
         digester.setRuleNamespaceURI(XMLConfigDigester.CONFIG_NS_URI);
 
         // digester.setRuleNamespaceURI(OGC_NS_URI);
-        ComplexDataStoreDTO configDto = new ComplexDataStoreDTO();
+        AppSchemaDataAccessDTO configDto = new AppSchemaDataAccessDTO();
         configDto.setBaseSchemasUrl(dataStoreConfigUrl.toExternalForm());
 
         digester.push(configDto);
@@ -138,7 +138,7 @@ public class XMLConfigDigester {
             throw ioe;
         }
 
-        ComplexDataStoreDTO config = (ComplexDataStoreDTO) digester.getRoot();
+        AppSchemaDataAccessDTO config = (AppSchemaDataAccessDTO) digester.getRoot();
 
         return config;
     }

@@ -29,8 +29,8 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
-import org.geotools.data.complex.config.ComplexDataStoreDTO;
+import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
+import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
 import org.geotools.data.complex.config.XMLConfigDigester;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.factory.CommonFactoryFinder;
@@ -55,7 +55,6 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.opengis.geometry.BoundingBox;
 import org.xml.sax.helpers.NamespaceSupport;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -64,21 +63,21 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ComplexDataStoreTest.java 31742 2008-10-31 06:00:25Z bencd $
+ * @version $Id: AppSchemaDataAccessTest.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/ComplexDataStoreTest.java $
  * @since 2.4
  */
-public class ComplexDataStoreTest extends TestCase {
+public class AppSchemaDataAccessTest extends TestCase {
 
     private final static Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(ComplexDataStoreTest.class.getPackage().getName());
+            .getLogger(AppSchemaDataAccessTest.class.getPackage().getName());
 
     Name targetName;
 
     FeatureType targetType;
 
-    private ComplexDataStore dataStore;
+    private AppSchemaDataAccess dataStore;
 
     FeatureTypeMapping mapping;
 
@@ -99,7 +98,7 @@ public class ComplexDataStoreTest extends TestCase {
         NamespaceSupport namespaces = new NamespaceSupport();
         mapping = new FeatureTypeMapping(source, targetFeature, mappings, namespaces);
 
-        dataStore = new ComplexDataStore(Collections.singleton(mapping));
+        dataStore = new AppSchemaDataAccess(Collections.singleton(mapping));
 
     }
 
@@ -137,11 +136,11 @@ public class ComplexDataStoreTest extends TestCase {
 
         URL configUrl = getClass().getResource("/test-data/roadsegments.xml");
 
-        ComplexDataStoreDTO config = new XMLConfigDigester().parse(configUrl);
+        AppSchemaDataAccessDTO config = new XMLConfigDigester().parse(configUrl);
 
-        Set<FeatureTypeMapping> mappings = ComplexDataStoreConfigurator.buildMappings(config);
+        Set<FeatureTypeMapping> mappings = AppSchemaDataAccessConfigurator.buildMappings(config);
 
-        dataStore = new ComplexDataStore(mappings);
+        dataStore = new AppSchemaDataAccess(mappings);
         FeatureSource<FeatureType, Feature> source = dataStore.getFeatureSource(typeName);
 
         FeatureTypeMapping mapping = (FeatureTypeMapping) mappings.iterator().next();
@@ -294,11 +293,12 @@ public class ComplexDataStoreTest extends TestCase {
 
         final URL configUrl = getClass().getResource("/test-data/roadsegments.xml");
 
-        ComplexDataStoreDTO config = new XMLConfigDigester().parse(configUrl);
+        AppSchemaDataAccessDTO config = new XMLConfigDigester().parse(configUrl);
 
-        Set/* <FeatureTypeMapping> */mappings = ComplexDataStoreConfigurator.buildMappings(config);
+        Set/* <FeatureTypeMapping> */mappings = AppSchemaDataAccessConfigurator
+                .buildMappings(config);
 
-        dataStore = new ComplexDataStore(mappings);
+        dataStore = new AppSchemaDataAccess(mappings);
         FeatureSource<FeatureType, Feature> source = dataStore.getFeatureSource(typeName);
 
         FeatureType type = source.getSchema();
@@ -413,7 +413,7 @@ public class ComplexDataStoreTest extends TestCase {
         SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(type);
         for (int i = 0; i < NUM_FEATURES; i++) {
             String fid = type.getName().getLocalPart() + "." + i;
-            
+
             fbuilder.add("watersample." + i);
             fbuilder.add(new Integer(i));
             fbuilder.add(new Integer(10 + i));

@@ -31,7 +31,7 @@ import org.geotools.util.CheckedHashMap;
 import org.geotools.util.CheckedHashSet;
 
 /**
- * Configuration object for a {@link org.geotools.data.complex.ComplexDataStore}.
+ * Configuration object for a {@link org.geotools.data.complex.AppSchemaDataAccess}.
  * <p>
  * This configuration object contains all the needed elements for a ComplexDataStore to aquire the
  * source and target FeatureTypes, and apply the mappings between attributes to serve community
@@ -39,12 +39,12 @@ import org.geotools.util.CheckedHashSet;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ComplexDataStoreDTO.java 31514 2008-09-15 08:36:50Z bencd $
+ * @version $Id: AppSchemaDataAccessDTO.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/ComplexDataStoreDTO.java $
  * @since 2.4
  */
-public class ComplexDataStoreDTO implements Serializable {
+public class AppSchemaDataAccessDTO implements Serializable {
     private static final long serialVersionUID = -8649884546130644668L;
 
     /**

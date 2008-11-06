@@ -33,8 +33,8 @@ import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.AppSchemaFeatureFactoryImpl;
 import org.geotools.feature.AttributeBuilder;
-import org.geotools.feature.ComplexFeatureFactoryImpl;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.GeometryAttributeImpl;
@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * feature of the source type.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: MappingFeatureIterator.java 31742 2008-10-31 06:00:25Z bencd $
+ * @version $Id: MappingFeatureIterator.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/AbstractMappingFeatureIterator.java $
  * @since 2.4
@@ -99,7 +99,7 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
 
     protected Iterator sourceFeatures;
 
-    protected ComplexDataStore store;
+    protected AppSchemaDataAccess store;
 
     protected FeatureSource featureSource;
 
@@ -128,10 +128,10 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
      *                equivalent over the surrogate feature type.
      * @throws IOException
      */
-    public MappingFeatureIterator(ComplexDataStore store, FeatureTypeMapping mapping, Query query)
+    public MappingFeatureIterator(AppSchemaDataAccess store, FeatureTypeMapping mapping, Query query)
             throws IOException {
         this.store = store;
-        this.attf = new ComplexFeatureFactoryImpl();
+        this.attf = new AppSchemaFeatureFactoryImpl();
         Name name = mapping.getTargetFeature().getName();
         this.featureSource = store.getFeatureSource(name);
 
@@ -318,7 +318,7 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
             }
             setSingleValuedAttribute(target, sourceInstance, attMapping);
         }
-         if (target.getDefaultGeometryProperty() == null) {
+        if (target.getDefaultGeometryProperty() == null) {
             setGeometry(target);
         }
         featureCounter++;

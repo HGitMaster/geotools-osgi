@@ -24,10 +24,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.data.DataAccess;
+import org.geotools.data.DataAccessFactory;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
-import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
-import org.geotools.data.complex.config.ComplexDataStoreDTO;
+import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
+import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
 import org.geotools.data.complex.config.XMLConfigDigester;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
@@ -39,33 +40,33 @@ import org.opengis.feature.type.FeatureType;
  * Instead, we're directly using DataAccessFactory
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ComplexDataStoreFactory.java 31514 2008-09-15 08:36:50Z bencd $
+ * @version $Id: AppSchemaDataAccessFactory.java 31784 2008-11-06 06:20:21Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/ComplexDataStoreFactory.java $
  * @since 2.4
  */
-public class ComplexDataStoreFactory /* implements DataStoreFactorySpi */{
+public class AppSchemaDataAccessFactory implements DataAccessFactory {
 
     public static final DataStoreFactorySpi.Param DBTYPE = new DataStoreFactorySpi.Param("dbtype",
-            String.class, "Fixed value 'complex'", true, "complex");
+            String.class, "Fixed value 'app-schema'", true, "app-schema");
 
     public static final DataStoreFactorySpi.Param URL = new DataStoreFactorySpi.Param("url",
-            URL.class, "URL to a complex datastore XML configuration file", true);
+            URL.class, "URL to an application schema datastore XML configuration file", true);
 
-    public ComplexDataStoreFactory() {
+    public AppSchemaDataAccessFactory() {
         // no-op
     }
 
     public DataAccess<FeatureType, Feature> createDataStore(Map params) throws IOException {
         Set/* <FeatureTypeMapping> */mappings;
-        ComplexDataStore dataStore;
+        AppSchemaDataAccess dataStore;
 
-        URL configFileUrl = (URL) ComplexDataStoreFactory.URL.lookUp(params);
+        URL configFileUrl = (URL) AppSchemaDataAccessFactory.URL.lookUp(params);
         XMLConfigDigester configReader = new XMLConfigDigester();
-        ComplexDataStoreDTO config = configReader.parse(configFileUrl);
-        mappings = ComplexDataStoreConfigurator.buildMappings(config);
+        AppSchemaDataAccessDTO config = configReader.parse(configFileUrl);
+        mappings = AppSchemaDataAccessConfigurator.buildMappings(config);
 
-        dataStore = new ComplexDataStore(mappings);
+        dataStore = new AppSchemaDataAccess(mappings);
 
         return dataStore;
     }
@@ -75,23 +76,23 @@ public class ComplexDataStoreFactory /* implements DataStoreFactorySpi */{
     }
 
     public String getDisplayName() {
-        return "Complex DataStore.";
+        return "Application Schema DataAccess";
     }
 
     public String getDescription() {
-        return "Complex DataStore allows mapping of FeatureTypes to externally defined Output Schemas";
+        return "Application Schema DataStore allows mapping of FeatureTypes to externally defined Output Schemas";
     }
 
     public DataStoreFactorySpi.Param[] getParametersInfo() {
-        return new DataStoreFactorySpi.Param[] { ComplexDataStoreFactory.DBTYPE,
-                ComplexDataStoreFactory.URL };
+        return new DataStoreFactorySpi.Param[] { AppSchemaDataAccessFactory.DBTYPE,
+                AppSchemaDataAccessFactory.URL };
     }
 
     public boolean canProcess(Map params) {
         try {
-            Object dbType = ComplexDataStoreFactory.DBTYPE.lookUp(params);
-            Object configUrl = ComplexDataStoreFactory.URL.lookUp(params);
-            return "complex".equals(dbType) && configUrl != null;
+            Object dbType = AppSchemaDataAccessFactory.DBTYPE.lookUp(params);
+            Object configUrl = AppSchemaDataAccessFactory.URL.lookUp(params);
+            return "app-schema".equals(dbType) && configUrl != null;
         } catch (Exception e) {
             // e.printStackTrace();
         }

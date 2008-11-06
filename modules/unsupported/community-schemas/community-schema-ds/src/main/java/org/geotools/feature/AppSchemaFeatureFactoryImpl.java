@@ -25,7 +25,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </ul>
  * 
  */
-public class ComplexFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
+public class AppSchemaFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {
 
     /*
      * @see org.geotools.feature.AbstractFeatureFactoryImpl#createAttribute(java.lang.Object,

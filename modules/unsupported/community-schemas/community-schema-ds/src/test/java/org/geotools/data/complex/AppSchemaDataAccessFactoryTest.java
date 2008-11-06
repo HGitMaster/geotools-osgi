@@ -37,13 +37,14 @@ import org.opengis.feature.type.Name;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ComplexDataStoreFactoryTest.java 31742 2008-10-31 06:00:25Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/ComplexDataStoreFactoryTest.java $
+ * @version $Id: AppSchemaDataAccessFactoryTest.java 31784 2008-11-06 06:20:21Z bencd $
+ * @source $URL:
+ *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/ComplexDataStoreFactoryTest.java $
  * @since 2.4
  */
-public class ComplexDataStoreFactoryTest extends TestCase {
+public class AppSchemaDataAccessFactoryTest extends TestCase {
 
-    ComplexDataStoreFactory factory;
+    AppSchemaDataAccessFactory factory;
 
     Map params;
 
@@ -53,7 +54,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        factory = new ComplexDataStoreFactory();
+        factory = new AppSchemaDataAccessFactory();
         params = new HashMap();
         params.put("dbtype", "complex");
         URL resource = getClass().getResource("/test-data/roadsegments.xml");
@@ -70,8 +71,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
     }
 
     /**
-     * Test method for
-     * 'org.geotools.data.complex.ComplexDataStoreFactory.createDataStore(Map)'
+     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.createDataStore(Map)'
      */
     public void testCreateDataStorePreconditions() {
         Map badParams = new HashMap();
@@ -100,19 +100,17 @@ public class ComplexDataStoreFactoryTest extends TestCase {
     /*
      * public void test2()throws Exception{ String configFile =
      * "file:/home/gabriel/workspaces/complex_sco/GEOS/conf/data/featureTypes/complexWQ_Plus/wq_plus_mappings.xml";
-     * Map params = new HashMap(); params.put("dbtype", "complex");
-     * params.put("config", configFile);
+     * Map params = new HashMap(); params.put("dbtype", "complex"); params.put("config",
+     * configFile);
      * 
-     * DataStore ds = DataStoreFinder.getDataStore(params); assertNotNull(ds);
-     * assertTrue(ds instanceof ComplexDataStore);
+     * DataStore ds = DataStoreFinder.getDataStore(params); assertNotNull(ds); assertTrue(ds
+     * instanceof ComplexDataStore);
      * 
-     * org.opengis.feature.type.FeatureType ft = ds.getSchema("wq_plus");
-     * assertNotNull(ft);
+     * org.opengis.feature.type.FeatureType ft = ds.getSchema("wq_plus"); assertNotNull(ft);
      * 
-     * FeatureSource fs = ds.getFeatureSource("wq_plus"); assertNotNull(fs);
-     * FeatureIterator fi = fs.getFeatures().features(); while(fi.hasNext()){
-     * Feature f = fi.next(); assertNotNull(f); Object result = XPath.get(f,
-     * "measurement/result"); assertNotNull(result); } fi.close();
+     * FeatureSource fs = ds.getFeatureSource("wq_plus"); assertNotNull(fs); FeatureIterator fi =
+     * fs.getFeatures().features(); while(fi.hasNext()){ Feature f = fi.next(); assertNotNull(f);
+     * Object result = XPath.get(f, "measurement/result"); assertNotNull(result); } fi.close();
      * 
      * Envelope bounds = fs.getBounds(); assertNotNull(bounds); }
      */
@@ -136,15 +134,14 @@ public class ComplexDataStoreFactoryTest extends TestCase {
     public void testFactoryLookup() throws IOException {
         DataAccess<FeatureType, Feature> ds = DataAccessFinder.getDataStore(params);
         assertNotNull(ds);
-        assertTrue(ds instanceof ComplexDataStore);
+        assertTrue(ds instanceof AppSchemaDataAccess);
 
         FeatureSource<FeatureType, Feature> mappedSource = ds.getFeatureSource(mappedTypeName);
         assertNotNull(mappedSource);
     }
 
     /**
-     * Test method for
-     * 'org.geotools.data.complex.ComplexDataStoreFactory.createNewDataStore(Map)'
+     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.createNewDataStore(Map)'
      */
     public void testCreateNewDataStore() throws IOException {
         try {
@@ -156,8 +153,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
     }
 
     /**
-     * Test method for
-     * 'org.geotools.data.complex.ComplexDataStoreFactory.getParametersInfo()'
+     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.getParametersInfo()'
      */
     public void testGetParametersInfo() {
         DataStoreFactorySpi.Param[] params = factory.getParametersInfo();
@@ -169,8 +165,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
 
     /**
      * 
-     * Test method for
-     * 'org.geotools.data.complex.ComplexDataStoreFactory.canProcess(Map)'
+     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.canProcess(Map)'
      */
     public void testCanProcess() {
         Map params = new HashMap();
@@ -188,8 +183,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
 
     /**
      * 
-     * Test method for
-     * 'org.geotools.data.complex.ComplexDataStoreFactory.isAvailable()'
+     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.isAvailable()'
      */
     public void testIsAvailable() {
         assertTrue(factory.isAvailable());
@@ -197,8 +191,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
 
     /**
      * 
-     * Test method for
-     * 'org.geotools.data.complex.ComplexDataStoreFactory.getImplementationHints()'
+     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.getImplementationHints()'
      */
     public void testGetImplementationHints() {
         assertNotNull(factory.getImplementationHints());
