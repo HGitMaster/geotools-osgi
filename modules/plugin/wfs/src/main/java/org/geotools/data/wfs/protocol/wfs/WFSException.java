@@ -11,7 +11,8 @@ public class WFSException extends IOException {
     }
 
     public WFSException( String msg, Throwable cause ) {
-        super(msg, cause);
+        super(msg);
+        super.initCause(cause);
         this.msg = new StringBuilder();
         if (msg != null) {
             this.msg.append(msg);
