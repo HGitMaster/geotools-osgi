@@ -24,3 +24,12 @@ Import-Package: com.vividsolutions.jts.geom,
  org.opengis.referencing.operation,
  org.opengis.style,
  org.opengis.util
+Export-Package: org.geotools.data,
+ org.geotools.feature,
+ org.geotools.feature.collection,
+ org.geotools.feature.visitor,
+ org.geotools.filter,
+ org.geotools.filter.expression,
+ org.geotools.geometry.jts,
+ org.geotools.styling,
+ org.geotools.util
