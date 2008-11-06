@@ -24,6 +24,8 @@ import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Function;
 
 public class FilterFunction_Test extends TestCase {
 
@@ -1998,4 +2000,15 @@ public class FilterFunction_Test extends TestCase {
         }
     }
 
+    public void testToLowerCase() {
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        Function f = ff.function("strToLowerCase", ff.literal("UPCASE"));
+        assertEquals("upcase", f.evaluate(null));
+    }
+    
+    public void testToUpperCase() {
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        Function f = ff.function("strToUpperCase", ff.literal("lowcase"));
+        assertEquals("LOWCASE", f.evaluate(null));
+    }
 }

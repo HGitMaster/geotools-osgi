@@ -70,6 +70,8 @@ org.geotools.filter.function.FilterFunction_strEqualsIgnoreCase
 org.geotools.filter.function.FilterFunction_strIndexOf
 org.geotools.filter.function.FilterFunction_strLastIndexOf
 org.geotools.filter.function.FilterFunction_strLength
+org.geotools.filter.function.FilterFunction_strToLowerCase
+org.geotools.filter.function.FilterFunction_strToUpperCase
 org.geotools.filter.function.FilterFunction_strMatches
 org.geotools.filter.function.FilterFunction_strReplace
 org.geotools.filter.function.FilterFunction_strSubstring

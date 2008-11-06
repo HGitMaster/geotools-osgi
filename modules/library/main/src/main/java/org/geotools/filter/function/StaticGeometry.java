@@ -430,6 +430,16 @@ import com.vividsolutions.jts.io.WKTReader;
      	return s1.length();
      }
      
+     static public String strToLowerCase(String s1)
+     {
+        return s1.toLowerCase();
+     }
+     
+     static public String strToUpperCase(String s1)
+     {
+        return s1.toUpperCase();
+     }
+     
      static public boolean strMatches(String s1,String s2)
      {
      	return s1.matches(s2);
