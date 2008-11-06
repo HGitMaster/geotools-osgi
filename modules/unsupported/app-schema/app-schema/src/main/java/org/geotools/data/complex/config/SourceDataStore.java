@@ -28,7 +28,7 @@ import org.geotools.util.CheckedHashMap;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id: SourceDataStore.java 31374 2008-09-03 07:26:50Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/community-schema-ds/src/main/java/org/geotools/data/complex/config/SourceDataStore.java $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/SourceDataStore.java $
  * @since 2.4
  */
 public class SourceDataStore implements Serializable{
