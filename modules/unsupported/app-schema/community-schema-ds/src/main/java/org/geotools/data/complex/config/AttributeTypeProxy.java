@@ -30,7 +30,7 @@ import org.opengis.util.InternationalString;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id: AttributeTypeProxy.java 31514 2008-09-15 08:36:50Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/AttributeTypeProxy.java $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/community-schema-ds/src/main/java/org/geotools/data/complex/config/AttributeTypeProxy.java $
  * @since 2.4
  */
 class AttributeTypeProxy implements AttributeType {
