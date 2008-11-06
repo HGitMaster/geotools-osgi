@@ -161,15 +161,16 @@ public abstract class SQLDialect {
      * However any statements objects or result sets that are instantiated from it
      * must be closed.
      * </p>
+     * @param schemaName The schema of the table, might be <code>null</code>..
      * @param tableName The name of the table.
      * @param cx Database connection.
      *
      */
-    public boolean includeTable(String tableName, Connection cx)
+    public boolean includeTable(String schemaName, String tableName, Connection cx)
         throws SQLException {
         return true;
     }
-
+    
     /**
      * Registers the sql type name to java type mappings that the dialect uses when
      * reading and writing objects to and from the database.

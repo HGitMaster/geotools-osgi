@@ -166,7 +166,7 @@ public class OracleDialect extends PreparedStatementSQLDialect {
 
     
     @Override
-    public boolean includeTable(String tableName, Connection cx)
+    public boolean includeTable(String schemaName, String tableName, Connection cx)
             throws SQLException {
         
         if (tableName.endsWith("$"))  {

@@ -622,10 +622,11 @@ public final class JDBCDataStore extends ContentDataStore
 
             try {
                 while (tables.next()) {
+                    String schemaName = tables.getString( "TABLE_SCHEM");
                     String tableName = tables.getString("TABLE_NAME");
 
                     //use the dialect to filter
-                    if (!dialect.includeTable(tableName, cx)) {
+                    if (!dialect.includeTable(schemaName, tableName, cx)) {
                         continue;
                     }
 
