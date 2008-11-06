@@ -19,6 +19,7 @@ package org.geotools.renderer.style;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
@@ -50,6 +51,7 @@ import org.geotools.util.NumberRange;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
+import org.opengis.sld.Fill;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -225,4 +227,16 @@ public class SLDStyleFactoryTest extends TestCase {
         assertEquals( Color.BLUE, s2.getContour() );
         assertNotNull( s2.getStroke() );
     }
+    public void testTexturePaintNoSize() throws Exception {
+        PolygonSymbolizer symb = sf.createPolygonSymbolizer();
+        Mark myMark = sf.createMark();
+        myMark.setWellKnownName(ff.literal("square"));
+        org.geotools.styling.Fill fill = sf.createFill(null);
+        fill.setGraphicFill(sf.createGraphic(null, new Mark[] {myMark}, null, null, null, null));
+        symb.setFill(fill); 
+        
+        PolygonStyle2D ps = (PolygonStyle2D) sld.createPolygonStyle(feature, symb, range);
+        assertTrue(ps.getFill() instanceof TexturePaint);
+    }
+    
 }

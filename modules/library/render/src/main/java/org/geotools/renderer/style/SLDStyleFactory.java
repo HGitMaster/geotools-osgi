@@ -238,7 +238,7 @@ public class SLDStyleFactory {
                 return style;
             } else {
                 // lets see if it's static or dynamic
-            	StyleAttributeExtractorTruncated sae = new StyleAttributeExtractorTruncated();
+                StyleAttributeExtractorTruncated sae = new StyleAttributeExtractorTruncated();
                 sae.visit(symbolizer);
 
                 Set nameSet = sae.getAttributeNameSet();
@@ -384,7 +384,6 @@ public class SLDStyleFactory {
 
         // Extract the sequence of external graphics and symbols and process them in order
         // to recognize which one will be used for rendering
-        Symbol symbolsArray[] =  sldGraphic.getSymbols();
         List<GraphicalSymbol> symbols = sldGraphic.graphicalSymbols();
         if( symbols.isEmpty()){
             symbols = new ArrayList<GraphicalSymbol>();
@@ -411,31 +410,14 @@ public class SLDStyleFactory {
                 if (LOGGER.isLoggable(Level.FINER)) {
                     LOGGER.finer("rendering External graphic");
                 }
-				eg = (ExternalGraphic) symbol;
-				img = null;
 
-                // first see if any glyph renderers can handle this, for backwards compatibility
-                for(Iterator it = glyphRenderers.iterator(); it.hasNext() && (img == null); ) {
-					r = (GlyphRenderer) it.next();
-
-                    if (r.canRender(eg.getFormat())) {
-                        img = r.render(sldGraphic, eg, feature,size);
-                        break; // dont render twice
-                    }
-                }
-
-                // if no-one of the glyph renderers can handle the eg, use the dynamic symbol factoreis
-                if(img == null) {
-                    img = getImage(eg, (Feature) feature, size); //size is only a hint
-                }
+                eg = (ExternalGraphic) symbol;
+                img = externalGraphicToImage(feature, sldGraphic, size, eg);
 
                 if (img == null) {
                     continue;
-                }
-
-                if (img != null) {
+                } else {
                     retval = new GraphicStyle2D(img, rotation, opacity);
-
                     break;
                 }
             }
@@ -451,7 +433,7 @@ public class SLDStyleFactory {
 				    throw new IllegalArgumentException("The specified mark " + mark.getWellKnownName() 
 				            + " was not found!");
 
-				ms2d = new MarkStyle2D();
+                ms2d = new MarkStyle2D();
                 ms2d.setShape(shape);
                 ms2d.setFill(getPaint(mark.getFill(), feature));
                 ms2d.setFillComposite(getComposite(mark.getFill(), feature));
@@ -486,6 +468,27 @@ public class SLDStyleFactory {
         }
 
         return retval;
+    }
+
+    private BufferedImage externalGraphicToImage(Object feature, Graphic sldGraphic, int size,
+            ExternalGraphic eg) {
+        BufferedImage img = null;
+        GlyphRenderer r;
+        // first see if any glyph renderers can handle this, for backwards compatibility
+        for(Iterator it = glyphRenderers.iterator(); it.hasNext() && (img == null); ) {
+            r = (GlyphRenderer) it.next();
+
+            if (r.canRender(eg.getFormat())) {
+                img = r.render(sldGraphic, eg, feature,size);
+                break; // dont render twice
+            }
+        }
+
+        // if no-one of the glyph renderers can handle the eg, use the dynamic symbol factoreis
+        if(img == null) {
+            img = getImage(eg, (Feature) feature, size); //size is only a hint
+        }
+        return img;
     }
 
 
@@ -548,19 +551,19 @@ public class SLDStyleFactory {
             // rotation
             if  ( (symbolizer instanceof TextSymbolizer2)  && (((TextSymbolizer2)symbolizer).getGraphic() != null) )
             {
-				// don't rotate labels that are being placed on shields.
-				rotation = 0.0;
-			} else {
-				rotation = ((Number) p.getRotation().evaluate(feature)).doubleValue();
-				rotation *= (Math.PI / 180.0);
-			}
+                // don't rotate labels that are being placed on shields.
+                rotation = 0.0;
+            } else {
+                rotation = ((Number) p.getRotation().evaluate(feature)).doubleValue();
+                rotation *= (Math.PI / 180.0);
+            }
 
             ts2d.setPointPlacement(true);
         }
         else if (placement instanceof LinePlacement)
         {
-        	  // this code used to really really really really suck, so I removed it!
-        	if (LOGGER.isLoggable(Level.FINER)) {
+              // this code used to really really really really suck, so I removed it!
+            if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("setting pointPlacement");
             }
             ts2d.setPointPlacement(false);
@@ -591,15 +594,15 @@ public class SLDStyleFactory {
         Graphic graphicShield = null;
         if  (symbolizer instanceof TextSymbolizer2)
         {
-        	    graphicShield = ( (TextSymbolizer2) symbolizer).getGraphic();
-        		if (graphicShield != null)
-        		{
-        			PointSymbolizer p = StyleFactoryFinder.createStyleFactory().createPointSymbolizer();
-        			p.setGraphic(graphicShield);
+                graphicShield = ( (TextSymbolizer2) symbolizer).getGraphic();
+                if (graphicShield != null)
+                {
+                    PointSymbolizer p = StyleFactoryFinder.createStyleFactory().createPointSymbolizer();
+                    p.setGraphic(graphicShield);
 
-        			Style2D shieldStyle = createPointStyle(feature, p, scaleRange);
-        			ts2d.setGraphic(shieldStyle);
-        		}
+                    Style2D shieldStyle = createPointStyle(feature, p, scaleRange);
+                    ts2d.setGraphic(shieldStyle);
+                }
         }
 
 
@@ -849,8 +852,10 @@ public class SLDStyleFactory {
      */
     public TexturePaint getTexturePaint(org.geotools.styling.Graphic gr, Object feature) {
         BufferedImage image = getImage(gr, feature, -1);
+        boolean isImage = false;
 
         if (image != null) {
+            isImage = true;
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("got an image in graphic fill");
             }
@@ -889,7 +894,15 @@ public class SLDStyleFactory {
             }
         }
 
-        int size = ((Number) gr.getSize().evaluate(feature)).intValue();
+        int size;
+        if(gr.getSize() == null || gr.getSize().evaluate(feature) == null) {
+            if(isImage)
+                size = image.getWidth();
+            else
+                size = 16;
+        } else {
+            size = ((Number) gr.getSize().evaluate(feature)).intValue();
+        }
         double width = image.getWidth();
         double height = image.getHeight();
 
@@ -926,7 +939,7 @@ public class SLDStyleFactory {
 
         if (extgraphics != null) {
             for (int i = 0; i < extgraphics.length; i++) {
-                BufferedImage image = getImage(extgraphics[i], feature, size);
+                BufferedImage image = externalGraphicToImage(feature, graphic, size, extgraphics[i]);
                 if(image != null)
                     return image;
             }
