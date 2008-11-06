@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
+import org.geotools.data.wfs.v1_1_0.parsers.EmfAppSchemaParser;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
@@ -31,7 +32,7 @@ import org.opengis.feature.type.FeatureType;
  * the WFS module.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: WFSFeatureReader.java 31731 2008-10-29 13:51:20Z groldan $
+ * @version $Id: WFSFeatureReader.java 31792 2008-11-06 19:17:35Z groldan $
  * @since 2.5.x
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/WFSFeatureReader.java $
  * @see WFS110ProtocolHandler#getFeatureReader(org.geotools.data.Query,

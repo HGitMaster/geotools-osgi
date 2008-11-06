@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.wfs.v1_1_0;
+package org.geotools.data.wfs.v1_1_0.parsers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +27,8 @@ import javax.xml.namespace.QName;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
+import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
+import org.geotools.data.wfs.protocol.wfs.WFSResponse;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.gml3.GML;
 import org.geotools.referencing.CRS;
@@ -38,7 +40,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.feature.type.Name;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -60,7 +61,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * response.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: XmlSimpleFeatureParser.java 31769 2008-11-05 15:21:49Z groldan $
+ * @version $Id: XmlSimpleFeatureParser.java 31792 2008-11-06 19:17:35Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0
@@ -602,6 +603,10 @@ public class XmlSimpleFeatureParser implements GetFeatureParser {
                 }
             }
         }
+    }
+
+    public Object parse( WFSProtocol wfs, WFSResponse response ) {
+        return null;
     }
 
 }

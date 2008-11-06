@@ -2,19 +2,32 @@ package org.geotools.data.wfs.protocol.wfs;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import net.opengis.wfs.BaseRequestType;
+
+import org.geotools.util.logging.Logging;
+
+@SuppressWarnings("nls")
 public class WFSResponse {
+
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs.protocol.wfs");
 
     private Charset charset;
     private String contentType;
     private InputStream inputStream;
 
+    private BaseRequestType request;
+
     /**
      * @param charset the response charset, {@code null} if unknown, utf-8 will be assumed then
      * @param contentType the response content type
-     * @param in the response inpnut stream ready to be consumed
+     * @param in the response input stream ready to be consumed
      */
-    public WFSResponse( Charset charset, String contentType, InputStream in ) {
+    public WFSResponse( BaseRequestType originatingRequest, Charset charset, String contentType,
+            InputStream in ) {
+        this.request = originatingRequest;
         if (charset == null) {
             this.charset = Charset.forName("UTF-8");
         } else {
@@ -22,6 +35,9 @@ public class WFSResponse {
         }
         this.contentType = contentType;
         this.inputStream = in;
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("WFS response: charset=" + charset + ", contentType=" + contentType);
+        }
     }
 
     /**
@@ -50,6 +66,19 @@ public class WFSResponse {
      */
     public InputStream getInputStream() {
         return inputStream;
+    }
+
+    /**
+     * Allows to replace the input stream
+     * 
+     * @param in
+     */
+    public void setInputStream( InputStream in ) {
+        this.inputStream = in;
+    }
+
+    public BaseRequestType getOriginatingRequest() {
+        return request;
     }
 
     @Override

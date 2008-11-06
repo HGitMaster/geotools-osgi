@@ -28,7 +28,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * {@link DataStore} extension interface to provide WFS specific extra information.
  * 
  * @author Gabriel Roldan
- * @version $Id: WFSDataStore.java 31752 2008-11-01 15:04:56Z groldan $
+ * @version $Id: WFSDataStore.java 31792 2008-11-06 19:17:35Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -56,5 +56,7 @@ public interface WFSDataStore extends DataStore {
     public Set<String> getFeatureTypeKeywords(String typeName);
 
     public URL getDescribeFeatureTypeURL(String typeName);
+
+    void setMaxFeatures( Integer maxFeatures );
 
 }

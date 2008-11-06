@@ -2,37 +2,46 @@ package org.geotools.data.wfs.protocol.wfs;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
+import net.opengis.wfs.BaseRequestType;
+import net.opengis.wfs.GetFeatureType;
+import net.opengis.wfs.WfsFactory;
+
+import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.junit.Test;
 
 /**
  * @author Gabriel Roldan
  * @since 2.6.x
- * @version $Id: WFSExtensionsTest.java 31769 2008-11-05 15:21:49Z groldan $
+ * @version $Id: WFSExtensionsTest.java 31792 2008-11-06 19:17:35Z groldan $
  */
+@SuppressWarnings("nls")
 public class WFSExtensionsTest {
 
     @Test
     public void testFindParserFactory() {
-        WFSResponse response = new WFSResponse(null, "application/testException", null);
-        WFSResponseParserFactory factory = WFSExtensions.findParserFactory(response);
+        GetFeatureType request = WfsFactory.eINSTANCE.createGetFeatureType();
+        request.setOutputFormat("application/fakeFormat");
+        WFSResponseParserFactory factory = WFSExtensions.findParserFactory(request);
         assertNotNull(factory);
-        assertTrue(factory instanceof TestExceptionParserFactory);
+        assertTrue(factory instanceof TestParserFactory);
     }
 
-    public static class TestExceptionParserFactory implements ExceptionParserFactory {
+    public static class TestParserFactory implements WFSResponseParserFactory {
 
-        public ExceptionReportParser createParser( WFSResponse response ) {
-            return null;
+        public boolean canProcess( BaseRequestType request ) {
+            return request instanceof GetFeatureType
+                    && "application/fakeFormat"
+                            .equals(((GetFeatureType) request).getOutputFormat());
         }
-
-        public boolean canProcess( WFSResponse response ) {
-            String contentType = response.getContentType();
-            return "application/testException".equals(contentType);
-        }
-
         public boolean isAvailable() {
             return true;
         }
 
+        public WFSResponseParser createParser( WFS_1_1_0_DataStore wfs, WFSResponse response )
+                throws IOException {
+            throw new UnsupportedOperationException("not intended to be called for this test class");
+        }
     }
 }

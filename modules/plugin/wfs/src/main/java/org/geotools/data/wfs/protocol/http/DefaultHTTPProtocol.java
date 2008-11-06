@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
@@ -23,7 +24,10 @@ import org.geotools.util.logging.Logging;
 /**
  * @author Gabriel Roldan
  */
+@SuppressWarnings("nls")
 public class DefaultHTTPProtocol implements HTTPProtocol {
+
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs.protocol.http");
 
     /**
      * An {@link HTTPResponse} wrapping an executed {@link GetMethod} or {@link PostMethod} from the
@@ -39,35 +43,63 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
             this.method = method;
         }
 
+        /**
+         * @see HTTPResponse#getResponseStream()
+         */
         public InputStream getResponseStream() throws IOException {
             InputStream responseStream = method.getResponseBodyAsStream();
 
-            Header contentEncoding = method.getResponseHeader("Content-Encoding");
-            if (contentEncoding != null) {
-                String encoding = contentEncoding.getValue().toLowerCase();
-                if (encoding.indexOf("gzip") > -1) {
+            String encoding = getResponseHeader("Content-Encoding");
+            if (encoding != null) {
+                if (encoding.toLowerCase().indexOf("gzip") > -1) {
+                    LOGGER.finest("Response is GZIP encoded, wrapping with gzip input stream");
                     responseStream = new GZIPInputStream(responseStream);
                 }
+            } else {
+                LOGGER.finest("HTTP response is not gzip encoded");
             }
             return responseStream;
         }
 
         public String getContentType() {
-            Header header = method.getResponseHeader("Content-Type");
-            String contentType = null;
-            if (header != null) {
-                contentType = header.getValue();
-            }
-            return contentType;
+            return getResponseHeader("Content-Type");
         }
 
         public String getResponseCharset() {
             String responseCharSet = method.getResponseCharSet();
             return responseCharSet;
         }
+
+        /**
+         * @see HTTPResponse#getResponseHeader()
+         */
+        public String getResponseHeader( String headerName ) {
+            Header header = method.getResponseHeader(headerName);
+            String headerValue = null;
+            if (header != null) {
+                headerValue = header.getValue();
+            }
+            return headerValue;
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+            sb.append("[Method=").append(method.getName());
+            sb.append("\n\tHTTP version=").append(method.getEffectiveVersion());
+            sb.append("\n\tstatus code=").append(method.getStatusCode());
+            sb.append("\n\tpath=").append(method.getPath());
+            sb.append("\n\tquery string=").append(method.getQueryString());
+            sb.append("\n\tresponse charset=").append(getResponseCharset());
+            Header[] responseHeaders = method.getResponseHeaders();
+            sb.append("\n\tresponse headers=");
+            for( Header header : responseHeaders ) {
+                sb.append(header.toExternalForm());
+            }
+            sb.append("]");
+            return sb.toString();
+        }
     }
 
-    private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
     private boolean tryGzip;
     private String authUsername;
     private String authPassword;
@@ -114,6 +146,12 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
      */
     public URL createUrl( final URL baseUrl, final Map<String, String> queryStringKvp )
             throws MalformedURLException {
+        final String finalUrlString = createUri(baseUrl, queryStringKvp);
+        URL queryUrl = new URL(finalUrlString);
+        return queryUrl;
+    }
+
+    private String createUri( final URL baseUrl, final Map<String, String> queryStringKvp ) {
         final String query = baseUrl.getQuery();
         Map<String, String> finalKvpMap = new HashMap<String, String>(queryStringKvp);
         if (query != null) {
@@ -174,24 +212,29 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         }
 
         final String finalUrlString = sb.toString();
-        URL queryUrl = new URL(finalUrlString);
-        return queryUrl;
+        return finalUrlString;
     }
 
-    @SuppressWarnings("nls")
     public HTTPResponse issueGet( final URL baseUrl, final Map<String, String> kvp )
             throws IOException {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("About to issue GET request to " + baseUrl.toExternalForm()
+                    + " with query parameters: " + kvp);
+        }
 
-        final URL requestUrl = createUrl(baseUrl, kvp);
+        final String uri = createUri(baseUrl, kvp);
         HttpClient client = new HttpClient();
-        String uri = requestUrl.toExternalForm();
         GetMethod request = new GetMethod(uri);
 
         if (isTryGzip()) {
+            LOGGER.finest("Adding 'Accept-Encoding=gzip' header to request");
             request.addRequestHeader("Accept-Encoding", "gzip");
         }
 
         int statusCode;
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Executing HTTP GET request: " + uri);
+        }
         try {
             statusCode = client.executeMethod(request);
         } catch (IOException e) {
@@ -206,6 +249,9 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         }
 
         HTTPResponse httpResponse = new HTTPClientResponse(request);
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Got " + httpResponse);
+        }
         return httpResponse;
     }
 }

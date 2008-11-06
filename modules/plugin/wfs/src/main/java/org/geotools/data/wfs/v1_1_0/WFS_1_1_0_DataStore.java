@@ -16,29 +16,34 @@
  */
 package org.geotools.data.wfs.v1_1_0;
 
-import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
 import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.GET_FEATURE;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.text.AbstractDocument.Content;
 import javax.xml.namespace.QName;
 
-import net.opengis.wfs.FeatureTypeType;
+import net.opengis.wfs.GetFeatureType;
+import net.opengis.wfs.QueryType;
+import net.opengis.wfs.ResultTypeType;
+import net.opengis.wfs.WfsFactory;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -50,23 +55,23 @@ import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
+import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.data.view.DefaultView;
 import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.WFSServiceInfo;
-import org.geotools.data.wfs.protocol.wfs.ExceptionParserFactory;
-import org.geotools.data.wfs.protocol.wfs.ExceptionReportParser;
 import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
-import org.geotools.data.wfs.protocol.wfs.GetFeatureResponseParserFactory;
+import org.geotools.data.wfs.protocol.wfs.WFSException;
 import org.geotools.data.wfs.protocol.wfs.WFSExtensions;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
-import org.geotools.data.wfs.protocol.wfs.WFSResponseParser;
-import org.geotools.data.wfs.protocol.wfs.WFSResponseParserFactory;
+import org.geotools.data.wfs.v1_1_0.parsers.EmfAppSchemaParser;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
@@ -74,9 +79,12 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -90,12 +98,13 @@ import org.opengis.referencing.operation.TransformException;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStore.java 31769 2008-11-05 15:21:49Z groldan $
+ * @version $Id: WFS_1_1_0_DataStore.java 31792 2008-11-06 19:17:35Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
  *         /wfs/v_1_1_0/data/WFSDataStore.java $
  */
+@SuppressWarnings({"nls"})
 public final class WFS_1_1_0_DataStore implements WFSDataStore {
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
 
@@ -114,7 +123,6 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * 
      * @param capabilities
      */
-    @SuppressWarnings("unchecked")
     public WFS_1_1_0_DataStore( final WFSProtocol wfs ) {
         this.wfs = wfs;
         this.DEFAULT_OUTPUT_FORMAT = wfs.getDefaultOutputFormat();
@@ -122,6 +130,16 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         maxFeaturesHardLimit = Integer.valueOf(0); // not set
     }
 
+    /**
+     * @see WFSDataStore#setMaxFeatures(Integer)
+     */
+    public void setMaxFeatures( Integer maxFeatures ) {
+        this.maxFeaturesHardLimit = Integer.valueOf(maxFeatures.intValue());
+    }
+
+    /**
+     * @see WFSDataStore#getInfo()
+     */
     public WFSServiceInfo getInfo() {
         return new CapabilitiesServiceInfo(this);
     }
@@ -180,7 +198,8 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
                 builder.setCRS(defaultGeometry.getCoordinateReferenceSystem());
             }
             final SimpleFeatureType adaptedFeatureType = builder.buildFeatureType();
-            return adaptedFeatureType;
+            ftype = adaptedFeatureType;
+            byTypeNameTypes.put(prefixedTypeName, ftype);
         }
         return ftype;
     }
@@ -249,28 +268,34 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      *      org.geotools.data.Transaction)
      */
     public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader( Query query,
-            Transaction transaction ) throws IOException {
+            final Transaction transaction ) throws IOException {
+
+        if (Filter.EXCLUDE.equals(query.getFilter())) {
+            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(getQueryType(query));
+        }
+
         // TODO: handle output format preferences
-        String outputFormat = DEFAULT_OUTPUT_FORMAT;
+        final String outputFormat = DEFAULT_OUTPUT_FORMAT;
+        final CoordinateReferenceSystem queryCrs = query.getCoordinateSystem();
 
-        final WFSResponse response = sendGetFeatures(query, outputFormat);
+        query = new DefaultQuery(query);
+        final GetFeatureType wfsRequest = createGetFeatureRequest((DefaultQuery) query,
+                outputFormat);
+        final WFSResponse response = sendGetFeatures(wfsRequest);
 
-        final WFSResponseParserFactory parserFactory = WFSExtensions.findParserFactory(response);
-        if (parserFactory instanceof ExceptionParserFactory) {
-            ExceptionParserFactory factory = (ExceptionParserFactory) parserFactory;
-            ExceptionReportParser parser = factory.createParser(response);
-            IOException exception = parser.parse(response);
-            throw exception;
-        } else if (!(parserFactory instanceof GetFeatureResponseParserFactory)) {
-            throw new IOException("Unknown parser for " + response + ": " + parserFactory);
+        Object result = WFSExtensions.process(this, response);
+
+        GetFeatureParser parser;
+        if (result instanceof WFSException) {
+            throw (WFSException) result;
+        } else if (result instanceof GetFeatureParser) {
+            parser = (GetFeatureParser) result;
+        } else {
+            throw new IllegalStateException("Unknown response result for GetFeature: " + result);
         }
 
         final SimpleFeatureType contentType = getQueryType(query);
 
-        GetFeatureResponseParserFactory factory = (GetFeatureResponseParserFactory) parserFactory;
-        QName featureDescriptorName = wfs.getFeatureTypeName(query.getTypeName());
-        GetFeatureParser parser = factory
-                .createParser(contentType, response, featureDescriptorName);
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         reader = new WFSFeatureReader((GetFeatureParser) parser);
 
@@ -282,6 +307,15 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         if (!contentType.equals(readerType)) {
             final boolean cloneContents = false;
             reader = new ReTypeFeatureReader(reader, contentType, cloneContents);
+        }
+
+        CoordinateReferenceSystem readerCrs = readerType.getCoordinateReferenceSystem();
+        if (queryCrs != null && !queryCrs.equals(readerCrs)) {
+            try {
+                reader = new ReprojectFeatureReader(reader, queryCrs);
+            } catch (Exception e) {
+                throw new DataSourceException(e);
+            }
         }
 
         // if (Filter.EXCLUDE != unsupportedFilter) {
@@ -298,13 +332,151 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         return reader;
     }
 
-    private WFSResponse sendGetFeatures( Query query, String outputFormat ) throws IOException {
+    @SuppressWarnings("unchecked")
+    private GetFeatureType createGetFeatureRequest( DefaultQuery query, String outputFormat )
+            throws IOException {
+        final WfsFactory factory = WfsFactory.eINSTANCE;
+
+        final String srsName = adaptQueryForSupportedCrs(query);
+
+        GetFeatureType getFeature = factory.createGetFeatureType();
+        getFeature.setService("WFS");
+        getFeature.setVersion(wfs.getServiceVersion().toString());
+        getFeature.setOutputFormat(outputFormat);
+
+        getFeature.setHandle("GeoTools WFS DataStore");
+        Integer maxFeatures = getMaxFeatures(query);
+        if (maxFeatures != null) {
+            getFeature.setMaxFeatures(BigInteger.valueOf(maxFeatures));
+        }
+        getFeature.setResultType(ResultTypeType.RESULTS_LITERAL);
+
+        QueryType wfsQuery = factory.createQueryType();
+        wfsQuery.setTypeName(Collections.singletonList(query.getTypeName()));
+
+        Filter filter = query.getFilter();
+        wfsQuery.setFilter(filter);
+        try {
+            wfsQuery.setSrsName(new URI(srsName));
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Can't create a URI from the query CRS: " + srsName, e);
+        }
+        if (!query.retrieveAllProperties()) {
+            String[] propertyNames = query.getPropertyNames();
+            List propertyName = wfsQuery.getPropertyName();
+            for( String propName : propertyNames ) {
+                propertyName.add(propName);
+            }
+        }
+        SortBy[] sortByList = query.getSortBy();
+        if (sortByList != null && sortByList.length > 0) {
+            for( SortBy sortBy : sortByList ) {
+                wfsQuery.getSortBy().add(sortBy);
+            }
+        }
+
+        getFeature.getQuery().add(wfsQuery);
+
+        return getFeature;
+    }
+
+    /**
+     * Checks if the query requested CRS is supported by the query feature type and if not, adapts
+     * the query to the feature type default CRS, returning the CRS identifier to use for the WFS
+     * query.
+     * <p>
+     * If the query CRS is not advertised as supported in the WFS capabilities for the requested
+     * feature type, the query filter is modified so that any geometry literal is reprojected to the
+     * default CRS for the feature type, otherwise the query is not modified at all. In any case,
+     * the crs identifier to actually use in the WFS GetFeature operation is returned.
+     * </p>
+     * 
+     * @param query
+     * @return
+     * @throws IOException
+     */
+    private String adaptQueryForSupportedCrs( DefaultQuery query ) throws IOException {
+        // The CRS the query is performed in
+        final String typeName = query.getTypeName();
+        final CoordinateReferenceSystem queryCrs = query.getCoordinateSystem();
+        final CoordinateReferenceSystem crsNative = getFeatureTypeCRS(typeName);
+
+        final String defaultCrs = wfs.getDefaultCRS(typeName);
+
+        if (queryCrs == null) {
+            LOGGER.warning("Query does not provides a CRS, using default: " + query);
+            return defaultCrs;
+        }
+
+        String epsgCode;
+
+        if (CRS.equalsIgnoreMetadata(queryCrs, crsNative)) {
+            epsgCode = defaultCrs;
+            LOGGER.fine("request and native crs for " + typeName + " are the same: " + epsgCode);
+        } else {
+            boolean transform = false;
+            epsgCode = GML2EncodingUtils.epsgCode(queryCrs);
+            if (epsgCode == null) {
+                LOGGER.fine("Can't find the identifier for the request CRS, "
+                        + "query will be performed in native CRS");
+                transform = true;
+            } else {
+                epsgCode = "EPSG:" + epsgCode;
+                LOGGER.fine("Request CRS is " + epsgCode + ", checking if its supported for "
+                        + typeName);
+
+                Set<String> supportedCRSIdentifiers = wfs.getSupportedCRSIdentifiers(typeName);
+                if (supportedCRSIdentifiers.contains(epsgCode)) {
+                    LOGGER.fine(epsgCode + " is supported, request will be performed asking "
+                            + "for reprojection over it");
+                } else {
+                    LOGGER.fine(epsgCode + " is not supported for " + typeName
+                            + ". Query will be adapted to default CRS " + defaultCrs);
+                    transform = true;
+                }
+                if (transform) {
+                    epsgCode = defaultCrs;
+                    FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+                    SimpleFeatureType ftype = getSchema(typeName);
+                    ReprojectingFilterVisitor visitor = new ReprojectingFilterVisitor(ff, ftype);
+                    Filter filter = query.getFilter();
+                    Filter reprojectedFilter = (Filter) filter.accept(visitor, null);
+                    if (LOGGER.isLoggable(Level.FINER)) {
+                        LOGGER.finer("Original Filter: " + filter + "\nReprojected filter: "
+                                + reprojectedFilter);
+                    }
+                    LOGGER.fine("Query filter reprojected to native CRS for " + typeName);
+                    query.setFilter(reprojectedFilter);
+                }
+            }
+        }
+        return epsgCode;
+    }
+
+    private Integer getMaxFeatures( Query query ) {
+        int maxFeaturesDataStoreLimit = maxFeaturesHardLimit.intValue();
+        int queryMaxFeatures = query.getMaxFeatures();
+        Integer maxFeatures = null;
+        if (Query.DEFAULT_MAX != queryMaxFeatures) {
+            maxFeatures = Integer.valueOf(queryMaxFeatures);
+        }
+        if (maxFeaturesDataStoreLimit > 0) {
+            if (maxFeatures == null) {
+                maxFeatures = maxFeaturesHardLimit;
+            } else {
+                maxFeatures = Math.min(maxFeaturesDataStoreLimit, maxFeatures);
+            }
+        }
+        return maxFeatures;
+    }
+
+    private WFSResponse sendGetFeatures( GetFeatureType request ) throws IOException {
         // TODO: split filters! WFSProtocol is not responsible of doing so
         final WFSResponse response;
         if (useHttpPostFor(GET_FEATURE)) {
-            response = wfs.getFeaturePOST(query, outputFormat);
+            response = wfs.getFeaturePOST(request);
         } else {
-            response = wfs.getFeatureGET(query, outputFormat);
+            response = wfs.getFeatureGET(request);
         }
         return response;
     }
@@ -446,6 +618,10 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      */
     public void createSchema( SimpleFeatureType featureType ) throws IOException {
         throw new UnsupportedOperationException("WFS DataStore does not support createSchema");
+    }
+
+    public QName getFeatureTypeName( String typeName ) {
+        return wfs.getFeatureTypeName(typeName);
     }
 
     public String getFeatureTypeTitle( String typeName ) {

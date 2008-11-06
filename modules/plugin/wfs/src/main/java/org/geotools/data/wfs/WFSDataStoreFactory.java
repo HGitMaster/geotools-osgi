@@ -66,7 +66,8 @@ import org.xml.sax.SAXException;
  * @author dzwiers
  * @author Gabriel Roldan (TOPP)
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
+ *         /data/wfs/WFSDataStoreFactory.java $
  */
 @SuppressWarnings("unchecked")
 public class WFSDataStoreFactory extends AbstractDataStoreFactory {
@@ -76,10 +77,11 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31769 2008-11-05 15:21:49Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31792 2008-11-06 19:17:35Z groldan $
      * @since 2.5.x
      * @source $URL:
-     *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
+     *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
+     *         /data/wfs/WFSDataStoreFactory.java $
      */
     public static class WFSFactoryParam<T> extends Param {
         private T defaultValue;
@@ -91,7 +93,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
          * @param type
          * @param description
          */
-        public WFSFactoryParam(String key, Class type, String description) {
+        public WFSFactoryParam( String key, Class type, String description ) {
             super(key, type, description, true);
         }
 
@@ -103,12 +105,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
          * @param description
          * @param required
          */
-        public WFSFactoryParam(String key, Class type, String description, T defaultValue) {
+        public WFSFactoryParam( String key, Class type, String description, T defaultValue ) {
             super(key, type, description, false);
             this.defaultValue = defaultValue;
         }
 
-        public T lookUp(final Map params) throws IOException {
+        public T lookUp( final Map params ) throws IOException {
             T parameter = (T) super.lookUp(params);
             return parameter == null ? defaultValue : parameter;
         }
@@ -273,7 +275,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * 
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
      */
-    public WFSDataStore createDataStore(final Map params) throws IOException {
+    public WFSDataStore createDataStore( final Map params ) throws IOException {
         if (perParameterSetDataStoreCache.containsKey(params)) {
             return perParameterSetDataStoreCache.get(params);
         }
@@ -281,7 +283,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         final Boolean protocol = (Boolean) PROTOCOL.lookUp(params);
         final String user = (String) USERNAME.lookUp(params);
         final String pass = (String) PASSWORD.lookUp(params);
-        final int timeout = (Integer) TIMEOUT.lookUp(params);
+        final int timeoutMillis = (Integer) TIMEOUT.lookUp(params);
         final int buffer = (Integer) BUFFER_SIZE.lookUp(params);
         final boolean tryGZIP = (Boolean) TRY_GZIP.lookUp(params);
         final boolean lenient = (Boolean) LENIENT.lookUp(params);
@@ -349,8 +351,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
             try {
                 HttpMethod prefferredProtocol = Boolean.TRUE.equals(protocol) ? POST : GET;
-                dataStore = new WFS_1_0_0_DataStore(prefferredProtocol, protocolHandler, timeout,
-                        buffer, lenient);
+                dataStore = new WFS_1_0_0_DataStore(prefferredProtocol, protocolHandler,
+                        timeoutMillis, buffer, lenient);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 throw new IOException(e.toString());
@@ -358,16 +360,22 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         } else {
             InputStream capsIn = new ByteArrayInputStream(wfsCapabilitiesRawData);
             HTTPProtocol http = new DefaultHTTPProtocol();
+            http.setTryGzip(tryGZIP);
+            http.setAuth(user, pass);
+            http.setTimeoutMillis(timeoutMillis);
+
             WFSProtocol wfs = new WFS_1_1_0_Protocol(capsIn, http);
 
             // ///////////////////////////////////
             // this is a meanwhile hack to test the StreamingParser vs pull parser approaches //
-            Object pullParserParam = params.get("USE_PULL_PARSER");
-            Boolean usePullParser = pullParserParam == null? Boolean.TRUE : Boolean.valueOf(pullParserParam.toString());
-            //protocolHandler.setUsePullParser(usePullParser.booleanValue());
+            // Object pullParserParam = params.get("USE_PULL_PARSER");
+            // Boolean usePullParser = pullParserParam == null? Boolean.TRUE :
+            // Boolean.valueOf(pullParserParam.toString());
+            // protocolHandler.setUsePullParser(usePullParser.booleanValue());
             // ///////////////////////////////////
 
             dataStore = new WFS_1_1_0_DataStore(wfs);
+            dataStore.setMaxFeatures(maxFeatures);
         }
 
         perParameterSetDataStoreCache.put(new HashMap(params), dataStore);
@@ -380,7 +388,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @throws UnsupportedOperationException always, as this operation is not applicable to WFS.
      * @see org.geotools.data.DataStoreFactorySpi#createNewDataStore(java.util.Map)
      */
-    public DataStore createNewDataStore(final Map params) throws IOException {
+    public DataStore createNewDataStore( final Map params ) throws IOException {
         throw new UnsupportedOperationException("Operation not applicable to a WFS service");
     }
 
@@ -426,7 +434,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @param params non null map of datastore parameters.
      * @see org.geotools.data.DataStoreFactorySpi#canProcess(java.util.Map)
      */
-    public boolean canProcess(final Map params) {
+    public boolean canProcess( final Map params ) {
         if (params == null) {
             throw new NullPointerException("params");
         }
@@ -473,10 +481,10 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * </p>
      * 
      * @param host non null URL from which to construct the WFS {@code GetCapabilities} request by
-     *            discarding the query string, if any, and appending the propper query string.
+     *        discarding the query string, if any, and appending the propper query string.
      * @return
      */
-    public static URL createGetCapabilitiesRequest(URL host, Version version) {
+    public static URL createGetCapabilitiesRequest( URL host, Version version ) {
         if (host == null) {
             throw new NullPointerException("null url");
         }
@@ -495,7 +503,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             logger.log(Level.WARNING, "Can't create GetCapabilities request from " + host, e);
             throw new RuntimeException(e);
         }
-        
+
         return getcapsUrl;
     }
 
@@ -512,10 +520,10 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * </p>
      * 
      * @param host non null URL pointing either to a base WFS service access point, or to a full
-     *            {@code GetCapabilities} request.
+     *        {@code GetCapabilities} request.
      * @return
      */
-    public static URL createGetCapabilitiesRequest(final URL host) {
+    public static URL createGetCapabilitiesRequest( final URL host ) {
         if (host == null) {
             throw new NullPointerException("url");
         }
@@ -525,7 +533,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                 .toUpperCase();
 
         final Version defaultVersion = Version.highest();
-        //final Version defaultVersion = Version.v1_0_0;
+        // final Version defaultVersion = Version.v1_0_0;
         // which version to use
         Version requestVersion = defaultVersion;
 
@@ -533,7 +541,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
             Map<String, String> params = new HashMap<String, String>();
             String[] split = queryString.split("&");
-            for (String kvp : split) {
+            for( String kvp : split ) {
                 int index = kvp.indexOf('=');
                 String key = index > 0 ? kvp.substring(0, index) : kvp;
                 String value = index > 0 ? kvp.substring(index + 1) : null;
@@ -563,7 +571,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @return
      * @throws IOException
      */
-    byte[] loadCapabilities(final URL capabilitiesUrl, final ConnectionFactory connectionFac)
+    byte[] loadCapabilities( final URL capabilitiesUrl, final ConnectionFactory connectionFac )
             throws IOException {
         byte[] wfsCapabilitiesRawData;
 
@@ -573,14 +581,14 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buff = new byte[1024];
         int readCount;
-        while ((readCount = inputStream.read(buff)) != -1) {
+        while( (readCount = inputStream.read(buff)) != -1 ) {
             out.write(buff, 0, readCount);
         }
         wfsCapabilitiesRawData = out.toByteArray();
         return wfsCapabilitiesRawData;
     }
 
-    private Element parseCapabilities(ByteArrayInputStream inputStream) throws IOException,
+    private Element parseCapabilities( ByteArrayInputStream inputStream ) throws IOException,
             DataSourceException {
         Element rootElement;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

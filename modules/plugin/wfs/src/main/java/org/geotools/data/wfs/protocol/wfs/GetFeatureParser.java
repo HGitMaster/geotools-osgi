@@ -25,11 +25,11 @@ import org.opengis.feature.simple.SimpleFeature;
  * request from the underlying xml parsing technology in use.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: GetFeatureParser.java 31731 2008-10-29 13:51:20Z groldan $
+ * @version $Id: GetFeatureParser.java 31792 2008-11-06 19:17:35Z groldan $
  * @since 2.5.x
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/protocol/wfs/GetFeatureParser.java $
  */
-public interface GetFeatureParser extends WFSResponseParser{
+public interface GetFeatureParser{
 
     /**
      * @return the next feature in the stream or {@code null} if there are no

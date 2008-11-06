@@ -24,6 +24,7 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 
 import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
+import org.geotools.data.wfs.v1_1_0.parsers.XmlSimpleFeatureParser;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 public class XmlSimpleFeatureParserTest extends AbstractGetFeatureParserTest {

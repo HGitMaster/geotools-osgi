@@ -253,6 +253,10 @@ public final class DataTestSupport {
         public InputStream getResponseStream() throws IOException {
             return bodyContent == null ? null : new StringBufferInputStream(bodyContent);
         }
+
+        public String getResponseHeader( String headerName ) {
+            return null;
+        }
     }
 
 }

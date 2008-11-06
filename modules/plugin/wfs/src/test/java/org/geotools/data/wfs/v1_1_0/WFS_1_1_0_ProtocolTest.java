@@ -752,7 +752,7 @@ public class WFS_1_1_0_ProtocolTest {
         
         String encodedFilter = kvp.get("FILTER");
         assertNotNull(encodedFilter);
-        Parser filterParser = new Parser(new OGCConfiguration());
+        Parser filterParser = new Parser(wfs.filterConfig);
         Filter parsed = (Filter) filterParser.parse(new StringReader(encodedFilter));
         assertTrue(parsed instanceof PropertyIsEqualTo);
     }

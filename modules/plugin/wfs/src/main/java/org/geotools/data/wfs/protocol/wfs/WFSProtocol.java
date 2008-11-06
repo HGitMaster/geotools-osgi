@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import net.opengis.wfs.GetFeatureType;
+
 import org.geotools.data.Query;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.Filter;
@@ -206,39 +208,19 @@ public interface WFSProtocol {
     /**
      * Issues a GetFeature request for the given {@link Query}, using GET HTTP method
      * <p>
-     * The query is a GeoTools query and shall already be adapted to what the server supports in
-     * terms of filter capabilities and CRS reprojection. The {@code WFSProtocol} implementation is
-     * not required to check if the query filter is fully supported nor if the
-     * {@link Query#getCoordinateSystem() CRS} is supported for the {@link Query#getTypeName()}
-     * feature type.
-     * </p>
-     * <p>
-     * The query properties are mapped to GetFeature arguments as this:
-     * <ul>
-     * <li>{@link Query#getTypeName()}: TYPENAME argument (we request a single feature type at a
-     * time)
-     * <li>{@link Query#getCoordinateSystem()}: SRSNAME argument
-     * <li>{@link Query#getFilter()}: FILTER argument, may be FEATUREID if its an {@link Id} filter
-     * or a BBOX argument if it's a {@link BBOX} filter, at the implementation's discretion
-     * <li>{@link Query#getHandle()}: (ignored)
-     * <li>{@link Query#getPropertyNames()}: if non empty nor null, PROPERTYNAME argument
-     * <li>{@link Query#getMaxFeatures()}: MAXFEATURES argument
-     * <li>{@link Query#getNamespace()}: (ignored)
-     * <li>{@link Query#getSortBy()}: SORTBY argument
-     * <li>{@link Query#getStartIndex()}: (ignored)
-     * <li>{@link Query#getVersion()}: (ignored, no feature version support so far)
-     * </ul>
+     * The {@code request} shall already be adapted to what the server supports in terms of filter
+     * capabilities and CRS reprojection. The {@code WFSProtocol} implementation is not required to
+     * check if the query filter is fully supported nor if the CRS is supported for the feature
+     * type.
      * </p>
      * 
-     * @param query the query containing the feature type name to request and filtering criteria
-     * @param outputFormat the format to request the results in
-     * @return the server response as a {@link WFSResponse} instance
-     * @throws IOException if a communication error occurs with the WFS
-     * @throws UnsupportedOperationException the the required HTTP method is not supported for the
-     *         GetFeature operation
+     * @param request the request to send to the WFS, as is.
+     * @return
+     * @throws IOException
+     * @throws UnsupportedOperationException
      */
-    public WFSResponse getFeatureGET( final Query query, final String outputFormat )
-            throws IOException, UnsupportedOperationException;
+    public WFSResponse getFeatureGET( final GetFeatureType request ) throws IOException,
+            UnsupportedOperationException;
 
     /**
      * Issues a GetFeature request for the given {@link Query}, using POST HTTP method
@@ -247,8 +229,8 @@ public interface WFSProtocol {
      * {@link #getFeatureGET(Query, String)}
      * </p>
      */
-    public WFSResponse getFeaturePOST( final Query query, final String outputFormat )
-            throws IOException, UnsupportedOperationException;
+    public WFSResponse getFeaturePOST( GetFeatureType request ) throws IOException,
+            UnsupportedOperationException;
 
     /**
      * Issues a GetFeature request with {@code resultType=hits} if supported by the server and

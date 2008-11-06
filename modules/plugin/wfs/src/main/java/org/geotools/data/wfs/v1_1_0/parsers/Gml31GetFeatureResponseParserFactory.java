@@ -1,45 +1,83 @@
 package org.geotools.data.wfs.v1_1_0.parsers;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.PushbackInputStream;
+import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
+import net.opengis.wfs.BaseRequestType;
+import net.opengis.wfs.GetFeatureType;
 
-import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
-import org.geotools.data.wfs.protocol.wfs.GetFeatureResponseParserFactory;
+import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
-import org.geotools.data.wfs.v1_1_0.XmlSimpleFeatureParser;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.data.wfs.protocol.wfs.WFSResponseParser;
+import org.geotools.data.wfs.protocol.wfs.WFSResponseParserFactory;
+import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
+import org.geotools.util.logging.Logging;
 
 @SuppressWarnings("nls")
-public class Gml31GetFeatureResponseParserFactory implements GetFeatureResponseParserFactory {
+public class Gml31GetFeatureResponseParserFactory implements WFSResponseParserFactory {
 
-    private static final String SUPPORTED_OUTPUT_FORMAT = "text/xml;subtype=gml/3.1.1";
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
 
+    private static final String SUPPORTED_OUTPUT_FORMAT = "text/xml; subtype=gml/3.1.1";
+
+    /**
+     * @see WFSResponseParserFactory#isAvailable()
+     */
     public boolean isAvailable() {
         return true;
     }
 
-    public boolean canProcess( WFSResponse response ) {
-        String contentType = response.getContentType();
-        if (contentType == null) {
+    /**
+     * @see WFSResponseParserFactory#canProcess(WFSOperationType, String)
+     */
+    public boolean canProcess( BaseRequestType request ) {
+        if (!(request instanceof GetFeatureType)) {
             return false;
         }
-        contentType = contentType.replaceAll(" ", "");
-        boolean supported = contentType.startsWith(SUPPORTED_OUTPUT_FORMAT);
-        return supported;
+        String outputFormat = ((GetFeatureType) request).getOutputFormat();
+        boolean matches = SUPPORTED_OUTPUT_FORMAT.equals(outputFormat);
+        return matches;
     }
 
-    public GetFeatureParser createParser( SimpleFeatureType requestType, WFSResponse response,
-            QName featureDescriptorName ) throws IOException {
-        if (!canProcess(response)) {
-            throw new IllegalArgumentException(
-                    "response can't be processed.. checked with canProcess() before?");
+    public WFSResponseParser createParser( WFS_1_1_0_DataStore wfs, WFSResponse response )
+            throws IOException {
+        final WFSResponseParser parser;
+        final String contentType = response.getContentType();
+        if (SUPPORTED_OUTPUT_FORMAT.equals(contentType)) {
+            parser = new FeatureCollectionParser();
+        } else {
+            // We can't rely on the server returning the correct output format. Some, for example
+            // CubeWerx, upon a successful GetFeature request, set the response's content-type
+            // header to plain "text/xml" instead of "text/xml;subtype=gml/3.1.1". So we'll do a bit
+            // of heuristics to find out what it actually returned
+            final int buffSize = 256;
+            PushbackInputStream pushbackIn = new PushbackInputStream(response.getInputStream(),
+                    buffSize);
+            byte[] buff = new byte[buffSize];
+            int readCount = 0;
+            int r;
+            while( (r = pushbackIn.read(buff, readCount, buffSize - readCount)) != -1 ) {
+                readCount += r;
+                if (readCount == buffSize) {
+                    break;
+                }
+            }
+
+            String head = new String(buff, response.getCharacterEncoding());
+            LOGGER.fine("response head: " + head);
+
+            pushbackIn.unread(buff, 0, readCount);
+            response.setInputStream(pushbackIn);
+
+            if (head.contains("FeatureCollection")) {
+                parser = new FeatureCollectionParser();
+            } else if (head.contains("ExceptionReport")) {
+                parser = new ExceptionReportParser();
+            } else {
+                throw new IllegalStateException("Unkown server response: " + head);
+            }
         }
-
-        InputStream in = response.getInputStream();
-        XmlSimpleFeatureParser getFeatureParser = new XmlSimpleFeatureParser(in, requestType, featureDescriptorName);
-        return getFeatureParser;
+        return parser;
     }
-
 }

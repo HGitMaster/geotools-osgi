@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.wfs.v1_1_0;
+package org.geotools.data.wfs.v1_1_0.parsers;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,13 +71,13 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: EmfAppSchemaParser.java 31769 2008-11-05 15:21:49Z groldan $
+ * @version $Id: EmfAppSchemaParser.java 31792 2008-11-06 19:17:35Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
  *         /wfs/v_1_1_0/data/EmfAppSchemaParser.java $
  */
-class EmfAppSchemaParser {
+public class EmfAppSchemaParser {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
 
