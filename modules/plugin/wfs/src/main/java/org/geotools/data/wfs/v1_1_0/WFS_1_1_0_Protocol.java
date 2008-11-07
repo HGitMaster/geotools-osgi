@@ -442,7 +442,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         }
         URL url = getOperationURL(WFSOperationType.GET_FEATURE, false);
         Map<String, String> getFeatureKvp = buildGetFeatureParametersForGet(request);
-
+        System.out.println(" > getFeatureGET: Request url: " + url + ". Parameters: " + getFeatureKvp);
         WFSResponse response = issueGetRequest(request, url, getFeatureKvp);
 
         return response;

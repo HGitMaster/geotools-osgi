@@ -98,7 +98,7 @@ import org.opengis.referencing.operation.TransformException;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStore.java 31792 2008-11-06 19:17:35Z groldan $
+ * @version $Id: WFS_1_1_0_DataStore.java 31805 2008-11-07 19:23:45Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -181,6 +181,8 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
             }
 
             final URL describeUrl = wfs.getDescribeFeatureTypeURLGet(prefixedTypeName);
+            //@TODO remove this
+            System.err.println("DecribeFT URL for " + prefixedTypeName + ": " + describeUrl);
 
             final SimpleFeatureType featureType;
             CoordinateReferenceSystem crs = getFeatureTypeCRS(prefixedTypeName);

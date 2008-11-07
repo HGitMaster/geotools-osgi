@@ -235,6 +235,8 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("Executing HTTP GET request: " + uri);
         }
+        //TODO: remove this
+        System.err.println("Executing HTTP GET request: " + uri);
         try {
             statusCode = client.executeMethod(request);
         } catch (IOException e) {

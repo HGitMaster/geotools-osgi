@@ -21,7 +21,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
@@ -61,13 +64,14 @@ import com.vividsolutions.jts.geom.Polygon;
  * response.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: XmlSimpleFeatureParser.java 31792 2008-11-06 19:17:35Z groldan $
+ * @version $Id: XmlSimpleFeatureParser.java 31805 2008-11-07 19:23:45Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0
- *         /data/XmlSimpleFeatureParser.java $
- * @deprecated should be removed as long as {@link StreamingParserFeatureReader} works well
+ *         /data/XmlSimpleFeatureParser.java $ //@deprecated should be removed as long as
+ *         {@link StreamingParserFeatureReader} works well
  */
+@SuppressWarnings("nls")
 public class XmlSimpleFeatureParser implements GetFeatureParser {
 
     private static final GeometryFactory geomFac = new GeometryFactory();
@@ -84,7 +88,7 @@ public class XmlSimpleFeatureParser implements GetFeatureParser {
 
     final String featureName;
 
-    private final Set<String> expectedProperties;
+    private final Map<String, AttributeDescriptor> expectedProperties;
 
     public XmlSimpleFeatureParser( final InputStream getFeatureResponseStream,
             final SimpleFeatureType targetType, QName featureDescriptorName ) throws IOException {
@@ -110,12 +114,15 @@ public class XmlSimpleFeatureParser implements GetFeatureParser {
             throw new DataSourceException(e);
         }
 
-        expectedProperties = new HashSet<String>();
+        // HACK! use a case insensitive set to compare the comming attribute names with the ones in
+        // the schema. Rationale being that the FGDC CubeWerx server has a missmatch in the case of
+        // property names between what it states in a DescribeFeatureType and in a GetFeature
+        // requests
+        expectedProperties = new TreeMap<String, AttributeDescriptor>(String.CASE_INSENSITIVE_ORDER);
         for( AttributeDescriptor desc : targetType.getAttributeDescriptors() ) {
-            expectedProperties.add(desc.getLocalName());
+            expectedProperties.put(desc.getLocalName(), desc);
         }
     }
-
     public void close() throws IOException {
         if (this.inputStream != null) {
             try {
@@ -154,9 +161,10 @@ public class XmlSimpleFeatureParser implements GetFeatureParser {
                     break;
                 }
                 if (XmlPullParser.START_TAG == tagType) {
-                    if (expectedProperties.contains(tagName)) {
+                    AttributeDescriptor descriptor = expectedProperties.get(tagName);
+                    if (descriptor != null) {
                         attributeValue = parseAttributeValue();
-                        builder.set(tagName, attributeValue);
+                        builder.set(descriptor.getLocalName(), attributeValue);
                     }
                 }
             }
@@ -180,7 +188,7 @@ public class XmlSimpleFeatureParser implements GetFeatureParser {
     @SuppressWarnings("unchecked")
     private Object parseAttributeValue() throws XmlPullParserException, IOException {
         final String name = parser.getName();
-        final AttributeDescriptor attribute = this.targetType.getDescriptor(name);
+        final AttributeDescriptor attribute = expectedProperties.get(name);
         final AttributeType type = attribute.getType();
         Object parsedValue;
         if (type instanceof GeometryType) {
