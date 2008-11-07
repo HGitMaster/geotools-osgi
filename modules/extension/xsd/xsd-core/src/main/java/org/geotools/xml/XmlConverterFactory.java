@@ -56,6 +56,10 @@ public class XmlConverterFactory implements ConverterFactory {
             throws Exception {
             String value = (String) source;
 
+            // don't bother performing conversions if the target types are not dates/times
+            if(!Calendar.class.equals(target) && !Date.class.isAssignableFrom(target))
+                return null;
+
             //JD: this is a bit of a hack but delegate to the 
             // commons converter in case we are executing first.
             Converter converter = new CommonsConverterFactory().createConverter(value.getClass(),
