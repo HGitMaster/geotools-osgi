@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Cql Plug-in
+Bundle-SymbolicName: org.geotools.cql
+Bundle-Version: 2.6.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.geotools.main;bundle-version="2.6.0",
+ org.geotools.referencing;bundle-version="2.6.0",
+ org.geotools.metadata;bundle-version="2.6.0"
+Import-Package: com.vividsolutions.jts.geom,
+ com.vividsolutions.jts.io,
+ org.apache.commons.beanutils;version="1.7.0",
+ org.opengis.feature.simple,
+ org.opengis.feature.type,
+ org.opengis.filter,
+ org.opengis.filter.expression,
+ org.opengis.filter.identity,
+ org.opengis.filter.spatial
+Export-Package: org.geotools.filter.function,
+ org.geotools.filter.text.commons,
+ org.geotools.filter.text.cql2,
+ org.geotools.filter.text.generated.parsers,
+ org.geotools.filter.text.txt
