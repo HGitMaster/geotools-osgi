@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>unsupported</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.5-SNAPSHOT</version>
   </parent>
 
 
@@ -24,17 +24,21 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt-jdbc-ng</artifactId>
-  <packaging>pom</packaging>
-  <name>Next Generation JDBC DataStores</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/jdbc-ng/</url>
+  <artifactId>gt-jdbc-db2</artifactId>
+  <packaging>jar</packaging>
+  <name>DB2 DataStore</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/jdbc-ng/jdbc-db2</url>
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/
+      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/jdbc-db2/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/</url>
+    <url>http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/jdbc-db2/</url>
   </scm>
+
+  <description>
+	DataStore for DB2  Database.
+  </description>
 
   <licenses>
     <license>
@@ -50,9 +54,9 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>Justin Deoliveira</name>
-      <id>jdeolive</id>
-      <email>jdeolive@users.sourceforge.net</email>
+      <name>Christian Mueller</name>
+      <id>christian.mueller@nvoe.at</id>
+      <email>christian.mueller@nvoe.at</email>
       <organization>TOPP</organization>
       <roles>
         <role>Module Maintainer</role>
@@ -60,13 +64,25 @@
       </roles>
     </developer>
   </developers>
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-jdbc-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-jdbc-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
-  <modules>
-    <module>jdbc-core</module>
-    <module>jdbc-h2</module>
-    <module>jdbc-mysql</module>
-    <module>jdbc-oracle</module>
-    <module>jdbc-postgis</module>
-    <module>jdbc-db2</module>
-  </modules>
 </project>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="0" time="10.638" errors="0" skipped="0" tests="8" name="org.geotools.data.db2.DB2FeatureStoreTest">
+  <properties>
+    <property name="env.DESKTOP_SESSION" value="kde4"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="java.home" value="/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre"/>
+    <property name="env.NNTPSERVER" value="news"/>
+    <property name="env.DISPLAY" value=":0"/>
+    <property name="env.PROFILEHOME" value=""/>
+    <property name="env.LS_COLORS" value="no=00:fi=00:di=01;34:ln=00;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=41;33;01:ex=00;32:*.cmd=00;32:*.exe=01;32:*.com=01;32:*.bat=01;32:*.btm=01;32:*.dll=01;32:*.tar=00;31:*.tbz=00;31:*.tgz=00;31:*.rpm=00;31:*.deb=00;31:*.arj=00;31:*.taz=00;31:*.lzh=00;31:*.lzma=00;31:*.zip=00;31:*.zoo=00;31:*.z=00;31:*.Z=00;31:*.gz=00;31:*.bz2=00;31:*.tb2=00;31:*.tz2=00;31:*.tbz2=00;31:*.avi=01;35:*.bmp=01;35:*.fli=01;35:*.gif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mng=01;35:*.mov=01;35:*.mpg=01;35:*.pcx=01;35:*.pbm=01;35:*.pgm=01;35:*.png=01;35:*.ppm=01;35:*.tga=01;35:*.tif=01;35:*.xbm=01;35:*.xpm=01;35:*.dl=01;35:*.gl=01;35:*.wmv=01;35:*.aiff=00;32:*.au=00;32:*.mid=00;32:*.mp3=00;32:*.ogg=00;32:*.voc=00;32:*.wav=00;32:"/>
+    <property name="java.awt.headless" value="null"/>
+    <property name="classworlds.conf" value="/usr/local/apache-maven-2.0.9/bin/m2.conf"/>
+    <property name="env.XDG_SESSION_COOKIE" value="83ba8f4541289ba4649a9dacbe1df300-1226047843.43242-1003902588"/>
+    <property name="env.ENV" value="/etc/bash.bashrc"/>
+    <property name="env.mc" value="() {  . /usr/share/mc/bin/mc-wrapper.sh
+}"/>
+    <property name="java.endorsed.dirs" value="/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/endorsed"/>
+    <property name="env.LOGNAME" value="mcr"/>
+    <property name="env.GS_LIB" value="/home/mcr/.fonts"/>
+    <property name="env.G_FILENAME_ENCODING" value="@locale,UTF-8,ISO-8859-15,CP1252"/>
+    <property name="env.TEXINPUTS" value=":/home/mcr/.TeX:/usr/share/doc/.TeX:/usr/doc/.TeX"/>
+    <property name="env.KDE_SESSION_UID" value="1000"/>
+    <property name="env.SESSION_MANAGER" value="local/r01040:@/tmp/.ICE-unix/4636,unix/r01040:/tmp/.ICE-unix/4636"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.vendor.url" value="http://java.sun.com/"/>
+    <property name="env.G_BROKEN_FILENAMES" value="1"/>
+    <property name="java.version" value="1.6.0_07"/>
+    <property name="env.KONSOLE_DBUS_SERVICE" value=":1.28"/>
+    <property name="org.geotools.test.interactive" value="false"/>
+    <property name="env.INFODIR" value="/usr/local/info:/usr/share/info:/usr/info"/>
+    <property name="env.MAVEN_OPTS" value="-DproxySet=true -DproxyHost=iron3 -DproxyPort=8080"/>
+    <property name="env.HOSTTYPE" value="i386"/>
+    <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi"/>
+    <property name="env.LANGUAGE" value="en_US"/>
+    <property name="env.LESS_ADVANCED_PREPROCESSOR" value="no"/>
+    <property name="env.XDG_DATA_DIRS" value="/usr/share:/etc/opt/kde3/share:/opt/gnome/share:/opt/kde3/share"/>
+    <property name="user.name" value="mcr"/>
+    <property name="env.LANG" value="en_US.UTF-8"/>
+    <property name="env.CVS_RSH" value="ssh"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="env.CVSROOT" value=":pserver:mcr@r01050/home/cvsroot"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="env.DBUS_SESSION_BUS_ADDRESS" value="unix:abstract=/tmp/dbus-JKxUcObLcL,guid=9fa2d18ab27154c857965a8a49140168"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="env.KONSOLE_DBUS_SESSION" value="/Sessions/2"/>
+    <property name="env.MINICOM" value="-c on"/>
+    <property name="env.SSH_ASKPASS" value="/usr/lib/ssh/x11-ssh-askpass"/>
+    <property name="env.SDK_HOME" value="/usr/lib/jvm/java"/>
+    <property name="surefire.test.class.path" value="/home/mcr/gt2-2.5.x/modules/unsupported/jdbc-ng/jdbc-db2/target/test-classes:/home/mcr/gt2-2.5.x/modules/unsupported/jdbc-ng/jdbc-db2/target/classes:/home/mcr/.m2/repository/org/geotools/gt-jdbc-core/2.5-SNAPSHOT/gt-jdbc-core-2.5-SNAPSHOT.jar:/home/mcr/.m2/repository/org/geotools/gt-main/2.5-SNAPSHOT/gt-main-2.5-SNAPSHOT.jar:/home/mcr/.m2/repository/org/geotools/gt-api/2.5-SNAPSHOT/gt-api-2.5-SNAPSHOT.jar:/home/mcr/.m2/repository/com/vividsolutions/jts/1.9/jts-1.9.jar:/home/mcr/.m2/repository/org/geotools/gt-referencing/2.5-SNAPSHOT/gt-referencing-2.5-SNAPSHOT.jar:/home/mcr/.m2/repository/java3d/vecmath/1.3.1/vecmath-1.3.1.jar:/home/mcr/.m2/repository/commons-pool/commons-pool/1.3/commons-pool-1.3.jar:/home/mcr/.m2/repository/org/geotools/gt-metadata/2.5-SNAPSHOT/gt-metadata-2.5-SNAPSHOT.jar:/home/mcr/.m2/repository/org/opengis/geoapi/2.2-M1/geoapi-2.2-M1.jar:/home/mcr/.m2/repository/net/java/dev/jsr-275/jsr-275/1.0-beta-2/jsr-275-1.0-beta-2.jar:/home/mcr/.m2/repository/jdom/jdom/1.0/jdom-1.0.jar:/home/mcr/.m2/repository/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar:/home/mcr/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:/home/mcr/.m2/repository/org/geotools/gt-data/2.5-SNAPSHOT/gt-data-2.5-SNAPSHOT.jar:/home/mcr/.m2/repository/org/geotools/gt-jdbc/2.5-SNAPSHOT/gt-jdbc-2.5-SNAPSHOT.jar:/home/mcr/.m2/repository/commons-dbcp/commons-dbcp/1.2.2/commons-dbcp-1.2.2.jar:/home/mcr/.m2/repository/commons-collections/commons-collections/3.1/commons-collections-3.1.jar:/home/mcr/.m2/repository/org/geotools/gt-jdbc-core/2.5-SNAPSHOT/gt-jdbc-core-2.5-SNAPSHOT-tests.jar:/home/mcr/.m2/repository/org/geotools/gt-epsg-hsql/2.5-SNAPSHOT/gt-epsg-hsql-2.5-SNAPSHOT.jar:/home/mcr/.m2/repository/hsqldb/hsqldb/1.8.0.7/hsqldb-1.8.0.7.jar:/home/mcr/.m2/repository/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar:/home/mcr/.m2/repository/junit/junit/4.4/junit-4.4.jar:"/>
+    <property name="env.DB2INSTANCE" value="db2inst1"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="user.timezone" value="Europe/Vienna"/>
+    <property name="env.LESSOPEN" value="lessopen.sh %s"/>
+    <property name="env.MACHTYPE" value="i686-suse-linux"/>
+    <property name="path.separator" value=":"/>
+    <property name="env.XMODIFIERS" value="@im=local"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="env.XAUTHLOCALHOSTNAME" value="r01040"/>
+    <property name="env.WINDOWMANAGER" value="/usr/bin/startkde"/>
+    <property name="env.HOME" value="/home/mcr"/>
+    <property name="env.MANPATH" value="/usr/local/man:/usr/local/share/man:/usr/share/man:/usr/man"/>
+    <property name="env.GROFF_NO_SGR" value="yes"/>
+    <property name="env.PROFILEREAD" value="true"/>
+    <property name="env.HOSTNAME" value="r01040"/>
+    <property name="env.XSESSION_IS_UP" value="yes"/>
+    <property name="env.LADSPA_PATH" value="/usr/lib/ladspa"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="user.language" value="en"/>
+    <property name="line.separator" value="
+"/>
+    <property name="env.SSH_AGENT_PID" value="4525"/>
+    <property name="env.HISTSIZE" value="1000"/>
+    <property name="env.LIBXCB_ALLOW_SLOPPY_LOCK" value="1"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="proxySet" value="true"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="localRepository" value="/home/mcr/.m2/repository"/>
+    <property name="proxyPort" value="8080"/>
+    <property name="env.COLORTERM" value="1"/>
+    <property name="env.XNLSPATH" value="/usr/share/X11/nls"/>
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
+    <property name="env.DM_CONTROL" value="/var/run/xdmctl"/>
+    <property name="env.WINDOWID" value="48234837"/>
+    <property name="env.OSTYPE" value="linux"/>
+    <property name="env.DESKTOP_STARTUP_ID" value=""/>
+    <property name="env.CLASSPATH" value="/home/db2inst1/sqllib/java/db2java.zip:/home/db2inst1/sqllib/java/db2jcc.jar:/home/db2inst1/sqllib/java/sqlj.zip:/home/db2inst1/sqllib/function:/home/db2inst1/sqllib/java/db2jcc_license_cisuz.jar:/home/db2inst1/sqllib/java/db2jcc_license_cu.jar:."/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="env.QT_SYSTEM_DIR" value="/usr/share/desktop-data"/>
+    <property name="env.TERM" value="xterm"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) Client VM"/>
+    <property name="env.USE_FAM" value=""/>
+    <property name="env.KDE_SESSION_VERSION" value="4"/>
+    <property name="java.library.path" value="/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/i386/client:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/i386:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/../lib/i386:/home/db2inst1/sqllib/lib32:/usr/java/packages/lib/i386:/lib:/usr/lib"/>
+    <property name="env.PATH" value="/home/mcr/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/X11R6/bin:/usr/games:/opt/bin:/usr/lib/mit/bin:/usr/lib/mit/sbin:/home/db2inst1/sqllib/bin:/home/db2inst1/sqllib/adm:/home/db2inst1/sqllib/misc:/usr/local/apache-maven-2.0.9/bin:/opt/kde3/bin"/>
+    <property name="env.JDK_HOME" value="/usr/lib/jvm/java"/>
+    <property name="env.LESSCLOSE" value="lessclose.sh %s %s"/>
+    <property name="env.INFOPATH" value="/usr/local/info:/usr/share/info:/usr/info"/>
+    <property name="env.FROM_HEADER" value=""/>
+    <property name="basedir" value="/home/mcr/gt2-2.5.x/modules/unsupported/jdbc-ng/jdbc-db2"/>
+    <property name="java.class.version" value="50.0"/>
+    <property name="env.SHLVL" value="2"/>
+    <property name="env.LD_LIBRARY_PATH" value="/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/i386/client:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/i386:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/../lib/i386:/home/db2inst1/sqllib/lib32"/>
+    <property name="proxyHost" value="iron3"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/i386"/>
+    <property name="env.JAVA_BINDIR" value="/usr/lib/jvm/java/bin"/>
+    <property name="sun.management.compiler" value="HotSpot Client Compiler"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
+    <property name="env.COLORFGBG" value="15;0"/>
+    <property name="env.USER" value="mcr"/>
+    <property name="env.JRE_HOME" value="/usr/lib/jvm/java/jre"/>
+    <property name="env.XKEYSYMDB" value="/usr/share/X11/XKeysymDB"/>
+    <property name="env.QT_PLUGIN_PATH" value="/home/mcr/.kde4/lib/kde4/plugins/:/usr/lib/kde4/plugins/"/>
+    <property name="env.LESSKEY" value="/etc/lesskey.bin"/>
+    <property name="env.LESS" value="-M -I"/>
+    <property name="java.vm.specification.version" value="1.0"/>
+    <property name="env.NLSPATH" value="/usr/dt/lib/nls/msg/%L/%N.cat"/>
+    <property name="env.LS_OPTIONS" value="-N --color=tty -T 0"/>
+    <property name="sun.cpu.isalist" value=""/>
+    <property name="env.JAVA_ROOT" value="/usr/lib/jvm/java"/>
+    <property name="java.ext.dirs" value="/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/ext:/usr/java/packages/lib/ext"/>
+    <property name="os.version" value="2.6.25.18-0.2-pae"/>
+    <property name="env.HOST" value="r01040"/>
+    <property name="user.home" value="/home/mcr"/>
+    <property name="java.vm.vendor" value="Sun Microsystems Inc."/>
+    <property name="env.ftp_proxy" value="http://iron3:8080"/>
+    <property name="env.KDE_FULL_SESSION" value="true"/>
+    <property name="env.JAVA_HOME" value="/usr/lib/jvm/java"/>
+    <property name="env.INPUTRC" value="/etc/inputrc"/>
+    <property name="user.dir" value="/home/mcr/gt2-2.5.x/modules/unsupported/jdbc-ng/jdbc-db2"/>
+    <property name="env.CSHEDIT" value="emacs"/>
+    <property name="env.XFILESEARCHPATH" value="/usr/dt/app-defaults/%L/Dt"/>
+    <property name="env.MAIL" value="/var/spool/mail/mcr"/>
+    <property name="env.PWD" value="/home/mcr/gt2-2.5.x/modules/unsupported/jdbc-ng/jdbc-db2"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="env.PAGER" value="less"/>
+    <property name="env.GTK2_RC_FILES" value="/etc/gtk-2.0/gtkrc:/usr/share/themes//QtCurve/gtk-2.0/gtkrc:/home/mcr/.gtkrc-2.0-qtengine:/home/mcr/.gtkrc-2.0"/>
+    <property name="env.PYTHONSTARTUP" value="/etc/pythonstart"/>
+    <property name="env.TMPDIR" value="/tmp"/>
+    <property name="java.vm.version" value="10.0-b23"/>
+    <property name="java.class.path" value="/usr/local/apache-maven-2.0.9/boot/classworlds-1.1.jar"/>
+    <property name="env.XCURSOR_THEME" value="Oxygen_Black"/>
+    <property name="env.http_proxy" value="http://iron3:8080"/>
+    <property name="env.QTDIR" value="/usr/lib/qt3"/>
+    <property name="os.arch" value="i386"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="file.separator" value="/"/>
+    <property name="java.runtime.version" value="1.6.0_07-b06"/>
+    <property name="sun.boot.class.path" value="/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/resources.jar:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/rt.jar:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/jsse.jar:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/jce.jar:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/lib/charsets.jar:/usr/lib/jvm/java-1.6.0-sun-1.6.0.u7/jre/classes"/>
+    <property name="env.XDM_MANAGED" value="/var/run/xdmctl/xdmctl-:0,maysd,mayfn,sched,rsvd,method=classic"/>
+    <property name="env.SSH_AUTH_SOCK" value="/tmp/ssh-jTjeI4245/agent.4245"/>
+    <property name="env.XDG_CONFIG_DIRS" value="/etc/xdg"/>
+    <property name="env.https_proxy" value="http://iron3:8080"/>
+    <property name="env.CPU" value="i686"/>
+    <property name="user.country" value="US"/>
+    <property name="env.MORE" value="-sl"/>
+    <property name="env.SHELL" value="/bin/bash"/>
+    <property name="maven.home" value="/usr/local/apache-maven-2.0.9"/>
+    <property name="java.vendor" value="Sun Microsystems Inc."/>
+    <property name="env.GPG_AGENT_INFO" value="/tmp/gpg-wd6ctJ/S.gpg-agent:4513:1"/>
+    <property name="env.no_proxy" value="localhost"/>
+    <property name="java.specification.version" value="1.6"/>
+    <property name="sun.arch.data.model" value="32"/>
+    <property name="org.geotools.test.extensive" value="false"/>
+  </properties>
+  <testcase time="1.694" classname="org.geotools.data.db2.DB2FeatureStoreTest" name="testAddFeatures"/>
+  <testcase time="1.47" classname="org.geotools.data.db2.DB2FeatureStoreTest" name="testAddNullAttributes"/>
+  <testcase time="1.564" classname="org.geotools.data.db2.DB2FeatureStoreTest" name="testSetFeatures"/>
+  <testcase time="1.233" classname="org.geotools.data.db2.DB2FeatureStoreTest" name="testModifyFeatures"/>
+  <testcase time="1.195" classname="org.geotools.data.db2.DB2FeatureStoreTest" name="testModifyFeaturesSingleAttribute"/>
+  <testcase time="1.019" classname="org.geotools.data.db2.DB2FeatureStoreTest" name="testModifyFeaturesInvalidFilter"/>
+  <testcase time="1.184" classname="org.geotools.data.db2.DB2FeatureStoreTest" name="testRemoveFeatures"/>
+  <testcase time="1.168" classname="org.geotools.data.db2.DB2FeatureStoreTest" name="testRemoveFeaturesWithInvalidFilter"/>
+</testsuite>
