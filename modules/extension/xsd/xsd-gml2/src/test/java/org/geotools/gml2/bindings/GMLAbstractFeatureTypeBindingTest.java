@@ -67,7 +67,8 @@ public class GMLAbstractFeatureTypeBindingTest extends GMLTestSupport {
 
     public void testEncode() throws Exception {
         Document dom = encode(GML2MockData.feature(), TEST.TestFeature);
-
+        print(dom);
+        
         assertEquals(1, dom.getElementsByTagName("gml:boundedBy").getLength());
         assertEquals(1, dom.getElementsByTagName("test:geom").getLength());
         assertEquals(1, dom.getElementsByTagName("test:count").getLength());

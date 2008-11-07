@@ -979,4 +979,8 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
         Envelope latLongBoundingBox = fsd.getLatLongBoundingBox();
         return new ReferencedEnvelope(latLongBoundingBox, DefaultGeographicCRS.WGS84);
     }
+
+    public void setMaxFeatures( Integer maxFeatures ) {
+        //ignored... this class needs to move to the new arch
+    }
 }

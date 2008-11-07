@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCTestSetup;
 import org.geotools.jdbc.SQLDialect;
 
@@ -79,7 +80,8 @@ public class H2TestSetup extends JDBCTestSetup {
         run(sql);
     }
 
-    protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
-        return new H2Dialect(dataStore);
+    @Override
+    protected JDBCDataStoreFactory createDataStoreFactory() {
+        return new H2DataStoreFactory();
     }
 }

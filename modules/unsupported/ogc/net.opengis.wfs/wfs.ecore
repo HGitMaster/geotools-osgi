@@ -1488,7 +1488,7 @@
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="filterCapabilities" unique="false"
-        lowerBound="1" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/XMLType.ecore#//AnySimpleType">
+        lowerBound="1" eType="#//FilterCapabilities">
       <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">
         <details key="kind" value="element"/>
         <details key="name" value="Filter_Capabilities"/>
@@ -1571,6 +1571,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EDataType" name="ServiceType" instanceClassName="java.lang.String"/>
   <eClassifiers xsi:type="ecore:EDataType" name="Filter" instanceClassName="org.opengis.filter.Filter"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="FilterCapabilities" instanceClassName="org.opengis.filter.capability.FilterCapabilities"/>
   <eClassifiers xsi:type="ecore:EDataType" name="QName" instanceClassName="javax.xml.namespace.QName"/>
   <eClassifiers xsi:type="ecore:EDataType" name="Calendar" instanceClassName="java.util.Calendar"/>
   <eClassifiers xsi:type="ecore:EDataType" name="FeatureCollection" instanceClassName="org.geotools.feature.FeatureCollection"/>

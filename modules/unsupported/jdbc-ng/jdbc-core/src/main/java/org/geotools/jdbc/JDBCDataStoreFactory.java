@@ -65,7 +65,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
     public static final Param PORT = new Param("Port", Integer.class, "Port", true);
 
     /** parameter for database instance */
-    public static final Param DATABASE = new Param("Database", String.class, "Database");
+    public static final Param DATABASE = new Param("Database", String.class, "Database", false );
 
     /** parameter for database schema */
     public static final Param SCHEMA = new Param("Schema", String.class, "Schema", false);
@@ -79,6 +79,14 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
     /** parameter for namespace of the datastore */
     public static final Param NAMESPACE = new Param("namespace", String.class);
 
+    /** parameter for data source */
+    public static final Param DATASOURCE = new Param( "Data Source", DataSource.class, "Data Source", false );
+    
+    @Override
+    public String getDisplayName() {
+        return getDescription();
+    }
+    
     public boolean canProcess(Map params) {
         if (!super.canProcess(params)) {
             return false; // was not in agreement with getParametersInfo
@@ -99,12 +107,21 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         }
     }
 
-    public final DataStore createDataStore(Map params)
+    public final JDBCDataStore createDataStore(Map params)
         throws IOException {
         JDBCDataStore dataStore = new JDBCDataStore();
 
-        //datasource + dialect
-        dataStore.setDataSource(createDataSource(params));
+        //datasource 
+        //check if the DATASOURCE parameter was supplied, it takes precendence
+        DataSource ds = (DataSource) DATASOURCE.lookUp( params );
+        if ( ds != null ) {
+            dataStore.setDataSource(ds);
+        }
+        else {
+            dataStore.setDataSource(createDataSource(params));
+        }
+
+        //dialect
         dataStore.setSQLDialect(createSQLDialect(dataStore));
 
         //namespace
@@ -124,7 +141,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         //factories
         dataStore.setFilterFactory(CommonFactoryFinder.getFilterFactory(null));
         dataStore.setGeometryFactory(new GeometryFactory());
-//        dataStore.setFeatureTypeFactory(CommonFactoryFinder.getFeatureTypeFactory(null));
+        dataStore.setFeatureTypeFactory(new FeatureTypeFactoryImpl());
         dataStore.setFeatureFactory(CommonFactoryFinder.getFeatureFactory(null));
 
         //call subclass hook and return
@@ -266,6 +283,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
      * </p>
      */
     protected DataSource createDataSource(Map params) throws IOException {
+        //create a datasource
         BasicDataSource dataSource = new BasicDataSource();
 
         //some defualt data source behaviour
@@ -276,8 +294,19 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
 
         //jdbc url
         String host = (String) HOST.lookUp(params);
+        Integer port = (Integer) PORT.lookUp(params);
         String db = (String) DATABASE.lookUp(params);
-        dataSource.setUrl("jdbc:" + getDatabaseID() + "://" + host + "/" + db);
+        
+        String url = "jdbc:" + getDatabaseID() + "://" + host;
+        if ( port != null ) {
+            url += ":" + port;
+        }
+        
+        if ( db != null ) {
+            url += "/" + db; 
+        }
+        
+        dataSource.setUrl(url);
 
         //username
         String user = (String) USER.lookUp(params);

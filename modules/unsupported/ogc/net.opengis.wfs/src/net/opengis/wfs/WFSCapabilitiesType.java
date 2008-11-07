@@ -2,11 +2,12 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WFSCapabilitiesType.java 29859 2008-04-09 04:42:44Z jdeolive $
+ * $Id: WFSCapabilitiesType.java 31806 2008-11-07 21:28:00Z groldan $
  */
 package net.opengis.wfs;
 
 import net.opengis.ows10.CapabilitiesBaseType;
+import org.opengis.filter.capability.FilterCapabilities;
 
 /**
  * <!-- begin-user-doc -->
@@ -135,22 +136,22 @@ public interface WFSCapabilitiesType extends CapabilitiesBaseType {
 	 * </p>
 	 * <!-- end-user-doc -->
      * @return the value of the '<em>Filter Capabilities</em>' attribute.
-     * @see #setFilterCapabilities(Object)
+     * @see #setFilterCapabilities(FilterCapabilities)
      * @see net.opengis.wfs.WfsPackage#getWFSCapabilitiesType_FilterCapabilities()
-     * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.AnySimpleType" required="true"
+     * @model unique="false" dataType="net.opengis.wfs.FilterCapabilities" required="true"
      *        extendedMetaData="kind='element' name='Filter_Capabilities' namespace='http://www.opengis.net/ogc'"
      * @generated
      */
-	Object getFilterCapabilities();
+	FilterCapabilities getFilterCapabilities();
 
 	/**
      * Sets the value of the '{@link net.opengis.wfs.WFSCapabilitiesType#getFilterCapabilities <em>Filter Capabilities</em>}' attribute.
      * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+     * <!-- end-user-doc -->
      * @param value the new value of the '<em>Filter Capabilities</em>' attribute.
      * @see #getFilterCapabilities()
      * @generated
      */
-	void setFilterCapabilities(Object value);
+    void setFilterCapabilities(FilterCapabilities value);
 
 } // WFSCapabilitiesType

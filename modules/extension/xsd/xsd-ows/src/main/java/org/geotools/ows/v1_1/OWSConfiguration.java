@@ -68,7 +68,7 @@ public class OWSConfiguration extends Configuration {
         bindings.put(OWS.BoundingBoxType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.BoundingBoxType));
         bindings.put(OWS.CodeType,new SimpleContentComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.CodeType));
         bindings.put(OWS.ContactType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.ContactType));
-        bindings.put(OWS.DomainMetadataType,new ComplexEMFBinding(Ows11Factory.eINSTANCE,OWS.DomainMetadataType));
+        bindings.put(OWS.DomainMetadataType,new SimpleContentComplexEMFBinding(Ows11Factory.eINSTANCE,OWS.DomainMetadataType));
         
         bindings.put(OWS.ExceptionType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.ExceptionType));
         bindings.put(OWS.KeywordsType, new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.KeywordsType));

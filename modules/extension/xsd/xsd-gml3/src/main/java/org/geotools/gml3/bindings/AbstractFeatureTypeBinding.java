@@ -119,52 +119,12 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
 
     public Element encode(Object object, Document document, Element value)
         throws Exception {
-        SimpleFeature feature = (SimpleFeature) object;
-        SimpleFeatureType featureType = feature.getFeatureType();
-
-        String namespace = featureType.getName().getNamespaceURI();
-        String typeName = featureType.getTypeName();
-
-        Element encoding = document.createElementNS(namespace, typeName);
-        encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getID());
-
-        return encoding;
+        return GML3EncodingUtils.AbstractFeatureType_encode(object,document,value);
     }
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        //JD: here we only handle the "GML" attributes, all the application 
-        // schema attributes are handled by FeaturePropertyExtractor
-
-        //JD: TODO: handle all properties here and kill FeautrePropertyExtractor
-        SimpleFeature feature = (SimpleFeature) object;
-
-        if (GML.name.equals(name)) {
-            return feature.getAttribute("name");
-        }
-
-        if (GML.description.equals(name)) {
-            return feature.getAttribute("description");
-        }
-
-        if (GML.location.equals(name)) {
-            return feature.getAttribute("location");
-        }
-
-        if (GML.boundedBy.equals(name)) {
-            BoundingBox bounds = feature.getBounds();
-
-            if (bounds.isEmpty()) {
-                //do a check for the case where the feature has no geometry 
-                // properties
-                if (feature.getDefaultGeometry() == null) {
-                    return null;
-                }
-            }
-
-            return feature.getBounds();
-        }
-
-        return null;
+        
+        return GML3EncodingUtils.AbstractFeatureType_getProperty(object,name);
     }
 }

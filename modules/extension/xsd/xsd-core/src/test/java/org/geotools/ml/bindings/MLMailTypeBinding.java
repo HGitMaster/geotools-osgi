@@ -78,4 +78,14 @@ public class MLMailTypeBinding extends AbstractComplexBinding {
 
         return new Mail(id, body, envelope, attachments);
     }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        Mail m = (Mail) object;
+        if ( "envelope".equals( name.getLocalPart() ) ) {
+            return m.getEnvelope();
+        }
+        
+        return null;
+    }
 }

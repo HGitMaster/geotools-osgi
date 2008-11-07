@@ -315,154 +315,185 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                                 throw new RuntimeException(e);
                             }
 
-                            String sql = dataStore.selectGeometryAssociationSQL(fid, null,
-                                    gatt.getLocalName());
-                            dataStore.getLogger().fine(sql);
-
-                            Statement select = st.getConnection().createStatement();
-
+                            Statement select = null;
+                            ResultSet gas = null;
                             try {
-                                ResultSet gas = select.executeQuery(sql.toString());
+                                if ( dataStore.getSQLDialect() instanceof PreparedStatementSQLDialect ) {
+                                    select = dataStore.selectGeometryAssociationSQLPS(fid, null, gatt.getLocalName(), cx);
+                                    gas = ((PreparedStatement)select).executeQuery();
+                                }
+                                else {
+                                    String sql = dataStore.selectGeometryAssociationSQL(fid, null,
+                                            gatt.getLocalName());
+                                    dataStore.getLogger().fine(sql);    
+                                    select = st.getConnection().createStatement();
+                                    gas = select.executeQuery(sql.toString()); 
+                                }
+                                
+                                
+                                if (gas.next()) {
+                                    String gid = gas.getString("gid");
+                                    boolean ref = gas.getBoolean("ref");
 
-                                try {
-                                    if (gas.next()) {
-                                        String gid = gas.getString("gid");
-                                        boolean ref = gas.getBoolean("ref");
+                                    Geometry g = null;
 
-                                        Geometry g = null;
-
-                                        // if this is a "referenced" geometry,
-                                        // do not
-                                        // read it if the depth is <= 0
-                                        if (ref && !resolve) {
-                                            // use a stub
-                                            g = geometryFactory.createPoint(new CoordinateArraySequence(
-                                                        new Coordinate[] {  }));
-                                            //g = new NullGeometry();
-                                            dataStore.setGmlProperties(g, gid, null, null);
-                                        } else {
-                                            // read the geometry
-                                            sql = dataStore.selectGeometrySQL(gid);
+                                    // if this is a "referenced" geometry,
+                                    // do not
+                                    // read it if the depth is <= 0
+                                    if (ref && !resolve) {
+                                        // use a stub
+                                        g = geometryFactory.createPoint(new CoordinateArraySequence(
+                                                    new Coordinate[] {  }));
+                                        //g = new NullGeometry();
+                                        dataStore.setGmlProperties(g, gid, null, null);
+                                    } else {
+                                        // read the geometry
+                                        ResultSet grs = null;
+                                        if ( dataStore.getSQLDialect() instanceof PreparedStatementSQLDialect ) {
+                                            dataStore.closeSafe( select );
+                                            select = dataStore.selectGeometrySQLPS(gid, cx);
+                                            
+                                            grs = ((PreparedStatement) select).executeQuery();
+                                        }
+                                        else {
+                                            String sql = dataStore.selectGeometrySQL(gid);
                                             dataStore.getLogger().fine(sql);
 
-                                            ResultSet grs = select.executeQuery(sql);
+                                            grs = select.executeQuery(sql);    
+                                        }
+                                        
+                                        try {
+                                            // should always be one
+                                            if (!grs.next()) {
+                                                throw new SQLException("no entry for: " + gid
+                                                    + " in " + JDBCDataStore.GEOMETRY_TABLE);
+                                            }
 
-                                            try {
-                                                // should always be one
-                                                if (!grs.next()) {
-                                                    throw new SQLException("no entry for: " + gid
-                                                        + " in " + JDBCDataStore.GEOMETRY_TABLE);
-                                                }
+                                            String name = grs.getString("name");
+                                            String desc = grs.getString("description");
 
-                                                String name = grs.getString("name");
-                                                String desc = grs.getString("description");
+                                            if (grs.getObject("geometry") != null) {
+                                                //read the geometry
+                                                g = dataStore.getSQLDialect()
+                                                             .decodeGeometryValue(gatt, grs,
+                                                        "geometry", geometryFactory, cx);
+                                            } else {
+                                                //multi geometry?
+                                                String gtype = grs.getString("type");
 
-                                                if (grs.getObject("geometry") != null) {
-                                                    //read the geometry
-                                                    g = dataStore.getSQLDialect()
-                                                                 .decodeGeometryValue(gatt, grs,
-                                                            "geometry", geometryFactory, cx);
-                                                } else {
-                                                    //multi geometry?
-                                                    String gtype = grs.getString("type");
-
-                                                    if ("MULTIPOINT".equals(gtype)
-                                                            || "MULTILINESTRING".equals(gtype)
-                                                            || "MULTIPOLYGON".equals(gtype)) {
-                                                        sql = dataStore.selectMultiGeometrySQL(gid);
+                                                if ("MULTIPOINT".equals(gtype)
+                                                        || "MULTILINESTRING".equals(gtype)
+                                                        || "MULTIPOLYGON".equals(gtype)) {
+                                                    ResultSet mg = null;
+                                                    if ( dataStore.getSQLDialect() instanceof PreparedStatementSQLDialect ) {
+                                                        dataStore.closeSafe( select );
+                                                        select = dataStore.selectMultiGeometrySQLPS(gid, cx);
+                                                        
+                                                        mg = ((PreparedStatement)select).executeQuery();
+                                                    }
+                                                    else {
+                                                        String sql = dataStore.selectMultiGeometrySQL(gid);
                                                         dataStore.getLogger().fine(sql);
 
-                                                        ResultSet mg = select.executeQuery(sql);
+                                                        mg = select.executeQuery(sql);    
+                                                    }
+                                                    
+                                                    try {
+                                                        ArrayList members = new ArrayList();
 
-                                                        try {
-                                                            ArrayList members = new ArrayList();
-
-                                                            while (mg.next()) {
-                                                                String mgid = mg.getString("mgid");
-                                                                boolean mref = mg.getBoolean("ref");
-                                                                
-                                                                Geometry member = null;
-                                                                if ( !mref || resolve ) {
-                                                                    sql = dataStore.selectGeometrySQL(mgid);
-                                                                    dataStore.getLogger().fine(sql);
-    
-                                                                    Statement select2 = st.getConnection()
-                                                                                          .createStatement();
-                                                                    ResultSet mgg = select2.executeQuery(sql);
-    
-                                                                    try {
-                                                                        mgg.next();
-    
-                                                                        String mname = mgg.getString(
-                                                                                "name");
-                                                                        String mdesc = mgg.getString(
-                                                                                "description");
-    
-                                                                        member = dataStore.getSQLDialect()
-                                                                                                   .decodeGeometryValue(gatt,
-                                                                                mgg, "geometry",
-                                                                                geometryFactory, cx );
-    
-                                                                        dataStore.setGmlProperties(member, mgid,
-                                                                            mname, mdesc);
-                                                                        
-                                                                    } finally {
-                                                                        dataStore.closeSafe(mgg);
-                                                                        dataStore.closeSafe(select2);
-                                                                    }
+                                                        while (mg.next()) {
+                                                            String mgid = mg.getString("mgid");
+                                                            boolean mref = mg.getBoolean("ref");
+                                                            
+                                                            Geometry member = null;
+                                                            if ( !mref || resolve ) {
+                                                                Statement select2 = null;
+                                                                ResultSet mgg = null;
+                                                                if ( dataStore.getSQLDialect() instanceof PreparedStatementSQLDialect ) {
+                                                                    select2 = dataStore.selectGeometrySQLPS(mgid, cx);
+                                                                    mgg = ((PreparedStatement)select2).executeQuery();
                                                                 }
                                                                 else {
-                                                                    //create a stub
-                                                                    // use a stub
-                                                                    member = geometryFactory.createPoint(new CoordinateArraySequence(
-                                                                                new Coordinate[] {  }));
-                                                                    dataStore.setGmlProperties(member, mgid, null, null);
+                                                                    String sql = dataStore.selectGeometrySQL(mgid);
+                                                                    dataStore.getLogger().fine(sql);
+
+                                                                    select2 = st.getConnection()
+                                                                                          .createStatement();
+                                                                    mgg = select2.executeQuery(sql);    
                                                                 }
                                                                 
-                                                                members.add(member);
-                                                            }
+                                                                try {
+                                                                    mgg.next();
 
-                                                            if ("MULTIPOINT".equals(gtype)) {
-                                                                g = geometryFactory.createMultiPoint((Point[]) members
-                                                                        .toArray(new Point[members
-                                                                            .size()]));
-                                                            } else if ("MULTILINESTRING".equals(
-                                                                        gtype)) {
-                                                                g = geometryFactory
-                                                                    .createMultiLineString((LineString[]) members
-                                                                        .toArray(new LineString[members
-                                                                            .size()]));
-                                                            } else if ("MULTIPOLYGON".equals(gtype)) {
-                                                                g = geometryFactory
-                                                                    .createMultiPolygon((Polygon[]) members
-                                                                        .toArray(new Polygon[members
-                                                                            .size()]));
-                                                            } else {
-                                                                g = geometryFactory
-                                                                    .createGeometryCollection((Geometry[]) members
-                                                                        .toArray(new Geometry[members
-                                                                            .size()]));
+                                                                    String mname = mgg.getString(
+                                                                            "name");
+                                                                    String mdesc = mgg.getString(
+                                                                            "description");
+
+                                                                    member = dataStore.getSQLDialect()
+                                                                                               .decodeGeometryValue(gatt,
+                                                                            mgg, "geometry",
+                                                                            geometryFactory, cx );
+
+                                                                    dataStore.setGmlProperties(member, mgid,
+                                                                        mname, mdesc);
+                                                                    
+                                                                } finally {
+                                                                    dataStore.closeSafe(mgg);
+                                                                    dataStore.closeSafe(select2);
+                                                                }
                                                             }
-                                                        } finally {
-                                                            dataStore.closeSafe(mg);
+                                                            else {
+                                                                //create a stub
+                                                                // use a stub
+                                                                member = geometryFactory.createPoint(new CoordinateArraySequence(
+                                                                            new Coordinate[] {  }));
+                                                                dataStore.setGmlProperties(member, mgid, null, null);
+                                                            }
+                                                            
+                                                            members.add(member);
                                                         }
+
+                                                        if ("MULTIPOINT".equals(gtype)) {
+                                                            g = geometryFactory.createMultiPoint((Point[]) members
+                                                                    .toArray(new Point[members
+                                                                        .size()]));
+                                                        } else if ("MULTILINESTRING".equals(
+                                                                    gtype)) {
+                                                            g = geometryFactory
+                                                                .createMultiLineString((LineString[]) members
+                                                                    .toArray(new LineString[members
+                                                                        .size()]));
+                                                        } else if ("MULTIPOLYGON".equals(gtype)) {
+                                                            g = geometryFactory
+                                                                .createMultiPolygon((Polygon[]) members
+                                                                    .toArray(new Polygon[members
+                                                                        .size()]));
+                                                        } else {
+                                                            g = geometryFactory
+                                                                .createGeometryCollection((Geometry[]) members
+                                                                    .toArray(new Geometry[members
+                                                                        .size()]));
+                                                        }
+                                                    } finally {
+                                                        dataStore.closeSafe(mg);
                                                     }
                                                 }
-
-                                                dataStore.setGmlProperties(g, gid, name, desc);
-                                            } catch (IOException e) {
-                                                throw new RuntimeException(e);
-                                            } finally {
-                                                dataStore.closeSafe(grs);
                                             }
-                                        }
 
-                                        value = g;
+                                            dataStore.setGmlProperties(g, gid, name, desc);
+                                        } catch (IOException e) {
+                                            throw new RuntimeException(e);
+                                        } finally {
+                                            dataStore.closeSafe(grs);
+                                        }
                                     }
-                                } finally {
-                                    dataStore.closeSafe(gas);
+
+                                    value = g;
                                 }
+                                
                             } finally {
+                                dataStore.closeSafe( gas );
                                 dataStore.closeSafe(select);
                             }
                         }
@@ -475,99 +506,105 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                 // is this an association?
                 if (dataStore.isAssociations()
                         && Association.class.equals(type.getType().getBinding()) && (value != null)) {
-                    Statement select = st.getConnection().createStatement();
-
-                    try {
+                 
+                    Statement select = null;
+                    ResultSet associations = null;
+                    if (dataStore.getSQLDialect() instanceof PreparedStatementSQLDialect ) {
+                        select = dataStore.selectAssociationSQLPS(fid, cx);
+                        associations = ((PreparedStatement)select).executeQuery();
+                    }
+                    else {
                         String sql = dataStore.selectAssociationSQL(fid);
                         dataStore.getLogger().fine(sql);
+                        
+                        select = st.getConnection().createStatement();
+                        associations = select.executeQuery(sql);
+                    }
+                    
 
-                        ResultSet associations = select.executeQuery(sql);
+                    try {
+                        if (associations.next()) {
+                            String rtable = associations.getString("rtable");
+                            String rfid = associations.getString("rfid");
 
-                        try {
-                            if (associations.next()) {
-                                String rtable = associations.getString("rtable");
-                                String rfid = associations.getString("rfid");
+                            SimpleFeatureType associatedType = null;
 
-                                SimpleFeatureType associatedType = null;
+                            try {
+                                associatedType = dataStore.getSchema(rtable);
+                            } catch (IOException e) {
+                                //only log here, this means that the association
+                                // is probably bad... which we still want to 
+                                // handle, and fail only when and if we actually
+                                // resolve the link
+                                String msg = "Could not load schema: " + rtable;
+                                dataStore.getLogger().log(Level.WARNING, msg, e);
+                            }
+
+                            // set the referenced id + typeName as user data
+                            builder.userData("gml:id", rtable + "." + rfid);
+                            builder.userData("gml:featureTypeName", rtable);
+
+                            FeatureTypeFactory tf = dataStore.getFeatureTypeFactory();
+
+                            if (associatedType == null) {
+                                //means there was a problem with the link, 
+                                // create a dummy type
+                                SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder(tf);
+                                tb.setName(rtable);
+                                associatedType = tb.buildFeatureType();
+                            }
+
+                            //create an association
+                            AssociationType associationType = tf.createAssociationType(type
+                                    .getName(), associatedType, false, Collections.EMPTY_LIST,
+                                    null, null);
+                            AssociationDescriptor associationDescriptor = tf
+                                .createAssociationDescriptor(associationType, type.getName(),
+                                    1, 1, true);
+
+                            FeatureFactory f = dataStore.getFeatureFactory();
+                            Association association = f.createAssociation(null,
+                                    associationDescriptor);
+                            association.getUserData().put("gml:id", rtable + "." + rfid);
+
+                            if (resolve) {
+                                // use the value as an the identifier in a query against
+                                // the
+                                // referenced type
+                                DefaultQuery query = new DefaultQuery(rtable);
+
+                                Hints hints = new Hints(Hints.ASSOCIATION_TRAVERSAL_DEPTH,
+                                        new Integer(depth.intValue() - 1));
+                                query.setHints(hints);
+
+                                FilterFactory ff = dataStore.getFilterFactory();
+                                Id filter = ff.id(Collections.singleton(ff.featureId(
+                                                value.toString())));
+                                query.setFilter(filter);
 
                                 try {
-                                    associatedType = dataStore.getSchema(rtable);
-                                } catch (IOException e) {
-                                    //only log here, this means that the association
-                                    // is probably bad... which we still want to 
-                                    // handle, and fail only when and if we actually
-                                    // resolve the link
-                                    String msg = "Could not load schema: " + rtable;
-                                    dataStore.getLogger().log(Level.WARNING, msg, e);
-                                }
-
-                                // set the referenced id + typeName as user data
-                                builder.userData("gml:id", rtable + "." + rfid);
-                                builder.userData("gml:featureTypeName", rtable);
-
-                                FeatureTypeFactory tf = dataStore.getFeatureTypeFactory();
-
-                                if (associatedType == null) {
-                                    //means there was a problem with the link, 
-                                    // create a dummy type
-                                    SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder(tf);
-                                    tb.setName(rtable);
-                                    associatedType = tb.buildFeatureType();
-                                }
-
-                                //create an association
-                                AssociationType associationType = tf.createAssociationType(type
-                                        .getName(), associatedType, false, Collections.EMPTY_LIST,
-                                        null, null);
-                                AssociationDescriptor associationDescriptor = tf
-                                    .createAssociationDescriptor(associationType, type.getName(),
-                                        1, 1, true);
-
-                                FeatureFactory f = dataStore.getFeatureFactory();
-                                Association association = f.createAssociation(null,
-                                        associationDescriptor);
-                                association.getUserData().put("gml:id", rtable + "." + rfid);
-
-                                if (resolve) {
-                                    // use the value as an the identifier in a query against
-                                    // the
-                                    // referenced type
-                                    DefaultQuery query = new DefaultQuery(rtable);
-
-                                    Hints hints = new Hints(Hints.ASSOCIATION_TRAVERSAL_DEPTH,
-                                            new Integer(depth.intValue() - 1));
-                                    query.setHints(hints);
-
-                                    FilterFactory ff = dataStore.getFilterFactory();
-                                    Id filter = ff.id(Collections.singleton(ff.featureId(
-                                                    value.toString())));
-                                    query.setFilter(filter);
-
+                                    // grab a reader and get the feature, there should
+                                    // only
+                                    // be one
+                                     FeatureReader<SimpleFeatureType, SimpleFeature> r = dataStore.getFeatureReader(query, tx);
                                     try {
-                                        // grab a reader and get the feature, there should
-                                        // only
-                                        // be one
-                                         FeatureReader<SimpleFeatureType, SimpleFeature> r = dataStore.getFeatureReader(query, tx);
-                                        try {
-                                            r.hasNext();
+                                        r.hasNext();
 
-                                            SimpleFeature associated = r.next();
-                                            association.setValue(associated);
-                                        } finally {
-                                            r.close();
-                                        }
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
+                                        SimpleFeature associated = r.next();
+                                        association.setValue(associated);
+                                    } finally {
+                                        r.close();
                                     }
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
                                 }
-
-                                // set the actual value to be the association
-                                value = association;
                             }
-                        } finally {
-                            dataStore.closeSafe(associations);
+
+                            // set the actual value to be the association
+                            value = association;
                         }
                     } finally {
+                        dataStore.closeSafe(associations);
                         dataStore.closeSafe(select);
                     }
                 }

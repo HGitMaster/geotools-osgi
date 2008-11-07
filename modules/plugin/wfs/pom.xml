@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31720 2008-10-24 22:57:22Z groldan $              
+        Version: $Id: pom.xml 31769 2008-11-05 15:21:49Z groldan $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -126,7 +126,6 @@
         <configuration>
           <excludes>
             <!-- The following tests are skipped because they do not extend OnlineTestCase -->
-            <exclude>**/WFSDataStoreTest.java</exclude>
             <exclude>**/WFSFeatureSourceTest.java</exclude>
             <exclude>**/StreamingParserFeatureReaderTest.java</exclude>
             <!-- fails on gridlock but not on my machine! -->

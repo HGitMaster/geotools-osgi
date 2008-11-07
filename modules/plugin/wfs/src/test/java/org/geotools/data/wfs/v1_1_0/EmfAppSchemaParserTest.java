@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.wfs.v1_1_0.parsers.EmfAppSchemaParser;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.test.TestData;
 import org.geotools.wfs.WFSConfiguration;
@@ -37,7 +38,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Unit test suite for {@link EmfAppSchemaParser}
  * 
  * @author Gabriel Roldan
- * @version $Id: EmfAppSchemaParserTest.java 31731 2008-10-29 13:51:20Z groldan $
+ * @version $Id: EmfAppSchemaParserTest.java 31792 2008-11-06 19:17:35Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/EmfAppSchemaParserTest.java $

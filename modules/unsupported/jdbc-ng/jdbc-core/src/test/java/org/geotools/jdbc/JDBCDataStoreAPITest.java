@@ -911,16 +911,19 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         assertTrue((count == 3) || (count == -1));
 
         ReferencedEnvelope bounds = road.getBounds(Query.ALL);
-        assertTrue((bounds == null) || bounds.equals(td.roadBounds));
+        assertTrue((bounds == null) || 
+        		areReferencedEnvelopesEuqal(bounds,td.roadBounds));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> all = road.getFeatures();
         assertEquals(3, all.size());
-        assertEquals(td.roadBounds, all.getBounds());
+        //assertEquals(td.roadBounds, all.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(td.roadBounds, all.getBounds()));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(td.roadFeatures);
 
         assertCovers("all", expected, all);
-        assertEquals(td.roadBounds, all.getBounds());
+//        assertEquals(td.roadBounds, all.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(td.roadBounds, all.getBounds()));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> some = road.getFeatures(td.rd12Filter);
         assertEquals(2, some.size());
@@ -928,7 +931,9 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         ReferencedEnvelope e = new ReferencedEnvelope(CRS.decode("EPSG:4326"));
         e.include(td.roadFeatures[0].getBounds());
         e.include(td.roadFeatures[1].getBounds());
-        assertEquals(e, some.getBounds());
+//        assertEquals(e, some.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(e, some.getBounds()));
+
         assertEquals(some.getSchema(), road.getSchema());
 
         DefaultQuery query = new DefaultQuery(tname("road"), td.rd12Filter, new String[] { aname("name") });
@@ -956,7 +961,8 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
         ReferencedEnvelope b = half.getBounds();
         ReferencedEnvelope expectedBounds = td.roadBounds;
-        assertEquals(expectedBounds, b);
+        //assertEquals(expectedBounds, b);
+        assertTrue(areReferencedEnvelopesEuqal(expectedBounds,b));
     }
 
     public void testGetFeatureSourceRiver()
@@ -968,12 +974,16 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> all = river.getFeatures();
         assertEquals(2, all.size());
-        assertEquals(td.riverBounds, all.getBounds());
+        
+        //assertEquals(td.riverBounds, all.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(td.riverBounds, all.getBounds()));
+        
         assertTrue("rivers", covers(all.features(), td.riverFeatures));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(td.riverFeatures);
         assertCovers("all", expected, all);
-        assertEquals(td.riverBounds, all.getBounds());
+        //assertEquals(td.riverBounds, all.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(td.riverBounds, all.getBounds()));
     }
 
     //
@@ -1622,5 +1632,20 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         }
 
         return true;
+    }
+    
+    protected boolean areReferencedEnvelopesEuqal(ReferencedEnvelope e1, ReferencedEnvelope e2) {
+    	
+    	if (e1==null && e2 ==null) return true;
+    	if (e1==null || e2 == null) return false;
+    	
+    	boolean equal = 
+    		e1.getMinX()==e2.getMinX() &&
+    		e1.getMinY()==e2.getMinY() &&
+    		e1.getMaxX()==e2.getMaxX() &&
+    		e1.getMaxY()==e2.getMaxY();
+    	
+    	if (!equal) return false;
+    	return areCRSEqual(e1.getCoordinateReferenceSystem(), e2.getCoordinateReferenceSystem());
     }
 }

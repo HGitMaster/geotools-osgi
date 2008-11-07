@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WfsPackage.java 31719 2008-10-24 22:55:22Z groldan $
+ * $Id: WfsPackage.java 31806 2008-11-07 21:28:00Z groldan $
  */
 package net.opengis.wfs;
 
@@ -2518,6 +2518,16 @@ public interface WfsPackage extends EPackage {
 	int FILTER = 41;
 
 	/**
+     * The meta object id for the '<em>Filter Capabilities</em>' data type.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see org.opengis.filter.capability.FilterCapabilities
+     * @see net.opengis.wfs.impl.WfsPackageImpl#getFilterCapabilities()
+     * @generated
+     */
+    int FILTER_CAPABILITIES = 42;
+
+    /**
      * The meta object id for the '<em>QName</em>' data type.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2525,7 +2535,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getQName()
      * @generated
      */
-	int QNAME = 42;
+	int QNAME = 43;
 
 	/**
      * The meta object id for the '<em>Calendar</em>' data type.
@@ -2535,7 +2545,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getCalendar()
      * @generated
      */
-	int CALENDAR = 43;
+	int CALENDAR = 44;
 
 	/**
      * The meta object id for the '<em>Feature Collection</em>' data type.
@@ -2545,7 +2555,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getFeatureCollection()
      * @generated
      */
-	int FEATURE_COLLECTION = 44;
+	int FEATURE_COLLECTION = 45;
 
 	/**
      * The meta object id for the '<em>Feature Id</em>' data type.
@@ -2555,7 +2565,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getFeatureId()
      * @generated
      */
-	int FEATURE_ID = 45;
+	int FEATURE_ID = 46;
 
 	/**
      * The meta object id for the '<em>Service Type 1</em>' data type.
@@ -2565,7 +2575,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getServiceType_1()
      * @generated
      */
-	int SERVICE_TYPE_1 = 46;
+	int SERVICE_TYPE_1 = 47;
 
 	/**
      * The meta object id for the '<em>URI</em>' data type.
@@ -2575,7 +2585,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getURI()
      * @generated
      */
-	int URI = 47;
+	int URI = 48;
 
 	/**
      * The meta object id for the '<em>Format Type</em>' data type.
@@ -2585,7 +2595,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getFormatType()
      * @generated
      */
-	int FORMAT_TYPE = 48;
+	int FORMAT_TYPE = 49;
 
 	/**
      * The meta object id for the '<em>Type Type</em>' data type.
@@ -2595,7 +2605,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getTypeType()
      * @generated
      */
-	int TYPE_TYPE = 49;
+	int TYPE_TYPE = 50;
 
 	/**
      * The meta object id for the '<em>Function</em>' data type.
@@ -2605,7 +2615,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getFunction()
      * @generated
      */
-	int FUNCTION = 50;
+	int FUNCTION = 51;
 
 	/**
      * The meta object id for the '<em>Sort By</em>' data type.
@@ -2615,7 +2625,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getSortBy()
      * @generated
      */
-	int SORT_BY = 51;
+	int SORT_BY = 52;
 
 	/**
      * The meta object id for the '<em>Type Name List Type</em>' data type.
@@ -2625,7 +2635,7 @@ public interface WfsPackage extends EPackage {
      * @see net.opengis.wfs.impl.WfsPackageImpl#getTypeNameListType()
      * @generated
      */
-	int TYPE_NAME_LIST_TYPE = 52;
+	int TYPE_NAME_LIST_TYPE = 53;
 
 
 	/**
@@ -4635,6 +4645,17 @@ public interface WfsPackage extends EPackage {
 	EDataType getFilter();
 
 	/**
+     * Returns the meta object for data type '{@link org.opengis.filter.capability.FilterCapabilities <em>Filter Capabilities</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for data type '<em>Filter Capabilities</em>'.
+     * @see org.opengis.filter.capability.FilterCapabilities
+     * @model instanceClass="org.opengis.filter.capability.FilterCapabilities"
+     * @generated
+     */
+    EDataType getFilterCapabilities();
+
+    /**
      * Returns the meta object for data type '{@link javax.xml.namespace.QName <em>QName</em>}'.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -6350,6 +6371,16 @@ public interface WfsPackage extends EPackage {
 		EDataType FILTER = eINSTANCE.getFilter();
 
 		/**
+         * The meta object literal for the '<em>Filter Capabilities</em>' data type.
+         * <!-- begin-user-doc -->
+         * <!-- end-user-doc -->
+         * @see org.opengis.filter.capability.FilterCapabilities
+         * @see net.opengis.wfs.impl.WfsPackageImpl#getFilterCapabilities()
+         * @generated
+         */
+        EDataType FILTER_CAPABILITIES = eINSTANCE.getFilterCapabilities();
+
+        /**
          * The meta object literal for the '<em>QName</em>' data type.
          * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->

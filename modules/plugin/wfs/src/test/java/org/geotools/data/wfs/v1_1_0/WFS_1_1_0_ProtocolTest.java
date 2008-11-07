@@ -1,6 +1,4 @@
 package org.geotools.data.wfs.v1_1_0;
-import static org.geotools.data.wfs.protocol.http.HttpMethod.GET;
-import static org.geotools.data.wfs.protocol.http.HttpMethod.POST;
 import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.CUBEWERX_GOVUNITCE;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.CUBEWERX_ROADSEG;
@@ -10,8 +8,8 @@ import static org.geotools.data.wfs.v1_1_0.DataTestSupport.GEOS_ROADS;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.GEOS_STATES;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.GEOS_TASMANIA_CITIES;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.GEOS_TIGER_ROADS;
-import static org.geotools.data.wfs.v1_1_0.DataTestSupport.createProtocolHandler;
-import static org.geotools.data.wfs.v1_1_0.DataTestSupport.protocolHandler;
+import static org.geotools.data.wfs.v1_1_0.DataTestSupport.createTestProtocol;
+import static org.geotools.data.wfs.v1_1_0.DataTestSupport.wfs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -23,9 +21,12 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,13 +41,27 @@ import org.geotools.data.wfs.protocol.http.HTTPResponse;
 import org.geotools.data.wfs.protocol.http.HttpMethod;
 import org.geotools.data.wfs.protocol.wfs.Version;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
+import org.geotools.data.wfs.v1_1_0.DataTestSupport.TestHttpProtocol;
 import org.geotools.data.wfs.v1_1_0.DataTestSupport.TestHttpResponse;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.filter.Capabilities;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.test.TestData;
+import org.geotools.xml.Parser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.filter.capability.GeometryOperand;
+import org.opengis.filter.capability.SpatialCapabilities;
+import org.opengis.filter.capability.SpatialOperator;
+import org.opengis.filter.capability.SpatialOperators;
 
 /**
  * Unit test suite for {@link WFS_1_1_0_Protocol}
@@ -54,6 +69,7 @@ import org.junit.Test;
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.6.x
  */
+@SuppressWarnings("nls")
 public class WFS_1_1_0_ProtocolTest {
 
     /**
@@ -84,11 +100,10 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testWFS_1_1_0_Protocol() throws IOException {
         try {
-            createProtocolHandler(GEOS_STATES.SCHEMA);
+            createTestProtocol(GEOS_STATES.SCHEMA);
             fail("Excpected IOException as a capabilities document was not provided");
         } catch (IOException e) {
             assertTrue(true);
@@ -96,15 +111,15 @@ public class WFS_1_1_0_ProtocolTest {
         try {
             InputStream badData = new ByteArrayInputStream(new byte[1024]);
             HTTPProtocol connFac = new DefaultHTTPProtocol();
-            protocolHandler = new WFS_1_1_0_Protocol(badData, connFac);
+            new WFS_1_1_0_Protocol(badData, connFac);
             fail("Excpected IOException as a capabilities document was not provided");
         } catch (IOException e) {
             assertTrue(true);
         }
 
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        assertNotNull(protocolHandler);
-        assertNotNull(((WFS_1_1_0_Protocol) protocolHandler).capabilities);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        assertNotNull(wfs);
+        assertNotNull(((WFS_1_1_0_Protocol) wfs).capabilities);
 
     }
 
@@ -115,8 +130,8 @@ public class WFS_1_1_0_ProtocolTest {
      */
     @Test
     public void testGetServiceVersion() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        assertSame(Version.v1_1_0, protocolHandler.getServiceVersion());
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        assertSame(Version.v1_1_0, wfs.getServiceVersion());
     }
 
     /**
@@ -126,8 +141,8 @@ public class WFS_1_1_0_ProtocolTest {
      */
     @Test
     public void testGetServiceTitle() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        assertEquals("My GeoServer WFS", protocolHandler.getServiceTitle());
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        assertEquals("My GeoServer WFS", wfs.getServiceTitle());
     }
 
     /**
@@ -137,9 +152,9 @@ public class WFS_1_1_0_ProtocolTest {
      */
     @Test
     public void testGetServiceAbstract() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        assertEquals("This is a description of your Web Feature Server.", protocolHandler
-                .getServiceAbstract().trim());
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        assertEquals("This is a description of your Web Feature Server.", wfs.getServiceAbstract()
+                .trim());
     }
 
     /**
@@ -149,8 +164,8 @@ public class WFS_1_1_0_ProtocolTest {
      */
     @Test
     public void testGetServiceKeywords() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        Set<String> serviceKeywords = protocolHandler.getServiceKeywords();
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        Set<String> serviceKeywords = wfs.getServiceKeywords();
         assertNotNull(serviceKeywords);
         assertEquals(3, serviceKeywords.size());
         assertTrue(serviceKeywords.contains("WFS"));
@@ -165,9 +180,9 @@ public class WFS_1_1_0_ProtocolTest {
      */
     @Test
     public void testGetServiceProviderUri() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        assertNotNull(protocolHandler.getServiceProviderUri());
-        assertEquals("http://www.geoserver.org", protocolHandler.getServiceProviderUri().toString());
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        assertNotNull(wfs.getServiceProviderUri());
+        assertEquals("http://www.geoserver.org", wfs.getServiceProviderUri().toString());
     }
 
     /**
@@ -177,8 +192,8 @@ public class WFS_1_1_0_ProtocolTest {
      */
     @Test
     public void testGetSupportedGetFeatureOutputFormats() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        Set<String> supportedOutputFormats = protocolHandler.getSupportedGetFeatureOutputFormats();
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        Set<String> supportedOutputFormats = wfs.getSupportedGetFeatureOutputFormats();
         assertNotNull(supportedOutputFormats);
         assertEquals(2, supportedOutputFormats.size()); // should be 2 once GEOT-2096 is fixed
 
@@ -193,8 +208,8 @@ public class WFS_1_1_0_ProtocolTest {
      */
     @Test
     public void testGetSupportedOutputFormatsByFeatureType() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        Set<String> archSitesOutputFormats = protocolHandler
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        Set<String> archSitesOutputFormats = wfs
                 .getSupportedOutputFormats(GEOS_ARCHSITES.FEATURETYPENAME);
         assertNotNull(archSitesOutputFormats);
         assertEquals(8, archSitesOutputFormats.size());
@@ -214,16 +229,15 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetFeatureTypeNames() throws IOException {
 
         // test against a geoserver capabilities
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        Set<QName> featureTypeNames = protocolHandler.getFeatureTypeNames();
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        Set<QName> featureTypeNames = wfs.getFeatureTypeNames();
         assertEquals(6, featureTypeNames.size());
 
-        for (QName name : featureTypeNames) {
+        for( QName name : featureTypeNames ) {
             assertFalse(name.toString(), XMLConstants.DEFAULT_NS_PREFIX.equals(name.getPrefix()));
         }
         assertTrue(featureTypeNames.contains(GEOS_ARCHSITES.TYPENAME));
@@ -234,12 +248,12 @@ public class WFS_1_1_0_ProtocolTest {
         assertTrue(featureTypeNames.contains(GEOS_TIGER_ROADS.TYPENAME));
 
         // test against a cubewerx capabilities
-        createProtocolHandler(CUBEWERX_GOVUNITCE.CAPABILITIES);
-        featureTypeNames = protocolHandler.getFeatureTypeNames();
+        createTestProtocol(CUBEWERX_GOVUNITCE.CAPABILITIES);
+        featureTypeNames = wfs.getFeatureTypeNames();
         // there are 14 featuretypes in the capabilities document
         assertEquals(14, featureTypeNames.size());
 
-        for (QName name : featureTypeNames) {
+        for( QName name : featureTypeNames ) {
             assertFalse(name.toString(), XMLConstants.DEFAULT_NS_PREFIX.equals(name.getPrefix()));
         }
         assertTrue(featureTypeNames.contains(CUBEWERX_GOVUNITCE.TYPENAME));
@@ -251,38 +265,34 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetFeatureTypeNameGeoServer() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
 
         try {
-            protocolHandler.getFeatureTypeName("nonExistentTypeName");
+            wfs.getFeatureTypeName("nonExistentTypeName");
             fail("Expected IAE");
         } catch (IllegalArgumentException e) {
             assertTrue(true);
         }
 
         // test against a geoserver capabilities
-        assertEquals(GEOS_ARCHSITES.TYPENAME, protocolHandler
+        assertEquals(GEOS_ARCHSITES.TYPENAME, wfs
                 .getFeatureTypeName(GEOS_ARCHSITES.FEATURETYPENAME));
-        assertEquals(GEOS_POI.TYPENAME, protocolHandler
-                .getFeatureTypeName(GEOS_POI.FEATURETYPENAME));
-        assertEquals(GEOS_ROADS.TYPENAME, protocolHandler
-                .getFeatureTypeName(GEOS_ROADS.FEATURETYPENAME));
-        assertEquals(GEOS_STATES.TYPENAME, protocolHandler
-                .getFeatureTypeName(GEOS_STATES.FEATURETYPENAME));
-        assertEquals(GEOS_TASMANIA_CITIES.TYPENAME, protocolHandler
+        assertEquals(GEOS_POI.TYPENAME, wfs.getFeatureTypeName(GEOS_POI.FEATURETYPENAME));
+        assertEquals(GEOS_ROADS.TYPENAME, wfs.getFeatureTypeName(GEOS_ROADS.FEATURETYPENAME));
+        assertEquals(GEOS_STATES.TYPENAME, wfs.getFeatureTypeName(GEOS_STATES.FEATURETYPENAME));
+        assertEquals(GEOS_TASMANIA_CITIES.TYPENAME, wfs
                 .getFeatureTypeName(GEOS_TASMANIA_CITIES.FEATURETYPENAME));
-        assertEquals(GEOS_TIGER_ROADS.TYPENAME, protocolHandler
+        assertEquals(GEOS_TIGER_ROADS.TYPENAME, wfs
                 .getFeatureTypeName(GEOS_TIGER_ROADS.FEATURETYPENAME));
 
         // test against a cubewerx capabilities
-        createProtocolHandler(CUBEWERX_GOVUNITCE.CAPABILITIES);
+        createTestProtocol(CUBEWERX_GOVUNITCE.CAPABILITIES);
 
-        assertEquals(CUBEWERX_GOVUNITCE.TYPENAME, protocolHandler
+        assertEquals(CUBEWERX_GOVUNITCE.TYPENAME, wfs
                 .getFeatureTypeName(CUBEWERX_GOVUNITCE.FEATURETYPENAME));
-        assertEquals(CUBEWERX_ROADSEG.TYPENAME, protocolHandler
+        assertEquals(CUBEWERX_ROADSEG.TYPENAME, wfs
                 .getFeatureTypeName(CUBEWERX_ROADSEG.FEATURETYPENAME));
 
     }
@@ -294,15 +304,33 @@ public class WFS_1_1_0_ProtocolTest {
      */
     @Test
     public void testGetFilterCapabilities() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        try {
-            protocolHandler.getFilterCapabilities();
-            fail("expected 'not yet implemented'... he");
-        } catch (UnsupportedOperationException e) {
-            assertTrue(true);
-            System.out
-                    .println("testGetFilterCapabilities(): Remember to implement getFilterCapabilities()!!!");
-        }
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        FilterCapabilities filterCapabilities = wfs.getFilterCapabilities();
+        assertNotNull(filterCapabilities);
+
+        SpatialCapabilities spatialCapabilities = filterCapabilities.getSpatialCapabilities();
+        Collection<GeometryOperand> geometryOperands = spatialCapabilities.getGeometryOperands();
+        assertEquals(4, geometryOperands.size());
+        assertTrue(geometryOperands.contains(GeometryOperand.Envelope));
+        assertTrue(geometryOperands.contains(GeometryOperand.Point));
+        assertTrue(geometryOperands.contains(GeometryOperand.LineString));
+        assertTrue(geometryOperands.contains(GeometryOperand.Polygon));
+
+        SpatialOperators spatialOperators = spatialCapabilities.getSpatialOperators();
+        Collection<SpatialOperator> operators = spatialOperators.getOperators();
+        assertEquals(9, operators.size());
+        assertNotNull(spatialOperators.getOperator("Disjoint"));
+        assertNotNull(spatialOperators.getOperator("Equals"));
+        assertNotNull(spatialOperators.getOperator("DWithin"));
+        assertNotNull(spatialOperators.getOperator("Beyond"));
+        assertNotNull(spatialOperators.getOperator("Intersects"));
+        assertNotNull(spatialOperators.getOperator("Touches"));
+        assertNotNull(spatialOperators.getOperator("Crosses"));
+        assertNotNull(spatialOperators.getOperator("Contains"));
+        assertNotNull(spatialOperators.getOperator("BBOX"));
+
+        //intentionally removed from the test caps doc
+        assertNull(spatialOperators.getOperator("Overlaps"));
     }
 
     /**
@@ -314,14 +342,14 @@ public class WFS_1_1_0_ProtocolTest {
      */
     @Test
     public void testSupportsOperation() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        assertTrue(protocolHandler.supportsOperation(DESCRIBE_FEATURETYPE, GET));
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        assertTrue(wfs.supportsOperation(DESCRIBE_FEATURETYPE, false));
         // post was deliberately left off on the test capabilities file
-        assertFalse(protocolHandler.supportsOperation(DESCRIBE_FEATURETYPE, POST));
+        assertFalse(wfs.supportsOperation(DESCRIBE_FEATURETYPE, true));
 
-        createProtocolHandler(CUBEWERX_GOVUNITCE.CAPABILITIES);
-        assertTrue(protocolHandler.supportsOperation(DESCRIBE_FEATURETYPE, GET));
-        assertTrue(protocolHandler.supportsOperation(DESCRIBE_FEATURETYPE, POST));
+        createTestProtocol(CUBEWERX_GOVUNITCE.CAPABILITIES);
+        assertTrue(wfs.supportsOperation(DESCRIBE_FEATURETYPE, false));
+        assertTrue(wfs.supportsOperation(DESCRIBE_FEATURETYPE, true));
     }
 
     /**
@@ -331,15 +359,14 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetOperationURL() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        URL operationURL = protocolHandler.getOperationURL(DESCRIBE_FEATURETYPE, GET);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        URL operationURL = wfs.getOperationURL(DESCRIBE_FEATURETYPE, false);
         assertNotNull(operationURL);
         assertEquals("http://localhost:8080/geoserver/wfs?", operationURL.toExternalForm());
         // post was deliberately left off on the test capabilities file
-        assertNull(protocolHandler.getOperationURL(DESCRIBE_FEATURETYPE, POST));
+        assertNull(wfs.getOperationURL(DESCRIBE_FEATURETYPE, true));
     }
 
     /**
@@ -347,14 +374,12 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetFeatureTypeTitle() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        assertEquals("archsites_Type", protocolHandler
-                .getFeatureTypeTitle(GEOS_ARCHSITES.FEATURETYPENAME));
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        assertEquals("archsites_Type", wfs.getFeatureTypeTitle(GEOS_ARCHSITES.FEATURETYPENAME));
 
-        createProtocolHandler(CUBEWERX_GOVUNITCE.CAPABILITIES);
+        createTestProtocol(CUBEWERX_GOVUNITCE.CAPABILITIES);
     }
 
     /**
@@ -362,18 +387,17 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetFeatureTypeAbstract() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
-        assertEquals("Generated from sfArchsites", protocolHandler
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
+        assertEquals("Generated from sfArchsites", wfs
                 .getFeatureTypeAbstract(GEOS_ARCHSITES.FEATURETYPENAME));
 
-        createProtocolHandler(CUBEWERX_GOVUNITCE.CAPABILITIES);
-        assertNull(protocolHandler.getFeatureTypeAbstract(CUBEWERX_GOVUNITCE.FEATURETYPENAME));
+        createTestProtocol(CUBEWERX_GOVUNITCE.CAPABILITIES);
+        assertNull(wfs.getFeatureTypeAbstract(CUBEWERX_GOVUNITCE.FEATURETYPENAME));
 
         try {
-            protocolHandler.getFeatureTypeAbstract("nonExistentTypeName");
+            wfs.getFeatureTypeAbstract("nonExistentTypeName");
             fail("Expected IAE");
         } catch (IllegalArgumentException e) {
             assertTrue(true);
@@ -385,18 +409,17 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetFeatureTypeWGS84Bounds() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
         try {
-            protocolHandler.getFeatureTypeAbstract("nonExistentTypeName");
+            wfs.getFeatureTypeAbstract("nonExistentTypeName");
             fail("Expected IAE");
         } catch (IllegalArgumentException e) {
             assertTrue(true);
         }
 
-        ReferencedEnvelope wgs84Bounds = protocolHandler
+        ReferencedEnvelope wgs84Bounds = wfs
                 .getFeatureTypeWGS84Bounds(GEOS_ARCHSITES.FEATURETYPENAME);
 
         assertNotNull(wgs84Bounds);
@@ -406,8 +429,8 @@ public class WFS_1_1_0_ProtocolTest {
         assertEquals(-102D, wgs84Bounds.getMaxX(), 1.0e-3);
         assertEquals(45D, wgs84Bounds.getMaxY(), 1.0e-3);
 
-        createProtocolHandler(CUBEWERX_GOVUNITCE.CAPABILITIES);
-        assertNotNull(protocolHandler.getFeatureTypeWGS84Bounds(CUBEWERX_GOVUNITCE.FEATURETYPENAME));
+        createTestProtocol(CUBEWERX_GOVUNITCE.CAPABILITIES);
+        assertNotNull(wfs.getFeatureTypeWGS84Bounds(CUBEWERX_GOVUNITCE.FEATURETYPENAME));
     }
 
     /**
@@ -415,19 +438,18 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetDefaultCRS() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
         try {
-            protocolHandler.getDefaultCRS("nonExistentTypeName");
+            wfs.getDefaultCRS("nonExistentTypeName");
             fail("Expected IAE");
         } catch (IllegalArgumentException e) {
             assertTrue(true);
         }
 
-        assertEquals("EPSG:26713", protocolHandler.getDefaultCRS(GEOS_ARCHSITES.FEATURETYPENAME));
-        assertEquals("EPSG:4326", protocolHandler.getDefaultCRS(GEOS_STATES.FEATURETYPENAME));
+        assertEquals("EPSG:26713", wfs.getDefaultCRS(GEOS_ARCHSITES.FEATURETYPENAME));
+        assertEquals("EPSG:4326", wfs.getDefaultCRS(GEOS_STATES.FEATURETYPENAME));
     }
 
     /**
@@ -435,28 +457,26 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetSupportedCRSIdentifiers() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
         try {
-            protocolHandler.getSupportedCRSIdentifiers("nonExistentTypeName");
+            wfs.getSupportedCRSIdentifiers("nonExistentTypeName");
             fail("Expected IAE");
         } catch (IllegalArgumentException e) {
             assertTrue(true);
         }
 
         Set<String> supportedCRSs;
-        supportedCRSs = protocolHandler.getSupportedCRSIdentifiers(GEOS_ARCHSITES.FEATURETYPENAME);
+        supportedCRSs = wfs.getSupportedCRSIdentifiers(GEOS_ARCHSITES.FEATURETYPENAME);
 
         // capabilities doesn't set other crs's for this feature type than the default one...
         assertNotNull(supportedCRSs);
         assertEquals(1, supportedCRSs.size());
         assertTrue(supportedCRSs.contains("EPSG:26713"));
 
-        createProtocolHandler(CUBEWERX_GOVUNITCE.CAPABILITIES);
-        supportedCRSs = protocolHandler
-                .getSupportedCRSIdentifiers(CUBEWERX_GOVUNITCE.FEATURETYPENAME);
+        createTestProtocol(CUBEWERX_GOVUNITCE.CAPABILITIES);
+        supportedCRSs = wfs.getSupportedCRSIdentifiers(CUBEWERX_GOVUNITCE.FEATURETYPENAME);
         // capabilities defines more crs's for this ftype
         assertNotNull(supportedCRSs);
         assertEquals(2, supportedCRSs.size());
@@ -469,19 +489,18 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetFeatureTypeKeywords() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
         try {
-            protocolHandler.getFeatureTypeKeywords("nonExistentTypeName");
+            wfs.getFeatureTypeKeywords("nonExistentTypeName");
             fail("Expected IAE");
         } catch (IllegalArgumentException e) {
             assertTrue(true);
         }
 
         Set<String> keywords;
-        keywords = protocolHandler.getFeatureTypeKeywords(GEOS_ARCHSITES.FEATURETYPENAME);
+        keywords = wfs.getFeatureTypeKeywords(GEOS_ARCHSITES.FEATURETYPENAME);
 
         assertNotNull(keywords);
         assertEquals(1, keywords.size());
@@ -493,19 +512,18 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testGetDescribeFeatureTypeURLGet() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
         try {
-            protocolHandler.getDescribeFeatureTypeURLGet("nonExistentTypeName");
+            wfs.getDescribeFeatureTypeURLGet("nonExistentTypeName");
             fail("Expected IAE");
         } catch (IllegalArgumentException e) {
             assertTrue(true);
         }
 
         URL url;
-        url = protocolHandler.getDescribeFeatureTypeURLGet(GEOS_ARCHSITES.FEATURETYPENAME);
+        url = wfs.getDescribeFeatureTypeURLGet(GEOS_ARCHSITES.FEATURETYPENAME);
         assertNotNull(url);
         String externalForm = url.toExternalForm();
         externalForm = URLDecoder.decode(externalForm, "UTF-8");
@@ -525,46 +543,40 @@ public class WFS_1_1_0_ProtocolTest {
      * 
      * @throws IOException
      */
-    @SuppressWarnings("nls")
     @Test
     public void testDescribeFeatureType_HTTP_GET() throws IOException {
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
         try {
-            protocolHandler.describeFeatureType("nonExistentTypeName",
-                    "text/xml; subtype=gml/3.1.1", HttpMethod.GET);
+            wfs.describeFeatureTypeGET("nonExistentTypeName", "text/xml; subtype=gml/3.1.1");
             fail("Expected IAE");
         } catch (IllegalArgumentException e) {
             assertTrue(true);
         }
 
-        HTTPProtocol mockHttp = new DefaultHTTPProtocol() {
-            @Override
-            public HTTPResponse issueGet(final URL baseUrl, final Map<String, String> kvp)
-                    throws IOException {
-                assertNotNull(baseUrl);
-                String externalForm = baseUrl.toExternalForm();
-                externalForm = URLDecoder.decode(externalForm, "UTF-8");
+        HTTPResponse httpResponse = new TestHttpResponse("text/xml; subtype=gml/3.1.1", null,
+                "mock-content");
+        TestHttpProtocol mockHttp = new TestHttpProtocol(httpResponse);
 
-                assertTrue(externalForm.startsWith("http://localhost:8080/geoserver/wfs?"));
-                assertTrue(externalForm.contains("REQUEST=DescribeFeatureType"));
-                assertTrue(externalForm.contains("TYPENAME=sf:archsites"));
-                assertTrue(externalForm.contains("VERSION=1.1.0"));
-                assertTrue(externalForm.contains("SERVICE=WFS"));
-                assertTrue(externalForm
-                        .contains("NAMESPACE=xmlns(sf=http://www.openplans.org/spearfish)"));
-                assertTrue(externalForm.contains("OUTPUTFORMAT=text/xml; subtype=gml/3.1.1"));
-
-                HTTPResponse httpResponse = new TestHttpResponse("text/xml; subtype=gml/3.1.1",
-                        null, "mock-content");
-                return httpResponse;
-            }
-        };
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
 
         WFSResponse wfsResponse;
 
-        wfsResponse = protocolHandler.describeFeatureType(GEOS_ARCHSITES.FEATURETYPENAME,
-                "text/xml; subtype=gml/3.1.1", HttpMethod.GET);
+        wfsResponse = wfs.describeFeatureTypeGET(GEOS_ARCHSITES.FEATURETYPENAME,
+                "text/xml; subtype=gml/3.1.1");
+
+        URL baseUrl = mockHttp.issueGetBaseUrl;
+        assertNotNull(baseUrl);
+        String externalForm = baseUrl.toExternalForm();
+        externalForm = URLDecoder.decode(externalForm, "UTF-8");
+
+        assertTrue(externalForm.startsWith("http://localhost:8080/geoserver/wfs?"));
+        assertTrue(externalForm.contains("REQUEST=DescribeFeatureType"));
+        assertTrue(externalForm.contains("TYPENAME=sf:archsites"));
+        assertTrue(externalForm.contains("VERSION=1.1.0"));
+        assertTrue(externalForm.contains("SERVICE=WFS"));
+        assertTrue(externalForm.contains("NAMESPACE=xmlns(sf=http://www.openplans.org/spearfish)"));
+        assertTrue(externalForm.contains("OUTPUTFORMAT=text/xml; subtype=gml/3.1.1"));
+
         assertNotNull(wfsResponse);
         assertEquals(Charset.forName("UTF-8"), wfsResponse.getCharacterEncoding());
         assertEquals("text/xml; subtype=gml/3.1.1", wfsResponse.getContentType());
@@ -595,18 +607,12 @@ public class WFS_1_1_0_ProtocolTest {
         final TestHttpResponse response = new TestHttpResponse("text/xml; subtype=gml/3.1.1",
                 "UTF-8", responseContent);
 
-        HTTPProtocol mockHttp = new DefaultHTTPProtocol() {
-            @Override
-            public HTTPResponse issueGet(final URL baseUrl, final Map<String, String> kvp)
-                    throws IOException {
-                return response;
-            }
-        };
+        HTTPProtocol mockHttp = new TestHttpProtocol(response);
 
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
         DefaultQuery query = new DefaultQuery(GEOS_ARCHSITES.FEATURETYPENAME);
 
-        int featureHits = protocolHandler.getFeatureHits(query);
+        int featureHits = wfs.getFeatureHits(query);
         assertEquals(217, featureHits);
     }
 
@@ -633,19 +639,13 @@ public class WFS_1_1_0_ProtocolTest {
         final TestHttpResponse response = new TestHttpResponse(
                 "application/vnd.ogc.se_xml;chatset=UTF-8", "UTF-8", responseContent);
 
-        HTTPProtocol mockHttp = new DefaultHTTPProtocol() {
-            @Override
-            public HTTPResponse issueGet(final URL baseUrl, final Map<String, String> kvp)
-                    throws IOException {
-                return response;
-            }
-        };
+        HTTPProtocol mockHttp = new TestHttpProtocol(response);
 
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
         DefaultQuery query = new DefaultQuery(GEOS_ARCHSITES.FEATURETYPENAME);
 
         try {
-            protocolHandler.getFeatureHits(query);
+            wfs.getFeatureHits(query);
             fail("Expected IOException if the server returned an exception report");
         } catch (IOException e) {
             // make sure the error message propagates
@@ -678,27 +678,106 @@ public class WFS_1_1_0_ProtocolTest {
         final TestHttpResponse response = new TestHttpResponse("text/xml; subtype=gml/3.1.1",
                 "UTF-8", responseContent);
 
-        HTTPProtocol mockHttp = new DefaultHTTPProtocol() {
-            @Override
-            public HTTPResponse issueGet(final URL baseUrl, final Map<String, String> kvp)
-                    throws IOException {
-                return response;
-            }
-        };
+        HTTPProtocol mockHttp = new TestHttpProtocol(response);
 
-        createProtocolHandler(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
         DefaultQuery query = new DefaultQuery(GEOS_ARCHSITES.FEATURETYPENAME);
 
-        int featureHits = protocolHandler.getFeatureHits(query);
+        int featureHits = wfs.getFeatureHits(query);
         assertEquals(-1, featureHits);
     }
 
     /**
      * Test method for {@link WFS_1_1_0_Protocol#getFeature(Query, String, HttpMethod)} .
+     * 
+     * @throws IOException
      */
-    // @Test
-    public void testGetFeature_GET() {
-        fail("Not yet implemented");
+    @Test
+    public void testGetFeature_GET() throws IOException {
+        final InputStream responseContent = TestData.openStream(this, GEOS_ARCHSITES.DATA);
+
+        final TestHttpResponse httpResponse;
+        final String defaultWfs11OutputFormat = "text/xml; subtype=gml/3.1.1";
+        httpResponse = new TestHttpResponse(defaultWfs11OutputFormat, "UTF-16", responseContent);
+
+        TestHttpProtocol mockHttp = new TestHttpProtocol(httpResponse);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
+
+        DefaultQuery query = new DefaultQuery(GEOS_ARCHSITES.FEATURETYPENAME);
+
+        WFSResponse response;
+        response = wfs.getFeatureGET(query, defaultWfs11OutputFormat);
+
+        assertNotNull(response);
+        assertEquals(defaultWfs11OutputFormat, response.getContentType());
+        assertNotNull(response.getInputStream());
+        assertEquals(Charset.forName("UTF-16"), response.getCharacterEncoding());
+
+        URL baseUrl = mockHttp.issueGetBaseUrl;
+        Map<String, String> kvp = mockHttp.issueGetKvp;
+        assertNotNull(baseUrl);
+        assertNotNull(kvp);
+        assertEquals("http://localhost:8080/geoserver/wfs?", baseUrl.toExternalForm());
+        assertEquals("WFS", kvp.get("SERVICE"));
+        assertEquals("1.1.0", kvp.get("VERSION"));
+        assertEquals("GetFeature", kvp.get("REQUEST"));
+        assertEquals(GEOS_ARCHSITES.FEATURETYPENAME, kvp.get("TYPENAME"));
+        assertEquals(defaultWfs11OutputFormat, kvp.get("OUTPUTFORMAT"));
+        assertNull(kvp.get("PROPERTYNAME"));
+        assertNull(kvp.get("MAXFEATURES"));
+        assertNull(kvp.get("SRSNAME"));
+        assertNull(kvp.get("FEATUREID"));
+        assertNull(kvp.get("FILTER"));
     }
 
+    @Test
+    public void testGetFeature_GET_OptionalParameters() throws Exception {
+        final InputStream responseContent = TestData.openStream(this, GEOS_ARCHSITES.DATA);
+
+        final TestHttpResponse httpResponse;
+        final String defaultWfs11OutputFormat = "text/xml; subtype=gml/3.1.1";
+        httpResponse = new TestHttpResponse(defaultWfs11OutputFormat, "UTF-16", responseContent);
+
+        TestHttpProtocol mockHttp = new TestHttpProtocol(httpResponse);
+        createTestProtocol(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
+
+        DefaultQuery query = new DefaultQuery(GEOS_ARCHSITES.FEATURETYPENAME);
+        query.setMaxFeatures(1000);
+        query.setPropertyNames(new String[]{"cat", "the_geom"});
+        query.setCoordinateSystem(CRS.decode("EPSG:23030"));
+
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        Filter filter = ff.id(Collections.singleton(ff.featureId("archsites.1")));
+        query.setFilter(filter);
+
+        WFSResponse response;
+        response = wfs.getFeatureGET(query, defaultWfs11OutputFormat);
+        assertNotNull(response);
+
+        Map<String, String> kvp = mockHttp.issueGetKvp;
+        assertEquals("1000", kvp.get("MAXFEATURES"));
+
+        String propertyName = kvp.get("PROPERTYNAME");
+        assertEquals("cat,the_geom", propertyName);
+
+        String srsName = kvp.get("SRSNAME");
+        assertEquals("EPSG:23030", srsName);
+
+        assertEquals("archsites.1", kvp.get("FEATUREID"));
+        assertNull("FEATUREID and FILTER are mutually exclusive", kvp.get("FILTER"));
+
+        // now try with a non feature id filter
+        filter = ff.equals(ff.property("cat"), ff.literal(1));
+        query.setFilter(filter);
+        response = wfs.getFeatureGET(query, defaultWfs11OutputFormat);
+        kvp = mockHttp.issueGetKvp;
+
+        assertNull("FEATUREID and FILTER are mutually exclusive", kvp.get("FEATUREID"));
+
+        String encodedFilter = kvp.get("FILTER");
+        assertNotNull(encodedFilter);
+        Parser filterParser = new Parser(wfs.filterConfig);
+        Filter parsed = (Filter) filterParser.parse(new StringReader(encodedFilter));
+        assertTrue(parsed instanceof PropertyIsEqualTo);
+    }
 }

@@ -80,6 +80,8 @@ import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
 import org.geotools.data.wfs.protocol.wfs.Version;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
+import org.geotools.data.wfs.v1_1_0.parsers.EmfAppSchemaParser;
+import org.geotools.data.wfs.v1_1_0.parsers.XmlSimpleFeatureParser;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.v1_1.OGC;
@@ -120,7 +122,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * requests.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: WFS110ProtocolHandler.java 31731 2008-10-29 13:51:20Z groldan $
+ * @version $Id: WFS110ProtocolHandler.java 31792 2008-11-06 19:17:35Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0
@@ -641,7 +643,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         URL describeFeatureTypeURL = getDescribeFeatureTypeURLGet(typeName);
         GetFeatureParser parser;
         if (this.usePullParser) {
-            parser = new XmlSimpleFeatureParser(responseStream, name, contentType);
+            parser = new XmlSimpleFeatureParser(responseStream, contentType, name);
         } else {
             parser = new StreamingParserFeatureReader(configuration, responseStream, name,
                     describeFeatureTypeURL);

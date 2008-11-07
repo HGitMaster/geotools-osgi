@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author dblasby
  * @author simone giannecchini  * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCacheItem.java $
  */
-public final class LabelCacheItem implements Comparable {
+public class LabelCacheItem implements Comparable {
 	TextStyle2D textStyle;
 	List geoms=new ArrayList();
 	double priority = 0.0;

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -216,26 +217,32 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                         getDataStore().ensureAssociationTablesExist(cx);
 
                         //check for an association
-                        String sql = getDataStore().selectRelationshipSQL(tableName, name);
+                        Statement st = null;
+                        ResultSet relationships = null;
+                        if ( getDataStore().getSQLDialect() instanceof PreparedStatementSQLDialect ) {
+                            st = getDataStore().selectRelationshipSQLPS(tableName, name, cx);
+                            relationships = ((PreparedStatement)st).executeQuery();
+                        }
+                        else {
+                            String sql = getDataStore().selectRelationshipSQL(tableName, name);
+                            getDataStore().getLogger().fine(sql);
+                            
+                            st = cx.createStatement();
+                            relationships = st.executeQuery(sql);
+                        }
 
-                        Statement st = cx.createStatement();
+                       try {
+                            if (relationships.next()) {
+                                //found, create a special mapping 
+                                tb.add(name, Association.class);
 
-                        try {
-                            ResultSet relationships = st.executeQuery(sql);
-
-                            try {
-                                if (relationships.next()) {
-                                    //found, create a special mapping 
-                                    tb.add(name, Association.class);
-
-                                    continue;
-                                }
-                            } finally {
-                                getDataStore().closeSafe(relationships);
+                                continue;
                             }
                         } finally {
+                            getDataStore().closeSafe(relationships);
                             getDataStore().closeSafe(st);
                         }
+                        
                     }
 
                     //figure out the type mapping
@@ -482,7 +489,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         
         SQLDialect dialect = getDataStore().getSQLDialect();
-        if ( dialect.isUsingPreparedStatements() ) {
+        if ( dialect instanceof PreparedStatementSQLDialect ) {
             try {
                 PreparedStatement ps = 
                     getDataStore().selectSQLPS(querySchema, preFilter, query.getSortBy(), cx);
@@ -531,7 +538,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         try {
             //check for insert only
             if ( (flags | WRITER_ADD) == WRITER_ADD ) {
-                if ( getDataStore().getSQLDialect().isUsingPreparedStatements() ) {
+                if ( getDataStore().getSQLDialect() instanceof PreparedStatementSQLDialect ) {
                     PreparedStatement ps = getDataStore().selectSQLPS(getSchema(), Filter.EXCLUDE, query.getSortBy(), cx);
                     return new JDBCInsertFeatureWriter( ps, cx, this, query.getHints() );
                 }
@@ -551,7 +558,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
             postFilter = split[1];
             
             // build up a statement for the content
-            if(getDataStore().getSQLDialect().isUsingPreparedStatements()) {
+            if(getDataStore().getSQLDialect() instanceof PreparedStatementSQLDialect) {
                 PreparedStatement ps = getDataStore().selectSQLPS(getSchema(), preFilter, query.getSortBy(), cx);
                 if ( (flags | WRITER_UPDATE) == WRITER_UPDATE ) {
                     writer = new JDBCUpdateFeatureWriter(ps, cx, this, query.getHints() );

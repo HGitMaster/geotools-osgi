@@ -647,8 +647,20 @@ public class Encoder {
                             logger.warning( "Iterator returned null for " + element.getName() );
                         }
                         
-                        //add the next object to be encoded to the stack
-                        encoded.push(new EncodingEntry(next, element,entry));
+                        //here we check for instanceof EncoderDelegate
+                        if ( next instanceof EncoderDelegate ) {
+                            //do not add entry to the stack, just delegate to encode
+                            try {
+                                ((EncoderDelegate) next).encode(handler);
+                            } 
+                            catch (Exception e) {
+                                throw new RuntimeException( e );
+                            }
+                        }
+                        else {
+                            //add the next object to be encoded to the stack
+                            encoded.push(new EncodingEntry(next, element,entry));                            
+                        }
                     } else {
                         //this child is done, remove from child list
                         entry.children.remove(0);

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WfsFactoryImpl.java 30823 2008-06-26 22:01:56Z jdeolive $
+ * $Id: WfsFactoryImpl.java 31806 2008-11-07 21:28:00Z groldan $
  */
 package net.opengis.wfs.impl;
 
@@ -30,6 +30,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
+import org.opengis.filter.capability.FilterCapabilities;
 import org.opengis.filter.expression.Function;
 
 import org.opengis.filter.identity.FeatureId;
@@ -138,6 +139,8 @@ public class WfsFactoryImpl extends EFactoryImpl implements WfsFactory {
                 return createServiceTypeFromString(eDataType, initialValue);
             case WfsPackage.FILTER:
                 return createFilterFromString(eDataType, initialValue);
+            case WfsPackage.FILTER_CAPABILITIES:
+                return createFilterCapabilitiesFromString(eDataType, initialValue);
             case WfsPackage.QNAME:
                 return createQNameFromString(eDataType, initialValue);
             case WfsPackage.CALENDAR:
@@ -184,6 +187,8 @@ public class WfsFactoryImpl extends EFactoryImpl implements WfsFactory {
                 return convertServiceTypeToString(eDataType, instanceValue);
             case WfsPackage.FILTER:
                 return convertFilterToString(eDataType, instanceValue);
+            case WfsPackage.FILTER_CAPABILITIES:
+                return convertFilterCapabilitiesToString(eDataType, instanceValue);
             case WfsPackage.QNAME:
                 return convertQNameToString(eDataType, instanceValue);
             case WfsPackage.CALENDAR:
@@ -678,6 +683,24 @@ public class WfsFactoryImpl extends EFactoryImpl implements WfsFactory {
     }
 
 	/**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public FilterCapabilities createFilterCapabilitiesFromString(EDataType eDataType, String initialValue) {
+        return (FilterCapabilities)super.createFromString(eDataType, initialValue);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public String convertFilterCapabilitiesToString(EDataType eDataType, Object instanceValue) {
+        return super.convertToString(eDataType, instanceValue);
+    }
+
+    /**
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated

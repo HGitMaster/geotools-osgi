@@ -29,7 +29,7 @@ import org.geotools.jdbc.SQLDialect;
  */
 public class MySQLDataStoreFactory extends JDBCDataStoreFactory {
     protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
-        return new MySQLDialect(dataStore);
+        return new MySQLDialectPrepared(dataStore);
     }
 
     public String getDisplayName() {

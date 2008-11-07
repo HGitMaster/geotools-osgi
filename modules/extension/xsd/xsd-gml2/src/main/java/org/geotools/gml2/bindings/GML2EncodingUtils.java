@@ -19,13 +19,21 @@ package org.geotools.gml2.bindings;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
+import org.geotools.gml2.GML;
 import org.geotools.metadata.iso.citation.Citations;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -198,6 +206,56 @@ public class GML2EncodingUtils {
             Map userData = (Map) g.getUserData();
 
             return (String) userData.get(metadata);
+        }
+
+        return null;
+    }
+    
+    public static Element AbstractFeatureType_encode(Object object, Document document, Element value) {
+        SimpleFeature feature = (SimpleFeature) object;
+        SimpleFeatureType featureType = feature.getFeatureType();
+
+        String namespace = featureType.getName().getNamespaceURI();
+        String typeName = featureType.getTypeName();
+
+        Element encoding = document.createElementNS(namespace, typeName);
+        encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getID());
+
+        return encoding;
+    }
+
+    public static Object AbstractFeatureType_getProperty(Object object,
+            QName name) {
+      //JD: here we only handle the "GML" attributes, all the application 
+        // schema attributes are handled by FeaturePropertyExtractor
+
+        //JD: TODO: handle all properties here and kill FeautrePropertyExtractor
+        SimpleFeature feature = (SimpleFeature) object;
+
+        if (GML.name.equals(name)) {
+            return feature.getAttribute("name");
+        }
+
+        if (GML.description.equals(name)) {
+            return feature.getAttribute("description");
+        }
+
+        if (GML.location.equals(name)) {
+            return feature.getAttribute("location");
+        }
+
+        if (GML.boundedBy.equals(name)) {
+            BoundingBox bounds = feature.getBounds();
+
+            if (bounds.isEmpty()) {
+                //do a check for the case where the feature has no geometry 
+                // properties
+                if (feature.getDefaultGeometry() == null) {
+                    return null;
+                }
+            }
+
+            return feature.getBounds();
         }
 
         return null;

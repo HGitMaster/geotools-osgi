@@ -32,6 +32,7 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
+import org.geotools.data.wfs.v1_1_0.parsers.EmfAppSchemaParser;
 import org.geotools.referencing.CRS;
 import org.geotools.test.TestData;
 import org.geotools.wfs.WFSConfiguration;

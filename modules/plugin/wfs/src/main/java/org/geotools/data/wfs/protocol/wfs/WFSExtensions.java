@@ -1,47 +1,86 @@
 package org.geotools.data.wfs.protocol.wfs;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
-import org.geotools.data.wfs.WFSResponseParserFactory;
-import org.geotools.factory.FactoryCreator;
+import javax.imageio.spi.ServiceRegistry;
+
+import net.opengis.wfs.BaseRequestType;
+
+import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.factory.FactoryNotFoundException;
-import org.geotools.factory.FactoryRegistry;
 
+@SuppressWarnings("nls")
 public class WFSExtensions {
     /**
      * The service registry for this manager. Will be initialized only when first needed.
      */
-    private static FactoryRegistry registry;
+    private static Set<WFSResponseParserFactory> registry;
 
-    public static WFSResponseParser findParser( WFSResponse response ) {
-        FactoryRegistry serviceRegistry = getServiceRegistry();
+    /**
+     * Processes the result of a WFS operation and returns the parsed object.
+     * <p>
+     * The result can either be:
+     * <ul>
+     * <li>a {@link WFSException} exception if the WFS response was an exception report
+     * <li>a {@link GetFeatureParser} if the WFS returned a FeatureCollection
+     * </p>
+     * 
+     * @param request the WFS request that originated the given response
+     * @param response the handle to the WFS response contents
+     * @return
+     * @throws IOException 
+     */
+    public static Object process( WFS_1_1_0_DataStore wfs, WFSResponse response ) throws IOException {
+
+        BaseRequestType originatingRequest = response.getOriginatingRequest();
+        WFSResponseParserFactory pf = findParserFactory(originatingRequest);
+
+        WFSResponseParser parser = pf.createParser(wfs, response);
+
+        Object result = parser.parse(wfs, response);
+        return result;
+    }
+
+    /**
+     * @param requestType
+     * @param outputFormat
+     * @return
+     * @throws FactoryNotFoundException
+     */
+    public static WFSResponseParserFactory findParserFactory( BaseRequestType request ) {
         Iterator<WFSResponseParserFactory> serviceProviders;
-        serviceProviders = serviceRegistry.getServiceProviders(WFSResponseParserFactory.class,
-                false);
+        serviceProviders = getServiceProviders();
 
         WFSResponseParserFactory factory;
         while( serviceProviders.hasNext() ) {
             factory = serviceProviders.next();
             if (factory.isAvailable()) {
-                if (factory.canProcess(response)) {
-                    WFSResponseParser parser = factory.createParser(response);
-                    return parser;
+                if (factory.canProcess(request)) {
+                    return factory;
                 }
             }
         }
-        throw new FactoryNotFoundException("Can't find a response parser factory for " + response);
+        throw new FactoryNotFoundException("Can't find a response parser factory for " + request);
     }
 
-    /**
-     * Returns the service registry. The registry will be created the first time this method is
-     * invoked.
-     */
-    private static synchronized FactoryRegistry getServiceRegistry() {
+    private static Iterator<WFSResponseParserFactory> getServiceProviders() {
         if (registry == null) {
-            registry = new FactoryCreator(Arrays
-                    .asList(new Class< ? >[]{WFSResponseParserFactory.class}));
+            synchronized (WFSExtensions.class) {
+                if (registry == null) {
+                    Iterator<WFSResponseParserFactory> providers;
+                    providers = ServiceRegistry.lookupProviders(WFSResponseParserFactory.class);
+                    registry = new HashSet<WFSResponseParserFactory>();
+                    while( providers.hasNext() ) {
+                        WFSResponseParserFactory provider = providers.next();
+                        registry.add(provider);
+                    }
+                }
+            }
         }
-        return registry;
+        return registry.iterator();
     }
+
 }

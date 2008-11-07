@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WFSCapabilitiesTypeImpl.java 29859 2008-04-09 04:42:44Z jdeolive $
+ * $Id: WFSCapabilitiesTypeImpl.java 31806 2008-11-07 21:28:00Z groldan $
  */
 package net.opengis.wfs.impl;
 
@@ -20,6 +20,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.opengis.filter.capability.FilterCapabilities;
 
 /**
  * <!-- begin-user-doc -->
@@ -76,7 +77,7 @@ public class WFSCapabilitiesTypeImpl extends CapabilitiesBaseTypeImpl implements
      * @generated
      * @ordered
      */
-	protected static final Object FILTER_CAPABILITIES_EDEFAULT = null;
+	protected static final FilterCapabilities FILTER_CAPABILITIES_EDEFAULT = null;
 
 	/**
      * The cached value of the '{@link #getFilterCapabilities() <em>Filter Capabilities</em>}' attribute.
@@ -86,7 +87,7 @@ public class WFSCapabilitiesTypeImpl extends CapabilitiesBaseTypeImpl implements
      * @generated
      * @ordered
      */
-	protected Object filterCapabilities = FILTER_CAPABILITIES_EDEFAULT;
+	protected FilterCapabilities filterCapabilities = FILTER_CAPABILITIES_EDEFAULT;
 
 	/**
      * <!-- begin-user-doc -->
@@ -240,23 +241,23 @@ public class WFSCapabilitiesTypeImpl extends CapabilitiesBaseTypeImpl implements
 	 * <!-- end-user-doc -->
      * @generated
      */
-	public Object getFilterCapabilities() {
+	public FilterCapabilities getFilterCapabilities() {
         return filterCapabilities;
     }
 
 	/**
      * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+     * <!-- end-user-doc -->
      * @generated
      */
-	public void setFilterCapabilities(Object newFilterCapabilities) {
-        Object oldFilterCapabilities = filterCapabilities;
+    public void setFilterCapabilities(FilterCapabilities newFilterCapabilities) {
+        FilterCapabilities oldFilterCapabilities = filterCapabilities;
         filterCapabilities = newFilterCapabilities;
         if (eNotificationRequired())
             eNotify(new ENotificationImpl(this, Notification.SET, WfsPackage.WFS_CAPABILITIES_TYPE__FILTER_CAPABILITIES, oldFilterCapabilities, filterCapabilities));
     }
 
-	/**
+    /**
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
@@ -309,7 +310,7 @@ public class WFSCapabilitiesTypeImpl extends CapabilitiesBaseTypeImpl implements
                 setSupportsGMLObjectTypeList((GMLObjectTypeListType)newValue);
                 return;
             case WfsPackage.WFS_CAPABILITIES_TYPE__FILTER_CAPABILITIES:
-                setFilterCapabilities(newValue);
+                setFilterCapabilities((FilterCapabilities)newValue);
                 return;
         }
         super.eSet(featureID, newValue);

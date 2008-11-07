@@ -314,7 +314,6 @@
 				<ogc:SpatialOperator name="Touches" />
 				<ogc:SpatialOperator name="Crosses" />
 				<ogc:SpatialOperator name="Contains" />
-				<ogc:SpatialOperator name="Overlaps" />
 				<ogc:SpatialOperator name="BBOX" />
 			</ogc:SpatialOperators>
 		</ogc:Spatial_Capabilities>
