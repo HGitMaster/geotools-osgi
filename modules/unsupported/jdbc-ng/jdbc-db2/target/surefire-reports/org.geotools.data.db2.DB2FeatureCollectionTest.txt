@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: org.geotools.data.db2.DB2FeatureCollectionTest
--------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.597 sec
