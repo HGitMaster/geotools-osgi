@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WfsPackageImpl.java 31719 2008-10-24 22:55:22Z groldan $
+ * $Id: WfsPackageImpl.java 31806 2008-11-07 21:28:00Z groldan $
  */
 package net.opengis.wfs.impl;
 
@@ -72,6 +72,7 @@ import org.geotools.feature.FeatureCollection;
 
 import org.opengis.filter.Filter;
 
+import org.opengis.filter.capability.FilterCapabilities;
 import org.opengis.filter.expression.Function;
 
 import org.opengis.filter.identity.FeatureId;
@@ -380,6 +381,13 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
 	private EDataType filterEDataType = null;
 
 	/**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    private EDataType filterCapabilitiesEDataType = null;
+
+    /**
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
@@ -2203,6 +2211,15 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
 
 	/**
      * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EDataType getFilterCapabilities() {
+        return filterCapabilitiesEDataType;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
      */
@@ -2553,6 +2570,7 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
         // Create data types
         serviceTypeEDataType = createEDataType(SERVICE_TYPE);
         filterEDataType = createEDataType(FILTER);
+        filterCapabilitiesEDataType = createEDataType(FILTER_CAPABILITIES);
         qNameEDataType = createEDataType(QNAME);
         calendarEDataType = createEDataType(CALENDAR);
         featureCollectionEDataType = createEDataType(FEATURE_COLLECTION);
@@ -2760,7 +2778,7 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
 
         initEClass(outputFormatListTypeEClass, OutputFormatListType.class, "OutputFormatListType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getOutputFormatListType_Group(), theEcorePackage.getEFeatureMapEntry(), "group", null, 0, -1, OutputFormatListType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-        initEAttribute(getOutputFormatListType_Format(), theXMLTypePackage.getString(), "format", null, 1, -1, OutputFormatListType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+        initEAttribute(getOutputFormatListType_Format(), theXMLTypePackage.getAnyURI(), "format", null, 1, -1, OutputFormatListType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
         initEClass(propertyTypeEClass, PropertyType.class, "PropertyType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getPropertyType_Name(), this.getQName(), "name", null, 0, 1, PropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2814,7 +2832,7 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
         initEReference(getWFSCapabilitiesType_FeatureTypeList(), this.getFeatureTypeListType(), null, "featureTypeList", null, 0, 1, WFSCapabilitiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
         initEReference(getWFSCapabilitiesType_ServesGMLObjectTypeList(), this.getGMLObjectTypeListType(), null, "servesGMLObjectTypeList", null, 0, 1, WFSCapabilitiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
         initEReference(getWFSCapabilitiesType_SupportsGMLObjectTypeList(), this.getGMLObjectTypeListType(), null, "supportsGMLObjectTypeList", null, 0, 1, WFSCapabilitiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-        initEAttribute(getWFSCapabilitiesType_FilterCapabilities(), theXMLTypePackage.getAnySimpleType(), "filterCapabilities", null, 1, 1, WFSCapabilitiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEAttribute(getWFSCapabilitiesType_FilterCapabilities(), this.getFilterCapabilities(), "filterCapabilities", null, 1, 1, WFSCapabilitiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
         initEClass(xlinkPropertyNameTypeEClass, XlinkPropertyNameType.class, "XlinkPropertyNameType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getXlinkPropertyNameType_Value(), theXMLTypePackage.getString(), "value", null, 0, 1, XlinkPropertyNameType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2846,6 +2864,7 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
         // Initialize data types
         initEDataType(serviceTypeEDataType, String.class, "ServiceType", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
         initEDataType(filterEDataType, Filter.class, "Filter", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
+        initEDataType(filterCapabilitiesEDataType, FilterCapabilities.class, "FilterCapabilities", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
         initEDataType(qNameEDataType, QName.class, "QName", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
         initEDataType(calendarEDataType, Calendar.class, "Calendar", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
         initEDataType(featureCollectionEDataType, FeatureCollection.class, "FeatureCollection", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
