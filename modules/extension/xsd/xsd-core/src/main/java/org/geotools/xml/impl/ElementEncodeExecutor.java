@@ -68,6 +68,10 @@ public class ElementEncodeExecutor implements BindingWalker.Visitor {
     }
 
     public void visit(Binding binding) {
+        if( object == null ) {
+            throw new RuntimeException( "Unable to encode " + element.getName() + ", value is null.");
+        }
+        
         //ensure that the type of the object being encoded matches the type 
         // of the binding
         if (binding.getType() == null) {
@@ -77,7 +81,7 @@ public class ElementEncodeExecutor implements BindingWalker.Visitor {
 
             return;
         }
-
+        
         if (!binding.getType().isAssignableFrom(object.getClass())) {
             //try to convert 
             Object converted = Converters.convert(object, binding.getType());

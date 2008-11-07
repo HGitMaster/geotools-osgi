@@ -89,4 +89,18 @@ public class MLEnvelopeTypeBinding extends AbstractComplexBinding {
 
         return new Envelope(from, to, date, subject, headers);
     }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        Envelope e = (Envelope) object;
+        
+        if ( "From".equals( name.getLocalPart() ) ) {
+            return e.getFrom();
+        }
+        if ( "To".equals( name.getLocalPart() ) ) {
+            return e.getTo();
+        }
+
+        return null;
+    }
 }

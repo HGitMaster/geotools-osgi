@@ -324,16 +324,39 @@ public class EMFUtils {
      * @param factory The factory used to create the clone.
      *
      * @return THe cloned object, with all properties the same to the original.
+     * @deprecated use {@link #clone(EObject, EFactory, boolean)}.
      */
     public static EObject clone(EObject prototype, EFactory factory) {
+        return clone( prototype, factory, false );
+    }
+    
+    /**
+     * Clones an eobject, with the option of performing a deep clone in which referenced eobjects
+     * are also cloned.
+     *
+     * @param prototype The object to be cloned from.
+     * @param factory The factory used to create the clone.
+     * @param deep Flag indicating wether to perform a deep clone.
+     *
+     * @return THe cloned object, with all properties the same to the original.
+     */
+    public static EObject clone(EObject prototype, EFactory factory, boolean deep) {
         EObject clone = factory.create(prototype.eClass());
 
         for (Iterator i = clone.eClass().getEStructuralFeatures().iterator(); i.hasNext();) {
             EStructuralFeature feature = (EStructuralFeature) i.next();
-            clone.eSet(feature, prototype.eGet(feature));
+            Object value = prototype.eGet(feature);
+            if ( deep && value instanceof EObject ) {
+                EObject evalue = (EObject) value;
+                //recursively call
+                //TODO:handle cycles in reference graph
+                value = clone(  evalue, evalue.eClass().getEPackage().getEFactoryInstance(), deep );
+            }
+            
+            clone.eSet(feature, value );    
         }
 
-        return clone;
+        return clone; 
     }
 
     /**
