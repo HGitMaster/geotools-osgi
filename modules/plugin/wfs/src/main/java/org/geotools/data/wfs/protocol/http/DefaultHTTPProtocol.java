@@ -17,6 +17,8 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.geotools.util.logging.Logging;
@@ -80,6 +82,19 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
                 headerValue = header.getValue();
             }
             return headerValue;
+        }
+
+        /**
+         * @see HTTPResponse#getTargetUrl() 
+         */
+        public String getTargetUrl() {
+            try {
+                URI uri = method.getURI();
+                return uri.toString();
+            } catch (URIException e) {
+                LOGGER.log(Level.FINE, "can't get HTTP request URI", e);
+            }
+            return null;
         }
 
         public String toString() {
@@ -235,7 +250,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("Executing HTTP GET request: " + uri);
         }
-        //TODO: remove this
+        // TODO: remove this
         System.err.println("Executing HTTP GET request: " + uri);
         try {
             statusCode = client.executeMethod(request);

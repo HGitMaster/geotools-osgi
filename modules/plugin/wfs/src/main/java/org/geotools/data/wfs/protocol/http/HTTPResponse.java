@@ -5,6 +5,8 @@ import java.io.InputStream;
 
 public interface HTTPResponse {
 
+    public String getTargetUrl();
+
     public InputStream getResponseStream() throws IOException;
 
     public String getResponseHeader( String headerName );

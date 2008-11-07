@@ -257,6 +257,10 @@ public final class DataTestSupport {
         public String getResponseHeader( String headerName ) {
             return null;
         }
+
+        public String getTargetUrl() {
+            return null;
+        }
     }
 
 }

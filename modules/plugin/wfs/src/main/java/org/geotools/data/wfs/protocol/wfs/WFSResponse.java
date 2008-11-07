@@ -20,13 +20,16 @@ public class WFSResponse {
 
     private BaseRequestType request;
 
+    private String targetUrl;
+
     /**
      * @param charset the response charset, {@code null} if unknown, utf-8 will be assumed then
      * @param contentType the response content type
      * @param in the response input stream ready to be consumed
      */
-    public WFSResponse( BaseRequestType originatingRequest, Charset charset, String contentType,
-            InputStream in ) {
+    public WFSResponse( String targetUrl, BaseRequestType originatingRequest, Charset charset,
+            String contentType, InputStream in ) {
+        this.targetUrl = targetUrl;
         this.request = originatingRequest;
         if (charset == null) {
             this.charset = Charset.forName("UTF-8");
@@ -79,6 +82,10 @@ public class WFSResponse {
 
     public BaseRequestType getOriginatingRequest() {
         return request;
+    }
+
+    public String getTargetUrl() {
+        return targetUrl;
     }
 
     @Override

@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,7 @@ import org.geotools.data.wfs.protocol.wfs.WFSResponse;
 import org.geotools.data.wfs.v1_1_0.DataTestSupport.TestHttpProtocol;
 import org.geotools.data.wfs.v1_1_0.DataTestSupport.TestHttpResponse;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.v1_0.OGCConfiguration;
+import org.geotools.filter.Capabilities;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -56,6 +57,11 @@ import org.junit.Test;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.filter.capability.GeometryOperand;
+import org.opengis.filter.capability.SpatialCapabilities;
+import org.opengis.filter.capability.SpatialOperator;
+import org.opengis.filter.capability.SpatialOperators;
 
 /**
  * Unit test suite for {@link WFS_1_1_0_Protocol}
@@ -299,14 +305,32 @@ public class WFS_1_1_0_ProtocolTest {
     @Test
     public void testGetFilterCapabilities() throws IOException {
         createTestProtocol(GEOS_ARCHSITES.CAPABILITIES);
-        try {
-            wfs.getFilterCapabilities();
-            fail("expected 'not yet implemented'... he");
-        } catch (UnsupportedOperationException e) {
-            assertTrue(true);
-            System.out
-                    .println("testGetFilterCapabilities(): Remember to implement getFilterCapabilities()!!!");
-        }
+        FilterCapabilities filterCapabilities = wfs.getFilterCapabilities();
+        assertNotNull(filterCapabilities);
+
+        SpatialCapabilities spatialCapabilities = filterCapabilities.getSpatialCapabilities();
+        Collection<GeometryOperand> geometryOperands = spatialCapabilities.getGeometryOperands();
+        assertEquals(4, geometryOperands.size());
+        assertTrue(geometryOperands.contains(GeometryOperand.Envelope));
+        assertTrue(geometryOperands.contains(GeometryOperand.Point));
+        assertTrue(geometryOperands.contains(GeometryOperand.LineString));
+        assertTrue(geometryOperands.contains(GeometryOperand.Polygon));
+
+        SpatialOperators spatialOperators = spatialCapabilities.getSpatialOperators();
+        Collection<SpatialOperator> operators = spatialOperators.getOperators();
+        assertEquals(9, operators.size());
+        assertNotNull(spatialOperators.getOperator("Disjoint"));
+        assertNotNull(spatialOperators.getOperator("Equals"));
+        assertNotNull(spatialOperators.getOperator("DWithin"));
+        assertNotNull(spatialOperators.getOperator("Beyond"));
+        assertNotNull(spatialOperators.getOperator("Intersects"));
+        assertNotNull(spatialOperators.getOperator("Touches"));
+        assertNotNull(spatialOperators.getOperator("Crosses"));
+        assertNotNull(spatialOperators.getOperator("Contains"));
+        assertNotNull(spatialOperators.getOperator("BBOX"));
+
+        //intentionally removed from the test caps doc
+        assertNull(spatialOperators.getOperator("Overlaps"));
     }
 
     /**
@@ -749,7 +773,7 @@ public class WFS_1_1_0_ProtocolTest {
         kvp = mockHttp.issueGetKvp;
 
         assertNull("FEATUREID and FILTER are mutually exclusive", kvp.get("FEATUREID"));
-        
+
         String encodedFilter = kvp.get("FILTER");
         assertNotNull(encodedFilter);
         Parser filterParser = new Parser(wfs.filterConfig);

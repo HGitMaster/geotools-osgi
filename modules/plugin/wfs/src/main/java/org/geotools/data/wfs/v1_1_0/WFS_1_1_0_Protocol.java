@@ -53,6 +53,7 @@ import org.geotools.data.wfs.protocol.wfs.Version;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
+import org.geotools.filter.Capabilities;
 import org.geotools.filter.v1_1.OGC;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.bindings.GML2EncodingUtils;
@@ -248,7 +249,9 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @see WFSProtocol#getFilterCapabilities()
      */
     public FilterCapabilities getFilterCapabilities() {
-        throw new UnsupportedOperationException("not yet implemented");
+        FilterCapabilities wfsFilterCapabilities;
+        wfsFilterCapabilities = capabilities.getFilterCapabilities();
+        return wfsFilterCapabilities;
     }
 
     /**
@@ -442,7 +445,8 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         }
         URL url = getOperationURL(WFSOperationType.GET_FEATURE, false);
         Map<String, String> getFeatureKvp = buildGetFeatureParametersForGet(request);
-        System.out.println(" > getFeatureGET: Request url: " + url + ". Parameters: " + getFeatureKvp);
+        System.out.println(" > getFeatureGET: Request url: " + url + ". Parameters: "
+                + getFeatureKvp);
         WFSResponse response = issueGetRequest(request, url, getFeatureKvp);
 
         return response;
@@ -570,7 +574,8 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         Charset charset = responseCharset == null ? null : Charset.forName(responseCharset);
         String contentType = httpResponse.getContentType();
         InputStream responseStream = httpResponse.getResponseStream();
-        response = new WFSResponse(request, charset, contentType, responseStream);
+        String target = httpResponse.getTargetUrl();
+        response = new WFSResponse(target, request, charset, contentType, responseStream);
         return response;
     }
 
