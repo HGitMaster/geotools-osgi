@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 31668 2008-10-16 10:13:18Z aaime $
+        Version: $Id: pom.xml 31811 2008-11-09 23:16:15Z jgarnett $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -151,12 +151,10 @@
          <module>gml</module>    
          <module>gpx</module>
          <module>jdbc-ng</module>
-         <module>mappane</module>
          <module>mif</module>
          <module>mysql</module>
          <module>oracle-spatial</module>
          <module>postgis-versioned</module>
-         <module>repository</module>
          <module>temporal</module>
          <module>tiger</module>
          <module>vpf</module>
@@ -167,6 +165,8 @@
 
   <modules>
     <module>ogc</module>
+    <module>repository</module>
+    <module>mappane</module>
   </modules>
 
 </project>
