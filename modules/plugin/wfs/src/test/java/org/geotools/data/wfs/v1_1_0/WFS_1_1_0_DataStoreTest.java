@@ -44,7 +44,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Unit test suite for {@link WFS_1_1_0_DataStore}
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStoreTest.java 31769 2008-11-05 15:21:49Z groldan $
+ * @version $Id: WFS_1_1_0_DataStoreTest.java 31817 2008-11-10 22:21:18Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/test/java/org/geotools/data
@@ -69,7 +69,7 @@ public class WFS_1_1_0_DataStoreTest {
 
         createTestProtocol(CUBEWERX_GOVUNITCE.CAPABILITIES);
 
-        WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs);
+        WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs, new DefaultWFSStrategy());
 
         String[] typeNames = ds.getTypeNames();
         assertNotNull(typeNames);
@@ -95,7 +95,7 @@ public class WFS_1_1_0_DataStoreTest {
         URL describeUrl = TestData.getResource(this, CUBEWERX_GOVUNITCE.SCHEMA);
         wfs.setDescribeFeatureTypeURLOverride(describeUrl);
 
-        WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs);
+        WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs, new DefaultWFSStrategy());
 
         try {
             ds.getSchema("nonExistentTypeName");
@@ -120,7 +120,7 @@ public class WFS_1_1_0_DataStoreTest {
         URL describeUrl = TestData.getResource(this, CUBEWERX_GOVUNITCE.SCHEMA);
         wfs.setDescribeFeatureTypeURLOverride(describeUrl);
 
-        WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs);
+        WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs, new DefaultWFSStrategy());
         DefaultQuery query = new DefaultQuery(CUBEWERX_GOVUNITCE.FEATURETYPENAME);
         FeatureReader<SimpleFeatureType, SimpleFeature> featureReader;
         featureReader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);

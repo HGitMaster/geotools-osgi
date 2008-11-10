@@ -74,10 +74,11 @@ public interface WFSProtocol {
      * declared for the feature type specifically in the FeatureTypeList section of the capabilities
      * document for the given feature type
      * 
-     * @param typeName the feature type name for which to return the supported output formats
+     * @param typeName
+     *            the feature type name for which to return the supported output formats
      * @return the output formats supported by {@code typeName}
      */
-    public Set<String> getSupportedOutputFormats( final String typeName );
+    public Set<String> getSupportedOutputFormats(final String typeName);
 
     /**
      * Returns the set of type names as extracted from the capabilities document, including the
@@ -95,11 +96,13 @@ public interface WFSProtocol {
      * is known to be {@code prefix:localName}.
      * </p>
      * 
-     * @param typeName the prefixed type name to get the full name for
+     * @param typeName
+     *            the prefixed type name to get the full name for
      * @return the full name of the given feature type
-     * @throws IllegalArgumentException if the {@code typeName} does not exist
+     * @throws IllegalArgumentException
+     *             if the {@code typeName} does not exist
      */
-    public QName getFeatureTypeName( final String typeName );
+    public QName getFeatureTypeName(final String typeName);
 
     /**
      * Returns the parsed version of the FilterCapabilities section in the capabilities document
@@ -112,84 +115,94 @@ public interface WFSProtocol {
     /**
      * Returns whether the service supports the given operation for the given HTTP method.
      * 
-     * @param operation the operation to check if the server supports
-     * @param method the HTTP method to check if the server supports for the given operation
+     * @param operation
+     *            the operation to check if the server supports
+     * @param method
+     *            the HTTP method to check if the server supports for the given operation
      * @return {@code true} if the operation/method is supported as stated in the WFS capabilities
      */
-    public boolean supportsOperation( final WFSOperationType operation, final boolean post );
+    public boolean supportsOperation(final WFSOperationType operation, final boolean post);
 
     /**
      * Returns the URL for the given operation name and HTTP protocol as stated in the WFS
      * capabilities.
      * 
-     * @param operation the name of the WFS operation
-     * @param method the HTTP method
+     * @param operation
+     *            the name of the WFS operation
+     * @param method
+     *            the HTTP method
      * @return The URL access point for the given operation and method or {@code null} if the
      *         capabilities does not declare an access point for the operation/method combination
      * @see #supportsOperation(WFSOperationType, HttpMethod)
      */
-    public URL getOperationURL( final WFSOperationType operation, final boolean post );
+    public URL getOperationURL(final WFSOperationType operation, final boolean post);
 
     /**
      * Returns the title of the given feature type as declared in the corresponding FeatureType
      * element in the capabilities document.
      * 
-     * @param typeName the featuretype name as declared in the FeatureType/Name element of the WFS
-     *        capabilities
+     * @param typeName
+     *            the featuretype name as declared in the FeatureType/Name element of the WFS
+     *            capabilities
      * @return the title for the given feature type
      */
-    public String getFeatureTypeTitle( final String typeName );
+    public String getFeatureTypeTitle(final String typeName);
 
     /**
      * Returns the abstract of the given feature type as declared in the corresponding FeatureType
      * element in the capabilities document.
      * 
-     * @param typeName the featuretype name as declared in the FeatureType/Name element of the WFS
-     *        capabilities
+     * @param typeName
+     *            the featuretype name as declared in the FeatureType/Name element of the WFS
+     *            capabilities
      * @return the abstract for the given feature type
      */
-    public String getFeatureTypeAbstract( final String typeName );
+    public String getFeatureTypeAbstract(final String typeName);
 
     /**
      * Returns the lat lon envelope of the given feature type as declared in the corresponding
      * FeatureType element in the capabilities document.
      * 
-     * @param typeName the featuretype name as declared in the FeatureType/Name element of the WFS
-     *        capabilities
+     * @param typeName
+     *            the featuretype name as declared in the FeatureType/Name element of the WFS
+     *            capabilities
      * @return a WGS84 envelope representing the bounds declared for the feature type in the
      *         capabilities document
      */
-    public ReferencedEnvelope getFeatureTypeWGS84Bounds( final String typeName );
+    public ReferencedEnvelope getFeatureTypeWGS84Bounds(final String typeName);
 
     /**
      * Returns the CRS identifier of the default CRS for the given feature type as declared in the
      * corresponding FeatureType element in the capabilities document.
      * 
-     * @param typeName the featuretype name as declared in the FeatureType/Name element of the WFS
-     *        capabilities
+     * @param typeName
+     *            the featuretype name as declared in the FeatureType/Name element of the WFS
+     *            capabilities
      * @return the default CRS for the given feature type
      */
-    public String getDefaultCRS( final String typeName );
+    public String getDefaultCRS(final String typeName);
 
     /**
      * Returns the union of the default CRS and the other supported CRS's of the given feature type
      * as declared in the corresponding FeatureType element in the capabilities document.
      * 
-     * @param typeName the featuretype name as declared in the FeatureType/Name element of the WFS
-     *        capabilities
+     * @param typeName
+     *            the featuretype name as declared in the FeatureType/Name element of the WFS
+     *            capabilities
      * @return the list of supported CRS identifiers for the given feature type
      */
-    public Set<String> getSupportedCRSIdentifiers( final String typeName );
+    public Set<String> getSupportedCRSIdentifiers(final String typeName);
 
     /**
      * Returns the list of keywords of the given feature type as declared in the corresponding
      * FeatureType element in the capabilities document.
      * 
-     * @param typeName the featuretype name as declared in the FeatureType/Name element of the WFS
-     *        capabilities
+     * @param typeName
+     *            the featuretype name as declared in the FeatureType/Name element of the WFS
+     *            capabilities
      * @return the keywords for the given feature type
      */
-    public Set<String> getFeatureTypeKeywords( final String typeName );
+    public Set<String> getFeatureTypeKeywords(final String typeName);
 
     /**
      * Returns the http GET request to get the gml schema for the given type name
@@ -197,12 +210,12 @@ public interface WFSProtocol {
      * @param typeName
      * @return
      */
-    public URL getDescribeFeatureTypeURLGet( final String typeName );
+    public URL getDescribeFeatureTypeURLGet(final String typeName);
 
-    public WFSResponse describeFeatureTypeGET( final String typeName, final String outputFormat )
+    public WFSResponse describeFeatureTypeGET(final String typeName, final String outputFormat)
             throws IOException, UnsupportedOperationException;
 
-    public WFSResponse describeFeatureTypePOST( final String typeName, final String outputFormat )
+    public WFSResponse describeFeatureTypePOST(final String typeName, final String outputFormat)
             throws IOException, UnsupportedOperationException;
 
     /**
@@ -214,12 +227,13 @@ public interface WFSProtocol {
      * type.
      * </p>
      * 
-     * @param request the request to send to the WFS, as is.
+     * @param request
+     *            the request to send to the WFS, as is.
      * @return
      * @throws IOException
      * @throws UnsupportedOperationException
      */
-    public WFSResponse getFeatureGET( final GetFeatureType request ) throws IOException,
+    public WFSResponse getFeatureGET(final GetFeatureType request) throws IOException,
             UnsupportedOperationException;
 
     /**
@@ -229,7 +243,7 @@ public interface WFSProtocol {
      * {@link #getFeatureGET(Query, String)}
      * </p>
      */
-    public WFSResponse getFeaturePOST( GetFeatureType request ) throws IOException,
+    public WFSResponse getFeaturePOST(GetFeatureType request) throws IOException,
             UnsupportedOperationException;
 
     /**
@@ -254,9 +268,10 @@ public interface WFSProtocol {
      * 
      * @return the number of features returned by a getfeature request with resultType=hits or
      *         {@code -1} if not supported.
-     * @throws IOException if a communication error occurs with the WFS
+     * @throws IOException
+     *             if a communication error occurs with the WFS
      */
-    public int getFeatureHits( final Query query ) throws IOException;
+    public int getFeatureHits(final Query query) throws IOException;
 
     /**
      * Returns the protocol default output format name for the WFS version the implementation talks.
@@ -264,5 +279,7 @@ public interface WFSProtocol {
      * @return the default output format name for the GetFeature operation for the protocol version
      */
     public String getDefaultOutputFormat();
+
+    public void dispose();
 
 }

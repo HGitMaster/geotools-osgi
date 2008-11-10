@@ -47,6 +47,9 @@ import org.geotools.data.wfs.protocol.wfs.Version;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.data.wfs.v1_0_0.WFS100ProtocolHandler;
 import org.geotools.data.wfs.v1_0_0.WFS_1_0_0_DataStore;
+import org.geotools.data.wfs.v1_1_0.CubeWerxStrategy;
+import org.geotools.data.wfs.v1_1_0.DefaultWFSStrategy;
+import org.geotools.data.wfs.v1_1_0.WFSStrategy;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_Protocol;
 import org.geotools.util.logging.Logging;
@@ -56,6 +59,7 @@ import org.geotools.wfs.protocol.DefaultConnectionFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -69,7 +73,7 @@ import org.xml.sax.SAXException;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
  *         /data/wfs/WFSDataStoreFactory.java $
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings( { "unchecked", "nls" })
 public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     private static final Logger logger = Logging.getLogger("org.geotools.data.wfs");
 
@@ -77,7 +81,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31792 2008-11-06 19:17:35Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31817 2008-11-10 22:21:18Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -93,7 +97,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
          * @param type
          * @param description
          */
-        public WFSFactoryParam( String key, Class type, String description ) {
+        public WFSFactoryParam(String key, Class type, String description) {
             super(key, type, description, true);
         }
 
@@ -105,12 +109,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
          * @param description
          * @param required
          */
-        public WFSFactoryParam( String key, Class type, String description, T defaultValue ) {
+        public WFSFactoryParam(String key, Class type, String description, T defaultValue) {
             super(key, type, description, false);
             this.defaultValue = defaultValue;
         }
 
-        public T lookUp( final Map params ) throws IOException {
+        public T lookUp(final Map params) throws IOException {
             T parameter = (T) super.lookUp(params);
             return parameter == null ? defaultValue : parameter;
         }
@@ -275,7 +279,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * 
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
      */
-    public WFSDataStore createDataStore( final Map params ) throws IOException {
+    public WFSDataStore createDataStore(final Map params) throws IOException {
         if (perParameterSetDataStoreCache.containsKey(params)) {
             return perParameterSetDataStoreCache.get(params);
         }
@@ -302,44 +306,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
         final byte[] wfsCapabilitiesRawData = loadCapabilities(getCapabilitiesRequest,
                 connectionFac);
-        Element rootElement;
-        {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(wfsCapabilitiesRawData);
-            rootElement = parseCapabilities(inputStream);
-
-            String localName = rootElement.getLocalName();
-            String namespace = rootElement.getNamespaceURI();
-            if (!WFS.NAMESPACE.equals(namespace)
-                    || !WFS.WFS_Capabilities.getLocalPart().equals(localName)) {
-                if ("http://www.opengis.net/ows".equals(namespace)
-                        && "ExceptionReport".equals(localName)) {
-                    StringBuffer message = new StringBuffer();
-                    Element exception = (Element) rootElement.getElementsByTagNameNS("*",
-                            "Exception").item(0);
-                    if (exception == null) {
-                        throw new DataSourceException(
-                                "Exception Report when requesting capabilities");
-                    }
-                    Node exceptionCode = exception.getAttributes().getNamedItem("exceptionCode");
-                    Node locator = exception.getAttributes().getNamedItem("locator");
-                    Node exceptionText = exception.getElementsByTagNameNS("*", "ExceptionText")
-                            .item(0);
-
-                    message.append("Exception Report ");
-                    String text = exceptionText.getTextContent();
-                    if (text != null) {
-                        message.append(text.trim());
-                    }
-                    message.append(" Exception Code:");
-                    message.append(exceptionCode.getTextContent());
-                    message.append(" Locator: ");
-                    message.append(locator.getTextContent());
-                    throw new DataSourceException(message.toString());
-                }
-                throw new DataSourceException("Expected " + WFS.WFS_Capabilities + " but was "
-                        + namespace + "#" + localName);
-            }
-        }
+        final Document capsDoc = parseCapabilities(wfsCapabilitiesRawData);
+        final Element rootElement = capsDoc.getDocumentElement();
 
         final String capsVersion = rootElement.getAttribute("version");
         final Version version = Version.find(capsVersion);
@@ -374,7 +342,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             // protocolHandler.setUsePullParser(usePullParser.booleanValue());
             // ///////////////////////////////////
 
-            dataStore = new WFS_1_1_0_DataStore(wfs);
+            WFSStrategy strategy = determineCorrectStrategy(capsDoc);
+            dataStore = new WFS_1_1_0_DataStore(wfs, strategy);
             dataStore.setMaxFeatures(maxFeatures);
         }
 
@@ -382,13 +351,78 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         return dataStore;
     }
 
+    private static Document parseCapabilities(final byte[] wfsCapabilitiesRawData)
+            throws IOException, DataSourceException {
+        Document capsDoc;
+        {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(wfsCapabilitiesRawData);
+            capsDoc = parseCapabilities(inputStream);
+            Element root = capsDoc.getDocumentElement();
+            String localName = root.getLocalName();
+            String namespace = root.getNamespaceURI();
+            if (!WFS.NAMESPACE.equals(namespace)
+                    || !WFS.WFS_Capabilities.getLocalPart().equals(localName)) {
+                if ("http://www.opengis.net/ows".equals(namespace)
+                        && "ExceptionReport".equals(localName)) {
+                    StringBuffer message = new StringBuffer();
+                    Element exception = (Element) capsDoc.getElementsByTagNameNS("*", "Exception")
+                            .item(0);
+                    if (exception == null) {
+                        throw new DataSourceException(
+                                "Exception Report when requesting capabilities");
+                    }
+                    Node exceptionCode = exception.getAttributes().getNamedItem("exceptionCode");
+                    Node locator = exception.getAttributes().getNamedItem("locator");
+                    Node exceptionText = exception.getElementsByTagNameNS("*", "ExceptionText")
+                            .item(0);
+
+                    message.append("Exception Report ");
+                    String text = exceptionText.getTextContent();
+                    if (text != null) {
+                        message.append(text.trim());
+                    }
+                    message.append(" Exception Code:");
+                    message.append(exceptionCode.getTextContent());
+                    message.append(" Locator: ");
+                    message.append(locator.getTextContent());
+                    throw new DataSourceException(message.toString());
+                }
+                throw new DataSourceException("Expected " + WFS.WFS_Capabilities + " but was "
+                        + namespace + "#" + localName);
+            }
+        }
+        return capsDoc;
+    }
+
+    static WFSStrategy determineCorrectStrategy(Document capabilitiesDoc) {
+        WFSStrategy strategy = null;
+        NodeList childNodes = capabilitiesDoc.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node child = childNodes.item(i);
+            if (child.getNodeType() == Node.COMMENT_NODE) {
+                String nodeValue = child.getNodeValue();
+                nodeValue = nodeValue.toLowerCase();
+                if (nodeValue.contains("cubewerx")) {
+                    strategy = new CubeWerxStrategy();
+                }
+            }
+        }
+
+        if (strategy == null) {
+            strategy = new DefaultWFSStrategy();
+        }
+        logger.info("Using WFS Strategy: " + strategy.getClass().getName());
+        return strategy;
+    }
+
     /**
      * Unsupported operation, can't create a WFS service.
      * 
-     * @throws UnsupportedOperationException always, as this operation is not applicable to WFS.
+     * @throws UnsupportedOperationException
+     *             always, as this operation is not applicable to WFS.
      * @see org.geotools.data.DataStoreFactorySpi#createNewDataStore(java.util.Map)
      */
-    public DataStore createNewDataStore( final Map params ) throws IOException {
+    public DataStore createNewDataStore(final Map params) throws IOException {
         throw new UnsupportedOperationException("Operation not applicable to a WFS service");
     }
 
@@ -431,10 +465,11 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * Availability of the other optional parameters is not checked for existence.
      * </p>
      * 
-     * @param params non null map of datastore parameters.
+     * @param params
+     *            non null map of datastore parameters.
      * @see org.geotools.data.DataStoreFactorySpi#canProcess(java.util.Map)
      */
-    public boolean canProcess( final Map params ) {
+    public boolean canProcess(final Map params) {
         if (params == null) {
             throw new NullPointerException("params");
         }
@@ -480,11 +515,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * is <b>discarded</b>.
      * </p>
      * 
-     * @param host non null URL from which to construct the WFS {@code GetCapabilities} request by
-     *        discarding the query string, if any, and appending the propper query string.
+     * @param host
+     *            non null URL from which to construct the WFS {@code GetCapabilities} request by
+     *            discarding the query string, if any, and appending the propper query string.
      * @return
      */
-    public static URL createGetCapabilitiesRequest( URL host, Version version ) {
+    public static URL createGetCapabilitiesRequest(URL host, Version version) {
         if (host == null) {
             throw new NullPointerException("null url");
         }
@@ -519,11 +555,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * VERSION=1.1.0 parameter in the GetCapabilities request meanwhile.
      * </p>
      * 
-     * @param host non null URL pointing either to a base WFS service access point, or to a full
-     *        {@code GetCapabilities} request.
+     * @param host
+     *            non null URL pointing either to a base WFS service access point, or to a full
+     *            {@code GetCapabilities} request.
      * @return
      */
-    public static URL createGetCapabilitiesRequest( final URL host ) {
+    public static URL createGetCapabilitiesRequest(final URL host) {
         if (host == null) {
             throw new NullPointerException("url");
         }
@@ -541,7 +578,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
             Map<String, String> params = new HashMap<String, String>();
             String[] split = queryString.split("&");
-            for( String kvp : split ) {
+            for (String kvp : split) {
                 int index = kvp.indexOf('=');
                 String key = index > 0 ? kvp.substring(0, index) : kvp;
                 String value = index > 0 ? kvp.substring(index + 1) : null;
@@ -571,7 +608,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @return
      * @throws IOException
      */
-    byte[] loadCapabilities( final URL capabilitiesUrl, final ConnectionFactory connectionFac )
+    byte[] loadCapabilities(final URL capabilitiesUrl, final ConnectionFactory connectionFac)
             throws IOException {
         byte[] wfsCapabilitiesRawData;
 
@@ -581,16 +618,15 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buff = new byte[1024];
         int readCount;
-        while( (readCount = inputStream.read(buff)) != -1 ) {
+        while ((readCount = inputStream.read(buff)) != -1) {
             out.write(buff, 0, readCount);
         }
         wfsCapabilitiesRawData = out.toByteArray();
         return wfsCapabilitiesRawData;
     }
 
-    private Element parseCapabilities( ByteArrayInputStream inputStream ) throws IOException,
+    static Document parseCapabilities(InputStream inputStream) throws IOException,
             DataSourceException {
-        Element rootElement;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder documentBuilder;
@@ -605,7 +641,6 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         } catch (SAXException e) {
             throw new DataSourceException("Error parsing capabilities document", e);
         }
-        rootElement = document.getDocumentElement();
-        return rootElement;
+        return document;
     }
 }

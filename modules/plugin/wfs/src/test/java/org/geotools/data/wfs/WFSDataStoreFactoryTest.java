@@ -16,6 +16,7 @@
  */
 package org.geotools.data.wfs;
 
+import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,32 +30,37 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.wfs.v1_1_0.CubeWerxStrategy;
+import org.geotools.data.wfs.v1_1_0.DefaultWFSStrategy;
+import org.geotools.data.wfs.v1_1_0.WFSStrategy;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.test.TestData;
 import org.geotools.wfs.protocol.ConnectionFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-public class WFSDataStoreFactoryTest extends TestCase {
+public class WFSDataStoreFactoryTest {
 
     private WFSDataStoreFactory dsf;
 
     private Map<String, Serializable> params;
 
-    public WFSDataStoreFactoryTest( String name ) {
-        super(name);
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         dsf = new WFSDataStoreFactory();
         params = new HashMap<String, Serializable>();
     }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         dsf = null;
         params = null;
     }
 
+    @Test
     public void testCanProcess() {
         // URL not set
         assertFalse(dsf.canProcess(params));
@@ -70,6 +76,27 @@ public class WFSDataStoreFactoryTest extends TestCase {
         assertTrue(dsf.canProcess(params));
     }
 
+    @SuppressWarnings("nls")
+    @Test
+    public void testDetermineWFS1_1_0_Strategy() throws IOException {
+        InputStream in;
+        Document capabilitiesDoc;
+        WFSStrategy strategy;
+
+        in = TestData.openStream(this, "geoserver_capabilities_1_1_0.xml");
+        capabilitiesDoc = WFSDataStoreFactory.parseCapabilities(in);
+        strategy = WFSDataStoreFactory.determineCorrectStrategy(capabilitiesDoc);
+        assertNotNull(strategy);
+        assertEquals(DefaultWFSStrategy.class, strategy.getClass());
+
+        in = TestData.openStream(this, "cubewerx_capabilities_1_1_0.xml");
+        capabilitiesDoc = WFSDataStoreFactory.parseCapabilities(in);
+        strategy = WFSDataStoreFactory.determineCorrectStrategy(capabilitiesDoc);
+        assertNotNull(strategy);
+        assertEquals(CubeWerxStrategy.class, strategy.getClass());
+    }
+
+    @Test
     public void testCreateDataStoreWFS_1_1_0() throws IOException {
         String capabilitiesFile;
         capabilitiesFile = "geoserver_capabilities_1_1_0.xml";
@@ -79,17 +106,17 @@ public class WFSDataStoreFactoryTest extends TestCase {
         testCreateDataStore_WFS_1_1_0(capabilitiesFile);
     }
 
-    private void testCreateDataStore_WFS_1_1_0( final String capabilitiesFile ) throws IOException {
+    private void testCreateDataStore_WFS_1_1_0(final String capabilitiesFile) throws IOException {
         // override caps loading not to set up an http connection at all but to
         // load the test file
-        final WFSDataStoreFactory dsf = new WFSDataStoreFactory(){
+        final WFSDataStoreFactory dsf = new WFSDataStoreFactory() {
             @Override
-            byte[] loadCapabilities( final URL capabilitiesUrl,
-                    final ConnectionFactory connectionFac ) throws IOException {
+            byte[] loadCapabilities(final URL capabilitiesUrl, final ConnectionFactory connectionFac)
+                    throws IOException {
                 InputStream in = capabilitiesUrl.openStream();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 int aByte;
-                while( (aByte = in.read()) != -1 ) {
+                while ((aByte = in.read()) != -1) {
                     out.write(aByte);
                 }
                 return out.toByteArray();
@@ -107,6 +134,7 @@ public class WFSDataStoreFactoryTest extends TestCase {
     }
 
     @SuppressWarnings("nls")
+    @Test
     public void testCreateCapabilities() throws MalformedURLException, UnsupportedEncodingException {
         final String parametrizedUrl = "https://excise.pyr.ec.gc.ca:8081/cgi-bin/mapserv.exe?map=/LocalApps/Mapsurfer/PYRWQMP.map&service=WFS&version=1.0.0&request=GetCapabilities";
         URL url = WFSDataStoreFactory.createGetCapabilitiesRequest(new URL(parametrizedUrl));
@@ -121,7 +149,7 @@ public class WFSDataStoreFactoryTest extends TestCase {
 
         Map<String, String> kvpMap = new HashMap<String, String>();
         String[] kvpPairs = query.split("&");
-        for( String kvp : kvpPairs ) {
+        for (String kvp : kvpPairs) {
             assertTrue(kvp.indexOf('=') > 0);
             String[] split = kvp.split("=");
             String param = split[0];
