@@ -23,6 +23,12 @@ import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+/**
+ * @author Gabriel Roldan
+ * @version $Id: GeometryTypeProxy.java 31815 2008-11-10 07:53:14Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/GeometryTypeProxy.java $
+ * @since 2.4
+ */
 class GeometryTypeProxy extends AttributeTypeProxy implements GeometryType {
 
     public GeometryTypeProxy(final Name typeName, final Map registry) {

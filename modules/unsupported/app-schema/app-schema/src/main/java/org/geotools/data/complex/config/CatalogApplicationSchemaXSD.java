@@ -1,5 +1,3 @@
-package org.geotools.data.complex.config;
-
 /*
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
@@ -17,12 +15,19 @@ package org.geotools.data.complex.config;
  *    Lesser General Public License for more details.
  */
 
+package org.geotools.data.complex.config;
+
 import org.apache.xml.resolver.Catalog;
 import org.geotools.gml3.ApplicationSchemaXSD;
 import org.geotools.xml.SchemaLocationResolver;
 
 /**
  * Schema with support for resolution in OASIS catalog.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: CatalogApplicationSchemaXSD.java 31815 2008-11-10 07:53:14Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/CatalogApplicationSchemaXSD.java $
+ * @since 2.6
  */
 public class CatalogApplicationSchemaXSD extends ApplicationSchemaXSD {
 

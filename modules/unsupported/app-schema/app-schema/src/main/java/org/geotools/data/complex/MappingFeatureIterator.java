@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -48,6 +47,8 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -70,15 +71,13 @@ import com.vividsolutions.jts.geom.Geometry;
  * feature of the source type.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: MappingFeatureIterator.java 31784 2008-11-06 06:20:21Z bencd $
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: MappingFeatureIterator.java 31815 2008-11-10 07:53:14Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/AbstractMappingFeatureIterator.java $
  * @since 2.4
  */
 public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterator<Feature> {
-
-    private static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(MappingFeatureIterator.class.getPackage().getName());
 
     /**
      * The mappings for the source and target schemas
@@ -95,19 +94,18 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
      */
     protected FeatureFactory attf;
 
-    protected FeatureCollection features;
+    protected FeatureCollection<SimpleFeatureType, SimpleFeature> sourceFeatures;
 
-    protected Iterator sourceFeatures;
+    /**
+     * Hold on to iterator to allow features to be streamed.
+     */
+    protected Iterator<SimpleFeature> sourceFeatureIterator;
 
     protected AppSchemaDataAccess store;
-
-    protected FeatureSource featureSource;
 
     final protected XPath xpathAttributeBuilder;
 
     protected FilterFactory namespaceAwareFilterFactory;
-
-    // this(store, mapping, query, new AttributeFactoryImpl());
 
     /**
      * maxFeatures restriction value as provided by query
@@ -133,12 +131,10 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         this.store = store;
         this.attf = new AppSchemaFeatureFactoryImpl();
         Name name = mapping.getTargetFeature().getName();
-        this.featureSource = store.getFeatureSource(name);
 
-        List attributeMappings = mapping.getAttributeMappings();
+        List<AttributeMapping> attributeMappings = mapping.getAttributeMappings();
 
-        for (Iterator it = attributeMappings.iterator(); it.hasNext();) {
-            AttributeMapping attMapping = (AttributeMapping) it.next();
+        for (AttributeMapping attMapping : attributeMappings) {
             StepList targetXPath = attMapping.getTargetXPath();
             if (targetXPath.size() > 1) {
                 continue;
@@ -161,11 +157,11 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         Query unrolledQuery = getUnrolledQuery(query);
         Filter filter = unrolledQuery.getFilter();
 
-        FeatureSource mappedSource = mapping.getSource();
+        FeatureSource<SimpleFeatureType, SimpleFeature> mappedSource = mapping.getSource();
 
-        features = (FeatureCollection) mappedSource.getFeatures(filter);
+        sourceFeatures = mappedSource.getFeatures(filter);
 
-        this.sourceFeatures = features.iterator();
+        this.sourceFeatureIterator = sourceFeatures.iterator();
 
         xpathAttributeBuilder = new XPath();
         xpathAttributeBuilder.setFeatureFactory(attf);
@@ -187,10 +183,10 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
      * Closes the underlying FeatureIterator
      */
     public void close() {
-        if (features != null && sourceFeatures != null) {
-            features.close(sourceFeatures);
+        if (sourceFeatures != null && sourceFeatureIterator != null) {
+            sourceFeatures.close(sourceFeatureIterator);
+            sourceFeatureIterator = null;
             sourceFeatures = null;
-            features = null;
         }
     }
 
@@ -251,26 +247,31 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
             id = extractIdForAttribute(attMapping.getIdentifierExpression(), source);
         }
         Attribute instance = xpathAttributeBuilder.set(target, xpath, value, id, targetNodeType);
-        Map clientPropsMappings = attMapping.getClientProperties();
+        Map<Name, Expression> clientPropsMappings = attMapping.getClientProperties();
         setClientProperties(instance, source, clientPropsMappings);
     }
 
     private void setClientProperties(final Attribute target, final Object source,
-            final Map clientProperties) {
+            final Map<Name, Expression> clientProperties) {
         if (clientProperties.size() == 0) {
             return;
         }
-        final Map targetAttributes = new HashMap();
-        for (Iterator it = clientProperties.entrySet().iterator(); it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
-            org.opengis.feature.type.Name propName = (org.opengis.feature.type.Name) entry.getKey();
-            Expression propExpr = (Expression) entry.getValue();
+        final Map<Name, Object> targetAttributes = new HashMap<Name, Object>();
+        for (Map.Entry<Name, Expression> entry : clientProperties.entrySet()) {
+            Name propName = entry.getKey();
+            Expression propExpr = entry.getValue();
             Object propValue = getValue(propExpr, source);
             targetAttributes.put(propName, propValue);
         }
+        // FIXME should set a child Property
         target.getUserData().put(Attributes.class, targetAttributes);
     }
 
+    /**
+     * Return next feature.
+     * 
+     * @see java.util.Iterator#next()
+     */
     public Feature next() {
         try {
             return computeNext();
@@ -280,8 +281,14 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         }
     }
 
+    /**
+     * Return true if there are more features.  
+     * 
+     * @see java.util.Iterator#hasNext()
+     */
     public boolean hasNext() {
-        return featureCounter < maxFeatures && sourceFeatures != null && sourceFeatures.hasNext();
+        return featureCounter < maxFeatures && sourceFeatureIterator != null
+                && sourceFeatureIterator.hasNext();
     }
 
     /**
@@ -296,16 +303,15 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
     }
 
     private Feature computeNext() throws IOException {
-        ComplexAttribute sourceInstance = (ComplexAttribute) sourceFeatures.next();
+        ComplexAttribute sourceInstance = (ComplexAttribute) sourceFeatureIterator.next();
         final AttributeDescriptor targetNode = mapping.getTargetFeature();
         final Name targetNodeName = targetNode.getName();
-        final List mappings = mapping.getAttributeMappings();
+        final List<AttributeMapping> mappings = mapping.getAttributeMappings();
         String id = extractIdForFeature(sourceInstance);
         AttributeBuilder builder = new AttributeBuilder(attf);
         builder.setDescriptor(targetNode);
         Feature target = (Feature) builder.build(id);
-        for (Iterator itr = mappings.iterator(); itr.hasNext();) {
-            AttributeMapping attMapping = (AttributeMapping) itr.next();
+        for (AttributeMapping attMapping : mappings) {
             StepList targetXpathProperty = attMapping.getTargetXPath();
             if (targetXpathProperty.size() == 1) {
                 Step rootStep = (Step) targetXpathProperty.get(0);

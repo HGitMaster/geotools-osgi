@@ -29,6 +29,11 @@ import org.apache.xml.resolver.Catalog;
 
 /**
  * Implementation help for use of OASIS catalog.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: CatalogUtilities.java 31815 2008-11-10 07:53:14Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/CatalogUtilities.java $
+ * @since 2.6
  */
 public class CatalogUtilities {
 

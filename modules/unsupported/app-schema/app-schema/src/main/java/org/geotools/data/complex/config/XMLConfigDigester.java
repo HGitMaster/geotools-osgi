@@ -27,13 +27,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.digester.Digester;
+import org.geotools.data.complex.AppSchemaDataAccessFactory;
 import org.xml.sax.SAXException;
 
 /**
- * DOCUMENT ME!
+ * Digester to consume the app-schema {@link AppSchemaDataAccessFactory} configuration file.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XMLConfigDigester.java 31784 2008-11-06 06:20:21Z bencd $
+ * @version $Id: XMLConfigDigester.java 31815 2008-11-10 07:53:14Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/XMLConfigDigester.java $
  * @since 2.4

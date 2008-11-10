@@ -40,7 +40,7 @@ import org.opengis.feature.type.FeatureType;
  * Instead, we're directly using DataAccessFactory
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessFactory.java 31784 2008-11-06 06:20:21Z bencd $
+ * @version $Id: AppSchemaDataAccessFactory.java 31815 2008-11-10 07:53:14Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/ComplexDataStoreFactory.java $
  * @since 2.4
@@ -58,7 +58,7 @@ public class AppSchemaDataAccessFactory implements DataAccessFactory {
     }
 
     public DataAccess<FeatureType, Feature> createDataStore(Map params) throws IOException {
-        Set/* <FeatureTypeMapping> */mappings;
+        Set<FeatureTypeMapping> mappings;
         AppSchemaDataAccess dataStore;
 
         URL configFileUrl = (URL) AppSchemaDataAccessFactory.URL.lookUp(params);

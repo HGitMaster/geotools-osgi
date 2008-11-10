@@ -1,3 +1,20 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2004-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package org.geotools.data.complex;
 
 import java.io.IOException;
@@ -16,6 +33,14 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.util.ProgressListener;
 
+/**
+ * {@link FeatureCollection} for a {@link MappingFeatureIterator}.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: MappingFeatureCollection.java 31815 2008-11-10 07:53:14Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureCollection.java $
+ * @since 2.6
+ */
 public class MappingFeatureCollection implements FeatureCollection<FeatureType, Feature> {
 
     private final AppSchemaDataAccess store;
@@ -31,8 +56,8 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
         this.query = query;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Not a supported operation.
      * 
      * @see org.geotools.feature.FeatureCollection#accepts(org.opengis.feature.FeatureVisitor,
      *      org.opengis.util.ProgressListener)
@@ -41,8 +66,8 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
         throw new UnsupportedOperationException();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Not a supported operation.
      * 
      * @see org.geotools.feature.FeatureCollection#add(org.opengis.feature.Feature)
      */
