@@ -29,14 +29,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 public class XmlSimpleFeatureParserTest extends AbstractGetFeatureParserTest {
 
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     @Override
     protected GetFeatureParser getParser(final QName featureName, final String schemaLocation,
             final SimpleFeatureType featureType, final URL getFeaturesRequest) throws IOException {
