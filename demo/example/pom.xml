@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31811 2008-11-09 23:16:15Z jgarnett $              
+        Version: $Id: pom.xml 31814 2008-11-10 01:20:07Z jgarnett $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -116,11 +116,6 @@
       <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-geometry</artifactId>
-      <version>${project.version}</version>
-    </dependency>    
     <!--  GeoTools Extentions -->
     <dependency>
       <groupId>org.geotools</groupId>
@@ -150,6 +145,11 @@
       <artifactId>gt-widgets-swing-pending</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-geometry</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
     -->
   </dependencies>
 
