@@ -1394,7 +1394,7 @@ public class ShapefileRenderer implements GTRenderer {
                 DefaultQuery query = new DefaultQuery(currLayer.getQuery());
                 if( query.getFilter() !=null ){
                     // now reproject the geometries in filter because geoms are retrieved projected to screen space
-                    FilterTransformer transformer= new  FilterTransformer(dataCRS, destinationCrs, mt);
+                    FilterTransformer transformer= new  FilterTransformer(mt);
                     Filter transformedFilter = (Filter) query.getFilter().accept(transformer, null);
                     query.setFilter(transformedFilter);
                 }
