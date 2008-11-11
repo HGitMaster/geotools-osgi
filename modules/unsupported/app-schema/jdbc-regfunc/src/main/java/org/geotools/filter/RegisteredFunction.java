@@ -32,6 +32,11 @@ import java.util.List;
  * <p>
  * 
  * The number of arguments is deduced from the number provided. We hope they match.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: RegisteredFunction.java 31819 2008-11-11 02:31:21Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/jdbc-regfunc/src/main/java/org/geotools/filter/RegisteredFunction.java $
+ * @since 2.4
  */
 public class RegisteredFunction extends FunctionExpressionImpl {
 

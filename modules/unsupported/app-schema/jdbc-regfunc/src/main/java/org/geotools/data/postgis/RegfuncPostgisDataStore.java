@@ -44,6 +44,11 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * <p>
  * 
  * TODO: everything in this class should be pulled up into ancestor classes.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: RegfuncPostgisDataStore.java 31819 2008-11-11 02:31:21Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/jdbc-regfunc/src/main/java/org/geotools/data/postgis/RegfuncPostgisDataStore.java $
+ * @since 2.4
  */
 public class RegfuncPostgisDataStore extends PostgisDataStore {
 
