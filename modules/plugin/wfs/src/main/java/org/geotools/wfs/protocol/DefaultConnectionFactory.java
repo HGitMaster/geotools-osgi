@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import org.geotools.data.wfs.protocol.http.DefaultHTTPProtocol;
 import org.geotools.data.wfs.protocol.http.HttpMethod;
 import org.geotools.util.logging.Logging;
 
@@ -42,6 +43,7 @@ import org.geotools.util.logging.Logging;
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/io/WFSConnectionFactory.java $
+ * @deprecated use {@link DefaultHTTPProtocol}
  */
 public class DefaultConnectionFactory implements ConnectionFactory {
 

@@ -1,3 +1,19 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wfs.v1_1_0;
 
 import java.io.IOException;
@@ -33,6 +49,14 @@ import org.opengis.filter.capability.FilterCapabilities;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+/**
+ * A default strategy for a WFS 1.1.0 implementation that assumes the server sticks to the standard.
+ * 
+ * @author Gabriel Roldan (OpenGeo)
+ * @version $Id: DefaultWFSStrategy.java 31823 2008-11-11 16:11:49Z groldan $
+ * @since 2.6
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/DefaultWFSStrategy.java $
+ */
 @SuppressWarnings("nls")
 public class DefaultWFSStrategy implements WFSStrategy {
 
@@ -74,6 +98,10 @@ public class DefaultWFSStrategy implements WFSStrategy {
     }
 
     /**
+     * Creates the mapping {@link GetFeatureType GetFeature} request for the given {@link Query} and
+     * {@code outputFormat}, and post-processing filter based on the server's stated filter
+     * capabilities.
+     * 
      * @see WFSStrategy#createGetFeatureRequest(WFS_1_1_0_DataStore, WFSProtocol, Query, String)
      */
     @SuppressWarnings("unchecked")

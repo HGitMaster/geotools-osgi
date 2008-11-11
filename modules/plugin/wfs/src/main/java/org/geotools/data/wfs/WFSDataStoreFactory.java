@@ -40,6 +40,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.wfs.protocol.http.DefaultHTTPProtocol;
 import org.geotools.data.wfs.protocol.http.HTTPProtocol;
 import org.geotools.data.wfs.protocol.http.HttpMethod;
@@ -63,8 +65,37 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
+ * A {@link DataStoreFactorySpi} to connect to a Web Feature Service.
  * <p>
- * DOCUMENT ME!
+ * Produces a {@link WFSDataStore} is the correct set of connection parameters are provided. For
+ * instance, the only mandatory one is {@link #URL}.
+ * </p>
+ * <p>
+ * As with all the DataStoreFactorySpi implementations, this one is not intended to be used directly
+ * but through the {@link DataStoreFinder} mechanism, so client application should not have strong
+ * dependencies over this module.
+ * </p>
+ * <p>
+ * Upon a valid URL to a WFS GetCapabilities document, this factory will perform version negotiation
+ * between the server supported protocol versions and this plugin supported ones, and will return a
+ * {@link DataStore} capable of communicating with the server using the agreed WFS protocol version.
+ * </p>
+ * <p>
+ * In the case the provided GetCapabilities URL explicitly contains a VERSION parameter and both the
+ * server and client support that version, that version will be used.
+ * </p>
+ * <p>
+ * That said, for the time being, the current default version is {@code 1.0.0} instead of {@code
+ * 1.1.0}, since the former is the one that supports transactions. When further development provides
+ * transaction support for the WFS 1.1.0 version, propper version negotiation capabilities will be
+ * added.
+ * </p>
+ * <p>
+ * Among feeding the wfs datastore with a {@link WFSProtocol} that can handle the WFS version agreed
+ * upong the server and this client, this factory will try to provide the datastore with a
+ * {@link WFSStrategy} appropriate for the WFS implementation, if that could be somehow guessed.
+ * That is so the datastore itself nor the protocol need to worry about any implementation specific
+ * limitation or deviation from the standard the actual server may have.
  * </p>
  * 
  * @author dzwiers
@@ -72,6 +103,9 @@ import org.xml.sax.SAXException;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
  *         /data/wfs/WFSDataStoreFactory.java $
+ * @see WFSDataStore
+ * @see WFSProtocol
+ * @see WFSStrategy
  */
 @SuppressWarnings( { "unchecked", "nls" })
 public class WFSDataStoreFactory extends AbstractDataStoreFactory {
@@ -81,7 +115,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31817 2008-11-10 22:21:18Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31823 2008-11-11 16:11:49Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -345,6 +379,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             WFSStrategy strategy = determineCorrectStrategy(capsDoc);
             dataStore = new WFS_1_1_0_DataStore(wfs, strategy);
             dataStore.setMaxFeatures(maxFeatures);
+            dataStore.setPreferPostOverGet(protocol);
         }
 
         perParameterSetDataStoreCache.put(new HashMap(params), dataStore);

@@ -1,3 +1,19 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wfs.protocol.wfs;
 
 import java.io.IOException;
@@ -12,6 +28,21 @@ import net.opengis.wfs.BaseRequestType;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.factory.FactoryNotFoundException;
 
+/**
+ * Utility class to look up for a parser that can deal with a given WFS response and process it.
+ * <p>
+ * This class uses the usual GeoTools SPI (Service Provider Interface) mechanism to find out a
+ * {@link WFSResponseParserFactory} for a given {@link WFSResponse}. As such,
+ * {@link WFSResponseParserFactory} implementation may live outside this plugin as long as they're
+ * declared in it's own {code
+ * /META-INF/services/org.geotools.data.wfs.protocol.wfs.WFSResponseParserFactory} text file.
+ * </p>
+ * 
+ * @author Gabriel Roldan (OpenGeo)
+ * @version $Id: WFSExtensions.java 31823 2008-11-11 16:11:49Z groldan $
+ * @since 2.6
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/protocol/wfs/WFSExtensions.java $
+ */
 @SuppressWarnings("nls")
 public class WFSExtensions {
     /**
@@ -28,12 +59,14 @@ public class WFSExtensions {
      * <li>a {@link GetFeatureParser} if the WFS returned a FeatureCollection
      * </p>
      * 
-     * @param request the WFS request that originated the given response
-     * @param response the handle to the WFS response contents
+     * @param request
+     *            the WFS request that originated the given response
+     * @param response
+     *            the handle to the WFS response contents
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
-    public static Object process( WFS_1_1_0_DataStore wfs, WFSResponse response ) throws IOException {
+    public static Object process(WFS_1_1_0_DataStore wfs, WFSResponse response) throws IOException {
 
         BaseRequestType originatingRequest = response.getOriginatingRequest();
         WFSResponseParserFactory pf = findParserFactory(originatingRequest);
@@ -50,12 +83,12 @@ public class WFSExtensions {
      * @return
      * @throws FactoryNotFoundException
      */
-    public static WFSResponseParserFactory findParserFactory( BaseRequestType request ) {
+    public static WFSResponseParserFactory findParserFactory(BaseRequestType request) {
         Iterator<WFSResponseParserFactory> serviceProviders;
         serviceProviders = getServiceProviders();
 
         WFSResponseParserFactory factory;
-        while( serviceProviders.hasNext() ) {
+        while (serviceProviders.hasNext()) {
             factory = serviceProviders.next();
             if (factory.isAvailable()) {
                 if (factory.canProcess(request)) {
@@ -73,7 +106,7 @@ public class WFSExtensions {
                     Iterator<WFSResponseParserFactory> providers;
                     providers = ServiceRegistry.lookupProviders(WFSResponseParserFactory.class);
                     registry = new HashSet<WFSResponseParserFactory>();
-                    while( providers.hasNext() ) {
+                    while (providers.hasNext()) {
                         WFSResponseParserFactory provider = providers.next();
                         registry.add(provider);
                     }

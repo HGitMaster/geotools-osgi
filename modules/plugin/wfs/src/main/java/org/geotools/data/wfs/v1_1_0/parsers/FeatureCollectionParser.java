@@ -1,3 +1,19 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wfs.v1_1_0.parsers;
 
 import java.io.IOException;
@@ -17,9 +33,23 @@ import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeatureType;
 
+/**
+ * A WFS response parser that parses a GetFeature response that did not return an ExceptionReport
+ * and is on GML 3.1 format into a {@link GetFeatureParser} in order to stream the features produced
+ * by the server.
+ * 
+ * @author Gabriel Roldan (OpenGeo)
+ * @version $Id: FeatureCollectionParser.java 31823 2008-11-11 16:11:49Z groldan $
+ * @since 2.6
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/parsers/FeatureCollectionParser.java $
+ * @see Gml31GetFeatureResponseParserFactory
+ */
 public class FeatureCollectionParser implements WFSResponseParser {
 
-    public Object parse( WFS_1_1_0_DataStore wfs, WFSResponse response ) throws IOException {
+    /**
+     * @return a {@link GetFeatureParser} to stream the contents of the GML 3.1 response
+     */
+    public Object parse(WFS_1_1_0_DataStore wfs, WFSResponse response) throws IOException {
 
         GetFeatureType request = (GetFeatureType) response.getOriginatingRequest();
         QueryType queryType = (QueryType) request.getQuery().get(0);

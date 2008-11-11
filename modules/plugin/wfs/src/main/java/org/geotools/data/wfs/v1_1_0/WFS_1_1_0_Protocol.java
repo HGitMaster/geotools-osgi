@@ -1,3 +1,19 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wfs.v1_1_0;
 
 import static org.geotools.data.wfs.protocol.http.HttpMethod.GET;
@@ -53,7 +69,6 @@ import org.geotools.data.wfs.protocol.wfs.Version;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
-import org.geotools.filter.Capabilities;
 import org.geotools.filter.v1_1.OGC;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.bindings.GML2EncodingUtils;
@@ -77,7 +92,9 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * xml-xsd} subsystem for schema assisted parsing and encoding of WFS requests and responses.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @since 2.6.x
+ * @version $Id: WFS_1_1_0_Protocol.java 31823 2008-11-11 16:11:49Z groldan $
+ * @since 2.6
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/WFS_1_1_0_Protocol.java $
  */
 @SuppressWarnings( { "unchecked", "nls" })
 public class WFS_1_1_0_Protocol implements WFSProtocol {
@@ -696,6 +713,10 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         return map;
     }
 
+    /**
+     * Returns a single-line string containing the xml representation of the given filter, as
+     * appropriate for the {@code FILTER} parameter in a GetFeature request.
+     */
     private String encodeGetFeatureGetFilter(final Filter filter) throws IOException {
         Encoder encoder = new Encoder(filterConfig);
         // do not write the xml declaration

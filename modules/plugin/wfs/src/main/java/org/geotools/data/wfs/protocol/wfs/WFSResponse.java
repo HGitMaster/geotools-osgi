@@ -1,3 +1,19 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wfs.protocol.wfs;
 
 import java.io.InputStream;
@@ -9,13 +25,24 @@ import net.opengis.wfs.BaseRequestType;
 
 import org.geotools.util.logging.Logging;
 
+/**
+ * A handle to a WFS response that contains the input stream to the actual contents and some well
+ * known response information derived from the HTTP response headers.
+ * 
+ * @author Gabriel Roldan (OpenGeo)
+ * @version $Id: WFSResponse.java 31823 2008-11-11 16:11:49Z groldan $
+ * @since 2.6
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/protocol/wfs/WFSResponse.java $
+ */
 @SuppressWarnings("nls")
 public class WFSResponse {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs.protocol.wfs");
 
     private Charset charset;
+
     private String contentType;
+
     private InputStream inputStream;
 
     private BaseRequestType request;
@@ -23,12 +50,15 @@ public class WFSResponse {
     private String targetUrl;
 
     /**
-     * @param charset the response charset, {@code null} if unknown, utf-8 will be assumed then
-     * @param contentType the response content type
-     * @param in the response input stream ready to be consumed
+     * @param charset
+     *            the response charset, {@code null} if unknown, utf-8 will be assumed then
+     * @param contentType
+     *            the response content type
+     * @param in
+     *            the response input stream ready to be consumed
      */
-    public WFSResponse( String targetUrl, BaseRequestType originatingRequest, Charset charset,
-            String contentType, InputStream in ) {
+    public WFSResponse(String targetUrl, BaseRequestType originatingRequest, Charset charset,
+            String contentType, InputStream in) {
         this.targetUrl = targetUrl;
         this.request = originatingRequest;
         if (charset == null) {
@@ -76,7 +106,7 @@ public class WFSResponse {
      * 
      * @param in
      */
-    public void setInputStream( InputStream in ) {
+    public void setInputStream(InputStream in) {
         this.inputStream = in;
     }
 

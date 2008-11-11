@@ -37,7 +37,7 @@ import org.geotools.util.logging.Logging;
  * Adapts a WFS capabilities document to {@link ServiceInfo}
  * 
  * @author Gabriel Roldan
- * @version $Id: CapabilitiesServiceInfo.java 31769 2008-11-05 15:21:49Z groldan $
+ * @version $Id: CapabilitiesServiceInfo.java 31823 2008-11-11 16:11:49Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -57,7 +57,7 @@ final class CapabilitiesServiceInfo implements WFSServiceInfo {
 
     private WFS_1_1_0_DataStore wfs;
 
-    public CapabilitiesServiceInfo( WFS_1_1_0_DataStore service ) {
+    public CapabilitiesServiceInfo(WFS_1_1_0_DataStore service) {
         this.wfs = service;
     }
 
@@ -109,12 +109,7 @@ final class CapabilitiesServiceInfo implements WFSServiceInfo {
      * @see ServiceInfo#getSource()
      */
     public URI getSource() {
-        URL url;
-        if (wfs.supportsOperation(GET_CAPABILITIES, false)) {
-            url = wfs.getOperationURL(GET_CAPABILITIES, false);
-        } else {
-            url = wfs.getOperationURL(GET_CAPABILITIES, true);
-        }
+        URL url = wfs.getCapabilitiesURL();
         try {
             return url.toURI();
         } catch (URISyntaxException e) {

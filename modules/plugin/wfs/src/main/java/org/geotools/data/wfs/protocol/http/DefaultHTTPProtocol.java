@@ -1,3 +1,19 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wfs.protocol.http;
 
 import java.io.IOException;
@@ -24,7 +40,12 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.geotools.util.logging.Logging;
 
 /**
- * @author Gabriel Roldan
+ * Default implementation of {@link HTTPProtocol} based on apache's common-http-client
+ * 
+ * @author Gabriel Roldan (OpenGeo)
+ * @version $Id: DefaultHTTPProtocol.java 31823 2008-11-11 16:11:49Z groldan $
+ * @since 2.6
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/protocol/http/DefaultHTTPProtocol.java $
  */
 @SuppressWarnings("nls")
 public class DefaultHTTPProtocol implements HTTPProtocol {
@@ -41,7 +62,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
 
         private HttpMethodBase method;
 
-        public HTTPClientResponse( HttpMethodBase method ) {
+        public HTTPClientResponse(HttpMethodBase method) {
             this.method = method;
         }
 
@@ -75,7 +96,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         /**
          * @see HTTPResponse#getResponseHeader()
          */
-        public String getResponseHeader( String headerName ) {
+        public String getResponseHeader(String headerName) {
             Header header = method.getResponseHeader(headerName);
             String headerValue = null;
             if (header != null) {
@@ -85,7 +106,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         }
 
         /**
-         * @see HTTPResponse#getTargetUrl() 
+         * @see HTTPResponse#getTargetUrl()
          */
         public String getTargetUrl() {
             try {
@@ -107,7 +128,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
             sb.append("\n\tresponse charset=").append(getResponseCharset());
             Header[] responseHeaders = method.getResponseHeaders();
             sb.append("\n\tresponse headers=");
-            for( Header header : responseHeaders ) {
+            for (Header header : responseHeaders) {
                 sb.append(header.toExternalForm());
             }
             sb.append("]");
@@ -116,8 +137,11 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
     }
 
     private boolean tryGzip;
+
     private String authUsername;
+
     private String authPassword;
+
     private int timeoutMillis;
 
     /**
@@ -130,14 +154,14 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
     /**
      * @see HTTPProtocol#setTryGzip(boolean)
      */
-    public void setTryGzip( boolean tryGzip ) {
+    public void setTryGzip(boolean tryGzip) {
         this.tryGzip = tryGzip;
     }
 
     /**
      * @see HTTPProtocol#setAuth(String, String)
      */
-    public void setAuth( String username, String password ) {
+    public void setAuth(String username, String password) {
         this.authUsername = username;
         this.authPassword = password;
     }
@@ -152,27 +176,27 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
     /**
      * @see HTTPProtocol#setTimeoutMillis(int)
      */
-    public void setTimeoutMillis( int milliseconds ) {
+    public void setTimeoutMillis(int milliseconds) {
         this.timeoutMillis = milliseconds;
     }
 
     /**
      * @see HTTPProtocol#createUrl(URL, Map)
      */
-    public URL createUrl( final URL baseUrl, final Map<String, String> queryStringKvp )
+    public URL createUrl(final URL baseUrl, final Map<String, String> queryStringKvp)
             throws MalformedURLException {
         final String finalUrlString = createUri(baseUrl, queryStringKvp);
         URL queryUrl = new URL(finalUrlString);
         return queryUrl;
     }
 
-    private String createUri( final URL baseUrl, final Map<String, String> queryStringKvp ) {
+    private String createUri(final URL baseUrl, final Map<String, String> queryStringKvp) {
         final String query = baseUrl.getQuery();
         Map<String, String> finalKvpMap = new HashMap<String, String>(queryStringKvp);
         if (query != null) {
             Map<String, String> userParams = new CaseInsensitiveMap(queryStringKvp);
             String[] rawUrlKvpSet = query.split("&");
-            for( String rawUrlKvp : rawUrlKvpSet ) {
+            for (String rawUrlKvp : rawUrlKvpSet) {
                 int eqIdx = rawUrlKvp.indexOf('=');
                 String key, value;
                 if (eqIdx > 0) {
@@ -209,7 +233,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
 
         String key, value;
         try {
-            for( Map.Entry<String, String> kvp : finalKvpMap.entrySet() ) {
+            for (Map.Entry<String, String> kvp : finalKvpMap.entrySet()) {
                 key = kvp.getKey();
                 value = kvp.getValue();
                 if (value == null) {
@@ -230,7 +254,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         return finalUrlString;
     }
 
-    public HTTPResponse issueGet( final URL baseUrl, final Map<String, String> kvp )
+    public HTTPResponse issueGet(final URL baseUrl, final Map<String, String> kvp)
             throws IOException {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("About to issue GET request to " + baseUrl.toExternalForm()

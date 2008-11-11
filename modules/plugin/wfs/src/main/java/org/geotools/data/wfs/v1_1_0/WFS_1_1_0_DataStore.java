@@ -16,6 +16,7 @@
  */
 package org.geotools.data.wfs.v1_1_0;
 
+import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.GET_CAPABILITIES;
 import static org.geotools.data.wfs.protocol.wfs.WFSOperationType.GET_FEATURE;
 
 import java.io.IOException;
@@ -87,7 +88,7 @@ import org.opengis.referencing.operation.TransformException;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStore.java 31817 2008-11-10 22:21:18Z groldan $
+ * @version $Id: WFS_1_1_0_DataStore.java 31823 2008-11-11 16:11:49Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -115,6 +116,12 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * @param capabilities
      */
     public WFS_1_1_0_DataStore(final WFSProtocol wfs, final WFSStrategy strategy) {
+        if (wfs == null) {
+            throw new NullPointerException("wfs protocol");
+        }
+        if (strategy == null) {
+            throw new NullPointerException("strategy");
+        }
         this.wfs = wfs;
         this.strategy = strategy;
         this.DEFAULT_OUTPUT_FORMAT = wfs.getDefaultOutputFormat();
@@ -129,8 +136,26 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         this.maxFeaturesHardLimit = Integer.valueOf(maxFeatures.intValue());
     }
 
+    /**
+     * @see WFSDataStore#getMaxFeatures()
+     */
     public Integer getMaxFeatures() {
         return this.maxFeaturesHardLimit;
+    }
+
+    /**
+     * @see WFSDataStore#isPreferPostOverGet()
+     */
+    public boolean isPreferPostOverGet() {
+        return preferPostOverGet;
+    }
+
+    /**
+     * @see WFSDataStore#setPreferPostOverGet(boolean)
+     */
+    public void setPreferPostOverGet(Boolean booleanValue) {
+        // we don't prefer POST by default yet... actually we don't support it yet
+        this.preferPostOverGet = booleanValue == null ? false : booleanValue.booleanValue();
     }
 
     /**
@@ -331,6 +356,17 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         return reader;
     }
 
+    /**
+     * Sends the GetFeature request using the appropriate HTTP method depending on the
+     * {@link #isPreferPostOverGet()} preference and what the server supports.
+     * 
+     * @param request
+     *            the request to send
+     * @return the server response handle
+     * @throws IOException
+     *             if a communication error occurs. If a server returns an exception report that's a
+     *             normal response, no exception will be thrown here.
+     */
     private WFSResponse sendGetFeatures(GetFeatureType request) throws IOException {
         // TODO: split filters! WFSProtocol is not responsible of doing so
         final WFSResponse response;
@@ -345,7 +381,12 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
     /**
      * Returns the feature type that shall result of issueing the given request, adapting the
      * original feature type for the request's type name in terms of the query CRS and requested
-     * attributes
+     * attributes.
+     * <p>
+     * This is just a facade so {@link WFSFeatureCollection} does not need to depend on
+     * {@link WFSProtocol}. Remember this is the only class knowing about {@code WFSProtocol} among
+     * {@link WFSStrategy}
+     * </p>
      * 
      * @param query
      * @return
@@ -454,22 +495,37 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         throw new UnsupportedOperationException("WFS DataStore does not support createSchema");
     }
 
+    /**
+     * @see WFSDataStore#getFeatureTypeName
+     */
     public QName getFeatureTypeName(String typeName) {
         return wfs.getFeatureTypeName(typeName);
     }
 
+    /**
+     * @see WFSDataStore#getFeatureTypeTitle(String)
+     */
     public String getFeatureTypeTitle(String typeName) {
         return wfs.getFeatureTypeTitle(typeName);
     }
 
+    /**
+     * @see WFSDataStore#getFeatureTypeAbstract(String)
+     */
     public String getFeatureTypeAbstract(String typeName) {
         return wfs.getFeatureTypeAbstract(typeName);
     }
 
+    /**
+     * @see WFSDataStore#getFeatureTypeWGS84Bounds(String)
+     */
     public ReferencedEnvelope getFeatureTypeWGS84Bounds(String typeName) {
         return wfs.getFeatureTypeWGS84Bounds(typeName);
     }
 
+    /**
+     * @see WFSDataStore#getFeatureTypeBounds(String)
+     */
     public ReferencedEnvelope getFeatureTypeBounds(String typeName) {
         final ReferencedEnvelope wgs84Bounds = wfs.getFeatureTypeWGS84Bounds(typeName);
         final CoordinateReferenceSystem ftypeCrs = getFeatureTypeCRS(typeName);
@@ -489,6 +545,9 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         return nativeBounds;
     }
 
+    /**
+     * @see WFSDataStore#getFeatureTypeCRS(String)
+     */
     public CoordinateReferenceSystem getFeatureTypeCRS(String typeName) {
         final String defaultCRS = wfs.getDefaultCRS(typeName);
         CoordinateReferenceSystem crs = null;
@@ -513,38 +572,62 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         return crs;
     }
 
+    /**
+     * @see WFSDataStore#getFeatureTypeKeywords(String)
+     */
     public Set<String> getFeatureTypeKeywords(String typeName) {
         return wfs.getFeatureTypeKeywords(typeName);
     }
 
+    /**
+     * @see WFSDataStore#getDescribeFeatureTypeURL(String)
+     */
     public URL getDescribeFeatureTypeURL(String typeName) {
         return wfs.getDescribeFeatureTypeURLGet(typeName);
     }
 
+    /**
+     * @see WFSDataStore#getServiceAbstract()
+     */
     public String getServiceAbstract() {
         return wfs.getServiceAbstract();
     }
 
+    /**
+     * @see WFSDataStore#getServiceKeywords()
+     */
     public Set<String> getServiceKeywords() {
         return wfs.getServiceKeywords();
     }
 
+    /**
+     * @see WFSDataStore#getServiceProviderUri()
+     */
     public URI getServiceProviderUri() {
         return wfs.getServiceProviderUri();
     }
 
-    public boolean supportsOperation(WFSOperationType operation, boolean post) {
-        return wfs.supportsOperation(operation, post);
+    /**
+     * @see WFSDataStore#getCapabilitiesURL()
+     */
+    public URL getCapabilitiesURL() {
+        URL capsUrl = wfs.getOperationURL(GET_CAPABILITIES, false);
+        if (capsUrl == null) {
+            capsUrl = wfs.getOperationURL(GET_CAPABILITIES, true);
+        }
+        return capsUrl;
     }
 
-    public URL getOperationURL(WFSOperationType operation, boolean post) {
-        return wfs.getOperationURL(operation, post);
-    }
-
+    /**
+     * @see WFSDataStore#getserviceTitle()
+     */
     public String getServiceTitle() {
         return wfs.getServiceTitle();
     }
 
+    /**
+     * @see WFSDataStore#getServiceVersion()
+     */
     public String getServiceVersion() {
         return wfs.getServiceVersion().toString();
     }
@@ -597,6 +680,22 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         // TODO: issue only if filter is fully supported
         int hits = wfs.getFeatureHits(query);
         return hits;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("WFSDataStore[");
+        sb.append("version=").append(getServiceVersion());
+        URL capabilitiesUrl = getCapabilitiesURL();
+        sb.append(", URL=").append(capabilitiesUrl);
+        sb.append(", strategy=").append(strategy.getClass().getName());
+        sb.append(", default output format='").append(DEFAULT_OUTPUT_FORMAT).append("'");
+        sb.append(", max features=").append(
+                maxFeaturesHardLimit.intValue() == 0 ? "not set" : String
+                        .valueOf(maxFeaturesHardLimit));
+        sb.append(", prefer POST over GET=").append(preferPostOverGet);
+        sb.append("]");
+        return sb.toString();
     }
 
     /**

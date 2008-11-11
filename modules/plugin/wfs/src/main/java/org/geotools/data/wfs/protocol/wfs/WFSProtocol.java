@@ -1,3 +1,19 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wfs.protocol.wfs;
 
 import java.io.IOException;
@@ -10,19 +26,30 @@ import javax.xml.namespace.QName;
 import net.opengis.wfs.GetFeatureType;
 
 import org.geotools.data.Query;
+import org.geotools.data.wfs.protocol.http.HttpMethod;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.Filter;
-import org.opengis.filter.Id;
 import org.opengis.filter.capability.FilterCapabilities;
-import org.opengis.filter.spatial.BBOX;
 
 /**
- * Facade interface to interoperate with a WFS instance.
+ * Facade interface to interact with a WFS instance.
  * <p>
+ * Implementations of this interface know how to send and get information back from a WFS service
+ * for a specific protocol version, but are <b>not</b> meant to provide any logic other than the
+ * conversation with the service. For instance, {@code WFSProtocol} implementations are not required
+ * to transform {@link Filter filters} to something appropriate for the service capabilities, nor
+ * any other control logic than creating and sending the requests mapping what is given to the
+ * operation methods.
+ * </p>
+ * <p>
+ * This interface provides enough information extracted or derived from the WFS capabilities
+ * document as for the client code to issue requests appropriate for the server capabilities.
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @since 2.6.x
+ * @version $Id: WFSProtocol.java 31823 2008-11-11 16:11:49Z groldan $
+ * @since 2.6
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/protocol/wfs/WFSProtocol.java $
  */
 public interface WFSProtocol {
 
@@ -212,9 +239,23 @@ public interface WFSProtocol {
      */
     public URL getDescribeFeatureTypeURLGet(final String typeName);
 
+    /**
+     * Issues a DescribeFeatureType request for the given type name and output format using the HTTP
+     * GET method
+     * 
+     * @throws IOException
+     * @throws UnsupportedOperationException
+     */
     public WFSResponse describeFeatureTypeGET(final String typeName, final String outputFormat)
             throws IOException, UnsupportedOperationException;
 
+    /**
+     * Issues a DescribeFeatureType request for the given type name and output format using the HTTP
+     * POST method
+     * 
+     * @throws IOException
+     * @throws UnsupportedOperationException
+     */
     public WFSResponse describeFeatureTypePOST(final String typeName, final String outputFormat)
             throws IOException, UnsupportedOperationException;
 
@@ -280,6 +321,13 @@ public interface WFSProtocol {
      */
     public String getDefaultOutputFormat();
 
+    /**
+     * Allows to free any resource held.
+     * <p>
+     * Successive calls to this method should not result in any exception, but the instance is meant
+     * to not be usable after the first invocation.
+     * </p>
+     */
     public void dispose();
 
 }

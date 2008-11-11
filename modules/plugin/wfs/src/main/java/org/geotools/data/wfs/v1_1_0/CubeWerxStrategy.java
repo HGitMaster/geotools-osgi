@@ -1,3 +1,19 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wfs.v1_1_0;
 
 import java.io.IOException;
@@ -5,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.opengis.wfs.GetFeatureType;
-import net.opengis.wfs.QueryType;
 
 import org.geotools.data.Query;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
@@ -18,10 +33,23 @@ import org.opengis.filter.Or;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 
 /**
+ * An strategy object to deal in querying a CubeWerx WFS 1.1 server
+ * <p>
+ * This strategy was created as per the limitations encountered at the CubeWerx server being tested
+ * while developing this plugin.
+ * </p>
+ * <p>
+ * For instance, the following issues were found:
+ * <ul>
+ * <li>resultType parameter is not supported in GetFeature
+ * <li>logically grouped spatial filters can't be handled
+ * </ul>
+ * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: CubeWerxStrategy.java 31817 2008-11-10 22:21:18Z groldan $
- * @since 1.6
+ * @version $Id: CubeWerxStrategy.java 31823 2008-11-11 16:11:49Z groldan $
+ * @since 2.6
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/CubeWerxStrategy.java $
  */
 public class CubeWerxStrategy extends DefaultWFSStrategy {
 
