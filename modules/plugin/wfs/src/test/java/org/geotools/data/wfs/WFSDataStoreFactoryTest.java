@@ -32,6 +32,7 @@ import junit.framework.TestCase;
 
 import org.geotools.data.wfs.v1_1_0.CubeWerxStrategy;
 import org.geotools.data.wfs.v1_1_0.DefaultWFSStrategy;
+import org.geotools.data.wfs.v1_1_0.GeoServerStrategy;
 import org.geotools.data.wfs.v1_1_0.WFSStrategy;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.test.TestData;
@@ -79,19 +80,22 @@ public class WFSDataStoreFactoryTest {
     @SuppressWarnings("nls")
     @Test
     public void testDetermineWFS1_1_0_Strategy() throws IOException {
+        URL url;
         InputStream in;
         Document capabilitiesDoc;
         WFSStrategy strategy;
 
+        url = TestData.url(this, "geoserver_capabilities_1_1_0.xml");
         in = TestData.openStream(this, "geoserver_capabilities_1_1_0.xml");
         capabilitiesDoc = WFSDataStoreFactory.parseCapabilities(in);
-        strategy = WFSDataStoreFactory.determineCorrectStrategy(capabilitiesDoc);
+        strategy = WFSDataStoreFactory.determineCorrectStrategy(url, capabilitiesDoc);
         assertNotNull(strategy);
-        assertEquals(DefaultWFSStrategy.class, strategy.getClass());
+        assertEquals(GeoServerStrategy.class, strategy.getClass());
 
+        url = TestData.url(this, "cubewerx_capabilities_1_1_0.xml");
         in = TestData.openStream(this, "cubewerx_capabilities_1_1_0.xml");
         capabilitiesDoc = WFSDataStoreFactory.parseCapabilities(in);
-        strategy = WFSDataStoreFactory.determineCorrectStrategy(capabilitiesDoc);
+        strategy = WFSDataStoreFactory.determineCorrectStrategy(url, capabilitiesDoc);
         assertNotNull(strategy);
         assertEquals(CubeWerxStrategy.class, strategy.getClass());
     }

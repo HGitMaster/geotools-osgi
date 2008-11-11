@@ -16,12 +16,17 @@
  */
 package org.geotools.data.wfs.v1_1_0;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,13 +44,19 @@ import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Capabilities;
+import org.geotools.filter.v1_1.OGC;
+import org.geotools.filter.v1_1.OGCConfiguration;
 import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
+import org.geotools.xml.Configuration;
+import org.geotools.xml.Encoder;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Id;
 import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -53,14 +64,37 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * A default strategy for a WFS 1.1.0 implementation that assumes the server sticks to the standard.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: DefaultWFSStrategy.java 31823 2008-11-11 16:11:49Z groldan $
+ * @version $Id: DefaultWFSStrategy.java 31824 2008-11-11 19:22:41Z groldan $
  * @since 2.6
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/DefaultWFSStrategy.java $
+ * @source $URL:
+ *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
+ *         /wfs/v1_1_0/DefaultWFSStrategy.java $
  */
 @SuppressWarnings("nls")
 public class DefaultWFSStrategy implements WFSStrategy {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
+
+    protected static final String DEFAULT_OUTPUT_FORMAT = "text/xml; subtype=gml/3.1.1";
+
+    private Configuration filter_1_1_0_Configuration;
+
+    public DefaultWFSStrategy() {
+        filter_1_1_0_Configuration = new OGCConfiguration();
+    }
+
+    /**
+     * @return {@code "text/xml; subtype=gml/3.1.1"}
+     * @see WFSProtocol#getDefaultOutputFormat()
+     */
+    public String getDefaultOutputFormat(WFSProtocol wfs) {
+        Set<String> supportedOutputFormats = wfs.getSupportedGetFeatureOutputFormats();
+        if (supportedOutputFormats.contains(DEFAULT_OUTPUT_FORMAT)) {
+            return DEFAULT_OUTPUT_FORMAT;
+        }
+        throw new IllegalArgumentException("Server does not support '" + DEFAULT_OUTPUT_FORMAT
+                + "' output format: " + supportedOutputFormats);
+    }
 
     /**
      * @see WFSStrategy#getQueryType(WFS_1_1_0_DataStore, Query)
@@ -161,7 +195,90 @@ public class DefaultWFSStrategy implements WFSStrategy {
         // @TODO filter splitting!
         reqParts.setPostFilter(postFilter);
         reqParts.setServerRequest(getFeature);
+
+        Map<String, String> parametersForGet = buildGetFeatureParametersForGet(getFeature);
+        reqParts.setKvpParameters(parametersForGet);
+
         return reqParts;
+    }
+
+    private Map<String, String> buildGetFeatureParametersForGet(GetFeatureType request)
+            throws IOException {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("SERVICE", "WFS");
+        map.put("VERSION", "1.1.0");
+        map.put("REQUEST", "GetFeature");
+        map.put("OUTPUTFORMAT", request.getOutputFormat());
+
+        if (request.getMaxFeatures() != null) {
+            map.put("MAXFEATURES", String.valueOf(request.getMaxFeatures()));
+        }
+
+        final QueryType query = (QueryType) request.getQuery().get(0);
+        final String typeName = (String) query.getTypeName().get(0);
+        map.put("TYPENAME", typeName);
+
+        if (query.getPropertyName().size() > 0) {
+            List<String> propertyNames = query.getPropertyName();
+            StringBuilder pnames = new StringBuilder();
+            for (Iterator<String> it = propertyNames.iterator(); it.hasNext();) {
+                pnames.append(it.next());
+                if (it.hasNext()) {
+                    pnames.append(',');
+                }
+            }
+            map.put("PROPERTYNAME", pnames.toString());
+        }
+
+        // SRSNAME parameter. Let the server reproject.
+        // TODO: should check if the server supports the required crs
+        URI srsName = query.getSrsName();
+        if (srsName != null) {
+            map.put("SRSNAME", srsName.toString());
+        }
+        final Filter filter = query.getFilter();
+
+        if (filter != null && Filter.INCLUDE != filter) {
+            if (filter instanceof Id) {
+                final Set<Identifier> identifiers = ((Id) filter).getIdentifiers();
+                StringBuffer idValues = new StringBuffer();
+                for (Iterator<Identifier> it = identifiers.iterator(); it.hasNext();) {
+                    Object id = it.next().getID();
+                    // REVISIT: should URL encode the id?
+                    idValues.append(String.valueOf(id));
+                    if (it.hasNext()) {
+                        idValues.append(",");
+                    }
+                }
+                map.put("FEATUREID", idValues.toString());
+            } else {
+                String xmlEncodedFilter = encodeGetFeatureGetFilter(filter);
+                map.put("FILTER", xmlEncodedFilter);
+            }
+        }
+
+        return map;
+    }
+
+    /**
+     * Returns a single-line string containing the xml representation of the given filter, as
+     * appropriate for the {@code FILTER} parameter in a GetFeature request.
+     */
+    private String encodeGetFeatureGetFilter(final Filter filter) throws IOException {
+        Configuration filterConfig = getFilterConfiguration();
+        Encoder encoder = new Encoder(filterConfig);
+        // do not write the xml declaration
+        encoder.setOmitXMLDeclaration(true);
+
+        OutputStream out = new ByteArrayOutputStream();
+        encoder.encode(filter, OGC.Filter, out);
+        String encoded = out.toString();
+        encoded = encoded.replaceAll("\n", "");
+        return encoded;
+    }
+
+    protected Configuration getFilterConfiguration() {
+        return filter_1_1_0_Configuration;
     }
 
     /**

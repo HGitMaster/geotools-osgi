@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import net.opengis.wfs.GetFeatureType;
+import net.opengis.wfs.ResultTypeType;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
@@ -66,6 +67,8 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -88,7 +91,7 @@ import org.opengis.referencing.operation.TransformException;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStore.java 31823 2008-11-11 16:11:49Z groldan $
+ * @version $Id: WFS_1_1_0_DataStore.java 31824 2008-11-11 19:22:41Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -124,7 +127,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         }
         this.wfs = wfs;
         this.strategy = strategy;
-        this.DEFAULT_OUTPUT_FORMAT = wfs.getDefaultOutputFormat();
+        this.DEFAULT_OUTPUT_FORMAT = strategy.getDefaultOutputFormat(wfs);
         byTypeNameTypes = Collections.synchronizedMap(new HashMap<String, SimpleFeatureType>());
         maxFeaturesHardLimit = Integer.valueOf(0); // not set
     }
@@ -305,7 +308,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
                 (DefaultQuery) query, outputFormat);
         final GetFeatureType wfsRequest = requestParts.getServerRequest();
         final Filter postFilter = requestParts.getPostFilter();
-        final WFSResponse response = sendGetFeatures(wfsRequest);
+        final WFSResponse response = sendGetFeatures(wfsRequest, requestParts.getKvpParameters());
 
         Object result = WFSExtensions.process(this, response);
 
@@ -362,18 +365,20 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * 
      * @param request
      *            the request to send
+     * @param map
      * @return the server response handle
      * @throws IOException
      *             if a communication error occurs. If a server returns an exception report that's a
      *             normal response, no exception will be thrown here.
      */
-    private WFSResponse sendGetFeatures(GetFeatureType request) throws IOException {
+    private WFSResponse sendGetFeatures(GetFeatureType request, Map<String, String> kvp)
+            throws IOException {
         // TODO: split filters! WFSProtocol is not responsible of doing so
         final WFSResponse response;
         if (useHttpPostFor(GET_FEATURE)) {
             response = wfs.getFeaturePOST(request);
         } else {
-            response = wfs.getFeatureGET(request);
+            response = wfs.getFeatureGET(request, kvp);
         }
         return response;
     }
@@ -546,6 +551,8 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
     }
 
     /**
+     * @return a non null CRS for the feature type, if the actual CRS can't be determined,
+     *         {@link DefaultEngineeringCRS#GENERIC_2D} is returned
      * @see WFSDataStore#getFeatureTypeCRS(String)
      */
     public CoordinateReferenceSystem getFeatureTypeCRS(String typeName) {
@@ -563,7 +570,10 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
                 try {
                     crs = CRS.decode(epsgCode);
                 } catch (Exception e1) {
-                    LOGGER.log(Level.WARNING, "can't decode CRS " + epsgCode + " for " + typeName);
+                    LOGGER.log(Level.WARNING, "can't decode CRS " + epsgCode + " for " + typeName
+                            + ". Assigning DefaultEngineeringCRS.GENERIC_2D: "
+                            + DefaultEngineeringCRS.GENERIC_2D);
+                    crs = DefaultEngineeringCRS.GENERIC_2D;
                 }
             }
         } catch (FactoryException e) {
@@ -677,8 +687,27 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      *         -1} if not supported
      */
     public int getCount(final Query query) throws IOException {
-        // TODO: issue only if filter is fully supported
-        int hits = wfs.getFeatureHits(query);
+        String defaultOutputFormat = strategy.getDefaultOutputFormat(wfs);
+        final RequestComponents requestParts;
+        requestParts = strategy.createGetFeatureRequest(this, wfs, (DefaultQuery) query,
+                defaultOutputFormat);
+        if (!Filter.EXCLUDE.equals(requestParts.getPostFilter())) {
+            // Filter not fully supported, can't know without a full scan of the results
+            return -1;
+        }
+
+        GetFeatureType serverRequest = requestParts.getServerRequest();
+        Map<String, String> kvpParameters = requestParts.getKvpParameters();
+        serverRequest.setResultType(ResultTypeType.HITS_LITERAL);
+        kvpParameters.put("RESULTTYPE", "hits");
+
+        WFSResponse response = sendGetFeatures(serverRequest, kvpParameters);
+
+        Object process = WFSExtensions.process(this, response);
+        if (!(process instanceof GetFeatureParser)) {
+            LOGGER.info("GetFeature with resultType=hits resulted in " + process);
+        }
+        int hits = ((GetFeatureParser)process).getNumberOfFeatures();
         return hits;
     }
 

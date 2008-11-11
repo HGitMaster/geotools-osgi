@@ -19,6 +19,7 @@ package org.geotools.data.wfs.protocol.wfs;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -47,9 +48,11 @@ import org.opengis.filter.capability.FilterCapabilities;
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFSProtocol.java 31823 2008-11-11 16:11:49Z groldan $
+ * @version $Id: WFSProtocol.java 31824 2008-11-11 19:22:41Z groldan $
  * @since 2.6
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/protocol/wfs/WFSProtocol.java $
+ * @source $URL:
+ *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
+ *         /wfs/protocol/wfs/WFSProtocol.java $
  */
 public interface WFSProtocol {
 
@@ -270,12 +273,14 @@ public interface WFSProtocol {
      * 
      * @param request
      *            the request to send to the WFS, as is.
+     * @param kvp
+     *            the key/value pair representation of the request to build the query string from
      * @return
      * @throws IOException
      * @throws UnsupportedOperationException
      */
-    public WFSResponse getFeatureGET(final GetFeatureType request) throws IOException,
-            UnsupportedOperationException;
+    public WFSResponse getFeatureGET(final GetFeatureType request, final Map<String, String> kvp)
+            throws IOException, UnsupportedOperationException;
 
     /**
      * Issues a GetFeature request for the given {@link Query}, using POST HTTP method
@@ -286,40 +291,6 @@ public interface WFSProtocol {
      */
     public WFSResponse getFeaturePOST(GetFeatureType request) throws IOException,
             UnsupportedOperationException;
-
-    /**
-     * Issues a GetFeature request with {@code resultType=hits} if supported by the server and
-     * returns the number of features declared in the response, or {@code -1} otherwise.
-     * <p>
-     * The argument is a GeoTools {@link Query} and shall already be appropriate for the WFS
-     * capabilities, the {@link WFSProtocol} implementation is not required to perform any
-     * {@link Filter} splitting depending on what filter capabilities the server supports, etc.
-     * </p>
-     * <p>
-     * How to send the request (GET or POST method) and what output format to require the response
-     * on is up to the {@code WFSProtocol} implementation. This method is meant for the protocol to
-     * leverage an easy parsing of the {@code numberOfFeatures} attribute in a {@code
-     * FeatureCollection} gml response, or whatever other means of getting the results hits the
-     * protocol may leverage.
-     * </p>
-     * <p>
-     * The {@link Query} to GetFeature arguments mapping is the same as for the
-     * {@link #getFeature(Query, String, HttpMethod)} method.
-     * </p>
-     * 
-     * @return the number of features returned by a getfeature request with resultType=hits or
-     *         {@code -1} if not supported.
-     * @throws IOException
-     *             if a communication error occurs with the WFS
-     */
-    public int getFeatureHits(final Query query) throws IOException;
-
-    /**
-     * Returns the protocol default output format name for the WFS version the implementation talks.
-     * 
-     * @return the default output format name for the GetFeature operation for the protocol version
-     */
-    public String getDefaultOutputFormat();
 
     /**
      * Allows to free any resource held.

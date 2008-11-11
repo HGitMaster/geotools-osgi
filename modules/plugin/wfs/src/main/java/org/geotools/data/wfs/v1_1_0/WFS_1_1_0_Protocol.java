@@ -50,15 +50,19 @@ import net.opengis.ows10.KeywordsType;
 import net.opengis.ows10.OnlineResourceType;
 import net.opengis.ows10.OperationType;
 import net.opengis.ows10.OperationsMetadataType;
+import net.opengis.ows10.Ows10Factory;
 import net.opengis.ows10.RequestMethodType;
+import net.opengis.ows10.ServiceIdentificationType;
 import net.opengis.ows10.ServiceProviderType;
 import net.opengis.ows10.WGS84BoundingBoxType;
+import net.opengis.ows11.Ows11Factory;
 import net.opengis.wfs.BaseRequestType;
 import net.opengis.wfs.FeatureTypeType;
 import net.opengis.wfs.GetFeatureType;
 import net.opengis.wfs.OutputFormatListType;
 import net.opengis.wfs.QueryType;
 import net.opengis.wfs.WFSCapabilitiesType;
+import net.opengis.wfs.WfsFactory;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Query;
@@ -74,6 +78,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
+import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
@@ -92,16 +97,16 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * xml-xsd} subsystem for schema assisted parsing and encoding of WFS requests and responses.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFS_1_1_0_Protocol.java 31823 2008-11-11 16:11:49Z groldan $
+ * @version $Id: WFS_1_1_0_Protocol.java 31824 2008-11-11 19:22:41Z groldan $
  * @since 2.6
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/WFS_1_1_0_Protocol.java $
+ * @source $URL:
+ *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
+ *         /wfs/v1_1_0/WFS_1_1_0_Protocol.java $
  */
 @SuppressWarnings( { "unchecked", "nls" })
 public class WFS_1_1_0_Protocol implements WFSProtocol {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
-
-    private static final String DEFAULT_OUTPUT_FORMAT = "text/xml; subtype=gml/3.1.1";
 
     /**
      * Configuration used to encode filters
@@ -144,14 +149,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     }
 
     /**
-     * @return {@code "text/xml; subtype=gml/3.1.1"}
-     * @see WFSProtocol#getDefaultOutputFormat()
-     */
-    public String getDefaultOutputFormat() {
-        return DEFAULT_OUTPUT_FORMAT;
-    }
-
-    /**
      * @return {@link Version#v1_1_0}
      * @see WFSProtocol#getServiceVersion()
      */
@@ -163,22 +160,32 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @see WFSProtocol#getServiceTitle()
      */
     public String getServiceTitle() {
-        return capabilities.getServiceIdentification().getTitle();
+        return getServiceIdentification().getTitle();
     }
 
     /**
      * @see WFSProtocol#getServiceAbstract()
      */
     public String getServiceAbstract() {
-        return capabilities.getServiceIdentification().getAbstract();
+        return getServiceIdentification().getAbstract();
     }
 
     /**
      * @see WFSProtocol#getServiceKeywords()
      */
     public Set<String> getServiceKeywords() {
-        List<KeywordsType> capsKeywords = capabilities.getServiceIdentification().getKeywords();
+        List<KeywordsType> capsKeywords = getServiceIdentification().getKeywords();
         return extractKeywords(capsKeywords);
+    }
+
+    private ServiceIdentificationType getServiceIdentification() {
+        ServiceIdentificationType serviceId = capabilities.getServiceIdentification();
+        if (serviceId == null) {
+            LOGGER.info("Capabilities did not provide a ServiceIdentification section");
+            serviceId = Ows10Factory.eINSTANCE.createServiceIdentificationType();
+            capabilities.setServiceIdentification(serviceId);
+        }
+        return serviceId;
     }
 
     /**
@@ -403,85 +410,21 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
 
     }
 
-    /**
-     * @see WFSProtocol#getFeatureHits(Query)
-     */
-    public int getFeatureHits(Query query) throws IOException {
-        URL url = getOperationURL(WFSOperationType.GET_FEATURE, false);
-        Map<String, String> getFeatureKvp = buildGetFeatureParametersForGet(query,
-                DEFAULT_OUTPUT_FORMAT);
-
-        getFeatureKvp.put("RESULTTYPE", "hits");
-        WFSResponse response = issueGetRequest(null, url, getFeatureKvp);
-
-        int featureCount = -1;
-
-        final InputStream responseStream = response.getInputStream();
-        try {
-            XmlPullParser parser = null;
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            factory.setValidating(false);
-
-            // parse root element
-            parser = factory.newPullParser();
-            parser.setInput(responseStream, "UTF-8");
-            parser.nextTag();
-            final String rootElementName = parser.getName();
-            if ("FeatureCollection".equals(rootElementName)) {
-                String numberOfFeatures = null;
-                for (int i = 0; i < parser.getAttributeCount(); i++) {
-                    if ("numberOfFeatures".equals(parser.getAttributeName(i))) {
-                        numberOfFeatures = parser.getAttributeValue(i);
-                        break;
-                    }
-                }
-                // reset input stream
-                parser.setInput(null);
-                if (numberOfFeatures == null) {
-                    LOGGER.finer("Response din't return numberOfFeatures");
-                } else {
-                    featureCount = Integer.valueOf(numberOfFeatures);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.INFO, "Error calculating query count", e);
-        } finally {
-            responseStream.close();
-        }
-        return featureCount;
-    }
 
     /**
-     * @see WFSProtocol#getFeatureGET(Query, String)
+     * @see WFSProtocol#getFeatureGET(GetFeatureType, Map)
      */
-    public WFSResponse getFeatureGET(final GetFeatureType request) throws IOException {
+    public WFSResponse getFeatureGET(final GetFeatureType request, Map<String, String> kvp)
+            throws IOException {
         if (!supportsOperation(WFSOperationType.GET_FEATURE, false)) {
             throw new UnsupportedOperationException(
                     "The server does not support GetFeature for HTTP method GET");
         }
         URL url = getOperationURL(WFSOperationType.GET_FEATURE, false);
-        Map<String, String> getFeatureKvp = buildGetFeatureParametersForGet(request);
+        Map<String, String> getFeatureKvp = kvp;
         System.out.println(" > getFeatureGET: Request url: " + url + ". Parameters: "
                 + getFeatureKvp);
         WFSResponse response = issueGetRequest(request, url, getFeatureKvp);
-
-        return response;
-    }
-
-    /**
-     * @see WFSProtocol#getFeatureGET(Query, String)
-     */
-    public WFSResponse getFeatureGET(Query query, String outputFormat) throws IOException {
-        if (!supportsOperation(WFSOperationType.GET_FEATURE, false)) {
-            throw new UnsupportedOperationException(
-                    "The server does not support GetFeature for HTTP method GET");
-        }
-
-        URL url = getOperationURL(WFSOperationType.GET_FEATURE, false);
-        Map<String, String> getFeatureKvp = buildGetFeatureParametersForGet(query, outputFormat);
-
-        WFSResponse response = issueGetRequest(null, url, getFeatureKvp);
 
         return response;
     }
@@ -572,8 +515,10 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         if (!XMLConstants.DEFAULT_NS_PREFIX.equals(name.getPrefix())) {
             String nsUri = name.getNamespaceURI();
             kvp.put("NAMESPACE", "xmlns(" + name.getPrefix() + "=" + nsUri + ")");
-            kvp.put("OUTPUTFORMAT", outputFormat);
         }
+
+        // ommit output format by now, server should just return xml shcema
+        // kvp.put("OUTPUTFORMAT", outputFormat);
 
         URL url;
         try {
@@ -596,137 +541,6 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         String target = httpResponse.getTargetUrl();
         response = new WFSResponse(target, request, charset, contentType, responseStream);
         return response;
-    }
-
-    private Map<String, String> buildGetFeatureParametersForGet(GetFeatureType request)
-            throws IOException {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("SERVICE", "WFS");
-        map.put("VERSION", getServiceVersion().toString());
-        map.put("REQUEST", "GetFeature");
-        map.put("OUTPUTFORMAT", request.getOutputFormat());
-
-        if (request.getMaxFeatures() != null) {
-            map.put("MAXFEATURES", String.valueOf(request.getMaxFeatures()));
-        }
-
-        final QueryType query = (QueryType) request.getQuery().get(0);
-        final String typeName = (String) query.getTypeName().get(0);
-        map.put("TYPENAME", typeName);
-
-        if (query.getPropertyName().size() > 0) {
-            List<String> propertyNames = query.getPropertyName();
-            StringBuilder pnames = new StringBuilder();
-            for (Iterator<String> it = propertyNames.iterator(); it.hasNext();) {
-                pnames.append(it.next());
-                if (it.hasNext()) {
-                    pnames.append(',');
-                }
-            }
-            map.put("PROPERTYNAME", pnames.toString());
-        }
-
-        // SRSNAME parameter. Let the server reproject.
-        // TODO: should check if the server supports the required crs
-        URI srsName = query.getSrsName();
-        if (srsName != null) {
-            map.put("SRSNAME", srsName.toString());
-        }
-        final Filter filter = query.getFilter();
-
-        if (filter != null && Filter.INCLUDE != filter) {
-            if (filter instanceof Id) {
-                final Set<Identifier> identifiers = ((Id) filter).getIdentifiers();
-                StringBuffer idValues = new StringBuffer();
-                for (Iterator<Identifier> it = identifiers.iterator(); it.hasNext();) {
-                    Object id = it.next().getID();
-                    // REVISIT: should URL encode the id?
-                    idValues.append(String.valueOf(id));
-                    if (it.hasNext()) {
-                        idValues.append(",");
-                    }
-                }
-                map.put("FEATUREID", idValues.toString());
-            } else {
-                String xmlEncodedFilter = encodeGetFeatureGetFilter(filter);
-                map.put("FILTER", xmlEncodedFilter);
-            }
-        }
-
-        return map;
-    }
-
-    private Map<String, String> buildGetFeatureParametersForGet(Query query, String outputFormat)
-            throws IOException {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("SERVICE", "WFS");
-        map.put("VERSION", getServiceVersion().toString());
-        map.put("REQUEST", "GetFeature");
-        map.put("TYPENAME", query.getTypeName());
-        map.put("OUTPUTFORMAT", outputFormat);
-
-        if (Query.DEFAULT_MAX != query.getMaxFeatures()) {
-            map.put("MAXFEATURES", String.valueOf(query.getMaxFeatures()));
-        }
-        if (!query.retrieveAllProperties()) {
-            String[] propertyNames = query.getPropertyNames();
-            StringBuilder pnames = new StringBuilder();
-            for (int i = 0; i < propertyNames.length; i++) {
-                pnames.append(propertyNames[i]);
-                if (i < propertyNames.length - 1) {
-                    pnames.append(',');
-                }
-            }
-            map.put("PROPERTYNAME", pnames.toString());
-        }
-
-        // SRSNAME parameter. Let the server reproject.
-        // TODO: should check if the server supports the required crs
-        final CoordinateReferenceSystem requestCrs = query.getCoordinateSystem();
-        String epsgCode = GML2EncodingUtils.epsgCode(requestCrs);
-        if (epsgCode != null) {
-            epsgCode = "EPSG:" + epsgCode;
-            map.put("SRSNAME", epsgCode);
-        }
-
-        final Filter filter = query.getFilter();
-
-        if (filter != null && Filter.INCLUDE != filter) {
-            if (filter instanceof Id) {
-                final Set<Identifier> identifiers = ((Id) filter).getIdentifiers();
-                StringBuffer idValues = new StringBuffer();
-                for (Iterator<Identifier> it = identifiers.iterator(); it.hasNext();) {
-                    Object id = it.next().getID();
-                    // REVISIT: should URL encode the id?
-                    idValues.append(String.valueOf(id));
-                    if (it.hasNext()) {
-                        idValues.append(",");
-                    }
-                }
-                map.put("FEATUREID", idValues.toString());
-            } else {
-                String xmlEncodedFilter = encodeGetFeatureGetFilter(filter);
-                map.put("FILTER", xmlEncodedFilter);
-            }
-        }
-
-        return map;
-    }
-
-    /**
-     * Returns a single-line string containing the xml representation of the given filter, as
-     * appropriate for the {@code FILTER} parameter in a GetFeature request.
-     */
-    private String encodeGetFeatureGetFilter(final Filter filter) throws IOException {
-        Encoder encoder = new Encoder(filterConfig);
-        // do not write the xml declaration
-        encoder.setOmitXMLDeclaration(true);
-
-        OutputStream out = new ByteArrayOutputStream();
-        encoder.encode(filter, OGC.Filter, out);
-        String encoded = out.toString();
-        encoded = encoded.replaceAll("\n", "");
-        return encoded;
     }
 
     /**
