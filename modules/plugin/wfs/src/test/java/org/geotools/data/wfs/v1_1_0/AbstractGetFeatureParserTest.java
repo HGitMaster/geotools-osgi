@@ -16,7 +16,7 @@
  */
 package org.geotools.data.wfs.v1_1_0;
 
-import static org.geotools.data.wfs.v1_1_0.DataTestSupport.CUBEWERX_GOVUNITCE;
+import static org.geotools.data.wfs.v1_1_0.DataTestSupport.*;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.CUBEWERX_ROADSEG;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.GEOS_ARCHSITES;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.GEOS_ROADS;
@@ -65,13 +65,14 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: AbstractGetFeatureParserTest.java 31824 2008-11-11 19:22:41Z groldan $
+ * @version $Id: AbstractGetFeatureParserTest.java 31831 2008-11-12 22:17:24Z groldan $
  * @since 2.5.x
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src /test/
  *         java/org/geotools/wfs/v_1_1_0/data/StreamingParserFeatureReaderTest .java $
  * @see XmlSimpleFeatureParserTest
  * @see StreamingParserFeatureReaderTest
  */
+@SuppressWarnings("nls")
 public abstract class AbstractGetFeatureParserTest {
 
     /**
@@ -85,7 +86,7 @@ public abstract class AbstractGetFeatureParserTest {
      * A feature visitor used to assert the parsed features
      * 
      * @author Gabriel Roldan (TOPP)
-     * @version $Id: AbstractGetFeatureParserTest.java 31824 2008-11-11 19:22:41Z groldan $
+     * @version $Id: AbstractGetFeatureParserTest.java 31831 2008-11-12 22:17:24Z groldan $
      * @since 2.5.x
      * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs /src/test
      *         /java/org/geotools/wfs/v_1_1_0/data/AbstractGetFeatureParserTest .java $
@@ -372,6 +373,24 @@ public abstract class AbstractGetFeatureParserTest {
 
         FeatureVisitor assertor = new FeatureAssertor(featureType);
         testParseGetFeatures(featureName, featureType, parser, assertor, 3);
+    }
+
+    @Test
+    public void testParseMapserver_StatisticalUnit() throws Exception {
+        final String[] properties = { "unitId", "typeAbbreviation", "instanceName", "geometry" };
+        final QName featureName = MAPSERVER_STATISTICAL_UNIT.TYPENAME;
+        final String schemaLocation = MAPSERVER_STATISTICAL_UNIT.SCHEMA;
+        final SimpleFeatureType featureType = getTypeView(featureName, schemaLocation,
+                CUBEWERX_ROADSEG.CRS, properties);
+
+        URL url = TestData.getResource(this, MAPSERVER_STATISTICAL_UNIT.DATA);
+        final GetFeatureParser parser = getParser(featureName, schemaLocation, featureType, url);
+
+        int nof = parser.getNumberOfFeatures();
+        assertEquals(-1, nof);
+
+        FeatureVisitor assertor = new FeatureAssertor(featureType);
+        testParseGetFeatures(featureName, featureType, parser, assertor, 2);
     }
 
     protected void runGetFeaturesParsing() throws Exception {

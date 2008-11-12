@@ -744,8 +744,6 @@ public class WFS_1_1_0_ProtocolTest {
 
     @Test
     public void testGetFeature_GET_OptionalParameters() throws Exception {
-        if ( true ) 
-            return;
         
         final InputStream responseContent = TestData.openStream(this, GEOS_ARCHSITES.DATA);
 
@@ -766,8 +764,9 @@ public class WFS_1_1_0_ProtocolTest {
         query.setFilter(filter);
 
         WFSResponse response;
-        DefaultWFSStrategy strategy = new GeoServerStrategy();
+        WFSStrategy strategy = new GeoServerStrategy();
         WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs, strategy);
+        wfs.setDescribeFeatureTypeURLOverride(TestData.url(this, GEOS_ARCHSITES.SCHEMA));
         RequestComponents request = strategy.createGetFeatureRequest(ds, wfs, query,
                 defaultWfs11OutputFormat);
 

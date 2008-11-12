@@ -70,14 +70,18 @@ public final class DataTestSupport {
         final String DATA;
 
         /**
-         * @param folder the folder name under {@code test-data} where the test files for this
-         *        feature type are stored
-         * @param qName the qualified type name (ns + local name)
-         * @param featureTypeName the name as stated in the capabilities
-         * @param crs the default feature type CRS as stated in the capabilities
+         * @param folder
+         *            the folder name under {@code test-data} where the test files for this feature
+         *            type are stored
+         * @param qName
+         *            the qualified type name (ns + local name)
+         * @param featureTypeName
+         *            the name as stated in the capabilities
+         * @param crs
+         *            the default feature type CRS as stated in the capabilities
          */
-        TestDataType( final String folder, final QName qName, final String featureTypeName,
-                final String crs ) {
+        TestDataType(final String folder, final QName qName, final String featureTypeName,
+                final String crs) {
             TYPENAME = qName;
             FEATURETYPENAME = featureTypeName;
             CRS = crs;
@@ -90,7 +94,7 @@ public final class DataTestSupport {
             checkResource(DATA);
         }
 
-        private void checkResource( String resource ) {
+        private void checkResource(String resource) {
             try {
                 TestData.url(this, resource);
             } catch (FileNotFoundException e) {
@@ -127,6 +131,10 @@ public final class DataTestSupport {
             new QName("http://www.fgdc.gov/framework/073004/transportation", "RoadSeg"),
             "trans:RoadSeg", "EPSG:4269");
 
+    public static final TestDataType MAPSERVER_STATISTICAL_UNIT = new TestDataType("Mapserver",
+            new QName("http://www.fgdc.gov/fgdc/gubs", "StatisticalUnit"),
+            "gubs:StatisticalUnit", "EPSG:4269");
+
     public static TestWFS_1_1_0_Protocol wfs;
 
     /**
@@ -136,11 +144,12 @@ public final class DataTestSupport {
      * Tests methods call this one to set up a protocolHandler to test
      * </p>
      * 
-     * @param capabilitiesFileName the relative path under {@code test-data} for the file containing
-     *        the WFS_Capabilities document.
+     * @param capabilitiesFileName
+     *            the relative path under {@code test-data} for the file containing the
+     *            WFS_Capabilities document.
      * @throws IOException
      */
-    public static void createTestProtocol( String capabilitiesFileName ) throws IOException {
+    public static void createTestProtocol(String capabilitiesFileName) throws IOException {
         HTTPProtocol http = new DefaultHTTPProtocol();
         createTestProtocol(capabilitiesFileName, http);
     }
@@ -152,11 +161,12 @@ public final class DataTestSupport {
      * Tests methods call this one to set up a protocolHandler to test
      * </p>
      * 
-     * @param capabilitiesFileName the relative path under {@code test-data} for the file containing
-     *        the WFS_Capabilities document.
+     * @param capabilitiesFileName
+     *            the relative path under {@code test-data} for the file containing the
+     *            WFS_Capabilities document.
      * @throws IOException
      */
-    public static void createTestProtocol( String capabilitiesFileName, HTTPProtocol http )
+    public static void createTestProtocol(String capabilitiesFileName, HTTPProtocol http)
             throws IOException {
         InputStream stream = TestData.openStream(DataTestSupport.class, capabilitiesFileName);
         wfs = new TestWFS_1_1_0_Protocol(stream, http);
@@ -166,7 +176,7 @@ public final class DataTestSupport {
 
         private URL describeFeatureTypeUrlOverride;
 
-        public TestWFS_1_1_0_Protocol( InputStream capabilitiesReader, HTTPProtocol http )
+        public TestWFS_1_1_0_Protocol(InputStream capabilitiesReader, HTTPProtocol http)
                 throws IOException {
             super(capabilitiesReader, http);
         }
@@ -178,12 +188,12 @@ public final class DataTestSupport {
          * 
          * @param url
          */
-        public void setDescribeFeatureTypeURLOverride( URL url ) {
+        public void setDescribeFeatureTypeURLOverride(URL url) {
             this.describeFeatureTypeUrlOverride = url;
         }
 
         @Override
-        public URL getDescribeFeatureTypeURLGet( String typeName ) {
+        public URL getDescribeFeatureTypeURLGet(String typeName) {
             if (describeFeatureTypeUrlOverride == null) {
                 return super.getDescribeFeatureTypeURLGet(typeName);
             }
@@ -196,14 +206,15 @@ public final class DataTestSupport {
         private HTTPResponse mockResponse;
 
         public URL issueGetBaseUrl;
+
         public Map<String, String> issueGetKvp;
 
-        public TestHttpProtocol( HTTPResponse mockResponse ) {
+        public TestHttpProtocol(HTTPResponse mockResponse) {
             this.mockResponse = mockResponse;
         }
 
         @Override
-        public HTTPResponse issueGet( final URL baseUrl, final Map<String, String> kvp )
+        public HTTPResponse issueGet(final URL baseUrl, final Map<String, String> kvp)
                 throws IOException {
             this.issueGetBaseUrl = baseUrl;
             this.issueGetKvp = kvp;
@@ -219,20 +230,20 @@ public final class DataTestSupport {
 
         private String bodyContent;
 
-        public TestHttpResponse( String contentType, String charset, String bodyContent ) {
+        public TestHttpResponse(String contentType, String charset, String bodyContent) {
             this.contentType = contentType;
             this.charset = charset;
             this.bodyContent = bodyContent;
         }
 
-        public TestHttpResponse( String contentType, String charset, InputStream contentInputStream ) {
+        public TestHttpResponse(String contentType, String charset, InputStream contentInputStream) {
             this.contentType = contentType;
             this.charset = charset;
             BufferedReader reader = new BufferedReader(new InputStreamReader(contentInputStream));
             StringBuilder sb = new StringBuilder();
             String line;
             try {
-                while( (line = reader.readLine()) != null ) {
+                while ((line = reader.readLine()) != null) {
                     sb.append(line);
                     sb.append('\n');
                 }
@@ -254,7 +265,7 @@ public final class DataTestSupport {
             return bodyContent == null ? null : new StringBufferInputStream(bodyContent);
         }
 
-        public String getResponseHeader( String headerName ) {
+        public String getResponseHeader(String headerName) {
             return null;
         }
 

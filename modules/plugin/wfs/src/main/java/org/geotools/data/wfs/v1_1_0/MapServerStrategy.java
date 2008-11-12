@@ -9,15 +9,19 @@ public class MapServerStrategy extends DefaultWFSStrategy {
 
     private static Configuration filter_1_0_0_Configuration = new OGCConfiguration();
 
+    /**
+     * MapServer does not declare the supported output formats in the caps, yet it fails if asked
+     * for {@code text/xml; subtype=gml/3.1.1} but succeeds if asked for {@code GML3}
+     */
     @Override
     public String getDefaultOutputFormat(WFSProtocol wfs) {
-        return "GML2";
+        return "GML3";
     }
 
-    @Override
-    protected Configuration getFilterConfiguration() {
-        return filter_1_0_0_Configuration;
-    }
+    // @Override
+    // protected Configuration getFilterConfiguration() {
+    // return filter_1_0_0_Configuration;
+    // }
 
     /**
      * MapServer seems not to support any filtering

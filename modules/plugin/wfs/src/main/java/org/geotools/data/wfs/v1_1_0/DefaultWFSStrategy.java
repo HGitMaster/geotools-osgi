@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -64,7 +65,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * A default strategy for a WFS 1.1.0 implementation that assumes the server sticks to the standard.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: DefaultWFSStrategy.java 31824 2008-11-11 19:22:41Z groldan $
+ * @version $Id: DefaultWFSStrategy.java 31831 2008-11-12 22:17:24Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -202,7 +203,7 @@ public class DefaultWFSStrategy implements WFSStrategy {
         return reqParts;
     }
 
-    private Map<String, String> buildGetFeatureParametersForGet(GetFeatureType request)
+    protected Map<String, String> buildGetFeatureParametersForGet(GetFeatureType request)
             throws IOException {
         Map<String, String> map = new HashMap<String, String>();
         map.put("SERVICE", "WFS");
@@ -264,11 +265,12 @@ public class DefaultWFSStrategy implements WFSStrategy {
      * Returns a single-line string containing the xml representation of the given filter, as
      * appropriate for the {@code FILTER} parameter in a GetFeature request.
      */
-    private String encodeGetFeatureGetFilter(final Filter filter) throws IOException {
+    protected String encodeGetFeatureGetFilter(final Filter filter) throws IOException {
         Configuration filterConfig = getFilterConfiguration();
         Encoder encoder = new Encoder(filterConfig);
         // do not write the xml declaration
         encoder.setOmitXMLDeclaration(true);
+        encoder.setEncoding(Charset.forName("UTF-8"));
 
         OutputStream out = new ByteArrayOutputStream();
         encoder.encode(filter, OGC.Filter, out);
