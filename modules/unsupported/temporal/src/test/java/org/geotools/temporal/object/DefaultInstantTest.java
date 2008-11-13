@@ -123,9 +123,16 @@ public class DefaultInstantTest {
      */
     @Test
     public void testEquals() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(2000, 1, 1);
+        
+        
         assertFalse(instant1.equals(null));
-        assertEquals(instant1, instant1);
+        assertEquals(cal.getTime().getTime(), instant1.getPosition().getDate().getTime());
         assertFalse(instant1.equals(instant2));
+        
+        
+        
     }
 
     /**

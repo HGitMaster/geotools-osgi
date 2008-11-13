@@ -70,7 +70,7 @@ public class Utils {
      * The number of millisecond in one second.
      */
     private final static long secondMS = 1000;
-
+    
     /**
      * Returns a Date object from an ISO-8601 representation string. (String defined with pattern yyyy-MM-dd'T'HH:mm:ss.SSSZ or yyyy-MM-dd).
      * @param dateString
@@ -104,6 +104,9 @@ public class Utils {
             } else if (dateString.endsWith("Z")) {
                 //e.g : 1985-04-12T10:15:30Z
                 dateString = dateString.substring(0, dateString.length() - 1).concat("+0000");
+            }else {
+                //e.g : 1985-04-12T10:15:30
+                dateString = dateString + "+0000";
             }
             final String timezone = getTimeZone(dateString);
             sdf.setTimeZone(TimeZone.getTimeZone(timezone));
