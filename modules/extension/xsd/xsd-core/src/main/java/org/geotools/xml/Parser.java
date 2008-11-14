@@ -16,12 +16,9 @@
  */
 package org.geotools.xml;
 
-import org.apache.xerces.parsers.SAXParser;
-import org.eclipse.xsd.XSDSchema;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.NamespaceSupport;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,10 +28,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.xerces.parsers.SAXParser;
+import org.eclipse.xsd.XSDSchema;
 import org.geotools.xml.impl.ParserHandler;
 import org.geotools.xs.XS;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.NamespaceSupport;
 
 
 /**
@@ -157,6 +166,38 @@ public class Parser {
         throws IOException, SAXException, ParserConfigurationException {
         return parse(new InputSource(reader));
     }
+
+    /**
+     * Parses an instance document defined by a transformer source.
+     * <p>
+     * Note: Currently this method reads the entire source into memory in order to validate
+     * it. If large documents must be parsed one of {@link #
+     * </p>
+     * @param source THe source of the instance document.
+     *
+     * @return @return The object representation of the root element of the document.
+     * 
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws TransformerException
+     * 
+     * @since 2.6
+     */
+    public Object parse(Source source) throws IOException, SAXException, ParserConfigurationException, TransformerException {
+        //TODO: use SAXResult to stream, need to figure out how to enable 
+        // validation with transformer api
+        //SAXResult result = new SAXResult( handler );
+        StreamResult result = new StreamResult( new ByteArrayOutputStream() );
+        
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer tx = tf.newTransformer();
+        
+        tx.transform( source, result );
+        
+        return parse( new ByteArrayInputStream( ((ByteArrayOutputStream)result.getOutputStream()).toByteArray() ) );
+    }
+    
 
     /**
      * Parses an instance documented defined by a sax input source.
