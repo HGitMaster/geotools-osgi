@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.opengis.wps.ProcessDescriptionType;
+import net.opengis.wps10.ProcessDescriptionType;
 
 import org.geotools.data.Parameter;
 import org.geotools.process.Process;

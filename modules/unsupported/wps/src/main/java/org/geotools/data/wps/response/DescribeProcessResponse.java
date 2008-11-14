@@ -22,16 +22,13 @@ import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.opengis.ows11.ExceptionReportType;
-import net.opengis.wps.ExecuteResponseType;
-import net.opengis.wps.ProcessDescriptionType;
-import net.opengis.wps.ProcessDescriptionsType;
+import net.opengis.wps10.ProcessDescriptionsType;
 
 import org.geotools.data.ows.Response;
-import org.geotools.data.ows.ProcessDescription;
-import org.geotools.xml.Configuration;
-import org.geotools.xml.Parser;
 import org.geotools.ows.ServiceException;
 import org.geotools.wps.WPSConfiguration;
+import org.geotools.xml.Configuration;
+import org.geotools.xml.Parser;
 import org.xml.sax.SAXException;
 
 /**

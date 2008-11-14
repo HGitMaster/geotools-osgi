@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.opengis.wps.DataType;
-import net.opengis.wps.ExecuteResponseType;
-import net.opengis.wps.InputDescriptionType;
-import net.opengis.wps.ProcessDescriptionType;
+import net.opengis.wps10.DataType;
+import net.opengis.wps10.ExecuteResponseType;
+import net.opengis.wps10.InputDescriptionType;
+import net.opengis.wps10.ProcessDescriptionType;
 
 import org.eclipse.emf.common.util.EList;
 import org.geotools.data.wps.request.ExecuteProcessRequest;

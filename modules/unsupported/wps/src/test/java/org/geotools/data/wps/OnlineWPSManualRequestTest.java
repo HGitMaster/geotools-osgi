@@ -22,20 +22,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.TestCase;
 import net.opengis.ows11.ExceptionReportType;
-import net.opengis.wps.ComplexDataCombinationsType;
-import net.opengis.wps.ComplexDataDescriptionType;
-import net.opengis.wps.DataType;
-import net.opengis.wps.ExecuteResponseType;
-import net.opengis.wps.InputDescriptionType;
-import net.opengis.wps.LiteralDataType;
-import net.opengis.wps.OutputDataType;
-import net.opengis.wps.ProcessBriefType;
-import net.opengis.wps.ProcessDescriptionType;
-import net.opengis.wps.ProcessDescriptionsType;
-import net.opengis.wps.ProcessOfferingsType;
-import net.opengis.wps.SupportedComplexDataInputType;
-import net.opengis.wps.WPSCapabilitiesType;
+import net.opengis.wps10.DataType;
+import net.opengis.wps10.ExecuteResponseType;
+import net.opengis.wps10.InputDescriptionType;
+import net.opengis.wps10.LiteralDataType;
+import net.opengis.wps10.OutputDataType;
+import net.opengis.wps10.ProcessBriefType;
+import net.opengis.wps10.ProcessDescriptionType;
+import net.opengis.wps10.ProcessDescriptionsType;
+import net.opengis.wps10.ProcessOfferingsType;
+import net.opengis.wps10.WPSCapabilitiesType;
 
 import org.eclipse.emf.common.util.EList;
 import org.geotools.data.wps.request.DescribeProcessRequest;
@@ -54,8 +52,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
-
-import junit.framework.TestCase;
 
 /**
  * Test making requests by manually building up requests using the utility methods.

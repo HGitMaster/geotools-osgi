@@ -25,24 +25,18 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import javax.swing.Icon;
+import net.opengis.wps10.WPSCapabilitiesType;
 
-import net.opengis.wps.WPSCapabilitiesType;
-import net.opengis.ows11.CapabilitiesBaseType;
-
-import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.ServiceInfo;
 import org.geotools.ows.ServiceException;
