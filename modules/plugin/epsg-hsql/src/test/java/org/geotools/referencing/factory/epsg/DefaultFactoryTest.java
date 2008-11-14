@@ -57,7 +57,7 @@ import static org.junit.Assert.*;
  * database, since this test live in the {@code epsg-hsql} module.
  *
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/DefaultFactoryTest.java $
- * @version $Id: DefaultFactoryTest.java 30760 2008-06-18 14:28:24Z desruisseaux $
+ * @version $Id: DefaultFactoryTest.java 31840 2008-11-14 09:53:30Z desruisseaux $
  * @author Martin Desruisseaux
  * @author Vadim Semenov
  *
@@ -809,8 +809,15 @@ public class DefaultFactoryTest {
         assertEquals("4326",
                 AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
         finder.setFullScanAllowed(false);
+
+        ReferenceIdentifier foundri = AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority());
+
+        // this is broken because, as we know from above, it is ambiguous, so it may not be EPSG:4326 in the cache at all!
+        //        assertEquals("The CRS should still in the cache.",
+        //                            "EPSG:4326", finder.findIdentifier(crs));
         assertEquals("The CRS should still in the cache.",
-                     "EPSG:4326", finder.findIdentifier(crs));
+                foundri.getCodeSpace()+':'+foundri.getCode(), finder.findIdentifier(crs));
+
         /*
          * The PROJCS below intentionally uses a name different from the one found in the
          * EPSG database, in order to force a full scan (otherwise the EPSG database would
