@@ -19,34 +19,14 @@ package org.geotools.wps;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.opengis.ows11.CodeType;
-import net.opengis.ows11.LanguageStringType;
-import net.opengis.ows11.Ows11Factory;
-import net.opengis.wps.ComplexDataType;
-import net.opengis.wps.DataInputsType1;
-import net.opengis.wps.DataType;
-import net.opengis.wps.ExecuteResponseType;
-import net.opengis.wps.ExecuteType;
-import net.opengis.wps.InputType;
-import net.opengis.wps.OutputDataType;
-import net.opengis.wps.ProcessOutputsType1;
-import net.opengis.wps.WpsFactory;
-
-import org.geotools.xml.Encoder;
-import org.xml.sax.SAXException;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
-
 import junit.framework.TestCase;
+
+import org.xml.sax.SAXException;
 
 public class ExecuteOnlineTest extends TestCase {
 

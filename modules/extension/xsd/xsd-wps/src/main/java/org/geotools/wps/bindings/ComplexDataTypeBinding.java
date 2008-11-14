@@ -24,8 +24,8 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import net.opengis.wps.ComplexDataType;
-import net.opengis.wps.WpsFactory;
+import net.opengis.wps10.ComplexDataType;
+import net.opengis.wps10.Wps10Factory;
 
 import org.geotools.gml2.GML;
 import org.geotools.wps.WPS;
@@ -43,9 +43,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class ComplexDataTypeBinding extends AbstractComplexBinding
 {
-    private WpsFactory factory;
+    private Wps10Factory factory;
 
-    public ComplexDataTypeBinding(WpsFactory factory)
+    public ComplexDataTypeBinding(Wps10Factory factory)
     {
         this.factory = factory;
     }
@@ -93,6 +93,7 @@ public class ComplexDataTypeBinding extends AbstractComplexBinding
     	
     	List/*<List<Object>>*/ properties = new ArrayList/*<List<Object>>*/();
 
+    	/*
     	List<?> features = data.getData();
 
     	for(Object obj0 : features)	// XXX TEST
@@ -121,7 +122,7 @@ public class ComplexDataTypeBinding extends AbstractComplexBinding
                 properties.add( new Object[]{ GML.MultiPolygon, obj0 } );
             }             
     	}
-    	
+    	*/
     	return properties;
     }
 
@@ -142,10 +143,12 @@ public class ComplexDataTypeBinding extends AbstractComplexBinding
             data.setEncoding( node.getAttributeValue( "encoding").toString() );
         }
         
+        /*
         for ( Iterator i = node.getChildren().iterator(); i.hasNext(); ) {
             Node c = (Node) i.next();
             data.getData().add( c.getValue() );
         }
+        */
         
         return data;
     }
