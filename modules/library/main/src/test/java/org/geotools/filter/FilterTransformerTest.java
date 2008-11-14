@@ -17,6 +17,7 @@
 package org.geotools.filter;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import junit.framework.TestCase;
 
@@ -31,7 +32,7 @@ public class FilterTransformerTest extends TestCase {
     
     public void testIdEncode() throws Exception {
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
-        HashSet<FeatureId> set = new HashSet<FeatureId>();
+        HashSet<FeatureId> set = new LinkedHashSet<FeatureId>();
         set.add( ff.featureId("FID.1"));
         set.add( ff.featureId("FID.2"));        
         Filter filter=ff.id( set );
