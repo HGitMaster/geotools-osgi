@@ -19,7 +19,9 @@ package org.geotools.xml;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 
 /**
@@ -50,6 +52,15 @@ public class SchemaLocationResolver implements XSDSchemaLocationResolver {
      * the xsd instance
      */
     protected XSD xsd;
+    
+    /**
+     * A list of locations to use as prefixes when looking up schema files.
+     * <p>
+     * This value should be set in cases where an xml schema imports or includes
+     * schema files from sub directories. 
+     * </p>
+     */
+    protected String[] lookupDirectories;
 
     /**
      * Creates the new schema location resolver.
@@ -57,7 +68,35 @@ public class SchemaLocationResolver implements XSDSchemaLocationResolver {
      * @param xsd The xsd to resolve filenames relative to.
      */
     public SchemaLocationResolver(XSD xsd) {
+        this(xsd,new String[]{});
+    }
+    
+    /**
+     * Creates the new schema location resolver specifying additional directories to locate
+     * schema files in.
+     * <p>
+     * The <tt>lookupDirectories</tt> parameter should be used in cases where a main schema imports
+     * or includes files from sub directories. Consider the following schema file structure:
+     * <pre>
+     *   main.xsd
+     *   dir1/
+     *      include1.xsd
+     *   dir2/
+     *      include2.xsd
+     * </pre>
+     * 
+     * The constructor would be called with:
+     * <pre>
+     * new SchemaLocationResolver(this,"include1","include2");
+     * </pre>
+     * 
+     * </p>
+     * @param xsd The xsd to resolve files relative to.
+     * @param lookupDirectories Additional lookup directories relative to the xsd to lookup files in.
+     */
+    public SchemaLocationResolver(XSD xsd, String... lookupDirectories) {
         this.xsd = xsd;
+        this.lookupDirectories = lookupDirectories;
     }
 
     /**
@@ -68,14 +107,38 @@ public class SchemaLocationResolver implements XSDSchemaLocationResolver {
      */
     public boolean canHandle( XSDSchema schema, String uri, String location ) {
         if ( xsd.getNamespaceURI().equals(uri) ) {
-            //strip off the filename and do a resource lookup
-            String fileName = new File(location).getName();
-            URL xsdLocation = xsd.getClass().getResource(fileName);
-
+            //try resolving directly
+            URL xsdLocation = resolveLocationToResource( location );
             return xsdLocation != null;
         }
         
         return false;
+    }
+    
+    private URL resolveLocationToResource( String location ) {
+        //try to resolve it directly
+        URL url = xsd.getClass().getResource( location );
+        
+        if ( url == null ) {
+            //strip off the filename and do a resource lookup
+            String fileName = new File(location).getName();
+            url = xsd.getClass().getResource(fileName);
+        }
+        
+        if ( url == null ) {
+            //try resolving relative to lookupDirectories
+            if ( lookupDirectories != null ) {
+                for ( String lookup : lookupDirectories ) {
+                    if ( lookup.endsWith( "/" ) ) {
+                        lookup = lookup.substring(0,lookup.length()-1);
+                    }
+                    url = xsd.getClass().getResource( lookup + "/" + location );
+                }
+            }
+        }
+        
+        return url;
+    
     }
     
     /**
@@ -97,8 +160,7 @@ public class SchemaLocationResolver implements XSDSchemaLocationResolver {
 
         //namespace match?
         if (canHandle(schema, uri, location)) {
-            String fileName = new File(location).getName();
-            return xsd.getClass().getResource(fileName).toString();
+            return resolveLocationToResource( location ).toString();
         }
 
         return null;
