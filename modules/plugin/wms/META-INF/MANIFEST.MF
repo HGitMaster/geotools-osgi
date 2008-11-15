@@ -4,6 +4,7 @@ Bundle-Name: Web Map Server Plug-in
 Bundle-SymbolicName: org.geotools.wms
 Bundle-Version: 2.6.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.api;bundle-version="2.6.0",
  org.geotools.referencing;bundle-version="2.6.0",
  org.geotools.data;bundle-version="2.6.0",

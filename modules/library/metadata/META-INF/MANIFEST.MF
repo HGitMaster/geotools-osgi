@@ -4,6 +4,7 @@ Bundle-Name: Metadata Plug-in
 Bundle-SymbolicName: org.geotools.metadata
 Bundle-Version: 2.6.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Eclipse-BuddyPolicy: registered
 Import-Package: javax.measure.converter,
  javax.measure.quantity,
  javax.measure.unit,

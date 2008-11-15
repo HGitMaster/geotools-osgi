@@ -4,6 +4,7 @@ Bundle-Name: Geotools Process Support
 Bundle-SymbolicName: org.geotools.process
 Bundle-Version: 2.6.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Eclipse-RegisterBuddy: org.geotools.metadata
 Import-Package: com.vividsolutions.jts.algorithm,
  com.vividsolutions.jts.geom,
  com.vividsolutions.jts.operation.polygonize,
