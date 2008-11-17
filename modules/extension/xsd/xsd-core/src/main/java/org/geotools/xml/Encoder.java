@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -566,6 +567,12 @@ public class Encoder {
 
         if (namespaceAware) {
             //write out all the namespace prefix value mappings
+            for ( Enumeration e = namespaces.getPrefixes(); e.hasMoreElements(); ) {
+                String prefix = (String) e.nextElement();
+                String uri = namespaces.getURI( prefix );
+                
+                serializer.startPrefixMapping( prefix , uri );
+            }
             for (Iterator itr = schema.getQNamePrefixToNamespaceMap().entrySet().iterator();
                     itr.hasNext();) {
                 Map.Entry entry = (Map.Entry) itr.next();
@@ -662,6 +669,16 @@ public class Encoder {
                             encoded.push(new EncodingEntry(next, element,entry));                            
                         }
                     } else {
+                        //iterator done, special case check here for feature collection
+                        // we need to ensure the iterator is closed properly
+                        Object source = child[2];
+                        if ( source instanceof FeatureCollection ) {
+                            //only close the iterator if not just a wrapping one
+                            if ( !( itr instanceof SingleIterator ) ) {
+                                ((FeatureCollection)source).close( itr );    
+                            }
+                        }
+                        
                         //this child is done, remove from child list
                         entry.children.remove(0);
                     }
@@ -965,10 +982,10 @@ O:
                                     iterator = new SingleIterator(obj);
                                 }
 
-                                entry.children.add(new Object[] { child, iterator });
+                                entry.children.add(new Object[] { child, iterator, obj });
                             } else {
                                 //only one, just add the object
-                                entry.children.add(new Object[] { child, new SingleIterator(obj) });
+                                entry.children.add(new Object[] { child, new SingleIterator(obj), obj });
                             }
                         }
                     }
