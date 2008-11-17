@@ -42,6 +42,7 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.visitor.PropertyNameResolvingVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -340,7 +341,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     public final ReferencedEnvelope getBounds(Query query) throws IOException {
         query = joinQuery( query );
-        
+        query = resolvePropertyNames(query);
         /*
         if ( query == Query.ALL ) {
             //check the cache
@@ -385,7 +386,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     public final int getCount(Query query) throws IOException {
         query = joinQuery( query );
-        
+        query = resolvePropertyNames( query );
         /*
         if ( query == Query.ALL ) {
             //check the cache
@@ -491,6 +492,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     public final  FeatureReader<SimpleFeatureType, SimpleFeature> getReader(Query query) throws IOException {
         query = joinQuery( query );
+        query = resolvePropertyNames(query);
         
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReaderInternal( query );
         
@@ -677,6 +679,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     public final ContentFeatureSource getView(Query query) throws IOException {
         query = joinQuery(query);
+        query = resolvePropertyNames(query);
         
         //reflectively create subclass
         Class clazz = getClass();
@@ -786,6 +789,33 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
         
         // join the queries
         return DataUtilities.mixQueries(this.query, query, null);
+    }
+    
+    /**
+     * This method changes the query object so that all propertyName references are resolved
+     * to simple attribute names against the schema of the feature source.
+     * <p>
+     * For example, this method ensures that propertyName's such as "gml:name" are rewritten as
+     * simply "name".
+     *</p>
+     */
+    protected Query resolvePropertyNames( Query query ) {
+        Filter resolved = resolvePropertyNames( query.getFilter() );
+        if ( resolved == query.getFilter() ) {
+            return query;
+        }
+        
+        DefaultQuery newQuery = new DefaultQuery(query);
+        newQuery.setFilter( resolved );
+        return newQuery;
+    }
+    protected Filter resolvePropertyNames( Filter filter ) {
+        if ( filter == null || filter == Filter.INCLUDE || filter == Filter.EXCLUDE ) {
+            return filter;
+        }
+        
+        return (Filter) filter.accept( 
+            new PropertyNameResolvingVisitor(getSchema()) , null);
     }
     /**
      * Creates the feature type or schema for the feature source.
