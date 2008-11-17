@@ -52,7 +52,6 @@ public final class WPS extends XSD {
     
     protected void addDependencies(Set dependencies) {
        dependencies.add( OWS.getInstance() );
-       dependencies.add( GML.getInstance() );
     }
     
     /**
