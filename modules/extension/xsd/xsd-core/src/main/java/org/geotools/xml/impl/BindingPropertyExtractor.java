@@ -84,7 +84,7 @@ O:
         }
 
         //second, get the properties which cannot be infereed from the schema
-        GetPropertiesExecutor executor = new GetPropertiesExecutor(object);
+        GetPropertiesExecutor executor = new GetPropertiesExecutor(object,element);
         encoder.getBindingWalker().walk(element, executor, context);
 
         if (!executor.getProperties().isEmpty()) {
@@ -101,6 +101,14 @@ O:
 
             for (Iterator e = map.entrySet().iterator(); e.hasNext();) {
                 Map.Entry entry = (Map.Entry) e.next();
+                
+                //key could be a name or a particle
+                if ( entry.getKey() instanceof XSDParticle ) {
+                    XSDParticle particle = (XSDParticle) entry.getKey();
+                    particles.put( Schemas.getParticleName( particle), particle );
+                    continue;
+                }
+                
                 QName name = (QName) entry.getKey();
                 Collection values = (Collection) entry.getValue();
 
@@ -182,23 +190,28 @@ O:
                     }    
                 }
                 
-
                 particles.put(name, particle);
             }
 
             //process the particles in order in which we got the properties
             for (Iterator p = executor.getProperties().iterator(); p.hasNext();) {
                 Object[] property = (Object[]) p.next();
-                QName name = (QName) property[0];
+                Collection values = (Collection) map.get( property[0] );
+                
+                QName name;
+                if ( property[0]  instanceof XSDParticle ) {
+                    name = Schemas.getParticleName( (XSDParticle) property[0] );
+                }
+                else {
+                    name = (QName) property[0];
+                }
 
                 XSDParticle particle = (XSDParticle) particles.get(name);
 
                 if (particle == null) {
                     continue; //already processed, must be a multi property
                 }
-
-                Collection values = (Collection) map.get(name);
-
+                
                 if (values.size() > 1) {
                     //add as is, the encoder will unwrap
                     properties.add(new Object[] { particle, values });

@@ -18,6 +18,8 @@ package org.geotools.xml.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ComplexBinding;
 
@@ -33,11 +35,15 @@ public class GetPropertiesExecutor implements BindingWalker.Visitor {
     /** the parent object */
     Object parent;
 
+    /** the parent element */
+    XSDElementDeclaration element;
+    
     /** the properties */
     List properties;
 
-    public GetPropertiesExecutor(Object parent) {
+    public GetPropertiesExecutor(Object parent, XSDElementDeclaration element) {
         this.parent = parent;
+        this.element = element;
         properties = new ArrayList();
     }
 
@@ -51,7 +57,9 @@ public class GetPropertiesExecutor implements BindingWalker.Visitor {
 
             try {
                 List properties = complex.getProperties(parent);
-
+                if ( properties == null || properties.isEmpty() ) {
+                    properties = complex.getProperties(parent, element);
+                }
                 if (properties != null) {
                     this.properties.addAll(properties);
                 }
