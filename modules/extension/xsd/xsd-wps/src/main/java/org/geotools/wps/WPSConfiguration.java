@@ -21,20 +21,19 @@ import java.util.Map;
 import net.opengis.wps10.DataInputsType1;
 import net.opengis.wps10.DefaultType1;
 import net.opengis.wps10.DefaultType2;
-import net.opengis.wps10.LanguagesType1;
 import net.opengis.wps10.ProcessOutputsType1;
 import net.opengis.wps10.Wps10Factory;
 
-import org.geotools.gml2.GMLConfiguration;
+import org.geotools.gml3.GMLParserDelegate;
 import org.geotools.ows.v1_1.OWSConfiguration;
+import org.geotools.wfs.WFSParserDelegate;
+import org.geotools.wps.bindings.ComplexDataTypeBinding;
+import org.geotools.wps.bindings.InputReferenceTypeBinding;
 import org.geotools.wps.bindings.LanguagesBinding;
 import org.geotools.xml.ComplexEMFBinding;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.SimpleContentComplexEMFBinding;
 import org.picocontainer.MutablePicoContainer;
-
-import org.geotools.wps.bindings.InputReferenceTypeBinding;
-import org.geotools.wps.bindings.ComplexDataTypeBinding;
 
 /**
  * Parser configuration for the http://www.opengis.net/wps/1.0.0 schema.
@@ -52,7 +51,6 @@ public class WPSConfiguration extends Configuration {
        super(WPS.getInstance());
 
        addDependency( new OWSConfiguration());
-       addDependency( new GMLConfiguration());
     }
 
     @Override
@@ -116,5 +114,9 @@ public class WPSConfiguration extends Configuration {
     @Override
     protected void configureContext(MutablePicoContainer container) {
         container.registerComponentInstance(Wps10Factory.eINSTANCE);
+        
+        //register parser delegates for parsing schemas we do not know about
+        container.registerComponentInstance( new GMLParserDelegate() );
+        container.registerComponentInstance( new WFSParserDelegate() );
     }
 }
