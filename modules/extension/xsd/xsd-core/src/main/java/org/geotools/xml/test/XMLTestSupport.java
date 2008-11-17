@@ -43,11 +43,13 @@ import org.geotools.xml.Binding;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.DOMParser;
 import org.geotools.xml.Encoder;
+import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.XSD;
 import org.geotools.xml.impl.BindingFactoryImpl;
 import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.BindingWalkerFactoryImpl;
 import org.geotools.xml.impl.NamespaceSupportWrapper;
+import org.geotools.xml.impl.SchemaIndexImpl;
 
 
 /**
@@ -313,7 +315,7 @@ public abstract class XMLTestSupport extends TestCase {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-
+        
         return dbf.newDocumentBuilder().parse(new ByteArrayInputStream(output.toByteArray()));
     }
 
@@ -340,7 +342,7 @@ public abstract class XMLTestSupport extends TestCase {
         TransformerFactory txFactory = TransformerFactory.newInstance();
         Transformer tx = txFactory.newTransformer();
         tx.setOutputProperty(OutputKeys.INDENT, "yes");
-
+        
         tx.transform(new DOMSource(dom), new StreamResult(System.out));
     }
 
@@ -405,7 +407,9 @@ public abstract class XMLTestSupport extends TestCase {
 
         context.registerComponentInstance(namespaces);
         context.registerComponentInstance(new NamespaceSupportWrapper(namespaces));
-
+        
+        SchemaIndex index = new SchemaIndexImpl( new XSDSchema[]{configuration.schema()} );
+        context.registerComponentInstance(index);
         return bindingLoader.loadBinding(name, context);
     }
 
