@@ -17,7 +17,6 @@
 
 package org.geotools.wps.bindings;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,20 +26,26 @@ import javax.xml.namespace.QName;
 import net.opengis.wps10.ComplexDataType;
 import net.opengis.wps10.Wps10Factory;
 
-import org.geotools.gml2.GML;
 import org.geotools.wps.WPS;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-
+/**
+ *&lt;complexType name="ComplexDataType" mixed="true">
+ *   &lt;annotation>
+ *      &lt;documentation>Complex data (such as an image), including a definition of the complex value data structure (i.e., schema, format, and encoding).  May be an ows:Manifest data structure.&lt;/documentation>
+ *   &lt;/annotation>
+ *   &lt;complexContent mixed="true">
+ *     &lt;extension base="anyType">
+ *        &lt;attributeGroup ref="wps:ComplexDataEncoding"/>
+ *     &lt;/extension>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ *
+ * @author Justin Deoliveira, OpenGEO
+ *
+ */
 public class ComplexDataTypeBinding extends AbstractComplexBinding
 {
     private Wps10Factory factory;
@@ -84,49 +89,6 @@ public class ComplexDataTypeBinding extends AbstractComplexBinding
     }
     
     /*
-    	Would need to look at the contained values to detect the correct
-    	order.
-    */
-    public List<List<Object>> getProperties(Object obj)
-    {
-    	ComplexDataType data = (ComplexDataType)obj;
-    	
-    	List/*<List<Object>>*/ properties = new ArrayList/*<List<Object>>*/();
-
-    	/*
-    	List<?> features = data.getData();
-
-    	for(Object obj0 : features)	// XXX TEST
-    	{
-    		// put all the possible values mapped to qnames.
-    		// for now just support the main GML 2 types
-            if ( obj0 instanceof Point ) {
-                properties.add( new Object[]{ GML.Point, obj0 } );
-            }
-            else if ( obj0 instanceof Polygon ) {
-                properties.add( new Object[]{ GML.Polygon, obj0 } );
-            }
-            else if ( obj0 instanceof LinearRing ) {
-                properties.add( new Object[]{ GML.LinearRing, obj0 } );
-            }             
-            else if ( obj0 instanceof LineString ) {
-                properties.add( new Object[]{ GML.LineString, obj0 } );
-            }   
-            else if ( obj0 instanceof MultiLineString ) {
-                properties.add( new Object[]{ GML.MultiLineString, obj0 } );
-            }      
-            else if ( obj0 instanceof MultiPoint ) {
-                properties.add( new Object[]{ GML.MultiPoint, obj0 } );
-            }          
-            else if ( obj0 instanceof MultiPolygon ) {
-                properties.add( new Object[]{ GML.MultiPolygon, obj0 } );
-            }             
-    	}
-    	*/
-    	return properties;
-    }
-
-    /*
     	NodeImpl -> JTS.Polygon
     */
     public Object parse(ElementInstance instance, Node node, Object value) throws Exception
@@ -143,12 +105,10 @@ public class ComplexDataTypeBinding extends AbstractComplexBinding
             data.setEncoding( node.getAttributeValue( "encoding").toString() );
         }
         
-        /*
         for ( Iterator i = node.getChildren().iterator(); i.hasNext(); ) {
             Node c = (Node) i.next();
             data.getData().add( c.getValue() );
         }
-        */
         
         return data;
     }
