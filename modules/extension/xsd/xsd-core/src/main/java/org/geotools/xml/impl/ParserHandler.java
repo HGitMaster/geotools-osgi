@@ -44,6 +44,7 @@ import javax.xml.namespace.QName;
 import org.geotools.xml.BindingFactory;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.ElementInstance;
+import org.geotools.xml.ParserDelegate;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.geotools.xs.XS;
@@ -221,6 +222,8 @@ public class ParserHandler extends DefaultHandler {
 
         //binding walker support
         context.registerComponentInstance(new BindingWalkerFactoryImpl(bindingLoader, context));
+        
+        docHandler.startDocument();
     }
 
     public void startElement(String uri, String localName, String qName, Attributes attributes)
@@ -416,7 +419,8 @@ O:          for (int i = 0; i < schemas.length; i++) {
             }
 
             index = new SchemaIndexImpl(schemas);
-
+            context.registerComponentInstance(index);
+            
             //if no default prefix is set in this namespace context, then 
             // set it to be the namesapce of the configuration
             if (namespaces.getURI("") == null) {
@@ -459,6 +463,20 @@ O:          for (int i = 0; i < schemas.length; i++) {
             }
         }
 
+        if (handler == null) {
+            //look for ParserDelegate instances in the context to see if there is a delegate
+            // around to handle this
+            List delegates = Schemas.getComponentInstancesOfType(context,ParserDelegate.class);
+            for ( Iterator d = delegates.iterator(); d.hasNext(); ) {
+                ParserDelegate delegate = (ParserDelegate) d.next();
+                if ( delegate.canHandle( qualifiedName ) ) {
+                    //found one
+                    handler = new DelegatingHandler( delegate, qualifiedName, parent );
+                    ((DelegatingHandler)handler).startDocument();
+                }
+                
+            }
+        }
         if (handler == null) {
             //if the type only contains one type of element, just assume the 
             // the element is of that type
@@ -583,6 +601,16 @@ O:          for (int i = 0; i < schemas.length; i++) {
 
         endElementInternal(handler);
 
+        //if the upper most delegating handler, then end the document
+        if ( handler instanceof DelegatingHandler && 
+                !handlers.isEmpty() && !(handlers.peek() instanceof DelegatingHandler) ) {
+            DelegatingHandler dh = (DelegatingHandler) handler;
+            dh.endDocument();
+            
+            //grabbed the parsed value
+            dh.getParseNode().setValue(dh.delegate.getParsedObject());
+        }
+        
         //pop namespace context
         namespaces.popContext();
     }
@@ -594,6 +622,7 @@ O:          for (int i = 0; i < schemas.length; i++) {
     public void endDocument() throws SAXException {
         //only the document handler should be left on the stack
         documentHandler = (DocumentHandler) handlers.pop();
+        documentHandler.endDocument();
         
         //cleanup
         if ( index != null ) {
