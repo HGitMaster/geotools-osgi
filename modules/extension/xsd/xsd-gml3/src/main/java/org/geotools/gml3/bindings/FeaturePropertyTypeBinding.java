@@ -75,4 +75,13 @@ public class FeaturePropertyTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return node.getChildValue(SimpleFeature.class);
     }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        if( GML._Feature.equals( name ) ) {
+            return object;    
+        }
+        return null;
+    }
+    
 }
