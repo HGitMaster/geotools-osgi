@@ -16,15 +16,38 @@
  */
 package org.geotools.gml2.bindings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.xsd.XSDComplexTypeDefinition;
+import org.eclipse.xsd.XSDCompositor;
+import org.eclipse.xsd.XSDDerivationMethod;
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDFactory;
+import org.eclipse.xsd.XSDModelGroup;
+import org.eclipse.xsd.XSDParticle;
+import org.eclipse.xsd.XSDTypeDefinition;
+import org.eclipse.xsd.util.XSDConstants;
 import org.geotools.gml2.GML;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.util.logging.Logging;
+import org.geotools.xml.SchemaIndex;
+import org.geotools.xml.Schemas;
+import org.geotools.xs.XS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -45,6 +68,10 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  */
 public class GML2EncodingUtils {
+    
+    /** logging instance */
+    static Logger LOGGER = Logging.getLogger( "org.geotools.gml");
+    
     static final int LON_LAT = 0;
     static final int LAT_LON = 1;
     static final int INAPPLICABLE = 2;
@@ -226,10 +253,7 @@ public class GML2EncodingUtils {
 
     public static Object AbstractFeatureType_getProperty(Object object,
             QName name) {
-      //JD: here we only handle the "GML" attributes, all the application 
-        // schema attributes are handled by FeaturePropertyExtractor
-
-        //JD: TODO: handle all properties here and kill FeautrePropertyExtractor
+      
         SimpleFeature feature = (SimpleFeature) object;
 
         if (GML.name.equals(name)) {
@@ -260,4 +284,134 @@ public class GML2EncodingUtils {
 
         return null;
     }
+    
+    public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex) {
+        return AbstractFeatureType_getProperties(object, element, schemaIndex, new HashSet<String>(Arrays.asList("name","description","boundedBy")));
+    }
+    
+    public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex, Set<String> toFilter) {
+        SimpleFeature feature = (SimpleFeature) object;
+        
+        //check if this was a resolved feature, if so dont return anything
+        // TODO: this is just a hack for our lame xlink implementation
+        if (feature.getUserData().get("xlink:id") != null) {
+            return Collections.EMPTY_LIST;
+        }
+
+        SimpleFeatureType featureType = feature.getFeatureType();
+
+        String namespace = featureType.getName().getNamespaceURI();
+
+        if (namespace == null) {
+            namespace = element.getTargetNamespace();
+        }
+
+        String typeName = featureType.getTypeName();
+
+        //find the type in the schema
+        XSDTypeDefinition type = schemaIndex.getTypeDefinition(new QName(namespace, typeName));
+
+        if (type == null) {
+            //type not found, do a check for an element, and use its type
+            XSDElementDeclaration e = schemaIndex.getElementDeclaration(new QName(namespace,
+                        typeName));
+
+            if (e != null) {
+                type = e.getTypeDefinition();
+            }
+        }
+
+        if (type == null) {
+            //could not find the feature type in teh schema, create a mock one
+            LOGGER.warning( "Could find type for " + typeName + " in the schema, generating type" + 
+                    "from feature.");
+            type = createXmlTypeFromFeatureType( featureType, schemaIndex, toFilter );
+        }
+
+        List particles = Schemas.getChildElementParticles(type, true);
+        List properties = new ArrayList();
+
+        for (Iterator p = particles.iterator(); p.hasNext();) {
+            XSDParticle particle = (XSDParticle) p.next();
+            XSDElementDeclaration attribute = (XSDElementDeclaration) particle.getContent();
+
+            if (attribute.isElementDeclarationReference()) {
+                attribute = attribute.getResolvedElementDeclaration();
+            }
+
+            //ignore gml attributes
+            if (GML.NAMESPACE.equals(attribute.getTargetNamespace())) {
+                continue;
+            }
+
+            //make sure the feature type has an element
+            if (featureType.getDescriptor(attribute.getName()) == null) {
+                continue;
+            }
+
+            //get the value
+            Object attributeValue = feature.getAttribute(attribute.getName());
+            properties.add(new Object[] { particle, attributeValue });
+        }
+
+        return properties;
+    }
+    
+    public static XSDTypeDefinition createXmlTypeFromFeatureType(SimpleFeatureType featureType, SchemaIndex schemaIndex, Set<String> toFilter ) { 
+        XSDFactory f = XSDFactory.eINSTANCE;
+        Document dom;
+        try {
+            dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException( e );
+        }
+        
+        XSDComplexTypeDefinition type = f.createXSDComplexTypeDefinition();
+        type.setTargetNamespace( featureType.getName().getNamespaceURI() );
+        type.setName( featureType.getTypeName() + "Type" );
+        type.setDerivationMethod(XSDDerivationMethod.EXTENSION_LITERAL);
+        type.setBaseTypeDefinition(schemaIndex.getTypeDefinition( GML.AbstractFeatureType ) );
+                
+        XSDModelGroup group = f.createXSDModelGroup();
+        group.setCompositor(XSDCompositor.SEQUENCE_LITERAL);
+
+        List attributes = featureType.getAttributeDescriptors();
+        for (int i = 0; i < attributes.size(); i++) {
+            AttributeDescriptor attribute = (AttributeDescriptor) attributes.get(i);
+
+            if ( toFilter.contains( attribute.getLocalName() ) ) {
+                continue;
+            }
+           
+            XSDElementDeclaration element = f.createXSDElementDeclaration();
+            element.setName(attribute.getLocalName());
+            element.setNillable(attribute.isNillable());
+
+            //TODO: do a proper mapping
+            /*
+            Class binding = attribute.getType().getBinding();
+            Name typeName = new NameImpl( XS.NAMESPACE, XS.STRING.getLocalPart() );
+            if (typeName == null) {
+                throw new NullPointerException("Could not find a type for property: "
+                    + attribute.getName() + " of type: " + binding.getName());
+            }
+            */
+            element.setTypeDefinition(schemaIndex.getTypeDefinition(XS.STRING));
+
+            XSDParticle particle = f.createXSDParticle();
+            particle.setMinOccurs(attribute.getMinOccurs());
+            particle.setMaxOccurs(attribute.getMaxOccurs());
+            particle.setContent(element);
+            particle.setElement( dom.createElementNS( XSDConstants.SCHEMA_FOR_SCHEMA_URI_2001, "element" ) );
+            
+            group.getContents().add(particle);
+        }
+
+        XSDParticle particle = f.createXSDParticle();
+        particle.setContent(group);
+        particle.setElement( dom.createElementNS( XSDConstants.SCHEMA_FOR_SCHEMA_URI_2001, "sequence") );
+        type.setContent(particle);
+        return type;
+    }
+    
 }

@@ -18,17 +18,23 @@ package org.geotools.gml3.bindings;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.gml3.GML;
 import org.geotools.xlink.XLINK;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.Encoder;
+import org.geotools.xml.SchemaIndex;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
@@ -185,4 +191,10 @@ public class GML3EncodingUtils {
             QName name) {
         return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name);
     }
+    
+    public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex) {
+        return GML2EncodingUtils.AbstractFeatureType_getProperties(object, element, schemaIndex,
+            new HashSet<String>(Arrays.asList("name","description","boundedBy","location","metaDataProperty")));
+    }
+   
 }
