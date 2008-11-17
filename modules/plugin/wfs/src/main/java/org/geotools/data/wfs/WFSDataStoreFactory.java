@@ -117,7 +117,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31824 2008-11-11 19:22:41Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31870 2008-11-17 14:56:38Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -433,6 +433,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
     static WFSStrategy determineCorrectStrategy(URL getCapabilitiesRequest, Document capabilitiesDoc) {
         WFSStrategy strategy = null;
+        
+        // look in comments for indication of CubeWerx server
         NodeList childNodes = capabilitiesDoc.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node child = childNodes.item(i);
@@ -441,18 +443,23 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                 nodeValue = nodeValue.toLowerCase();
                 if (nodeValue.contains("cubewerx")) {
                     strategy = new CubeWerxStrategy();
+                    break;
                 }
             }
         }
 
-        String uri = getCapabilitiesRequest.toExternalForm();
-        if (uri.contains("/mapserv")) {
-            strategy = new MapServerStrategy();
-        } else if (uri.contains("geoserver")) {
-            strategy = new GeoServerStrategy();
+        if (strategy == null) {
+            // guess server implementation from capabilities URI
+            String uri = getCapabilitiesRequest.toExternalForm();
+            if (uri.contains("/mapserv")) {
+                strategy = new MapServerStrategy();
+            } else if (uri.contains("geoserver")) {
+                strategy = new GeoServerStrategy();
+            }
         }
 
         if (strategy == null) {
+            // use fallback strategy
             strategy = new DefaultWFSStrategy();
         }
         logger.info("Using WFS Strategy: " + strategy.getClass().getName());
