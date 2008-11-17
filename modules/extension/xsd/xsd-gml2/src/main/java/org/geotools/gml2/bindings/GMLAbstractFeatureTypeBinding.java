@@ -16,14 +16,18 @@
  */
 package org.geotools.gml2.bindings;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+import org.geotools.xml.SchemaIndex;
 import org.opengis.feature.simple.SimpleFeature;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,10 +69,14 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
 
     /** factory for loading bindings */
     BindingWalkerFactory bwFactory;
+    
+    /** schema index for looking up types */
+    SchemaIndex schemaIndex;
 
-    public GMLAbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory) {
+    public GMLAbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory, SchemaIndex schemaIndex) {
         this.ftCache = ftCache;
         this.bwFactory = bwFactory;
+        this.schemaIndex = schemaIndex;
     }
 
     /**
@@ -107,31 +115,12 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        SimpleFeature feature = (SimpleFeature) object;
-
-        //JD: here we only handle the "GML" attributes, all the application 
-        // schema attributes are handled by FeaturePropertyExtractor
-        //JD: TODO: handle all properties here and kill FeautrePropertyExtractor
-        if (GML.name.equals(name)) {
-            return feature.getAttribute("name");
-        }
-
-        if (GML.description.equals(name)) {
-            return feature.getAttribute("description");
-        }
-
-        if (GML.location.equals(name)) {
-            return feature.getAttribute("location");
-        }
-
-        if (GML.boundedBy.equals(name)) {
-            return feature.getBounds();
-        }
-
-//        if (feature.getFeatureType().getDescriptor(name.getLocalPart()) != null) {
-//            return feature.getAttribute(name.getLocalPart());
-//        }
-
-        return null;
+        return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name);
+    }
+    
+    @Override
+    public List getProperties(Object object, XSDElementDeclaration element)
+            throws Exception {
+        return GML2EncodingUtils.AbstractFeatureType_getProperties(object, element, schemaIndex);
     }
 }
