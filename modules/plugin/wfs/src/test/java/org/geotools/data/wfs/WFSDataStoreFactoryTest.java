@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 import org.geotools.data.wfs.v1_1_0.CubeWerxStrategy;
 import org.geotools.data.wfs.v1_1_0.DefaultWFSStrategy;
 import org.geotools.data.wfs.v1_1_0.GeoServerStrategy;
+import org.geotools.data.wfs.v1_1_0.IonicStrategy;
 import org.geotools.data.wfs.v1_1_0.WFSStrategy;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.test.TestData;
@@ -86,18 +87,25 @@ public class WFSDataStoreFactoryTest {
         WFSStrategy strategy;
 
         url = TestData.url(this, "geoserver_capabilities_1_1_0.xml");
-        in = TestData.openStream(this, "geoserver_capabilities_1_1_0.xml");
+        in = url.openStream();
         capabilitiesDoc = WFSDataStoreFactory.parseCapabilities(in);
         strategy = WFSDataStoreFactory.determineCorrectStrategy(url, capabilitiesDoc);
         assertNotNull(strategy);
         assertEquals(GeoServerStrategy.class, strategy.getClass());
 
         url = TestData.url(this, "cubewerx_capabilities_1_1_0.xml");
-        in = TestData.openStream(this, "cubewerx_capabilities_1_1_0.xml");
+        in = url.openStream();
         capabilitiesDoc = WFSDataStoreFactory.parseCapabilities(in);
         strategy = WFSDataStoreFactory.determineCorrectStrategy(url, capabilitiesDoc);
         assertNotNull(strategy);
         assertEquals(CubeWerxStrategy.class, strategy.getClass());
+
+        url = TestData.url(this, "ionic_capabilities_1_1_0.xml");
+        in = url.openStream();
+        capabilitiesDoc = WFSDataStoreFactory.parseCapabilities(in);
+        strategy = WFSDataStoreFactory.determineCorrectStrategy(url, capabilitiesDoc);
+        assertNotNull(strategy);
+        assertEquals(IonicStrategy.class, strategy.getClass());
     }
 
     @Test

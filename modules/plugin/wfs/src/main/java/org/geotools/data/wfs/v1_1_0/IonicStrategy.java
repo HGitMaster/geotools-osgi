@@ -5,12 +5,12 @@ import org.geotools.filter.v1_0.OGCConfiguration;
 import org.geotools.xml.Configuration;
 import org.opengis.filter.Filter;
 
-public class MapServerStrategy extends DefaultWFSStrategy {
+public class IonicStrategy extends DefaultWFSStrategy {
 
     private static Configuration filter_1_0_0_Configuration = new OGCConfiguration();
 
     /**
-     * MapServer does not declare the supported output formats in the caps, yet it fails if asked
+     * Ionic does not declare the supported output formats in the caps, yet it fails if asked
      * for {@code text/xml; subtype=gml/3.1.1} but succeeds if asked for {@code GML3}
      */
     @Override
@@ -24,7 +24,7 @@ public class MapServerStrategy extends DefaultWFSStrategy {
     // }
 
     /**
-     * MapServer seems not to support any filtering
+     * Ionic seems not to support any filtering well
      */
     @Override
     protected Filter[] splitFilters(WFS_1_1_0_DataStore ds, WFSProtocol wfs, Filter queryFilter) {

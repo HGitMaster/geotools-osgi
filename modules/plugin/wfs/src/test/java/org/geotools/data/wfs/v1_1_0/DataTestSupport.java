@@ -131,7 +131,7 @@ public final class DataTestSupport {
             new QName("http://www.fgdc.gov/framework/073004/transportation", "RoadSeg"),
             "trans:RoadSeg", "EPSG:4269");
 
-    public static final TestDataType MAPSERVER_STATISTICAL_UNIT = new TestDataType("Mapserver",
+    public static final TestDataType IONIC_STATISTICAL_UNIT = new TestDataType("Ionic",
             new QName("http://www.fgdc.gov/fgdc/gubs", "StatisticalUnit"),
             "gubs:StatisticalUnit", "EPSG:4269");
 
