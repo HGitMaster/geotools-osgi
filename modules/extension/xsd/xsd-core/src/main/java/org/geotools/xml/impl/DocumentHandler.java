@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.impl;
 
+import org.xml.sax.SAXException;
+
 public interface DocumentHandler extends Handler {
     /**
      * Returns the element handler for the root element of
@@ -25,4 +27,8 @@ public interface DocumentHandler extends Handler {
      */
 
     //ElementHandler getDocumentElementHandler();
+    
+    void startDocument() throws SAXException;
+    
+    void endDocument() throws SAXException;
 }

@@ -18,9 +18,14 @@ package org.geotools.xml;
 
 import junit.framework.TestCase;
 import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.geotools.ml.MLConfiguration;
 import org.geotools.ml.Mail;
 import org.geotools.ml.bindings.MLSchemaLocationResolver;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 
@@ -61,6 +66,85 @@ public class ParserTest extends TestCase {
             fail( "should have thrown an error with setFailOnValidationError set");
         }
         catch( SAXException e ) {
+        }
+        
+    }
+    
+    public void testParserDelegate() throws Exception {
+        MLConfiguration config = new MLConfiguration();
+        
+        MyParserDelegate delegate = new MyParserDelegate();
+        assertFalse( delegate.foo );
+        assertFalse( delegate.bar );
+        
+        config.getContext().registerComponentInstance(  delegate );
+       
+        Parser parser = new Parser(config);
+        Object o = parser.parse( ParserTest.class.getResourceAsStream( "parserDelegate.xml") );
+    
+        assertTrue( delegate.foo );
+        assertTrue( delegate.bar );
+    }
+    
+    static class MyParserDelegate implements ParserDelegate {
+
+        boolean foo = false;
+        boolean bar = false;
+        
+        public boolean canHandle(QName elementName) {
+            return "parserDelegateElement".equals( elementName.getLocalPart() );
+        }
+        
+        public void initialize(QName elementName) {
+        }
+
+        public Object getParsedObject() {
+            return null;
+        }
+
+        public void characters(char[] ch, int start, int length)
+                throws SAXException {
+            if ( !bar && "bar".equals( new String( ch, start, length ) ) ) {
+                bar = true;
+            }
+        }
+
+        public void endDocument() throws SAXException {
+        }
+
+        public void endElement(String uri, String localName, String name)
+                throws SAXException {
+        }
+
+        public void endPrefixMapping(String prefix) throws SAXException {
+        }
+
+        public void ignorableWhitespace(char[] ch, int start, int length)
+                throws SAXException {
+        }
+
+        public void processingInstruction(String target, String data)
+                throws SAXException {
+        }
+
+        public void setDocumentLocator(Locator locator) {
+        }
+
+        public void skippedEntity(String name) throws SAXException {
+        }
+
+        public void startDocument() throws SAXException {
+        }
+
+        public void startElement(String uri, String localName, String name,
+                Attributes atts) throws SAXException {
+            if ( !foo && "foo".equals( localName ) ) {
+                foo = true;
+            }
+        }
+
+        public void startPrefixMapping(String prefix, String uri)
+                throws SAXException {
         }
         
     }
