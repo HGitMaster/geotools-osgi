@@ -502,7 +502,7 @@ public class SLDTransformer extends TransformerBase {
                 // no filter
             }
             else {
-                filterTranslator.encode(filter);
+                element("Filter", filter);
             }
 
             if (rule.hasElseFilter()) {
