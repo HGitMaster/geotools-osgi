@@ -821,6 +821,11 @@ public class Schemas {
                 if (grp != null) {
                     //enque all particles in the group
                     List parts = grp.getParticles();
+                    
+                    //TODO: this check isa  bit hacky.. .figure out why this is the case
+                    if ( parts.isEmpty() ) {
+                        parts = grp.getContents();
+                    }
 
                     //add in reverse order to front of queue to maintain order
                     for (int i = parts.size() - 1; i >= 0; i--) {
@@ -1291,6 +1296,17 @@ public class Schemas {
             });
     }
 
+    /**
+     * Returns the name of the element represented by the particle as a QName.
+     */
+    public static QName getParticleName(XSDParticle particle) {
+        XSDElementDeclaration content = (XSDElementDeclaration) particle.getContent();
+        if ( content.isElementDeclarationReference() ) {
+            content = content.getResolvedElementDeclaration();
+        }
+        return new QName( content.getTargetNamespace(),content.getName() );
+    }
+    
     /**
      * Simple visitor interface for visiting elements which are part of
      * complex types. This interface is private api because there is probably
