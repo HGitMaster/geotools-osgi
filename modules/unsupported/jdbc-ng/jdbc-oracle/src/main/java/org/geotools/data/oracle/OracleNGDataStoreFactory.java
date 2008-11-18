@@ -17,13 +17,8 @@
 package org.geotools.data.oracle;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.dbcp.BasicDataSource;
-import org.geotools.data.DataAccessFactory.Param;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
@@ -37,12 +32,11 @@ import org.geotools.jdbc.SQLDialect;
 public class OracleNGDataStoreFactory extends JDBCDataStoreFactory {
     private static final String JDBC_PATH = "jdbc:oracle:thin:@";
     
+    /** parameter for database port */
+    public static final Param PORT = new Param("port", Integer.class, "Port", true, 1521);
+    
     /** parameter for namespace of the datastore */
     public static final Param LOOSEBBOX = new Param("Loose bbox", Boolean.class, "Perform only primary filter on bbox", false, Boolean.TRUE);
-    
-    /** verify the connection is alive and well before using it   */
-    public static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
-            "check connection is alive before using it", false, Boolean.FALSE);
     
     @Override
     protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
@@ -82,60 +76,65 @@ public class OracleNGDataStoreFactory extends JDBCDataStoreFactory {
         return dataStore;
     }
     
+//    @Override
+//    protected DataSource createDataSource(Map params) throws IOException {
+//        BasicDataSource dataSource = new BasicDataSource();
+//
+//        //driver
+//        dataSource.setDriverClassName(getDriverClassName());
+//
+//        //jdbc url
+//        
+//        dataSource.setUrl(dbUrl);
+//
+//        //username
+//        String user = (String) USER.lookUp(params);
+//        dataSource.setUsername(user);
+//
+//        //password
+//        String passwd = (String) PASSWD.lookUp(params);
+//
+//        if (passwd != null) {
+//            dataSource.setPassword(passwd);
+//        }
+//
+//        // setup pooling
+//        dataSource.setMinIdle(4);
+//        dataSource.setMaxActive(20);
+//        dataSource.setAccessToUnderlyingConnectionAllowed(true);
+//        dataSource.setPoolPreparedStatements(true);
+//        dataSource.setDefaultTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+//        
+//        // check connections?
+//        Boolean validate = (Boolean) VALIDATECONN.lookUp(params);
+//        if(Boolean.TRUE.equals(validate))
+//            dataSource.setValidationQuery("select sysdate from dual");
+//        
+//        return dataSource;
+//    }
+    
     @Override
-    protected DataSource createDataSource(Map params) throws IOException {
-        BasicDataSource dataSource = new BasicDataSource();
-
-        //driver
-        dataSource.setDriverClassName(getDriverClassName());
-
-        //jdbc url
+    protected String getJDBCUrl(Map params) throws IOException {
         String host = (String) HOST.lookUp(params);
         String db = (String) DATABASE.lookUp(params);
         int port = (Integer) PORT.lookUp(params);
-        String dbUrl = null;
         if( db.startsWith("(") )
-            dbUrl = JDBC_PATH + db;
+            return JDBC_PATH + db;
         else if( db.startsWith("/") )
-            dbUrl = JDBC_PATH + "//" + host + ":" + port + db;
+            return JDBC_PATH + "//" + host + ":" + port + db;
         else
-            dbUrl = JDBC_PATH + host + ":" + port + ":" + db;
-        dataSource.setUrl(dbUrl);
-
-        //username
-        String user = (String) USER.lookUp(params);
-        dataSource.setUsername(user);
-
-        //password
-        String passwd = (String) PASSWD.lookUp(params);
-
-        if (passwd != null) {
-            dataSource.setPassword(passwd);
-        }
-
-        // setup pooling
-        dataSource.setMinIdle(4);
-        dataSource.setMaxActive(20);
-        dataSource.setAccessToUnderlyingConnectionAllowed(true);
-        dataSource.setPoolPreparedStatements(true);
-        dataSource.setDefaultTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        
-        // check connections?
-        Boolean validate = (Boolean) VALIDATECONN.lookUp(params);
-        if(Boolean.TRUE.equals(validate))
-            dataSource.setValidationQuery("select sysdate from dual");
-        
-        // pool eviction settings
-        dataSource.setMinEvictableIdleTimeMillis(1000 * 60);
-        dataSource.setTimeBetweenEvictionRunsMillis(1000 * 10);
-        
-        return dataSource;
+            return JDBC_PATH + host + ":" + port + ":" + db;
     }
     
     @Override
     protected void setupParameters(Map parameters) {
         super.setupParameters(parameters);
         parameters.put(LOOSEBBOX.key, LOOSEBBOX);
-        parameters.put(VALIDATECONN.key, VALIDATECONN);
+        parameters.put(PORT.key, PORT);
+    }
+    
+    @Override
+    protected String getValidationQuery() {
+        return "select sysdate from dual";
     }
 }

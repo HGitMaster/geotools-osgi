@@ -51,4 +51,9 @@ public class DB2NGDataStoreFactory extends JDBCDataStoreFactory {
     public String getDescription() {
         return "DB2 Database";
     }
+    
+    @Override
+    protected String getValidationQuery() {
+        return "select current date from sysibm.sysdummy1";
+    }
 }
