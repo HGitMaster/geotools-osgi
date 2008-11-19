@@ -17,13 +17,19 @@
 
 package org.geotools.filter.text.cql2;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.geotools.filter.text.commons.CompilerUtil;
 import org.geotools.filter.text.commons.Language;
 import org.junit.Assert;
 import org.junit.Test;
+import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 
 /**
  * Test for Temporal Predicate
@@ -79,6 +85,7 @@ public class CQLTemporalPredicateTest {
     public void before() throws Exception {
         Filter resultFilter;
         Filter expected;
+
         // -------------------------------------------------------------
         // <attribute_name> BEFORE <date-time expression>
         // -------------------------------------------------------------
@@ -90,7 +97,7 @@ public class CQLTemporalPredicateTest {
         expected = FilterCQLSample.getSample(FilterCQLSample.FILTER_BEFORE_DATE);
         Assert.assertEquals("less filter ", expected, resultFilter);
 
-        // ATTR1 BEFORE 2006-11-31T01:30:00Z/2006-12-31T01:30:00Z
+        // ATTR1 BEFORE 2006-11-31T01:30:00Z/2006-12-31T01:30:00Z                                             
         resultFilter = CompilerUtil.parseFilter(this.language,FilterCQLSample.FILTER_BEFORE_PERIOD_BETWEEN_DATES);
 
         Assert.assertNotNull("Filter expected", resultFilter);
@@ -136,7 +143,31 @@ public class CQLTemporalPredicateTest {
         Assert.assertEquals("greater filter", expected, resultFilter);
 
     }
-    
+
+    /**
+     * It must produce a filter with an instance of Date object
+     * 
+     * @throws Exception
+     */
+    @Test 
+    public void dateTime() throws Exception{
+                
+        Filter resultFilter = CompilerUtil.parseFilter(this.language, "ZONE_VALID_FROM BEFORE 2008-09-09T17:00:00Z");
+
+        BinaryComparisonOperator comparation = (BinaryComparisonOperator) resultFilter;
+
+        // date test
+        Expression expr2 = comparation.getExpression2();
+        Literal literalDate = (Literal)expr2;
+        
+        final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        
+        Date expectedDate = dateFormatter.parse("2008-09-09T17:00:00Z");
+        Date actualDate = (Date) literalDate.getValue();
+        
+        Assert.assertEquals(expectedDate, actualDate);
+        
+    }
     /**
      * before with compound attribute
      * 

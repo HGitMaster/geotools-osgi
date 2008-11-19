@@ -19,7 +19,6 @@ package org.geotools.filter.text.txt;
 import java.util.List;
 
 import org.geotools.filter.text.commons.CompilerUtil;
-import org.geotools.filter.text.commons.Language;
 import org.geotools.filter.text.cql2.CQLException;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -69,7 +68,7 @@ import org.opengis.filter.expression.Expression;
  * @since 2.6
  */
 class TXT {
-    
+//TODO switch to public before publish    
     private TXT(){
         // do nothing, private constructor
         // to indicate it is a pure utility class
@@ -106,7 +105,8 @@ class TXT {
     public static Filter toFilter(final String txtPredicate, final FilterFactory filterFactory)
         throws CQLException {
 
-        Filter result = CompilerUtil.parseFilter(Language.TXT, txtPredicate, filterFactory);
+        TXTCompilerFactory compilerFactory = new TXTCompilerFactory();
+        Filter result = CompilerUtil.parseFilter(txtPredicate, compilerFactory, filterFactory);
 
         return result;
     }
@@ -141,8 +141,9 @@ class TXT {
     public static Expression toExpression(final String txtExpression,
             final FilterFactory filterFactory) throws CQLException {
 
-        Expression expression = CompilerUtil.parseExpression(Language.TXT,
-                txtExpression, filterFactory);
+        TXTCompilerFactory compilerFactory = new TXTCompilerFactory();
+
+        Expression expression = CompilerUtil.parseExpression(txtExpression, compilerFactory, filterFactory);
 
         return expression;
     }
@@ -153,17 +154,35 @@ class TXT {
      * <code>Filter</code>s, using the provided FilterFactory.
      *
      * @param txtSequencePredicate
-     *            a list of OGC CQL predicates separated by <code>|</code>
+     *            a list of TXT predicates separated by <code>|</code>
      *
-     * @return a List of {@link Filter}, one for each input CQL statement
+     * @return a List of {@link Filter}, one for each input TXT statement
      */
     public static List<Filter> toFilterList(final String txtSequencePredicate)
         throws CQLException {
-        
-        List<Filter> filters =  CompilerUtil.parseFilterList(Language.TXT, txtSequencePredicate);
 
-        return filters;
+        return toFilterList(txtSequencePredicate, null);
     }
     
+    /**
+     * Parses the input string, which has to be a list of TXT predicates
+     * separated by <code>;</code> into a <code>List</code> of
+     * <code>Filter</code>s, using the provided FilterFactory.
+     *
+     * @param txtSequencePredicate a txt predicate sequence
+     * @param filterFactory the factory used to make the filters
+     * @return a List of {@link Filter}, one for each input TXT statement
+     * @throws CQLException
+     */
+    public static List<Filter> toFilterList(final String txtSequencePredicate, FilterFactory filterFactory)
+        throws CQLException {
+
+        TXTCompilerFactory compilerFactory = new TXTCompilerFactory();
+
+        List<Filter> filters = CompilerUtil.parseFilterList(txtSequencePredicate, compilerFactory, filterFactory);
+        
+        return filters;
+    
+    }
     
 }

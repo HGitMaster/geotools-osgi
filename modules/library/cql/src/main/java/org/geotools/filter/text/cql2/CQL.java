@@ -25,7 +25,6 @@ import javax.xml.transform.TransformerException;
 
 import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.text.commons.CompilerUtil;
-import org.geotools.filter.text.commons.Language;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
@@ -87,7 +86,7 @@ import org.opengis.filter.expression.Expression;
  * @since 2.5
  * @author Mauricio Pazos (Axios Engineering)
  * @author Gabriel Roldan (Axios Engineering)
- * @version $Id: CQL.java 31659 2008-10-14 08:31:18Z mauricio.pazos $
+ * @version $Id: CQL.java 31879 2008-11-19 12:46:47Z mauricio.pazos $
  * @source $URL:
  *        http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQL.java $
  */
@@ -128,9 +127,10 @@ public class CQL {
     public static Filter toFilter(final String cqlPredicate, final FilterFactory filterFactory)
         throws CQLException {
 
-            Filter result = CompilerUtil.parseFilter(Language.CQL, cqlPredicate, filterFactory);
+        CQLCompilerFactory compilerFactory = new CQLCompilerFactory();
+        Filter result = CompilerUtil.parseFilter(cqlPredicate, compilerFactory, filterFactory);
 
-            return result;
+        return result;
     }
     
 
@@ -163,10 +163,11 @@ public class CQL {
      */
     public static Expression toExpression(final String cqlExpression,
                                           final FilterFactory filterFactory) throws CQLException {
+        CQLCompilerFactory compilerFactory = new CQLCompilerFactory();
 
-        Expression result = CompilerUtil.parseExpression(Language.CQL, cqlExpression, filterFactory);
+        Expression expression = CompilerUtil.parseExpression(cqlExpression, compilerFactory, filterFactory);
 
-        return result;
+        return expression;
     }
 
     /**
@@ -218,7 +219,7 @@ public class CQL {
      * separated by <code>|</code> into a <code>List</code> of
      * <code>Filter</code>s, using the provided FilterFactory.
      *
-     * @param cqlSourceFilterList
+     * @param cqlSequencePredicate
      *            a list of OGC CQL predicates separated by <code>|</code>
      *
      * @param filterFactory
@@ -226,15 +227,15 @@ public class CQL {
      *            Expression. If it is null the method finds the default implementation.
      * @return a List of {@link Filter}, one for each input CQL statement
      */
-    public static List<Filter> toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
+    public static List<Filter> toFilterList(final String cqlSequencePredicate, final FilterFactory filterFactory)
         throws CQLException {
         
-        List<Filter> results = CompilerUtil.parseFilterList(Language.CQL,cqlSourceFilterList, filterFactory);
+        CQLCompilerFactory compilerFactory = new CQLCompilerFactory();
 
-        return results;
+        List<Filter> filters = CompilerUtil.parseFilterList(cqlSequencePredicate, compilerFactory, filterFactory);
 
+        return filters;
     }
-
 
     public static final void main(String[] args) {
         System.out.println("Expression Tester (\"quit\" to finish)");
