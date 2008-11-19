@@ -774,7 +774,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
         }
 
         return new IndexedShapefileFeatureWriter(typeName, shpFiles, attReader,
-                featureReader, this);
+                featureReader, this, dbfCharset);
     }
 
     /**

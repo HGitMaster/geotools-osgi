@@ -580,7 +580,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         }
 
         return new ShapefileFeatureWriter(typeName, shpFiles, attReader,
-                featureReader);
+                featureReader, dbfCharset);
     }
 
     /**

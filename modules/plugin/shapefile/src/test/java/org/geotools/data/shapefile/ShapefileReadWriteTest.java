@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 
 import junit.framework.AssertionFailedError;
 
@@ -38,36 +39,62 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/ShapefileReadWriteTest.java $
- * @version $Id: ShapefileReadWriteTest.java 30670 2008-06-12 23:59:23Z acuster $
+ * @version $Id: ShapefileReadWriteTest.java 31878 2008-11-19 08:40:38Z aaime $
  * @author Ian Schneider
  */
 public class ShapefileReadWriteTest extends TestCaseSupport {
     final String[] files = { "shapes/statepop.shp", "shapes/polygontest.shp",
             "shapes/pointtest.shp", "shapes/holeTouchEdge.shp",
-            "shapes/stream.shp" };
+            "shapes/stream.shp", "shapes/chinese_poly.shp" };
 
     /** Creates a new instance of ShapefileReadWriteTest */
     public ShapefileReadWriteTest(String name) throws IOException {
         super(name);
     }
-
-    public void testAll() {
-        StringBuffer errors = new StringBuffer();
-        Exception bad = null;
-        for (int i = 0, ii = files.length; i < ii; i++) {
-            try {
-                test(files[i]);
-            } catch (Exception e) {
-                System.out.println("File failed:" + files[i] + " " + e);
-                e.printStackTrace();
-                errors.append("\nFile " + files[i] + " : " + e.getMessage());
-                bad = e;
-            }
-        }
-        if (errors.length() > 0) {
-            fail(errors.toString(), bad);
-        }
+    
+    public void testReadWriteStatePop() throws Exception {
+        test("shapes/statepop.shp");
     }
+    
+    public void testReadWritePolygonTest() throws Exception {
+        test("shapes/polygontest.shp");
+    }
+    
+    public void testReadWritePointTest() throws Exception {
+        test("shapes/pointtest.shp");
+    }
+    
+    public void testReadWriteHoleTouchEdge() throws Exception {
+        test("shapes/holeTouchEdge.shp");
+    }
+    
+    public void testReadWriteChinese() throws Exception {
+        test("shapes/chinese_poly.shp", Charset.forName("GB18030"));
+    }
+    
+    public void testReadDanishPoint() throws Exception {
+        test("shapes/danish_point.shp");
+    }
+    
+    
+
+//    public void testAll() {
+//        StringBuffer errors = new StringBuffer();
+//        Exception bad = null;
+//        for (int i = 0, ii = files.length; i < ii; i++) {
+//            try {
+//                
+//            } catch (Exception e) {
+//                System.out.println("File failed:" + files[i] + " " + e);
+//                e.printStackTrace();
+//                errors.append("\nFile " + files[i] + " : " + e.getMessage());
+//                bad = e;
+//            }
+//        }
+//        if (errors.length() > 0) {
+//            fail(errors.toString(), bad);
+//        }
+//    }
 
     boolean readStarted = false;
 
@@ -140,10 +167,19 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         fail.initCause(cause);
         throw fail;
     }
-
+    
     private void test(String f) throws Exception {
+        test(f, null);
+    }
+
+    private void test(String f, Charset charset) throws Exception {
         copyShapefiles(f); // Work on File rather than URL from JAR.
-        ShapefileDataStore s = new ShapefileDataStore(TestData.url(TestCaseSupport.class, f));
+        ShapefileDataStore s = null;
+        if(charset == null) {
+            s = new ShapefileDataStore(TestData.url(TestCaseSupport.class, f));
+        } else {
+            s = new ShapefileDataStore(TestData.url(TestCaseSupport.class, f), false, charset);
+        }
         String typeName = s.getTypeNames()[0];
         FeatureSource<SimpleFeatureType, SimpleFeature> source = s.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
@@ -151,21 +187,23 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         File tmp = getTempFile();
 
         ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();
-        test(type, one, tmp, maker, true);
+        test(type, one, tmp, maker, true, charset);
 
         File tmp2 = getTempFile(); // TODO consider reuse tmp results in
         // failure
-        test(type, one, tmp2, maker, false);
+        test(type, one, tmp2, maker, false, charset);
     }
 
     private void test(SimpleFeatureType type, FeatureCollection<SimpleFeatureType, SimpleFeature> original,
-            File tmp, ShapefileDataStoreFactory maker, boolean memorymapped)
+            File tmp, ShapefileDataStoreFactory maker, boolean memorymapped, Charset charset)
             throws IOException, MalformedURLException, Exception {
 
         ShapefileDataStore shapefile;
         String typeName;
         shapefile = (ShapefileDataStore) maker.createDataStore(tmp.toURL(),
                 memorymapped);
+        if(charset != null)
+            shapefile.setStringCharset(charset);
 
         shapefile.createSchema(type);
 
@@ -179,8 +217,11 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 
         if (true) {
             // review open
-            ShapefileDataStore review = new ShapefileDataStore(tmp.toURL(), tmp
-                    .toURI(), memorymapped);
+            ShapefileDataStore review;
+            if(charset == null) 
+                review = new ShapefileDataStore(tmp.toURL(), tmp.toURI(), memorymapped);
+            else
+                review = new ShapefileDataStore(tmp.toURL(), tmp.toURI(), memorymapped, charset);
             typeName = review.getTypeNames()[0];
             FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = review.getFeatureSource(typeName);
             FeatureCollection<SimpleFeatureType, SimpleFeature> again = featureSource.getFeatures();
