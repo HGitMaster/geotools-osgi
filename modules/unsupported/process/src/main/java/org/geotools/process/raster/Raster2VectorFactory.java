@@ -16,10 +16,7 @@
  */
 package org.geotools.process.raster;
 
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
-import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,23 +51,28 @@ import org.opengis.util.ProgressListener;
 import com.vividsolutions.jts.algorithm.InteriorPointArea;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.operation.polygonize.Polygonizer;
 import javax.media.jai.TiledImage;
 import javax.media.jai.iterator.RandomIterFactory;
 
+
 /**
  * Process for converting a raster to a vector.
+ * <p>
+ * The algorithm used is adapted from the GRASS raster to vector C code. It moves
+ * a 2x2 kernel over the input raster. The data in the kernel are matched to a
+ * table of the 12 possible configurations indicating which horizontal and/or
+ * vertical pixel boundaries need to be traced.
  * 
- * As a learning exercise I've re-written the Java version of the GRASS raster to vector routine.
- * I'm using it currently with very modest rasters and so far, so good. I'd be grateful for any
- * comments or (especially) suggestions for improvements. And if it's useful to you, in whole or
- * part, please feel free to do whatever.
- * 
- * @author Michael Bedward
+ * @author Michael Bedward <michael.bedward@gmail.com>
  */
 public class Raster2VectorFactory implements ProcessFactory {
+
+    private static final String VERSION_STRING = "0.0.2";
+
     /**
      * Creates a Process that can be executed later.
      * <p>
@@ -99,10 +101,18 @@ public class Raster2VectorFactory implements ProcessFactory {
         };
     }
 
+    /**
+     * Get a descrption for this proecess
+     * @return the string: Raster to Vector transformation
+     */
     public InternationalString getDescription() {
         return Text.text("Raster to Vector transformation");
     }
 
+    /**
+     * Get the name of this process
+     * @return the string: Raster2Vector
+     */
     public String getName() {
         return "Raster2Vector";
     }
@@ -110,11 +120,15 @@ public class Raster2VectorFactory implements ProcessFactory {
     /**
      * Description input parameters.
      * <ul>
-     * <li>raster: the input coverage <li>band: the index of the band to be vectorized <li>nodata: a
-     * value to represent 'outside' or no data
+     * <li>raster: the input coverage
+     * <li>band: the index of the band to be vectorized
+     * <li>nodata: a double value which represents 'outside' or no data
      * </ul>
-     * 
+     *
      * @return Map of Parameter describing valid input parameters
+     *
+     * @todo introduce more flexibility here so that, for instance, we can
+     * requrest that a subset of the values in the input raster are vectorized
      */
     public Map<String, Parameter<?>> getParameterInfo() {
         Map<String, Parameter<?>> info = new HashMap<String, Parameter<?>>();
@@ -127,6 +141,12 @@ public class Raster2VectorFactory implements ProcessFactory {
         return info;
     }
 
+    /**
+     * Get information about the results
+     * @param parameters ???
+     * @return
+     * @throws java.lang.IllegalArgumentException
+     */
     public Map<String, Parameter<?>> getResultInfo(Map<String, Object> parameters)
             throws IllegalArgumentException {
         Map<String, Parameter<?>> info = new HashMap<String, Parameter<?>>();
@@ -140,14 +160,25 @@ public class Raster2VectorFactory implements ProcessFactory {
         return info;
     }
 
+    /**
+     * @return the string: Raster2Vector
+     */
     public InternationalString getTitle() {
         return Text.text("Raster2Vector");
     }
 
+    /**
+     * Get the version of this process
+     * @return
+     */
     public String getVersion() {
-        return "0.0.1";
+        return VERSION_STRING;
     }
 
+    /**
+     * Check if this process supports a progress listener
+     * @return always returns true
+     */
     public boolean supportsProgress() {
         return true;
     }
@@ -155,8 +186,8 @@ public class Raster2VectorFactory implements ProcessFactory {
     /**
      * We can generate a schema; but we need to know the CoordinateReferenceSystem.
      * 
-     * @param crs
-     * @return
+     * @param crs a coorindate reference system for the features
+     * @return a new SimpleFeatureType object
      */
     public static SimpleFeatureType getSchema(CoordinateReferenceSystem crs) {
         SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
@@ -170,10 +201,9 @@ public class Raster2VectorFactory implements ProcessFactory {
         return type;
     }
 }
-
 /**
  * A class to vectorize discrete regions of uniform data in the specified band of a GridCoverage2D
- * object.
+ * object. Data are treated as double values regardless of the data type of the input grid coverage.
  * 
  * @author Michael Bedward <michael.bedward@gmail.com>
  */
@@ -208,17 +238,17 @@ class Raster2Vector {
     private static final int BR = 3;
 
     // Precision of comparison in the function different(a, b)
-    private static final double epsilon = 1.0e-8d;
+    private static final double EPSILON = 1.0e-10d;
 
     /**
      * array of Coor objects that store end-points of vertical lines under construction
      */
-    private Map<Integer, LineSeg> vertLines;
+    private Map<Integer, LineSegment> vertLines;
 
     /**
      * end-points of horizontal line under construction
      */
-    private LineSeg horizLine;
+    private LineSegment horizLine;
 
     /**
      * collection of line strings on the boundary of raster regions
@@ -227,6 +257,9 @@ class Raster2Vector {
 
     private TiledImage image;
 
+    /**
+     * Constructor (empty at present)
+     */
     public Raster2Vector() {
     }
 
@@ -239,6 +272,7 @@ class Raster2Vector {
      *            the index of the band to be vectorized
      * @param outside
      *            a value to represent 'outside' or no data
+     *
      * @return a FeatureCollection containing simple polygon features
      * 
      * @todo Presently it is assumed that there is only a single tile in the coverage raster. Need
@@ -268,10 +302,10 @@ class Raster2Vector {
     /**
      * Assemble a feature collection from the raster
      * 
-     * @param grid
-     * @param band
-     * @param type
-     * @param progress
+     * @param grid the input grid coverage
+     * @param band the band containing the data to vectorize
+     * @param type feature type
+     * @param progress a progress listener (may be null)
      * @return
      */
     private FeatureCollection assembleFeatures(GridCoverage2D grid, int band,
@@ -316,8 +350,10 @@ class Raster2Vector {
         }
     }
 
-    /*
+    /**
      * Set convenience data fields and create the data objects
+     * @param coverage the input grid coverage
+     * @param progress a progress listener (may be null)
      */
     private void initialize(GridCoverage2D coverage, ProgressListener progress) {
         if (progress == null)
@@ -346,16 +382,19 @@ class Raster2Vector {
 
             progress.progress(0.8f);
 
-            vertLines = new HashMap<Integer, LineSeg>();
+            vertLines = new HashMap<Integer, LineSegment>();
         } finally {
             progress.complete();
         }
     }
 
-    /***********************************************************
-     * Vectorize discrete regions in the raster and collect the boundaries as LineStrings
-     * 
-     ***********************************************************/
+    /**
+     * Vectorize the boundaries of regions of uniform value in the input grid coverage
+     * and collect the boundaries as LineStrings
+     * @param band index of the band which contains the data to be vectorized
+     * @param outside a double value indicating 'outside' or nodata
+     * @param progress a progress listener (may be null)
+     */
     private void vectorizeAndCollectBoundaries(int band, double outside, ProgressListener progress) {
         if (progress == null)
             progress = new NullProgressListener();
@@ -389,9 +428,15 @@ class Raster2Vector {
         }
     }
 
-    /*
-     * Check position of the 2x2 curData matrix with respect to the raster bounds. The values of
-     * row,col are the position of curData[TL].
+    /**
+     * Check the position of the data window with regard to the grid coverage
+     * boundaries. We do this because a virtual, single-cell-width border is
+     * placed around the input data.
+     *
+     * @param row index of the image row in the top left cell of the data window
+     * @param col index of the image col in the top left cell of the data window
+     * @return an array of four boolean values to be indexed with the TL, TR, BL
+     * and BR constants.
      */
     private boolean[] inDataWindow(int row, int col) {
         boolean[] ok = new boolean[4];
@@ -407,13 +452,16 @@ class Raster2Vector {
         return ok;
     }
 
-    /*
-     * This function controls the construction of line segments that border regions of uniform data
-     * in the raster. See the nbrConfig() function for more details on how borders are inferred from
-     * the 2x2 curData matrix.
+    /**
+     * This method controls the construction of line segments that border regions of uniform data
+     * in the raster. See the nbrConfig method for more details.
+     *
+     * @param row index of the image row in the top left cell of the 2x2 data window
+     * @param col index of the image col in the top left cell of the 2x2 data window
+     * @param curData values in the current data window
      */
     private void updateCoordList(int row, int col, double[] curData) {
-        LineSeg seg;
+        LineSegment seg;
 
         switch (nbrConfig(curData)) {
         case 0:
@@ -424,11 +472,11 @@ class Raster2Vector {
         case 1:
             // bottom right corner
             // new horizontal and vertical lines
-            horizLine = new LineSeg();
-            horizLine.start = col;
+            horizLine = new LineSegment();
+            horizLine.p0.x = col;
 
-            seg = new LineSeg();
-            seg.start = row;
+            seg = new LineSegment();
+            seg.p0.y = row;
             vertLines.put(col, seg);
             break;
 
@@ -440,24 +488,24 @@ class Raster2Vector {
         case 3:
             // bottom left corner
             // end of horizontal line; start of new vertical line
-            horizLine.end = col;
+            horizLine.p1.x = col;
             addHorizLine(row);
             horizLine = null;
 
-            seg = new LineSeg();
-            seg.start = row;
+            seg = new LineSegment();
+            seg.p0.y = row;
             vertLines.put(col, seg);
             break;
 
         case 4:
             // top left corner
             // end of horizontal line; end of vertical line
-            horizLine.end = col;
+            horizLine.p1.x = col;
             addHorizLine(row);
             horizLine = null;
 
             seg = vertLines.get(col);
-            seg.end = row;
+            seg.p1.y = row;
             addVertLine(col);
             vertLines.remove(col);
             break;
@@ -465,11 +513,11 @@ class Raster2Vector {
         case 5:
             // top right corner
             // start horiztonal line; end vertical line
-            horizLine = new LineSeg();
-            horizLine.start = col;
+            horizLine = new LineSegment();
+            horizLine.p0.x = col;
 
             seg = vertLines.get(col);
-            seg.end = row;
+            seg.p1.y = row;
             addVertLine(col);
             vertLines.remove(col);
             break;
@@ -477,13 +525,13 @@ class Raster2Vector {
         case 6:
             // inverted T in upper half
             // end horiztonal line; start new horizontal line; end vertical line
-            horizLine.end = col;
+            horizLine.p1.x = col;
             addHorizLine(row);
 
-            horizLine.start = col;
+            horizLine.p0.x = col;
 
             seg = vertLines.get(col);
-            seg.end = row;
+            seg.p1.y = row;
             addVertLine(col);
             vertLines.remove(col);
             break;
@@ -491,44 +539,44 @@ class Raster2Vector {
         case 7:
             // T in lower half
             // end horizontal line; start new horizontal line; start new vertical line
-            horizLine.end = col;
+            horizLine.p1.x = col;
             addHorizLine(row);
 
-            horizLine.start = col;
+            horizLine.p0.x = col;
 
-            seg = new LineSeg();
-            seg.start = row;
+            seg = new LineSegment();
+            seg.p0.y = row;
             vertLines.put(col, seg);
             break;
 
         case 8:
             // T pointing left
             // end horizontal line; end vertical line; start new vertical line
-            horizLine.end = col;
+            horizLine.p1.x = col;
             addHorizLine(row);
             horizLine = null;
 
             seg = vertLines.get(col);
-            seg.end = row;
+            seg.p1.y = row;
             addVertLine(col);
 
-            seg = new LineSeg();
-            seg.start = row;
+            seg = new LineSegment();
+            seg.p0.y = row;
             vertLines.put(col, seg);
             break;
 
         case 9:
             // T pointing right
             // start new horizontal line; end vertical line; start new vertical line
-            horizLine = new LineSeg();
-            horizLine.start = col;
+            horizLine = new LineSegment();
+            horizLine.p0.x = col;
 
             seg = vertLines.get(col);
-            seg.end = row;
+            seg.p1.y = row;
             addVertLine(col);
 
-            seg = new LineSeg();
-            seg.start = row;
+            seg = new LineSegment();
+            seg.p0.y = row;
             vertLines.put(col, seg);
             break;
 
@@ -536,17 +584,17 @@ class Raster2Vector {
             // cross
             // end horizontal line; start new horizontal line
             // end vertical line; start new vertical line
-            horizLine.end = col;
+            horizLine.p1.x = col;
             addHorizLine(row);
 
-            horizLine.start = col;
+            horizLine.p0.x = col;
 
             seg = vertLines.get(col);
-            seg.end = row;
+            seg.p1.y = row;
             addVertLine(col);
 
-            seg = new LineSeg();
-            seg.start = row;
+            seg = new LineSegment();
+            seg.p0.y = row;
             vertLines.put(col, seg);
             break;
 
@@ -557,22 +605,22 @@ class Raster2Vector {
         }
     }
 
-    /*
-     * 
-     * Check 2 x 2 matrix and return case from table below <pre>---------------- | | | | | | | | | |
-     * --------- | | | | | | | | | | |----------------
-     * 
-     * 0 1 2 3
-     * 
-     * ---------------- | | | | | | | | | | |------------ | | | | | | | | |----------------
-     * 
-     * 4 5 6 7
-     * 
-     * ---------------- | | | | | | | | | | |-------- | | | | | | | | | | |----------------
-     * 
-     * 8 9 10 11 </pre>
-     * 
+    /**
+     * Examine the values in the 2x2 kernel and match to one of
+     * the cases in the table below:
+     * <pre>
+     *  0) AB   1) AA   2) AA   3) AA
+     *     AB      AB      BB      BA
+     *
+     *  4) AB   5) AB   6) AB   7) AA
+     *     BB      AA      CC      BC
+     *
+     *  8) AB   9) AB  10) AB  11) AA
+     *     CB      AC      CD      AA
+     * </pre>
      * These patterns are those used in the GRASS raster to vector routine.
+     * @param curData array of current data window values
+     * @return integer id of the matching configuration
      */
     private int nbrConfig(double[] curData) {
         if (different(curData[TL], curData[TR])) { // 0, 4, 5, 6, 8, 9, 10
@@ -622,12 +670,13 @@ class Raster2Vector {
         }
     }
 
-    /*
+    /**
      * Create a LineString for a newly constructed horizontal border segment
+     * @param row index of the image row in the top left cell of the current data window
      */
     private void addHorizLine(int row) {
-        Point2D pixelStart = new Point2D.Double(horizLine.start, row);
-        Point2D pixelEnd = new Point2D.Double(horizLine.end, row);
+        Point2D pixelStart = new Point2D.Double(horizLine.p0.x, row);
+        Point2D pixelEnd = new Point2D.Double(horizLine.p1.x, row);
         Point2D rwStart = new Point2D.Double();
         Point2D rwEnd = new Point2D.Double();
 
@@ -645,12 +694,13 @@ class Raster2Vector {
         lines.add(gf.createLineString(coords));
     }
 
-    /*
+    /**
      * Create a LineString for a newly constructed vertical border segment
+     * @param col index of the image column in the top-left cell of the current data window
      */
     private void addVertLine(int col) {
-        Point2D pixelStart = new Point2D.Double(col, vertLines.get(col).start);
-        Point2D pixelEnd = new Point2D.Double(col, vertLines.get(col).end);
+        Point2D pixelStart = new Point2D.Double(col, vertLines.get(col).p0.y);
+        Point2D pixelEnd = new Point2D.Double(col, vertLines.get(col).p1.y);
         Point2D rwStart = new Point2D.Double();
         Point2D rwEnd = new Point2D.Double();
 
@@ -668,11 +718,14 @@ class Raster2Vector {
         lines.add(gf.createLineString(coords));
     }
 
-    /*
-     * Compare two double values
+    /**
+     * Check for difference between two double values within a set tolerance
+     * @param a first value
+     * @param b second value
+     * @return true if the values are different; false otherwise
      */
     private boolean different(double a, double b) {
-        if (Math.abs(a - b) > epsilon) {
+        if (Math.abs(a - b) > EPSILON) {
             return true;
         } else {
             return false;
@@ -680,15 +733,3 @@ class Raster2Vector {
     }
 }
 
-/**
- * LineSegment. (We should be able to replace this with a JTS class)
- */
-class LineSeg {
-    public int start; // col for horizontal line, row for vertical line
-
-    public int end; // ditto
-
-    public int left; // when going right for horizontal line, down for vertical line
-
-    public int right; // ditto
-}
