@@ -23,15 +23,14 @@ import java.awt.image.RenderedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.media.jai.iterator.RandomIter;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.Parameter;
 import org.geotools.feature.FeatureCollection;
@@ -58,6 +57,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.operation.polygonize.Polygonizer;
+import javax.media.jai.TiledImage;
+import javax.media.jai.iterator.RandomIterFactory;
 
 /**
  * Process for converting a raster to a vector.
@@ -224,7 +225,7 @@ class Raster2Vector {
      */
     private List<LineString> lines;
 
-    private RenderedImage image;
+    private TiledImage image;
 
     public Raster2Vector() {
     }
@@ -329,7 +330,7 @@ class Raster2Vector {
             // this.raster = coverage.getRenderedImage().getData();
 
             // image used to sample the grid coverage
-            image = coverage.getRenderedImage();
+            image = new TiledImage(coverage.getRenderedImage(), true);
 
             this.transformLR = coverage.getGridGeometry().getGridToCRS2D(
                     PixelOrientation.LOWER_RIGHT);
@@ -362,6 +363,7 @@ class Raster2Vector {
         try {
             // a 2x2 matrix of double values used as a moving window
             double[] curData = new double[4];
+            RandomIter imageIter = RandomIterFactory.create(image, null);
 
             // we add a virtual border, one cell wide, coded as 'outside'
             // around the raster
@@ -370,22 +372,15 @@ class Raster2Vector {
                     throw new CancellationException();
                 }
                 progress.progress(((float) row) / ((float) maxRasterRow));
+                curData[TR] = curData[BR] = outside;
                 for (int col = minRasterCol - 1; col <= maxRasterCol; col++) {
                     boolean[] ok = inDataWindow(row, col);
-                    if (ok[TL] && ok[TR] && ok[BL] && ok[BR]) {
-                        Rectangle rect = new Rectangle(col, row, 2, 2);
-                        Raster data = image.getData(rect);
-                        curData = data.getSamples(1, 1, 2, 2, band, curData);
-                    } else {
-                        Rectangle rect = new Rectangle(col, row, 2, 2);
-                        Raster data = image.getData(rect);
-                        curData = data.getSamples(1, 1, 2, 2, band, curData);
-                        curData[TL] = (ok[TL] ? data.getSampleDouble(col, row, band) : outside);
-                        curData[TR] = (ok[TR] ? data.getSampleDouble(col + 1, row, band) : outside);
-                        curData[BL] = (ok[BL] ? data.getSampleDouble(col, row + 1, band) : outside);
-                        curData[BR] = (ok[BR] ? data.getSampleDouble(col + 1, row + 1, band)
-                                : outside);
-                    }
+
+                    curData[TL] = curData[TR];
+                    curData[BL] = curData[BR];
+                    curData[TR] = (ok[TR] ? imageIter.getSampleDouble(col + 1, row, band) : outside);
+                    curData[BR] = (ok[BR] ? imageIter.getSampleDouble(col + 1, row + 1, band) : outside);
+
                     updateCoordList(row, col, curData);
                 }
             }
