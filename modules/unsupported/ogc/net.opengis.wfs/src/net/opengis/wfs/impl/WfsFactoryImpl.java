@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WfsFactoryImpl.java 31890 2008-11-20 16:38:08Z jdeolive $
+ * $Id: WfsFactoryImpl.java 31893 2008-11-20 19:29:05Z jdeolive $
  */
 package net.opengis.wfs.impl;
 
@@ -11,7 +11,6 @@ import java.net.URI;
 import java.util.Calendar;
 import java.util.List;
 
-import java.util.Map;
 import javax.xml.namespace.QName;
 
 import net.opengis.wfs.*;
@@ -164,8 +163,6 @@ public class WfsFactoryImpl extends EFactoryImpl implements WfsFactory {
                 return createSortByFromString(eDataType, initialValue);
             case WfsPackage.TYPE_NAME_LIST_TYPE:
                 return createTypeNameListTypeFromString(eDataType, initialValue);
-            case WfsPackage.MAP:
-                return createMapFromString(eDataType, initialValue);
             default:
                 throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
         }
@@ -214,8 +211,6 @@ public class WfsFactoryImpl extends EFactoryImpl implements WfsFactory {
                 return convertSortByToString(eDataType, instanceValue);
             case WfsPackage.TYPE_NAME_LIST_TYPE:
                 return convertTypeNameListTypeToString(eDataType, instanceValue);
-            case WfsPackage.MAP:
-                return convertMapToString(eDataType, instanceValue);
             default:
                 throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
         }
@@ -905,24 +900,6 @@ public class WfsFactoryImpl extends EFactoryImpl implements WfsFactory {
     }
 
 	/**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    public Map createMapFromString(EDataType eDataType, String initialValue) {
-        return (Map)super.createFromString(eDataType, initialValue);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    public String convertMapToString(EDataType eDataType, Object instanceValue) {
-        return super.convertToString(eDataType, instanceValue);
-    }
-
-    /**
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated

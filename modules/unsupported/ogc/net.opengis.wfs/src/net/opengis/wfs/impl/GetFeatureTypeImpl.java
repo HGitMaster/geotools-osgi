@@ -2,16 +2,14 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GetFeatureTypeImpl.java 31890 2008-11-20 16:38:08Z jdeolive $
+ * $Id: GetFeatureTypeImpl.java 31893 2008-11-20 19:29:05Z jdeolive $
  */
 package net.opengis.wfs.impl;
 
 import java.math.BigInteger;
 
 import java.util.Collection;
-import java.util.HashMap;
 
-import java.util.Map;
 import net.opengis.wfs.GetFeatureType;
 import net.opengis.wfs.QueryType;
 import net.opengis.wfs.ResultTypeType;
@@ -43,7 +41,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.opengis.wfs.impl.GetFeatureTypeImpl#getResultType <em>Result Type</em>}</li>
  *   <li>{@link net.opengis.wfs.impl.GetFeatureTypeImpl#getTraverseXlinkDepth <em>Traverse Xlink Depth</em>}</li>
  *   <li>{@link net.opengis.wfs.impl.GetFeatureTypeImpl#getTraverseXlinkExpiry <em>Traverse Xlink Expiry</em>}</li>
- *   <li>{@link net.opengis.wfs.impl.GetFeatureTypeImpl#getFormatOptions <em>Format Options</em>}</li>
  * </ul>
  * </p>
  *
@@ -179,26 +176,6 @@ public class GetFeatureTypeImpl extends BaseRequestTypeImpl implements GetFeatur
 	protected BigInteger traverseXlinkExpiry = TRAVERSE_XLINK_EXPIRY_EDEFAULT;
 
 	/**
-     * The default value of the '{@link #getFormatOptions() <em>Format Options</em>}' attribute.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @see #getFormatOptions()
-     * @generated NOT
-     * @ordered
-     */
-    protected static final Map FORMAT_OPTIONS_EDEFAULT = new HashMap();
-
-    /**
-     * The cached value of the '{@link #getFormatOptions() <em>Format Options</em>}' attribute.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @see #getFormatOptions()
-     * @generated
-     * @ordered
-     */
-    protected Map formatOptions = FORMAT_OPTIONS_EDEFAULT;
-
-    /**
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
@@ -385,27 +362,6 @@ public class GetFeatureTypeImpl extends BaseRequestTypeImpl implements GetFeatur
 
 	/**
      * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    public Map getFormatOptions() {
-        return formatOptions;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    public void setFormatOptions(Map newFormatOptions) {
-        Map oldFormatOptions = formatOptions;
-        formatOptions = newFormatOptions;
-        if (eNotificationRequired())
-            eNotify(new ENotificationImpl(this, Notification.SET, WfsPackage.GET_FEATURE_TYPE__FORMAT_OPTIONS, oldFormatOptions, formatOptions));
-    }
-
-    /**
-     * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
      */
@@ -436,8 +392,6 @@ public class GetFeatureTypeImpl extends BaseRequestTypeImpl implements GetFeatur
                 return getTraverseXlinkDepth();
             case WfsPackage.GET_FEATURE_TYPE__TRAVERSE_XLINK_EXPIRY:
                 return getTraverseXlinkExpiry();
-            case WfsPackage.GET_FEATURE_TYPE__FORMAT_OPTIONS:
-                return getFormatOptions();
         }
         return super.eGet(featureID, resolve, coreType);
     }
@@ -468,9 +422,6 @@ public class GetFeatureTypeImpl extends BaseRequestTypeImpl implements GetFeatur
             case WfsPackage.GET_FEATURE_TYPE__TRAVERSE_XLINK_EXPIRY:
                 setTraverseXlinkExpiry((BigInteger)newValue);
                 return;
-            case WfsPackage.GET_FEATURE_TYPE__FORMAT_OPTIONS:
-                setFormatOptions((Map)newValue);
-                return;
         }
         super.eSet(featureID, newValue);
     }
@@ -500,9 +451,6 @@ public class GetFeatureTypeImpl extends BaseRequestTypeImpl implements GetFeatur
             case WfsPackage.GET_FEATURE_TYPE__TRAVERSE_XLINK_EXPIRY:
                 setTraverseXlinkExpiry(TRAVERSE_XLINK_EXPIRY_EDEFAULT);
                 return;
-            case WfsPackage.GET_FEATURE_TYPE__FORMAT_OPTIONS:
-                setFormatOptions(FORMAT_OPTIONS_EDEFAULT);
-                return;
         }
         super.eUnset(featureID);
     }
@@ -526,8 +474,6 @@ public class GetFeatureTypeImpl extends BaseRequestTypeImpl implements GetFeatur
                 return TRAVERSE_XLINK_DEPTH_EDEFAULT == null ? traverseXlinkDepth != null : !TRAVERSE_XLINK_DEPTH_EDEFAULT.equals(traverseXlinkDepth);
             case WfsPackage.GET_FEATURE_TYPE__TRAVERSE_XLINK_EXPIRY:
                 return TRAVERSE_XLINK_EXPIRY_EDEFAULT == null ? traverseXlinkExpiry != null : !TRAVERSE_XLINK_EXPIRY_EDEFAULT.equals(traverseXlinkExpiry);
-            case WfsPackage.GET_FEATURE_TYPE__FORMAT_OPTIONS:
-                return FORMAT_OPTIONS_EDEFAULT == null ? formatOptions != null : !FORMAT_OPTIONS_EDEFAULT.equals(formatOptions);
         }
         return super.eIsSet(featureID);
     }
@@ -551,8 +497,6 @@ public class GetFeatureTypeImpl extends BaseRequestTypeImpl implements GetFeatur
         result.append(traverseXlinkDepth);
         result.append(", traverseXlinkExpiry: ");
         result.append(traverseXlinkExpiry);
-        result.append(", formatOptions: ");
-        result.append(formatOptions);
         result.append(')');
         return result.toString();
     }
