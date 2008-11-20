@@ -3,7 +3,7 @@
     xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.opengis.wfs/src"
     modelPluginID="net.opengis.wfs" modelName="Wfs" importerID="org.eclipse.emf.importer.java"
-    usedGenPackages="platform:/plugin/org.eclipse.emf.ecore/model/XMLType.genmodel#//type platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../net.opengis.ows/ows10.genmodel#//ows10">
+    usedGenPackages="../org.eclipse.emf.ecore/model/XMLType.genmodel#//type ../org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore ../net.opengis.ows/ows10.genmodel#//ows10">
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Wfs" basePackage="net.opengis" disposableProviderFactory="true"
       adapterFactory="false" ecorePackage="wfs.ecore#/">
@@ -30,6 +30,7 @@
     </genEnums>
     <genDataTypes ecoreDataType="wfs.ecore#//ServiceType"/>
     <genDataTypes ecoreDataType="wfs.ecore#//Filter"/>
+    <genDataTypes ecoreDataType="wfs.ecore#//FilterCapabilities"/>
     <genDataTypes ecoreDataType="wfs.ecore#//QName"/>
     <genDataTypes ecoreDataType="wfs.ecore#//Calendar"/>
     <genDataTypes ecoreDataType="wfs.ecore#//FeatureCollection"/>
@@ -41,6 +42,7 @@
     <genDataTypes ecoreDataType="wfs.ecore#//Function"/>
     <genDataTypes ecoreDataType="wfs.ecore#//SortBy"/>
     <genDataTypes ecoreDataType="wfs.ecore#//TypeNameListType"/>
+    <genDataTypes ecoreDataType="wfs.ecore#//Map"/>
     <genClasses ecoreClass="wfs.ecore#//ActionType">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//ActionType/message"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//ActionType/code"/>
@@ -141,6 +143,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureType/resultType"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureType/traverseXlinkDepth"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureType/traverseXlinkExpiry"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureType/formatOptions"/>
     </genClasses>
     <genClasses ecoreClass="wfs.ecore#//GetFeatureWithLockType">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureWithLockType/expiry"/>

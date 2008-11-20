@@ -2,11 +2,12 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GetFeatureType.java 29859 2008-04-09 04:42:44Z jdeolive $
+ * $Id: GetFeatureType.java 31890 2008-11-20 16:38:08Z jdeolive $
  */
 package net.opengis.wfs;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -36,6 +37,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link net.opengis.wfs.GetFeatureType#getResultType <em>Result Type</em>}</li>
  *   <li>{@link net.opengis.wfs.GetFeatureType#getTraverseXlinkDepth <em>Traverse Xlink Depth</em>}</li>
  *   <li>{@link net.opengis.wfs.GetFeatureType#getTraverseXlinkExpiry <em>Traverse Xlink Expiry</em>}</li>
+ *   <li>{@link net.opengis.wfs.GetFeatureType#getFormatOptions <em>Format Options</em>}</li>
  * </ul>
  * </p>
  *
@@ -303,4 +305,24 @@ public interface GetFeatureType extends BaseRequestType {
      */
 	void setTraverseXlinkExpiry(BigInteger value);
 
+     /**
+      * Format options for the request.
+      * <p>
+      * This property is used to add custom parameters about how to encode 
+      * the response to the GetFeature request.
+      * </p>
+      * @model
+      */
+     Map getFormatOptions();
+
+    /**
+     * Sets the value of the '{@link net.opengis.wfs.GetFeatureType#getFormatOptions <em>Format Options</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @param value the new value of the '<em>Format Options</em>' attribute.
+     * @see #getFormatOptions()
+     * @generated
+     */
+    void setFormatOptions(Map value);
+     
 } // GetFeatureType
