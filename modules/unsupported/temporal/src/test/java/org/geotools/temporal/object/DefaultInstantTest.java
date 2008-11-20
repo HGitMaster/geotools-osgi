@@ -27,7 +27,6 @@ import static org.junit.Assert.*;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.Position;
 
-
 /**
  *
  * @author Mehdi Sidhoum (Geomatys)
@@ -38,10 +37,11 @@ public class DefaultInstantTest {
     private Instant instant2;
     private Position position1;
     private Position position2;
+    private Calendar cal = Calendar.getInstance();
 
     @Before
     public void setUp() {
-        Calendar cal = Calendar.getInstance();
+
         cal.set(2000, 1, 1);
         position1 = new DefaultPosition(cal.getTime());
         cal.set(1998, 1, 1);
@@ -123,16 +123,11 @@ public class DefaultInstantTest {
      */
     @Test
     public void testEquals() {
-        Calendar cal = Calendar.getInstance();
         cal.set(2000, 1, 1);
-        
-        
+
         assertFalse(instant1.equals(null));
         assertEquals(cal.getTime().getTime(), instant1.getPosition().getDate().getTime());
         assertFalse(instant1.equals(instant2));
-        
-        
-        
     }
 
     /**

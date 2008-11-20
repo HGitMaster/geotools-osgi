@@ -38,12 +38,13 @@ public class DefaultTemporalGeometricPrimitiveTest {
     private TemporalGeometricPrimitive temporalGeomericPrimitive2;
     private Position position1;
     private Position position2;
+    private Calendar cal = Calendar.getInstance();
 
     @Before
     public void setUp() {
-        Calendar cal1 = Calendar.getInstance();
-        cal1.set(1981, 6, 25);
-        Date date = cal1.getTime();
+        
+        cal.set(1981, 6, 25);
+        Date date = cal.getTime();
 
         position1 = new DefaultPosition(date);
         position2 = new DefaultPosition(new Date());
@@ -67,7 +68,6 @@ public class DefaultTemporalGeometricPrimitiveTest {
         TemporalGeometricPrimitive other;
 
         //calcul Distance with instant objects
-        Calendar cal = Calendar.getInstance();
         cal.set(2000, 0, 1);
         Position position = new DefaultPosition(cal.getTime());
         other = new DefaultInstant(position);
@@ -95,7 +95,6 @@ public class DefaultTemporalGeometricPrimitiveTest {
      */
     @Test
     public void testLength() {
-        Calendar cal = Calendar.getInstance();
         cal.set(2012, 0, 1);
         temporalGeomericPrimitive1 = new DefaultPeriod(new DefaultInstant(position1), new DefaultInstant(position2));
         temporalGeomericPrimitive2 = new DefaultPeriod(new DefaultInstant(position2), new DefaultInstant(new DefaultPosition(cal.getTime())));

@@ -49,6 +49,7 @@ public class DefaultCalendarEraTest {
 
     private CalendarEra calendarEra1;
     private CalendarEra calendarEra2;
+    private Calendar cal = Calendar.getInstance();
 
     @Before
     public void setUp() {
@@ -61,7 +62,7 @@ public class DefaultCalendarEraTest {
         CalendarDate referenceDate1 = new DefaultCalendarDate(frame1, IndeterminateValue.BEFORE, new SimpleInternationalString("Gregorian calendar"), calendarDate1);
         CalendarDate referenceDate2 = new DefaultCalendarDate(frame2, IndeterminateValue.NOW, new SimpleInternationalString("Babylonian calendar"), calendarDate2);
         JulianDate julianReference = new DefaultJulianDate(frame1, IndeterminateValue.NOW, 123456789);
-        java.util.Calendar cal = java.util.Calendar.getInstance();
+        
         cal.set(1900, 0, 1);
         Instant begining1 = new DefaultInstant(new DefaultPosition(cal.getTime()));
         cal.set(2000, 9, 17);
@@ -181,7 +182,6 @@ public class DefaultCalendarEraTest {
     @Test
     public void testSetEpochOfUse() {
         Period result = calendarEra1.getEpochOfUse();
-        Calendar cal = Calendar.getInstance();
         cal.set(1900, 10, 10);
         ((DefaultCalendarEra)calendarEra1).setEpochOfUse(new DefaultPeriod(new DefaultInstant(new DefaultPosition(cal.getTime())), new DefaultInstant(new DefaultPosition(new Date()))));
         assertFalse(calendarEra1.getEpochOfUse().equals(result));
