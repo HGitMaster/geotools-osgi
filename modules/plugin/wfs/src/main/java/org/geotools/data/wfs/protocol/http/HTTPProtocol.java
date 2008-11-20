@@ -17,6 +17,7 @@
 package org.geotools.data.wfs.protocol.http;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -30,11 +31,22 @@ import java.util.Map;
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: HTTPProtocol.java 31823 2008-11-11 16:11:49Z groldan $
+ * @version $Id: HTTPProtocol.java 31888 2008-11-20 13:34:53Z groldan $
  * @since 2.6
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/protocol/http/HTTPProtocol.java $
+ * @source $URL:
+ *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
+ *         /wfs/protocol/http/HTTPProtocol.java $
  */
 public interface HTTPProtocol {
+
+    public interface POSTCallBack {
+        
+        public String getContentType();
+        
+        public long getContentLength();
+
+        public void writeBody(OutputStream out) throws IOException;
+    }
 
     /**
      * Sets whether the server should be asked to return responses encoded in GZIP.
@@ -94,6 +106,9 @@ public interface HTTPProtocol {
      * @see #createUrl(URL, Map)
      */
     public HTTPResponse issueGet(URL baseUrl, Map<String, String> kvp) throws IOException;
+
+    public HTTPResponse issuePost(final URL targetUrl, final POSTCallBack callback)
+            throws IOException;
 
     /**
      * Creates an URL with {@code baseUrl} and a query string defined by the {@code kvp} key/value

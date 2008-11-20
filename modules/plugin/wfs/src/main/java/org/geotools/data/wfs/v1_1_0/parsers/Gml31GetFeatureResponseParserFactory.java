@@ -23,9 +23,9 @@ import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
 import java.util.logging.Logger;
 
-import net.opengis.wfs.BaseRequestType;
 import net.opengis.wfs.GetFeatureType;
 
+import org.eclipse.emf.ecore.EObject;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
 import org.geotools.data.wfs.protocol.wfs.WFSResponseParser;
@@ -38,7 +38,7 @@ import org.geotools.util.logging.Logging;
  * output format.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: Gml31GetFeatureResponseParserFactory.java 31831 2008-11-12 22:17:24Z groldan $
+ * @version $Id: Gml31GetFeatureResponseParserFactory.java 31888 2008-11-20 13:34:53Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -71,7 +71,7 @@ public class Gml31GetFeatureResponseParserFactory implements WFSResponseParserFa
      * 
      * @see WFSResponseParserFactory#canProcess(WFSOperationType, String)
      */
-    public boolean canProcess(BaseRequestType request) {
+    public boolean canProcess(EObject request) {
         if (!(request instanceof GetFeatureType)) {
             return false;
         }

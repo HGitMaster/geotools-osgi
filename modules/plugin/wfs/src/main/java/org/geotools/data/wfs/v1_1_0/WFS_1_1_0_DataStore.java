@@ -68,7 +68,6 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -91,7 +90,7 @@ import org.opengis.referencing.operation.TransformException;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStore.java 31824 2008-11-11 19:22:41Z groldan $
+ * @version $Id: WFS_1_1_0_DataStore.java 31888 2008-11-20 13:34:53Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -100,6 +99,11 @@ import org.opengis.referencing.operation.TransformException;
 @SuppressWarnings( { "nls" })
 public final class WFS_1_1_0_DataStore implements WFSDataStore {
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
+
+    /**
+     * Whether to use POST as default HTTP method is not explicitly set
+     */
+    private static final boolean DEFAULT_HTTP_METHOD = true;
 
     private final WFSProtocol wfs;
 
@@ -157,8 +161,8 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * @see WFSDataStore#setPreferPostOverGet(boolean)
      */
     public void setPreferPostOverGet(Boolean booleanValue) {
-        // we don't prefer POST by default yet... actually we don't support it yet
-        this.preferPostOverGet = booleanValue == null ? false : booleanValue.booleanValue();
+        this.preferPostOverGet = booleanValue == null ? DEFAULT_HTTP_METHOD : booleanValue
+                .booleanValue();
     }
 
     /**
@@ -373,12 +377,11 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      */
     private WFSResponse sendGetFeatures(GetFeatureType request, Map<String, String> kvp)
             throws IOException {
-        // TODO: split filters! WFSProtocol is not responsible of doing so
         final WFSResponse response;
         if (useHttpPostFor(GET_FEATURE)) {
-            response = wfs.getFeaturePOST(request);
+            response = wfs.issueGetFeaturePOST(request);
         } else {
-            response = wfs.getFeatureGET(request, kvp);
+            response = wfs.issueGetFeatureGET(request, kvp);
         }
         return response;
     }
@@ -707,7 +710,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         if (!(process instanceof GetFeatureParser)) {
             LOGGER.info("GetFeature with resultType=hits resulted in " + process);
         }
-        int hits = ((GetFeatureParser)process).getNumberOfFeatures();
+        int hits = ((GetFeatureParser) process).getNumberOfFeatures();
         return hits;
     }
 

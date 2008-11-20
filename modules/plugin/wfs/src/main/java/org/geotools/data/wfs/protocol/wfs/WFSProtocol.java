@@ -48,7 +48,7 @@ import org.opengis.filter.capability.FilterCapabilities;
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFSProtocol.java 31824 2008-11-11 19:22:41Z groldan $
+ * @version $Id: WFSProtocol.java 31888 2008-11-20 13:34:53Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -279,17 +279,17 @@ public interface WFSProtocol {
      * @throws IOException
      * @throws UnsupportedOperationException
      */
-    public WFSResponse getFeatureGET(final GetFeatureType request, final Map<String, String> kvp)
+    public WFSResponse issueGetFeatureGET(final GetFeatureType request, final Map<String, String> kvp)
             throws IOException, UnsupportedOperationException;
 
     /**
      * Issues a GetFeature request for the given {@link Query}, using POST HTTP method
      * <p>
      * The query to WFS request parameter translation is the same than for
-     * {@link #getFeatureGET(Query, String)}
+     * {@link #issueGetFeatureGET(Query, String)}
      * </p>
      */
-    public WFSResponse getFeaturePOST(GetFeatureType request) throws IOException,
+    public WFSResponse issueGetFeaturePOST(GetFeatureType request) throws IOException,
             UnsupportedOperationException;
 
     /**

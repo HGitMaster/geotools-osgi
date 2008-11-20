@@ -17,6 +17,7 @@
 package org.geotools.data.wfs.v1_1_0;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -131,9 +132,9 @@ public final class DataTestSupport {
             new QName("http://www.fgdc.gov/framework/073004/transportation", "RoadSeg"),
             "trans:RoadSeg", "EPSG:4269");
 
-    public static final TestDataType IONIC_STATISTICAL_UNIT = new TestDataType("Ionic",
-            new QName("http://www.fgdc.gov/fgdc/gubs", "StatisticalUnit"),
-            "gubs:StatisticalUnit", "EPSG:4269");
+    public static final TestDataType IONIC_STATISTICAL_UNIT = new TestDataType("Ionic", new QName(
+            "http://www.fgdc.gov/fgdc/gubs", "StatisticalUnit"), "gubs:StatisticalUnit",
+            "EPSG:4269");
 
     public static TestWFS_1_1_0_Protocol wfs;
 
@@ -205,9 +206,15 @@ public final class DataTestSupport {
 
         private HTTPResponse mockResponse;
 
-        public URL issueGetBaseUrl;
+        public URL targetUrl;
 
         public Map<String, String> issueGetKvp;
+
+        public String postCallbackContentType;
+
+        public long postCallbackContentLength;
+
+        public ByteArrayOutputStream postCallbackEncodedRequestBody;
 
         public TestHttpProtocol(HTTPResponse mockResponse) {
             this.mockResponse = mockResponse;
@@ -216,8 +223,20 @@ public final class DataTestSupport {
         @Override
         public HTTPResponse issueGet(final URL baseUrl, final Map<String, String> kvp)
                 throws IOException {
-            this.issueGetBaseUrl = baseUrl;
+            this.targetUrl = baseUrl;
             this.issueGetKvp = kvp;
+            return mockResponse;
+        }
+
+        @Override
+        public HTTPResponse issuePost(final URL targetUrl, final POSTCallBack callback)
+                throws IOException {
+            this.targetUrl = targetUrl;
+            this.postCallbackContentType = callback.getContentType();
+            this.postCallbackContentLength = callback.getContentLength();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            this.postCallbackEncodedRequestBody = out;
+            callback.writeBody(out);
             return mockResponse;
         }
     }

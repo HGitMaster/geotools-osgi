@@ -43,6 +43,7 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Capabilities;
 import org.geotools.filter.v1_1.OGC;
@@ -65,7 +66,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * A default strategy for a WFS 1.1.0 implementation that assumes the server sticks to the standard.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: DefaultWFSStrategy.java 31831 2008-11-12 22:17:24Z groldan $
+ * @version $Id: DefaultWFSStrategy.java 31888 2008-11-20 13:34:53Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -160,7 +161,7 @@ public class DefaultWFSStrategy implements WFSStrategy {
         getFeature.setVersion(wfs.getServiceVersion().toString());
         getFeature.setOutputFormat(outputFormat);
 
-        getFeature.setHandle("GeoTools WFS DataStore");
+        getFeature.setHandle("GeoTools " + GeoTools.getVersion() + " WFS DataStore");
         Integer maxFeatures = getMaxFeatures(ds, query);
         if (maxFeatures.intValue() > 0) {
             getFeature.setMaxFeatures(BigInteger.valueOf(maxFeatures));
@@ -170,7 +171,9 @@ public class DefaultWFSStrategy implements WFSStrategy {
         QueryType wfsQuery = factory.createQueryType();
         wfsQuery.setTypeName(Collections.singletonList(query.getTypeName()));
 
-        wfsQuery.setFilter(serverFilter);
+        if (!Filter.INCLUDE.equals(serverFilter)) {
+            wfsQuery.setFilter(serverFilter);
+        }
         try {
             wfsQuery.setSrsName(new URI(srsName));
         } catch (URISyntaxException e) {

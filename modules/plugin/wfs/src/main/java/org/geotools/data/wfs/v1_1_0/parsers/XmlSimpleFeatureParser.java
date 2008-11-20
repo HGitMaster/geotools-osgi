@@ -19,12 +19,9 @@ package org.geotools.data.wfs.v1_1_0.parsers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -66,7 +63,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * response.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: XmlSimpleFeatureParser.java 31831 2008-11-12 22:17:24Z groldan $
+ * @version $Id: XmlSimpleFeatureParser.java 31888 2008-11-20 13:34:53Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0

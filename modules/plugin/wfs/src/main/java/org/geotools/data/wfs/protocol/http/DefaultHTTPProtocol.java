@@ -18,6 +18,7 @@ package org.geotools.data.wfs.protocol.http;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,15 +38,19 @@ import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.geotools.factory.GeoTools;
 import org.geotools.util.logging.Logging;
 
 /**
  * Default implementation of {@link HTTPProtocol} based on apache's common-http-client
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: DefaultHTTPProtocol.java 31823 2008-11-11 16:11:49Z groldan $
+ * @version $Id: DefaultHTTPProtocol.java 31888 2008-11-20 13:34:53Z groldan $
  * @since 2.6
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/protocol/http/DefaultHTTPProtocol.java $
+ * @source $URL:
+ *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
+ *         /wfs/protocol/http/DefaultHTTPProtocol.java $
  */
 @SuppressWarnings("nls")
 public class DefaultHTTPProtocol implements HTTPProtocol {
@@ -254,6 +259,41 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         return finalUrlString;
     }
 
+    public HTTPResponse issuePost(final URL targetUrl, final POSTCallBack callback)
+            throws IOException {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("About to issue POST request to " + targetUrl.toExternalForm());
+        }
+
+        final String uri = targetUrl.toExternalForm();
+
+        final PostMethod postRequest = new PostMethod(uri);
+
+        final RequestEntity requestEntity = new RequestEntity() {
+            public long getContentLength() {
+                return callback.getContentLength();
+            }
+
+            public String getContentType() {
+                return callback.getContentType();
+            }
+
+            public boolean isRepeatable() {
+                return false;
+            }
+
+            public void writeRequest(OutputStream out) throws IOException {
+                callback.writeBody(out);
+            }
+        };
+
+        postRequest.setRequestEntity(requestEntity);
+
+        HTTPResponse httpResponse = issueRequest(postRequest);
+        
+        return httpResponse;
+    }
+
     public HTTPResponse issueGet(final URL baseUrl, final Map<String, String> kvp)
             throws IOException {
         if (LOGGER.isLoggable(Level.FINEST)) {
@@ -262,34 +302,52 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         }
 
         final String uri = createUri(baseUrl, kvp);
-        HttpClient client = new HttpClient();
-        GetMethod request = new GetMethod(uri);
+        GetMethod getRequest = new GetMethod(uri);
+
+        HTTPResponse httpResponse = issueRequest(getRequest);
+
+        return httpResponse;
+    }
+
+    /**
+     * 
+     * @param httpRequest
+     *            either a {@link HttpMethod} or {@link PostMethod} set up with the request to be
+     *            sent
+     * @return
+     * @throws IOException
+     */
+    private HTTPResponse issueRequest(HttpMethodBase httpRequest) throws IOException {
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Executing HTTP request: " + httpRequest);
+        }
+        final HttpClient client = new HttpClient();
+        client.getParams().setParameter("http.useragent",
+                "GeoTools " + GeoTools.getVersion() + " WFS DataStore");
+        // TODO: remove this
+        System.err.println("Executing HTTP request: " + httpRequest);
 
         if (isTryGzip()) {
             LOGGER.finest("Adding 'Accept-Encoding=gzip' header to request");
-            request.addRequestHeader("Accept-Encoding", "gzip");
+            httpRequest.addRequestHeader("Accept-Encoding", "gzip");
         }
 
         int statusCode;
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Executing HTTP GET request: " + uri);
-        }
-        // TODO: remove this
-        System.err.println("Executing HTTP GET request: " + uri);
         try {
-            statusCode = client.executeMethod(request);
+            statusCode = client.executeMethod(httpRequest);
         } catch (IOException e) {
-            request.releaseConnection();
+            httpRequest.releaseConnection();
             throw e;
         }
+
         if (statusCode != HttpStatus.SC_OK) {
-            request.releaseConnection();
+            httpRequest.releaseConnection();
             String statusText = HttpStatus.getStatusText(statusCode);
             throw new IOException("Request failed with status code " + statusCode + "("
-                    + statusText + "): " + uri);
+                    + statusText + "): " + httpRequest.getURI());
         }
 
-        HTTPResponse httpResponse = new HTTPClientResponse(request);
+        HTTPResponse httpResponse = new HTTPClientResponse(httpRequest);
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("Got " + httpResponse);
         }

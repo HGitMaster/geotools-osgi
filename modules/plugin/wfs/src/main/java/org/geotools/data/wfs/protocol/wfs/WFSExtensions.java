@@ -23,8 +23,7 @@ import java.util.Set;
 
 import javax.imageio.spi.ServiceRegistry;
 
-import net.opengis.wfs.BaseRequestType;
-
+import org.eclipse.emf.ecore.EObject;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.factory.FactoryNotFoundException;
 
@@ -39,7 +38,7 @@ import org.geotools.factory.FactoryNotFoundException;
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFSExtensions.java 31823 2008-11-11 16:11:49Z groldan $
+ * @version $Id: WFSExtensions.java 31888 2008-11-20 13:34:53Z groldan $
  * @since 2.6
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/protocol/wfs/WFSExtensions.java $
  */
@@ -68,7 +67,7 @@ public class WFSExtensions {
      */
     public static Object process(WFS_1_1_0_DataStore wfs, WFSResponse response) throws IOException {
 
-        BaseRequestType originatingRequest = response.getOriginatingRequest();
+        EObject originatingRequest = response.getOriginatingRequest();
         WFSResponseParserFactory pf = findParserFactory(originatingRequest);
 
         WFSResponseParser parser = pf.createParser(wfs, response);
@@ -83,7 +82,7 @@ public class WFSExtensions {
      * @return
      * @throws FactoryNotFoundException
      */
-    public static WFSResponseParserFactory findParserFactory(BaseRequestType request) {
+    static WFSResponseParserFactory findParserFactory(EObject request) {
         Iterator<WFSResponseParserFactory> serviceProviders;
         serviceProviders = getServiceProviders();
 
