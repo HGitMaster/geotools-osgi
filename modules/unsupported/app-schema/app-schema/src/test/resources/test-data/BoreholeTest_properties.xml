@@ -2,9 +2,9 @@
 <!-- 
   Loughborough mapping file
 -->
-<c:ComplexDataStore xmlns:c="http://www.geotools.org/complex" xmlns:ogc="http://www.opengis.net/ogc"
+<as:AppSchemaDataAccess xmlns:as="http://www.geotools.org/app-schema" xmlns:ogc="http://www.opengis.net/ogc"
   xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.geotools.org/complex ComplexDataStore.xsd
+  xsi:schemaLocation="http://www.geotools.org/app-schema AppSchemaDataAccess.xsd
                       http://www.opengis.net/ogc http://schemas.opengis.net/filter/1.1.0/expr.xsd">
   <namespaces>
     <!-- 
@@ -324,4 +324,4 @@
       </attributeMappings>
     </FeatureTypeMapping>
   </typeMappings>
-</c:ComplexDataStore>
+</as:AppSchemaDataAccess>

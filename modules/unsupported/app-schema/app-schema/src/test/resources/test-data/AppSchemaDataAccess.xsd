@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://www.geotools.org/complex"
-  xmlns:c="http://www.geotools.org/complex" xmlns:ogc="http://www.opengis.net/ogc"
+<schema xmlns="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://www.geotools.org/app-schema"
+  xmlns:as="http://www.geotools.org/app-schema" xmlns:ogc="http://www.opengis.net/ogc"
   xmlns:gml="http://www.opengis.net/gml">
 
   <import namespace="http://www.opengis.net/ogc" schemaLocation="http://schemas.opengis.net/filter/1.1.0/expr.xsd" />
   <import namespace="http://www.opengis.net/gml" schemaLocation="http://schemas.opengis.net/gml/3.1.1/base/feature.xsd" />
 
-  <element name="ComplexDataStore" type="c:ComplexDataStoreType">
+  <element name="AppSchemaDataAccess" type="as:AppSchemaDataAccessType">
     <annotation>
       <documentation>Root element of a mappings configuration file.</documentation>
     </annotation>
   </element>
 
-  <complexType name="ComplexDataStoreType">
+  <complexType name="AppSchemaDataAccessType">
     <annotation>
       <documentation>
         Mappings configuration element type. Defines the mappings sections needed to define the namespaces _used in the
@@ -21,8 +21,8 @@
       </documentation>
     </annotation>
     <sequence>
-      <element name="namespaces" type="c:NamespacesPropertyType" />
-      <element name="sourceDataStores" type="c:SourceDataStoresPropertyType" />
+      <element name="namespaces" type="as:NamespacesPropertyType" />
+      <element name="sourceDataStores" type="as:SourceDataStoresPropertyType" />
       <element name="catalog" type="string" minOccurs="0">
         <annotation>
           <documentation>
@@ -33,8 +33,8 @@
           </documentation>
         </annotation>
       </element>
-      <element name="targetTypes" type="c:TargetTypesPropertyType" />
-      <element name="typeMappings" type="c:TypeMappingsPropertyType" />
+      <element name="targetTypes" type="as:TargetTypesPropertyType" />
+      <element name="typeMappings" type="as:TypeMappingsPropertyType" />
     </sequence>
   </complexType>
 
@@ -266,7 +266,7 @@
               </annotation>
               <complexType>
                 <sequence>
-                  <element name="AttributeMapping" minOccurs="0" maxOccurs="unbounded" type="c:AttributeMappingType" />
+                  <element name="AttributeMapping" minOccurs="0" maxOccurs="unbounded" type="as:AttributeMappingType" />
                 </sequence>
               </complexType>
             </element>
@@ -317,7 +317,7 @@
           </documentation>
         </annotation>
       </element>
-      <element name="idExpression" minOccurs="0" type="c:AttributeExpressionMappingType">
+      <element name="idExpression" minOccurs="0" type="as:AttributeExpressionMappingType">
         <annotation>
           <documentation>
             <![CDATA[ CQL expression whose evaluated value over the Features of the 
@@ -326,7 +326,7 @@
           </documentation>
         </annotation>
       </element>
-      <element name="sourceExpression" minOccurs="0" type="c:AttributeExpressionMappingType">
+      <element name="sourceExpression" minOccurs="0" type="as:AttributeExpressionMappingType">
         <annotation>
           <documentation>
             <![CDATA[ CQL Expression whose evaluated value over the Feature(s) of the 
@@ -342,7 +342,7 @@
             when creating this attribute instead of the one declared in the target schema. This is to support
             the cases where the schema states a given element, which might be abstract, and we want an specific
             kind of element to be used, which should be in the schema's declared element substitution group
-            according to the GML rules, though ComplexDataStore will not check for it. ]]>
+            according to the GML rules, though AppSchemaDataAccess will not check for it. ]]>
           </documentation>
         </annotation>
       </element>
@@ -350,7 +350,7 @@
         <annotation>
           <documentation>
             <![CDATA[ Flag to indicate the target element addressed by this mapping has to be treated as
-            a multivalued property. ComplexDataStore will treat all the attribute mappings having this flag
+            a multivalued property. AppSchemaDataAccess will treat all the attribute mappings having this flag
             set to true as multivalued attributes and will create as many instances of it as Features of
             the surrogate datastore lie inside the group mapping, as defined by the groupBy element in 
             a FeatureTypeMapping ]]>

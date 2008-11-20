@@ -26,7 +26,7 @@ import java.util.Map;
  * Configuration object for the mapping of a community schema attribute.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AttributeMapping.java 31784 2008-11-06 06:20:21Z bencd $
+ * @version $Id: AttributeMapping.java 31882 2008-11-20 07:20:42Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/AttributeMapping.java $
  * @since 2.4
@@ -138,7 +138,7 @@ public class AttributeMapping implements Serializable {
      * <p>
      * For example, the target FeatureType may define a property as GeometryAttributeType, but the
      * actual instance should be PointPropertyType. In which case, it should be set to
-     * "gml:PointPropertyType" so ComplexDataStore knows it should create a point property an thus
+     * "gml:PointPropertyType" so AppSchemaDataAccess knows it should create a point property an thus
      * its subelements are to be addressable by subsequent mappings.
      * </p>
      * 

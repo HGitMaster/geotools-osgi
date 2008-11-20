@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
  * Digester to consume the app-schema {@link AppSchemaDataAccessFactory} configuration file.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XMLConfigDigester.java 31815 2008-11-10 07:53:14Z bencd $
+ * @version $Id: XMLConfigDigester.java 31882 2008-11-20 07:20:42Z bencd $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/XMLConfigDigester.java $
  * @since 2.4
@@ -44,8 +44,8 @@ public class XMLConfigDigester {
     private static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(XMLConfigDigester.class.getPackage().getName());
 
-    /** Namespace URI for the ComplexDataStore configuration files */
-    private static final String CONFIG_NS_URI = "http://www.geotools.org/complex";
+    /** Namespace URI for the AppSchemaDataAccess configuration files */
+    private static final String CONFIG_NS_URI = "http://www.geotools.org/app-schema";
 
     /**
      * Creates a new XMLConfigReader object.
@@ -101,7 +101,7 @@ public class XMLConfigDigester {
         Digester digester = new Digester();
         XMLConfigDigester.LOGGER.fine("digester created");
         // URL schema = getClass()
-        // .getResource("../test-data/ComplexDataStore.xsd");
+        // .getResource("../test-data/AppSchemaDataAccess.xsd");
         // digester.setSchema(schema.toExternalForm());
         digester.setValidating(false);
         digester.setNamespaceAware(true);
@@ -145,7 +145,7 @@ public class XMLConfigDigester {
     }
 
     private void setTypeMappingsRules(Digester digester) {
-        final String mappings = "ComplexDataStore/typeMappings";
+        final String mappings = "AppSchemaDataAccess/typeMappings";
         digester.addObjectCreate(mappings, XMLConfigDigester.CONFIG_NS_URI, HashSet.class);
 
         final String typeMapping = mappings + "/FeatureTypeMapping";
@@ -194,14 +194,14 @@ public class XMLConfigDigester {
         // add the TypeMapping to the Set
         digester.addSetNext(typeMapping, "add");
 
-        // set the TypeMapping on ComplexDataStoreDTO
+        // set the TypeMapping on AppSchemaDataAccessDTO
         digester.addSetNext(mappings, "setTypeMappings");
     }
 
     private void setTargetSchemaUriRules(Digester digester) {
-        final String targetSchemas = "ComplexDataStore/targetTypes";
+        final String targetSchemas = "AppSchemaDataAccess/targetTypes";
 
-        digester.addBeanPropertySetter("ComplexDataStore/catalog");
+        digester.addBeanPropertySetter("AppSchemaDataAccess/catalog");
         // digester.addCallMethod(targetSchemas + "/Catalog", "setCatalog", 1);
         // digester.addCallParam(targetSchemas + "/Catalog", 0);
 
@@ -210,12 +210,12 @@ public class XMLConfigDigester {
         final String schema = targetSchemas + "/FeatureType/schemaUri";
         digester.addCallMethod(schema, "add", 1);
         digester.addCallParam(schema, 0);
-        // set the list of XSD file uris on ComplexDataStoreDTO
+        // set the list of XSD file uris on AppSchemaDataAccessDTO
         digester.addSetNext(targetSchemas, "setTargetSchemasUris");
     }
 
     private void setSourceDataStoresRules(Digester digester) {
-        final String dataStores = "ComplexDataStore/sourceDataStores";
+        final String dataStores = "AppSchemaDataAccess/sourceDataStores";
         digester.addObjectCreate(dataStores, XMLConfigDigester.CONFIG_NS_URI, ArrayList.class);
 
         // create a SourceDataStore for each DataStore tag
@@ -239,7 +239,7 @@ public class XMLConfigDigester {
     }
 
     private void setNamespacesRules(Digester digester) {
-        final String ns = "ComplexDataStore/namespaces";
+        final String ns = "AppSchemaDataAccess/namespaces";
         digester.addObjectCreate(ns, XMLConfigDigester.CONFIG_NS_URI, HashMap.class);
         digester.addCallMethod(ns + "/Namespace", "put", 2);
         digester.addCallParam(ns + "/Namespace/prefix", 0);

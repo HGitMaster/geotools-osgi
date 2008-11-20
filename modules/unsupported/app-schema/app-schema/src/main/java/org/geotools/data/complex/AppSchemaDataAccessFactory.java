@@ -40,9 +40,8 @@ import org.opengis.feature.type.FeatureType;
  * Instead, we're directly using DataAccessFactory
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessFactory.java 31815 2008-11-10 07:53:14Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/ComplexDataStoreFactory.java $
+ * @version $Id: AppSchemaDataAccessFactory.java 31882 2008-11-20 07:20:42Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccessFactory.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessFactory implements DataAccessFactory {

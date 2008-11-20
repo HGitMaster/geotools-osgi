@@ -37,9 +37,8 @@ import org.opengis.feature.type.Name;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessFactoryTest.java 31787 2008-11-06 07:12:25Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/ComplexDataStoreFactoryTest.java $
+ * @version $Id: AppSchemaDataAccessFactoryTest.java 31882 2008-11-20 07:20:42Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AppSchemaDataAccessFactoryTest.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessFactoryTest extends TestCase {
@@ -71,7 +70,7 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
     }
 
     /**
-     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.createDataStore(Map)'
+     * Test method for 'org.geotools.data.complex.AppSchemaDataAccessFactory.createDataStore(Map)'
      */
     public void testCreateDataStorePreconditions() {
         Map badParams = new HashMap();
@@ -96,24 +95,6 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
             // OK
         }
     }
-
-    /*
-     * public void test2()throws Exception{ String configFile =
-     * "file:/home/gabriel/workspaces/complex_sco/GEOS/conf/data/featureTypes/complexWQ_Plus/wq_plus_mappings.xml";
-     * Map params = new HashMap(); params.put("dbtype", "complex"); params.put("config",
-     * configFile);
-     * 
-     * DataStore ds = DataStoreFinder.getDataStore(params); assertNotNull(ds); assertTrue(ds
-     * instanceof ComplexDataStore);
-     * 
-     * org.opengis.feature.type.FeatureType ft = ds.getSchema("wq_plus"); assertNotNull(ft);
-     * 
-     * FeatureSource fs = ds.getFeatureSource("wq_plus"); assertNotNull(fs); FeatureIterator fi =
-     * fs.getFeatures().features(); while(fi.hasNext()){ Feature f = fi.next(); assertNotNull(f);
-     * Object result = XPath.get(f, "measurement/result"); assertNotNull(result); } fi.close();
-     * 
-     * Envelope bounds = fs.getBounds(); assertNotNull(bounds); }
-     */
 
     /**
      * 
@@ -141,7 +122,8 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
     }
 
     /**
-     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.createNewDataStore(Map)'
+     * Test method for
+     * 'org.geotools.data.complex.AppSchemaDataAccessFactory.createNewDataStore(Map)'
      */
     public void testCreateNewDataStore() throws IOException {
         try {
@@ -153,7 +135,7 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
     }
 
     /**
-     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.getParametersInfo()'
+     * Test method for 'org.geotools.data.complex.AppSchemaDataAccessFactory.getParametersInfo()'
      */
     public void testGetParametersInfo() {
         DataStoreFactorySpi.Param[] params = factory.getParametersInfo();
@@ -165,7 +147,7 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
 
     /**
      * 
-     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.canProcess(Map)'
+     * Test method for 'org.geotools.data.complex.AppSchemaDataAccessFactory.canProcess(Map)'
      */
     public void testCanProcess() {
         Map params = new HashMap();
@@ -183,7 +165,7 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
 
     /**
      * 
-     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.isAvailable()'
+     * Test method for 'org.geotools.data.complex.AppSchemaDataAccessFactory.isAvailable()'
      */
     public void testIsAvailable() {
         assertTrue(factory.isAvailable());
@@ -191,7 +173,8 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
 
     /**
      * 
-     * Test method for 'org.geotools.data.complex.ComplexDataStoreFactory.getImplementationHints()'
+     * Test method for
+     * 'org.geotools.data.complex.AppSchemaDataAccessFactory.getImplementationHints()'
      */
     public void testGetImplementationHints() {
         assertNotNull(factory.getImplementationHints());

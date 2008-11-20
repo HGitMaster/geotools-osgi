@@ -65,9 +65,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * org.geotools.data.complex.config.AppSchemaDataAccessDTO}).
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessConfigurator.java 31784 2008-11-06 06:20:21Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/ComplexDataStoreConfigurator.java $
+ * @version $Id: AppSchemaDataAccessConfigurator.java 31882 2008-11-20 07:20:42Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AppSchemaDataAccessConfigurator.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessConfigurator {

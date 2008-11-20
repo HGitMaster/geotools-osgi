@@ -63,9 +63,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: AppSchemaDataAccess.java 31815 2008-11-10 07:53:14Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/ComplexDataStore.java $
+ * @version $Id: AppSchemaDataAccess.java 31882 2008-11-20 07:20:42Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccess.java $
  * @since 2.4
  */
 public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
