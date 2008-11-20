@@ -2,13 +2,14 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WfsPackageImpl.java 31894 2008-11-20 20:35:38Z jdeolive $
+ * $Id: WfsPackageImpl.java 31895 2008-11-20 20:40:48Z jdeolive $
  */
 package net.opengis.wfs.impl;
 
 import java.util.Calendar;
 import java.util.List;
 
+import java.util.Map;
 import javax.xml.namespace.QName;
 
 import net.opengis.ows10.Ows10Package;
@@ -465,6 +466,13 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
 	private EDataType typeNameListTypeEDataType = null;
 
 	/**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    private EDataType mapEDataType = null;
+
+    /**
      * Creates an instance of the model <b>Package</b>, registered with
      * {@link org.eclipse.emf.ecore.EPackage.Registry EPackage.Registry} by the package
      * package URI value.
@@ -1321,6 +1329,15 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
     }
 
 	/**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EAttribute getGetFeatureType_FormatOptions() {
+        return (EAttribute)getFeatureTypeEClass.getEStructuralFeatures().get(6);
+    }
+
+    /**
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
@@ -2321,6 +2338,15 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
 
 	/**
      * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EDataType getMap() {
+        return mapEDataType;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
      */
@@ -2447,6 +2473,7 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
         createEAttribute(getFeatureTypeEClass, GET_FEATURE_TYPE__RESULT_TYPE);
         createEAttribute(getFeatureTypeEClass, GET_FEATURE_TYPE__TRAVERSE_XLINK_DEPTH);
         createEAttribute(getFeatureTypeEClass, GET_FEATURE_TYPE__TRAVERSE_XLINK_EXPIRY);
+        createEAttribute(getFeatureTypeEClass, GET_FEATURE_TYPE__FORMAT_OPTIONS);
 
         getFeatureWithLockTypeEClass = createEClass(GET_FEATURE_WITH_LOCK_TYPE);
         createEAttribute(getFeatureWithLockTypeEClass, GET_FEATURE_WITH_LOCK_TYPE__EXPIRY);
@@ -2584,6 +2611,7 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
         functionEDataType = createEDataType(FUNCTION);
         sortByEDataType = createEDataType(SORT_BY);
         typeNameListTypeEDataType = createEDataType(TYPE_NAME_LIST_TYPE);
+        mapEDataType = createEDataType(MAP);
     }
 
 	/**
@@ -2725,6 +2753,7 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
         initEAttribute(getGetFeatureType_ResultType(), this.getResultTypeType(), "resultType", "results", 0, 1, GetFeatureType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
         initEAttribute(getGetFeatureType_TraverseXlinkDepth(), theXMLTypePackage.getString(), "traverseXlinkDepth", null, 0, 1, GetFeatureType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
         initEAttribute(getGetFeatureType_TraverseXlinkExpiry(), theXMLTypePackage.getPositiveInteger(), "traverseXlinkExpiry", null, 0, 1, GetFeatureType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEAttribute(getGetFeatureType_FormatOptions(), this.getMap(), "formatOptions", null, 0, 1, GetFeatureType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
         initEClass(getFeatureWithLockTypeEClass, GetFeatureWithLockType.class, "GetFeatureWithLockType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getGetFeatureWithLockType_Expiry(), theXMLTypePackage.getPositiveInteger(), "expiry", "5", 0, 1, GetFeatureWithLockType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2878,6 +2907,7 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
         initEDataType(functionEDataType, Function.class, "Function", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
         initEDataType(sortByEDataType, SortBy.class, "SortBy", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
         initEDataType(typeNameListTypeEDataType, List.class, "TypeNameListType", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
+        initEDataType(mapEDataType, Map.class, "Map", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
 
         // Create resource
         createResource(eNS_URI);

@@ -42,6 +42,7 @@
     <genDataTypes ecoreDataType="wfs.ecore#//Function"/>
     <genDataTypes ecoreDataType="wfs.ecore#//SortBy"/>
     <genDataTypes ecoreDataType="wfs.ecore#//TypeNameListType"/>
+    <genDataTypes ecoreDataType="wfs.ecore#//Map"/>
     <genClasses ecoreClass="wfs.ecore#//ActionType">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//ActionType/message"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//ActionType/code"/>
@@ -142,6 +143,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureType/resultType"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureType/traverseXlinkDepth"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureType/traverseXlinkExpiry"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureType/formatOptions"/>
     </genClasses>
     <genClasses ecoreClass="wfs.ecore#//GetFeatureWithLockType">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute wfs.ecore#//GetFeatureWithLockType/expiry"/>

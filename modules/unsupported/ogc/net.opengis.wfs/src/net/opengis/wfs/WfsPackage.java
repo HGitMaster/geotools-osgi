@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WfsPackage.java 31893 2008-11-20 19:29:05Z jdeolive $
+ * $Id: WfsPackage.java 31895 2008-11-20 20:40:48Z jdeolive $
  */
 package net.opengis.wfs;
 
@@ -1113,13 +1113,22 @@ public interface WfsPackage extends EPackage {
 	int GET_FEATURE_TYPE__TRAVERSE_XLINK_EXPIRY = BASE_REQUEST_TYPE_FEATURE_COUNT + 5;
 
 	/**
+     * The feature id for the '<em><b>Format Options</b></em>' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int GET_FEATURE_TYPE__FORMAT_OPTIONS = BASE_REQUEST_TYPE_FEATURE_COUNT + 6;
+
+    /**
      * The number of structural features of the '<em>Get Feature Type</em>' class.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
      * @ordered
      */
-	int GET_FEATURE_TYPE_FEATURE_COUNT = BASE_REQUEST_TYPE_FEATURE_COUNT + 6;
+	int GET_FEATURE_TYPE_FEATURE_COUNT = BASE_REQUEST_TYPE_FEATURE_COUNT + 7;
 
 	/**
      * The meta object id for the '{@link net.opengis.wfs.impl.GetFeatureWithLockTypeImpl <em>Get Feature With Lock Type</em>}' class.
@@ -1231,6 +1240,15 @@ public interface WfsPackage extends EPackage {
 	int GET_FEATURE_WITH_LOCK_TYPE__TRAVERSE_XLINK_EXPIRY = GET_FEATURE_TYPE__TRAVERSE_XLINK_EXPIRY;
 
 	/**
+     * The feature id for the '<em><b>Format Options</b></em>' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int GET_FEATURE_WITH_LOCK_TYPE__FORMAT_OPTIONS = GET_FEATURE_TYPE__FORMAT_OPTIONS;
+
+    /**
      * The feature id for the '<em><b>Expiry</b></em>' attribute.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2639,6 +2657,17 @@ public interface WfsPackage extends EPackage {
 
 
 	/**
+     * The meta object id for the '<em>Map</em>' data type.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see java.util.Map
+     * @see net.opengis.wfs.impl.WfsPackageImpl#getMap()
+     * @generated
+     */
+    int MAP = 54;
+
+
+    /**
      * Returns the meta object for class '{@link net.opengis.wfs.ActionType <em>Action Type</em>}'.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3582,6 +3611,17 @@ public interface WfsPackage extends EPackage {
 	EAttribute getGetFeatureType_TraverseXlinkExpiry();
 
 	/**
+     * Returns the meta object for the attribute '{@link net.opengis.wfs.GetFeatureType#getFormatOptions <em>Format Options</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for the attribute '<em>Format Options</em>'.
+     * @see net.opengis.wfs.GetFeatureType#getFormatOptions()
+     * @see #getGetFeatureType()
+     * @generated
+     */
+    EAttribute getGetFeatureType_FormatOptions();
+
+    /**
      * Returns the meta object for class '{@link net.opengis.wfs.GetFeatureWithLockType <em>Get Feature With Lock Type</em>}'.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4777,6 +4817,17 @@ public interface WfsPackage extends EPackage {
 	EDataType getTypeNameListType();
 
 	/**
+     * Returns the meta object for data type '{@link java.util.Map <em>Map</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for data type '<em>Map</em>'.
+     * @see java.util.Map
+     * @model instanceClass="java.util.Map"
+     * @generated
+     */
+    EDataType getMap();
+
+    /**
      * Returns the factory that creates the instances of the model.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -5523,6 +5574,14 @@ public interface WfsPackage extends EPackage {
 		EAttribute GET_FEATURE_TYPE__TRAVERSE_XLINK_EXPIRY = eINSTANCE.getGetFeatureType_TraverseXlinkExpiry();
 
 		/**
+         * The meta object literal for the '<em><b>Format Options</b></em>' attribute feature.
+         * <!-- begin-user-doc -->
+         * <!-- end-user-doc -->
+         * @generated
+         */
+        EAttribute GET_FEATURE_TYPE__FORMAT_OPTIONS = eINSTANCE.getGetFeatureType_FormatOptions();
+
+        /**
          * The meta object literal for the '{@link net.opengis.wfs.impl.GetFeatureWithLockTypeImpl <em>Get Feature With Lock Type</em>}' class.
          * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -6489,6 +6548,16 @@ public interface WfsPackage extends EPackage {
          * @generated
          */
 		EDataType TYPE_NAME_LIST_TYPE = eINSTANCE.getTypeNameListType();
+
+        /**
+         * The meta object literal for the '<em>Map</em>' data type.
+         * <!-- begin-user-doc -->
+         * <!-- end-user-doc -->
+         * @see java.util.Map
+         * @see net.opengis.wfs.impl.WfsPackageImpl#getMap()
+         * @generated
+         */
+        EDataType MAP = eINSTANCE.getMap();
 
 	}
 
