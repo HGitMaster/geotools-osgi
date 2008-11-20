@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WfsPackageImpl.java 31893 2008-11-20 19:29:05Z jdeolive $
+ * $Id: WfsPackageImpl.java 31894 2008-11-20 20:35:38Z jdeolive $
  */
 package net.opengis.wfs.impl;
 
@@ -521,6 +521,8 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
         isInited = true;
 
         // Initialize simple dependencies
+        XMLTypePackage.eINSTANCE.eClass();
+        EcorePackage.eINSTANCE.eClass();
         Ows10Package.eINSTANCE.eClass();
 
         // Create package meta-data objects
@@ -2778,7 +2780,7 @@ public class WfsPackageImpl extends EPackageImpl implements WfsPackage {
 
         initEClass(outputFormatListTypeEClass, OutputFormatListType.class, "OutputFormatListType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getOutputFormatListType_Group(), theEcorePackage.getEFeatureMapEntry(), "group", null, 0, -1, OutputFormatListType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-        initEAttribute(getOutputFormatListType_Format(), theXMLTypePackage.getAnyURI(), "format", null, 1, -1, OutputFormatListType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+        initEAttribute(getOutputFormatListType_Format(), theXMLTypePackage.getString(), "format", null, 1, -1, OutputFormatListType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
         initEClass(propertyTypeEClass, PropertyType.class, "PropertyType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getPropertyType_Name(), this.getQName(), "name", null, 0, 1, PropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

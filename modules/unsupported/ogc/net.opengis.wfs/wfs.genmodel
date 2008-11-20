@@ -30,6 +30,7 @@
     </genEnums>
     <genDataTypes ecoreDataType="wfs.ecore#//ServiceType"/>
     <genDataTypes ecoreDataType="wfs.ecore#//Filter"/>
+    <genDataTypes ecoreDataType="wfs.ecore#//FilterCapabilities"/>
     <genDataTypes ecoreDataType="wfs.ecore#//QName"/>
     <genDataTypes ecoreDataType="wfs.ecore#//Calendar"/>
     <genDataTypes ecoreDataType="wfs.ecore#//FeatureCollection"/>

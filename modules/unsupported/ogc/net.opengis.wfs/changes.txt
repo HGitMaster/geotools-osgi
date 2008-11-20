@@ -1,0 +1,1 @@
+* added many='true' to FeaturTypeType#getOtherSRS() and OutputFormatListType#getFormat()
