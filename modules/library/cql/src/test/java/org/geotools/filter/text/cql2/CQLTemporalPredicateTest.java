@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.commons.CompilerUtil;
 import org.geotools.filter.text.commons.Language;
 import org.junit.Assert;

@@ -22,10 +22,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.filter.text.commons.AbstractFilterBuilder;
+import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.commons.IToken;
 import org.geotools.filter.text.commons.Result;
-import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.filter.text.cql2.CQLFilterBuilder;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
@@ -53,9 +53,9 @@ import com.vividsolutions.jts.geom.Polygon;
  * Builds the filters required by the {@link TXTCompiler}.
  * 
  * @author Mauricio Pazos (Axios Engineering)
- * @since 2.5
+ * @since 2.6
  */
-final class TXTFilterBuilder extends CQLFilterBuilder {
+final class TXTFilterBuilder extends AbstractFilterBuilder {
 
     public TXTFilterBuilder(String txtSource, FilterFactory filterFactory) {
         super(txtSource, filterFactory);

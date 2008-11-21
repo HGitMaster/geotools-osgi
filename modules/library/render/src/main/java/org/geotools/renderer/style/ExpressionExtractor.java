@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.cql2.CQL;
-import org.geotools.filter.text.cql2.CQLException;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 

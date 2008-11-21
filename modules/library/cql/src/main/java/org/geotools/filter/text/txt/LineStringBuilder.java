@@ -20,7 +20,7 @@ package org.geotools.filter.text.txt;
 import java.util.Stack;
 
 import org.geotools.filter.text.commons.BuildResultStack;
-import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.filter.text.commons.CQLException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

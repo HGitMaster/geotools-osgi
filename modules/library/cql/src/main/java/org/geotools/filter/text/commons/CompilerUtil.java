@@ -19,7 +19,6 @@ package org.geotools.filter.text.commons;
 
 import java.util.List;
 
-import org.geotools.filter.text.cql2.CQLException;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;

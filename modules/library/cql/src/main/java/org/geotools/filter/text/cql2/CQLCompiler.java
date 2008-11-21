@@ -25,6 +25,7 @@ import java.util.List;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.commons.ICompiler;
 import org.geotools.filter.text.commons.IToken;
 import org.geotools.filter.text.commons.Result;
@@ -55,7 +56,7 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
  * 
  * @author Mauricio Pazos (Axios Engineering)
  * 
- * @version $Id: CQLCompiler.java 31632 2008-10-07 19:32:57Z mauricio.pazos $
+ * @version $Id: CQLCompiler.java 31896 2008-11-21 14:25:53Z mauricio.pazos $
  * @since 2.5
  */
 public class CQLCompiler extends CQLParser implements ICompiler{

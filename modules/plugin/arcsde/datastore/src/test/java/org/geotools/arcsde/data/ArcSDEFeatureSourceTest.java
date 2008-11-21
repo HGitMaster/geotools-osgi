@@ -42,8 +42,8 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.cql2.CQL;
-import org.geotools.filter.text.cql2.CQLException;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
- * @version $Id: ArcSDEFeatureSourceTest.java 30921 2008-07-05 07:51:23Z jgarnett $
+ * @version $Id: ArcSDEFeatureSourceTest.java 31896 2008-11-21 14:25:53Z mauricio.pazos $
  */
 public class ArcSDEFeatureSourceTest extends TestCase {
     /** package logger */

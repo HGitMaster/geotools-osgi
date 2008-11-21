@@ -19,7 +19,6 @@ package org.geotools.filter.text.commons;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.filter.text.cql2.CQLCompiler;
-import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.filter.text.txt.TXTCompiler;
 import org.opengis.filter.FilterFactory;
 

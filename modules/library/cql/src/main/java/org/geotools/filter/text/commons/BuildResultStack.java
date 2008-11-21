@@ -19,7 +19,6 @@ package org.geotools.filter.text.commons;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
-import org.geotools.filter.text.cql2.CQLException;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 
@@ -31,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
- * @version $Id: BuildResultStack.java 31632 2008-10-07 19:32:57Z mauricio.pazos $
+ * @version $Id: BuildResultStack.java 31896 2008-11-21 14:25:53Z mauricio.pazos $
  * @since 2.4
  */
 public final class BuildResultStack {

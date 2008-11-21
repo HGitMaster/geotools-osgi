@@ -3,9 +3,9 @@ package org.geotools.filter.text.txt;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.commons.CompilerUtil;
 import org.geotools.filter.text.commons.Language;
-import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.filter.text.cql2.CQLLiteralTest;
 import org.junit.Assert;
 import org.junit.Test;
