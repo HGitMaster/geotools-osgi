@@ -24,7 +24,6 @@ import org.geotools.gml3.GML3TestSupport;
 public class CurvePropertyTypeBindingTest extends GML3TestSupport {
     public void testEncode() throws Exception {
         Document dom = encode(GML3MockData.multiLineString(), GML.curveProperty);
-        print(dom);
-//        assertEquals(1, dom.getElementsByTagName("gml:Curve").getLength());
+        assertEquals(1, dom.getElementsByTagName("gml:Curve").getLength() + dom.getElementsByTagName("gml:LineString").getLength() );
     }
 }
