@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
@@ -53,6 +54,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTReader;
+
 /**
  * 
  * This abstract class provides the common behavior to build the filters for the related

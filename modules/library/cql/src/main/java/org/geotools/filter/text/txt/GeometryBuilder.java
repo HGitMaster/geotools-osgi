@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.geotools.filter.text.commons.BuildResultStack;
-import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.commons.Result;
+import org.geotools.filter.text.cql2.CQLException;
 import org.opengis.filter.expression.Literal;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -131,7 +131,7 @@ abstract class GeometryBuilder {
      * @return a list of indeed geometries 
      * @throws CQLException
      */
-    protected List<Geometry> popGeometry(final int geometryNode) throws CQLException{
+    protected List<Geometry> popGeometry(final int geometryNode) throws org.geotools.filter.text.cql2.CQLException{
 
         List<Geometry> geomList = new LinkedList<Geometry>();
         while( !getResultStack().empty() ) {

@@ -17,9 +17,9 @@
 
 package org.geotools.filter.text.txt;
 
-import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.commons.Language;
 import org.geotools.filter.text.cql2.CQLBetweenPredicateTest;
+import org.geotools.filter.text.cql2.CQLException;
 import org.junit.Test;
 import org.opengis.filter.Filter;
 

@@ -18,7 +18,7 @@ package org.geotools.filter.text.txt;
 
 import java.util.Set;
 
-import org.geotools.filter.text.commons.CQLException;
+import org.geotools.filter.text.cql2.CQLException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opengis.filter.Filter;

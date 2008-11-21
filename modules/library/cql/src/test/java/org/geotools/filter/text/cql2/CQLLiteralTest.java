@@ -17,7 +17,6 @@
 
 package org.geotools.filter.text.cql2;
 
-import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.commons.CompilerUtil;
 import org.geotools.filter.text.commons.Language;
 import org.junit.Assert;

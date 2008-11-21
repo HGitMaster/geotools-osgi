@@ -24,7 +24,6 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 
 import org.geotools.filter.FilterTransformer;
-import org.geotools.filter.text.commons.CQLException;
 import org.geotools.filter.text.commons.CompilerUtil;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -87,7 +86,7 @@ import org.opengis.filter.expression.Expression;
  * @since 2.5
  * @author Mauricio Pazos (Axios Engineering)
  * @author Gabriel Roldan (Axios Engineering)
- * @version $Id: CQL.java 31896 2008-11-21 14:25:53Z mauricio.pazos $
+ * @version $Id: CQL.java 31897 2008-11-21 16:12:31Z mauricio.pazos $
  * @source $URL:
  *        http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQL.java $
  */
