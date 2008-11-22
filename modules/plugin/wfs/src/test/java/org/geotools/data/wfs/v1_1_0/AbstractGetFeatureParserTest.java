@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: AbstractGetFeatureParserTest.java 31871 2008-11-17 15:14:30Z groldan $
+ * @version $Id: AbstractGetFeatureParserTest.java 31902 2008-11-22 00:37:35Z groldan $
  * @since 2.5.x
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src /test/
  *         java/org/geotools/wfs/v_1_1_0/data/StreamingParserFeatureReaderTest .java $
@@ -86,7 +86,7 @@ public abstract class AbstractGetFeatureParserTest {
      * A feature visitor used to assert the parsed features
      * 
      * @author Gabriel Roldan (TOPP)
-     * @version $Id: AbstractGetFeatureParserTest.java 31871 2008-11-17 15:14:30Z groldan $
+     * @version $Id: AbstractGetFeatureParserTest.java 31902 2008-11-22 00:37:35Z groldan $
      * @since 2.5.x
      * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs /src/test
      *         /java/org/geotools/wfs/v_1_1_0/data/AbstractGetFeatureParserTest .java $
@@ -376,7 +376,7 @@ public abstract class AbstractGetFeatureParserTest {
     }
 
     @Test
-    public void testParseMapserver_StatisticalUnit() throws Exception {
+    public void testParseIonic_StatisticalUnit() throws Exception {
         final String[] properties = { "unitId", "typeAbbreviation", "instanceName", "geometry" };
         final QName featureName = IONIC_STATISTICAL_UNIT.TYPENAME;
         final String schemaLocation = IONIC_STATISTICAL_UNIT.SCHEMA;

@@ -25,7 +25,11 @@ import net.opengis.wfs.GetFeatureType;
 import org.geotools.data.Query;
 import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.WFSDataStoreFactory;
+import org.geotools.data.wfs.protocol.wfs.GetFeature;
+import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
+import org.geotools.wfs.WFSConfiguration;
+import org.geotools.xml.Configuration;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
@@ -34,9 +38,11 @@ import org.opengis.filter.Filter;
  * care of specific WFS implementations limitations or deviations from the spec.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFSStrategy.java 31824 2008-11-11 19:22:41Z groldan $
+ * @version $Id: WFSStrategy.java 31902 2008-11-22 00:37:35Z groldan $
  * @since 2.6
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/WFSStrategy.java $
+ * @source $URL:
+ *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
+ *         /wfs/v1_1_0/WFSStrategy.java $
  * @see WFSDataStoreFactory
  * @see DefaultWFSStrategy
  * @see CubeWerxStrategy
@@ -44,23 +50,47 @@ import org.opengis.filter.Filter;
 public interface WFSStrategy {
 
     /**
-     * Returns the protocol default output format name for the WFS version the implementation talks.
+     * A simple means to specify whether POST requests are supported between the server and the
+     * client. Regardless of the server supporting the method or not there might be other sort of
+     * inconvenients (technical?) that prevents us from using a given method at all, but generally
+     * this should just return {@code true}
      * 
-     * @return the default output format name for the GetFeature operation for the protocol version
+     * @return whether we can send POST requests to the server
      */
-    public String getDefaultOutputFormat(WFSProtocol wfs);
+    public boolean supportsPost();
 
     /**
-     * Returns the feature type that shall result of issueing the given request, adapting the
-     * original feature type for the request's type name in terms of the query CRS and requested
-     * attributes
+     * A simple means to specify whether GET requests are supported between the server and the
+     * client. Regardless of the server supporting the method or not there might be other sort of
+     * inconvenients (technical?) that prevents us from using a given method at all, but generally
+     * this should just return {@code true}
      * 
-     * @param query
-     * @return
-     * @throws IOException
+     * @return whether we can send GET requests to the server
      */
-    public SimpleFeatureType getQueryType(final WFS_1_1_0_DataStore ds, final Query query)
-            throws IOException;
+    public boolean supportsGet();
+
+    /**
+     * Returns an xml configuration suitable to parse/encode wfs documents appropriate for the
+     * server.
+     * <p>
+     * Note: most of the time it will just be {@link WFSConfiguration}, but it may be possible, for
+     * example, an strategy needs to override some bindings.
+     * </p>
+     * 
+     * @return a WFS xml {@link Configuration}
+     */
+    public Configuration getWfsConfiguration();
+
+    /**
+     * Returns the protocol default output format name for the WFS version the implementation talks.
+     * 
+     * @param operation
+     * 
+     * @return the default output format name for the given operation for the protocol version
+     */
+    public String getDefaultOutputFormat(WFSProtocol wfs, WFSOperationType operation);
+
+    public Filter[] splitFilters(WFSProtocol protocol, Filter filter);
 
     /**
      * Creates a GetFeature request that the server implementation this strategy works upon can deal
@@ -68,15 +98,12 @@ public interface WFSStrategy {
      * {@link Filter} that should be post processed at runtime once the server response is obtained,
      * in order to match the actual {@code query}.
      * 
-     * @param ds
-     *            the data store issueing the request, may be needed to grab the feature type,
-     *            feature type crs, or any other means the strategy needs
      * @param wfs
      *            the WFS protocol handler from which the strategy may need to grab some feature
      *            type metadata not available through the datastore interface, or even perform some
      *            test request.
-     * @param query
-     *            the GeoTools query to create the server request and post-processing filter for
+     * @param request
+     *            the GetFeature query to create the server request and post-processing filter for
      * @param outputFormat
      *            the output format indentifier that the request needs to be sent for. Shall be
      *            supported by the server for the requested feature type.
@@ -84,8 +111,8 @@ public interface WFSStrategy {
      *         {@code query}
      * @throws IOException
      */
-    public RequestComponents createGetFeatureRequest(WFS_1_1_0_DataStore ds, WFSProtocol wfs,
-            Query query, String outputFormat) throws IOException;
+    public RequestComponents createGetFeatureRequest(WFSProtocol wfs, GetFeature request)
+            throws IOException;
 
     /**
      * Holds the components needed by the data store to issue and post process a GetFeature request.
@@ -96,24 +123,11 @@ public interface WFSStrategy {
     public class RequestComponents {
 
         /**
-         * The filter to post-process (the one not supported by the server)
-         */
-        private Filter postFilter = Filter.EXCLUDE;
-
-        /**
          * The GetFeature request to issue to the WFS
          */
         private GetFeatureType serverRequest;
-        
-        private Map<String, String>kvpParameters;
 
-        public Filter getPostFilter() {
-            return postFilter;
-        }
-
-        public void setPostFilter(Filter postFilter) {
-            this.postFilter = postFilter;
-        }
+        private Map<String, String> kvpParameters;
 
         public GetFeatureType getServerRequest() {
             return serverRequest;
@@ -125,7 +139,7 @@ public interface WFSStrategy {
 
         @SuppressWarnings("unchecked")
         public Map<String, String> getKvpParameters() {
-            return kvpParameters == null? Collections.EMPTY_MAP : kvpParameters;
+            return kvpParameters == null ? Collections.EMPTY_MAP : kvpParameters;
         }
 
         public void setKvpParameters(Map<String, String> kvpParameters) {

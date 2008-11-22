@@ -19,12 +19,9 @@ package org.geotools.data.wfs.protocol.wfs;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-
-import net.opengis.wfs.GetFeatureType;
 
 import org.geotools.data.Query;
 import org.geotools.data.wfs.protocol.http.HttpMethod;
@@ -48,7 +45,7 @@ import org.opengis.filter.capability.FilterCapabilities;
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFSProtocol.java 31888 2008-11-20 13:34:53Z groldan $
+ * @version $Id: WFSProtocol.java 31902 2008-11-22 00:37:35Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -263,7 +260,7 @@ public interface WFSProtocol {
             throws IOException, UnsupportedOperationException;
 
     /**
-     * Issues a GetFeature request for the given {@link Query}, using GET HTTP method
+     * Issues a GetFeature request for the given request, using GET HTTP method
      * <p>
      * The {@code request} shall already be adapted to what the server supports in terms of filter
      * capabilities and CRS reprojection. The {@code WFSProtocol} implementation is not required to
@@ -279,17 +276,17 @@ public interface WFSProtocol {
      * @throws IOException
      * @throws UnsupportedOperationException
      */
-    public WFSResponse issueGetFeatureGET(final GetFeatureType request, final Map<String, String> kvp)
-            throws IOException, UnsupportedOperationException;
+    public WFSResponse issueGetFeatureGET(final GetFeature request) throws IOException,
+            UnsupportedOperationException;
 
     /**
-     * Issues a GetFeature request for the given {@link Query}, using POST HTTP method
+     * Issues a GetFeature request for the given request, using POST HTTP method
      * <p>
      * The query to WFS request parameter translation is the same than for
-     * {@link #issueGetFeatureGET(Query, String)}
+     * {@link #issueGetFeatureGET(GetFeature)}
      * </p>
      */
-    public WFSResponse issueGetFeaturePOST(GetFeatureType request) throws IOException,
+    public WFSResponse issueGetFeaturePOST(GetFeature request) throws IOException,
             UnsupportedOperationException;
 
     /**
@@ -301,4 +298,7 @@ public interface WFSProtocol {
      */
     public void dispose();
 
+    public String getDefaultOutputFormat(WFSOperationType get_feature);
+
+    public Filter[] splitFilters(Filter filter);
 }

@@ -117,7 +117,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31871 2008-11-17 15:14:30Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31902 2008-11-22 00:37:35Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -368,18 +368,11 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             http.setAuth(user, pass);
             http.setTimeoutMillis(timeoutMillis);
 
-            WFSProtocol wfs = new WFS_1_1_0_Protocol(capsIn, http);
-
-            // ///////////////////////////////////
-            // this is a meanwhile hack to test the StreamingParser vs pull parser approaches //
-            // Object pullParserParam = params.get("USE_PULL_PARSER");
-            // Boolean usePullParser = pullParserParam == null? Boolean.TRUE :
-            // Boolean.valueOf(pullParserParam.toString());
-            // protocolHandler.setUsePullParser(usePullParser.booleanValue());
-            // ///////////////////////////////////
+            WFS_1_1_0_Protocol wfs = new WFS_1_1_0_Protocol(capsIn, http);
 
             WFSStrategy strategy = determineCorrectStrategy(getCapabilitiesRequest, capsDoc);
-            dataStore = new WFS_1_1_0_DataStore(wfs, strategy);
+            wfs.setStrategy(strategy);
+            dataStore = new WFS_1_1_0_DataStore(wfs);
             dataStore.setMaxFeatures(maxFeatures);
             dataStore.setPreferPostOverGet(protocol);
         }
@@ -463,7 +456,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                 }
             }
         }
-        
+
         if (strategy == null) {
             // guess server implementation from capabilities URI
             String uri = getCapabilitiesRequest.toExternalForm();

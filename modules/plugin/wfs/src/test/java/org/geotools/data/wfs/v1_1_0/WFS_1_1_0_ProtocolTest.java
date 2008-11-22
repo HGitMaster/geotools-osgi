@@ -38,21 +38,18 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.opengis.wfs.GetFeatureType;
-import net.opengis.wfs.QueryType;
-
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.Query;
 import org.geotools.data.wfs.protocol.http.DefaultHTTPProtocol;
 import org.geotools.data.wfs.protocol.http.HTTPProtocol;
 import org.geotools.data.wfs.protocol.http.HTTPResponse;
-import org.geotools.data.wfs.protocol.http.HttpMethod;
+import org.geotools.data.wfs.protocol.wfs.GetFeature;
 import org.geotools.data.wfs.protocol.wfs.Version;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
+import org.geotools.data.wfs.protocol.wfs.GetFeature.ResultType;
 import org.geotools.data.wfs.v1_1_0.DataTestSupport.TestHttpProtocol;
 import org.geotools.data.wfs.v1_1_0.DataTestSupport.TestHttpResponse;
-import org.geotools.data.wfs.v1_1_0.WFSStrategy.RequestComponents;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.filter.v1_1.OGCConfiguration;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -694,7 +691,7 @@ public class WFS_1_1_0_ProtocolTest {
      * int featureHits = wfs.getFeatureHits(query); assertEquals(-1, featureHits); }
      */
 
-    /**
+/**
      * Test method for {@link WFS_1_1_0_Protocol#issueGetFeatureGET(net.opengis.wfs.GetFeatureType, Map)
      * 
      * @throws IOException
@@ -708,17 +705,19 @@ public class WFS_1_1_0_ProtocolTest {
         httpResponse = new TestHttpResponse(defaultWfs11OutputFormat, "UTF-16", responseContent);
 
         TestHttpProtocol mockHttp = new TestHttpProtocol(httpResponse);
+
         createTestProtocol(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
 
-        DefaultWFSStrategy strategy = new GeoServerStrategy();
-        WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs, strategy);
+        WFSStrategy strategy = new GeoServerStrategy();
+        wfs.setStrategy(strategy);
 
         DefaultQuery query = new DefaultQuery(GEOS_ARCHSITES.FEATURETYPENAME);
-        RequestComponents request = strategy.createGetFeatureRequest(ds, wfs, query,
-                defaultWfs11OutputFormat);
+        GetFeature getFeature = new GetFeatureQueryAdapter(query, defaultWfs11OutputFormat,
+                "EPSG:4326", ResultType.RESULTS);
 
         WFSResponse response;
-        response = wfs.issueGetFeatureGET(request.getServerRequest(), request.getKvpParameters());
+
+        response = wfs.issueGetFeatureGET(getFeature);
 
         assertNotNull(response);
         assertEquals(defaultWfs11OutputFormat, response.getContentType());
@@ -765,12 +764,15 @@ public class WFS_1_1_0_ProtocolTest {
 
         WFSResponse response;
         WFSStrategy strategy = new GeoServerStrategy();
-        WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs, strategy);
-        wfs.setDescribeFeatureTypeURLOverride(TestData.url(this, GEOS_ARCHSITES.SCHEMA));
-        RequestComponents request = strategy.createGetFeatureRequest(ds, wfs, query,
-                defaultWfs11OutputFormat);
+        wfs.setStrategy(strategy);
 
-        response = wfs.issueGetFeatureGET(request.getServerRequest(), request.getKvpParameters());
+        wfs.setDescribeFeatureTypeURLOverride(TestData.url(this, GEOS_ARCHSITES.SCHEMA));
+
+        GetFeature getFeature = new GetFeatureQueryAdapter(query, defaultWfs11OutputFormat,
+                "EPSG:26713", ResultType.RESULTS);
+
+        response = wfs.issueGetFeatureGET(getFeature);
+
         assertNotNull(response);
 
         Map<String, String> kvp = mockHttp.issueGetKvp;
@@ -791,20 +793,22 @@ public class WFS_1_1_0_ProtocolTest {
         filter = ff.equals(ff.property("cat"), ff.literal(1));
         query.setFilter(filter);
 
-        request = strategy.createGetFeatureRequest(ds, wfs, query, defaultWfs11OutputFormat);
-        response = wfs.issueGetFeatureGET(request.getServerRequest(), request.getKvpParameters());
+        getFeature = new GetFeatureQueryAdapter(query, defaultWfs11OutputFormat, "EPSG:23030",
+                ResultType.RESULTS);
+
+        response = wfs.issueGetFeatureGET(getFeature);
         kvp = mockHttp.issueGetKvp;
 
         assertNull("FEATUREID and FILTER are mutually exclusive", kvp.get("FEATUREID"));
 
         String encodedFilter = kvp.get("FILTER");
         assertNotNull(encodedFilter);
-        Parser filterParser = new Parser(wfs.filterConfig);
+        Parser filterParser = new Parser(new OGCConfiguration());
         Filter parsed = (Filter) filterParser.parse(new StringReader(encodedFilter));
         assertTrue(parsed instanceof PropertyIsEqualTo);
     }
 
-    /**
+/**
      * Test method for {@link WFS_1_1_0_Protocol#issueGetFeaturePOST(net.opengis.wfs.GetFeatureType)
      * 
      * @throws IOException
@@ -823,17 +827,16 @@ public class WFS_1_1_0_ProtocolTest {
         TestHttpProtocol mockHttp = new TestHttpProtocol(httpResponse);
         createTestProtocol(GEOS_ARCHSITES.CAPABILITIES, mockHttp);
 
-        DefaultWFSStrategy strategy = new GeoServerStrategy();
-        WFS_1_1_0_DataStore ds = new WFS_1_1_0_DataStore(wfs, strategy);
+        WFSStrategy strategy = new GeoServerStrategy();
+        wfs.setStrategy(strategy);
 
         DefaultQuery query = new DefaultQuery(GEOS_ARCHSITES.FEATURETYPENAME);
-        RequestComponents request = strategy.createGetFeatureRequest(ds, wfs, query,
-                defaultWfs11OutputFormat);
+        GetFeature getFeature = new GetFeatureQueryAdapter(query, defaultWfs11OutputFormat,
+                "EPSG:4326", ResultType.RESULTS);
 
         WFSResponse response;
-        GetFeatureType serverRequest = request.getServerRequest();
-        
-        response = wfs.issueGetFeaturePOST(serverRequest);
+
+        response = wfs.issueGetFeaturePOST(getFeature);
 
         assertNotNull(response);
         assertEquals(defaultWfs11OutputFormat, response.getContentType());

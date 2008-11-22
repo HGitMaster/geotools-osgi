@@ -70,18 +70,20 @@ import org.geotools.data.wfs.protocol.http.HTTPProtocol;
 import org.geotools.data.wfs.protocol.http.HTTPResponse;
 import org.geotools.data.wfs.protocol.http.HttpMethod;
 import org.geotools.data.wfs.protocol.http.HTTPProtocol.POSTCallBack;
+import org.geotools.data.wfs.protocol.wfs.GetFeature;
 import org.geotools.data.wfs.protocol.wfs.Version;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
+import org.geotools.data.wfs.v1_1_0.WFSStrategy.RequestComponents;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFS;
-import org.geotools.wfs.WFSConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.Parser;
+import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
 import org.xml.sax.SAXException;
 
@@ -90,7 +92,7 @@ import org.xml.sax.SAXException;
  * xml-xsd} subsystem for schema assisted parsing and encoding of WFS requests and responses.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFS_1_1_0_Protocol.java 31888 2008-11-20 13:34:53Z groldan $
+ * @version $Id: WFS_1_1_0_Protocol.java 31902 2008-11-22 00:37:35Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -101,15 +103,7 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
 
-    /**
-     * Configuration used to encode filters
-     */
-    Configuration filterConfig;
-
-    /**
-     * WFS 1.1 configuration used for XML parsing and encoding
-     */
-    private static final WFSConfiguration configuration = new WFSConfiguration();
+    private WFSStrategy strategy;
 
     /**
      * The WFS GetCapabilities document. Final by now, as we're not handling updatesequence, so will
@@ -126,10 +120,10 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     private HTTPProtocol http;
 
     public WFS_1_1_0_Protocol(InputStream capabilitiesReader, HTTPProtocol http) throws IOException {
+        this.strategy = new DefaultWFSStrategy();
         this.capabilities = parseCapabilities(capabilitiesReader);
         this.http = http;
         this.typeInfos = new HashMap<String, FeatureTypeType>();
-        filterConfig = new org.geotools.filter.v1_1.OGCConfiguration();
 
         final List<FeatureTypeType> ftypes = capabilities.getFeatureTypeList().getFeatureType();
         QName typeName;
@@ -139,6 +133,10 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
             String prefixedTypeName = typeName.getPrefix() + ":" + typeName.getLocalPart();
             typeInfos.put(prefixedTypeName, ftype);
         }
+    }
+
+    public void setStrategy(WFSStrategy strategy) {
+        this.strategy = strategy;
     }
 
     /**
@@ -274,6 +272,13 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
      * @see WFSProtocol#supportsOperation(WFSOperationType, boolean)
      */
     public boolean supportsOperation(WFSOperationType operation, boolean post) {
+        if (post && !strategy.supportsPost()) {
+            return false;
+        }
+        if (!post && !strategy.supportsGet()) {
+            return false;
+        }
+
         HttpMethod method = post ? POST : GET;
         return null != getOperationURI(operation, method);
     }
@@ -406,17 +411,20 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#issueGetFeatureGET(GetFeatureType, Map)
      */
-    public WFSResponse issueGetFeatureGET(final GetFeatureType request, Map<String, String> kvp)
-            throws IOException {
+    public WFSResponse issueGetFeatureGET(final GetFeature request) throws IOException {
         if (!supportsOperation(WFSOperationType.GET_FEATURE, false)) {
             throw new UnsupportedOperationException(
                     "The server does not support GetFeature for HTTP method GET");
         }
         URL url = getOperationURL(WFSOperationType.GET_FEATURE, false);
-        Map<String, String> getFeatureKvp = kvp;
+
+        RequestComponents reqParts = strategy.createGetFeatureRequest(this, request);
+        Map<String, String> getFeatureKvp = reqParts.getKvpParameters();
+        GetFeatureType requestType = reqParts.getServerRequest();
+
         System.out.println(" > getFeatureGET: Request url: " + url + ". Parameters: "
                 + getFeatureKvp);
-        WFSResponse response = issueGetRequest(request, url, getFeatureKvp);
+        WFSResponse response = issueGetRequest(requestType, url, getFeatureKvp);
 
         return response;
     }
@@ -424,14 +432,17 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     /**
      * @see WFSProtocol#getFeaturePOST(Query, String)
      */
-    public WFSResponse issueGetFeaturePOST(final GetFeatureType request) throws IOException {
+    public WFSResponse issueGetFeaturePOST(final GetFeature request) throws IOException {
         if (!supportsOperation(WFSOperationType.GET_FEATURE, true)) {
             throw new UnsupportedOperationException(
                     "The server does not support GetFeature for HTTP method POST");
         }
         URL url = getOperationURL(WFSOperationType.GET_FEATURE, true);
 
-        WFSResponse response = issuePostRequest(request, url);
+        RequestComponents reqParts = strategy.createGetFeatureRequest(this, request);
+        GetFeatureType serverRequest = reqParts.getServerRequest();
+
+        WFSResponse response = issuePostRequest(serverRequest, url);
 
         return response;
     }
@@ -467,7 +478,8 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
 
     private WFSCapabilitiesType parseCapabilities(InputStream capabilitiesReader)
             throws IOException {
-        final Parser parser = new Parser(configuration);
+        final Configuration wfsConfig = strategy.getWfsConfiguration();
+        final Parser parser = new Parser(wfsConfig);
         final Object parsed;
         try {
             parsed = parser.parse(capabilitiesReader);
@@ -563,9 +575,13 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
             }
 
             public void writeBody(final OutputStream out) throws IOException {
-                final WFSConfiguration xmlConfig = WFS_1_1_0_Protocol.configuration;
+                final Configuration wfsConfig = strategy.getWfsConfiguration();
                 final Charset charset = Charset.forName("UTF-8");
-                WFS_1_1_0_Protocol.encode(request, xmlConfig, out, charset);
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    System.err.println("Sending POST request: ");
+                    WFS_1_1_0_Protocol.encode(request, wfsConfig, System.err, charset);
+                }
+                WFS_1_1_0_Protocol.encode(request, wfsConfig, out, charset);
             }
         };
 
@@ -646,6 +662,14 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
             throw new IllegalArgumentException("Unkown xml element name for " + originatingRequest);
         }
         return encodeElementName;
+    }
+
+    public String getDefaultOutputFormat(WFSOperationType operation) {
+        return strategy.getDefaultOutputFormat(this, operation);
+    }
+
+    public Filter[] splitFilters(Filter filter) {
+        return strategy.splitFilters(this, filter);
     }
 
 }

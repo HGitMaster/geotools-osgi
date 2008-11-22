@@ -22,7 +22,7 @@ import java.util.List;
 
 import net.opengis.wfs.GetFeatureType;
 
-import org.geotools.data.Query;
+import org.geotools.data.wfs.protocol.wfs.GetFeature;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.visitor.SimplifyingFilterVisitor;
@@ -47,9 +47,11 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: CubeWerxStrategy.java 31823 2008-11-11 16:11:49Z groldan $
+ * @version $Id: CubeWerxStrategy.java 31902 2008-11-22 00:37:35Z groldan $
  * @since 2.6
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/CubeWerxStrategy.java $
+ * @source $URL:
+ *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
+ *         /wfs/v1_1_0/CubeWerxStrategy.java $
  */
 public class CubeWerxStrategy extends DefaultWFSStrategy {
 
@@ -67,9 +69,9 @@ public class CubeWerxStrategy extends DefaultWFSStrategy {
      * </p>
      */
     @Override
-    public RequestComponents createGetFeatureRequest(WFS_1_1_0_DataStore ds, WFSProtocol wfs,
-            Query query, String outputFormat) throws IOException {
-        RequestComponents parts = super.createGetFeatureRequest(ds, wfs, query, outputFormat);
+    public RequestComponents createGetFeatureRequest(WFSProtocol wfs, GetFeature query)
+            throws IOException {
+        RequestComponents parts = super.createGetFeatureRequest(wfs, query);
 
         GetFeatureType serverRequest = parts.getServerRequest();
 
@@ -80,11 +82,10 @@ public class CubeWerxStrategy extends DefaultWFSStrategy {
     }
 
     @Override
-    protected Filter[] splitFilters(final WFS_1_1_0_DataStore ds, final WFSProtocol wfs,
-            final Filter queryFilter) {
+    public Filter[] splitFilters(final WFSProtocol wfs, final Filter queryFilter) {
 
         if (!(queryFilter instanceof BinaryLogicOperator)) {
-            return super.splitFilters(ds, wfs, queryFilter);
+            return super.splitFilters(wfs, queryFilter);
         }
 
         int spatialFiltersCount = 0;
@@ -96,7 +97,7 @@ public class CubeWerxStrategy extends DefaultWFSStrategy {
             }
         }
         if (spatialFiltersCount <= 1) {
-            return super.splitFilters(ds, wfs, queryFilter);
+            return super.splitFilters(wfs, queryFilter);
         }
 
         Filter serverFilter;

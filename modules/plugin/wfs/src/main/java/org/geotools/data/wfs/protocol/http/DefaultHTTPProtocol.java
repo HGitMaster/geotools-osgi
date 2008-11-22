@@ -46,7 +46,7 @@ import org.geotools.util.logging.Logging;
  * Default implementation of {@link HTTPProtocol} based on apache's common-http-client
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: DefaultHTTPProtocol.java 31888 2008-11-20 13:34:53Z groldan $
+ * @version $Id: DefaultHTTPProtocol.java 31902 2008-11-22 00:37:35Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -319,7 +319,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
      */
     private HTTPResponse issueRequest(HttpMethodBase httpRequest) throws IOException {
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Executing HTTP request: " + httpRequest);
+            LOGGER.fine("Executing HTTP request: " + httpRequest.getURI());
         }
         final HttpClient client = new HttpClient();
         client.getParams().setParameter("http.useragent",
