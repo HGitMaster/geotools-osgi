@@ -17,17 +17,16 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.geotools.arcsde.ArcSDEDataStoreFactory;
+import org.geotools.arcsde.data.ArcSDEQuery.FilterSet;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.data.versioning.AutoCommitDefaultVersionHandler;
 import org.geotools.arcsde.pool.ISession;
@@ -40,9 +39,16 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 
@@ -56,7 +62,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEQueryTest.java $
  * @version $Revision: 1.9 $
  */
-public class ArcSDEQueryTest extends TestCase {
+public class ArcSDEQueryTest {
 
     private static TestData testData;
 
@@ -82,40 +88,9 @@ public class ArcSDEQueryTest extends TestCase {
 
     private static final int FILTERING_COUNT = 3;
 
-    /**
-     * Constructor for ArcSDEQueryTest.
-     * 
-     * @param arg0
-     */
-    public ArcSDEQueryTest(String name) {
-        super(name);
-    }
 
-    /**
-     * Builds a test suite for all this class' tests with per suite initialization directed to
-     * {@link #oneTimeSetUp()} and per suite clean up directed to {@link #oneTimeTearDown()}
-     * 
-     * @return
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(ArcSDEQueryTest.class);
-
-        TestSetup wrapper = new TestSetup(suite) {
-            @Override
-            protected void setUp() throws Exception {
-                oneTimeSetUp();
-            }
-
-            @Override
-            protected void tearDown() {
-                oneTimeTearDown();
-            }
-        };
-        return wrapper;
-    }
-
-    private static void oneTimeSetUp() throws Exception {
+    @BeforeClass
+    public static void oneTimeSetUp() throws Exception {
         testData = new TestData();
         testData.setUp();
 
@@ -123,21 +98,20 @@ public class ArcSDEQueryTest extends TestCase {
         testData.createTempTable(insertTestData);
     }
 
-    private static void oneTimeTearDown() {
+    @AfterClass
+    public static void oneTimeTearDown() {
         boolean cleanTestTable = false;
         boolean cleanPool = true;
         testData.tearDown(cleanTestTable, cleanPool);
     }
 
     /**
-     * loads {@code test-data/testparams.properties} into a Properties object, wich is used to
-     * obtain test tables names and is used as parameter to find the DataStore
-     * 
-     * @throws Exception DOCUMENT ME!
+     * loads {@code test-data/testparams.properties} into a Properties object,
+     * wich is used to obtain test tables names and is used as parameter to find
+     * the DataStore
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         if (testData == null) {
             oneTimeSetUp();
         }
@@ -158,9 +132,8 @@ public class ArcSDEQueryTest extends TestCase {
         filteringQuery = new DefaultQuery(typeName, filter);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         try {
             this._queryAll.close();
         } catch (Exception e) {
@@ -173,6 +146,30 @@ public class ArcSDEQueryTest extends TestCase {
         }
         this._queryAll = null;
         this.queryFiltered = null;
+    }
+
+    /**
+     * Filters are separated into backend supported and unsupported filters.
+     * Once split they should be simplified to avoid silly filters like
+     * {@code 1 = 1 AND 1 = 1}
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void testSimplifiesFilters() throws IOException {
+        ArcSDEQuery filteringQuery = getQueryFiltered();
+        FilterSet filters;
+        try {
+            filters = filteringQuery.getFilters();
+        } finally {
+            filteringQuery.close();
+        }
+        Filter geometryFilter = filters.getGeometryFilter();
+        Filter sqlFilter = filters.getSqlFilter();
+        Filter unsupportedFilter = filters.getUnsupportedFilter();
+
+        System.out.println("geom: " + geometryFilter + ", sql: " + sqlFilter + ", unsupp: "
+                + unsupportedFilter);
     }
 
     private ArcSDEQuery getQueryAll() throws IOException {
@@ -190,9 +187,7 @@ public class ArcSDEQueryTest extends TestCase {
         return this.queryFiltered;
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Test
     public void testClose() throws IOException {
         ArcSDEQuery queryAll = getQueryAll();
         assertNotNull(queryAll.session);
@@ -213,9 +208,7 @@ public class ArcSDEQueryTest extends TestCase {
         session.dispose();
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Test
     public void testFetch() throws IOException {
         ArcSDEQuery queryAll = getQueryAll();
         try {
@@ -239,9 +232,7 @@ public class ArcSDEQueryTest extends TestCase {
         queryAll.session.dispose();
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Test
     public void testCalculateResultCount() throws Exception {
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = dstore.getFeatureSource(
                 typeName).getFeatures();
@@ -255,26 +246,25 @@ public class ArcSDEQueryTest extends TestCase {
 
         ArcSDEQuery q = getQueryAll();
         int calculated = q.calculateResultCount();
-        q.session.dispose();
-        assertEquals(read, calculated);
+        q.close();
+        Assert.assertEquals(read, calculated);
 
         q = getQueryFiltered();
         calculated = q.calculateResultCount();
-        q.session.dispose();
-        assertEquals(FILTERING_COUNT, calculated);
+        q.close();
+        Assert.assertEquals(FILTERING_COUNT, calculated);
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Test
     public void testCalculateQueryExtent() throws Exception {
         {
-            FeatureCollection<SimpleFeatureType, SimpleFeature> features = dstore.getFeatureSource(
-                    typeName).getFeatures();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> features;
+            features = dstore.getFeatureSource(typeName).getFeatures();
             FeatureIterator<SimpleFeature> reader = features.features();
             SimpleFeatureType featureType = features.getSchema();
             GeometryDescriptor defaultGeometry = featureType.getGeometryDescriptor();
-            ReferencedEnvelope real = new ReferencedEnvelope(defaultGeometry.getCoordinateReferenceSystem());
+            ReferencedEnvelope real = new ReferencedEnvelope(defaultGeometry
+                    .getCoordinateReferenceSystem());
             try {
                 while (reader.hasNext()) {
                     real.include(reader.next().getBounds());
@@ -285,15 +275,20 @@ public class ArcSDEQueryTest extends TestCase {
 
             // TODO: make calculateQueryExtent to return ReferencedEnvelope
             ArcSDEQuery queryAll = getQueryAll();
-            Envelope actual = queryAll.calculateQueryExtent();
+            Envelope actual;
+            try {
+                actual = queryAll.calculateQueryExtent();
+            } finally {
+                queryAll.close();
+            }
             Envelope expected = new Envelope(real);
             assertNotNull(actual);
             assertEquals(expected, actual);
 
         }
         {
-            FeatureReader<SimpleFeatureType, SimpleFeature> featureReader = dstore
-                    .getFeatureReader(filteringQuery, Transaction.AUTO_COMMIT);
+            FeatureReader<SimpleFeatureType, SimpleFeature> featureReader;
+            featureReader = dstore.getFeatureReader(filteringQuery, Transaction.AUTO_COMMIT);
             ReferencedEnvelope real = new ReferencedEnvelope();
             try {
                 while (featureReader.hasNext()) {
@@ -303,7 +298,13 @@ public class ArcSDEQueryTest extends TestCase {
                 featureReader.close();
             }
 
-            Envelope actual = getQueryFiltered().calculateQueryExtent();
+            ArcSDEQuery queryFiltered = getQueryFiltered();
+            Envelope actual;
+            try {
+                actual = queryFiltered.calculateQueryExtent();
+            } finally {
+                queryFiltered.close();
+            }
             assertNotNull(actual);
             Envelope expected = new Envelope(real);
             assertEquals(expected, actual);
@@ -312,9 +313,9 @@ public class ArcSDEQueryTest extends TestCase {
 
     private void assertEquals(Envelope e1, Envelope e2) {
         final double tolerance = 1.0E-9;
-        assertEquals(e1.getMinX(), e2.getMinX(), tolerance);
-        assertEquals(e1.getMinY(), e2.getMinY(), tolerance);
-        assertEquals(e1.getMaxX(), e2.getMaxX(), tolerance);
-        assertEquals(e1.getMaxY(), e2.getMaxY(), tolerance);
+        Assert.assertEquals(e1.getMinX(), e2.getMinX(), tolerance);
+        Assert.assertEquals(e1.getMinY(), e2.getMinY(), tolerance);
+        Assert.assertEquals(e1.getMaxX(), e2.getMaxX(), tolerance);
+        Assert.assertEquals(e1.getMaxY(), e2.getMaxY(), tolerance);
     }
 }

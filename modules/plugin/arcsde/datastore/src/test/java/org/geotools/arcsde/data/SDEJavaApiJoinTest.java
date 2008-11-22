@@ -17,16 +17,18 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
@@ -38,6 +40,11 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.text.cql2.CQL;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -54,6 +61,7 @@ import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
+
 
 /**
  * ArcSDEDAtaStore test case for a master-child joining
@@ -130,11 +138,11 @@ import com.vividsolutions.jts.geom.Point;
  * 
  *  &#064;author Gabriel Roldan, Axios Engineering
  *  &#064;source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/SDEJavaApiJoinTest.java $
- *  &#064;version $Id: SDEJavaApiJoinTest.java 30921 2008-07-05 07:51:23Z jgarnett $
+ *  &#064;version $Id: SDEJavaApiJoinTest.java 31904 2008-11-22 20:51:53Z groldan $
  *  &#064;since 2.3.x
  * 
  */
-public class SDEJavaApiJoinTest extends TestCase {
+public class SDEJavaApiJoinTest {
     /** package logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(SDEJavaApiJoinTest.class.getPackage().getName());
@@ -145,31 +153,6 @@ public class SDEJavaApiJoinTest extends TestCase {
     /** an ArcSDEDataStore created on setUp() to run tests against */
     private ArcSDEDataStore store;
 
-    /**
-     * Builds a test suite for all this class' tests with per suite
-     * initialization directed to {@link #oneTimeSetUp()} and per suite clean up
-     * directed to {@link #oneTimeTearDown()}
-     * 
-     * @return
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(SDEJavaApiJoinTest.class);
-
-        TestSetup wrapper = new TestSetup(suite) {
-            @Override
-            protected void setUp() throws IOException, SeException, NoSuchAuthorityCodeException,
-                    FactoryException {
-                oneTimeSetUp();
-            }
-
-            @Override
-            protected void tearDown() {
-                oneTimeTearDown();
-            }
-        };
-        return wrapper;
-    }
 
     /**
      * Initialization code for the whole test suite
@@ -179,6 +162,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws FactoryException
      * @throws NoSuchAuthorityCodeException
      */
+    @BeforeClass
     public static void oneTimeSetUp() throws IOException, SeException,
             NoSuchAuthorityCodeException, FactoryException {
         testData = new TestData();
@@ -195,6 +179,7 @@ public class SDEJavaApiJoinTest extends TestCase {
     /**
      * Tear down code for the whole suite
      */
+    @AfterClass
     public static void oneTimeTearDown() {
         final boolean cleanTestTable = true;
         final boolean cleanPool = true;
@@ -209,18 +194,9 @@ public class SDEJavaApiJoinTest extends TestCase {
      * 
      * @throws Exception
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        if (testData == null) {
-            oneTimeSetUp();
-        }
+    @Before
+    public void setUp() throws Exception {
         this.store = testData.getDataStore();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
     }
 
     /*
@@ -248,6 +224,7 @@ public class SDEJavaApiJoinTest extends TestCase {
     /**
      * Assert that the datastore complains on views with non supported features
      */
+    @Test
     public void testRegisterIllegalView() throws IOException {
         final String typeName = "badQuery";
         String plainSql;
@@ -294,6 +271,7 @@ public class SDEJavaApiJoinTest extends TestCase {
     /**
      * Fail if tried to register the same view name more than once
      */
+    @Test
     public void testRegisterDuplicateViewName() throws IOException {
         final String plainSQL = InProcessViewSupportTestData.masterChildSql;
 
@@ -307,6 +285,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         }
     }
 
+    @Test
     public void testRegisterViewListedInGetTypeNames() throws IOException {
         final String plainSQL = InProcessViewSupportTestData.masterChildSql;
 
@@ -317,6 +296,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertTrue(publishedTypeNames.contains(InProcessViewSupportTestData.typeName));
     }
 
+    @Test
     public void testRegisterViewBuildsCorrectFeatureType() throws IOException {
         final String plainSQL = "SELECT " + InProcessViewSupportTestData.MASTER_UNQUALIFIED
                 + ".*, " + InProcessViewSupportTestData.CHILD_UNQUALIFIED + ".DESCRIPTION FROM "
@@ -352,6 +332,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertEquals(String.class, att4.getType().getBinding());
     }
 
+    @Test
     public void testViewBounds() throws IOException {
         SelectBody select = ViewRegisteringFactoryHelper
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
@@ -368,6 +349,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertEquals(3D, bounds.getMaxY(), 0);
     }
 
+    @Test
     public void testViewBoundsQuery() throws Exception {
         SelectBody select = ViewRegisteringFactoryHelper
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
@@ -390,6 +372,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertEquals(3D, bounds.getMaxY(), 0);
     }
 
+    @Test
     public void testViewCount() throws Exception {
         SelectBody select = ViewRegisteringFactoryHelper
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
@@ -403,6 +386,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertEquals(expected, count);
     }
 
+    @Test
     public void testViewCountQuery() throws Exception {
         SelectBody select = ViewRegisteringFactoryHelper
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
@@ -421,6 +405,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertEquals(expected, count);
     }
 
+    @Test
     public void testReadView() throws Exception {
         SelectBody select = ViewRegisteringFactoryHelper
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
@@ -446,6 +431,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertEquals(expectedCount, itCount);
     }
 
+    @Test
     public void testQueryView() throws Exception {
         SelectBody select = ViewRegisteringFactoryHelper
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
@@ -480,6 +466,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testApiOrderBy() throws Exception {
         ISession session = store.getSession(Transaction.AUTO_COMMIT);
 
@@ -569,7 +556,9 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws Exception
      * TODO: revisit, this test hangs with SDE 9.2/Oracle9i at query.prepareQueryInfo(queryInfo);
      */
-    public void _testApiAlias() throws Exception {
+    @Test
+    @Ignore
+    public void testApiAlias() throws Exception {
         ISession session = store.getSession(Transaction.AUTO_COMMIT);
 
         SeSqlConstruct sqlConstruct = new SeSqlConstruct();
@@ -630,6 +619,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testApiGroupBy() throws Exception {
         ISession session = store.getSession(Transaction.AUTO_COMMIT);
 
@@ -714,6 +704,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testApiPlainSql() throws Exception {
         ISession session = store.getSession(Transaction.AUTO_COMMIT);
 

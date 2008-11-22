@@ -16,20 +16,16 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ISession;
-import org.geotools.arcsde.pool.SessionPool;
-import org.geotools.arcsde.pool.SessionPoolFactory;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -41,6 +37,9 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.util.logging.Logging;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -60,7 +59,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @version $Id: ArcSDEFeatureStoreVersionedTest.java 30807 2008-06-25 17:02:40Z
  *          groldan $
  */
-public class ArcSDEFeatureStoreVersionedTest extends TestCase {
+public class ArcSDEFeatureStoreVersionedTest {
     /** package logger */
     private static Logger LOGGER = Logging.getLogger(" org.geotools.arcsde.data");
 
@@ -91,8 +90,8 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         testData = new TestData();
         testData.setUp();
         {
@@ -115,12 +114,12 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
         }
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         testData.tearDown(false, true);
     }
 
+    @Test
     public void testEditVersionedTableAutoCommit() throws Exception {
         final ArcSDEDataStore dataStore = testData.getDataStore();
         final FeatureSource<SimpleFeatureType, SimpleFeature> source;
@@ -167,6 +166,7 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
         assertEquals(2, source.getCount(Query.ALL));
     }
 
+    @Test
     public void testEditVersionedTableTransaction() throws Exception {
         try {
             final String tableName;
@@ -267,6 +267,7 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
         }
     }
 
+    @Test
     public void testEditVersionedTableTransactionConcurrently() throws Exception {
         Properties conProps = testData.getConProps();
 

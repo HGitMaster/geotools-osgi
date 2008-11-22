@@ -17,22 +17,27 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.Command;
 import org.geotools.arcsde.pool.ISession;
 import org.geotools.arcsde.pool.SessionPool;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;
@@ -67,9 +72,9 @@ import com.esri.sde.sdk.client.SeVersion;
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEJavaApiTest.java $
- * @version $Id: ArcSDEJavaApiTest.java 30842 2008-07-02 11:31:31Z groldan $
+ * @version $Id: ArcSDEJavaApiTest.java 31904 2008-11-22 20:51:53Z groldan $
  */
-public class ArcSDEJavaApiTest extends TestCase {
+public class ArcSDEJavaApiTest  {
     /** package logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(ArcSDEJavaApiTest.class.getPackage().getName());
@@ -81,39 +86,8 @@ public class ArcSDEJavaApiTest extends TestCase {
 
     private SessionPool pool;
 
-    /**
-     * Runs this test suite
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(ArcSDEJavaApiTest.class);
-    }
-
-    /**
-     * Builds a test suite for all this class' tests with per suite
-     * initialization directed to {@link #oneTimeSetUp()} and per suite clean up
-     * directed to {@link #oneTimeTearDown()}
-     * 
-     * @return
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(ArcSDEJavaApiTest.class);
-
-        TestSetup wrapper = new TestSetup(suite) {
-            @Override
-            protected void setUp() throws Exception {
-                oneTimeSetUp();
-            }
-
-            @Override
-            protected void tearDown() {
-                oneTimeTearDown();
-            }
-        };
-        return wrapper;
-    }
-
-    private static void oneTimeSetUp() throws Exception {
+    @BeforeClass
+    public static void oneTimeSetUp() throws Exception {
         testData = new TestData();
         testData.setUp();
 
@@ -121,7 +95,8 @@ public class ArcSDEJavaApiTest extends TestCase {
         testData.createTempTable(insertTestData);
     }
 
-    private static void oneTimeTearDown() {
+    @AfterClass
+    public static void oneTimeTearDown() {
         boolean cleanTestTable = true;
         boolean cleanPool = true;
         testData.tearDown(cleanTestTable, cleanPool);
@@ -135,9 +110,8 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         // facilitates running a single test at a time (eclipse lets you do this
         // and it's very useful)
         if (testData == null) {
@@ -153,9 +127,8 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         if (session != null) {
             try {
                 session.dispose();
@@ -167,6 +140,7 @@ public class ArcSDEJavaApiTest extends TestCase {
         pool = null;
     }
 
+    @Test
     public void testNullSQLConstruct() throws Exception {
         String[] columns = { TestData.TEST_TABLE_COLS[0] };
         SeSqlConstruct sql = null;
@@ -179,6 +153,7 @@ public class ArcSDEJavaApiTest extends TestCase {
         }
     }
 
+    @Test
     public void testEmptySQLConstruct() throws Exception {
         String typeName = testData.getTempTableName();
         String[] columns = { TestData.TEST_TABLE_COLS[0] };
@@ -200,6 +175,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Test
     public void testGetBoundsWhileFetchingRows() throws Exception {
         final String typeName = testData.getTempTableName();
         final String[] columns = { TestData.TEST_TABLE_COLS[0] };
@@ -317,6 +293,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Test
     public void testCalculateCount() throws Exception {
         try {
             String typeName = testData.getTempTableName();
@@ -350,6 +327,7 @@ public class ArcSDEJavaApiTest extends TestCase {
         }
     }
 
+    @Test
     public void testCalculateBoundsSqlFilter() throws Exception {
         String typeName = testData.getTempTableName();
         String where = "INT32_COL = 1";
@@ -384,6 +362,7 @@ public class ArcSDEJavaApiTest extends TestCase {
         assertEquals(0D, maxY, 1E-9);
     }
 
+    @Test
     public void testCalculateBoundsSpatialFilter() throws Exception {
         final String typeName = testData.getTempTableName();
 
@@ -435,6 +414,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 
     }
 
+    @Test
     public void testCalculateBoundsMixedFilter() throws Exception {
         final String typeName = testData.getTempTableName();
         // try {
@@ -495,6 +475,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws SeException
      *             if it is thrown while constructing the SeShape
      */
+    @Test
     public void testPointFormat() throws SeException {
         int numPts = 1;
         SDEPoint[] ptArray = new SDEPoint[numPts];
@@ -527,6 +508,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws SeException
      *             if it is thrown while constructing the SeShape
      */
+    @Test
     public void testMultiPointFormat() throws SeException {
         int numPts = 4;
         SDEPoint[] ptArray = new SDEPoint[numPts];
@@ -562,6 +544,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws SeException
      *             if it is thrown while constructing the SeShape
      */
+    @Test
     public void testLineStringFormat() throws SeException {
         int numPts = 4;
         SDEPoint[] ptArray = new SDEPoint[numPts];
@@ -591,6 +574,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws SeException
      *             if it is thrown while constructing the SeShape
      */
+    @Test
     public void testMultiLineStringFormat() throws SeException {
         int numPts = 4;
         SDEPoint[] ptArray = new SDEPoint[numPts];
@@ -623,6 +607,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws SeException
      *             if it is thrown while constructing the SeShape
      */
+    @Test
     public void testPolygonFormat() throws SeException {
         /*
          * Generate an area shape composed of two polygons, the first with a
@@ -695,6 +680,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws SeException
      *             if it is thrown while constructing the SeShape
      */
+    @Test
     public void testMultiPolygonFormat() throws SeException {
         /*
          * Generate an area shape composed of two polygons, the first with a
@@ -771,6 +757,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws UnavailableArcSDEConnectionException
      *             DOCUMENT ME!
      */
+    @Test
     public void testCreateBaseTable() throws SeException, IOException,
             UnavailableArcSDEConnectionException {
 
@@ -893,6 +880,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws UnavailableArcSDEConnectionException
      *             DOCUMENT ME!
      */
+    @Test
     public void testCreateNonStandardSchema() throws SeException, IOException,
             UnavailableArcSDEConnectionException {
 
@@ -1026,6 +1014,7 @@ public class ArcSDEJavaApiTest extends TestCase {
         session.issue(createCommand);
     } // End method createBaseTable
 
+    @Test
     public void testDeleteById() throws IOException, UnavailableArcSDEConnectionException,
             SeException {
 
@@ -1067,6 +1056,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * 
      * @throws DataSourceException
      */
+    @Test
     public void testTransactionStateRead() throws Exception {
         // connection with a transaction in progress
         final ISession transSession;
@@ -1166,6 +1156,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testEditVersionedTable_DefaultVersion() throws Exception {
         final SeTable versionedTable = testData.createVersionedTable(session);
 

@@ -17,6 +17,9 @@
  */
 package org.geotools.arcsde.pool;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -25,9 +28,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
-
 import org.geotools.data.DataSourceException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests de functionality of a pool of ArcSDE connection objects over a live ArcSDE database
@@ -35,9 +39,9 @@ import org.geotools.data.DataSourceException;
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/pool/SessionPoolTest.java $
- * @version $Id: SessionPoolTest.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: SessionPoolTest.java 31904 2008-11-22 20:51:53Z groldan $
  */
-public class SessionPoolTest extends TestCase {
+public class SessionPoolTest {
     /** DOCUMENT ME! */
     private static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger("org.geotools.data.sde");
@@ -52,24 +56,14 @@ public class SessionPoolTest extends TestCase {
     private SessionPool pool = null;
 
     /**
-     * Creates a new SessionPoolTest object.
-     * 
-     * @param name DOCUMENT ME!
-     */
-    public SessionPoolTest(String name) {
-        super(name);
-    }
-
-    /**
      * loads {@code test-data/testparams.properties} to get connection parameters and sets up a
      * ArcSDEConnectionConfig with them for tests to set up SessionPool's as requiered
      * 
      * @throws Exception DOCUMENT ME!
      * @throws IllegalStateException DOCUMENT ME!
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
 
         Properties conProps = new Properties();
         String propsFile = "testparams.properties";
@@ -102,8 +96,8 @@ public class SessionPoolTest extends TestCase {
      * 
      * @throws Exception DOCUMENT ME!
      */
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         connectionConfig = null;
 
         if (pool != null) {
@@ -111,7 +105,6 @@ public class SessionPoolTest extends TestCase {
         }
 
         pool = null;
-        super.tearDown();
     }
 
     /**
@@ -148,6 +141,7 @@ public class SessionPoolTest extends TestCase {
      * 
      * @throws IOException DOCUMENT ME!
      */
+    @Test
     public void testConnect() throws IOException {
         LOGGER.fine("testing connection to the sde database");
 
@@ -172,6 +166,7 @@ public class SessionPoolTest extends TestCase {
      * @throws DataSourceException DOCUMENT ME!
      * @throws UnavailableArcSDEConnectionException DOCUMENT ME!
      */
+    @Test
     public void testInitialCount() throws DataSourceException, UnavailableArcSDEConnectionException {
         int MIN_CONNECTIONS = 2;
         int MAX_CONNECTIONS = 6;
@@ -199,6 +194,7 @@ public class SessionPoolTest extends TestCase {
      * @throws DataSourceException
      * @throws UnavailableArcSDEConnectionException
      */
+    @Test
     public void testChecksLimits() throws DataSourceException, UnavailableArcSDEConnectionException {
         int MIN_CONNECTIONS = 2;
 
@@ -227,6 +223,7 @@ public class SessionPoolTest extends TestCase {
      * @throws DataSourceException DOCUMENT ME!
      * @throws UnavailableArcSDEConnectionException DOCUMENT ME!
      */
+    @Test
     public void testMaxConnections() throws DataSourceException,
             UnavailableArcSDEConnectionException {
         final int MIN_CONNECTIONS = 2;
@@ -269,6 +266,7 @@ public class SessionPoolTest extends TestCase {
      * 
      * @throws DataSourceException
      */
+    @Test
     public void testCreateWithNullDBName() throws DataSourceException {
         Map params = new HashMap(this.connectionParameters);
         params.remove(ArcSDEConnectionConfig.INSTANCE_NAME_PARAM);
@@ -280,6 +278,7 @@ public class SessionPoolTest extends TestCase {
      * 
      * @throws DataSourceException
      */
+    @Test
     public void testCreateWithEmptyDBName() throws DataSourceException {
         Map params = new HashMap(this.connectionParameters);
         params.put(ArcSDEConnectionConfig.INSTANCE_NAME_PARAM, "");

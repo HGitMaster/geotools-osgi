@@ -19,7 +19,9 @@ package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,7 +74,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/TestData.java $
- * @version $Id: TestData.java 31197 2008-08-20 20:56:42Z groldan $
+ * @version $Id: TestData.java 31904 2008-11-22 20:51:53Z groldan $
  */
 public class TestData {
     /** DOCUMENT ME! */
@@ -888,7 +890,9 @@ public class TestData {
         TestData testData = new TestData();
         try {
             testData.setUp();
-            testData.createSimpleTestTables();
+            // testData.createSimpleTestTables();
+            testData.createSampleLayers(2000);
+            //testData.deleteSampleLayers(5000);
             System.err.println("test tables successfully created");
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "while creating test tables got '" + e.getMessage() + "'");
@@ -896,6 +900,81 @@ public class TestData {
         } finally {
             System.exit(0);
         }
+    }
+
+    private void deleteSampleLayers(final int numLayersToCreate) throws IOException {
+        final SessionPool connectionPool = getConnectionPool();
+        final ISession session = connectionPool.getSession();
+        final NumberFormat formatter = NumberFormat.getInstance();
+        formatter.setMinimumIntegerDigits(4);
+        formatter.setGroupingUsed(false);
+
+        session.issue(new Command<Void>() {
+            @Override
+            public Void execute(ISession session, SeConnection connection) throws SeException,
+                    IOException {
+                LOGGER.info("Deleting tables GT_MULTIPLE_LAYER_" + formatter.format(1)
+                        + " to GT_MULTIPLE_LAYER_" + formatter.format(numLayersToCreate));
+                for (int i = 1; i <= numLayersToCreate; i++) {
+                    String tableName = "GT_MULTIPLE_LAYER_" + formatter.format(i);
+                    SeTable table = new SeTable(connection, tableName);
+                    try {
+                        table.delete();
+                    } catch (SeException e) {
+                        LOGGER.info("Couldn't delete table " + tableName);
+                    }
+                }
+                LOGGER.info("Tables deleted");
+                return null;
+            }
+        });
+    }
+
+    /**
+     * This private method is used to create a lot of layers in the test
+     * database in order to fix GEOT-1956
+     */
+    private void createSampleLayers(final int numLayersToCreate) throws IOException {
+        final SessionPool connectionPool = getConnectionPool();
+        final ISession session = connectionPool.getSession();
+
+        String tableName;
+        String rowIdColName;
+        int rowIdColumnType;
+        int shapeTypeMask;
+        NumberFormat formatter = NumberFormat.getInstance();
+        formatter.setMinimumIntegerDigits(4);
+        formatter.setGroupingUsed(false);
+
+        // use a double linked list to set to alternate between rowid
+        // registration types
+        LinkedList<Integer> registrationTypes = new LinkedList<Integer>();
+        registrationTypes.add(Integer
+                .valueOf(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER));
+        registrationTypes.add(Integer
+                .valueOf(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE));
+        registrationTypes.add(Integer
+                .valueOf(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE));
+
+        LOGGER.info("Creating " + numLayersToCreate + " layers...");
+        try {
+            rowIdColName = "ROW_ID";
+            shapeTypeMask = SeLayer.SE_POINT_TYPE_MASK;
+            for (int count = 1; count <= numLayersToCreate; count++) {
+                tableName = "GT_MULTIPLE_LAYER_" + formatter.format(count);
+                System.err.println("Creating " + tableName);
+
+                Integer registrationType = registrationTypes.removeFirst();
+                rowIdColumnType = registrationType.intValue();
+                registrationTypes.addLast(registrationType);
+
+                createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType,
+                        shapeTypeMask);
+            }
+        } finally {
+            session.dispose();
+        }
+        LOGGER.info(numLayersToCreate + " created successfully");
     }
 
     public void createSimpleTestTables() throws IOException {
