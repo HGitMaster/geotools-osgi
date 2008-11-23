@@ -17,12 +17,13 @@
  */
 package org.geotools.arcsde.data;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -38,6 +39,8 @@ import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -48,9 +51,15 @@ import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.Id;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.spatial.BBOX;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -59,7 +68,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEQueryTest.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/ArcSDEQueryTest.java $
  * @version $Revision: 1.9 $
  */
 public class ArcSDEQueryTest {
@@ -88,7 +98,6 @@ public class ArcSDEQueryTest {
 
     private static final int FILTERING_COUNT = 3;
 
-
     @BeforeClass
     public static void oneTimeSetUp() throws Exception {
         testData = new TestData();
@@ -106,9 +115,8 @@ public class ArcSDEQueryTest {
     }
 
     /**
-     * loads {@code test-data/testparams.properties} into a Properties object,
-     * wich is used to obtain test tables names and is used as parameter to find
-     * the DataStore
+     * loads {@code test-data/testparams.properties} into a Properties object, wich is used to
+     * obtain test tables names and is used as parameter to find the DataStore
      */
     @Before
     public void setUp() throws Exception {
@@ -149,20 +157,27 @@ public class ArcSDEQueryTest {
     }
 
     /**
-     * Filters are separated into backend supported and unsupported filters.
-     * Once split they should be simplified to avoid silly filters like
-     * {@code 1 = 1 AND 1 = 1}
+     * Filters are separated into backend supported and unsupported filters. Once split they should
+     * be simplified to avoid silly filters like {@code 1 = 1 AND 1 = 1}
      * 
      * @throws IOException
+     * @throws CQLException
      */
     @Test
-    public void testSimplifiesFilters() throws IOException {
-        ArcSDEQuery filteringQuery = getQueryFiltered();
+    public void testSimplifiesFilters() throws IOException, CQLException {
+
+        Filter filter = CQL
+                .toFilter("STRING_COL = strConcat('string', STRING_COL) AND STRING_COL > 'String2' AND BBOX(SHAPE, 10.0,20.0,30.0,40.0)");
+        filteringQuery = new DefaultQuery(typeName, filter);
+        // filteringQuery based on the above filter...
+        ArcSDEQuery sdeQuery = getQueryFiltered();
+
         FilterSet filters;
         try {
-            filters = filteringQuery.getFilters();
+            filters = sdeQuery.getFilters();
         } finally {
-            filteringQuery.close();
+            sdeQuery.session.dispose();
+            sdeQuery.close();
         }
         Filter geometryFilter = filters.getGeometryFilter();
         Filter sqlFilter = filters.getSqlFilter();
@@ -170,6 +185,63 @@ public class ArcSDEQueryTest {
 
         System.out.println("geom: " + geometryFilter + ", sql: " + sqlFilter + ", unsupp: "
                 + unsupportedFilter);
+
+        assertTrue(geometryFilter instanceof BBOX);
+        assertTrue(sqlFilter instanceof PropertyIsGreaterThan);
+        assertTrue(unsupportedFilter instanceof PropertyIsEqualTo);
+
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        // @id = 'DELETEME.1' AND STRING_COL = 'test'
+        filter = ff.and(ff.id(Collections.singleton(ff.featureId("DELETEME.1"))), ff.equals(ff
+                .property("STRING_COL"), ff.literal("test")));
+
+        filteringQuery = new DefaultQuery(typeName, filter);
+        // filteringQuery based on the above filter...
+        sdeQuery = getQueryFiltered();
+
+        try {
+            filters = sdeQuery.getFilters();
+        } finally {
+            sdeQuery.session.dispose();
+            sdeQuery.close();
+        }
+        geometryFilter = filters.getGeometryFilter();
+        sqlFilter = filters.getSqlFilter();
+        unsupportedFilter = filters.getUnsupportedFilter();
+
+        System.out.println("geom: " + geometryFilter + ", sql: " + sqlFilter + ", unsupp: "
+                + unsupportedFilter);
+
+        Assert.assertEquals(Filter.INCLUDE, geometryFilter);
+        assertTrue(sqlFilter instanceof And);
+        Assert.assertEquals(Filter.INCLUDE, unsupportedFilter);
+
+        // AND( @id = 'DELETEME.1' )
+        List<Filter> singleAnded = Collections.singletonList((Filter) ff.id(Collections
+                .singleton(ff.featureId("DELETEME.1"))));
+        filter = ff.and(singleAnded);
+
+        filteringQuery = new DefaultQuery(typeName, filter);
+        // filteringQuery based on the above filter...
+        sdeQuery = getQueryFiltered();
+
+        try {
+            filters = sdeQuery.getFilters();
+        } finally {
+            sdeQuery.session.dispose();
+            sdeQuery.close();
+        }
+        geometryFilter = filters.getGeometryFilter();
+        sqlFilter = filters.getSqlFilter();
+        unsupportedFilter = filters.getUnsupportedFilter();
+
+        System.out.println("geom: " + geometryFilter + ", sql: " + sqlFilter + ", unsupp: "
+                + unsupportedFilter);
+
+        // this one should have been simplified
+        assertTrue(sqlFilter instanceof Id);
+        Assert.assertEquals(Filter.INCLUDE, geometryFilter);
+        Assert.assertEquals(Filter.INCLUDE, unsupportedFilter);
     }
 
     private ArcSDEQuery getQueryAll() throws IOException {
