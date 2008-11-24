@@ -16,12 +16,15 @@
  */
 package org.geotools.filter.v1_0;
 
+import java.util.Collections;
+
 import javax.xml.namespace.QName;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Not;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.geotools.filter.v1_1.OGC;
 import org.geotools.xml.AbstractComplexBinding;
@@ -76,6 +79,13 @@ public class OGCNotBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         Filter filter = (Filter) node.getChildValue(Filter.class);
+        if ( filter == null ) {
+            //look for an Identifier, not in the spec but something we handle
+            Identifier id = (Identifier) node.getChildValue( Identifier.class );
+            if ( id != null ) {
+                filter = filterfactory.id( Collections.singleton( id ) );
+            }
+        }
 
         return filterfactory.not(filter);
     }

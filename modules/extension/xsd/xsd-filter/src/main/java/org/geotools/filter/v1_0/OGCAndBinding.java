@@ -16,10 +16,13 @@
  */
 package org.geotools.filter.v1_0;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.geotools.filter.FilterParsingUtils;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -75,6 +78,7 @@ public class OGCAndBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return filterfactory.and(node.getChildValues(Filter.class));
+        List<Filter> operands = FilterParsingUtils.BinaryLogicOperator_getChildFilters(node, filterfactory);
+        return filterfactory.and( operands );
     }
 }

@@ -16,13 +16,18 @@
  */
 package org.geotools.filter;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import org.geotools.filter.v1_1.OGC;
+import org.geotools.xml.Node;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 
 /**
@@ -67,5 +72,19 @@ public class FilterParsingUtils {
         }
 
         return null;
+    }
+    
+    public static List<Filter> BinaryLogicOperator_getChildFilters( Node node, org.opengis.filter.FilterFactory factory ) {
+        List<Filter> filters = node.getChildValues(Filter.class);
+        if ( filters.size() < 2 ) {
+            //look for Id elements and turn them into fid filters
+            //note: this is not spec compliant and is a bit lax
+            List<Identifier> ids = node.getChildValues( Identifier.class );
+            for ( Identifier id : ids ) {
+                filters.add( factory.id( Collections.singleton( id ) ) ) ;
+            }
+        }
+        
+        return filters;
     }
 }
