@@ -821,7 +821,14 @@ public final class JDBCDataStore extends ContentDataStore
                     //set the crs to be the crs of the feature type
                     // grab the 2d part of the crs 
                     CoordinateReferenceSystem flatCRS = CRS.getHorizontalCRS(featureType.getCoordinateReferenceSystem());
-                    bounds = new ReferencedEnvelope(e, flatCRS);
+                    
+                    if ( e != null ) {
+                        bounds = new ReferencedEnvelope(e, flatCRS);
+                    }
+                    else {
+                        bounds = new ReferencedEnvelope( flatCRS );
+                        bounds.setToNull();
+                    }
                 }
 
                 //keep going to handle case where envelope is not calculated
