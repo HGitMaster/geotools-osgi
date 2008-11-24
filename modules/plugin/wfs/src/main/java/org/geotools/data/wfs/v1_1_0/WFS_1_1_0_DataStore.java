@@ -92,7 +92,7 @@ import org.opengis.referencing.operation.TransformException;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStore.java 31902 2008-11-22 00:37:35Z groldan $
+ * @version $Id: WFS_1_1_0_DataStore.java 31915 2008-11-24 19:48:07Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -313,6 +313,8 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         Filter[] filters = wfs.splitFilters(query.getFilter());
         Filter supportedFilter = filters[0];
         Filter postFilter = filters[1];
+        System.out.println("Supported filter:  " + supportedFilter);
+        System.out.println("Unupported filter: " + postFilter);
         ((DefaultQuery) query).setFilter(supportedFilter);
         ((DefaultQuery) query).setMaxFeatures(getMaxFeatures(query));
 
@@ -353,8 +355,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         }
 
         if (Filter.INCLUDE != postFilter) {
-            reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, query
-                    .getFilter());
+            reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, postFilter);
         }
 
         if (!contentType.equals(readerType)) {

@@ -117,7 +117,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31902 2008-11-22 00:37:35Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31915 2008-11-24 19:48:07Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -412,9 +412,9 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                         message.append(text.trim());
                     }
                     message.append(" Exception Code:");
-                    message.append(exceptionCode.getTextContent());
+                    message.append(exceptionCode== null? "" : exceptionCode.getTextContent());
                     message.append(" Locator: ");
-                    message.append(locator.getTextContent());
+                    message.append(locator == null? "" : locator.getTextContent());
                     throw new DataSourceException(message.toString());
                 }
                 throw new DataSourceException("Expected " + WFS.WFS_Capabilities + " but was "

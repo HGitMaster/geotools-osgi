@@ -76,6 +76,7 @@ import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.data.wfs.protocol.wfs.WFSResponse;
 import org.geotools.data.wfs.v1_1_0.WFSStrategy.RequestComponents;
+import org.geotools.filter.Capabilities;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
@@ -92,7 +93,7 @@ import org.xml.sax.SAXException;
  * xml-xsd} subsystem for schema assisted parsing and encoding of WFS requests and responses.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFS_1_1_0_Protocol.java 31902 2008-11-22 00:37:35Z groldan $
+ * @version $Id: WFS_1_1_0_Protocol.java 31915 2008-11-24 19:48:07Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -669,7 +670,12 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     }
 
     public Filter[] splitFilters(Filter filter) {
-        return strategy.splitFilters(this, filter);
+        FilterCapabilities filterCapabilities = getFilterCapabilities();
+        Capabilities filterCaps = new Capabilities();
+        if (filterCapabilities != null) {
+            filterCaps.addAll(filterCapabilities);
+        }
+        return strategy.splitFilters(filterCaps, filter);
     }
 
 }

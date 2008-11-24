@@ -62,7 +62,7 @@ import org.opengis.filter.sort.SortBy;
  * A default strategy for a WFS 1.1.0 implementation that assumes the server sticks to the standard.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: DefaultWFSStrategy.java 31902 2008-11-22 00:37:35Z groldan $
+ * @version $Id: DefaultWFSStrategy.java 31915 2008-11-24 19:48:07Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -78,7 +78,6 @@ public class DefaultWFSStrategy implements WFSStrategy {
     private static final Configuration filter_1_1_0_Configuration = new OGCConfiguration();
 
     private static final Configuration wfs_1_1_0_Configuration = new WFSConfiguration();
-
 
     /**
      * @see WFSStrategy#supportsGet()
@@ -276,9 +275,7 @@ public class DefaultWFSStrategy implements WFSStrategy {
      *         the one to post-process
      * @see WFSStrategy#splitFilters(WFS_1_1_0_Protocol, Filter)
      */
-    public Filter[] splitFilters(WFSProtocol wfs, Filter queryFilter) {
-        FilterCapabilities filterCapabilities = wfs.getFilterCapabilities();
-        Capabilities caps = new Capabilities(filterCapabilities);
+    public Filter[] splitFilters(Capabilities caps, Filter queryFilter) {
         PostPreProcessFilterSplittingVisitor splitter = new PostPreProcessFilterSplittingVisitor(
                 caps, null, null);
 

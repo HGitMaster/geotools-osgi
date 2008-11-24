@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -29,11 +30,19 @@ import net.opengis.wfs.QueryType;
 import org.geotools.data.wfs.protocol.wfs.GetFeature;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
+import org.geotools.filter.Capabilities;
 import org.geotools.filter.v1_0.OGCConfiguration;
 import org.geotools.gml2.GML;
 import org.geotools.gml2.bindings.GMLBoxTypeBinding;
 import org.geotools.gml2.bindings.GMLCoordinatesTypeBinding;
+import org.geotools.util.logging.Logging;
 import org.geotools.xml.Configuration;
+import org.opengis.filter.Filter;
+import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.filter.capability.SpatialCapabilities;
+import org.opengis.filter.capability.SpatialOperator;
+import org.opengis.filter.capability.SpatialOperators;
+import org.opengis.filter.spatial.Intersects;
 import org.picocontainer.MutablePicoContainer;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -43,10 +52,13 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
 @SuppressWarnings("nls")
 public class IonicStrategy extends DefaultWFSStrategy {
 
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
+
     /**
      * A filter 1.0 configuration to encode Filters issued to Ionic
      */
     private static final Configuration filter_1_0_0_Configuration = new OGCConfiguration() {
+        @Override
         protected void registerBindings(MutablePicoContainer container) {
             super.registerBindings(container);
             // override the binding for GML.BoxType to use the one producing an output Ionic
@@ -80,6 +92,9 @@ public class IonicStrategy extends DefaultWFSStrategy {
         return "GML3";
     }
 
+    /**
+     * @return a Filter 1.0 configuration since Ionic expects that instead of 1.1
+     */
     @Override
     protected Configuration getFilterConfiguration() {
         return filter_1_0_0_Configuration;
@@ -107,6 +122,31 @@ public class IonicStrategy extends DefaultWFSStrategy {
             kvpParameters.put("SRSNAME", "EPSG:4269");
         }
         return req;
+    }
+
+    /**
+     * Ionic's capabilities may state the spatial operator {@code Intersect} instead of {@code
+     * Intersects}. If so, we fix that here so intersects is actually recognized as a supported
+     * filter.
+     */
+    @Override
+    public Filter[] splitFilters(Capabilities caps, Filter queryFilter) {
+        FilterCapabilities filterCapabilities = caps.getContents();
+        SpatialCapabilities spatialCapabilities = filterCapabilities.getSpatialCapabilities();
+        if (spatialCapabilities != null) {
+            SpatialOperators spatialOperators = spatialCapabilities.getSpatialOperators();
+            if (spatialOperators != null) {
+                SpatialOperator missnamedIntersects = spatialOperators.getOperator("Intersect");
+                if (missnamedIntersects != null) {
+                    LOGGER.fine("Ionic capabilities states the spatial operator Intersect. "
+                            + "Assuming it is Intersects and adding Intersects as a "
+                            + "supported filter type");
+                    caps.addName(Intersects.NAME);
+                }
+            }
+        }
+
+        return super.splitFilters(caps, queryFilter);
     }
 
     /**

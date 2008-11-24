@@ -25,6 +25,7 @@ import net.opengis.wfs.GetFeatureType;
 import org.geotools.data.wfs.protocol.wfs.GetFeature;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.filter.Capabilities;
 import org.geotools.filter.visitor.SimplifyingFilterVisitor;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -47,7 +48,7 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: CubeWerxStrategy.java 31902 2008-11-22 00:37:35Z groldan $
+ * @version $Id: CubeWerxStrategy.java 31915 2008-11-24 19:48:07Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -82,10 +83,10 @@ public class CubeWerxStrategy extends DefaultWFSStrategy {
     }
 
     @Override
-    public Filter[] splitFilters(final WFSProtocol wfs, final Filter queryFilter) {
+    public Filter[] splitFilters(final Capabilities caps, final Filter queryFilter) {
 
         if (!(queryFilter instanceof BinaryLogicOperator)) {
-            return super.splitFilters(wfs, queryFilter);
+            return super.splitFilters(caps, queryFilter);
         }
 
         int spatialFiltersCount = 0;
@@ -97,7 +98,7 @@ public class CubeWerxStrategy extends DefaultWFSStrategy {
             }
         }
         if (spatialFiltersCount <= 1) {
-            return super.splitFilters(wfs, queryFilter);
+            return super.splitFilters(caps, queryFilter);
         }
 
         Filter serverFilter;

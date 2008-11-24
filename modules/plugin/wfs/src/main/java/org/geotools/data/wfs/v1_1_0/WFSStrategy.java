@@ -28,6 +28,7 @@ import org.geotools.data.wfs.WFSDataStoreFactory;
 import org.geotools.data.wfs.protocol.wfs.GetFeature;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
+import org.geotools.filter.Capabilities;
 import org.geotools.wfs.WFSConfiguration;
 import org.geotools.xml.Configuration;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -38,7 +39,7 @@ import org.opengis.filter.Filter;
  * care of specific WFS implementations limitations or deviations from the spec.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFSStrategy.java 31902 2008-11-22 00:37:35Z groldan $
+ * @version $Id: WFSStrategy.java 31915 2008-11-24 19:48:07Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -90,7 +91,7 @@ public interface WFSStrategy {
      */
     public String getDefaultOutputFormat(WFSProtocol wfs, WFSOperationType operation);
 
-    public Filter[] splitFilters(WFSProtocol protocol, Filter filter);
+    public Filter[] splitFilters(Capabilities filterCaps, Filter filter);
 
     /**
      * Creates a GetFeature request that the server implementation this strategy works upon can deal
