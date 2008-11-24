@@ -54,7 +54,6 @@ import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
-import org.opengis.filter.capability.FilterCapabilities;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.sort.SortBy;
 
@@ -62,7 +61,7 @@ import org.opengis.filter.sort.SortBy;
  * A default strategy for a WFS 1.1.0 implementation that assumes the server sticks to the standard.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: DefaultWFSStrategy.java 31915 2008-11-24 19:48:07Z groldan $
+ * @version $Id: DefaultWFSStrategy.java 31917 2008-11-24 21:09:38Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -268,8 +267,8 @@ public class DefaultWFSStrategy implements WFSStrategy {
      * Splits the filter provided by the geotools query into the server supported and unsupported
      * ones.
      * 
-     * @param ds
-     * @param wfs
+     * @param caps
+     *            the server filter capabilities description
      * @param queryFilter
      * @return a two-element array where the first element is the supported filter and the second
      *         the one to post-process

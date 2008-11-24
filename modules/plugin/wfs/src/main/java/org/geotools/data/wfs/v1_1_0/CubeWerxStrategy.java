@@ -21,12 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.opengis.wfs.GetFeatureType;
+import net.opengis.wfs.ResultTypeType;
+import net.opengis.wfs.WfsPackage;
+import net.opengis.wfs.impl.GetFeatureTypeImpl;
 
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.geotools.data.wfs.protocol.wfs.GetFeature;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.Capabilities;
 import org.geotools.filter.visitor.SimplifyingFilterVisitor;
+import org.geotools.xml.EMFUtils;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -48,7 +54,7 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: CubeWerxStrategy.java 31915 2008-11-24 19:48:07Z groldan $
+ * @version $Id: CubeWerxStrategy.java 31917 2008-11-24 21:09:38Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -69,17 +75,41 @@ public class CubeWerxStrategy extends DefaultWFSStrategy {
      * </ul>
      * </p>
      */
+    @SuppressWarnings("nls")
     @Override
     public RequestComponents createGetFeatureRequest(WFSProtocol wfs, GetFeature query)
             throws IOException {
         RequestComponents parts = super.createGetFeatureRequest(wfs, query);
 
         GetFeatureType serverRequest = parts.getServerRequest();
-
+        GetFeatureType nonResultTypeRequest = new CubeWerxGetFeatureType();
+        EMFUtils.copy(serverRequest, nonResultTypeRequest);
         // CubeWerx fails if the _mandatory_ resultType attribute is sent
-        serverRequest.setResultType(null);
+        nonResultTypeRequest.setResultType(null);
+        parts.setServerRequest(nonResultTypeRequest);
+
+        parts.getKvpParameters().remove("RESULTTYPE");
 
         return parts;
+    }
+
+    /**
+     * A {@link GetFeatureTypeImpl} that allows the {@code resultType} property to be {@code null}
+     */
+    private static class CubeWerxGetFeatureType extends GetFeatureTypeImpl {
+
+        @Override
+        public void setResultType(ResultTypeType newResultType) {
+            ResultTypeType oldResultType = resultType;
+            resultType = newResultType;// == null ? RESULT_TYPE_EDEFAULT : newResultType;
+            boolean oldResultTypeESet = resultTypeESet;
+            resultTypeESet = true;
+            if (eNotificationRequired()) {
+                eNotify(new ENotificationImpl(this, Notification.SET,
+                        WfsPackage.GET_FEATURE_TYPE__RESULT_TYPE, oldResultType, resultType,
+                        !oldResultTypeESet));
+            }
+        }
     }
 
     @Override
