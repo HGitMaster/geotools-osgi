@@ -207,6 +207,24 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         LineString ls = (LineString) f.getDefaultGeometry();
         assertTrue(ls.getCoordinateSequence() instanceof LiteCoordinateSequence);
     }
+    
+    public void testGetFeatureReaderLake() throws IOException, IllegalFilterException {
+        Transaction t = new DefaultTransaction();
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        reader = dataStore.getFeatureReader(new DefaultQuery(tname("lake")), t);
+
+        assertNotNull(reader);
+        try {
+            assertTrue(reader.hasNext());
+            assertNotNull(reader.next());
+            assertFalse(reader.hasNext());
+        } finally {
+            reader.close();
+            t.close();
+        }
+    }
 
     public void testGetFeatureReaderFilterPrePost() throws IOException, IllegalFilterException {
         Transaction t = new DefaultTransaction();
