@@ -167,7 +167,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         ComparisonOperators operators = scalar.getComparisonOperators();
         if( operators == null ) return false;
         
-        if( operators.getOperator( "Between" ) == null ) return false;
+        if( operators.getOperator( PropertyIsBetween.NAME ) == null ) return false;
         
         return (Boolean) filter.getLowerBoundary().accept(this, null) && 
                (Boolean) filter.getExpression().accept(this, null) &&
@@ -181,7 +181,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         ComparisonOperators operators = scalar.getComparisonOperators();
         if( operators == null ) return false;
         
-        if( operators.getOperator( "EqualTo" ) == null ) return false;
+        if( operators.getOperator( PropertyIsEqualTo.NAME ) == null ) return false;
         
         return (Boolean) filter.getExpression1().accept(this,null) &&
                (Boolean) filter.getExpression2().accept(this,null);
@@ -194,7 +194,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         ComparisonOperators operators = scalar.getComparisonOperators();
         if( operators == null ) return false;
         
-        if( operators.getOperator( "NotEqualTo" ) == null ) return false;
+        if( operators.getOperator( PropertyIsNotEqualTo.NAME ) == null ) return false;
         
         return (Boolean) filter.getExpression1().accept(this,null) &&
                (Boolean) filter.getExpression2().accept(this,null);
@@ -207,7 +207,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         ComparisonOperators operators = scalar.getComparisonOperators();
         if( operators == null ) return false;
         
-        if( operators.getOperator( "GreaterThan" ) == null ) return false;
+        if( operators.getOperator( PropertyIsGreaterThan.NAME ) == null ) return false;
         
         return (Boolean) filter.getExpression1().accept(this,null) &&
                (Boolean) filter.getExpression2().accept(this,null);
@@ -220,7 +220,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         ComparisonOperators operators = scalar.getComparisonOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "GreaterThanOrEqualTo" ) != null;
+        return operators.getOperator( PropertyIsGreaterThanOrEqualTo.NAME ) != null;
     }
 
     public Object visit( PropertyIsLessThan filter, Object extraData ) {
@@ -230,7 +230,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         ComparisonOperators operators = scalar.getComparisonOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "LessThan" ) != null;
+        return operators.getOperator( PropertyIsLessThan.NAME ) != null;
     }
 
     public Object visit( PropertyIsLessThanOrEqualTo filter, Object extraData ) {
@@ -240,7 +240,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         ComparisonOperators operators = scalar.getComparisonOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "LessThanOrEqualTo" ) != null;
+        return operators.getOperator( PropertyIsLessThanOrEqualTo.NAME ) != null;
     }
 
     public Object visit( PropertyIsLike filter, Object extraData ) {
@@ -250,7 +250,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         ComparisonOperators operators = scalar.getComparisonOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Like" ) != null;
+        return operators.getOperator( PropertyIsLike.NAME ) != null;
     }
 
     public Object visit( PropertyIsNull filter, Object extraData ) {
@@ -260,7 +260,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         ComparisonOperators operators = scalar.getComparisonOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Null" ) != null;
+        return operators.getOperator( PropertyIsNull.NAME ) != null;
     }
 
     public Object visit( BBOX filter, Object extraData ) {
@@ -270,7 +270,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "BBOX" ) != null;
+        return operators.getOperator( BBOX.NAME ) != null;
     }
 
     public Object visit( Beyond filter, Object extraData ) {
@@ -280,7 +280,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Beyond" ) != null;
+        return operators.getOperator( Beyond.NAME ) != null;
     }
 
     public Object visit( Contains filter, Object extraData ) {
@@ -290,7 +290,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Contains" ) != null;
+        return operators.getOperator( Contains.NAME ) != null;
     }
 
     public Object visit( Crosses filter, Object extraData ) {
@@ -300,7 +300,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Crosses" ) != null;
+        return operators.getOperator( Crosses.NAME ) != null;
     }
 
     public Object visit( Disjoint filter, Object extraData ) {
@@ -310,7 +310,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Disjoint" ) != null;
+        return operators.getOperator( Disjoint.NAME ) != null;
     }
 
     public Object visit( DWithin filter, Object extraData ) {
@@ -320,7 +320,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "DWithin" ) != null;
+        return operators.getOperator( DWithin.NAME ) != null;
     }
 
     public Object visit( Equals filter, Object extraData ) {
@@ -330,7 +330,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Equals" ) != null;
+        return operators.getOperator( Equals.NAME ) != null;
     }
 
     public Object visit( Intersects filter, Object extraData ) {
@@ -340,7 +340,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Intersects" ) != null;
+        return operators.getOperator( Intersects.NAME ) != null;
     }
 
     public Object visit( Overlaps filter, Object extraData ) {
@@ -350,7 +350,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Overlaps" ) != null;
+        return operators.getOperator( Overlaps.NAME ) != null;
     }
 
     public Object visit( Touches filter, Object extraData ) {
@@ -360,7 +360,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Touches" ) != null;
+        return operators.getOperator( Touches.NAME ) != null;
     }
 
     public Object visit( Within filter, Object extraData ) {
@@ -370,7 +370,7 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         SpatialOperators operators = spatial.getSpatialOperators();
         if( operators == null ) return false;
         
-        return operators.getOperator( "Within" ) != null;
+        return operators.getOperator( Within.NAME ) != null;
     }
 
     public Object visitNullFilter( Object extraData ) {
