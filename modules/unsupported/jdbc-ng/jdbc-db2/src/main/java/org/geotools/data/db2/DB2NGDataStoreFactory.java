@@ -16,6 +16,9 @@
  */
 package org.geotools.data.db2;
 
+import java.io.IOException;
+import java.util.Map;
+
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
@@ -37,7 +40,7 @@ public class DB2NGDataStoreFactory extends JDBCDataStoreFactory {
     }
 
     public String getDisplayName() {
-        return "DB2";
+        return "DB2 NG";
     }
     
     protected String getDriverClassName() {
@@ -56,4 +59,26 @@ public class DB2NGDataStoreFactory extends JDBCDataStoreFactory {
     protected String getValidationQuery() {
         return "select current date from sysibm.sysdummy1";
     }
+    
+    @Override
+    protected String getJDBCUrl(Map params) throws IOException {
+        // jdbc url
+    	String host=null;
+    	Integer port = null;
+    	try {
+    		host = (String) HOST.lookUp(params);
+    		port = (Integer) PORT.lookUp(params);
+    	} catch (IOException ex) {
+    		// do nothing
+    	}
+    	
+        String db = (String) DATABASE.lookUp(params);
+        
+        if (host==null && port== null && db !=null)
+        	return "jdbc:"+getDatabaseID()+":"+db;
+
+        return super.getJDBCUrl(params);
+    }
+    
+    
 }
