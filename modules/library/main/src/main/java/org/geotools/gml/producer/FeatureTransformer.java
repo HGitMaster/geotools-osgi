@@ -91,7 +91,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/gml/producer/FeatureTransformer.java $
- * @version $Id: FeatureTransformer.java 30921 2008-07-05 07:51:23Z jgarnett $
+ * @version $Id: FeatureTransformer.java 31924 2008-11-27 17:18:51Z aaime $
  *
  * @todo Add support for schemaLocation
  */
@@ -107,6 +107,7 @@ public class FeatureTransformer extends TransformerBase {
     private int maxFeatures = -1;
     private boolean prefixGml = false;
     private boolean featureBounding = false;
+    private boolean collectionBounding = true;
     private String srsName;
     private String lockId;
     private int numDecimals = 4;
@@ -256,6 +257,18 @@ public class FeatureTransformer extends TransformerBase {
     public void setFeatureBounding(boolean featureBounding) {
         this.featureBounding = featureBounding;
     }
+    
+    /**
+     * If true, enables the generation of the full collection bounds. Depending on the
+     * collection being generated in output, this operation can be extremely expensive.
+     * <p>
+     * Defaults to true (for backwards compatibility), disable explicitly if you 
+     * don't want feature collection bounds to be generated.
+     * @param collectionBounding
+     */
+    public void setCollectionBounding(boolean collectionBounding) {
+        this.collectionBounding = collectionBounding;
+    }
 
     public org.geotools.xml.transform.Translator createTranslator(
         ContentHandler handler) {
@@ -269,6 +282,7 @@ public class FeatureTransformer extends TransformerBase {
         t.setSrsName(srsName);
         t.setLockId(lockId);
         t.setFeatureBounding(featureBounding);
+        t.setCollectionBounding(collectionBounding);
 
         while (prefixes.hasMoreElements()) {
             String prefix = prefixes.nextElement().toString();
@@ -337,6 +351,7 @@ public class FeatureTransformer extends TransformerBase {
         FeatureTypeNamespaces types;
         boolean prefixGml = false;
         boolean featureBounding = false;
+        boolean collectionBounding = true;
         /**
          * The string representing the Spatial Reference System of the data.
          * <p>
@@ -427,6 +442,10 @@ public class FeatureTransformer extends TransformerBase {
         void setFeatureBounding(boolean bounding) {
             this.featureBounding = bounding;
         }
+        
+        void setCollectionBounding(boolean collectionBounding) {
+            this.collectionBounding = collectionBounding;
+        }
 
         void setSrsName(String srsName) {
             this.srsName = srsName;
@@ -464,19 +483,21 @@ public class FeatureTransformer extends TransformerBase {
                     //Did FeatureResult[] so that we are sure they're all the same type.
                     //Could also consider collections here...  
                     FeatureCollection<SimpleFeatureType, SimpleFeature>[] results = (FeatureCollection[]) o;
-                    ReferencedEnvelope bounds = null;
-
-                    for (int i = 0; i < results.length; i++) {
-                        ReferencedEnvelope more = results[i].getBounds();
-                        if( bounds == null ){
-                            bounds = new ReferencedEnvelope( more );
-                        }
-                        else {
-                           bounds.expandToInclude(more);
-                        }
-                    }
                     startFeatureCollection();
-                    writeBounds(bounds);
+                    if(collectionBounding) {
+                        ReferencedEnvelope bounds = null;
+                        for (int i = 0; i < results.length; i++) {
+                            ReferencedEnvelope more = results[i].getBounds();
+                            if( bounds == null ){
+                                bounds = new ReferencedEnvelope( more );
+                            }
+                            else {
+                               bounds.expandToInclude(more);
+                            }
+                        }
+                        writeBounds(bounds);
+                    }
+                   
                     for (int i = 0; i < results.length; i++) {
                         handleFeatureIterator(results[i].features());
                     }
@@ -606,7 +627,8 @@ public class FeatureTransformer extends TransformerBase {
          */
         public void handleFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
             startFeatureCollection();
-            writeBounds(collection.getBounds());
+            if(collectionBounding)
+                writeBounds(collection.getBounds());
         }
 
         /**
@@ -823,4 +845,6 @@ public class FeatureTransformer extends TransformerBase {
         }
         
     }
+
+    
 }
