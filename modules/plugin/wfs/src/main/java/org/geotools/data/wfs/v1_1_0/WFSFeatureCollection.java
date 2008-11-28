@@ -17,7 +17,6 @@
 package org.geotools.data.wfs.v1_1_0;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +27,6 @@ import org.geotools.data.Transaction;
 import org.geotools.data.store.DataFeatureCollection;
 import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureReaderIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
@@ -41,7 +39,7 @@ import org.opengis.geometry.BoundingBox;
  * {@link WFSDataStore}.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: WFSFeatureCollection.java 31823 2008-11-11 16:11:49Z groldan $
+ * @version $Id: WFSFeatureCollection.java 31928 2008-11-28 19:08:35Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0
@@ -144,8 +142,8 @@ class WFSFeatureCollection extends DataFeatureCollection {
      * Calculates the feature collection size, doing a full scan if needed.
      * <p>
      * <b>WARN</b>: this method could be very inefficient if the size cannot be efficiently
-     * calculated. That is, it is not cached and {@link WFSDataStore#getCount(Query)}
-     * returns {@code -1}.
+     * calculated. That is, it is not cached and {@link WFSDataStore#getCount(Query)} returns
+     * {@code -1}.
      * </p>
      * 
      * @return the FeatureCollection<SimpleFeatureType, SimpleFeature> size.
@@ -164,14 +162,10 @@ class WFSFeatureCollection extends DataFeatureCollection {
         return cachedSize;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected Iterator<SimpleFeature> openIterator() throws IOException {
+    public FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-        // System.err.println("Opening FC iterator for " + getSchema().getName() + " and query "
-        // + query);
         reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
-        // System.err.println("Got FeatureReader to open FC iterator for " + getSchema().getName());
-        return new FeatureReaderIterator<SimpleFeature>(reader);
+        return reader;
     }
 }
