@@ -125,68 +125,6 @@ public class ArcSDEFeatureSourceTest {
         this.store = null;
     }
 
-    @Test
-    @Ignore
-    public void testStress() throws Exception {
-
-        ArcSDEDataStore ds = testData.getDataStore();
-
-        SessionPool pool = testData.getConnectionPool();
-        final int initialAvailableCount = pool.getAvailableCount();
-        final int initialPoolSize = pool.getPoolSize();
-
-        String typeName = testData.getTempTableName();
-
-        FeatureSource<SimpleFeatureType, SimpleFeature> source;
-        source = ds.getFeatureSource(typeName);
-
-        assertEquals(initialAvailableCount, pool.getAvailableCount());
-        assertEquals(initialPoolSize, pool.getPoolSize());
-
-        SimpleFeatureType schema = source.getSchema();
-
-        assertEquals("After getSchema()", initialAvailableCount, pool.getAvailableCount());
-        assertEquals("After getSchema()", initialPoolSize, pool.getPoolSize());
-
-        final Envelope layerBounds = source.getBounds();
-
-        assertEquals("After getBounds()", initialAvailableCount, pool.getAvailableCount());
-        assertEquals("After getBounds()", initialPoolSize, pool.getPoolSize());
-
-        source.getCount(Query.ALL);
-
-        assertEquals("After size()", initialAvailableCount, pool.getAvailableCount());
-        assertEquals("After size()", initialPoolSize, pool.getPoolSize());
-
-        BBOX bbox = ff.bbox(schema.getGeometryDescriptor().getLocalName(),
-                layerBounds.getMinX() + 10, layerBounds.getMinY() + 10, layerBounds.getMaxX() - 10,
-                layerBounds.getMaxY() - 10, schema.getCoordinateReferenceSystem().getName()
-                        .getCode());
-
-        for (int i = 0; i < 20; i++) {
-            LOGGER.fine("Running iteration #" + i);
-
-            FeatureCollection<SimpleFeatureType, SimpleFeature> res;
-            res = source.getFeatures(bbox);
-            FeatureIterator<SimpleFeature> reader = res.features();
-            try {
-                assertNotNull(reader.next());
-
-                assertTrue(0 < res.size());
-                assertNotNull(res.getBounds());
-
-                assertNotNull(reader.next());
-
-                assertTrue(0 < res.size());
-                assertNotNull(res.getBounds());
-
-                assertNotNull(reader.next());
-            } finally {
-                reader.close();
-            }
-        }
-    }
-
     /**
      * This method tests the feature reader by opening various simultaneous
      * FeatureReaders using the 3 test tables.
@@ -668,6 +606,67 @@ public class ArcSDEFeatureSourceTest {
         testBBox(testData.getTempTableName(), expected);
     }
 
+    @Test
+    public void testStress() throws Exception {
+
+        ArcSDEDataStore ds = testData.getDataStore();
+
+        SessionPool pool = testData.getConnectionPool();
+        final int initialAvailableCount = pool.getAvailableCount();
+        final int initialPoolSize = pool.getPoolSize();
+
+        String typeName = testData.getTempTableName();
+
+        FeatureSource<SimpleFeatureType, SimpleFeature> source;
+        source = ds.getFeatureSource(typeName);
+
+        assertEquals(initialAvailableCount, pool.getAvailableCount());
+        assertEquals(initialPoolSize, pool.getPoolSize());
+
+        SimpleFeatureType schema = source.getSchema();
+
+        assertEquals("After getSchema()", initialAvailableCount, pool.getAvailableCount());
+        assertEquals("After getSchema()", initialPoolSize, pool.getPoolSize());
+
+        final Envelope layerBounds = source.getBounds();
+
+        assertEquals("After getBounds()", initialAvailableCount, pool.getAvailableCount());
+        assertEquals("After getBounds()", initialPoolSize, pool.getPoolSize());
+
+        source.getCount(Query.ALL);
+
+        assertEquals("After size()", initialAvailableCount, pool.getAvailableCount());
+        assertEquals("After size()", initialPoolSize, pool.getPoolSize());
+
+        BBOX bbox = ff.bbox(schema.getGeometryDescriptor().getLocalName(),
+                layerBounds.getMinX() + 10, layerBounds.getMinY() + 10, layerBounds.getMaxX() - 10,
+                layerBounds.getMaxY() - 10, schema.getCoordinateReferenceSystem().getName()
+                        .getCode());
+
+        for (int i = 0; i < 20; i++) {
+            LOGGER.fine("Running iteration #" + i);
+
+            FeatureCollection<SimpleFeatureType, SimpleFeature> res;
+            res = source.getFeatures(bbox);
+            FeatureIterator<SimpleFeature> reader = res.features();
+            try {
+                assertNotNull(reader.next());
+
+                assertTrue(0 < res.size());
+                assertNotNull(res.getBounds());
+
+                assertNotNull(reader.next());
+
+                assertTrue(0 < res.size());
+                assertNotNull(res.getBounds());
+
+                assertNotNull(reader.next());
+            } finally {
+                reader.close();
+            }
+        }
+    }
+    
     // ///////////////// HELPER FUNCTIONS ////////////////////////
 
     /**
