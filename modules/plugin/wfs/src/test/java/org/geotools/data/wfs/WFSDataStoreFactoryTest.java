@@ -123,8 +123,7 @@ public class WFSDataStoreFactoryTest {
         // load the test file
         final WFSDataStoreFactory dsf = new WFSDataStoreFactory() {
             @Override
-            byte[] loadCapabilities(final URL capabilitiesUrl, final ConnectionFactory connectionFac)
-                    throws IOException {
+            byte[] loadCapabilities(final URL capabilitiesUrl) throws IOException {
                 InputStream in = capabilitiesUrl.openStream();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 int aByte;

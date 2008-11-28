@@ -19,17 +19,11 @@ package org.geotools.data.wfs.protocol.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -40,22 +34,19 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.geotools.factory.GeoTools;
-import org.geotools.util.logging.Logging;
 
 /**
  * Default implementation of {@link HTTPProtocol} based on apache's common-http-client
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: DefaultHTTPProtocol.java 31902 2008-11-22 00:37:35Z groldan $
+ * @version $Id: DefaultHTTPProtocol.java 31929 2008-11-28 19:10:03Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
  *         /wfs/protocol/http/DefaultHTTPProtocol.java $
  */
 @SuppressWarnings("nls")
-public class DefaultHTTPProtocol implements HTTPProtocol {
-
-    private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs.protocol.http");
+public class DefaultHTTPProtocol extends AbstractHttpProtocol implements HTTPProtocol {
 
     /**
      * An {@link HTTPResponse} wrapping an executed {@link GetMethod} or {@link PostMethod} from the
@@ -75,18 +66,35 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
          * @see HTTPResponse#getResponseStream()
          */
         public InputStream getResponseStream() throws IOException {
-            InputStream responseStream = method.getResponseBodyAsStream();
+            final InputStream in;
+            {
+                InputStream responseStream = method.getResponseBodyAsStream();
 
-            String encoding = getResponseHeader("Content-Encoding");
-            if (encoding != null) {
-                if (encoding.toLowerCase().indexOf("gzip") > -1) {
-                    LOGGER.finest("Response is GZIP encoded, wrapping with gzip input stream");
-                    responseStream = new GZIPInputStream(responseStream);
+                String encoding = getResponseHeader("Content-Encoding");
+                if (encoding != null) {
+                    if (encoding.toLowerCase().indexOf("gzip") > -1) {
+                        LOGGER.finest("Response is GZIP encoded, wrapping with gzip input stream");
+                        responseStream = new GZIPInputStream(responseStream);
+                    }
+                } else {
+                    LOGGER.finest("HTTP response is not gzip encoded");
                 }
-            } else {
-                LOGGER.finest("HTTP response is not gzip encoded");
+                in = responseStream;
             }
-            return responseStream;
+            
+            InputStream releaseConnectionInputStream = new InputStream() {
+
+                @Override
+                public int read() throws IOException {
+                    return in.read();
+                }
+
+                @Override
+                public void close() throws IOException {
+                    method.releaseConnection();
+                }
+            };
+            return releaseConnectionInputStream;
         }
 
         public String getContentType() {
@@ -141,124 +149,6 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         }
     }
 
-    private boolean tryGzip;
-
-    private String authUsername;
-
-    private String authPassword;
-
-    private int timeoutMillis;
-
-    /**
-     * @see HTTPProtocol#isTryGzip()
-     */
-    public boolean isTryGzip() {
-        return this.tryGzip;
-    }
-
-    /**
-     * @see HTTPProtocol#setTryGzip(boolean)
-     */
-    public void setTryGzip(boolean tryGzip) {
-        this.tryGzip = tryGzip;
-    }
-
-    /**
-     * @see HTTPProtocol#setAuth(String, String)
-     */
-    public void setAuth(String username, String password) {
-        this.authUsername = username;
-        this.authPassword = password;
-    }
-
-    /**
-     * @see HTTPProtocol#
-     */
-    public int getTimeoutMillis() {
-        return this.timeoutMillis;
-    }
-
-    /**
-     * @see HTTPProtocol#setTimeoutMillis(int)
-     */
-    public void setTimeoutMillis(int milliseconds) {
-        this.timeoutMillis = milliseconds;
-    }
-
-    /**
-     * @see HTTPProtocol#createUrl(URL, Map)
-     */
-    public URL createUrl(final URL baseUrl, final Map<String, String> queryStringKvp)
-            throws MalformedURLException {
-        final String finalUrlString = createUri(baseUrl, queryStringKvp);
-        URL queryUrl = new URL(finalUrlString);
-        return queryUrl;
-    }
-
-    private String createUri(final URL baseUrl, final Map<String, String> queryStringKvp) {
-        final String query = baseUrl.getQuery();
-        Map<String, String> finalKvpMap = new HashMap<String, String>(queryStringKvp);
-        if (query != null) {
-            Map<String, String> userParams = new CaseInsensitiveMap(queryStringKvp);
-            String[] rawUrlKvpSet = query.split("&");
-            for (String rawUrlKvp : rawUrlKvpSet) {
-                int eqIdx = rawUrlKvp.indexOf('=');
-                String key, value;
-                if (eqIdx > 0) {
-                    key = rawUrlKvp.substring(0, eqIdx);
-                    value = rawUrlKvp.substring(eqIdx + 1);
-                } else {
-                    key = rawUrlKvp;
-                    value = null;
-                }
-                if (userParams.containsKey(key)) {
-                    LOGGER.fine("user supplied value for query string argument " + key
-                            + " overrides the one in the base url");
-                } else {
-                    finalKvpMap.put(key, value);
-                }
-            }
-        }
-
-        String protocol = baseUrl.getProtocol();
-        String host = baseUrl.getHost();
-        int port = baseUrl.getPort();
-        String path = baseUrl.getPath();
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(protocol).append("://").append(host);
-        if (port != -1 && port != baseUrl.getDefaultPort()) {
-            sb.append(':');
-            sb.append(port);
-        }
-        if (!"".equals(path) && !path.startsWith("/")) {
-            sb.append('/');
-        }
-        sb.append(path).append('?');
-
-        String key, value;
-        try {
-            for (Map.Entry<String, String> kvp : finalKvpMap.entrySet()) {
-                key = kvp.getKey();
-                value = kvp.getValue();
-                if (value == null) {
-                    value = "";
-                } else {
-                    value = URLEncoder.encode(value, "UTF-8");
-                }
-                sb.append(key);
-                sb.append('=');
-                sb.append(value);
-                sb.append('&');
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-
-        final String finalUrlString = sb.toString();
-        return finalUrlString;
-    }
-
     public HTTPResponse issuePost(final URL targetUrl, final POSTCallBack callback)
             throws IOException {
         if (LOGGER.isLoggable(Level.FINEST)) {
@@ -290,7 +180,7 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         postRequest.setRequestEntity(requestEntity);
 
         HTTPResponse httpResponse = issueRequest(postRequest);
-        
+
         return httpResponse;
     }
 
@@ -309,6 +199,8 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
         return httpResponse;
     }
 
+    private HttpClient client;
+
     /**
      * 
      * @param httpRequest
@@ -317,13 +209,19 @@ public class DefaultHTTPProtocol implements HTTPProtocol {
      * @return
      * @throws IOException
      */
-    private HTTPResponse issueRequest(HttpMethodBase httpRequest) throws IOException {
+    private HTTPResponse issueRequest(final HttpMethodBase httpRequest) throws IOException {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("Executing HTTP request: " + httpRequest.getURI());
         }
-        final HttpClient client = new HttpClient();
-        client.getParams().setParameter("http.useragent",
-                "GeoTools " + GeoTools.getVersion() + " WFS DataStore");
+        if (client == null) {
+            client = new HttpClient();
+            client.getParams().setParameter("http.useragent",
+                    "GeoTools " + GeoTools.getVersion() + " WFS DataStore");
+        }
+        if (timeoutMillis > 0) {
+            client.getParams().setSoTimeout(timeoutMillis);
+        }
+
         // TODO: remove this
         System.err.println("Executing HTTP request: " + httpRequest);
 

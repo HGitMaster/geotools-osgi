@@ -28,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -42,9 +43,10 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.data.wfs.protocol.http.DefaultHTTPProtocol;
 import org.geotools.data.wfs.protocol.http.HTTPProtocol;
+import org.geotools.data.wfs.protocol.http.HTTPResponse;
 import org.geotools.data.wfs.protocol.http.HttpMethod;
+import org.geotools.data.wfs.protocol.http.SimpleHttpProtocol;
 import org.geotools.data.wfs.protocol.wfs.Version;
 import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.data.wfs.v1_0_0.WFS100ProtocolHandler;
@@ -117,7 +119,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31915 2008-11-24 19:48:07Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31929 2008-11-28 19:10:03Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -337,11 +339,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         }
 
         final WFSDataStore dataStore;
-        final ConnectionFactory connectionFac = new DefaultConnectionFactory(tryGZIP, user, pass,
-                defaultEncoding);
 
-        final byte[] wfsCapabilitiesRawData = loadCapabilities(getCapabilitiesRequest,
-                connectionFac);
+        final byte[] wfsCapabilitiesRawData = loadCapabilities(getCapabilitiesRequest);
         final Document capsDoc = parseCapabilities(wfsCapabilitiesRawData);
         final Element rootElement = capsDoc.getDocumentElement();
 
@@ -349,6 +348,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         final Version version = Version.find(capsVersion);
 
         if (Version.v1_0_0 == version) {
+            final ConnectionFactory connectionFac = new DefaultConnectionFactory(tryGZIP, user,
+                    pass, defaultEncoding);
             InputStream reader = new ByteArrayInputStream(wfsCapabilitiesRawData);
             final WFS100ProtocolHandler protocolHandler = new WFS100ProtocolHandler(reader,
                     connectionFac);
@@ -363,7 +364,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             }
         } else {
             InputStream capsIn = new ByteArrayInputStream(wfsCapabilitiesRawData);
-            HTTPProtocol http = new DefaultHTTPProtocol();
+            HTTPProtocol http = new SimpleHttpProtocol();
             http.setTryGzip(tryGZIP);
             http.setAuth(user, pass);
             http.setTimeoutMillis(timeoutMillis);
@@ -412,9 +413,9 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                         message.append(text.trim());
                     }
                     message.append(" Exception Code:");
-                    message.append(exceptionCode== null? "" : exceptionCode.getTextContent());
+                    message.append(exceptionCode == null ? "" : exceptionCode.getTextContent());
                     message.append(" Locator: ");
-                    message.append(locator == null? "" : locator.getTextContent());
+                    message.append(locator == null ? "" : locator.getTextContent());
                     throw new DataSourceException(message.toString());
                 }
                 throw new DataSourceException("Expected " + WFS.WFS_Capabilities + " but was "
@@ -585,7 +586,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         if (version == null) {
             throw new NullPointerException("version");
         }
-        HTTPProtocol httpUtils = new DefaultHTTPProtocol();
+        HTTPProtocol httpUtils = new SimpleHttpProtocol();
         Map<String, String> getCapsKvp = new HashMap<String, String>();
         getCapsKvp.put("SERVICE", "WFS");
         getCapsKvp.put("REQUEST", "GetCapabilities");
@@ -666,12 +667,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @return
      * @throws IOException
      */
-    byte[] loadCapabilities(final URL capabilitiesUrl, final ConnectionFactory connectionFac)
-            throws IOException {
+    byte[] loadCapabilities(final URL capabilitiesUrl) throws IOException {
         byte[] wfsCapabilitiesRawData;
 
-        HttpURLConnection hc = connectionFac.getConnection(capabilitiesUrl, GET);
-        InputStream inputStream = connectionFac.getInputStream(hc);
+        HTTPProtocol http = new SimpleHttpProtocol();
+        HTTPResponse httpResponse = http.issueGet(capabilitiesUrl, Collections.EMPTY_MAP);
+        InputStream inputStream = httpResponse.getResponseStream();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buff = new byte[1024];
