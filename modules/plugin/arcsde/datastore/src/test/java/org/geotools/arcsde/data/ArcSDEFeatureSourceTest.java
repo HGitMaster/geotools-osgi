@@ -69,9 +69,9 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
- * @version $Id: ArcSDEFeatureSourceTest.java 30921 2008-07-05 07:51:23Z
- *          jgarnett $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
+ * @version $Id: ArcSDEFeatureSourceTest.java 31931 2008-11-28 19:27:58Z groldan $
  */
 public class ArcSDEFeatureSourceTest {
     /** package logger */
@@ -103,9 +103,8 @@ public class ArcSDEFeatureSourceTest {
     }
 
     /**
-     * loads {@code testData/testparams.properties} into a Properties object,
-     * wich is used to obtain test tables names and is used as parameter to find
-     * the DataStore
+     * loads {@code testData/testparams.properties} into a Properties object, wich is used to obtain
+     * test tables names and is used as parameter to find the DataStore
      * 
      * @throws Exception
      *             DOCUMENT ME!
@@ -126,16 +125,14 @@ public class ArcSDEFeatureSourceTest {
     }
 
     /**
-     * This method tests the feature reader by opening various simultaneous
-     * FeatureReaders using the 3 test tables.
+     * This method tests the feature reader by opening various simultaneous FeatureReaders using the
+     * 3 test tables.
      * <p>
-     * I found experimentally that until 24 simultaneous streams can be opened
-     * by a single connection. Each featurereader has an ArcSDE stream opened
-     * until its <code>close()</code> method is called or hasNext() returns
-     * flase, wich automatically closes the stream. If more than 24 simultaneous
-     * streams are tryied to be opened upon a single SeConnection, an exception
-     * is thrown by de Java ArcSDE API saying that a "NETWORK I/O OPERATION
-     * FAILED"
+     * I found experimentally that until 24 simultaneous streams can be opened by a single
+     * connection. Each featurereader has an ArcSDE stream opened until its <code>close()</code>
+     * method is called or hasNext() returns flase, wich automatically closes the stream. If more
+     * than 24 simultaneous streams are tryied to be opened upon a single SeConnection, an exception
+     * is thrown by de Java ArcSDE API saying that a "NETWORK I/O OPERATION FAILED"
      * </p>
      * 
      * @throws IOException
@@ -238,8 +235,8 @@ public class ArcSDEFeatureSourceTest {
     }
 
     /**
-     * Checks that arcsde datastore returns featuretypes whose attributes are
-     * exactly in the requested order.
+     * Checks that arcsde datastore returns featuretypes whose attributes are exactly in the
+     * requested order.
      * 
      * @throws IOException
      *             DOCUMENT ME!
@@ -281,9 +278,8 @@ public class ArcSDEFeatureSourceTest {
     }
 
     /**
-     * Say the query contains a set of propertynames to retrieve and the query
-     * filter others, the returned feature type should still match the ones in
-     * Query.propertyNames
+     * Say the query contains a set of propertynames to retrieve and the query filter others, the
+     * returned feature type should still match the ones in Query.propertyNames
      * 
      * @throws IOException
      * @throws IllegalAttributeException
@@ -358,14 +354,13 @@ public class ArcSDEFeatureSourceTest {
     /**
      * tests the datastore behavior when fetching data based on mixed queries.
      * <p>
-     * "Mixed queries" refers to mixing alphanumeric and geometry based filters,
-     * since that is the natural separation of things in the Esri Java API for
-     * ArcSDE. This is necessary since mixed queries sometimes are problematic.
-     * So this test ensures that:
+     * "Mixed queries" refers to mixing alphanumeric and geometry based filters, since that is the
+     * natural separation of things in the Esri Java API for ArcSDE. This is necessary since mixed
+     * queries sometimes are problematic. So this test ensures that:
      * <ul>
-     * <li> A mixed query respects all filters </li>
-     * <li> A mixed query does not fails when getBounds() is performed </li>
-     * <li> A mixed query does not fails when size() is performed </li>
+     * <li>A mixed query respects all filters</li>
+     * <li>A mixed query does not fails when getBounds() is performed</li>
+     * <li>A mixed query does not fails when size() is performed</li>
      * </ul>
      * </p>
      * 
@@ -407,8 +402,7 @@ public class ArcSDEFeatureSourceTest {
         reader = results.features();
         try {
             /*
-             * verify that when features are already being fetched, getBounds
-             * and size still work
+             * verify that when features are already being fetched, getBounds and size still work
              */
             reader.next();
             bounds = results.getBounds();
@@ -425,9 +419,8 @@ public class ArcSDEFeatureSourceTest {
     }
 
     /**
-     * to expose GEOT-408, tests that queries in which only non spatial
-     * attributes are requested does not fails due to the datastore trying to
-     * parse the geometry attribute.
+     * to expose GEOT-408, tests that queries in which only non spatial attributes are requested
+     * does not fails due to the datastore trying to parse the geometry attribute.
      * 
      * @throws Exception
      */
@@ -606,6 +599,29 @@ public class ArcSDEFeatureSourceTest {
         testBBox(testData.getTempTableName(), expected);
     }
 
+    /**
+     * A bbox filter with an empty attribute name should work against the default geometry attribute
+     */
+    @SuppressWarnings("nls")
+    @Test
+    public void testBboxFilterWithEmptyAttributeName() throws Exception {
+        BBOX emptyAttNameFilter = ff.bbox("", -10, -10, 10, 10, "EPSG:4326");
+        String typeName = testData.getTempTableName();
+        SimpleFeatureType schema = store.getSchema(typeName);
+
+        FeatureSource<SimpleFeatureType, SimpleFeature> source;
+        source = store.getFeatureSource(typeName);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features;
+        features = source.getFeatures(emptyAttNameFilter);
+
+        FeatureIterator<SimpleFeature> iterator = features.features();
+        try {
+            assertTrue(iterator.hasNext());
+        } finally {
+            iterator.close();
+        }
+    }
+
     @Test
     public void testStress() throws Exception {
 
@@ -666,21 +682,21 @@ public class ArcSDEFeatureSourceTest {
             }
         }
     }
-    
+
     // ///////////////// HELPER FUNCTIONS ////////////////////////
 
     /**
      * for a given FeatureSource, makes the following assertions:
      * <ul>
-     * <li> it's not null </li>
-     * <li> .getDataStore() != null </li>
-     * <li> .getDataStore() == the datastore obtained in setUp() </li>
-     * <li> .getSchema() != null </li>
-     * <li> .getBounds() != null </li>
-     * <li> .getBounds().isNull() == false </li>
-     * <li> .getFeatures().getCounr() > 0 </li>
-     * <li> .getFeatures().reader().hasNex() == true </li>
-     * <li> .getFeatures().reader().next() != null </li>
+     * <li>it's not null</li>
+     * <li>.getDataStore() != null</li>
+     * <li>.getDataStore() == the datastore obtained in setUp()</li>
+     * <li>.getSchema() != null</li>
+     * <li>.getBounds() != null</li>
+     * <li>.getBounds().isNull() == false</li>
+     * <li>.getFeatures().getCounr() > 0</li>
+     * <li>.getFeatures().reader().hasNex() == true</li>
+     * <li>.getFeatures().reader().next() != null</li>
      * </ul>
      * 
      * @param fsource

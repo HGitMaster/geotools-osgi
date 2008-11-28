@@ -235,6 +235,10 @@ public class GeometryEncoderSDE implements FilterVisitor {
         if (rawPropName.indexOf(":") != -1) {
             localPropName = rawPropName.substring(rawPropName.indexOf(":") + 1);
         }
+        if("".equals(localPropName)){
+            log.fine("Empty property name found on filter, using default geometry property");
+            localPropName = spatialCol;
+        }
         if (!rawPropName.equalsIgnoreCase(spatialCol)
                 && !localPropName.equalsIgnoreCase(spatialCol)) {
             throw new IllegalArgumentException("When querying against a spatial "
