@@ -66,7 +66,7 @@ import com.esri.sde.sdk.client.SeRelease;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: SessionPool.java 31122 2008-07-31 21:59:08Z groldan $
+ * @version $Id: SessionPool.java 31925 2008-11-28 18:44:55Z groldan $
  */
 public class SessionPool {
     /** package's logger */
@@ -165,7 +165,7 @@ public class SessionPool {
     }
 
     /**
-     * returns the number of actual connections holded by this connection pool.
+     * returns the number of actual connections held by this connection pool.
      * In other words, the sum of used and available connections, regardless
      * 
      * @return DOCUMENT ME!
@@ -364,7 +364,7 @@ public class SessionPool {
      * objects pool, that provides ArcSDE's SeConnections.
      * 
      * @author Gabriel Roldan, Axios Engineering
-     * @version $Id: SessionPool.java 31122 2008-07-31 21:59:08Z groldan $
+     * @version $Id: SessionPool.java 31925 2008-11-28 18:44:55Z groldan $
      */
     protected class SeConnectionFactory extends BasePoolableObjectFactory {
         /** DOCUMENT ME! */
