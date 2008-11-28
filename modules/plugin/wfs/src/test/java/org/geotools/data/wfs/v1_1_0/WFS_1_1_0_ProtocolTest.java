@@ -847,14 +847,20 @@ public class WFS_1_1_0_ProtocolTest {
         assertEquals("text/xml", mockHttp.postCallbackContentType);
 
         Document dom;
+        String issuedRequest;
         {
             ByteArrayOutputStream out = mockHttp.postCallbackEncodedRequestBody;
-            System.out.println("Issued request: " + out.toString());
+            issuedRequest = out.toString();
+            System.out.println("Issued request: " + issuedRequest);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder docBuilder = dbf.newDocumentBuilder();
             dom = docBuilder.parse(new ByteArrayInputStream(out.toByteArray()));
         }
+        
+        //was the featuretype declaration included?
+        String expectedNsDecl = "xmlns:sf=\"" + GEOS_ARCHSITES.TYPENAME.getNamespaceURI() + "\"";
+        assertTrue(issuedRequest, issuedRequest.contains(expectedNsDecl));
         Element root = dom.getDocumentElement();
         assertEquals(WFS.GetFeature.getLocalPart(), root.getLocalName());
         assertEquals(WFS.NAMESPACE, root.getNamespaceURI());

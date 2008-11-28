@@ -93,7 +93,7 @@ import org.xml.sax.SAXException;
  * xml-xsd} subsystem for schema assisted parsing and encoding of WFS requests and responses.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: WFS_1_1_0_Protocol.java 31915 2008-11-24 19:48:07Z groldan $
+ * @version $Id: WFS_1_1_0_Protocol.java 31934 2008-11-28 21:06:43Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -443,7 +443,18 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         RequestComponents reqParts = strategy.createGetFeatureRequest(this, request);
         GetFeatureType serverRequest = reqParts.getServerRequest();
 
-        WFSResponse response = issuePostRequest(serverRequest, url);
+        Encoder encoder = new Encoder(strategy.getWfsConfiguration());
+
+        // If the typeName is of the form prefix:typeName we better declare the namespace since we
+        // don't know how picky the server parser will be
+        String typeName = reqParts.getKvpParameters().get("TYPENAME");
+        QName fullName = getFeatureTypeName(typeName);
+        String prefix = fullName.getPrefix();
+        String namespace = fullName.getNamespaceURI();
+        if (!XMLConstants.DEFAULT_NS_PREFIX.equals(prefix)) {
+            encoder.getNamespaces().declarePrefix(prefix, namespace);
+        }
+        WFSResponse response = issuePostRequest(serverRequest, url, encoder);
 
         return response;
     }
@@ -563,7 +574,8 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
         return response;
     }
 
-    private WFSResponse issuePostRequest(final EObject request, final URL url) throws IOException {
+    private WFSResponse issuePostRequest(final EObject request, final URL url, final Encoder encoder)
+            throws IOException {
 
         final POSTCallBack requestBodyCallback = new POSTCallBack() {
             public long getContentLength() {
@@ -576,13 +588,13 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
             }
 
             public void writeBody(final OutputStream out) throws IOException {
-                final Configuration wfsConfig = strategy.getWfsConfiguration();
                 final Charset charset = Charset.forName("UTF-8");
-                if (LOGGER.isLoggable(Level.FINEST)) {
-                    System.err.println("Sending POST request: ");
-                    WFS_1_1_0_Protocol.encode(request, wfsConfig, System.err, charset);
-                }
-                WFS_1_1_0_Protocol.encode(request, wfsConfig, out, charset);
+                encoder.setEncoding(charset);
+                // if (LOGGER.isLoggable(Level.FINEST)) {
+                // System.err.println("Sending POST request: ");
+                // WFS_1_1_0_Protocol.encode(request, wfsConfig, System.err, charset);
+                // }
+                WFS_1_1_0_Protocol.encode(request, encoder, out);
             }
         };
 
@@ -636,9 +648,13 @@ public class WFS_1_1_0_Protocol implements WFSProtocol {
     public static void encode(final EObject request, final Configuration configuration,
             final OutputStream out, final Charset charset) throws IOException {
         Encoder encoder = new Encoder(configuration);
-        encoder.setIndentSize(1);
         encoder.setEncoding(charset);
+        encode(request, encoder, out);
+    }
 
+    private static void encode(EObject request, Encoder encoder, OutputStream out)
+            throws IOException {
+        encoder.setIndentSize(1);
         QName encodeElementName = getElementName(request);
         encoder.encode(request, encodeElementName, out);
     }
