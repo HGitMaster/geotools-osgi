@@ -119,7 +119,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31929 2008-11-28 19:10:03Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31933 2008-11-28 20:31:50Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -340,7 +340,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
         final WFSDataStore dataStore;
 
-        final byte[] wfsCapabilitiesRawData = loadCapabilities(getCapabilitiesRequest);
+        final HTTPProtocol http = new SimpleHttpProtocol();
+        http.setTryGzip(tryGZIP);
+        http.setAuth(user, pass);
+        http.setTimeoutMillis(timeoutMillis);
+
+        final byte[] wfsCapabilitiesRawData = loadCapabilities(getCapabilitiesRequest, http);
         final Document capsDoc = parseCapabilities(wfsCapabilitiesRawData);
         final Element rootElement = capsDoc.getDocumentElement();
 
@@ -364,10 +369,6 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             }
         } else {
             InputStream capsIn = new ByteArrayInputStream(wfsCapabilitiesRawData);
-            HTTPProtocol http = new SimpleHttpProtocol();
-            http.setTryGzip(tryGZIP);
-            http.setAuth(user, pass);
-            http.setTimeoutMillis(timeoutMillis);
 
             WFS_1_1_0_Protocol wfs = new WFS_1_1_0_Protocol(capsIn, http);
 
@@ -667,10 +668,9 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @return
      * @throws IOException
      */
-    byte[] loadCapabilities(final URL capabilitiesUrl) throws IOException {
+    byte[] loadCapabilities(final URL capabilitiesUrl, HTTPProtocol http) throws IOException {
         byte[] wfsCapabilitiesRawData;
 
-        HTTPProtocol http = new SimpleHttpProtocol();
         HTTPResponse httpResponse = http.issueGet(capabilitiesUrl, Collections.EMPTY_MAP);
         InputStream inputStream = httpResponse.getResponseStream();
 

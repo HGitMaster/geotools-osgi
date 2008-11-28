@@ -16,7 +16,11 @@
  */
 package org.geotools.data.wfs;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,21 +32,17 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
+import org.geotools.data.wfs.protocol.http.HTTPProtocol;
 import org.geotools.data.wfs.v1_1_0.CubeWerxStrategy;
-import org.geotools.data.wfs.v1_1_0.DefaultWFSStrategy;
 import org.geotools.data.wfs.v1_1_0.GeoServerStrategy;
 import org.geotools.data.wfs.v1_1_0.IonicStrategy;
 import org.geotools.data.wfs.v1_1_0.WFSStrategy;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.test.TestData;
-import org.geotools.wfs.protocol.ConnectionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public class WFSDataStoreFactoryTest {
 
@@ -123,7 +123,7 @@ public class WFSDataStoreFactoryTest {
         // load the test file
         final WFSDataStoreFactory dsf = new WFSDataStoreFactory() {
             @Override
-            byte[] loadCapabilities(final URL capabilitiesUrl) throws IOException {
+            byte[] loadCapabilities(final URL capabilitiesUrl, HTTPProtocol htp) throws IOException {
                 InputStream in = capabilitiesUrl.openStream();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 int aByte;
