@@ -27,6 +27,7 @@ import org.geotools.arcsde.pool.ISession;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
+import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
@@ -171,7 +172,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
             if (defaultGeometry == null) {
                 envelope = ReferencedEnvelope.reference(ev);
             } else {
-                envelope = new ReferencedEnvelope(ev, defaultGeometry.getCoordinateReferenceSystem());
+                envelope = new ReferencedEnvelope(ev, defaultGeometry
+                        .getCoordinateReferenceSystem());
             }
             return envelope;
         }
@@ -212,8 +214,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      * Returns a session appropriate for the current transaction
      * <p>
      * This is convenient way to get a connection for {@link #getBounds()} and
-     * {@link #getCount(Query)}. {@link ArcSdeFeatureStore} overrides to get the connection from
-     * the transaction instead of the pool.
+     * {@link #getCount(Query)}. {@link ArcSdeFeatureStore} overrides to get the connection from the
+     * transaction instead of the pool.
      * </p>
      * 
      * @return
@@ -249,7 +251,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
             throws IOException {
         final Query namedQuery = namedQuery(query);
         FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
-        collection = new ArcSdeFeatureCollection(this, namedQuery);
+        SimpleFeatureType queryType = dataStore.getQueryType(namedQuery);
+        collection = new ArcSdeFeatureCollection(this, queryType, namedQuery);
         return collection;
     }
 
@@ -287,5 +290,12 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
 
     public ArcSdeVersionHandler getVersionHandler() throws IOException {
         return dataStore.getVersionHandler(typeInfo.getFeatureTypeName(), transaction);
+    }
+
+    public FeatureReader<SimpleFeatureType, SimpleFeature> getfeatureReader(
+            SimpleFeatureType targetSchema, Query query) throws IOException {
+        FeatureReader<SimpleFeatureType, SimpleFeature> featureReader;
+        featureReader = dataStore.getFeatureReader(query, transaction, targetSchema);
+        return featureReader;
     }
 }
