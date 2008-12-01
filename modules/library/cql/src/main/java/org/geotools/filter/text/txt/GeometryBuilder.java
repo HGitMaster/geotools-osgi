@@ -43,7 +43,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 abstract class GeometryBuilder {
 
-    private static final GeometryFactory GEOM_FACTORY = new GeometryFactory();
 
     private BuildResultStack resultStack;
     private String statement;
@@ -67,7 +66,7 @@ abstract class GeometryBuilder {
     }
 
     protected GeometryFactory getGeometryFactory() {
-        return GEOM_FACTORY;
+        return  new GeometryFactory();
     }
 
     protected BuildResultStack getResultStack() {

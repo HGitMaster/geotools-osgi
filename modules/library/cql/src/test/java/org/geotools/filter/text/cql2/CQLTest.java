@@ -277,21 +277,4 @@ public class CQLTest {
         CQL.toExpression("attName", ff);
         Assert.assertTrue("Provided FilterFactory was not called", called[0]);
     }
-    
-    /**
-     * Test for issue
-     * 
-     * http://jira.codehaus.org/browse/GEOT-2157?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel&focusedCommentId=154661#action_154661
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testForIssueCOT2157() throws Exception{
-
-        final String predicate = "( ZONE_VALID_FROM BEFORE 2008-09-15T00:00:00Z AND ( ZONE_VALID_TO IS NULL OR ZONE_VALID_TO AFTER 2008-09-15T00:00:00Z))";
-        Filter filter = CQL.toFilter(predicate);
-        
-        Assert.assertNotNull(filter);
-        
-    }
 }

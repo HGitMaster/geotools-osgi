@@ -65,15 +65,18 @@ import com.vividsolutions.jts.io.WKTReader;
  * It maintains the results of semantic actions in the stack used to build complex
  * filters and expressions.
  * </p>
+ * 
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
  *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  */
 public abstract class AbstractFilterBuilder {
-    protected static final WKTReader WKT_READER = new WKTReader();
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     private final FilterFactory filterFactory;
 
@@ -337,7 +340,10 @@ public abstract class AbstractFilterBuilder {
             throws CQLException {
         
         try {
-            Date dateTime = DATE_FORMAT.parse(token.toString());
+            
+          DateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+            
+            Date dateTime = formatter.parse(token.toString());
             Literal literalDate = filterFactory.literal(dateTime);
 
             return literalDate;
@@ -910,7 +916,9 @@ public abstract class AbstractFilterBuilder {
             // transforms wkt to vividsolution geometry
             String vividGeom = transformWKTGeometry(wktGeom);
 
-            Geometry g = WKT_READER.read(vividGeom);
+            WKTReader reader = new WKTReader();
+
+            Geometry g = reader.read(vividGeom);
 
             Literal literal = filterFactory.literal(g);
 

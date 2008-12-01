@@ -50,12 +50,17 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
  * each syntax rules recognized.
  * </p>
  * 
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
+ * 
  * TODO This module should use the new geometry API, more info in http://docs.codehaus.org/display/GEOTOOLS/GeomeryFactoryFinder+Proposal
  * 
  * 
  * @author Mauricio Pazos (Axios Engineering)
  * 
- * @version $Id: CQLCompiler.java 31897 2008-11-21 16:12:31Z mauricio.pazos $
+ * @version $Id: CQLCompiler.java 31937 2008-12-01 13:54:45Z mauricio.pazos $
  * @since 2.5
  */
 public class CQLCompiler extends CQLParser implements ICompiler{

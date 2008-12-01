@@ -29,10 +29,12 @@ import org.opengis.filter.expression.Expression;
  * 
  * <p>
  * This is an internal utility class with convenient methods for compiler actions.
- * 
- * This is intended as an internal interface used only in this module. Client modules
- * mustn't use it.
  * </p>
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
+ * 
  *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6

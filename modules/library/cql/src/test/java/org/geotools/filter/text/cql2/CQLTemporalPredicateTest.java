@@ -24,6 +24,7 @@ import java.util.Date;
 import org.geotools.filter.text.commons.CompilerUtil;
 import org.geotools.filter.text.commons.Language;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
@@ -160,8 +161,10 @@ public class CQLTemporalPredicateTest {
         Expression expr2 = comparation.getExpression2();
         Literal literalDate = (Literal)expr2;
         
-        final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
         
+        final DateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
+
         Date expectedDate = dateFormatter.parse("2008-09-09T17:00:00Z");
         Date actualDate = (Date) literalDate.getValue();
         
@@ -477,5 +480,40 @@ public class CQLTemporalPredicateTest {
 
         Assert.assertEquals("greater filter", expected, resultFilter);
     }
+    
+    /**
+     * Test for issue
+     * 
+     * http://jira.codehaus.org/browse/GEOT-2157?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel&focusedCommentId=154661#action_154661
+     * 
+     * Note: this test is ignored to avoid to add cycles in the geotools general build. 
+     * @throws Exception
+     */
+    @Ignore
+    public void issueCOT2157() throws Exception{
+
+        Runnable cqlRunner = new Runnable(){
+            public void run() {
+                final String predicate = "( ZONE_VALID_FROM BEFORE 2008-09-15T00:00:00Z AND ( ZONE_VALID_TO IS NULL OR ZONE_VALID_TO AFTER 2008-09-15T00:00:00Z))";
+                try {
+                    Filter filter = CompilerUtil.parseFilter(language,predicate);
+                    Assert.assertNotNull(filter);
+                } catch (CQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Thread[] threadList = new Thread[1000];
+        for (int i = 0; i < threadList .length; i++) {
+            threadList[i] = new Thread(cqlRunner);
+        }        
+        
+        for (int i = 0; i < threadList.length; i++) {
+            threadList[i].start();
+        }
+    }
+    
+    
     
 }

@@ -39,7 +39,7 @@ import org.opengis.filter.expression.Subtract;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  */
-public final class FilterTXTSample {
+final class FilterTXTSample {
     protected static final FilterFactory FACTORY = CommonFactoryFinder.getFilterFactory((Hints) null);
 
     // TXT Samples

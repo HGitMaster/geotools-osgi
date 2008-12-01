@@ -30,7 +30,10 @@ import org.geotools.filter.text.generated.parsers.Token;
  * implementing the interface {@link IToken} which is used by the
  * {@link CQLFilterBuilder} and {@link TXT}}.
  * </p>
- * 
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
  * @see IToken
  * @see CQLFilterBuilder
  * @see CQLCompiler

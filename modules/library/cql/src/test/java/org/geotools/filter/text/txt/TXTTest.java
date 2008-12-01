@@ -100,7 +100,7 @@ public final class TXTTest  {
         
         Assert.assertTrue(filter instanceof PropertyIsLessThan);
     }
-// FIXME the sintax is under debate. It will be eliminate from release    
+// FIXME the syntax is under debate. It will be eliminate from release    
 //    /**
 //     * Spatial relate like Intersection Matrix (DE-9IM)
 //     * 

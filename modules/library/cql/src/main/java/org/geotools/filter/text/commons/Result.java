@@ -21,11 +21,14 @@ import org.geotools.filter.text.commons.IToken;
 
 /**
  * Maintains the result of building process.
- *
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
  * @since 2.4
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
- * @version $Id: Result.java 31632 2008-10-07 19:32:57Z mauricio.pazos $
+ * @version $Id: Result.java 31937 2008-12-01 13:54:45Z mauricio.pazos $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/Result.java $
  */

@@ -28,17 +28,20 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Holds the results of the building process in a stack
- *
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
- * @version $Id: BuildResultStack.java 31897 2008-11-21 16:12:31Z mauricio.pazos $
+ * @version $Id: BuildResultStack.java 31937 2008-12-01 13:54:45Z mauricio.pazos $
  * @since 2.4
  */
 public final class BuildResultStack {
 
-    private Stack<Result> stack = new Stack<Result>();
+    private final Stack<Result> stack = new Stack<Result>();
 
-    private String cqlSource;
+    private final String cqlSource;
 
     public BuildResultStack(final String cqlSource) {
         assert cqlSource != null;
