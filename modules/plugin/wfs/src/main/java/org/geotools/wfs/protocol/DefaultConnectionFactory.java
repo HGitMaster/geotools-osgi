@@ -61,6 +61,8 @@ public class DefaultConnectionFactory implements ConnectionFactory {
 
     private String authPass;
 
+    private int timeoutMillis;
+
     /**
      * A simple user/password authenticator
      * 
@@ -88,10 +90,6 @@ public class DefaultConnectionFactory implements ConnectionFactory {
         }
     }
 
-    public DefaultConnectionFactory() {
-        this(false, null, null, DEFAULT_CHARSET);
-    }
-
     /**
      * Creates a connection factory set up for the given tryGzip flag, HTTP
      * authentication if needed, and default character encoding.
@@ -102,10 +100,11 @@ public class DefaultConnectionFactory implements ConnectionFactory {
      * @param encoding
      */
     public DefaultConnectionFactory(final boolean tryGzip, final String user, final String pass,
-            final Charset encoding) {
+            final Charset encoding, int timeoutMillis) {
         this.tryGzip = tryGzip;
         this.authUser = user;
         this.authPass = pass;
+        this.timeoutMillis = timeoutMillis;
 
         if (user != null && pass != null) {
             auth = new WFSAuthenticator(user, pass);
@@ -132,11 +131,11 @@ public class DefaultConnectionFactory implements ConnectionFactory {
      *      org.geotools.wfs.protocol.HttpMethod)
      */
     public HttpURLConnection getConnection(URL query, HttpMethod method) throws IOException {
-        return getConnection(query, tryGzip, method, auth);
+        return getConnection(query, tryGzip, method, auth, timeoutMillis);
     }
 
     private static HttpURLConnection getConnection(final URL url, final boolean tryGzip,
-            final HttpMethod method, final Authenticator auth) throws IOException {
+            final HttpMethod method, final Authenticator auth, final int timeoutMillis) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         if (POST == method) {
@@ -164,6 +163,8 @@ public class DefaultConnectionFactory implements ConnectionFactory {
             connection.addRequestProperty("Accept-Encoding", "gzip");
         }
 
+        connection.setConnectTimeout(timeoutMillis);
+        connection.setReadTimeout(timeoutMillis);
         return connection;
     }
 

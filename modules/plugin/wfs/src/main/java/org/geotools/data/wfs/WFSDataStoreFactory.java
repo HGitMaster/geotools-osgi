@@ -119,7 +119,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31933 2008-11-28 20:31:50Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 31945 2008-12-03 23:22:28Z groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -354,7 +354,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
         if (Version.v1_0_0 == version) {
             final ConnectionFactory connectionFac = new DefaultConnectionFactory(tryGZIP, user,
-                    pass, defaultEncoding);
+                    pass, defaultEncoding, timeoutMillis);
             InputStream reader = new ByteArrayInputStream(wfsCapabilitiesRawData);
             final WFS100ProtocolHandler protocolHandler = new WFS100ProtocolHandler(reader,
                     connectionFac);
