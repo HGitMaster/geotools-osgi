@@ -154,6 +154,14 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         features.close(iterator);
         
     }
+    
+    public void testCaseInsensitiveFilter() throws Exception {
+        FilterFactory ff = dataStore.getFilterFactory();
+        PropertyIsEqualTo sensitive = ff.equal(ff.property(aname("stringProperty")), ff.literal("OnE"), true);
+        PropertyIsEqualTo insensitive = ff.equal(ff.property(aname("stringProperty")), ff.literal("OnE"), false);
+        assertEquals(0, featureSource.getCount(new DefaultQuery(null, sensitive)));
+        assertEquals(1, featureSource.getCount(new DefaultQuery(null, insensitive)));
+    }
 
     public void testGetFeaturesWithQuery() throws Exception {
         FilterFactory ff = dataStore.getFilterFactory();

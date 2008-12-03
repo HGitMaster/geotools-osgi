@@ -558,6 +558,15 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         reader.close();
         t.close();
     }
+    
+    public void testCaseInsensitiveFilter() throws Exception {
+        final String riverName = riverType.getName().getLocalPart();
+        FeatureSource<SimpleFeatureType, SimpleFeature> rivers = data.getFeatureSource(riverName);
+        org.opengis.filter.Filter caseSensitive = ff.equal(ff.property("river"), ff.literal("Rv1"), true);
+        assertEquals(0, rivers.getCount(new DefaultQuery(riverName, caseSensitive)));
+        org.opengis.filter.Filter caseInsensitive = ff.equal(ff.property("river"), ff.literal("Rv1"), false);
+        assertEquals(1, rivers.getCount(new DefaultQuery(riverName, caseInsensitive)));
+    }
 
     public void testGetFeatureReaderRetypeBug() throws Exception {
         // this is here to avoid http://jira.codehaus.org/browse/GEOT-1069

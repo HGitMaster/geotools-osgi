@@ -59,6 +59,8 @@ import org.geotools.filter.LikeFilter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -367,6 +369,17 @@ public class OracleDataStoreOnlineTest extends TestCase {
         filter.addRightGeometry(left);
         fr = fs.getFeatures(filter);        
         assertEquals(2, fr.size()); // we pass this!
+    }
+    
+    public void testCaseInsensitiveFilter() throws Exception {
+        final String typeName = "ORA_TEST_POINTS";
+        FeatureSource<SimpleFeatureType, SimpleFeature> rivers = dstore.getFeatureSource(typeName);
+        final Literal literal = filterFactory.literal("PoInT 1");
+        final PropertyName property = filterFactory.property("NAME");
+        org.opengis.filter.Filter caseSensitive = filterFactory.equal(property, literal, true);
+        assertEquals(0, rivers.getCount(new DefaultQuery(typeName, caseSensitive)));
+        org.opengis.filter.Filter caseInsensitive = filterFactory.equal(property, literal, false);
+        assertEquals(1, rivers.getCount(new DefaultQuery(typeName, caseInsensitive)));
     }
     
     public void testBBoxFilterNoAttribute() throws Exception {
