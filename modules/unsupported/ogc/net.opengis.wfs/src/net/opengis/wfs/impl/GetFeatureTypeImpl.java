@@ -2,13 +2,14 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GetFeatureTypeImpl.java 31895 2008-11-20 20:40:48Z jdeolive $
+ * $Id: GetFeatureTypeImpl.java 31958 2008-12-04 18:19:12Z jdeolive $
  */
 package net.opengis.wfs.impl;
 
 import java.math.BigInteger;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import java.util.Map;
 import net.opengis.wfs.GetFeatureType;
@@ -182,10 +183,10 @@ public class GetFeatureTypeImpl extends BaseRequestTypeImpl implements GetFeatur
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @see #getFormatOptions()
-     * @generated
+     * @generated NOT
      * @ordered
      */
-    protected static final Map FORMAT_OPTIONS_EDEFAULT = null;
+    protected static final Map FORMAT_OPTIONS_EDEFAULT = new HashMap();
 
     /**
      * The cached value of the '{@link #getFormatOptions() <em>Format Options</em>}' attribute.
