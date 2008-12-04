@@ -571,8 +571,18 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 			
 			if (isPrepareEnabled()==false)				
 				return super.visit(expression, context);
+					
 			if (INSPATIALOP.equals(context)==false) {
-				return super.visit(expression, context);
+				Class target = (Class) context;
+	            Object literal = evaluateLiteral( expression, target );
+	            try {
+	            	writeLiteral(literal);	            	
+				} catch (IOException e) {
+					throw new RuntimeException("IO problems writing literal", e);
+				}
+
+	            return context;
+				//return super.visit(expression, context);
 			}
 			
 	        Geometry   literalValue = (Geometry) expression.getValue();
