@@ -124,11 +124,6 @@ public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisito
 	}
 
 	public Object visit(Id filter, Object extraData) {
-		
-		if (filter instanceof FeatureId) {
-			FeatureId featureId = (FeatureId) filter;
-			return getFactory(extraData).featureId(featureId.getID());
-		}
 		return getFactory(extraData).id(filter.getIdentifiers());
 	}
 
