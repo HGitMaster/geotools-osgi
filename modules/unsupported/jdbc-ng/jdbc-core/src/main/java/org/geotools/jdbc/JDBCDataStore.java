@@ -810,8 +810,6 @@ public final class JDBCDataStore extends ContentDataStore
             }
                         
             try {
-                rs.next();
-
                 ReferencedEnvelope bounds = null;
                 Envelope e;
                 if( rs.next() ) {
