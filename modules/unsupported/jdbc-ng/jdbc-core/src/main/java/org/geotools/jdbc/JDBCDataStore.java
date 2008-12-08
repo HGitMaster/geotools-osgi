@@ -813,8 +813,15 @@ public final class JDBCDataStore extends ContentDataStore
                 rs.next();
 
                 ReferencedEnvelope bounds = null;
-                Envelope e = dialect.decodeGeometryEnvelope(rs, 1, st.getConnection());
-
+                Envelope e;
+                if( rs.next() ) {
+                    e = dialect.decodeGeometryEnvelope(rs, 1, st.getConnection());
+                }
+                else {
+                    e = new Envelope();
+                    e.setToNull();
+                }
+               
                 if (e instanceof ReferencedEnvelope) {
                     bounds = (ReferencedEnvelope) e;
                 } else {
@@ -1096,6 +1103,8 @@ public final class JDBCDataStore extends ContentDataStore
             // isolation level is not set in the datastore, see 
             // http://jira.codehaus.org/browse/GEOT-2021 
 
+            //call dialect callback to iniitalie the connection
+            dialect.initializeConnection( cx );
             return cx;
         } catch (SQLException e) {
             throw new RuntimeException("Unable to obtain connection", e);

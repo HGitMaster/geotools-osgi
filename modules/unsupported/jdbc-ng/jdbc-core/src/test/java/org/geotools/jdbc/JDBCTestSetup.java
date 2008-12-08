@@ -109,7 +109,8 @@ public abstract class JDBCTestSetup {
 
         //connect
         Connection conn = dataSource.getConnection();
-
+        createDataStoreFactory().createSQLDialect(new JDBCDataStore()).initializeConnection(conn);
+        
         try {
             Statement st = conn.createStatement();
 
