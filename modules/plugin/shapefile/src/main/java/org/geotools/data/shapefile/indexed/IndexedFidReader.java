@@ -154,8 +154,17 @@ public class IndexedFidReader implements FIDReader, FileReader {
      */
     public long findFid(String fid) throws IOException {
         try {
-            long desired = Long.parseLong(fid
-                    .substring(fid.lastIndexOf(".") + 1));
+            int idx = typeName.length(); //typeName already contains the trailing "."
+            long desired = -1;
+            if(fid.startsWith(typeName)){
+                try{
+                    desired =  Long.parseLong(fid.substring(idx), 10);
+                }catch(NumberFormatException e){
+                    return -1;
+                }
+            }else{
+                return -1;
+            }
 
             if ((desired < 0)) {
                 return -1;

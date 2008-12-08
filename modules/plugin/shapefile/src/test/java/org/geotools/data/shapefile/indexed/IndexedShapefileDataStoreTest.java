@@ -34,9 +34,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.geotools.TestData;
+import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FIDReader;
+import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
@@ -59,8 +62,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -75,7 +78,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/shpLazyLoadingIndex/ext/shape/test/org/geotools/data/shapefile/indexed/ShapefileDataStoreTest.java $
- * @version $Id: IndexedShapefileDataStoreTest.java 31597 2008-09-25 14:02:39Z groldan $
+ * @version $Id: IndexedShapefileDataStoreTest.java 31980 2008-12-08 22:35:27Z groldan $
  * @author Ian Schneider
  */
 public class IndexedShapefileDataStoreTest extends TestCaseSupport {
@@ -745,6 +748,68 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         ds.dispose();
     }
     
+    
+    /**
+     * Issueing a request, whether its a query, update or delete, with a fid filter where feature
+     * ids match the {@code <typeName>.<number>} structure but the {@code <typeName>} part does not
+     * match the actual typeName, shoud ensure the invalid fids are ignored
+     * 
+     * @throws FileException
+     */
+    public void testWipesOutInvalidFidsFromFilters() throws Exception {
+        final IndexedShapefileDataStore ds = createDataStore();
+        FeatureStore<SimpleFeatureType, SimpleFeature> store;
+        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource();
+        
+        final String validFid1, validFid2, invalidFid1, invalidFid2;
+        {
+            FeatureIterator<SimpleFeature> features = store.getFeatures().features();
+            validFid1 = features.next().getID();
+            validFid2 = features.next().getID();
+            invalidFid1 = "_" + features.next().getID();
+            invalidFid2 = features.next().getID() + "abc";
+            features.close();
+        }
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        Set<Identifier> ids = new HashSet<Identifier>();
+        ids.add(ff.featureId(validFid1));
+        ids.add(ff.featureId(validFid2));
+        ids.add(ff.featureId(invalidFid1));
+        ids.add(ff.featureId(invalidFid2));
+        Filter fidFilter = ff.id(ids);
+
+        final SimpleFeatureType schema = store.getSchema();
+        final String typeName = schema.getTypeName();
+        //get a property of type String to update its value by the given filter
+        final AttributeDescriptor attribute = schema.getDescriptor("f");
+        
+        assertEquals(2, count(ds, typeName, fidFilter));
+
+        store.modifyFeatures(attribute, "modified", fidFilter);
+        Filter modifiedFilter = ff.equals(ff.property("f"), ff.literal("modified"));
+        assertEquals(2, count(ds, typeName, modifiedFilter));
+        
+        final int initialCount = store.getCount(Query.ALL);
+        store.removeFeatures(fidFilter);
+        final int afterCount = store.getCount(Query.ALL);
+        assertEquals(initialCount - 2, afterCount);
+    }
+    
+    private int count(DataStore ds, String typeName, Filter filter) throws Exception {
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+        reader = ds.getFeatureReader(new DefaultQuery(typeName, filter), Transaction.AUTO_COMMIT);
+        int count = 0;
+        try {
+            while (reader.hasNext()) {
+                reader.next();
+                count++;
+            }
+        } finally {
+            reader.close();
+        }
+        return count;
+    }
+
     public static void main(java.lang.String[] args) throws Exception {
         junit.textui.TestRunner.run(suite(IndexedShapefileDataStoreTest.class));
     }
