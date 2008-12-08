@@ -19,9 +19,9 @@ package org.geotools.filter.visitor;
 import org.opengis.filter.Filter;
 
 /**
- * Provides access to certain transaction state for the {@link PostPreProcessFilterSplittingVisitor}.  This is only required
- * if the transaction is kept on the client and the server is unaware of it.  For example PostGIS would not need to create
- * one.
+ * Provides access to certain transaction state for the {@link PostPreProcessFilterSplittingVisitor}
+ * and {@link CapabilitiesFilterSplitter}. This is only required if the transaction is kept on the
+ * client and the server is unaware of it. For example PostGIS would not need to create one.
  * 
  * @author Jesse
  */
