@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.wfs.v1_1_0;
+package org.geotools.filter.visitor;
 
 import org.junit.Test;
 import org.opengis.filter.Filter;

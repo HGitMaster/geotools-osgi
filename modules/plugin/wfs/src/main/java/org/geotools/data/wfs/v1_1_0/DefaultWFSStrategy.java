@@ -48,6 +48,7 @@ import org.geotools.factory.GeoTools;
 import org.geotools.filter.Capabilities;
 import org.geotools.filter.v1_1.OGC;
 import org.geotools.filter.v1_1.OGCConfiguration;
+import org.geotools.filter.visitor.CapabilitiesFilterSplitter;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFSConfiguration;
 import org.geotools.xml.Configuration;
@@ -61,7 +62,7 @@ import org.opengis.filter.sort.SortBy;
  * A default strategy for a WFS 1.1.0 implementation that assumes the server sticks to the standard.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: DefaultWFSStrategy.java 31962 2008-12-08 17:06:22Z groldan $
+ * @version $Id: DefaultWFSStrategy.java 31963 2008-12-08 17:19:39Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.wfs.v1_1_0;
+package org.geotools.filter.visitor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -114,7 +114,7 @@ import org.opengis.filter.spatial.Within;
  * @author dzwiers
  * @author commented and ported from gt to ogc filters by saul.farber
  * @author ported to work upon {@code org.geotools.filter.Capabilities} by Gabriel Roldan
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/CapabilitiesFilterSplitter.java $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/visitor/CapabilitiesFilterSplitter.java $
  * 
  */
 @SuppressWarnings( { "nls", "unchecked" })
