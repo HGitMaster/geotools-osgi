@@ -416,9 +416,8 @@ public class IsFullySupportedFilterVisitor implements FilterVisitor, ExpressionV
         
         // Note that only function name is checked here
         FunctionName found = functions.getFunctionName( function.getName() );
-        if( found == null ) return false; 
-        
-        return found.getArgumentCount() == function.getParameters().size();
+        // And that's enough to assess if the function is supported
+        return found != null; 
     }
 
     public Object visit( Literal expression, Object extraData ) {
