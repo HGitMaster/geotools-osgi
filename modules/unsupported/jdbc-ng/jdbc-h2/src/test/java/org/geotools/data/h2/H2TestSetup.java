@@ -32,16 +32,6 @@ import org.geotools.jdbc.SQLDialect;
  *
  */
 public class H2TestSetup extends JDBCTestSetup {
-    protected void initializeDatabase() throws Exception {
-        //spatially enable the database
-        
-        try {
-            run(getClass().getResourceAsStream("h2-drop.sql"));
-        } catch (Exception e) {}
-        
-        run(getClass().getResourceAsStream("h2.sql"));
-    }
-
     protected void setUpData() throws Exception {
         //drop old data
         try {

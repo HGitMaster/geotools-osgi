@@ -1,9 +1,0 @@
-DROP ALIAS AsWKT;
-DROP ALIAS AsText;
-DROP ALIAS EnvelopeAsText;
-DROP ALIAS GeomFromText;
-DROP ALIAS Envelope;
-DROP ALIAS GetSRID;
-DROP ALIAS GeometryType;
-
-COMMIT;

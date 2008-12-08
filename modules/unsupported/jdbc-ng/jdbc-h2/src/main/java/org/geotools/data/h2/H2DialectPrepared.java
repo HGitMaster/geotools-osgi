@@ -52,6 +52,11 @@ public class H2DialectPrepared extends PreparedStatementSQLDialect {
     }
 
     @Override
+    public void initializeConnection(Connection cx) throws SQLException {
+        delegate.initializeConnection(cx);
+    }
+    
+    @Override
     public String getNameEscape() {
         return delegate.getNameEscape();
     }

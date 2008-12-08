@@ -50,6 +50,11 @@ public class H2DialectBasic extends BasicSQLDialect {
     }
 
     @Override
+    public void initializeConnection(Connection cx) throws SQLException {
+        delegate.initializeConnection(cx);
+    }
+    
+    @Override
     public String getNameEscape() {
         return delegate.getNameEscape();
     }

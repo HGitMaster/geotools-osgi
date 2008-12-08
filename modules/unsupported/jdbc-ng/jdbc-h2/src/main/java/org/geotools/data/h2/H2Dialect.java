@@ -16,7 +16,10 @@
  */
 package org.geotools.data.h2;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,8 +33,12 @@ import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
@@ -73,8 +80,46 @@ public class H2Dialect extends SQLDialect {
         mappings.put(Point.class, new Integer(Types.BLOB));
         mappings.put(LineString.class, new Integer(Types.BLOB));
         mappings.put(Polygon.class, new Integer(Types.BLOB));
+        mappings.put(GeometryCollection.class, new Integer(Types.BLOB));
+        mappings.put(MultiPoint.class, new Integer(Types.BLOB));
+        mappings.put(MultiLineString.class, new Integer(Types.BLOB));
+        mappings.put(MultiPolygon.class, new Integer(Types.BLOB));
     }
 
+    @Override
+    public void initializeConnection(Connection cx) throws SQLException {
+        //spatialize this database (if neccessary)
+        Statement st = cx.createStatement();
+        try {
+            try {
+                st.execute( "SELECT GeoToolsVersion()");
+                
+                //db already spatialized
+                return;
+            }
+            catch( SQLException e ) {
+                //continue on, means database has not been spatialized
+            }
+            
+            BufferedReader r = new BufferedReader( 
+                    new InputStreamReader( getClass().getResourceAsStream( "h2.sql" ) ) );
+            
+            String line = null;
+            while( (line = r.readLine() ) != null ) {
+                st.execute( line );
+            }    
+            
+            r.close();
+        }
+        catch( IOException e ) {
+            throw new RuntimeException( e );
+        }
+        finally {
+            dataStore.closeSafe( st );
+        }
+        
+    }
+    
     public Integer getGeometrySRID(String schemaName, String tableName, String columnName,
         Connection cx) throws SQLException {
         //execute SELECT srid(<columnName>) FROM <tableName> LIMIT 1;
