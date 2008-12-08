@@ -16,12 +16,6 @@
  */
 package org.geotools.data.wfs.v1_1_0;
 
-import static org.junit.Assert.*;
-import org.geotools.factory.BasicFactories;
-import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.LiteralExpressionImpl;
-import org.geotools.filter.spatial.BBOXImpl;
-import org.geotools.referencing.CRS;
 import org.junit.Test;
 import org.opengis.filter.Filter;
 import org.opengis.filter.spatial.BBOX;
@@ -36,15 +30,14 @@ import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 import org.opengis.geometry.Geometry;
-import org.opengis.geometry.primitive.PrimitiveFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-
+/**
+ * 
+ * @author Jesse
+ * @author ported from PostPreProcessFilterSplittingVisitor at 2.5.2 by Gabriel Roldan
+ */
 @SuppressWarnings({"nls", "unchecked"})
-public class PostPreProcessFilterSplittingVisitorSpatialTest extends AbstractPostPreProcessFilterSplittingVisitorTests {
+public class CapabilitiesFilterSplitterSpatialTest extends AbstractCapabilitiesFilterSplitterTests {
 
     private Geometry geom = new MockGeometryImpl();
     

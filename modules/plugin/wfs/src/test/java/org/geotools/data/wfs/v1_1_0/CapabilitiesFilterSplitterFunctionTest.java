@@ -16,27 +16,27 @@
  */
 package org.geotools.data.wfs.v1_1_0;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 
+import org.geotools.filter.Capabilities;
+import org.geotools.filter.function.math.FilterFunction_abs;
+import org.junit.Test;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
-import org.geotools.filter.Capabilities;
-import org.geotools.filter.function.FilterFunction_geometryType;
-import org.geotools.filter.function.math.FilterFunction_abs;
-import org.junit.Test;
 
 /**
  * Test case where only specific functions are supported.
  * 
  * @author Jesse
- *
+ * @author ported from PostPreProcessFilterSplittingVisitor at 2.5.2 by Gabriel Roldan
  */
 @SuppressWarnings({"nls", "unchecked"})
-public class PostPreProcessFilterSplitterVisitorFunctionTest extends AbstractPostPreProcessFilterSplittingVisitorTests {
+public class CapabilitiesFilterSplitterFunctionTest extends AbstractCapabilitiesFilterSplitterTests {
     
-    PostPreProcessFilterSplittingVisitor visitor;
+    CapabilitiesFilterSplitter visitor;
 
     @Test
 	public void testSupportAll() throws Exception {
@@ -48,7 +48,7 @@ public class PostPreProcessFilterSplitterVisitorFunctionTest extends AbstractPos
 		
 		Filter filter=ff.and(filter1,filter2);
 
-        visitor = newVisitor(new Capabilities());
+        visitor = newVisitor(new Capabilities());        
         filter.accept(visitor, null);
 		
 		assertEquals(Filter.INCLUDE, visitor.getFilterPre());

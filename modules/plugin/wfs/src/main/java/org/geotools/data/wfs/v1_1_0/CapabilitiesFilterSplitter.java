@@ -28,7 +28,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.Capabilities;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.ClientTransactionAccessor;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.ExcludeFilter;
@@ -74,24 +74,53 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 
 /**
- * This is the same than {@link org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor}
- * but working against the non deprecated {@link FilterCapabilities} instead of
- * {@link org.geotools.filter.FilterCapabilities}.
- * 
+ * Determines what queries can be processed server side and which can be processed client side.
  * <p>
- * This class presumably may need to be moved to geotools main.
+ * IMPLEMENTATION NOTE: This class is implemented as a stack processor. If you're curious how it
+ * works, compare it with the old SQLUnpacker class, which did the same thing using recursion in a
+ * more straightforward way.
+ * </p>
+ * <p>
+ * Here's a non-implementors best-guess at the algorithm: Starting at the top of the filter, split
+ * each filter into its constituent parts. If the given FilterCapabilities support the given
+ * operator, then keep checking downwards.
+ * </p>
+ * <p>
+ * The key is in knowing whether or not something "down the tree" from you wound up being supported
+ * or not. This is where the stacks come in. Right before handing off to accept() the sub- filters,
+ * we count how many things are currently on the "can be proccessed by the underlying datastore"
+ * stack (the preStack) and we count how many things are currently on the "need to be post-
+ * processed" stack.
+ * </p>
+ * <p>
+ * After the accept() call returns, we look again at the preStack.size() and postStack.size(). If
+ * the postStack has grown, that means that there was stuff down in the accept()-ed filter that
+ * wasn't supportable. Usually this means that our filter isn't supportable, but not always.
+ * 
+ * In some cases a sub-filter being unsupported isn't necessarily bad, as we can 'unpack' OR
+ * statements into AND statements (DeMorgans rule/modus poens) and still see if we can handle the
+ * other side of the OR. Same with NOT and certain kinds of AND statements.
+ * </p>
+ * <p>
+ * In addition this class supports the case where we're doing an split in the middle of a
+ * client-side transaction. I.e. imagine doing a <Transaction> against a WFS-T where you have to
+ * filter against actions that happened previously in the transaction. That's what the
+ * ClientTransactionAccessor interface does, and this class splits filters while respecting the
+ * information about deletes and updates that have happened previously in the Transaction. I can't
+ * say with certainty exactly how the logic for that part of this works, but the test suite does
+ * seem to test it and the tests do pass.
  * </p>
  * 
  * @author dzwiers
  * @author commented and ported from gt to ogc filters by saul.farber
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/library/main/src/main/java/org/geotools/filter
- *         /visitor/PostPreProcessFilterSplittingVisitor.java $
+ * @author ported to work upon {@code org.geotools.filter.Capabilities} by Gabriel Roldan
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/v1_1_0/CapabilitiesFilterSplitter.java $
  * 
  */
 @SuppressWarnings( { "nls", "unchecked" })
-public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, ExpressionVisitor {
-    private static final Logger logger = org.geotools.util.logging.Logging
+public class CapabilitiesFilterSplitter implements FilterVisitor, ExpressionVisitor {
+
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger("org.geotools.filter");
 
     /**
@@ -118,7 +147,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
      */
     private Capabilities fcs = null;
 
-    private SimpleFeatureType parent = null;
+    private FeatureType parent = null;
 
     private Filter original = null;
 
@@ -128,11 +157,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
      */
     private ClientTransactionAccessor transactionAccessor;
 
-    private FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-
-    private PostPreProcessFilterSplittingVisitor() {
-        // do nothing
-    }
+    private FilterFactory ff;
 
     /**
      * Create a new instance.
@@ -147,8 +172,9 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
      *            filters must be sent to the server. This class provides a generic way of obtaining
      *            the information from the transaction.
      */
-    public PostPreProcessFilterSplittingVisitor(Capabilities fcs, SimpleFeatureType parent,
+    public CapabilitiesFilterSplitter(Capabilities fcs, FeatureType parent,
             ClientTransactionAccessor transactionAccessor) {
+        this.ff = CommonFactoryFinder.getFilterFactory(null);
         this.fcs = fcs;
         this.parent = parent;
         this.transactionAccessor = transactionAccessor;
@@ -168,10 +194,11 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
             return original;
 
         if (postStack.size() > 1) {
-            logger.warning("Too many post stack items after run: " + postStack.size());
+            LOGGER.warning("Too many post stack items after run: " + postStack.size());
         }
 
-        // JE: Changed to peek because get implies that the value can be retrieved multiple times
+        // JE: Changed to peek because get implies that the value can be retrieved multiple
+        // times
         Filter f = postStack.isEmpty() ? Filter.INCLUDE : (Filter) postStack.peek();
         return f;
     }
@@ -182,26 +209,25 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
      * @return the filter that can be sent to the server for pre-processing.
      */
     public Filter getFilterPre() {
-        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         if (preStack.isEmpty()) {
             return Filter.INCLUDE;
         }
 
         if (preStack.size() > 1) {
-            logger.warning("Too many pre stack items after run: " + preStack.size());
+            LOGGER.warning("Too many pre stack items after run: " + preStack.size());
         }
 
-        // JE: Changed to peek because get implies that the value can be retrieved multiple times
+        // JE: Changed to peek because get implies that the value can be retrieved multiple
+        // times
         Filter f = preStack.isEmpty() ? Filter.INCLUDE : (Filter) preStack.peek();
         // deal with deletes here !!!
-        if (transactionAccessor != null) {
-            if (f != null && f != Filter.EXCLUDE) {
-                Filter deleteFilter = transactionAccessor.getDeleteFilter();
-                if (deleteFilter != null) {
-                    if (deleteFilter == Filter.EXCLUDE)
-                        f = Filter.EXCLUDE;
-                    else
-                        f = ff.and(f, ff.not(deleteFilter));
+        if (transactionAccessor != null && f != null && f != Filter.EXCLUDE) {
+            Filter deleteFilter = transactionAccessor.getDeleteFilter();
+            if (deleteFilter != null) {
+                if (deleteFilter == Filter.EXCLUDE) {
+                    f = Filter.EXCLUDE;
+                } else {
+                    f = ff.and(f, ff.not(deleteFilter));
                 }
             }
         }
@@ -589,7 +615,8 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
         if (original == null)
             original = filter;
 
-        // if (!fcs.supports(Not.class) && !fcs.supports(And.class) && !fcs.supports(Or.class)) {
+        // if (!fcs.supports(Not.class) && !fcs.supports(And.class) && !fcs.supports(Or.class))
+        // {
         if (!fcs.supports(filter)) {
             postStack.push(filter);
             return;
@@ -665,7 +692,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
                             preStack.push(f);
                         }
                     } else {
-                        logger.warning("LogicFilter found which is not 'and, or, not");
+                        LOGGER.warning("LogicFilter found which is not 'and, or, not");
 
                         popToSize(postStack, i);
                         popToSize(preStack, j);
@@ -744,7 +771,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
         // JD: use an expression to get at the attribute type intead of accessing directly
         if (parent != null && expression.evaluate(parent) == null) {
             throw new IllegalArgumentException("Property '" + expression.getPropertyName()
-                    + "' could not be found in " + parent.getTypeName());
+                    + "' could not be found in " + parent.getName());
         }
         if (transactionAccessor != null) {
             Filter updateFilter = (Filter) transactionAccessor.getUpdateFilter(expression
