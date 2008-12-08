@@ -115,7 +115,7 @@ import org.opengis.filter.spatial.Within;
  * @author commented and ported from gt to ogc filters by saul.farber
  * @author ported to work upon {@code org.geotools.filter.Capabilities} by Gabriel Roldan
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/visitor/CapabilitiesFilterSplitter.java $
- * 
+ * @since 2.5.3
  */
 @SuppressWarnings( { "nls", "unchecked" })
 public class CapabilitiesFilterSplitter implements FilterVisitor, ExpressionVisitor {
