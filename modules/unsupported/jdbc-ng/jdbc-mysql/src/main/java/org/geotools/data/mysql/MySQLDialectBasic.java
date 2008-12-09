@@ -115,7 +115,10 @@ public class MySQLDialectBasic extends BasicSQLDialect {
             ResultSet rs, String column, GeometryFactory factory, Connection cx)
             throws IOException, SQLException {
         byte[] bytes = rs.getBytes(column);
-
+        if ( bytes == null ) {
+            return null;
+        }
+        
         try {
             return new WKBReader(factory).read(bytes);
         } catch (ParseException e) {
