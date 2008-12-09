@@ -42,12 +42,6 @@ import org.opengis.filter.expression.Expression;
  * be expressed in decimal, hexadecimal (e.g. <code>0x10</code>) octal (e.g.
  * <code>045</code>) form, as well as Unicode codes (e.g. <code>U+F054</code>
  * or <code>\uF054</code>).
- * <p>
- * When using the Windows CharMap to pick up the font codes, beware that the
- * reported code for symbol fonts are most of the time incomplete, for example,
- * the filled drop symbol in Wingdings is reported as having code
- * <code>0x53</code> whilst the real code is <code>0xF053</code> (as a rule
- * of thumb, try prefixing the reported code with <code>F0</code>).
  * 
  * @author Andrea Aime - TOPP
  * 
@@ -89,10 +83,16 @@ public class TTFMarkFactory implements MarkFactory {
         char character;
         try {
             // see if a unicode escape sequence has been used
-            if (code.startsWith("U+") || code.startsWith("\\u"))
+            if (code.startsWith("U+") || code.startsWith("\\u")) 
                 code = "0x" + code.substring(2);
+            
             // this will handle most numeric formats like decimal, hex and octal
             character = (char) Integer.decode(code).intValue();
+            
+            // handle charmap code reporting issues 
+            if(!font.canDisplay(character))
+                character = (char) (0xF000 | character);
+            
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
                     "Invalid character specification " + fontElements[1], e);
