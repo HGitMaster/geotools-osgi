@@ -51,7 +51,7 @@ import org.geotools.metadata.iso.citation.Citations;
  *
  * @since 2.3
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/LongitudeFirstFactory.java $
- * @version $Id: LongitudeFirstFactory.java 30641 2008-06-12 17:42:27Z acuster $
+ * @version $Id: LongitudeFirstFactory.java 31994 2008-12-10 16:06:18Z aaime $
  * @author Martin Desruisseaux
  *
  * @see OrderedAxisAuthorityFactory
@@ -140,12 +140,12 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
     private static int relativePriority() {
         try {
             if (Boolean.getBoolean(SYSTEM_DEFAULT_KEY)) {
-                return +10;
+                return +7;
             }
         } catch (SecurityException e) {
             // Fall back on default value.
         }
-        return -10;
+        return -7;
     }
 
     /**
