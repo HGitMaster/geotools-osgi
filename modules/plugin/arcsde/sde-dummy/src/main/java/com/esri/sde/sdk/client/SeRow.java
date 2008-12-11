@@ -28,6 +28,6 @@ public class SeRow {
     public Integer getInteger(int i) throws SeException {return null;}
     public void setLong(int index, Long value) {}
     public SeShape getShape(int i) {return null;}
-	
+    public void setNString(int index, String convertedValue) {}
 	
 }

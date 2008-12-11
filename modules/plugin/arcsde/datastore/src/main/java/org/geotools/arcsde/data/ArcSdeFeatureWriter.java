@@ -43,7 +43,6 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.Converters;
 import org.geotools.util.logging.Logging;
-import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -73,7 +72,7 @@ import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
-    protected static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
+    protected static final Logger LOGGER = Logging.getLogger(ArcSdeFeatureWriter.class.getName());
 
     /**
      * Fid prefix used for just created and not yet committed features
@@ -136,12 +135,10 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      */
     private final ArcSdeVersionHandler versionHandler;
 
-    public ArcSdeFeatureWriter(final FIDReader fidReader,
-                               final SimpleFeatureType featureType,
-                               final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
-                               final ISession session,
-                               final FeatureListenerManager listenerManager,
-                               final ArcSdeVersionHandler versionHandler) throws IOException {
+    public ArcSdeFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
+            final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
+            final ISession session, final FeatureListenerManager listenerManager,
+            final ArcSdeVersionHandler versionHandler) throws IOException {
 
         assert fidReader != null;
         assert featureType != null;
@@ -341,16 +338,13 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         doFireFeaturesRemoved(typeName, referencedEnvelope, filter);
     }
 
-    protected abstract void doFireFeaturesAdded(String typeName,
-            ReferencedEnvelope bounds,
+    protected abstract void doFireFeaturesAdded(String typeName, ReferencedEnvelope bounds,
             Filter filter);
 
-    protected abstract void doFireFeaturesChanged(String typeName,
-            ReferencedEnvelope bounds,
+    protected abstract void doFireFeaturesChanged(String typeName, ReferencedEnvelope bounds,
             Filter filter);
 
-    protected abstract void doFireFeaturesRemoved(String typeName,
-            ReferencedEnvelope bounds,
+    protected abstract void doFireFeaturesRemoved(String typeName, ReferencedEnvelope bounds,
             Filter filter);
 
     /**
@@ -387,12 +381,16 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * The db row to modify is obtained from the feature id.
      * </p>
      * 
-     * @param modifiedFeature the newly create Feature to insert.
-     * @param layer the layer where to insert the feature.
-     * @param session the connection to use for the insert operation. Its auto commit mode
-     *            determines whether the operation takes effect immediately or not.
+     * @param modifiedFeature
+     *            the newly create Feature to insert.
+     * @param layer
+     *            the layer where to insert the feature.
+     * @param session
+     *            the connection to use for the insert operation. Its auto commit mode determines
+     *            whether the operation takes effect immediately or not.
      * @throws IOException
-     * @throws SeException if thrown by any sde stream method
+     * @throws SeException
+     *             if thrown by any sde stream method
      * @throws IOException
      */
     private void updateRow(final SimpleFeature modifiedFeature, final SeLayer layer)
@@ -450,10 +448,13 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     /**
      * Inserts a feature into an SeLayer.
      * 
-     * @param newFeature the newly create Feature to insert.
-     * @param layer the layer where to insert the feature.
-     * @param session the connection to use for the insert operation. Its auto commit mode
-     *            determines whether the operation takes effect immediately or not.
+     * @param newFeature
+     *            the newly create Feature to insert.
+     * @param layer
+     *            the layer where to insert the feature.
+     * @param session
+     *            the connection to use for the insert operation. Its auto commit mode determines
+     *            whether the operation takes effect immediately or not.
      * @throws IOException
      */
     private Number insertSeRow(final SimpleFeature newFeature, final SeLayer layer)
@@ -538,7 +539,8 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * {@link Command#execute(Session, SeConnection)} method
      * </p>
      * 
-     * @param feature the Feature where to get the property values from
+     * @param feature
+     *            the Feature where to get the property values from
      * @param seCoordRef
      * @param mutableColumns
      * @param row
@@ -546,8 +548,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * @throws IOException
      */
     private static void setRowProperties(final SimpleFeature feature,
-            final SeCoordinateReference seCoordRef,
-            Map<Integer, String> mutableColumns,
+            final SeCoordinateReference seCoordRef, Map<Integer, String> mutableColumns,
             final SeRow row) throws SeException, IOException {
 
         // Now set the values for the new row here...
@@ -576,7 +577,8 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         // FIDReader
         final SeTable table = getTable();
         // ArcSDE JavaDoc only says: "Returns a range of row id values"
-        // http://edndoc.esri.com/arcsde/9.1/java_api/docs/com/esri/sde/sdk/client/setable.html#getIds(int)
+        //http://edndoc.esri.com/arcsde/9.1/java_api/docs/com/esri/sde/sdk/client/setable.html#getIds
+        // (int)
         // I've checked empirically it is to return a range of available ids
         final SeTableIdRange ids = table.getIds(1);
         final SeObjectId startId = ids.getStartId();
@@ -614,14 +616,13 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * @param index
      * @param convertedValue
      * @param coordRef
-     * @param attName for feedback purposes only in case of failure
-     * @throws IOException if failed to set the row value
+     * @param attName
+     *            for feedback purposes only in case of failure
+     * @throws IOException
+     *             if failed to set the row value
      */
-    private static void setRowValue(final SeRow row,
-            final int index,
-            final Object value,
-            final SeCoordinateReference coordRef,
-            final String attName) throws IOException {
+    private static void setRowValue(final SeRow row, final int index, final Object value,
+            final SeCoordinateReference coordRef, final String attName) throws IOException {
 
         try {
             final SeColumnDefinition seColumnDefinition = row.getColumnDef(index);
@@ -647,11 +648,13 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                 convertedValue = Converters.convert(convertedValue, Double.class);
                 row.setDouble(index, (Double) convertedValue);
             } else if (colType == SeColumnDefinition.TYPE_STRING
-                    || colType == SeColumnDefinition.TYPE_NSTRING
                     || colType == SeColumnDefinition.TYPE_CLOB
                     || colType == SeColumnDefinition.TYPE_NCLOB) {
                 convertedValue = Converters.convert(convertedValue, String.class);
                 row.setString(index, (String) convertedValue);
+            } else if (colType == SeColumnDefinition.TYPE_NSTRING) {
+                convertedValue = Converters.convert(convertedValue, String.class);
+                row.setNString(index, (String) convertedValue);
             } else if (colType == SeColumnDefinition.TYPE_DATE) {
                 // @todo REVISIT: is converters already ready for date->calendar?
                 if (convertedValue != null) {
