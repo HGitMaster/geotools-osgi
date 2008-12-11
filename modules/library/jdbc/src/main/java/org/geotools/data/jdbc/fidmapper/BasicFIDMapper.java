@@ -139,7 +139,9 @@ public class BasicFIDMapper extends AbstractFIDMapper {
     }
     
     /**
-     * @return {@code true}
+     * @return {@code true}, this mapper is used for the most trivial things and often the fids does
+     *         not match the "fid-<UUID>" pattern used at this mapper's
+     *         {@link #createID(Connection, SimpleFeature, Statement)} method
      * @see FIDMapper#isValid(String)
      */
     public boolean isValid(String fid) {

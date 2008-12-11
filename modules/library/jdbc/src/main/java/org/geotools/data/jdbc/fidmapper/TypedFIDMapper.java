@@ -182,12 +182,13 @@ public class TypedFIDMapper extends AbstractFIDMapper {
      * @see FIDMapper#isValid(String)
      */
     public boolean isValid(String fid) {
-        int idx = fid.indexOf('.');
-        if(idx > 0){
-           String typeName = fid.substring(0, idx);
-           String wrappedFid = fid.length() > idx? fid.substring(idx+1) : "";
-           return this.featureTypeName.equals(typeName) && wrappedMapper.isValid(wrappedFid);
+        if (!fid.startsWith(this.featureTypeName + ".")) {
+            return false;
         }
-        return false;
+        if (fid.length() < this.featureTypeName.length() + 1) {
+            return false;
+        }
+        String wrappedFid = fid.substring(this.featureTypeName.length() + 1);
+        return wrappedMapper.isValid(wrappedFid);
     }
 }

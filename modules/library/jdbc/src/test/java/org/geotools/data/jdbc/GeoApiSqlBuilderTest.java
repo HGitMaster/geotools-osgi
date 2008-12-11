@@ -63,7 +63,7 @@ public class GeoApiSqlBuilderTest extends SQLFilterTestSupport {
     }
 
     public void testGetPrePostQueryFilterWithFidValidation() throws Exception {
-        final String featureTypeName = "FT";
+        final String featureTypeName = "FT.Name";
         FIDMapper mapper = new TypedFIDMapper(new BasicFIDMapper("id", 5), featureTypeName);
 
         final FilterToSQL filterToSQL = new FilterToSQL();

@@ -98,7 +98,7 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
      * </p>
      * 
      * @author Gabriel Roldan (TOPP)
-     * @version $Id: JDBCFeatureSource.java 30921 2008-07-05 07:51:23Z jgarnett $
+     * @version $Id: JDBCFeatureSource.java 32000 2008-12-11 21:07:24Z groldan $
      * @since 2.4.3
      * @see #supportsNaturalOrderSorting()
      * @see #supportsReverseOrderSorting()
@@ -485,6 +485,7 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
         JDBC1DataStore jdbc = getJDBCDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(featureType.getTypeName());
 
+        Filter preFilter = (Filter) sqlBuilder.getPreQueryFilter(filter); 
         Filter postFilter = (Filter) sqlBuilder.getPostQueryFilter(filter); 
         if (postFilter != null && !Filter.INCLUDE.equals(postFilter)) {
             // this would require postprocessing the filter
@@ -502,7 +503,7 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
             //chorner: we should hit an indexed column, * will likely tablescan
             sql.append("SELECT COUNT(*) as cnt");
             sqlBuilder.sqlFrom(sql, typeName);
-            sqlBuilder.sqlWhere(sql, filter); //safe to assume filter = prefilter
+            sqlBuilder.sqlWhere(sql, preFilter); 
             
             LOGGER.finer("SQL: " + sql);
 
