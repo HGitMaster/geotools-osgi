@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.geotools.arcsde.data.ArcSDEQuery.FilterSet;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
@@ -59,6 +60,7 @@ import org.opengis.filter.Id;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BBOX;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -192,7 +194,7 @@ public class ArcSDEQueryTest {
 
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
         // @id = 'DELETEME.1' AND STRING_COL = 'test'
-        filter = ff.and(ff.id(Collections.singleton(ff.featureId("DELETEME.1"))), ff.equals(ff
+        filter = ff.and(ff.id(Collections.singleton(ff.featureId(typeName + ".1"))), ff.equals(ff
                 .property("STRING_COL"), ff.literal("test")));
 
         filteringQuery = new DefaultQuery(typeName, filter);
@@ -213,12 +215,12 @@ public class ArcSDEQueryTest {
                 + unsupportedFilter);
 
         Assert.assertEquals(Filter.INCLUDE, geometryFilter);
-        assertTrue(sqlFilter instanceof And);
+        assertTrue(String.valueOf(sqlFilter), sqlFilter instanceof And);
         Assert.assertEquals(Filter.INCLUDE, unsupportedFilter);
 
         // AND( @id = 'DELETEME.1' )
         List<Filter> singleAnded = Collections.singletonList((Filter) ff.id(Collections
-                .singleton(ff.featureId("DELETEME.1"))));
+                .singleton(ff.featureId(typeName + ".1"))));
         filter = ff.and(singleAnded);
 
         filteringQuery = new DefaultQuery(typeName, filter);
@@ -242,6 +244,39 @@ public class ArcSDEQueryTest {
         assertTrue(sqlFilter instanceof Id);
         Assert.assertEquals(Filter.INCLUDE, geometryFilter);
         Assert.assertEquals(Filter.INCLUDE, unsupportedFilter);
+    }
+    
+    @Test
+    public void testWipesOutInvalidFids() throws IOException {
+        final String typeName = this.typeName;
+        Set<Identifier> ids = new HashSet<Identifier>();
+        ids.add(ff.featureId(typeName + ".1"));
+        ids.add(ff.featureId(typeName + ".2"));
+        //some non valid ones...
+        ids.add(ff.featureId(typeName + ".a"));
+        ids.add(ff.featureId("states_.1"));
+
+        Filter filter = ff.id(ids);
+        filteringQuery = new DefaultQuery(typeName, filter);
+        // filteringQuery based on the above filter...
+        ArcSDEQuery sdeQuery = getQueryFiltered();
+
+        FilterSet filters;
+        try {
+            filters = sdeQuery.getFilters();
+        } finally {
+            sdeQuery.session.dispose();
+            sdeQuery.close();
+        }
+        Filter sqlFilter = filters.getSqlFilter();
+        assertTrue(sqlFilter instanceof Id);
+        Id id = (Id)sqlFilter;
+        Assert.assertEquals(2, id.getIDs().size());
+        Set<Identifier> validFids = new HashSet<Identifier>();
+        validFids.add(ff.featureId(typeName + ".1"));
+        validFids.add(ff.featureId(typeName + ".2"));
+        Id expected = ff.id(validFids);
+        Assert.assertEquals(expected, id);
     }
 
     private ArcSDEQuery getQueryAll() throws IOException {
@@ -310,20 +345,31 @@ public class ArcSDEQueryTest {
                 typeName).getFeatures();
         FeatureIterator<SimpleFeature> reader = features.features();
         int read = 0;
-        while (reader.hasNext()) {
-            reader.next();
-            read++;
+        try {
+            while (reader.hasNext()) {
+                reader.next();
+                read++;
+            }
+        } finally {
+            reader.close();
         }
-        reader.close();
-
         ArcSDEQuery q = getQueryAll();
-        int calculated = q.calculateResultCount();
-        q.close();
+        int calculated;
+        try {
+            calculated = q.calculateResultCount();
+        } finally {
+            q.session.dispose();
+            q.close();
+        }
         Assert.assertEquals(read, calculated);
 
         q = getQueryFiltered();
-        calculated = q.calculateResultCount();
-        q.close();
+        try {
+            calculated = q.calculateResultCount();
+        } finally {
+            q.session.dispose();
+            q.close();
+        }
         Assert.assertEquals(FILTERING_COUNT, calculated);
     }
 

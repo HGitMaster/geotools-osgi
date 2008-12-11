@@ -26,6 +26,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.datasource.DataSourceFinder;
 import org.geotools.data.jdbc.datasource.UnWrapper;
 import org.geotools.data.jdbc.fidmapper.AbstractFIDMapper;
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.opengis.feature.simple.SimpleFeature;
 import org.postgresql.PGStatement;
 
@@ -144,6 +145,19 @@ public class OIDFidMapper extends AbstractFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isAutoIncrement(int)
      */
     public boolean isAutoIncrement(int colIndex) {
+        return true;
+    }
+
+    /**
+     * @return {@code true} if fid can be parsed to a long, as OID's are longs
+     * @see FIDMapper#isValid(String)
+     */
+    public boolean isValid(String fid) {
+        try{
+            Long.parseLong(fid, 10);
+        }catch(NumberFormatException e){
+            return false;
+        }
         return true;
     }
 

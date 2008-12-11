@@ -262,6 +262,10 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         this.mapper = mapper;
     }
 
+    public FIDMapper getFIDMapper() {
+        return this.mapper;
+    }
+
     /**
      * Sets the capabilities of this filter.
      *

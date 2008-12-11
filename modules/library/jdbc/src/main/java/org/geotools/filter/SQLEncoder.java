@@ -197,6 +197,10 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
     public void setFIDMapper(FIDMapper mapper) {
         this.mapper = mapper;
     }
+    
+    public FIDMapper getFIDMapper(){
+        return this.mapper;
+    }
 
     /**
      * Sets the capabilities of this filter.

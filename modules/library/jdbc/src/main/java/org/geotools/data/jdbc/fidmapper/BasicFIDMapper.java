@@ -137,5 +137,12 @@ public class BasicFIDMapper extends AbstractFIDMapper {
         // to strings for the rest, so the only non word character is really ":"
         return "fid-" + new UID().toString().replace(':', '_');
     }
-
+    
+    /**
+     * @return {@code true}
+     * @see FIDMapper#isValid(String)
+     */
+    public boolean isValid(String fid) {
+        return true;
+    }
 }

@@ -44,6 +44,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 import org.geotools.filter.visitor.SimplifyingFilterVisitor;
+import org.geotools.filter.visitor.SimplifyingFilterVisitor.FIDValidator;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -68,7 +69,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/ArcSDEQuery.java $
- * @version $Id: ArcSDEQuery.java 31908 2008-11-23 01:23:44Z groldan $
+ * @version $Id: ArcSDEQuery.java 31997 2008-12-11 17:32:50Z groldan $
  */
 class ArcSDEQuery {
     /** Shared package's logger */
@@ -911,6 +912,10 @@ class ArcSDEQuery {
             sourceFilter.accept(unpacker, null);
 
             SimplifyingFilterVisitor filterSimplifier = new SimplifyingFilterVisitor();
+            final String typeName = this.featureType.getTypeName();
+            FIDValidator validator = new SimplifyingFilterVisitor.TypeNameDotNumberFidValidator(typeName);
+            filterSimplifier.setFIDValidator(validator);
+            
             this._sqlFilter = unpacker.getFilterPre();
             this._sqlFilter = (Filter) this._sqlFilter.accept(filterSimplifier, null);
 

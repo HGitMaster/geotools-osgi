@@ -2960,6 +2960,10 @@ public final class JDBCDataStore extends ContentDataStore
                     public boolean returnFIDColumnsAsAttributes() {
                         return false;
                     }
+
+                    public boolean isValid(String fid) {
+                        return true;
+                    }
                 };
             toSQL.setFeatureType(featureType);    
             toSQL.setFIDMapper(mapper);

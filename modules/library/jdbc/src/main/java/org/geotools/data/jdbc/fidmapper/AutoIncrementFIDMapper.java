@@ -142,4 +142,24 @@ public class AutoIncrementFIDMapper extends AbstractFIDMapper {
         throws IOException {
         return null;
     }
+    
+    /**
+     * @return {@code true} if fid is an integer, {@code false} othwerwise
+     * @see FIDMapper#isValid(String)
+     */
+    public boolean isValid(String fid){
+        Object pk;
+        try {
+            Object []pkAtts = getPKAttributes(fid);
+            pk = pkAtts[0];
+        } catch (IOException e) {
+            return false;
+        }
+        if(pk instanceof Number){
+            //getPKAttributes returns -1 whenever an invalid numeric fid is passed
+            return ((Number)pk).longValue() != -1;
+        }
+        return pk instanceof String;
+    }
+    
 }

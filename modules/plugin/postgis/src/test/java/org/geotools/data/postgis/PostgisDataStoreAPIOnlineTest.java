@@ -20,9 +20,12 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -69,9 +72,11 @@ import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -559,6 +564,57 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         t.close();
     }
     
+    /**
+     * GEOT-2182, make sure no invalid fids are passed down to the database
+     */
+    public void testGetFeatureReaderWipesOutInvalidFilterFids() throws IOException, IllegalFilterException {
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+
+        //grab some valid fids...
+        reader = data.getFeatureReader(new DefaultQuery("road"), Transaction.AUTO_COMMIT);
+        final String fid1, fid2, fid3;
+        try{
+            //roads contains initially 3 features, as set up in #dataSetup()
+            fid1 = reader.next().getID();
+            fid2 = reader.next().getID();
+            fid3 = reader.next().getID();
+        }finally{
+            reader.close();
+        }
+        
+        FilterFactory2 factory = CommonFactoryFinder.getFilterFactory2(null);
+        
+        Set<Identifier> ids = new HashSet<Identifier>();
+        ids.add(factory.featureId(fid1));
+        ids.add(factory.featureId(fid2));
+        // the following one should be stripped out from the request. Its structure keeps being
+        // <someString>.<number> but the FIDMapper.isValid() method should return false for it
+        ids.add(factory.featureId("_" + fid3));
+        
+        org.opengis.filter.Filter filter = factory.id(ids);
+
+        Transaction t = new DefaultTransaction();
+        reader = data.getFeatureReader(new DefaultQuery("road", filter), t);
+        assertNotNull(reader);
+        try {
+            Set<String> expected = new HashSet<String>();
+            expected.add(fid1);
+            expected.add(fid2);
+            
+            Set<String> returned = new HashSet<String>();
+            assertTrue(reader.hasNext());
+            returned.add( reader.next().getID());
+            assertTrue(reader.hasNext());
+            returned.add( reader.next().getID() );
+            assertFalse("expected only 2 features", reader.hasNext());
+            
+            assertEquals(expected, returned);
+        } finally {
+            reader.close();
+            t.close();
+        }
+    }
+
     public void testCaseInsensitiveFilter() throws Exception {
         final String riverName = riverType.getName().getLocalPart();
         FeatureSource<SimpleFeatureType, SimpleFeature> rivers = data.getFeatureSource(riverName);
