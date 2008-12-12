@@ -90,6 +90,8 @@ public class DB2SQLDialect extends SQLDialect  {
     private String SELECT_SRS_NAME_FROM_ORG = 
     	"select srs_name,srs_id from db2gse.st_spatial_reference_systems where organization = ? and organization_coordsys_id=?";
 
+    private static String SELECT_INCLUDE_WITH_SCHEMA ="select table_schema,table_name  from db2gse.st_geometry_columns where table_schema = ? and table_name=?";
+    private static String SELECT_INCLUDE="select table_schema,table_name  from db2gse.st_geometry_columns where table_schema = current schema  and table_name=?";
     
     public DB2SQLDialect(JDBCDataStore dataStore) {
         super(dataStore);
@@ -411,6 +413,28 @@ public class DB2SQLDialect extends SQLDialect  {
         }
         
     }
+
+	@Override
+	public boolean includeTable(String schemaName, String tableName, Connection cx) throws SQLException {
+		
+	
+				
+		PreparedStatement ps = null;
+		if (schemaName!=null || schemaName.trim().length()>0) { 
+			ps = cx.prepareStatement(SELECT_INCLUDE_WITH_SCHEMA); 
+			ps.setString(1,schemaName);
+			ps.setString(2,tableName);
+		}	else {
+			ps = cx.prepareStatement(SELECT_INCLUDE);
+			ps.setString(1,tableName);
+		}
+			
+		ResultSet rs = ps.executeQuery();
+		boolean isGeomTable = rs.next();
+		rs.close();
+		ps.close();		
+		return isGeomTable;
+	}
 
 
 
