@@ -127,6 +127,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
     protected ResultSet rs;
     protected Connection cx;
     protected Exception tracer;
+    protected String[] columnNames;
     
     public JDBCFeatureReader( String sql, Connection cx, JDBCFeatureStore featureStore, SimpleFeatureType featureType, Hints hints ) 
         throws SQLException {
@@ -736,10 +737,13 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
             //get the primary key, ensure its not contained in the values
             key = dataStore.getPrimaryKey(featureType);
             int count = md.getColumnCount();
+            columnNames=new String[count];
 
             for (int i = 0; i < md.getColumnCount(); i++) {
+            	String columnName =md.getColumnName(i + 1); 
+            	columnNames[i]=columnName;
                 for ( PrimaryKeyColumn col : key.getColumns() ) {
-                    if (col.getName().equals(md.getColumnName(i + 1))) {
+                    if (col.getName().equals(columnName)) {
                         count--;
                         break;
                     }    
@@ -820,19 +824,14 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         private int mapToResultSetIndex( int index ) {
             //map the index to result set
             int rsindex = index;
-            try {
-                ResultSetMetaData md = rs.getMetaData();
-                for ( int i = 0; i <= index; i++ ) {
-                    for( PrimaryKeyColumn col : key.getColumns() ) {
-                        if ( col.getName().equals( md.getColumnName(i+1))) {
-                            rsindex++;
-                            break;
-                        }
+            
+            for ( int i = 0; i <= index; i++ ) {
+                for( PrimaryKeyColumn col : key.getColumns() ) {
+                    if ( col.getName().equals( columnNames[i])) {
+                        rsindex++;
+                        break;
                     }
                 }
-            } 
-            catch (SQLException e) {
-                throw new RuntimeException( e );
             }
             
             rsindex++;
@@ -913,6 +912,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         public void close() {
             rs = null;
             cx = null;
+            columnNames=null;
         }
 
         public List<Object> getAttributes() {
