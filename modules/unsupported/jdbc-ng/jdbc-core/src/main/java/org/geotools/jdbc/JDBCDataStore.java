@@ -838,9 +838,11 @@ public final class JDBCDataStore extends ContentDataStore
 
                 //keep going to handle case where envelope is not calculated
                 // as aggregate function
-                while (rs.next()) {
-                    bounds.expandToInclude(dialect.decodeGeometryEnvelope(rs, 1, st.getConnection()));
-                }
+		if (e.isNull()==false) { // featuretype not empty
+		  while (rs.next()) {
+		      bounds.expandToInclude(dialect.decodeGeometryEnvelope(rs, 1, st.getConnection()));
+		  }
+		}
 
                 return bounds;
             }
