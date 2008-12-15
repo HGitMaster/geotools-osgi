@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -30,9 +30,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/extension/xsd/xsd-kml/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/extension/xsd/xsd-kml/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/extension/xsd/xsd-kml/</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/extension/xsd/xsd-kml/</url>
   </scm>
 
   <description>

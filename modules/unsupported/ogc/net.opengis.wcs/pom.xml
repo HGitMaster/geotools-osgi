@@ -17,9 +17,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/ogc/net.opengis.wcs
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/ogc/net.opengis.wcs
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/ogc/net.opengis.wcs</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/ogc/net.opengis.wcs</url>
   </scm>
 
   <description>Web Coverage Service Schema EMF Model</description>

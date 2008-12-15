@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $
+        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -27,9 +27,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/repository/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/repository/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/repository/</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/repository/</url>
   </scm>
 
   <description>

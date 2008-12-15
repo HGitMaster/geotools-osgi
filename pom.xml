@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 31202 2008-08-21 09:06:17Z jgarnett $
+        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -352,7 +352,7 @@
       <name>Jody Garnett</name>
       <id>jive</id>
       <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
+      <organization>LISAsoft</organization>
       <roles>
         <role>Java Developer</role>
         <role>Module Maintainer</role>
@@ -471,7 +471,6 @@
       <name>David Zwiers</name>
       <id>dmzwiers</id>
       <email>dzwiers@refractions.net</email>
-      <organization>Refractions Research Inc.</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -480,7 +479,6 @@
       <name>Brent Owens</name>
       <id>sploreg</id>
       <email>sploreg@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
       <roles>
         <role>Java Developer</role>
         <role>Module Maintainer</role>
@@ -1155,9 +1153,9 @@
   <distributionManagement>
     <repository>
       <uniqueVersion>false</uniqueVersion>
-      <id>refractions</id>
-      <name>Refractions Research - Maven 2 repo</name>
-      <url>dav:http://lists.refractions.net/m2</url>
+      <id>osgeo</id>
+      <name>Open Source Geospatial Foundation - Maven 2 repo</name>
+      <url>dav:http://download.osgeo.org/webdav/geotools/</url>
     </repository>
   </distributionManagement>
 
@@ -1175,10 +1173,16 @@
     </repository>
 
     <repository>
+      <id>osgeo</id>
+      <name>Open Source Geospatial Foundation Repository</name>
+      <url>http://download.osgeo.org/webdav/geotools/</url>
+    </repository>
+
+    <!--repository>
       <id>refractions</id>
       <name>Refractions Research Maven 2 Repository</name>
       <url>http://lists.refractions.net/m2</url>
-    </repository>
+    </repository-->
 
     <repository>
       <snapshots>
@@ -1189,7 +1193,6 @@
       <url>http://maven.geotools.fr/repository</url>
     </repository>
   </repositories>
-
 
   <!-- =========================================================== -->
   <!--     Plugin repositories.                                    -->
@@ -1208,6 +1211,17 @@
       </releases>
     </pluginRepository>
     <pluginRepository>
+      <id>osgeo</id>
+      <name>Open Source Geospatial Foundation Maven 2 Repository</name>
+      <url>http://download.osgeo.org/webdav/geotools/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository> 
+   <!--pluginRepository>
       <id>refractions</id>
       <name>Refractions Research Maven 2 Repository</name>
       <url>http://lists.refractions.net/m2</url>
@@ -1217,7 +1231,7 @@
       <releases>
         <enabled>true</enabled>
       </releases>
-    </pluginRepository>
+    </pluginRepository-->
   </pluginRepositories>
 
 
@@ -1230,4 +1244,3 @@
     <module>demo</module>
   </modules>
 </project>
-

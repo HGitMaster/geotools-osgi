@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31822 2008-11-11 14:30:21Z aaime $              
+        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -31,9 +31,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/extension/shapefile-renderer/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/extension/shapefile-renderer/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/extension/shapefile-renderer/</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/extension/shapefile-renderer/</url>
   </scm>
 
   <description>

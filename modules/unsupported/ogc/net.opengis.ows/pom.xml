@@ -17,9 +17,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/ogc/net.opengis.ows
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/ogc/net.opengis.ows
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/ogc/net.opengis.ows</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/ogc/net.opengis.ows</url>
   </scm>
 
   <description>Open Web Services Schema EMF Model</description>

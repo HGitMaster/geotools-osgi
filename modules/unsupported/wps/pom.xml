@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31109 2008-07-30 08:32:00Z cedricbr $              
+        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -63,9 +63,9 @@
   <url>http://maven.geotools.fr/reports/modules/unsupported/wps/</url>
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/wps/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/wps/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/wps/</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/wps/</url>
   </scm>
   
   <description>
