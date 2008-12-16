@@ -1243,10 +1243,13 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected String createTableSQL(SimpleFeatureType featureType, Connection cx)
         throws Exception {
-        //figure out the names of the columns
+        //figure out the names and types of the columns
         String[] columnNames = new String[featureType.getAttributeCount()];
         String[] sqlTypeNames = null;
         Class[] classes = new Class[featureType.getAttributeCount()];
+
+        //figure out which columns can not be null
+        boolean[] nillable = new boolean[featureType.getAttributeCount()];
 
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
             AttributeDescriptor attributeType = featureType.getDescriptor(i);
@@ -1256,6 +1259,9 @@ public final class JDBCDataStore extends ContentDataStore
 
             //column type 
             classes[i] = attributeType.getType().getBinding();
+            
+            //can be null?
+            nillable[i] = attributeType.getMinOccurs() <= 0 || attributeType.isNillable();
         }
 
         sqlTypeNames = getSQLTypeNames(classes, cx);
@@ -1266,7 +1272,7 @@ public final class JDBCDataStore extends ContentDataStore
             }
         }
         
-        return createTableSQL(featureType.getTypeName(), columnNames, sqlTypeNames, "fid");
+        return createTableSQL(featureType.getTypeName(), columnNames, sqlTypeNames, nillable, "fid");
     }
 
     /**
@@ -1394,7 +1400,7 @@ public final class JDBCDataStore extends ContentDataStore
         String[] sqlTypeNames = getSQLTypeNames(new Class[] { String.class, String.class }, cx);
         String[] columnNames = new String[] { "table", "col" };
 
-        return createTableSQL(FEATURE_RELATIONSHIP_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(FEATURE_RELATIONSHIP_TABLE, columnNames, sqlTypeNames, null, null);
     }
 
     /**
@@ -1411,7 +1417,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }, cx);
         String[] columnNames = new String[] { "fid", "rtable", "rcol", "rfid" };
 
-        return createTableSQL(FEATURE_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(FEATURE_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null, null);
     }
 
     /**
@@ -1429,7 +1435,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }, cx);
         String[] columnNames = new String[] { "id", "name", "description", "type", "geometry" };
 
-        return createTableSQL(GEOMETRY_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(GEOMETRY_TABLE, columnNames, sqlTypeNames, null, null);
     }
 
     /**
@@ -1444,7 +1450,7 @@ public final class JDBCDataStore extends ContentDataStore
         String[] sqlTypeNames = getSQLTypeNames(new Class[] { String.class, String.class, Boolean.class }, cx);
         String[] columnNames = new String[] { "id", "mgid", "ref" };
 
-        return createTableSQL(MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null, null);
     }
 
     /**
@@ -1785,7 +1791,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }, cx);
         String[] columnNames = new String[] { "fid", "gname", "gid", "ref" };
 
-        return createTableSQL(GEOMETRY_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(GEOMETRY_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null, null);
     }
 
     /**
@@ -1919,7 +1925,7 @@ public final class JDBCDataStore extends ContentDataStore
      * Helper method for building a 'CREATE TABLE' sql statement.
      */
     private String createTableSQL(String tableName, String[] columnNames, String[] sqlTypeNames,
-        String pkeyColumn) {
+        boolean[] nillable, String pkeyColumn) {
         //build the create table sql
         StringBuffer sql = new StringBuffer();
         sql.append("CREATE TABLE ");
@@ -1948,8 +1954,13 @@ public final class JDBCDataStore extends ContentDataStore
             else {
                 dialect.encodeColumnType(sqlTypeNames[i], sql);    
             }
-            
 
+            //nullable
+            if ( nillable != null && !nillable[i] ) {
+                sql.append( " NOT NULL");
+            }
+
+            
             //sql.append(sqlTypeNames[i]);
             if (i < (sqlTypeNames.length - 1)) {
                 sql.append(", ");
@@ -2701,6 +2712,10 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected int getGeometrySRID(Geometry g, AttributeDescriptor descriptor) throws IOException {
         int srid = getDescriptorSRID(descriptor);
+        
+        if ( g == null ) {
+            return srid;
+        }
         
         // check for srid in the jts geometry then
         if (srid <= 0 && g.getSRID() > 0) {

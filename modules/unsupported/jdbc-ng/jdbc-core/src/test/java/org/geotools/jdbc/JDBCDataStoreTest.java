@@ -104,6 +104,41 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
             st.close();
         }
     }
+    
+    public void testCreateSchemaWithConstraints() throws Exception {
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        builder.setName(tname("ft2"));
+        builder.setNamespaceURI(dataStore.getNamespaceURI());
+        builder.add(aname("geometry"), Geometry.class);
+        builder.nillable(false).add(aname("intProperty"), Integer.class);
+        builder.add(aname("dateProperty"), Date.class);
+        
+        SimpleFeatureType featureType = builder.buildFeatureType();
+        dataStore.createSchema(featureType);
+        
+        SimpleFeatureType ft2 = dataStore.getSchema(tname("ft2"));
+        assertEquals(ft2, featureType);
+        
+        //grab a writer
+        FeatureWriter w = dataStore.getFeatureWriter( "ft2",Transaction.AUTO_COMMIT);
+        w.hasNext();
+        
+        SimpleFeature f = (SimpleFeature) w.next();
+        f.setAttribute( 1, new Integer(0));
+        w.write();
+        
+        w.hasNext();
+        f = (SimpleFeature) w.next();
+        f.setAttribute( 1, null );
+        try {
+            w.write();
+            fail( "null value for intProperty should have failed");
+        }
+        catch( Exception e ) {
+            
+        }
+        
+    }
 
     public void testGetFeatureSource() throws Exception {
         FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = dataStore.getFeatureSource(tname("ft1"));
