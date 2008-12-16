@@ -16,6 +16,8 @@
  */
 package org.geotools.xml;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -36,6 +38,11 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
@@ -1006,9 +1013,26 @@ O:
             // kill them too
         }
         
-
     }
 
+    /**
+     * Encodes an object directly to a dom.
+     * <p>
+     * Note that this method should be used for testing or convenience since
+     * it does not stream and loads the entire encoded result into memory.
+     * </p>
+     */
+    public Document encodeAsDOM( Object object, QName name ) throws IOException, SAXException, TransformerException  {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        encode( object, name, out );
+        
+        ByteArrayInputStream in = new ByteArrayInputStream( out.toByteArray() );
+        DOMResult result = new DOMResult();
+        Transformer tx = TransformerFactory.newInstance().newTransformer();
+        tx.transform( new StreamSource( in ), result );
+        return (Document) result.getNode();
+    }
+    
     protected Node encode(Object object, XSDNamedComponent component) {
         return encode( object, component, null );
     }
