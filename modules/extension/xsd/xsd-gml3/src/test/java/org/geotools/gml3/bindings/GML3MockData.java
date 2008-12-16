@@ -86,6 +86,14 @@ public class GML3MockData {
     static Element lineString(Document document, Node parent) {
         return lineStringWithPos(document, parent);
     }
+    
+    static Element lineStringProperty(Document document, Node parent) {
+        Element property = element(GML.lineStringProperty, document, parent);
+
+        lineString(document, property);
+
+        return property;
+    }
 
     static Element lineStringWithPos(Document document, Node parent) {
         Element lineString = element(GML.LineString, document, parent);
