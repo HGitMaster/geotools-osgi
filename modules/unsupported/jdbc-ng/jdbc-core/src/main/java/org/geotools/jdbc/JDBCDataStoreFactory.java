@@ -314,8 +314,16 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         }
         
         // connection pooling options
-        dataSource.setMinIdle((Integer) MINCONN.lookUp(params));
-        dataSource.setMaxActive((Integer) MAXCONN.lookUp(params));
+        Integer minConn = (Integer) MINCONN.lookUp(params);
+        if ( minConn != null ) {
+            dataSource.setMinIdle(minConn);    
+        }
+        
+        Integer maxConn = (Integer) MAXCONN.lookUp(params);
+        if ( maxConn != null ) {
+            dataSource.setMaxActive(maxConn);
+        }
+        
         Boolean validate = (Boolean) VALIDATECONN.lookUp(params);
         if(validate != null && validate && getValidationQuery() != null) {
             dataSource.setValidationQuery(getValidationQuery());
