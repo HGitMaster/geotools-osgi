@@ -31,6 +31,8 @@ import org.eclipse.xsd.XSDAttributeGroupDefinition;
 import org.eclipse.xsd.XSDAttributeUse;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDFacet;
+import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDImport;
 import org.eclipse.xsd.XSDInclude;
 import org.eclipse.xsd.XSDModelGroup;
@@ -249,6 +251,44 @@ public class Schemas {
         return xsdMainResource.getSchema();
     }
 
+    /**
+     * Imports one schema into another.
+     * 
+     * @param schema The schema being imported into.
+     * @param importee The schema being imported.
+     * 
+     */
+    public static final void importSchema( XSDSchema schema, final XSDSchema importee ) throws IOException {
+        Resource resource = schema.eResource();
+        if ( resource == null ) {
+            final ResourceSet resourceSet = new ResourceSetImpl();
+            resource = (XSDResourceImpl) resourceSet.createResource(URI.createURI(".xsd"));
+            resource.getContents().add( schema );
+        }
+        
+        XSDImport imprt = XSDFactory.eINSTANCE.createXSDImport();
+        imprt.setNamespace( importee.getTargetNamespace() );
+        schema.getContents().add( imprt );
+        
+        List<XSDSchemaLocator> locators = new ArrayList<XSDSchemaLocator>();
+        locators.add( new XSDSchemaLocator() {
+            public XSDSchema locateSchema(XSDSchema xsdSchema,
+                    String namespaceURI, String rawSchemaLocationURI,
+                    String resolvedSchemaLocationURI) {
+                
+                if ( importee.getTargetNamespace().equals( namespaceURI ) ) {
+                    return importee;
+                }
+                
+                return null;
+            }
+        });
+        AdapterFactory adapterFactory = new SchemaLocatorAdapterFactory(locators);
+        resource.getResourceSet().getAdapterFactories().add( adapterFactory );
+        
+        
+    }
+    
     public static final List validateImportsIncludes(String location) throws IOException {
         return validateImportsIncludes(location,Collections.EMPTY_LIST,Collections.EMPTY_LIST);
     }
