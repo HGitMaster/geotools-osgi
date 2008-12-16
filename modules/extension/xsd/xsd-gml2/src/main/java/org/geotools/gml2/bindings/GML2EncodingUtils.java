@@ -42,12 +42,15 @@ import org.eclipse.xsd.util.XSDConstants;
 import org.geotools.gml2.GML;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.util.logging.Logging;
+import org.geotools.xlink.XLINK;
+import org.geotools.xml.Encoder;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.geotools.xs.XS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -59,6 +62,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -103,16 +113,23 @@ public class GML2EncodingUtils {
 
     /**
      * Encodes the crs object as a uri.
+     */
+    public static String toURI(CoordinateReferenceSystem crs) {
+        return toURI(crs,false);
+    }
+    
+    /**
+     * Encodes the crs object as a uri.
      * <p>
      * The axis order of the crs determines which form of uri is used.
      * </p>
      */
-    public static String toURI(CoordinateReferenceSystem crs) {
+    public static String toURI(CoordinateReferenceSystem crs, boolean forceOldStyle) {
         String code = epsgCode(crs);
         int axisOrder = axisOrder(crs);
 
         if (code != null) {
-            if ((axisOrder == LON_LAT) || (axisOrder == INAPPLICABLE)) {
+            if (forceOldStyle ||( (axisOrder == LON_LAT) || (axisOrder == INAPPLICABLE)) ) {
                 return "http://www.opengis.net/gml/srs/epsg.xml#" + code;
             } else {
                 //return "urn:x-ogc:def:crs:EPSG:6.11.2:" + code;
@@ -246,28 +263,28 @@ public class GML2EncodingUtils {
         String typeName = featureType.getTypeName();
 
         Element encoding = document.createElementNS(namespace, typeName);
-        encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getID());
+        encoding.setAttributeNS(null, "fid", feature.getID());
 
         return encoding;
     }
 
+    static Set<QName> abstractFetureTypeProperties = new HashSet();
+    static {
+        abstractFetureTypeProperties.add( GML.name );
+        abstractFetureTypeProperties.add( GML.description );
+        abstractFetureTypeProperties.add( GML.location );
+       
+    }
+    
     public static Object AbstractFeatureType_getProperty(Object object,
             QName name) {
       
         SimpleFeature feature = (SimpleFeature) object;
 
-        if (GML.name.equals(name)) {
-            return feature.getAttribute("name");
+        if ( abstractFetureTypeProperties.contains( name ) ) {
+            return feature.getAttribute( name.getLocalPart() );
         }
-
-        if (GML.description.equals(name)) {
-            return feature.getAttribute("description");
-        }
-
-        if (GML.location.equals(name)) {
-            return feature.getAttribute("location");
-        }
-
+      
         if (GML.boundedBy.equals(name)) {
             BoundingBox bounds = feature.getBounds();
 
@@ -281,7 +298,7 @@ public class GML2EncodingUtils {
 
             return feature.getBounds();
         }
-
+        
         return null;
     }
     
@@ -331,7 +348,7 @@ public class GML2EncodingUtils {
         List particles = Schemas.getChildElementParticles(type, true);
         List properties = new ArrayList();
 
-        for (Iterator p = particles.iterator(); p.hasNext();) {
+    O:  for (Iterator p = particles.iterator(); p.hasNext();) {
             XSDParticle particle = (XSDParticle) p.next();
             XSDElementDeclaration attribute = (XSDElementDeclaration) particle.getContent();
 
@@ -339,9 +356,14 @@ public class GML2EncodingUtils {
                 attribute = attribute.getResolvedElementDeclaration();
             }
 
-            //ignore gml attributes
+            //ignore abstract featureType properties
             if (GML.NAMESPACE.equals(attribute.getTargetNamespace())) {
-                continue;
+                for ( QName n : abstractFetureTypeProperties ) {
+                    if ( n.getLocalPart().equals( attribute.getName() )) {
+                        continue O;
+                    }
+                }
+                
             }
 
             //make sure the feature type has an element
@@ -387,16 +409,36 @@ public class GML2EncodingUtils {
             element.setName(attribute.getLocalName());
             element.setNillable(attribute.isNillable());
 
-            //TODO: do a proper mapping
-            /*
-            Class binding = attribute.getType().getBinding();
-            Name typeName = new NameImpl( XS.NAMESPACE, XS.STRING.getLocalPart() );
-            if (typeName == null) {
-                throw new NullPointerException("Could not find a type for property: "
-                    + attribute.getName() + " of type: " + binding.getName());
+            //check for geometry
+            if ( attribute instanceof GeometryDescriptor ) {
+                Class binding = attribute.getType().getBinding();
+                if ( Point.class.isAssignableFrom( binding ) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.PointPropertyType));
+                }
+                else if ( LineString.class.isAssignableFrom( binding ) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.LineStringPropertyType));
+                }
+                else if ( Polygon.class.isAssignableFrom( binding) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.PolygonPropertyType));
+                }
+                else if ( MultiPoint.class.isAssignableFrom( binding ) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.MultiPointPropertyType));
+                }
+                else if ( MultiLineString.class.isAssignableFrom( binding ) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.MultiLineStringPropertyType));
+                }
+                else if ( MultiPolygon.class.isAssignableFrom( binding) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.MultiPolygonPropertyType));
+                }
+                else {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.GeometryPropertyType));
+                }
             }
-            */
-            element.setTypeDefinition(schemaIndex.getTypeDefinition(XS.STRING));
+            else {
+                //TODO: do a proper mapping
+                element.setTypeDefinition(schemaIndex.getTypeDefinition(XS.STRING));
+            }
+            
 
             XSDParticle particle = f.createXSDParticle();
             particle.setMinOccurs(attribute.getMinOccurs());
@@ -413,5 +455,64 @@ public class GML2EncodingUtils {
         type.setContent(particle);
         return type;
     }
+
+    public static Object GeometryPropertyType_getProperty(Geometry geometry,
+            QName name) {
+        return GeometryPropertyType_getProperty(geometry,name,true);
+    }
+    public static Object GeometryPropertyType_getProperty(Geometry geometry,
+            QName name, boolean includeAbstractGeometry ) {
+        if (GML.Point.equals( name ) || GML.LineString.equals( name ) || GML.Polygon.equals( name ) 
+            || GML.MultiPoint.equals( name ) || GML.MultiLineString.equals( name ) || GML.MultiPolygon.equals( name )
+            || (includeAbstractGeometry && GML._Geometry.equals(name) )) {
+                //if the geometry is null, return null
+                if ( isEmpty( geometry ) ) {
+                    return null;
+                }
+                
+                return geometry;
+            }
+            
+            if (XLINK.HREF.equals(name)) {
+                //only process if geometry is empty
+                if ( isEmpty(geometry) ) {
+                    String id = getID( geometry );
+                    if ( id != null ) {
+                        return "#" + id;
+                    }
+                }
+            }
+
+            return null;
+    }
+
+    public static List GeometryPropertyType_getProperties(Geometry geometry) {
+
+        String id = getID( geometry );
+        
+        if ( !isEmpty(geometry) && id != null ) {
+            // return a comment which is hte xlink href
+            return Collections.singletonList(new Object[] { Encoder.COMMENT, "#" +id });            
+        }
+        
+        return null;
+    }
+    
+    static boolean isEmpty( Geometry geometry ) {
+        if ( geometry.isEmpty() ) {
+            //check for case of multi geometry, if it has > 0 goemetries 
+            // we consider this to be not empty
+            if ( geometry instanceof GeometryCollection ) {
+                if ( ((GeometryCollection) geometry).getNumGeometries() != 0 ) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        return false;
+    }
+    
+    
     
 }
