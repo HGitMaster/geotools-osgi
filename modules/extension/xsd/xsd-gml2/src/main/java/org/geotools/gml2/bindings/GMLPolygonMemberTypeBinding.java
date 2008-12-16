@@ -16,8 +16,11 @@
  */
 package org.geotools.gml2.bindings;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -60,16 +63,7 @@ public class GMLPolygonMemberTypeBinding extends AbstractComplexBinding {
         return GML.POLYGONMEMBERTYPE;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
+   
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -88,6 +82,17 @@ public class GMLPolygonMemberTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return (Polygon) value;
+        return node.getChildValue(Polygon.class);
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        return GML2EncodingUtils.GeometryPropertyType_getProperty((Polygon)object,name,false);
+    }
+    
+    @Override
+    public List getProperties(Object object, XSDElementDeclaration element)
+            throws Exception {
+        return GML2EncodingUtils.GeometryPropertyType_getProperties((Polygon)object);
     }
 }

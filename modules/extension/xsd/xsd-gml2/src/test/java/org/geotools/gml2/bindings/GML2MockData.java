@@ -24,14 +24,19 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.gml2.GML;
 import org.geotools.gml2.TEST;
+import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -192,7 +197,7 @@ public class GML2MockData {
     }
 
     static MultiPoint multiPoint() {
-        return gf.createMultiPoint(new Coordinate[] { new Coordinate(1, 1), new Coordinate(2, 2) });
+        return setCRS(gf.createMultiPoint(new Coordinate[] { new Coordinate(1, 1), new Coordinate(2, 2) }));
     }
 
     static Element multiPoint(Document document, Node parent) {
@@ -207,7 +212,21 @@ public class GML2MockData {
 
         return multiPoint;
     }
+    
+    static <G extends Geometry> G setCRS( G geometry ) {
+        geometry.setUserData( crs("4326") );
+        return geometry;
+    }
 
+    static CoordinateReferenceSystem crs( String srid ) {
+        try {
+            return CRS.decode( "EPSG:4326" );
+        } 
+        catch (Exception e) {
+            throw new RuntimeException( e );
+        }
+    }
+    
     static Element multiPointProperty(Document document, Node parent) {
         Element multiPointProperty = element(GML.multiPointProperty, document, parent);
         multiPoint(document, multiPointProperty);

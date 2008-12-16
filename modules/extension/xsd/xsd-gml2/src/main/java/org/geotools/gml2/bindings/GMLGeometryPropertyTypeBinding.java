@@ -16,8 +16,11 @@
  */
 package org.geotools.gml2.bindings;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -77,7 +80,7 @@ public class GMLGeometryPropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Geometry.class;
     }
 
     /**
@@ -89,5 +92,16 @@ public class GMLGeometryPropertyTypeBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return (Geometry) value;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        return GML2EncodingUtils.GeometryPropertyType_getProperty((Geometry)object, name);
+    }
+    
+    @Override
+    public List getProperties(Object object, XSDElementDeclaration element)
+            throws Exception {
+        return GML2EncodingUtils.GeometryPropertyType_getProperties((Geometry)object);
     }
 }

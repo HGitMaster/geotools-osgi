@@ -90,4 +90,15 @@ public class GMLAbstractGeometryCollectionBaseTypeBinding extends AbstractComple
 
         return value;
     }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        if ( "srsName".equals( name.getLocalPart() ) ) {
+            CoordinateReferenceSystem crs = GML2EncodingUtils.getCRS((GeometryCollection)object );
+            if ( crs != null ) {
+                return GML2EncodingUtils.toURI(crs,true);
+            }
+        }
+        return null;
+    }
 }
