@@ -9,18 +9,15 @@ MODULE EXAMPLE
 
     * <REVIEWER 2 NAME> - July 24th, 2007: removed dependencies on third party JDBC drivers
 
-    * <REVIEWER 3 NAME> - June 2008
+    * <REVIEWER 3 NAME> - June 2008: Initial commit as LGPL code
 
   STATUS: Clean
 
-  This module was adapted from the postgis module in GT 2.0 We will record the
-  (C) range as 2002-2006 with the understanding that it may in fact be earlier.
-
+  This module was added to the GeoTools project by <<YOUR NAME>> under the LGPL license.
 
 * org.geotools.example
   ~~~~~~~~~~~~~~~~~~~~
-  Contains the first JDBC based DataStore implementation from GeoTools 2.0
-  (aka 2003), based on earlier DataSource API (2002).
+  Initial commit LGPL under OSGeo LGPL license.
 
 
 * org.geotools.example2
