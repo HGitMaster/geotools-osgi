@@ -34,6 +34,7 @@ import org.geotools.xlink.XLINK;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.SchemaIndex;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -121,29 +122,8 @@ public class GML3EncodingUtils {
      *   <li>PolygonPropertyType
      * </ul>
      */
-    static Object getProperty( Geometry geometry, QName name ) {
-
-        if (GML._Geometry.equals(name) || GML.Point.equals( name ) || 
-            GML.LineString.equals( name ) || GML.Polygon.equals( name ) ) {
-            //if the geometry is null, return null
-            if ( isEmpty( geometry ) ) {
-                return null;
-            }
-            
-            return geometry;
-        }
-        
-        if (XLINK.HREF.equals(name)) {
-            //only process if geometry is empty
-            if ( isEmpty(geometry) ) {
-                String id = GML3EncodingUtils.getID( geometry );
-                if ( id != null ) {
-                    return "#" + id;
-                }
-            }
-        }
-
-        return null;
+    public static Object getProperty( Geometry geometry, QName name ) {
+        return GML2EncodingUtils.GeometryPropertyType_getProperty( geometry, name );
     }
     
     /**
@@ -156,35 +136,21 @@ public class GML3EncodingUtils {
      *   <li>PolygonPropertyType
      * </ul>
      */
-    static List getProperties(Geometry geometry) {
-
-        String id = GML3EncodingUtils.getID( geometry );
-        
-        if ( !isEmpty(geometry) && id != null ) {
-            // return a comment which is hte xlink href
-            return Collections.singletonList(new Object[] { Encoder.COMMENT, "#" +id });            
-        }
-        
-        return null;
-    }
-    
-    static boolean isEmpty( Geometry geometry ) {
-        if ( geometry.isEmpty() ) {
-            //check for case of multi geometry, if it has > 0 goemetries 
-            // we consider this to be not empty
-            if ( geometry instanceof GeometryCollection ) {
-                if ( ((GeometryCollection) geometry).getNumGeometries() != 0 ) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        
-        return false;
+    public static List getProperties(Geometry geometry) {
+        return GML2EncodingUtils.GeometryPropertyType_getProperties(geometry);
     }
     
     public static Element AbstractFeatureType_encode(Object object, Document document, Element value) {
-        return GML2EncodingUtils.AbstractFeatureType_encode(object, document, value);
+        SimpleFeature feature = (SimpleFeature) object;
+        SimpleFeatureType featureType = feature.getFeatureType();
+
+        String namespace = featureType.getName().getNamespaceURI();
+        String typeName = featureType.getTypeName();
+
+        Element encoding = document.createElementNS(namespace, typeName);
+        encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getID());
+
+        return encoding;
     }
 
     public static Object AbstractFeatureType_getProperty(Object object,
