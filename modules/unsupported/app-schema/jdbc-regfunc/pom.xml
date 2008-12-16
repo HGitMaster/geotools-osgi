@@ -19,10 +19,10 @@
 
 	<scm>
 		<connection>
-			scm:svn:http://svn.geotools.org/trunk/modules/unsupported/app-schema/jdbc-regfunc
+			scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/jdbc-regfunc
 		</connection>
 		<url>
-			http://svn.geotools.org/geotools/trunk/modules/unsupported/app-schema/jdbc-regfunc
+			http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/jdbc-regfunc
 		</url>
 	</scm>
 	<description>
