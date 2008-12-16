@@ -38,6 +38,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.util.Converters;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Id;
@@ -593,6 +594,18 @@ public abstract class SQLDialect {
         sql.append( " INTEGER PRIMARY KEY" );
     }
 
+    /**
+     * Encodes anything post a column in a CREATE TABLE statement.
+     * <p>
+     * This is appended after the column name and type. Subclasses may choose to override
+     * this method, the default implementation does nothing.
+     * </p>
+     * @param att The attribute corresponding to the column.
+     */
+    public void encodePostColumnCreateTable(AttributeDescriptor att, StringBuffer sql) {
+        
+    }
+    
     /**
      * Encodes anything post a CREATE TABLE statement.
      * <p>

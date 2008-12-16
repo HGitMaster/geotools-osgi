@@ -1272,7 +1272,7 @@ public final class JDBCDataStore extends ContentDataStore
             }
         }
         
-        return createTableSQL(featureType.getTypeName(), columnNames, sqlTypeNames, nillable, "fid");
+        return createTableSQL(featureType.getTypeName(), columnNames, sqlTypeNames, nillable, "fid", featureType);
     }
 
     /**
@@ -1400,7 +1400,7 @@ public final class JDBCDataStore extends ContentDataStore
         String[] sqlTypeNames = getSQLTypeNames(new Class[] { String.class, String.class }, cx);
         String[] columnNames = new String[] { "table", "col" };
 
-        return createTableSQL(FEATURE_RELATIONSHIP_TABLE, columnNames, sqlTypeNames, null, null);
+        return createTableSQL(FEATURE_RELATIONSHIP_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1417,7 +1417,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }, cx);
         String[] columnNames = new String[] { "fid", "rtable", "rcol", "rfid" };
 
-        return createTableSQL(FEATURE_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null, null);
+        return createTableSQL(FEATURE_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1435,7 +1435,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }, cx);
         String[] columnNames = new String[] { "id", "name", "description", "type", "geometry" };
 
-        return createTableSQL(GEOMETRY_TABLE, columnNames, sqlTypeNames, null, null);
+        return createTableSQL(GEOMETRY_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1450,7 +1450,7 @@ public final class JDBCDataStore extends ContentDataStore
         String[] sqlTypeNames = getSQLTypeNames(new Class[] { String.class, String.class, Boolean.class }, cx);
         String[] columnNames = new String[] { "id", "mgid", "ref" };
 
-        return createTableSQL(MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null, null);
+        return createTableSQL(MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1791,7 +1791,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }, cx);
         String[] columnNames = new String[] { "fid", "gname", "gid", "ref" };
 
-        return createTableSQL(GEOMETRY_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null, null);
+        return createTableSQL(GEOMETRY_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1925,7 +1925,7 @@ public final class JDBCDataStore extends ContentDataStore
      * Helper method for building a 'CREATE TABLE' sql statement.
      */
     private String createTableSQL(String tableName, String[] columnNames, String[] sqlTypeNames,
-        boolean[] nillable, String pkeyColumn) {
+        boolean[] nillable, String pkeyColumn, SimpleFeatureType featureType ) {
         //build the create table sql
         StringBuffer sql = new StringBuffer();
         sql.append("CREATE TABLE ");
@@ -1957,9 +1957,14 @@ public final class JDBCDataStore extends ContentDataStore
 
             //nullable
             if ( nillable != null && !nillable[i] ) {
-                sql.append( " NOT NULL");
+                sql.append( " NOT NULL ");
             }
 
+            //delegate to dialect to encode column postamble
+            if (featureType != null) {
+                AttributeDescriptor att = featureType.getDescriptor(columnNames[i]);
+                dialect.encodePostColumnCreateTable(att, sql);
+            }
             
             //sql.append(sqlTypeNames[i]);
             if (i < (sqlTypeNames.length - 1)) {
