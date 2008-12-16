@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.SQLDialect;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -118,6 +119,54 @@ public class H2Dialect extends SQLDialect {
             dataStore.closeSafe( st );
         }
         
+    }
+    
+    @Override
+    public Class<?> getMapping(ResultSet columnMetaData, Connection cx)
+            throws SQLException {
+        
+        //do a check for a column remark which marks this as a geometry
+        String remark = columnMetaData.getString( "REMARKS" );
+        if ( remark != null ) {
+            if ( "POINT".equalsIgnoreCase( remark ) ) {
+                return Point.class;
+            }
+            if ( "LINESTRING".equalsIgnoreCase( remark ) ) {
+                return LineString.class;
+            }
+            if ( "POLYGON".equalsIgnoreCase( remark ) ) {
+                return Polygon.class;
+            }
+            if ( "MULTIPOINT".equalsIgnoreCase( remark ) ) {
+                return MultiPoint.class;
+            }
+            if ( "MULTILINESTRING".equalsIgnoreCase( remark ) ) {
+                return MultiLineString.class;
+            }
+            if ( "MULTIPOLYGON".equalsIgnoreCase( remark ) ) {
+                return MultiPolygon.class;
+            }
+        }
+        
+        return null;
+    }
+    
+    @Override
+    public void encodePostColumnCreateTable(AttributeDescriptor att,
+            StringBuffer sql) {
+        if ( att instanceof GeometryDescriptor ) {
+            //try to narrow down the type with a comment
+            Class binding = att.getType().getBinding();
+            if (Point.class.isAssignableFrom(binding) 
+                || LineString.class.isAssignableFrom(binding)
+                || Polygon.class.isAssignableFrom(binding) 
+                || MultiPoint.class.isAssignableFrom( binding ) 
+                || MultiLineString.class.isAssignableFrom(binding) 
+                || MultiPolygon.class.isAssignableFrom( binding )) {
+                sql.append( " COMMENT '").append( binding.getSimpleName().toUpperCase() )
+                    .append( "'");
+            }
+        }
     }
     
     public Integer getGeometrySRID(String schemaName, String tableName, String columnName,
