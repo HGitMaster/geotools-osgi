@@ -74,15 +74,16 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/TestData.java $
- * @version $Id: TestData.java 31904 2008-11-22 20:51:53Z groldan $
+ * @version $Id: TestData.java 32037 2008-12-18 13:46:11Z groldan $
  */
+@SuppressWarnings({"nls", "unchecked"})
 public class TestData {
     /** DOCUMENT ME! */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(TestData.class
             .getPackage().getName());
 
     public static final String[] TEST_TABLE_COLS = { "INT32_COL", "INT16_COL", "FLOAT32_COL",
-            "FLOAT64_COL", "STRING_COL", "DATE_COL", "SHAPE" };
+            "FLOAT64_COL", "STRING_COL", "NSTRING_COL", "DATE_COL", "SHAPE" };
 
     private SeColumnDefinition[] tempTableColumns;
 
@@ -425,7 +426,7 @@ public class TestData {
             public SeColumnDefinition[] execute(ISession session, SeConnection connection)
                     throws SeException, IOException {
 
-                SeColumnDefinition[] colDefs = new SeColumnDefinition[8];
+                SeColumnDefinition[] colDefs = new SeColumnDefinition[9];
 
                 /*
                  * Define the columns and their attributes for the table to be
@@ -435,23 +436,27 @@ public class TestData {
                 boolean isNullable = true;
 
                 // first column to be SDE managed feature id
-                colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INTEGER, 10,
+                colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INT32, 10,
                         0, false);
 
                 colDefs[1] = new SeColumnDefinition(TEST_TABLE_COLS[0],
-                        SeColumnDefinition.TYPE_INTEGER, 10, 0, isNullable);
+                        SeColumnDefinition.TYPE_INT32, 10, 0, isNullable);
                 colDefs[2] = new SeColumnDefinition(TEST_TABLE_COLS[1],
-                        SeColumnDefinition.TYPE_SMALLINT, 4, 0, isNullable);
+                        SeColumnDefinition.TYPE_INT16, 4, 0, isNullable);
                 colDefs[3] = new SeColumnDefinition(TEST_TABLE_COLS[2],
-                        SeColumnDefinition.TYPE_FLOAT, 5, 2, isNullable);
+                        SeColumnDefinition.TYPE_FLOAT32, 5, 2, isNullable);
                 colDefs[4] = new SeColumnDefinition(TEST_TABLE_COLS[3],
-                        SeColumnDefinition.TYPE_DOUBLE, 25, 4, isNullable);
+                        SeColumnDefinition.TYPE_FLOAT64, 25, 4, isNullable);
                 colDefs[5] = new SeColumnDefinition(TEST_TABLE_COLS[4],
                         SeColumnDefinition.TYPE_STRING, 25, 0, isNullable);
+
                 colDefs[6] = new SeColumnDefinition(TEST_TABLE_COLS[5],
+                        SeColumnDefinition.TYPE_NSTRING, 25, 0, isNullable);
+
+                colDefs[7] = new SeColumnDefinition(TEST_TABLE_COLS[6],
                         SeColumnDefinition.TYPE_DATE, 1, 0, isNullable);
                 // this is a blob one and should be ignored to all effects
-                colDefs[7] = new SeColumnDefinition("SE_ANNO_CAD_DATA",
+                colDefs[8] = new SeColumnDefinition("SE_ANNO_CAD_DATA",
                         SeColumnDefinition.TYPE_BLOB, 1000, 0, isNullable);
 
                 try {
@@ -479,7 +484,7 @@ public class TestData {
                 /*
                  * Define the attributes of the spatial column
                  */
-                layer.setSpatialColumnName(TEST_TABLE_COLS[6]);
+                layer.setSpatialColumnName(TEST_TABLE_COLS[TEST_TABLE_COLS.length - 1]);
 
                 /*
                  * Set the type of shapes that can be inserted into the layer.
@@ -589,15 +594,16 @@ public class TestData {
         /*
          * Define the names of the columns that data is to be inserted into.
          */
-        final String[] columns = new String[7];
+        final String[] columns = new String[8];
 
         columns[0] = colDefs[1].getName(); // INT32 column
         columns[1] = colDefs[2].getName(); // INT16 column
         columns[2] = colDefs[3].getName(); // FLOAT32 column
         columns[3] = colDefs[4].getName(); // FLOAT64 column
         columns[4] = colDefs[5].getName(); // String column
-        columns[5] = colDefs[6].getName(); // Date column
-        columns[6] = "SHAPE"; // Shape column
+        columns[5] = colDefs[6].getName(); // NString column
+        columns[6] = colDefs[7].getName(); // Date column
+        columns[7] = "SHAPE"; // Shape column
 
         Command<Void> insertDataCmd = new Command<Void>() {
             @Override
@@ -621,10 +627,11 @@ public class TestData {
                         row.setFloat(2, new Float(i / 10.0F));
                         row.setDouble(3, new Double(i / 10D));
                         row.setString(4, "FEATURE_" + i);
+                        row.setNString(5, "NSTRING_" + i);
                         cal.set(Calendar.DAY_OF_MONTH, i);
-                        row.setTime(5, cal);
+                        row.setTime(6, cal);
                         SeShape seShape = shapes[i - 1];
-                        row.setShape(6, seShape);
+                        row.setShape(7, seShape);
 
                         insert.execute();
                     }
@@ -652,8 +659,9 @@ public class TestData {
      *  colDefs[2] = &quot;FLOAT32_COL&quot;, SeColumnDefinition.TYPE_FLOAT, 5, 2, true
      *  colDefs[3] = &quot;FLOAT64_COL&quot;, SeColumnDefinition.TYPE_DOUBLE, 15, 4, true
      *  colDefs[4] = &quot;STRING_COL&quot;, SeColumnDefinition.TYPE_STRING, 25, 0, true
-     *  colDefs[5] = &quot;DATE_COL&quot;, SeColumnDefinition.TYPE_DATE, 1, 0, true
-     *  colDefs[6] = &quot;SHAPE&quot;, Geometry, 1, 0, true
+     *  colDefs[5] = &quot;NSTRING_COL&quot;, SeColumnDefinition.TYPE_NSTRING, 25, 0, true
+     *  colDefs[6] = &quot;DATE_COL&quot;, SeColumnDefinition.TYPE_DATE, 1, 0, true
+     *  colDefs[7] = &quot;SHAPE&quot;, Geometry, 1, 0, true
      * </pre>
      * 
      * </p>
@@ -665,13 +673,10 @@ public class TestData {
      * @throws IOException
      *             if the schema for te test table cannot be fetched from the
      *             database.
-     * @throws IllegalAttributeException
-     *             if the feature type created from the test table cannot build
-     *             a feature with the given attribute values.
      * @throws SeException
      */
     public FeatureCollection<SimpleFeatureType, SimpleFeature> createTestFeatures(
-            Class jtsGeomType, int numFeatures) throws IOException, IllegalAttributeException,
+            Class jtsGeomType, int numFeatures) throws IOException,
             SeException {
         FeatureCollection<SimpleFeatureType, SimpleFeature> col = FeatureCollections
                 .newCollection();
@@ -686,11 +691,12 @@ public class TestData {
             values[2] = new Float(0.1 * i);
             values[3] = new Double(1000 * i);
             values[4] = "String value #" + i;
+            values[5] = "NString value #" + i;
 
             Calendar cal = Calendar.getInstance();
             cal.set(Calendar.DAY_OF_MONTH, i);
-            values[5] = cal.getTime();
-            values[6] = createTestGeometry(jtsGeomType, i);
+            values[6] = cal.getTime();
+            values[7] = createTestGeometry(jtsGeomType, i);
 
             SimpleFeature f = SimpleFeatureBuilder.build(type, values, null);
             col.add(f);
