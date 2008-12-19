@@ -16,8 +16,17 @@
  */
 package org.geotools.xs;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.xml.namespace.QName;
+
+import org.eclipse.xsd.XSDSchema;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.xml.XSD;
+import org.opengis.feature.type.Schema;
 
 
 /**
@@ -27,10 +36,7 @@ import org.geotools.xml.XSD;
  * @generated
  */
 public final class XS extends XSD {
-    /**
-     * singleton instance.
-     */
-    private static XS instance = new XS();
+    
     public static final String NAMESPACE = "http://www.w3.org/2001/XMLSchema";
     public static final QName ALL = new QName("http://www.w3.org/2001/XMLSchema", "all");
     public static final QName ALLNNI = new QName("http://www.w3.org/2001/XMLSchema", "allNNI");
@@ -166,6 +172,11 @@ public final class XS extends XSD {
             "unsignedShort");
     public static final QName WILDCARD = new QName("http://www.w3.org/2001/XMLSchema", "wildcard");
 
+    /**
+     * singleton instance.
+     */
+    private static XS instance = new XS();
+    
     private XS() {
     }
 
@@ -176,6 +187,35 @@ public final class XS extends XSD {
         return instance;
     }
 
+    @Override
+    protected Schema buildTypeSchema() {
+        return new XSSchema();
+    }
+    
+    @Override
+    protected Schema buildTypeMappingProfile(Schema schema) {
+        Set proper = new HashSet();
+        proper.add(name(BYTE)); //Byte.class
+        proper.add(name(HEXBINARY)); //byte[].class 
+        proper.add(name(SHORT)); //Short.class
+        proper.add(name(INT)); //Integer.class
+        proper.add(name(FLOAT)); //Float.class
+        proper.add(name(LONG)); //Long.class
+        proper.add(name(QNAME)); //Qname.class
+        proper.add(name(DATE)); //java.sql.Date.class
+        proper.add(name(DATETIME)); //java.sql.Timestamp.class
+        proper.add(name(TIME));     //java.sql.Time.class
+        proper.add(name(BOOLEAN)); //Boolean.class
+        proper.add(name(DOUBLE)); //Double.class
+        proper.add(name(STRING)); //String.class
+        proper.add(name(INTEGER)); //BigInteger.class
+        proper.add(name(DECIMAL)); //BigDecimal.class
+        proper.add(name(ANYURI)); //URI.class
+        Schema profile = schema.profile( proper );
+        
+        return profile;
+    }
+    
     /**
      * Returns 'http://www.w3.org/2001/XMLSchema'.
      */

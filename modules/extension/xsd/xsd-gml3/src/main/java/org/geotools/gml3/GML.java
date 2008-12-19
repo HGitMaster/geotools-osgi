@@ -16,12 +16,14 @@
  */
 package org.geotools.gml3;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.xml.namespace.QName;
 import org.geotools.gml3.smil.SMIL20;
 import org.geotools.gml3.smil.SMIL20LANG;
 import org.geotools.xlink.XLINK;
 import org.geotools.xml.XSD;
+import org.opengis.feature.type.Schema;
 
 
 /**
@@ -31,11 +33,7 @@ import org.geotools.xml.XSD;
  * @generated
  */
 public final class GML extends XSD {
-    /**
-     * singleton instance.
-     */
-    private static GML instance = new GML();
-
+    
     /** @generated */
     public static final String NAMESPACE = "http://www.opengis.net/gml";
 
@@ -3369,12 +3367,54 @@ public final class GML extends XSD {
     }
 
     /**
+     * singleton instance.
+     */
+    private static GML instance = new GML();
+
+    /**
      * The singleton instance;
      */
     public static GML getInstance() {
         return instance;
     }
 
+    @Override
+    protected Schema buildTypeSchema() {
+        return new GMLSchema();
+    }
+    
+    @Override
+    protected Schema buildTypeMappingProfile(Schema typeSchema) {
+        // set with guaranteed iteration order, so that we can put deprecated elements only
+        // after the ones that replaced them
+        Set profile = new LinkedHashSet();
+        
+        //basic
+        profile.add(name(GML.MeasureType));
+
+        //geomtetries
+        profile.add(name(GML.PointPropertyType));
+        profile.add(name(GML.MultiPointPropertyType));
+        profile.add(name(GML.LineStringPropertyType));
+        profile.add(name(GML.MultiLineStringPropertyType));
+        profile.add(name(GML.CurvePropertyType));
+        profile.add(name(GML.MultiCurvePropertyType));
+        profile.add(name(GML.SurfacePropertyType));
+        profile.add(name(GML.MultiSurfacePropertyType));
+
+        // register polygon and multipolygon only after surface, the iteration order
+        // will make sure surface is found before in any encoding attempt, this way we
+        // are still able to handle polygons, but we don't use them by default
+        profile.add(name(GML.PolygonPropertyType));
+        profile.add(name(GML.MultiPolygonPropertyType));
+
+        //profile.add( new NameImpl(  GML.NAMESPACE, GML.AbstractGeometryType ) );
+        profile.add(name(GML.GeometryPropertyType));
+        
+        return typeSchema.profile( profile );
+        
+    }
+    
     protected void addDependencies(Set dependencies) {
         //add xlink dependency
         dependencies.add(XLINK.getInstance());

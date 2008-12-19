@@ -20,6 +20,7 @@ import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -29,7 +30,15 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.namespace.QName;
+
+import org.geotools.feature.NameImpl;
+import org.geotools.feature.type.SchemaImpl;
 import org.geotools.xs.XS;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.Schema;
 
 
 /**
@@ -53,11 +62,72 @@ public abstract class XSD {
     protected XSDSchema schema;
 
     /**
+     * type schema
+     */
+    protected Schema typeSchema;
+    /**
+     * type mapping profile
+     */
+    protected Schema typeMappingProfile;
+    
+    /**
      * dependencies
      */
     private Set /*<XSD>*/ dependencies;
 
     protected XSD() {
+    }
+
+    /**
+     * Sets up the schema which maps xml schema types to attribute types.
+     */
+    protected Schema buildTypeSchema() {
+        return new SchemaImpl( getNamespaceURI() );
+    }
+    
+    /**
+     * Sets up a profile which uniquely maps a set of java classes to a schema 
+     * element.
+     */
+    protected Schema buildTypeMappingProfile( Schema typeSchema ) {
+        return typeSchema.profile( Collections.EMPTY_SET );
+    }
+    
+    /**
+     * Convenience method to turn a QName into a Name.
+     * <p>
+     * Useful for building type mapping profiles. 
+     * </p>
+     * @param qName The name to transform.
+     */
+    protected Name name( QName qName ) {
+        return new NameImpl(qName.getNamespaceURI(), qName.getLocalPart());
+    }
+    
+    /**
+     * Returns the schema containing {@link AttributeType}'s for 
+     * all xml types.
+     */
+    public final Schema getTypeSchema() {
+        if( typeSchema == null ) {
+            synchronized ( this ) {
+                typeSchema = buildTypeSchema();
+            }
+        }
+        return typeSchema;
+    }
+    
+    /**
+     * Returns the sbuset of {@link #getTypeSchema()} which maintains 
+     * a unique java class to xml type mapping.
+     */
+    public final Schema getTypeMappingProfile() {
+        if ( typeMappingProfile == null ){
+            synchronized (this) {
+                typeMappingProfile = buildTypeMappingProfile(getTypeSchema());
+            }
+        }
+        return typeMappingProfile;
     }
 
     /**
@@ -74,7 +144,7 @@ public abstract class XSD {
     /**
      * The dependencies of this schema.
      */
-    public final Set getDependencies() {
+    public final Set<XSD> getDependencies() {
         if (dependencies == null) {
             synchronized (this) {
                 if (dependencies == null) {
@@ -92,6 +162,14 @@ public abstract class XSD {
         return dependencies;
     }
 
+    /**
+     * Returns all dependencies , direct and transitive that this xsd 
+     * depends on.
+     */
+    public List<XSD> getAllDependencies() {
+        return allDependencies();
+    }
+    
     protected List allDependencies() {
         LinkedList unpacked = new LinkedList();
 
@@ -170,11 +248,11 @@ public abstract class XSD {
         return Schemas.parse(getSchemaLocation(), locators, resolvers);
     }
 
-    protected SchemaLocator createSchemaLocator() {
+    public SchemaLocator createSchemaLocator() {
         return new SchemaLocator(this);
     }
 
-    protected SchemaLocationResolver createSchemaLocationResolver() {
+    public SchemaLocationResolver createSchemaLocationResolver() {
         return new SchemaLocationResolver(this);
     }
 
