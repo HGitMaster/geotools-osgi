@@ -69,6 +69,7 @@ import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.GmlObjectId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -811,11 +812,12 @@ public final class JDBCDataStore extends ContentDataStore
                         
             try {
                 ReferencedEnvelope bounds = null;
-                Envelope e;
+                Envelope e = null;
                 if( rs.next() ) {
                     e = dialect.decodeGeometryEnvelope(rs, 1, st.getConnection());
                 }
-                else {
+                
+                if ( e == null ) {
                     e = new Envelope();
                     e.setToNull();
                 }
