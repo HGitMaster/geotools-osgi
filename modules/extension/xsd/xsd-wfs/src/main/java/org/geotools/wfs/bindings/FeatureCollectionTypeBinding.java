@@ -25,7 +25,9 @@ import net.opengis.wfs.WfsFactory;
 
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml3.GML;
+import org.geotools.wfs.CompositeFeatureCollection;
 import org.geotools.wfs.WFS;
 import org.geotools.xml.AbstractComplexEMFBinding;
 import org.geotools.xml.ElementInstance;
@@ -109,14 +111,32 @@ public class FeatureCollectionTypeBinding extends AbstractComplexEMFBinding {
     public Object getProperty(Object object, QName name) throws Exception {
         FeatureCollectionType fc = (FeatureCollectionType) object;
         if ( !fc.getFeature().isEmpty() ) {
-            FeatureCollection features = (FeatureCollection) fc.getFeature().get( 0 );
+            FeatureCollection first = (FeatureCollection) fc.getFeature().get( 0 );
             
             if( GML.boundedBy.equals( name ) ) {
-                return features.getBounds();
+                if ( fc.getFeature().size() == 1 ) {
+                    return first.getBounds();    
+                }
+                else {
+                    //aggregate
+                    ReferencedEnvelope bounds = new ReferencedEnvelope(first.getBounds());
+                    for ( int i = 1; i < fc.getFeature().size(); i++ ) {
+                        FeatureCollection features = (FeatureCollection) fc.getFeature().get( i );
+                        bounds.expandToInclude( features.getBounds() );
+                    }
+                    return bounds;
+                }
+                
             }
             
             if ( GML.featureMember.equals( name ) ) {
-                return features;
+                if (fc.getFeature().size() > 1) {
+                    //wrap in a single
+                    return new CompositeFeatureCollection(fc.getFeature());
+                }
+
+                //just return the single
+                return first;
             }    
         }
         
