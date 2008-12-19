@@ -71,7 +71,7 @@ public class WFSParsingTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        configuration = new WFSConfiguration();
+        configuration = new org.geotools.wfs.v1_1.WFSConfiguration();
     }
 
     public void testParseGetCapabilities() throws Exception {

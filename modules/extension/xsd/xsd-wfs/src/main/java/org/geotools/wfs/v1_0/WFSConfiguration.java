@@ -14,20 +14,24 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.wfs;
+package org.geotools.wfs.v1_0;
 
-import org.geotools.xml.XSDParserDelegate;
+import org.geotools.filter.v1_0.OGCConfiguration;
 
 /**
- * Parser delegate for WFS.
- * 
- * @author Justin Deoliveira, OpenGEO
- * @since 2.6
+ * Parser configuration for the wfs 1.0 schema.
+ *
+ * @generated
  */
-public class WFSParserDelegate extends XSDParserDelegate {
-
-    public WFSParserDelegate() {
-        super(new org.geotools.wfs.v1_1.WFSConfiguration());
+public class WFSConfiguration extends org.geotools.wfs.WFSConfiguration {
+    /**
+     * Creates a new configuration.
+     *
+     * @generated
+     */
+    public WFSConfiguration() {
+        super(WFS.getInstance());
+        
+        addDependency(new OGCConfiguration());
     }
-
 }

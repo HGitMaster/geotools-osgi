@@ -63,7 +63,7 @@ public abstract class WFSTestSupport extends XMLTestSupport {
     }
 
     protected Configuration createConfiguration() {
-        return new WFSConfiguration();
+        return new org.geotools.wfs.v1_1.WFSConfiguration();
     }
 
     public void testTarget() {
