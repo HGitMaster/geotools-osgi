@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDParticle;
@@ -33,12 +34,14 @@ import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.GML;
 import org.geotools.referencing.CRS;
 import org.geotools.util.Converters;
+import org.geotools.util.logging.Logging;
 import org.geotools.xml.Binding;
 import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xml.Schemas;
 import org.geotools.xml.impl.BindingWalker;
+import org.geotools.xs.bindings.XSAnyTypeBinding;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -60,6 +63,11 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  *
  */
 public class GML2ParsingUtils {
+    /**
+     * logging instance
+     */
+    static Logger LOGGER = Logging.getLogger( "org.geotools.gml" );
+    
     /**
      * Utility method to implement Binding.parse for a binding which parses
      * into A feature.
@@ -201,7 +209,8 @@ public class GML2ParsingUtils {
 
             if (bindings.isEmpty()) {
                 // could not find a binding, use the defaults
-                throw new RuntimeException("Could not find binding for " + property.getQName());
+                LOGGER.warning( "Could not find binding for " + property.getQName() + ", using XSAnyTypeBinding." );
+                bindings.add( new XSAnyTypeBinding() );
             }
 
             // get hte last binding in the chain to execute
