@@ -37,7 +37,7 @@ import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
 import org.geotools.data.wfs.v1_1_0.parsers.EmfAppSchemaParser;
 import org.geotools.referencing.CRS;
 import org.geotools.test.TestData;
-import org.geotools.wfs.WFSConfiguration;
+import org.geotools.wfs.v1_1.WFSConfiguration;
 import org.geotools.xml.Configuration;
 import org.junit.Test;
 import org.opengis.feature.Feature;
@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: AbstractGetFeatureParserTest.java 31902 2008-11-22 00:37:35Z groldan $
+ * @version $Id: AbstractGetFeatureParserTest.java 32043 2008-12-19 03:23:35Z jdeolive $
  * @since 2.5.x
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src /test/
  *         java/org/geotools/wfs/v_1_1_0/data/StreamingParserFeatureReaderTest .java $
@@ -86,7 +86,7 @@ public abstract class AbstractGetFeatureParserTest {
      * A feature visitor used to assert the parsed features
      * 
      * @author Gabriel Roldan (TOPP)
-     * @version $Id: AbstractGetFeatureParserTest.java 31902 2008-11-22 00:37:35Z groldan $
+     * @version $Id: AbstractGetFeatureParserTest.java 32043 2008-12-19 03:23:35Z jdeolive $
      * @since 2.5.x
      * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs /src/test
      *         /java/org/geotools/wfs/v_1_1_0/data/AbstractGetFeatureParserTest .java $

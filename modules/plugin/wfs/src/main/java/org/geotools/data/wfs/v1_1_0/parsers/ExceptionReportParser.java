@@ -38,14 +38,15 @@ import org.geotools.data.wfs.protocol.wfs.WFSResponseParser;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_DataStore;
 import org.geotools.data.wfs.v1_1_0.WFS_1_1_0_Protocol;
 import org.geotools.util.logging.Logging;
-import org.geotools.wfs.WFSConfiguration;
+
+import org.geotools.wfs.v1_1.WFSConfiguration;
 import org.geotools.xml.Parser;
 
 /**
  * A WFS response parser that parses server exception reports into {@link WFSException} objects.
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: ExceptionReportParser.java 31888 2008-11-20 13:34:53Z groldan $
+ * @version $Id: ExceptionReportParser.java 32043 2008-12-19 03:23:35Z jdeolive $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
