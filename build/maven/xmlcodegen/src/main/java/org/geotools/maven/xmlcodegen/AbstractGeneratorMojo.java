@@ -261,6 +261,9 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
                 
                 for ( Iterator x = xsds.iterator(); x.hasNext(); ) {
                     XSD xsd = (XSD) x.next();
+                    if ( xsd == null ) {
+                        continue;
+                    }
                     if ( xsd.getNamespaceURI().equals( namespaceURI ) ) {
                         try {
                             return xsd.getSchema();
