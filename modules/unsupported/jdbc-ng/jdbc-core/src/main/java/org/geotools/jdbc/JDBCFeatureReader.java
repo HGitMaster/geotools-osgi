@@ -307,7 +307,12 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                         }
                         
                         if (value != null) {
-                        
+                            //check to see if a crs was set
+                            Geometry geometry = (Geometry) value;
+                            if ( geometry.getUserData() == null ) {
+                                //if not set, set from descriptor
+                                geometry.setUserData( gatt.getCoordinateReferenceSystem() );
+                            }
                         } else {
                             // check case where this is an associated geometry
                             if (dataStore.isAssociations()) {
