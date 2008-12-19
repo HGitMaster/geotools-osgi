@@ -78,7 +78,7 @@ public class ApplicationSchemaXSD extends XSD {
      *         <code>location</code> can't be resolved as a relative
      *         path of the <code>schema</code> location.
      */
-    protected SchemaLocationResolver createSchemaLocationResolver() {
+    public SchemaLocationResolver createSchemaLocationResolver() {
         return new SchemaLocationResolver(this) {
                 public String resolveSchemaLocation(XSDSchema schema, String uri, String location) {
                     String schemaLocation;

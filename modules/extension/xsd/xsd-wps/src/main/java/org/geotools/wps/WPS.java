@@ -69,7 +69,7 @@ public final class WPS extends XSD {
     }
     
     @Override
-    protected SchemaLocationResolver createSchemaLocationResolver() {
+    public SchemaLocationResolver createSchemaLocationResolver() {
         return new SchemaLocationResolver(this,"common");
     }
     
