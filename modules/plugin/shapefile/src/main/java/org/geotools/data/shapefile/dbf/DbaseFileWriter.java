@@ -62,6 +62,23 @@ public class DbaseFileWriter {
     private final Date NULL_DATE = new Date();
     private StreamLogging streamLogger = new StreamLogging("Dbase File Writer");
     private Charset charset;
+    
+    /**
+     * Create a DbaseFileWriter using the specified header and writing to the
+     * given channel.
+     * 
+     * @param header
+     *                The DbaseFileHeader to write.
+     * @param out
+     *                The Channel to write to.
+     * @throws IOException
+     *                 If errors occur while initializing.
+     */
+    public DbaseFileWriter(DbaseFileHeader header, WritableByteChannel out)
+            throws IOException {
+        this(header, out, null);
+    }
+    
 
     /**
      * Create a DbaseFileWriter using the specified header and writing to the
@@ -71,6 +88,7 @@ public class DbaseFileWriter {
      *                The DbaseFileHeader to write.
      * @param out
      *                The Channel to write to.
+     * @param charset The charset the dbf is (will be) encoded in
      * @throws IOException
      *                 If errors occur while initializing.
      */
