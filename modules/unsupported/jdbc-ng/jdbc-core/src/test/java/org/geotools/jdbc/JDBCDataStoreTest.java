@@ -102,6 +102,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
             if(rs != null)
                 rs.close();
             st.close();
+            cx.close();
         }
     }
     
@@ -136,6 +137,8 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
         }
         catch( Exception e ) {
             
+        } finally {
+            w.close();
         }
         
     }

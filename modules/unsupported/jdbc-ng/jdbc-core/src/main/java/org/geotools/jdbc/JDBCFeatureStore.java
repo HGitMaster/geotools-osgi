@@ -495,7 +495,10 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                     getDataStore().selectSQLPS(querySchema, preFilter, query.getSortBy(), cx);
                 reader = new JDBCFeatureReader( ps, cx, this, querySchema, query.getHints() );
             } 
-            catch (SQLException e) {
+            catch (Exception e) {
+                // close the connection 
+                getDataStore().closeSafe(cx);
+                // safely rethrow
                 throw (IOException) new IOException().initCause(e);
             }
         }
@@ -507,6 +510,9 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
             try {
                 reader = new JDBCFeatureReader( sql, cx, this, querySchema, query.getHints() );
             } catch (SQLException e) {
+                // close the connection 
+                getDataStore().closeSafe(cx);
+                // safely rethrow
                 throw (IOException) new IOException("error create reader").initCause( e );
             }
         }
@@ -579,7 +585,10 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
             }
             
         } 
-        catch (SQLException e) {
+        catch (Exception e) {
+            // close the connection
+            getDataStore().closeSafe(cx);
+            // now we can safely rethrow the exception
             throw (IOException) new IOException( ).initCause(e);
         }
         
