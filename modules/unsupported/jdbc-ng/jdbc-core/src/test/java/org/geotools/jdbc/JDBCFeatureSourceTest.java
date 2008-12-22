@@ -16,6 +16,7 @@
  */
 package org.geotools.jdbc;
 
+import java.awt.RenderingHints;
 import java.util.Iterator;
 
 import org.geotools.data.DefaultQuery;
@@ -24,8 +25,10 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
@@ -264,4 +267,18 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         features.close(it);
     }
     
+    /**
+     * Makes sure the datastore works when the renderer uses the typical rendering hints
+     * @throws Exception
+     */
+    public void testRendererBehaviour() throws Exception {
+        DefaultQuery query = new DefaultQuery(featureSource.getSchema().getTypeName());
+        query.setHints(new Hints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory())));
+        FeatureCollection fc = featureSource.getFeatures(query);
+        FeatureIterator fi = fc.features();
+        while(fi.hasNext()) {
+            fi.next();
+        }
+        fi.close();
+    }
 }

@@ -63,7 +63,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  * @see <a href="http://otn.oracle.com/pls/db10g/db10g.to_toc?pathname=appdev.101%2Fb10826%2Ftoc.htm&remark=portal+%28Unstructured+data%29">Spatial User's Guide (10.1)</a>
  * @author Jody Garnett, Refractions Reasearch Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/jdbc-ng/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/SDO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/jdbc-ng/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/SDO.java $
  * @version CVS Version
  *
  * @see net.refractions.jspatial.jts
@@ -2063,8 +2063,8 @@ public final class SDO {
         //      POINT_TYPE Special Case
         //
         if ((D == 2) && (L == 0) && (TT == 1)) {
-            CoordinateSequence cs = f.create(1, ordinates.length);
-            for (int i = 0; i < ordinates.length; i++)
+            CoordinateSequence cs = f.create(1, 2);
+            for (int i = 0; i < 2; i++)
                 cs.setOrdinate(0, i, ordinates[i]);
             return cs;
         }
