@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
+        Version: $Id: pom.xml 32061 2008-12-22 20:36:44Z jdeolive $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -118,7 +118,6 @@
     <dependency>
       <groupId>org.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
