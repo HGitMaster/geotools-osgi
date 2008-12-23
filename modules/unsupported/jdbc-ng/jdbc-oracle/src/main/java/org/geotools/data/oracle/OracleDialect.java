@@ -134,16 +134,18 @@ public class OracleDialect extends PreparedStatementSQLDialect {
             String tableName = columnMetaData.getString(TABLE_NAME);
             String columnName = columnMetaData.getString(COLUMN_NAME);
             
-            String sqlStatement = "SELECT META.SDO_LAYER_GTYPE \n" // 
-                + "FROM MDSYS.ALL_SDO_INDEX_INFO INFO \n" //
-               + "INNER JOIN MDSYS.USER_SDO_INDEX_METADATA META \n"
-                    + " ON INFO.INDEX_NAME = META.SDO_INDEX_NAME \n" //
-                    + "WHERE INFO.TABLE_NAME = '" + tableName + "' \n" //
-                    + "AND INFO.COLUMN_NAME = '" + columnName + "'";
+            // Oracle 9 compatible query
+            String sqlStatement = "SELECT META.SDO_LAYER_GTYPE\n" + 
+            		"FROM ALL_INDEXES INFO\n" + 
+            		"INNER JOIN MDSYS.USER_SDO_INDEX_METADATA META\n" + 
+            		"ON INFO.INDEX_NAME = META.SDO_INDEX_NAME\n" + 
+            		"WHERE INFO.TABLE_NAME = '" + tableName + "'\n" + 
+            		"AND REPLACE(meta.sdo_column_name, '\"') = '" + columnName + "'\n"; 
             String schema = dataStore.getDatabaseSchema();
             if(schema != null && !"".equals(schema)) {
                 sqlStatement += " AND INFO.TABLE_OWNER = '" + schema + "'";
             }
+            
             LOGGER.log(Level.FINE, "Geometry type check; {0} ", sqlStatement);
             statement = cx.createStatement();
             result = statement.executeQuery(sqlStatement);
