@@ -42,11 +42,11 @@ import java.util.Set;
 
 import org.geotools.geometry.jts.Decimator;
 import org.geotools.geometry.jts.LiteShape2;
+import org.geotools.renderer.label.LabelCacheImpl;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.TextStyle2D;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
-import org.geotools.util.Range;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Literal;
 
@@ -113,7 +113,8 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
  *
  * @author jeichar
  * @author dblasby
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCacheDefault.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCacheDefault.java $
+ * @deprecated Use {@link LabelCacheImpl} instead
  */
 public final class LabelCacheDefault implements LabelCache {
 

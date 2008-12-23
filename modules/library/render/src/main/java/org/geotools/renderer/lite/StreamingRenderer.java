@@ -77,6 +77,7 @@ import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
+import org.geotools.renderer.label.LabelCacheImpl;
 import org.geotools.renderer.lite.gridcoverage2d.GridCoverageRenderer;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
@@ -137,7 +138,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 31767 2008-11-04 16:19:04Z aaime $
+ * @version $Id: StreamingRenderer.java 32066 2008-12-23 16:30:24Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -227,7 +228,7 @@ public final class StreamingRenderer implements GTRenderer {
 	/** Factory that will resolve symbolizers into rendered styles */
 	private SLDStyleFactory styleFactory = new SLDStyleFactory();
 
-	protected LabelCache labelCache = new LabelCacheDefault();
+	protected LabelCache labelCache = new LabelCacheImpl();
 
 	/** The painter class we use to depict shapes onto the screen */
 	private StyledShapePainter painter = new StyledShapePainter(labelCache);
