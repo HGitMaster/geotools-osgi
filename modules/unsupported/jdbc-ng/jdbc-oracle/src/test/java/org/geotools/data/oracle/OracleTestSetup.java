@@ -19,7 +19,6 @@ package org.geotools.data.oracle;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCTestSetup;
-import org.geotools.jdbc.SQLDialect;
 
 public class OracleTestSetup extends JDBCTestSetup {
 
