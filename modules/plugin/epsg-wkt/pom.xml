@@ -88,11 +88,42 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.vividsolutions</groupId>
+      <groupId>com.vividsolutions.osgi</groupId>
       <artifactId>jts</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+   <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
+	<build>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+  
 
 </project>

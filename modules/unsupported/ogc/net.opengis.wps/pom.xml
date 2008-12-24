@@ -31,7 +31,7 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>net.java.dev.jsr-275</groupId>
+      <groupId>net.java.dev.osgi</groupId>
       <artifactId>jsr-275</artifactId>
     </dependency>    
   </dependencies>

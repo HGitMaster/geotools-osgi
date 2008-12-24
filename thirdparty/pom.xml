@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>geotools</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+  
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>thirdparty</artifactId>
+  <version>2.6-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>Geotools thirdparty libs</name>
+  <description>
+    Geotools libraries.
+  </description>
+  
+              
+
+ 
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!--         copies all JARs in a single directory.              -->
+  <!-- =========================================================== -->
+ <!-- <build>
+    <plugins>
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>jar-collector</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>collect</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+     -->
+  <!-- =========================================================== -->
+  <!--     Modules included in the build                           -->
+  <!-- =========================================================== -->
+  <modules>
+    <module>javax.media.jai.osgi.imageio</module>
+    <module>java3d.osgi</module>
+    <module>com.vividsolutions.osgi.jts</module>
+    <module>org.apache.batik.osgi.transcoder</module>  
+ </modules>
+
+
+</project>

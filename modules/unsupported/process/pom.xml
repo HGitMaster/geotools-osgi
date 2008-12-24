@@ -1,198 +1,199 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- =======================================================================    
-        Maven Project Configuration File                                        
-                                                                                
-        The Geotools Project                                                    
-            http://www.geotools.org/                                            
-                                                                                
-        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
-     ======================================================================= -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" 
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+	<!--
+		=======================================================================
+		Maven Project Configuration File The Geotools Project
+		http://www.geotools.org/ Version: $Id: pom.xml 31093 2008-07-28
+		23:06:31Z groldan $
+		=======================================================================
+	-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                                http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.geotools</groupId>
-    <artifactId>unsupported</artifactId>
-    <version>2.6-SNAPSHOT</version>
-  </parent>
+	<parent>
+		<groupId>org.geotools</groupId>
+		<artifactId>unsupported</artifactId>
+		<version>2.6-SNAPSHOT</version>
+	</parent>
 
 
-  <!-- =========================================================== -->
-  <!--   Properties and Profiles                                   -->
-  <!--       explanation of their effect.                          -->
-  <!--                                                             -->
-  <!--   Available profiles are:                                   -->
-  <!--                                                             -->
-  <!--     nameOfprofile      Explantion of what the profile does  -->
-  <!--                        for the user.                        -->
-  <!--                                                             -->
-  <!--     Example:           mvn -PnameOfprofile install          -->
-  <!--                                                             -->
-  <!--     Note ...                                                -->
-  <!-- =========================================================== -->
-  <!-- Default setting of properties -->
-  <!--
-  <properties>
-    <nameOfproperty>valueOfsetting</nameOfproperty>
-  </properties>
-  -->
+	<!-- =========================================================== -->
+	<!--   Properties and Profiles                                   -->
+	<!--       explanation of their effect.                          -->
+	<!--                                                             -->
+	<!--   Available profiles are:                                   -->
+	<!--                                                             -->
+	<!--     nameOfprofile      Explantion of what the profile does  -->
+	<!--                        for the user.                        -->
+	<!--                                                             -->
+	<!--     Example:           mvn -PnameOfprofile install          -->
+	<!--                                                             -->
+	<!--     Note ...                                                -->
+	<!-- =========================================================== -->
+	<!-- Default setting of properties -->
+	<!--
+		<properties> <nameOfproperty>valueOfsetting</nameOfproperty>
+		</properties>
+	-->
 
-  <!-- Profiles set on the command-line to override default properties. -->
-  <!--
-  <profiles>
-    <profile>
-      <id>nameOfprofile</id>
-      <properties>
-        <nameOfproperty>valueOfsetting</nameOfproperty>
-      </properties>
-    </profile>
-  </profiles>
-  -->
-  
+	<!--
+		Profiles set on the command-line to override default properties.
+	-->
+	<!--
+		<profiles> <profile> <id>nameOfprofile</id> <properties>
+		<nameOfproperty>valueOfsetting</nameOfproperty> </properties>
+		</profile> </profiles>
+	-->
 
-  <!-- =========================================================== -->
-  <!--     Module Description                                      -->
-  <!-- =========================================================== -->
-  <groupId>org.geotools</groupId>
-  <artifactId>gt-process</artifactId>
-  <packaging>jar</packaging>
-  <name>Process</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/process/</url>
 
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/process/
+	<!-- =========================================================== -->
+	<!--     Module Description                                      -->
+	<!-- =========================================================== -->
+	<groupId>org.geotools</groupId>
+	<artifactId>gt-process</artifactId>
+	<packaging>jar</packaging>
+	<name>Process</name>
+	<url>http://maven.geotools.fr/reports/modules/unsupported/process/</url>
+
+	<scm>
+		<connection>
+			scm:svn:http://svn.geotools.org/trunk/modules/unsupported/process/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/process/</url>
-  </scm>
+		<url>http://svn.geotools.org/trunk/modules/unsupported/process/</url>
+	</scm>
 
-  <description>
-    This is an API for creating processes/operations.
+	<description>
+		This is an API for creating processes/operations.
   </description>
-  
-  <organization>
-    <name></name>
-    <url></url>
-  </organization>
-  
-  <!-- for your project. -->
-  <inceptionYear></inceptionYear>
 
-  <!-- Pick your license. -->
-  <!--
-  <licenses>
-    <license>
-      <name>Lesser General Public License (LGPL)</name>
-      <url>http://www.gnu.org/copyleft/lesser.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  -->
+	<organization>
+		<name></name>
+		<url></url>
+	</organization>
+
+	<!-- for your project. -->
+	<inceptionYear></inceptionYear>
+
+	<!-- Pick your license. -->
+	<!--
+		<licenses> <license> <name>Lesser General Public License (LGPL)</name>
+		<url>http://www.gnu.org/copyleft/lesser.txt</url>
+		<distribution>repo</distribution> </license> </licenses>
+	-->
 
 
-  <!-- =========================================================== -->
-  <!--     Developers and Contributors                             -->
-  <!-- =========================================================== -->
-  <developers>
-    <developer>
-      <id>gdavis</id>
-      <name>Graham Davis</name>
-      <email>gdavis@refractions.net</email>
-      <organization>Refractions Research</organization>
-      <roles>
-        <role>Module Maintainer</role>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-  </developers>
+	<!-- =========================================================== -->
+	<!--     Developers and Contributors                             -->
+	<!-- =========================================================== -->
+	<developers>
+		<developer>
+			<id>gdavis</id>
+			<name>Graham Davis</name>
+			<email>gdavis@refractions.net</email>
+			<organization>Refractions Research</organization>
+			<roles>
+				<role>Module Maintainer</role>
+				<role>Java Developer</role>
+			</roles>
+		</developer>
+	</developers>
 
 
-  <!-- =========================================================== -->
-  <!--     Dependency Mangement                                    -->
-  <!-- =========================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-main</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-postgis</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-coverage</artifactId>
-      <version>${project.version}</version>
-    </dependency>    
-  </dependencies>
+	<!-- =========================================================== -->
+	<!--     Dependency Mangement                                    -->
+	<!-- =========================================================== -->
+	<dependencies>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-main</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-postgis</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-coverage</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 
 
-  <!-- =========================================================== -->
-  <!--     Build Configuration                                     -->
-  <!--         copies all JARs in a single directory.              -->
-  <!-- =========================================================== -->
-  <build>
+	<!-- =========================================================== -->
+	<!--     Build Configuration                                     -->
+	<!--         copies all JARs in a single directory.              -->
+	<!-- =========================================================== -->
+	<build>
 
-    <plugins>
-      <!-- ====    Compilation      ============================== -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!-- ====    Switch commenting to skip tests    = -->
-          <skip>${allow.test.skip}</skip>
-          <!-- skip>true</skip> -->
-          <includes>
-            <include></include>
-          </includes>
-          <excludes>
-            <exclude></exclude>
-          </excludes>
-        </configuration>
-      </plugin>
+		<plugins>
+			<!-- ====    Compilation      ============================== -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- ====    Switch commenting to skip tests    = -->
+					<skip>${allow.test.skip}</skip>
+					<!-- skip>true</skip> -->
+					<includes>
+						<include></include>
+					</includes>
+					<excludes>
+						<exclude></exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 
-      <!-- ====    Testing          ============================== -->
-      <!-- ====    Code Formatting  ============================== -->
-      <!--
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jalopy-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>format</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      -->
-      <!-- ====    Code Coverage    ============================== -->
-      <!--
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clover-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal></goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      -->
-    </plugins>
+			<!-- ====    Testing          ============================== -->
+			<!-- ====    Code Formatting  ============================== -->
+			<!--
+				<plugin> <groupId>org.codehaus.mojo</groupId>
+				<artifactId>jalopy-maven-plugin</artifactId> <executions>
+				<execution> <goals> <goal>format</goal> </goals> </execution>
+				</executions> </plugin>
+			-->
+			<!-- ====    Code Coverage    ============================== -->
+			<!--
+				<plugin> <groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clover-plugin</artifactId> <executions>
+				<execution> <goals> <goal></goal> </goals> </execution>
+				</executions> </plugin>
+			-->
 
-  </build>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+
 
 </project>

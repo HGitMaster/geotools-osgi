@@ -105,17 +105,17 @@
     <!-- NOTE: The metadata module does not depend on JTS. -->
 
     <dependency>
-      <groupId>java3d</groupId>
+      <groupId>java3d.osgi</groupId>
       <artifactId>vecmath</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>org.opengis</groupId>
+      <groupId>org.opengis.osgi</groupId>
       <artifactId>geoapi</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>net.java.dev.jsr-275</groupId>
+      <groupId>net.java.dev.osgi</groupId>
       <artifactId>jsr-275</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
@@ -156,5 +156,31 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  
+  <build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

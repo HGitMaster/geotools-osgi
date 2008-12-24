@@ -104,33 +104,55 @@
   <!-- ==================================================== -->
   <!--     Compilation (including non-standard plugins)     -->
   <!-- ==================================================== -->
-  <build>
-    <plugins>
- 
-      <plugin>
-        <groupId>org.geotools.maven</groupId>
-        <artifactId>jjtree-javacc</artifactId>
-        <version>${project.version}</version>
-			
-    		<configuration>
-         		<nodePackage>org.geotools.filter.text.generated.parsers</nodePackage>
-     			<nodeDirectory>${basedir}/modified-src</nodeDirectory>
-     			<sourceDirectory>${basedir}/src/main/jjtree</sourceDirectory>
-    		</configuration>
+	<build>
+		<plugins>
 
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-            </goals>
+			<plugin>
+				<groupId>org.geotools.maven</groupId>
+				<artifactId>jjtree-javacc</artifactId>
+				<version>${project.version}</version>
 
-          </execution>
-          
-        </executions>
+				<configuration>
+					<nodePackage>org.geotools.filter.text.generated.parsers</nodePackage>
+					<nodeDirectory>${basedir}/modified-src</nodeDirectory>
+					<sourceDirectory>${basedir}/src/main/jjtree</sourceDirectory>
+				</configuration>
 
-      </plugin>     
-	</plugins>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
 
-  </build>
+					</execution>
+
+				</executions>
+
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+	</build>
 
 </project>

@@ -88,7 +88,7 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>com.vividsolutions</groupId>
+      <groupId>com.vividsolutions.osgi</groupId>
       <artifactId>jts</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
@@ -104,21 +104,37 @@
   <!-- =========================================================== -->
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
-  <build>
-    <!--plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jalopy-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>format</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins-->
-  </build>
+	<build>
+		<!--
+			plugins> <plugin> <groupId>org.codehaus.mojo</groupId>
+			<artifactId>jalopy-maven-plugin</artifactId> <executions> <execution>
+			<goals> <goal>format</goal> </goals> </execution> </executions>
+			</plugin> </plugins
+		-->
+		<plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
   
   
 </project>

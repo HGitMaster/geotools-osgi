@@ -126,13 +126,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai_codec</artifactId>
+      <groupId>javax.media.jai</groupId>
+      <artifactId>com.springsource.javax.media.jai.codec</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.media</groupId>
+      <groupId>javax.media.jai.osgi</groupId>
       <artifactId>jai_imageio</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
@@ -145,8 +145,8 @@
          for compiling optionals...
     -->
     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-transcoder</artifactId>
+      <groupId>org.apache.batik.osgi</groupId>
+      <artifactId>transcoder</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
@@ -219,6 +219,32 @@
     </dependency>
     
   </dependencies>
+  
+  <build>
+	<plugins>
+		<plugin>
+			<artifactId>maven-jar-plugin</artifactId>
+			<configuration>
+				<archive>
+					<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+				</archive>
+			</configuration>
+		</plugin>
+		<plugin>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>maven-bundle-plugin</artifactId>
+			<executions>
+				<execution>
+					<id>bundle-manifest</id>
+					<phase>process-classes</phase>
+					<goals>
+						<goal>manifest</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+	</plugins>
+</build>
   
 
 </project>

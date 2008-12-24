@@ -139,13 +139,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai_codec</artifactId>
+      <groupId>javax.media.jai</groupId>
+      <artifactId>com.springsource.javax.media.jai.codec</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.media</groupId>
+      <groupId>javax.media.jai.osgi</groupId>
       <artifactId>jai_imageio</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>  <!-- Users should execute JAI installer. -->

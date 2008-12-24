@@ -118,27 +118,57 @@
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <!-- The following tests are skipped because they do not extend OnlineTestCase -->
-            <exclude>**/LocalGeoServerOnlineTest.java</exclude>
-            <exclude>**/WMSReaderOnlineTest.java</exclude>
-            <exclude>**/WebMapServerOnlineTest.java</exclude>
-            <exclude>**/WMS1_0_0_OnlineTest.java</exclude>
-            <exclude>**/WMS1_1_0_OnlineTest.java</exclude>
-            <exclude>**/WMS1_1_1_OnlineTest.java</exclude>
-            <exclude>**/WMS1_3_0_OnlineTest.java</exclude>
-            <!-- The following tests fail -->
-            <exclude>**/Geot553Test.java</exclude>
-            <exclude>**/WMSSchemaTest.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<configuration>
+				<excludes>
+					<!--
+						The following tests are skipped because they do not extend
+						OnlineTestCase
+					-->
+					<exclude>**/LocalGeoServerOnlineTest.java</exclude>
+					<exclude>**/WMSReaderOnlineTest.java</exclude>
+					<exclude>**/WebMapServerOnlineTest.java</exclude>
+					<exclude>**/WMS1_0_0_OnlineTest.java</exclude>
+					<exclude>**/WMS1_1_0_OnlineTest.java</exclude>
+					<exclude>**/WMS1_1_1_OnlineTest.java</exclude>
+					<exclude>**/WMS1_3_0_OnlineTest.java</exclude>
+					<!-- The following tests fail -->
+					<exclude>**/Geot553Test.java</exclude>
+					<exclude>**/WMSSchemaTest.java</exclude>
+				</excludes>
+			</configuration>
+		</plugin>
+
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+		</plugin>
+
+		<plugin>
+			<artifactId>maven-jar-plugin</artifactId>
+			<configuration>
+				<archive>
+					<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+				</archive>
+			</configuration>
+		</plugin>
+		<plugin>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>maven-bundle-plugin</artifactId>
+			<executions>
+				<execution>
+					<id>bundle-manifest</id>
+					<phase>process-classes</phase>
+					<goals>
+						<goal>manifest</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+	</plugins>
+</build>
 
 </project>

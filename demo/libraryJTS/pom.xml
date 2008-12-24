@@ -80,7 +80,7 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>com.vividsolutions</groupId>
+      <groupId>com.vividsolutions.osgi</groupId>
       <artifactId>jts</artifactId>
     </dependency>
   </dependencies>

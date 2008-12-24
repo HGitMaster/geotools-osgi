@@ -10,7 +10,7 @@ Require-Bundle: org.geotools.api;bundle-version="2.6.0",
  org.geotools.main;bundle-version="2.6.0",
  org.geotools.metadata;bundle-version="2.6.0"
 Import-Package: com.sun.media.jai.operator,
- com.sun.media.jai.util;version="1.1.3",
+ com.sun.media.jai.util,
  com.vividsolutions.jts.geom,
  javax.measure.converter,
  javax.measure.unit,

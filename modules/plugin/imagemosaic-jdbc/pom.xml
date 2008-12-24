@@ -95,12 +95,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.vividsolutions</groupId>
+      <groupId>com.vividsolutions.osgi</groupId>
       <artifactId>jts</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>java3d</groupId>
+      <groupId>java3d.osgi</groupId>
       <artifactId>vecmath</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
@@ -120,12 +120,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai_codec</artifactId>
+      <groupId>javax.media.jai</groupId>
+      <artifactId>com.springsource.javax.media.jai.codec</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>javax.media</groupId>
+      <groupId>javax.media.jai.osgi</groupId>
       <artifactId>jai_imageio</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
