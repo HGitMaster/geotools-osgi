@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32011 2008-12-16 04:29:03Z bencaradocdavies $              
+        Version: $Id: pom.xml 32071 2008-12-24 03:03:33Z bencaradocdavies $              
      ======================================================================= --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                                 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -49,8 +49,9 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-  	<module>app-schema</module>
-  	<module>jdbc-regfunc</module>
+      <module>app-schema</module>
+      <module>jdbc-regfunc</module>
+      <module>sample-data-access</module>
   </modules>
   
 </project>
