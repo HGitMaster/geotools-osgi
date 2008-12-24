@@ -453,8 +453,14 @@ public abstract class SQLDialect {
     
     /**
      * Turns the specified srid into a {@link CoordinateReferenceSystem}, or returns <code>null</code> if not possible.
+     * <p>
      * The implementation might just use <code>CRS.decode("EPSG:" + srid)</code>, but most spatial databases will have 
-     * their own SRS database that can be queried as well.
+     * their own SRS database that can be queried as well.</p>
+     * <p>As a rule of thumb you should override this method if your spatial database uses codes that are 
+     * not part of the EPSG standard database, of if for some reason you deem it preferable to use
+     * your database definition instead of an official EPSG one.</p>
+     * <p>Most overrides will try out to decode the official EPSG code first, and fall back on
+     * the custom database definition otherwise</p>
      * @param srid
      * @return
      */
