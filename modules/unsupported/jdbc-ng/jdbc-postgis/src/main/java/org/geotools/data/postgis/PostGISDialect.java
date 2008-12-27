@@ -28,7 +28,6 @@ import java.util.logging.Level;
 
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.PreparedStatementSQLDialect;
-import org.geotools.jdbc.SQLDialect;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
