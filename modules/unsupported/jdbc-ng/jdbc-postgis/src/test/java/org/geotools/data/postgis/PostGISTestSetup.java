@@ -1,10 +1,8 @@
 package org.geotools.data.postgis;
 
-import org.geotools.data.postgis.PostGISDialect;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCTestSetup;
-import org.geotools.jdbc.SQLDialect;
 
 public class PostGISTestSetup extends JDBCTestSetup {
 
