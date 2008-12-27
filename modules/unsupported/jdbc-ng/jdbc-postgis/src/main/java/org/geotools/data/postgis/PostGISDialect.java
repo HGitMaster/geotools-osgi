@@ -123,7 +123,12 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
     public Envelope decodeGeometryEnvelope(ResultSet rs, int column,
             Connection cx) throws SQLException, IOException {
         try {
-            return new WKTReader().read(rs.getString(column)).getEnvelopeInternal();
+            String envelope = rs.getString(column);
+            if(envelope != null)
+                return new WKTReader().read(envelope).getEnvelopeInternal();
+            else
+                // empty one
+                return new Envelope();
         } catch (ParseException e) {
             throw (IOException) new IOException("Error occurred parsing the bounds WKT").initCause(e);
         }
