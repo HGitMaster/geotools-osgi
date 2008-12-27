@@ -67,14 +67,17 @@ Create a new JDBC datastore notes:
     * decodeGeometryValue, which reads from the resultset the value
       coming from the database and turns it into a JTS geometry using
       the specified geometry factory
-12) Now that the basis are laid down, we can move to the write part.
+12) While we're at it, let's implement some other read only tests as
+    well:
+    - JDBCFeatureReaderTest
+13) Now that the basis are laid down, we can move to the write part.
     Write wise prikary keys are king, so we need to extend JDBCPrimaryKeyTest
     and its associated setup. Depending on the database capabilities, we may
     have to override the autovalue or sequence test.
     If the database supports sequences the dialect will have to 
     override the getSequenceForColumn() and getNextSequenceValue() methods.
     Hammer until all four tests do pass.
-12) We start adding support for write operations by implementing
+14) We start adding support for write operations by implementing
     JDBCFeatureStore test. Most tests will fail because
     we did not provide means to encode the geometries as values for 
     parameters in prepared statements. 
