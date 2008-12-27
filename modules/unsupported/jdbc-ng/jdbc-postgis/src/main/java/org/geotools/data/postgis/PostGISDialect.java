@@ -42,6 +42,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKBWriter;
 import com.vividsolutions.jts.io.WKTReader;
 
 public class PostGISDialect extends PreparedStatementSQLDialect {
@@ -87,11 +88,6 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
             ResultSet rs, String column, GeometryFactory factory, Connection cx)
             throws IOException, SQLException {
         return (Geometry) new WKBAttributeIO(factory).read(rs, column);
-    }
-    
-    @Override
-    public void setGeometryValue(Geometry g, int srid, Class binding,
-            PreparedStatement ps, int column) throws SQLException {
     }
     
     
@@ -254,6 +250,67 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
 //        }
         
         return srid;
+    }
+    
+    @Override
+    public void prepareGeometryValue(Geometry g, int srid, Class binding,
+            StringBuffer sql) {
+        sql.append("GeomFromWKB(?, " + srid + ")");
+    }
+
+    @Override
+    public void setGeometryValue(Geometry g, int srid, Class binding,
+            PreparedStatement ps, int column) throws SQLException {
+        byte[] bytes = new WKBWriter().write(g);
+        ps.setBytes(column, bytes);
+    }
+    
+    @Override
+    public String getSequenceForColumn(String schemaName, String tableName,
+            String columnName, Connection cx) throws SQLException {
+        Statement st = cx.createStatement();
+        try {
+            String sql = "SELECT pg_get_serial_sequence('" + tableName + "', '" + columnName + "')";
+            
+            dataStore.getLogger().fine( sql);
+            ResultSet rs = st.executeQuery( sql);
+            try {
+                if ( rs.next() ) {
+                    return rs.getString(1);
+                }
+            } finally {
+                dataStore.closeSafe(rs);
+            }
+        }
+        finally {
+            dataStore.closeSafe(st);
+        }
+        
+        return null;
+    }
+    
+    @Override
+    public Object getNextSequenceValue(String schemaName, String sequenceName,
+            Connection cx) throws SQLException {
+        Statement st = cx.createStatement();
+        try {
+            String sql = "SELECT nextval('" + sequenceName + "')";
+            
+            dataStore.getLogger().fine( sql);
+            ResultSet rs = st.executeQuery( sql);
+            try {
+                if ( rs.next() ) {
+                    return rs.getLong(1);
+                }
+            } finally {
+                dataStore.closeSafe(rs);
+            }
+        }
+        finally {
+            dataStore.closeSafe(st);
+        }
+        
+        return null;
     }
 
 }
