@@ -24,7 +24,7 @@ import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
 
 public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
-private static final String JDBC_PATH = "jdbc:oracle:thin:@";
+    private static final String JDBC_PATH = "jdbc:oracle:thin:@";
     
     /** parameter for namespace of the datastore */
     public static final Param LOOSEBBOX = new Param("Loose bbox", Boolean.class, "Perform only primary filter on bbox", false, Boolean.TRUE);
@@ -80,6 +80,14 @@ private static final String JDBC_PATH = "jdbc:oracle:thin:@";
     @Override
     protected String getValidationQuery() {
         return "select now()";
+    }
+    
+    @Override
+    protected String getJDBCUrl(Map params) throws IOException {
+        String host = (String) HOST.lookUp(params);
+        String db = (String) DATABASE.lookUp(params);
+        int port = (Integer) PORT.lookUp(params);
+        return "jdbc:postgresql" + "://" + host + ":" + port + "/" + db;
     }
 
 }
