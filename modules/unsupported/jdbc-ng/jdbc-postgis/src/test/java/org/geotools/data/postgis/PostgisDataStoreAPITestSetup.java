@@ -18,7 +18,7 @@ public class PostgisDataStoreAPITestSetup extends JDBCDataStoreAPITestSetup {
         // advance the sequence to 1 to compensate for hand insertions
         run("SELECT nextval(pg_get_serial_sequence('lake','fid'))");
 
-        run("INSERT INTO \"lake\" (\"id\",\"geom\",\"name\") VALUES ( 0,"
+        run("INSERT INTO \"lake\" (\"fid\", \"id\",\"geom\",\"name\") VALUES (0, 0,"
                 + "GeomFromText('POLYGON((12 6, 14 8, 16 6, 16 4, 14 4, 12 6))',4326),"
                 + "'muddy')");
     }
@@ -33,10 +33,10 @@ public class PostgisDataStoreAPITestSetup extends JDBCDataStoreAPITestSetup {
         // advance the sequence to 1 to compensate for hand insertions
         run("SELECT nextval(pg_get_serial_sequence('river','fid'))");
 
-        run("INSERT INTO \"river\" (\"id\",\"geom\",\"river\", \"flow\")  VALUES ( 0,"
+        run("INSERT INTO \"river\" (\"fid\", \"id\",\"geom\",\"river\", \"flow\")  VALUES (0, 0,"
                 + "GeomFromText('MULTILINESTRING((5 5, 7 4),(7 5, 9 7, 13 7),(7 5, 9 3, 11 3))',4326),"
                 + "'rv1', 4.5)");
-        run("INSERT INTO \"river\" (\"id\",\"geom\",\"river\", \"flow\") VALUES ( 1,"
+        run("INSERT INTO \"river\" (\"fid\", \"id\",\"geom\",\"river\", \"flow\") VALUES (1, 1,"
                 + "GeomFromText('MULTILINESTRING((4 6, 4 8, 6 10))',4326),"
                 + "'rv2', 3.0)");
     }
@@ -54,13 +54,13 @@ public class PostgisDataStoreAPITestSetup extends JDBCDataStoreAPITestSetup {
         run("SELECT nextval(pg_get_serial_sequence('road','fid'))");
 
         // insertions
-        run("INSERT INTO \"road\" (\"id\",\"geom\",\"name\") VALUES (0,"
+        run("INSERT INTO \"road\" (\"fid\", \"id\",\"geom\",\"name\") VALUES (0, 0,"
                 + "GeomFromText('LINESTRING(1 1, 2 2, 4 2, 5 1)',4326),"
                 + "'r1')");
-        run("INSERT INTO \"road\" (\"id\",\"geom\",\"name\") VALUES ( 1,"
+        run("INSERT INTO \"road\" (\"fid\", \"id\",\"geom\",\"name\") VALUES (1, 1,"
                 + "GeomFromText('LINESTRING(3 0, 3 2, 3 3, 3 4)',4326),"
                 + "'r2')");
-        run("INSERT INTO \"road\" (\"id\",\"geom\",\"name\") VALUES ( 2,"
+        run("INSERT INTO \"road\" (\"fid\", \"id\",\"geom\",\"name\") VALUES (2, 2,"
                 + "GeomFromText('LINESTRING(3 2, 4 2, 5 3)',4326)," + "'r3')");
     }
 
