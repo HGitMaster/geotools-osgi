@@ -392,7 +392,9 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
 
     @Override
     public PreparedFilterToSQL createPreparedFilterToSQL() {
-        return new PostgisFilterToSql(this);
+        PostgisFilterToSql fts = new PostgisFilterToSql(this);
+        fts.setLooseBBOXEnabled(looseBBOXEnabled);
+        return fts;
     }
 
     @Override
