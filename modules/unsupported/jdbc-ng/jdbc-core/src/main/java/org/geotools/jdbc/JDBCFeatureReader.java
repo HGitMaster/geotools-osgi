@@ -723,6 +723,12 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
          * dirty flags
          */
         boolean[] dirty;
+        
+        /**
+         * Marks this feature as "new", about to be inserted
+         */
+        boolean newFeature;
+        
         /**
          * name index
          */
@@ -778,6 +784,9 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         }
 
         public void init(String fid) {
+            // mark as new according to the fid
+            newFeature = fid == null;
+            
             //clear values
             for (int i = 0; i < values.length; i++) {
                 values[i] = null;
@@ -844,34 +853,32 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         }
         
         private Object getAttributeInternal( int index, int rsindex ) {
-            if ( values[index] == null && !dirty[index]) {
+            if (!newFeature && values[index] == null && !dirty[index]) {
                 synchronized (this) {
-                    if ( values[index] == null && !dirty[index]) {
-                        //load the value from the result set, check the case 
-                        // in which its a geometry, this case the dialect needs
-                        // to read it
-                        try {
-                            AttributeDescriptor att = featureType.getDescriptor(index);
-                            if ( att instanceof GeometryDescriptor ) {
-                                GeometryDescriptor gatt = (GeometryDescriptor) att;
-                                values[index] = dataStore.getSQLDialect()
-                                    .decodeGeometryValue( gatt, rs, rsindex, dataStore.getGeometryFactory(), st.getConnection() );
-                            }
-                            else {
-                                values[index] = rs.getObject( rsindex );    
-                            }
+                    try {
+                        if (!newFeature && values[index] == null && !dirty[index]) {
+                            //load the value from the result set, check the case 
+                            // in which its a geometry, this case the dialect needs
+                            // to read it
                             
-                        } 
-                        catch (IOException e ) {
-                            throw new RuntimeException( e );
+                                AttributeDescriptor att = featureType.getDescriptor(index);
+                                if ( att instanceof GeometryDescriptor ) {
+                                    GeometryDescriptor gatt = (GeometryDescriptor) att;
+                                    values[index] = dataStore.getSQLDialect()
+                                        .decodeGeometryValue( gatt, rs, rsindex, dataStore.getGeometryFactory(), st.getConnection() );
+                                }
+                                else {
+                                    values[index] = rs.getObject( rsindex );    
+                                }
                         }
-                        catch (SQLException e) {
-                            //do not throw exception because of insert mode
-                            //TODO: set a flag for insert vs update
-                            //throw new RuntimeException( e );
-                            values[index] = null;
-                        }        
-                    }
+                    } catch (IOException e ) {
+                        throw new RuntimeException( e );
+                     } catch (SQLException e) {
+                         //do not throw exception because of insert mode
+                         //TODO: set a flag for insert vs update
+                         //throw new RuntimeException( e );
+                         values[index] = null;
+                     }
                                
                 }
             }
