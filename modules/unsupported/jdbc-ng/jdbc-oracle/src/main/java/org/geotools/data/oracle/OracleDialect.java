@@ -487,7 +487,9 @@ public class OracleDialect extends PreparedStatementSQLDialect {
                     }
     
                     int srid = -1;
-                    if(geom.getCoordinateReferenceSystem() != null) {
+                    if(geom.getUserData().get(JDBCDataStore.JDBC_NATIVE_SRID) != null) {
+                        srid = (Integer) geom.getUserData().get(JDBCDataStore.JDBC_NATIVE_SRID);
+                    } else if(geom.getCoordinateReferenceSystem() != null) {
                         try {
                             Integer result = CRS.lookupEpsgCode(geom.getCoordinateReferenceSystem(), true);
                             if(result != null)
