@@ -87,15 +87,6 @@ public class OracleFilterToSQL extends PreparedFilterToSQL {
         }
     };
 
-    /** The standard SQL multicharacter wild card. */
-    private static final String SQL_WILD_MULTI = "%";
-
-    /** The standard SQL single character wild card. */
-    private static final String SQL_WILD_SINGLE = "_";
-
-    /** Default tolerance for spatial queries. */
-    private static final String TOLERANCE = "0.001";
-    
     /**
      * Whether BBOX should be encoded as just a primary filter or primary+secondary
      */
