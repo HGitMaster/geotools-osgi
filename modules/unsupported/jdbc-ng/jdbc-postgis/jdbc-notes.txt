@@ -70,7 +70,19 @@ Create a new JDBC datastore notes:
 12) While we're at it, let's implement some other read only tests as
     well:
     - JDBCFeatureReaderTest
-13) Now that the basis are laid down, we can move to the write part.
+    - JDBCEmptyTest (and its setup)
+13) Let's get a spin to JDBCSpatialFilterTests. First off, prepare
+    the associated test setup and make sure the test passes. 
+    Once you've done that, you should wonder how the test has passed,
+    as we haven't coded up anything related to spatial filters.
+    It's working because the filters are executed in memory. Now,
+    take the dialect and override the createFilterToSql or the
+    createPreparedFilterToSql according to your needs. The FilterToSql
+    implementation returned will have to properly encode spatial
+    filters using the native spatial filter capabilities.
+    You may want to write custom unit tests for the FilterToSql
+    subclass you're going to write.
+13) Now that the read only behaviour is laid down, we can move to the write part.
     Write wise prikary keys are king, so we need to extend JDBCPrimaryKeyTest
     and its associated setup. Depending on the database capabilities, we may
     have to override the autovalue or sequence test.

@@ -22,13 +22,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
 import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.PreparedFilterToSQL;
 import org.geotools.jdbc.PreparedStatementSQLDialect;
-import org.hsqldb.Types;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -82,6 +83,19 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
 
     public PostGISDialect(JDBCDataStore dataStore) {
         super(dataStore);
+    }
+    
+    @Override
+    public boolean includeTable(String schemaName, String tableName,
+            Connection cx) throws SQLException {
+        if (tableName.equals("geometry_columns")) {
+            return false;
+        } else if (tableName.startsWith("spatial_ref_sys")) {
+            return false;
+        }
+
+        //others?
+        return true;
     }
 
     @Override
@@ -218,6 +232,8 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
         ResultSet result = null;
         Integer srid = null;
         try {
+           if(schemaName == null)
+               schemaName = "public";
            String sqlStatement = "SELECT SRID FROM GEOMETRY_COLUMNS WHERE " //
                     + "F_TABLE_SCHEMA = '" + schemaName + "' " //
                     + "AND F_TABLE_NAME = '" + tableName + "' " //
@@ -357,4 +373,10 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
 //        
 //        return null;
     }
+    
+    @Override
+    public PreparedFilterToSQL createPreparedFilterToSQL() {
+        return new PostgisFilterToSql(this);
+    }
+    
 }
