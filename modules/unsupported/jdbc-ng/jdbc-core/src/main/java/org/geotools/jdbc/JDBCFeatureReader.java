@@ -136,6 +136,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         //create the result set
         this.cx = cx;
         st = cx.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        st.setFetchSize(featureStore.getDataStore().getFetchSize());
         rs = st.executeQuery(sql);
     }
     

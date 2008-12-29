@@ -85,6 +85,10 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
     public static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
             "check connection is alive before using it", false, Boolean.FALSE);
     
+    /** If connections should be validated before using them */
+    public static final Param FETCHSIZE = new Param("fetch size", Integer.class,
+            "number of records read with each iteraction with the dbms", false, 1000);
+    
     @Override
     public String getDisplayName() {
         return getDescription();
@@ -127,6 +131,11 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         else {
             dataStore.setDataSource(createDataSource(params, dialect));
         }
+        
+        // fetch size
+        Integer fetchSize = (Integer) FETCHSIZE.lookUp(params);
+        if(fetchSize != null && fetchSize > 0)
+            dataStore.setFetchSize(fetchSize);
 
         // namespace
         String namespace = (String) NAMESPACE.lookUp(params);
@@ -142,7 +151,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
             dataStore.setDatabaseSchema(schema);
         }
 
-        //factories
+        // factories
         dataStore.setFilterFactory(CommonFactoryFinder.getFilterFactory(null));
         dataStore.setGeometryFactory(new GeometryFactory());
         dataStore.setFeatureTypeFactory(new FeatureTypeFactoryImpl());
@@ -218,6 +227,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         parameters.put(NAMESPACE.key, NAMESPACE);
         parameters.put(MAXCONN.key, MAXCONN);
         parameters.put(MINCONN.key, MINCONN);
+        parameters.put(FETCHSIZE.key, FETCHSIZE);
         if(getValidationQuery() != null)
             parameters.put(VALIDATECONN.key, VALIDATECONN);
     }
