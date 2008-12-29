@@ -43,14 +43,14 @@ public class DB2GeometrylessTestSetup extends JDBCGeometrylessTestSetup {
     }
 
     @Override
-    protected void dropPersonTable() throws SQLException {
+    protected void dropPersonTable() throws Exception {
         Connection con = getDataSource().getConnection();
     	DB2TestUtil.dropTable(DB2TestUtil.SCHEMA, "person", con);
         con.close();
     }
 
     @Override
-    protected void dropZipCodeTable() throws SQLException {
+    protected void dropZipCodeTable() throws Exception {
     	Connection con = getDataSource().getConnection();
     	DB2TestUtil.dropTable(DB2TestUtil.SCHEMA, "zipcode", con);        
         con.close();
