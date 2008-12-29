@@ -109,6 +109,10 @@ public class PostgisFilterToSql extends PreparedFilterToSQL {
             out.write(" && ");
             geometry.accept(this, extraData);
     
+            // if we're just encoding a bbox in loose mode, we're done 
+            if(filter instanceof BBOX && looseBBOXEnabled)
+                return;
+                
             out.write(" AND ");
         }
 
