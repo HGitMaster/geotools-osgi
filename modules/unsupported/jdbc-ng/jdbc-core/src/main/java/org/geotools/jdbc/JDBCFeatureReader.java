@@ -665,8 +665,15 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         else {
             //means we are already closed... should we throw an exception?
         }
-        
-        
+        cleanup();
+    }
+
+    /**
+     * Cleans up the reader state without closing the accessory resultset, statement
+     * and connection. Use only if the above are shared with another object that will
+     * take care of closing them.
+     */
+    protected void cleanup() {
         //throw away state
         rs = null;
         st = null;
@@ -678,7 +685,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         hints = null;
         next = null;
         builder = null;
-      
+        tracer = null;
     }
     
     @Override

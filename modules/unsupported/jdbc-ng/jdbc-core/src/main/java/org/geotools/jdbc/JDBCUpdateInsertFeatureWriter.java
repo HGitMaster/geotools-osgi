@@ -88,8 +88,10 @@ public class JDBCUpdateInsertFeatureWriter extends JDBCUpdateFeatureWriter {
         if ( inserter != null ) {
             //JD: do not call close because the inserter borrowed all of its state
             // from this reader... super will deal with it.
+            // AA: yet, make it throw away all references so that we won't get
+            // false positive information about connection leaks
+            inserter.cleanup();
             inserter = null;
-            //inserter.close();
         }
         
         super.close();
