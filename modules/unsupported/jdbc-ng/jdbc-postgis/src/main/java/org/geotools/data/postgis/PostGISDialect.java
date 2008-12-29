@@ -89,7 +89,7 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
         super(dataStore);
     }
 
-    boolean looseBBOXEnabled = true;
+    boolean looseBBOXEnabled = false;
 
     boolean estimatedExtentsEnabled = false;
 
@@ -523,9 +523,16 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
                             + ")");
                 }
             }
+            cx.commit();
         } finally {
             dataStore.closeSafe(st);
         }
     }
 
+    @Override
+    public void initializeConnection(Connection cx) throws SQLException {
+        super.initializeConnection(cx);
+        // if we don't do this partial fetches are disallowed
+//        cx.setAutoCommit(false);
+    }
 }
