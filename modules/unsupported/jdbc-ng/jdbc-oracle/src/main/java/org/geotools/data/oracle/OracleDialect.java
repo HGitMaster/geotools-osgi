@@ -40,7 +40,6 @@ import org.geotools.data.oracle.sdo.TT;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.PreparedFilterToSQL;
 import org.geotools.jdbc.PreparedStatementSQLDialect;
-import org.geotools.jdbc.SQLDialect;
 import org.geotools.referencing.CRS;
 import org.geotools.util.SoftValueHashMap;
 import org.opengis.feature.simple.SimpleFeatureType;

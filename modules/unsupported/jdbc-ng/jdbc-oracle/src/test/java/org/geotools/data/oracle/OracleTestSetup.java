@@ -21,7 +21,7 @@ import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCTestSetup;
 
 public class OracleTestSetup extends JDBCTestSetup {
-
+    
     @Override
     protected String typeName(String raw) {
         return raw.toUpperCase();
@@ -38,6 +38,8 @@ public class OracleTestSetup extends JDBCTestSetup {
     
     protected void setUpDataStore(JDBCDataStore dataStore) {
         super.setUpDataStore(dataStore);
+        // tests do assume the dialect is working in non loose mode
+        ((OracleDialect) dataStore.getSQLDialect()).setLooseBBOXEnabled(false);
         
         dataStore.setDatabaseSchema( "SPATIAL" );
     }
