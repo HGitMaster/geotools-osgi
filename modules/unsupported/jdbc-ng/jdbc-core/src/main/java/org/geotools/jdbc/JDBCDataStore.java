@@ -1976,8 +1976,17 @@ public final class JDBCDataStore extends ContentDataStore
             //sql type name
             //JD: some sql dialects require strings / varchars to have an 
             // associated size with them
-            if ( sqlTypeNames[i].startsWith( "VARCHAR" ) ) {
-                dialect.encodeColumnType(sqlTypeNames[i] + "(255)", sql);
+            if ( sqlTypeNames[i].toUpperCase().startsWith( "VARCHAR" ) ) {
+                Integer length = null;
+                if ( featureType != null ) {
+                    AttributeDescriptor att = featureType.getDescriptor(columnNames[i]);
+                    length = findVarcharColumnLength( att );
+                }
+                if ( length == null || length < 0 ) {
+                    length = 255;
+                }
+
+                dialect.encodeColumnType(sqlTypeNames[i] + "("+ length + ")", sql);
             }
             else {
                 dialect.encodeColumnType(sqlTypeNames[i], sql);    
@@ -2006,6 +2015,29 @@ public final class JDBCDataStore extends ContentDataStore
         dialect.encodePostCreateTable(tableName, sql);
 
         return sql.toString();
+    }
+
+    /**
+     * Searches the attribute descriptor restrictions in an attempt to determine
+     * the length of the specified varchar column.
+     */
+    private Integer findVarcharColumnLength(AttributeDescriptor att) {
+        for ( Filter r : att.getType().getRestrictions() ) {
+            if( r instanceof PropertyIsLessThanOrEqualTo ) {
+                PropertyIsLessThanOrEqualTo c = (PropertyIsLessThanOrEqualTo) r;
+                if ( c.getExpression1() instanceof Function &&
+                    ((Function) c.getExpression1()).getName().toLowerCase().endsWith( "length") ) {
+                    if ( c.getExpression2() instanceof Literal ) {
+                        Integer length = c.getExpression2().evaluate(null,Integer.class);
+                        if ( length != null ) {
+                            return length;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
