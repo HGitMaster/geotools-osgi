@@ -58,8 +58,8 @@ import java.util.Set;
  * {@linkplain java.io.Serializable} classes can use {@code (int) serialVersionUID} for example.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/Utilities.java $
- * @version $Id: Utilities.java 30792 2008-06-23 19:19:58Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/metadata/src/main/java/org/geotools/util/Utilities.java $
+ * @version $Id: Utilities.java 32122 2008-12-30 11:18:10Z jive $
  * @author Martin Desruisseaux (IRD)
  */
 public final class Utilities {
@@ -84,7 +84,7 @@ public final class Utilities {
     /**
      * The singleton instance to be returned by {@link #emptyQueue}.
      */
-    private static final Queue EMPTY_QUEUE = new EmptyQueue<Object>();
+    private static final Queue<?> EMPTY_QUEUE = new EmptyQueue<Object>();
 
     /**
      * The class for the {@link #EMPTY_QUEUE} instance. Defined as a named class rather than
@@ -592,7 +592,7 @@ public final class Utilities {
      */
     @SuppressWarnings("unchecked")
     public static <E> Queue<E> emptyQueue() {
-        return EMPTY_QUEUE;
+        return (Queue<E>) EMPTY_QUEUE;
     }
 
     /**
