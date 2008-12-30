@@ -66,6 +66,11 @@ public class MySQLDialectBasic extends BasicSQLDialect {
     }
 
     @Override
+    public void encodeColumnName(String raw, StringBuffer sql) {
+        delegate.encodeColumnName(raw, sql);
+    }
+    
+    @Override
     public void encodeColumnType(String sqlTypeName, StringBuffer sql) {
         delegate.encodeColumnType(sqlTypeName, sql);
     }
@@ -85,6 +90,12 @@ public class MySQLDialectBasic extends BasicSQLDialect {
         delegate.registerSqlTypeNameToClassMappings(mappings);
     }
 
+    @Override
+    public void registerSqlTypeToSqlTypeNameOverrides(
+            Map<Integer, String> overrides) {
+        delegate.registerSqlTypeToSqlTypeNameOverrides(overrides);
+    }
+    
     @Override
     public void encodePostCreateTable(String tableName, StringBuffer sql) {
         delegate.encodePostCreateTable(tableName, sql);

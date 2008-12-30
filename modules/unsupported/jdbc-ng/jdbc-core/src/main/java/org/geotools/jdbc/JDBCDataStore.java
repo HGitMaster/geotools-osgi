@@ -65,6 +65,9 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.GmlObjectId;
 import org.opengis.filter.sort.SortBy;
@@ -182,6 +185,11 @@ public final class JDBCDataStore extends ContentDataStore
      * java class to sql type mappings;
      */
     protected HashMap<Class<?>, Integer> classToSqlTypeMappings;
+
+    /**
+     * sql type to sql type name overrides
+     */
+    protected HashMap<Integer,String> sqlTypeToSqlTypeNameOverrides;
 
     /**
      * flag controlling if the datastore is supporting feature and geometry
@@ -360,6 +368,23 @@ public final class JDBCDataStore extends ContentDataStore
 
         return classToSqlTypeMappings;
     }
+
+    /**
+     * Returns any ovverides which map integer constants for database types (from {@link Types})
+     * to database type names.
+     * <p>
+     * This method will return an empty map when there are no overrides.
+     * </p>
+     */
+    public Map<Integer,String> getSqlTypeToSqlTypeNameOverrides() {
+        if ( sqlTypeToSqlTypeNameOverrides == null ) {
+            sqlTypeToSqlTypeNameOverrides = new HashMap<Integer,String>();
+            dialect.registerSqlTypeToSqlTypeNameOverrides(sqlTypeToSqlTypeNameOverrides);
+        }
+
+        return sqlTypeToSqlTypeNameOverrides;
+    }
+
 
     /**
      * Returns the java type mapped to the specified sql type.

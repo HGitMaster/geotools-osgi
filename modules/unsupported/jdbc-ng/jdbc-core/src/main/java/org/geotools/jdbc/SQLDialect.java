@@ -291,6 +291,21 @@ public abstract class SQLDialect {
     }
 
     /**
+     * Registers any overrides that should occur when mapping an integer sql type 
+     * value to an underlying sql type name.
+     * <p>
+     * The default implementation of this method does nothing. Subclasses should override
+     * in cases where:
+     * <ul>
+     * <li>database type metadata does not provide enough information to properly map
+     * <li>to support custom types (those not in {@link Types})
+     * </ul>
+     * </p>
+     */
+    public void registerSqlTypeToSqlTypeNameOverrides(Map<Integer,String> overrides) {
+    }
+    
+    /**
      * Returns the java class mapping for a particular column.
      * <p>
      * This method is used as a "last resort" when the mappings specified by the
