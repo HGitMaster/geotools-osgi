@@ -90,7 +90,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
     /**
      * hints
      */
-    protected Set<Hints.ClassKey> hints;
+    protected Set<Hints.Key> hints;
     /**
      * The query defining the feature source
      */
@@ -119,7 +119,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
         this.queryCapabilities = new QueryCapabilities();
         
         //set up hints
-        hints = new HashSet<Hints.ClassKey>();
+        hints = new HashSet<Hints.Key>();
         hints.add( Hints.JTS_GEOMETRY_FACTORY );
         hints.add( Hints.JTS_COORDINATE_SEQUENCE_FACTORY );
         
@@ -768,7 +768,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      * </p>
      * @param hints The set of hints supported by the feature source.
      */
-    protected void addHints( Set<Hints.ClassKey> hints ) {
+    protected void addHints( Set<Hints.Key> hints ) {
         
     }
  

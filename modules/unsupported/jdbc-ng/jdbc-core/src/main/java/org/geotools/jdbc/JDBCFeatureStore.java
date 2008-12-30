@@ -25,9 +25,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -35,10 +36,13 @@ import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.FilteringFeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
+import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.JDBCFeatureCollection;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.data.store.ContentState;
+import org.geotools.factory.Hints;
+import org.geotools.factory.Hints.Key;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.FilterAttributeExtractor;
@@ -79,9 +83,16 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
      */
     public JDBCFeatureStore(ContentEntry entry,Query query) throws IOException {
         super(entry,query);
-
+        
         //TODO: cache this
         primaryKey = ((JDBCDataStore) entry.getDataStore()).getPrimaryKey(entry);
+    }
+    
+    @Override
+    protected void addHints(Set<Key> hints) {
+        // mark the features as detached, that is, the user can directly alter them
+        // without altering the state of the datastore
+        hints.add(Hints.FEATURE_DETACHED);
     }
 
     /**
@@ -488,33 +499,29 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         //create the reader
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         
-        SQLDialect dialect = getDataStore().getSQLDialect();
-        if ( dialect instanceof PreparedStatementSQLDialect ) {
-            try {
-                PreparedStatement ps = 
-                    getDataStore().selectSQLPS(querySchema, preFilter, query.getSortBy(), cx);
+        try {
+            // this allows PostGIS to page the results and respect the fetch size
+            if(getState().getTransaction() == Transaction.AUTO_COMMIT) {
+                cx.setAutoCommit(false);
+                cx.setReadOnly(true);
+            }
+            
+            SQLDialect dialect = getDataStore().getSQLDialect();
+            if ( dialect instanceof PreparedStatementSQLDialect ) {
+                PreparedStatement ps = getDataStore().selectSQLPS(querySchema, preFilter, query.getSortBy(), cx);
                 reader = new JDBCFeatureReader( ps, cx, this, querySchema, query.getHints() );
-            } 
-            catch (Exception e) {
-                // close the connection 
-                getDataStore().closeSafe(cx);
-                // safely rethrow
-                throw (IOException) new IOException().initCause(e);
-            }
-        }
-        else {
-            //build up a statement for the content
-            String sql = getDataStore().selectSQL(querySchema, preFilter, query.getSortBy());
-            getDataStore().getLogger().fine(sql);
-
-            try {
+            } else {
+                //build up a statement for the content
+                String sql = getDataStore().selectSQL(querySchema, preFilter, query.getSortBy());
+                getDataStore().getLogger().fine(sql);
+    
                 reader = new JDBCFeatureReader( sql, cx, this, querySchema, query.getHints() );
-            } catch (SQLException e) {
-                // close the connection 
-                getDataStore().closeSafe(cx);
-                // safely rethrow
-                throw (IOException) new IOException("error create reader").initCause( e );
             }
+        } catch (Exception e) {
+            // close the connection 
+            getDataStore().closeSafe(cx);
+            // safely rethrow
+            throw (IOException) new IOException().initCause(e);
         }
         
 
