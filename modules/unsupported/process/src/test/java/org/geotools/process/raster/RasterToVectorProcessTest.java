@@ -12,26 +12,31 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.process.Process;
 import org.geotools.referencing.CRS;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import static org.junit.Assert.*;
 import org.opengis.util.ProgressListener;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Michael Bedward <michael.bedward@gmail.com>
  */
-public class Raster2VectorTest {
+public class RasterToVectorProcessTest {
     private GridCoverage2D grid = null;
     private static final int[] DATA = {
             1, 1, 0, 1,
@@ -66,7 +71,7 @@ public class Raster2VectorTest {
             "AXIS[\"Northing\", NORTH], " +
             "AUTHORITY[\"EPSG\",\"32755\"]]";
 
-    public Raster2VectorTest() {
+    public RasterToVectorProcessTest() {
     }
 
     @Before
@@ -101,21 +106,31 @@ public class Raster2VectorTest {
     }
 
     /**
-     * Test of convert method, of class Raster2Vector.
+     * Test of convert method, of class RasterToVectorProcess.
      */
     @Test
     public void testConvert() {
-        System.out.println("convert");
+        System.out.println("Vectorizing test grid coverage...");
         int band = 0;
-        double outside = 0.0d;
+        Set<Double> outsideValues = new HashSet<Double>();
+        outsideValues.add(0d);
+        
         ProgressListener progress = null;
-        Raster2Vector instance = new Raster2Vector();
-        FeatureCollection result = instance.convert(grid, band, outside, progress);
+        Process r2v = (new RasterToVectorFactory()).create();
+        
+        Map<String, Object> input = new HashMap<String, Object>();
+        input.put(RasterToVectorFactory.RASTER.key, grid);
+        input.put(RasterToVectorFactory.BAND.key, band);
+        input.put(RasterToVectorFactory.OUTSIDE.key, outsideValues);
 
+        //FeatureCollection result =
+        Map<String, Object> result = r2v.execute(input, progress);
+        
         double perimeter = 0;
         double area = 0;
 
-        FeatureIterator iter = result.features();
+        FeatureCollection fc = (FeatureCollection) result.get(RasterToVectorFactory.FEATURES);
+        FeatureIterator iter = fc.features();
         try {
             while (iter.hasNext()) {
                 SimpleFeature feature = (SimpleFeature)iter.next();
@@ -126,6 +141,9 @@ public class Raster2VectorTest {
         } finally {
             iter.close();
         }
+        
+        System.out.println("Total feature area: expected " + AREA + " got " + (int)Math.round(area));
+        System.out.println("Total feature perimeter: expected " + PERIMETER + " got " + (int)Math.round(perimeter));
 
         assertTrue(AREA == (int)Math.round(area) && PERIMETER == (int)Math.round(perimeter));
     }
