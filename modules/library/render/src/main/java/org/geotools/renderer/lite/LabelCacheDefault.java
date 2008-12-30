@@ -126,10 +126,10 @@ public final class LabelCacheDefault implements LabelCache {
 	public double DEFAULT_PRIORITY = 1000.0;
 
 	/** Map<label, LabelCacheItem> the label cache */
-	protected Map labelCache = new HashMap();
+	protected Map<String,LabelCacheItem> labelCache = new HashMap<String,LabelCacheItem>();
 
 	/** non-grouped labels get thrown in here* */
-	protected ArrayList labelCacheNonGrouped = new ArrayList();
+	protected ArrayList<LabelCacheItem> labelCacheNonGrouped = new ArrayList<LabelCacheItem>();
 
 	public boolean DEFAULT_GROUP = false; // what to do if there's no grouping option
 
@@ -145,8 +145,8 @@ public final class LabelCacheDefault implements LabelCache {
 	
 	protected SLDStyleFactory styleFactory=new SLDStyleFactory();
 	boolean stop=false;
-	Set enabledLayers=new HashSet();
-	Set activeLayers=new HashSet();
+	Set<String> enabledLayers=new HashSet<String>();
+	Set<String> activeLayers=new HashSet<String>();
 	
 	LineLengthComparator lineLengthComparator = new LineLengthComparator ();
 
@@ -181,14 +181,14 @@ public final class LabelCacheDefault implements LabelCache {
 		}
 		needsOrdering=true;
 
-		for (Iterator iter = labelCache.values().iterator(); iter.hasNext();) {
-			LabelCacheItem item = (LabelCacheItem) iter.next();
+		for (Iterator<LabelCacheItem> iter = labelCache.values().iterator(); iter.hasNext();) {
+			LabelCacheItem item = iter.next();
 			if( item.getLayerIds().contains(layerId) )
 				iter.remove();
 		}
-		for (Iterator iter = labelCacheNonGrouped
+		for (Iterator<LabelCacheItem> iter = labelCacheNonGrouped
 				.iterator(); iter.hasNext();) {
-			LabelCacheItem item = (LabelCacheItem) iter.next();
+			LabelCacheItem item = iter.next();
 			if( item.getLayerIds().contains(layerId) )
 				iter.remove();
 		}
@@ -224,7 +224,7 @@ public final class LabelCacheDefault implements LabelCache {
 
 		// evaluate
         try {
-            Double number = (Double) symbolizer.getPriority().evaluate( feature, Double.class );
+            Double number = symbolizer.getPriority().evaluate( feature, Double.class );
             return number.doubleValue();
         } catch (Exception e) {
 			return DEFAULT_PRIORITY;
@@ -235,12 +235,12 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @see org.geotools.renderer.lite.LabelCache#put(org.geotools.renderer.style.TextStyle2D,
 	 *      org.geotools.renderer.lite.LiteShape)
 	 */
-	public void put(String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, NumberRange scaleRange) 
+	public void put(String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, NumberRange<Double> scaleRange) 
 	{
 		needsOrdering=true;
 		try{
 			//get label and geometry				
-		    String label = (String) symbolizer.getLabel().evaluate(feature, String.class);
+		    String label = symbolizer.getLabel().evaluate(feature, String.class);
 		    
 			if (label == null) return;
             
@@ -267,7 +267,7 @@ public final class LabelCacheDefault implements LabelCache {
 
 				// DJB: this is where the "grouping" of 'same label' features
 				// occurs
-				LabelCacheItem lci = (LabelCacheItem) labelCache.get(label);
+				LabelCacheItem lci = labelCache.get(label);
 				if (lci == null) // nothing in there yet!
 				{
 					TextStyle2D textStyle = (TextStyle2D) styleFactory
@@ -351,32 +351,32 @@ public final class LabelCacheDefault implements LabelCache {
 	 *
 	 *
 	 */
-	public List orderedLabels() {
-		ArrayList al = getActiveLabels();
+	public List<LabelCacheItem> orderedLabels() {
+		ArrayList<LabelCacheItem> al = getActiveLabels();
 		
 		Collections.sort(al);
 		Collections.reverse(al);
 		return al;		
 	}
-	private ArrayList getActiveLabels() {
-		Collection c = labelCache.values();
-		ArrayList al = new ArrayList(); // modifiable (ie. sortable)
-		for (Iterator iter = c.iterator(); iter.hasNext();) {
-			LabelCacheItem item = (LabelCacheItem) iter.next();
+	private ArrayList<LabelCacheItem> getActiveLabels() {
+		Collection<LabelCacheItem> c = labelCache.values();
+		ArrayList<LabelCacheItem> al = new ArrayList<LabelCacheItem>(); // modifiable (ie. sortable)
+		for (Iterator<LabelCacheItem> iter = c.iterator(); iter.hasNext();) {
+			LabelCacheItem item = iter.next();
 			if( isActive(item.getLayerIds()) )
 					al.add(item);
 		}
 
-		for (Iterator iter = labelCacheNonGrouped.iterator(); iter.hasNext();) {
-			LabelCacheItem item = (LabelCacheItem) iter.next();
+		for (Iterator<LabelCacheItem> iter = labelCacheNonGrouped.iterator(); iter.hasNext();) {
+			LabelCacheItem item = iter.next();
 			if( isActive(item.getLayerIds()) )
 					al.add(item);
 		}
 		return al;
 	}
-	private boolean isActive(Set layerIds) {
-		for (Iterator iter = layerIds.iterator(); iter.hasNext();) {
-			String string = (String) iter.next();
+	private boolean isActive(Set<String> layerIds) {
+		for (Iterator<String> iter = layerIds.iterator(); iter.hasNext();) {
+			String string = iter.next();
 			if( enabledLayers.contains(string) )
 				return true;
 			
@@ -411,7 +411,7 @@ public final class LabelCacheDefault implements LabelCache {
 			throw new IllegalStateException( activeLayers+" are layers that started rendering but have not completed," +
 					" stop() or endLayer() must be called before end() is called" );
 		}
-		List glyphs=new ArrayList();
+		List<Rectangle> glyphs=new ArrayList<Rectangle>();
 		
         // Hack: let's reduce the display area width and height by one pixel.
         // If the rendered image is 256x256, proper rendering of polygons and
@@ -430,19 +430,19 @@ public final class LabelCacheDefault implements LabelCache {
 				displayArea.getMaxY()));
 
 		
-		List items; // both grouped and non-grouped
+		List<LabelCacheItem> items; // both grouped and non-grouped
 		if ( needsOrdering ){
 			items = orderedLabels();
 		} else {
 			items = getActiveLabels();
 		}
-		for (Iterator labelIter = items.iterator(); labelIter.hasNext();) {
+		for (Iterator<LabelCacheItem> labelIter = items.iterator(); labelIter.hasNext();) {
 			if (stop)
 				return;
 			try {
 				// LabelCacheItem labelItem = (LabelCacheItem)
 				// labelCache.get(labelIter.next());
-				LabelCacheItem labelItem = (LabelCacheItem) labelIter.next();
+				LabelCacheItem labelItem = labelIter.next();
 				labelItem.getTextStyle().setLabel(labelItem.getLabel());
 				GlyphVector glyphVector = labelItem.getTextStyle()
 						.getTextGlyphVector(graphics);
@@ -710,10 +710,10 @@ public final class LabelCacheDefault implements LabelCache {
 	    
 		LineString outer = polygon.getExteriorRing();
 		if (outer.getStartPoint().distance(outer.getEndPoint()) != 0) {
-			List clist = new ArrayList(Arrays.asList(outer.getCoordinates()));
+			List<Coordinate> clist = new ArrayList<Coordinate>(Arrays.asList(outer.getCoordinates()));
 			clist.add(outer.getStartPoint().getCoordinate());
 			outer = outer.getFactory().createLinearRing(
-					(Coordinate[]) clist.toArray(new Coordinate[clist.size()]));
+					clist.toArray(new Coordinate[clist.size()]));
 		}
 		LinearRing r = (LinearRing) outer;
 
@@ -731,13 +731,13 @@ public final class LabelCacheDefault implements LabelCache {
 	 *            extra space added to edges of bounds during check
 	 * @return true if labelItem overlaps a previously rendered glyph.
 	 */
-	private boolean overlappingItems(Rectangle bounds, List glyphs,
+	private boolean overlappingItems(Rectangle bounds, List<Rectangle> glyphs,
 			int extraSpace) {
 		bounds = new Rectangle(bounds.x - extraSpace, bounds.y - extraSpace,
 				bounds.width + extraSpace, bounds.height + extraSpace);
 		Rectangle oldBounds;
-		for (Iterator iter = glyphs.iterator(); iter.hasNext();) {
-			oldBounds = (Rectangle) iter.next();
+		for (Iterator<Rectangle> iter = glyphs.iterator(); iter.hasNext();) {
+			oldBounds = iter.next();
 			if (oldBounds.intersects(bounds))
 				return true;
 		}
@@ -959,11 +959,11 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param displayGeometry
 	 * @return a point or null (if there's nothing to draw)
 	 */
-	Point getPointSetRepresentativeLocation(List geoms, Geometry displayGeometry) {
-		ArrayList pts = new ArrayList(); // points that are inside the
+	Point getPointSetRepresentativeLocation(List<Geometry> geoms, Geometry displayGeometry) {
+		ArrayList<Point> pts = new ArrayList<Point>(); // points that are inside the
 		// displayGeometry
 
-		Iterator it = geoms.iterator();
+		Iterator<Geometry> it = geoms.iterator();
 		Geometry g;
 		while (it.hasNext()) {
 			g = (Geometry) it.next();
@@ -974,12 +974,12 @@ public final class LabelCacheDefault implements LabelCache {
 				g = g.getCentroid(); // will be point
 			if (g instanceof Point) {
 				if (displayGeometry.intersects(g)) // this is robust!
-					pts.add(g); // possible label location
+					pts.add((Point)g); // possible label location
 			} else if (g instanceof MultiPoint) {
 				for (int t = 0; t < g.getNumGeometries(); t++) {
 					Point gg = (Point) g.getGeometryN(t);
 					if (displayGeometry.intersects(gg))
-						pts.add(gg); // possible label location
+						pts.add((Point)gg); // possible label location
 				}
 			}
 		}
@@ -987,7 +987,7 @@ public final class LabelCacheDefault implements LabelCache {
 			return null;
 
 		// do better metric than this:
-		return (Point) pts.get(0);
+		return pts.get(0);
 	}
 
 	/**
@@ -1011,12 +1011,12 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param displayGeometry
 	 *            must be poly
 	 */
-	LineString getLineSetRepresentativeLocation(List geoms,
+	LineString getLineSetRepresentativeLocation(List<Geometry> geoms,
 			Geometry displayGeometry) {
-		ArrayList lines = new ArrayList(); // points that are inside the
+		ArrayList<LineString> lines = new ArrayList<LineString>(); // points that are inside the
 		// displayGeometry
 
-		Iterator it = geoms.iterator();
+		Iterator<Geometry> it = geoms.iterator();
 		Geometry g;
 		// go through each geometry in the set.
 		// if its a polygon or multipolygon, get the boundary (reduce to a line)
@@ -1036,7 +1036,7 @@ public final class LabelCacheDefault implements LabelCache {
 					continue; // protection
 			} else if (g instanceof LineString) {
 				if (g.getLength() != 0)
-					lines.add(g);
+					lines.add((LineString)g);
 			} else // multiline
 			{
 				for (int t = 0; t < g.getNumGeometries(); t++) {
@@ -1053,16 +1053,16 @@ public final class LabelCacheDefault implements LabelCache {
 		// join
 		// this algo doesnt always do what you want it to do, but its pretty
 		// good
-		Collection merged = this.mergeLines(lines);
+		Collection<LineString> merged = this.mergeLines(lines);
 
 		// clip to bounding box
-		ArrayList clippedLines = new ArrayList();
-		it = merged.iterator();
+		ArrayList<Geometry> clippedLines = new ArrayList<Geometry>();
+		Iterator<LineString> it2 = merged.iterator();
 		LineString l;
 		MultiLineString ll;
 		Envelope displayGeomEnv = displayGeometry.getEnvelopeInternal();
-		while (it.hasNext()) {
-			l = (LineString) it.next();
+		while (it2.hasNext()) {
+			l = (LineString) it2.next();
 			ll = clipLineString(l, (Polygon) displayGeometry, displayGeomEnv);
 			if ((ll != null) && (!(ll.isEmpty()))) {
 				for (int t = 0; t < ll.getNumGeometries(); t++)
@@ -1140,7 +1140,7 @@ public final class LabelCacheDefault implements LabelCache {
 
 		// its a GC (Line intersection Poly cannot be a polygon/multipoly)
 		GeometryCollection gc = (GeometryCollection) clip;
-		ArrayList lns = new ArrayList();
+		ArrayList<Geometry> lns = new ArrayList<Geometry>();
 		Geometry g;
 		for (int t = 0; t < gc.getNumGeometries(); t++) {
 			g = gc.getGeometryN(t);
@@ -1154,7 +1154,7 @@ public final class LabelCacheDefault implements LabelCache {
 			return null;
 
 		return line.getFactory().createMultiLineString(
-				(LineString[]) lns.toArray(new LineString[1]));
+				lns.toArray(new LineString[1]));
 
 	}
 
@@ -1166,12 +1166,12 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param geoms
 	 * @param displayGeometry
 	 */
-	Polygon getPolySetRepresentativeLocation(List geoms,
+	Polygon getPolySetRepresentativeLocation(List<Geometry> geoms,
 			Geometry displayGeometry) {
-		ArrayList polys = new ArrayList(); // points that are inside the
+		ArrayList<Geometry> polys = new ArrayList<Geometry>(); // points that are inside the
 		// displayGeometry
 
-		Iterator it = geoms.iterator();
+		Iterator<Geometry> it = geoms.iterator();
 		Geometry g;
 		// go through each geometry in the input set
 		// if its not a polygon or multipolygon ignore it
@@ -1183,7 +1183,7 @@ public final class LabelCacheDefault implements LabelCache {
 				continue;
 
 			if (g instanceof Polygon) {
-				polys.add(g);
+				polys.add((Polygon)g);
 			} else // multipoly
 			{
 				for (int t = 0; t < g.getNumGeometries(); t++) {
@@ -1198,7 +1198,7 @@ public final class LabelCacheDefault implements LabelCache {
 		// at this point "polys" is a list of polygons
 
 		// clip
-		ArrayList clippedPolys = new ArrayList();
+		ArrayList<Geometry> clippedPolys = new ArrayList<Geometry>();
 		it = polys.iterator();
 		Polygon p;
 		MultiPolygon pp;
@@ -1290,12 +1290,12 @@ public final class LabelCacheDefault implements LabelCache {
 
 		// its a GC
 		GeometryCollection gc = (GeometryCollection) clip;
-		ArrayList plys = new ArrayList();
+		ArrayList<Polygon> plys = new ArrayList<Polygon>();
 		Geometry g;
 		for (int t = 0; t < gc.getNumGeometries(); t++) {
 			g = gc.getGeometryN(t);
 			if (g instanceof Polygon)
-				plys.add(g);
+				plys.add((Polygon)g);
 			// dont think multiPolygon is possible, but not sure
 		}
 
@@ -1389,10 +1389,10 @@ public final class LabelCacheDefault implements LabelCache {
 		return l.getEndPoint(); // precision protection
 	}
 
-	Collection mergeLines(Collection lines) {
+    Collection<LineString> mergeLines(Collection<LineString> lines) {
 		LineMerger lm = new LineMerger();
 		lm.add(lines);
-		Collection merged = lm.getMergedLineStrings(); // merged lines
+		Collection<LineString> merged = (Collection<LineString>) lm.getMergedLineStrings(); // merged lines
 
 		// Collection merged = lines;
 
@@ -1404,17 +1404,18 @@ public final class LabelCacheDefault implements LabelCache {
 			return merged;
 		}
 
-		Hashtable nodes = new Hashtable(merged.size() * 2); // coordinate ->
+		Hashtable<Coordinate,ArrayList<LineString>> nodes = new Hashtable<Coordinate,ArrayList<LineString>>(merged.size() * 2); // coordinate ->
 		// list of lines
-		Iterator it = merged.iterator();
+		Iterator<?> it = merged.iterator();
 		while (it.hasNext()) {
 			LineString ls = (LineString) it.next();
 			putInNodeHash(ls, nodes);
 		}
 
-		ArrayList result = new ArrayList();
-		ArrayList merged_list = new ArrayList(merged);
-
+		ArrayList<LineString> result = new ArrayList<LineString>();
+		ArrayList<LineString> merged_list = new ArrayList<LineString>();
+		merged_list.addAll((Collection<? extends LineString>) merged);
+		
 		// SORT -- sorting is important because order does matter.
 		Collections.sort(merged_list, lineLengthComparator); // sorted
 		// long->short
@@ -1444,14 +1445,14 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param result
 	 *
 	 */
-	public void processNodes(List edges, Hashtable nodes, ArrayList result) {
+	public void processNodes(List<LineString> edges, Hashtable<Coordinate,ArrayList<LineString>> nodes, ArrayList<LineString> result) {
 		int index = 0; // index into edges
 		while (index < edges.size()) // still more to do
 		{
 			// 1. get a line and remove it from the graph
 			LineString ls = (LineString) edges.get(index);
 			Coordinate key = ls.getCoordinateN(0);
-			ArrayList nodeList = (ArrayList) nodes.get(key);
+			ArrayList<LineString> nodeList = nodes.get(key);
 			if (nodeList == null) // this was removed in an earlier iteration
 			{
 				index++;
@@ -1464,7 +1465,7 @@ public final class LabelCacheDefault implements LabelCache {
 			removeFromHash(nodes, ls); // we're removing this from the network
 
 			Coordinate key2 = ls.getCoordinateN(ls.getNumPoints() - 1);
-			ArrayList nodeList2 = (ArrayList) nodes.get(key2);
+			ArrayList<LineString> nodeList2 = nodes.get(key2);
 
 			// case 1 -- this line is independent
 			if ((nodeList.size() == 0) && (nodeList2.size() == 0)) {
@@ -1491,20 +1492,20 @@ public final class LabelCacheDefault implements LabelCache {
 		}
 	}
 
-	public void removeFromHash(Hashtable nodes, LineString ls) {
+	public void removeFromHash(Hashtable<Coordinate,ArrayList<LineString>> nodes, LineString ls) {
 		Coordinate key = ls.getCoordinateN(0);
-		ArrayList nodeList = (ArrayList) nodes.get(key);
+		ArrayList<LineString> nodeList = nodes.get(key);
 		if (nodeList != null) {
 			nodeList.remove(ls);
 		}
 		key = ls.getCoordinateN(ls.getNumPoints() - 1);
-		nodeList = (ArrayList) nodes.get(key);
+		nodeList = nodes.get(key);
 		if (nodeList != null) {
 			nodeList.remove(ls);
 		}
 	}
 
-	public LineString getLongest(ArrayList al) {
+	public LineString getLongest(ArrayList<LineString> al) {
 		if (al.size() == 1)
 			return (LineString) (al.get(0));
 		double maxLength = -1;
@@ -1521,19 +1522,19 @@ public final class LabelCacheDefault implements LabelCache {
 		return result;
 	}
 
-	public void putInNodeHash(LineString ls, Hashtable nodes) {
+	public void putInNodeHash(LineString ls, Hashtable<Coordinate,ArrayList<LineString>> nodes) {
 		Coordinate key = ls.getCoordinateN(0);
-		ArrayList nodeList = (ArrayList) nodes.get(key);
+		ArrayList<LineString> nodeList = nodes.get(key);
 		if (nodeList == null) {
-			nodeList = new ArrayList();
+			nodeList = new ArrayList<LineString>();
 			nodeList.add(ls);
 			nodes.put(key, nodeList);
 		} else
 			nodeList.add(ls);
 		key = ls.getCoordinateN(ls.getNumPoints() - 1);
-		nodeList = (ArrayList) nodes.get(key);
+		nodeList = nodes.get(key);
 		if (nodeList == null) {
-			nodeList = new ArrayList();
+			nodeList = new ArrayList<LineString>();
 			nodeList.add(ls);
 			nodes.put(key, nodeList);
 		} else
@@ -1558,10 +1559,10 @@ public final class LabelCacheDefault implements LabelCache {
 	 *
 	 * @param lines
 	 */
-	Collection mergeLines2(Collection lines) {
+	Collection<LineString> mergeLines2(Collection<LineString> lines) {
 		LineMerger lm = new LineMerger();
 		lm.add(lines);
-		Collection merged = lm.getMergedLineStrings(); // merged lines
+		Collection<LineString> merged = (Collection<LineString>)lm.getMergedLineStrings(); // merged lines
 		// Collection merged = lines;
 
 		if (merged.size() == 0) {
@@ -1586,7 +1587,7 @@ public final class LabelCacheDefault implements LabelCache {
 		// 5. keep going until you've completely gone through the list and no
 		// merging's taken place
 
-		ArrayList mylines = new ArrayList(merged);
+		ArrayList<LineString> mylines = new ArrayList<LineString>(merged);
 
 		boolean keep_going = true;
 		while (keep_going) {
@@ -1629,7 +1630,7 @@ public final class LabelCacheDefault implements LabelCache {
 			}
 			// remove any null items in the list (see step 3a)
 
-			mylines = (ArrayList) removeNulls(mylines);
+			mylines = (ArrayList<LineString>) removeNulls(mylines);
 
 		}
 
@@ -1644,10 +1645,10 @@ public final class LabelCacheDefault implements LabelCache {
 	 *
 	 * @param l
 	 */
-	ArrayList removeNulls(List l) {
-		ArrayList al = new ArrayList();
-		Iterator it = l.iterator();
-		Object o;
+	<T> ArrayList<T> removeNulls(List<T> l) {
+		ArrayList<T> al = new ArrayList<T>();
+		Iterator<T> it = l.iterator();
+		T o;
 		while (it.hasNext()) {
 			o = it.next();
 			if (o != null) {
@@ -1661,10 +1662,10 @@ public final class LabelCacheDefault implements LabelCache {
 	 * reverse direction of points in a line
 	 */
 	LineString reverse(LineString l) {
-		List clist = Arrays.asList(l.getCoordinates());
+		List<Coordinate> clist = Arrays.asList(l.getCoordinates());
 		Collections.reverse(clist);
 		return l.getFactory().createLineString(
-				(Coordinate[]) clist.toArray(new Coordinate[1]));
+				clist.toArray(new Coordinate[1]));
 	}
 
 	/**
@@ -1701,19 +1702,19 @@ public final class LabelCacheDefault implements LabelCache {
 	 * simple linestring merge - l1 points then l2 points
 	 */
 	private LineString mergeSimple(LineString l1, LineString l2) {
-		ArrayList clist = new ArrayList(Arrays.asList(l1.getCoordinates()));
+		ArrayList<Coordinate> clist = new ArrayList<Coordinate>(Arrays.asList(l1.getCoordinates()));
 		clist.addAll(Arrays.asList(l2.getCoordinates()));
 
 		return l1.getFactory().createLineString(
-				(Coordinate[]) clist.toArray(new Coordinate[1]));
+				clist.toArray(new Coordinate[1]));
 	}
 
 	/**
 	 * sorts a list of LineStrings by length (long=1st)
 	 *
 	 */
-	private final class LineLengthComparator implements java.util.Comparator {
-		public int compare(Object o1, Object o2) // note order - this sort
+	private final class LineLengthComparator implements java.util.Comparator<LineString> {
+		public int compare(LineString o1, LineString o2) // note order - this sort
 		// big->small
 		{
 			return Double.compare(((LineString) o2).getLength(),

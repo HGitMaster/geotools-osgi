@@ -36,13 +36,13 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author simone giannecchini  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCacheItem.java $
  * @deprecated Use {@link LabelCacheItem} instead (along with {@link LabelCacheImpl}
  */
-public class LabelCacheItem implements Comparable {
+public class LabelCacheItem implements Comparable<LabelCacheItem> {
 	TextStyle2D textStyle;
-	List geoms=new ArrayList();
+	List<Geometry> geoms=new ArrayList<Geometry>();
 	double priority = 0.0;
 	int spaceAround = 0;
 	String label;
-	private Set layerIds=new HashSet();
+	private Set<String> layerIds=new HashSet<String>();
 	
 	public String getLabel()
 	{
@@ -93,14 +93,14 @@ public class LabelCacheItem implements Comparable {
 	 * Return a modifiable set of ids
 	 * @return
 	 */
-	public Set getLayerIds() {
+	public Set<String> getLayerIds() {
 		return Collections.synchronizedSet(layerIds);
 	}
 	
 	/**
 	 * The list of geometries this item maintains
 	 */
-	public List getGeoms() {
+	public List<Geometry> getGeoms() {
 		return geoms;
 	}
 
@@ -121,7 +121,7 @@ public class LabelCacheItem implements Comparable {
 		}
 		if (arg0 instanceof LabelCacheItem) {
 			LabelCacheItem item = (LabelCacheItem) arg0;
-			return textStyle.getLabel().equals(((LabelCacheItem)arg0).getTextStyle().getLabel());
+			return textStyle.getLabel().equals( item.getTextStyle().getLabel() );
 		}
 		if (arg0 instanceof TextStyle2D) {
 			TextStyle2D text = (TextStyle2D) arg0;
@@ -147,7 +147,7 @@ public class LabelCacheItem implements Comparable {
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(Object o) 
+	public int compareTo(LabelCacheItem o) 
 	{
 		LabelCacheItem other = (LabelCacheItem) o;
 		return Double.compare(this.getPriority(),other.getPriority() );		
