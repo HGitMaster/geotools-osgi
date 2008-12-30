@@ -14,8 +14,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.geotools.process.raster;
 
+import com.vividsolutions.jts.algorithm.InteriorPointArea;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineSegment;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.operation.polygonize.Polygonizer;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,188 +34,30 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.media.jai.TiledImage;
 import javax.media.jai.iterator.RandomIter;
+import javax.media.jai.iterator.RandomIterFactory;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.data.Parameter;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.process.Process;
 import org.geotools.process.ProcessFactory;
 import org.geotools.process.impl.AbstractProcess;
-import org.geotools.text.Text;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.SubProgressListener;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.metadata.spatial.PixelOrientation;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.util.InternationalString;
 import org.opengis.util.ProgressListener;
 
-import com.vividsolutions.jts.algorithm.InteriorPointArea;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.operation.polygonize.Polygonizer;
-import javax.media.jai.TiledImage;
-import javax.media.jai.iterator.RandomIterFactory;
-
-
-/**
- * Process for converting a raster to a vector.
- * <p>
- * The algorithm used is adapted from the GRASS raster to vector C code. It moves
- * a 2x2 kernel over the input raster. The data in the kernel are matched to a
- * table of the 12 possible configurations indicating which horizontal and/or
- * vertical pixel boundaries need to be traced.
- * 
- * @author Michael Bedward <michael.bedward@gmail.com>
- */
-public class Raster2VectorFactory implements ProcessFactory {
-
-    private static final String VERSION_STRING = "0.0.2";
-
-    /**
-     * Creates a Process that can be executed later.
-     * <p>
-     * The process will call Raster2Vector.convert( raster, band, nododata, monitor ).
-     */
-    public Process create() {
-        return new AbstractProcess(this) {
-            public Map<String, Object> execute(Map<String, Object> input, ProgressListener monitor) {
-                if (monitor == null)
-                    monitor = new NullProgressListener();
-                try {
-                    GridCoverage2D raster = (GridCoverage2D) input.get("raster");
-                    int band = (Integer) input.get("band");
-                    double nodata = (Double) input.get("nodata");
-
-                    Raster2Vector engine = new Raster2Vector();
-                    FeatureCollection features = engine.convert(raster, band, nodata, monitor);
-
-                    Map<String, Object> results = new HashMap<String, Object>();
-                    results.put("features", features);
-                    return results;
-                } finally {
-                    monitor.complete();
-                }
-            }
-        };
-    }
-
-    /**
-     * Get a descrption for this proecess
-     * @return the string: Raster to Vector transformation
-     */
-    public InternationalString getDescription() {
-        return Text.text("Raster to Vector transformation");
-    }
-
-    /**
-     * Get the name of this process
-     * @return the string: Raster2Vector
-     */
-    public String getName() {
-        return "Raster2Vector";
-    }
-
-    /**
-     * Description input parameters.
-     * <ul>
-     * <li>raster: the input coverage
-     * <li>band: the index of the band to be vectorized
-     * <li>nodata: a double value which represents 'outside' or no data
-     * </ul>
-     *
-     * @return Map of Parameter describing valid input parameters
-     *
-     * @todo introduce more flexibility here so that, for instance, we can
-     * requrest that a subset of the values in the input raster are vectorized
-     */
-    public Map<String, Parameter<?>> getParameterInfo() {
-        Map<String, Parameter<?>> info = new HashMap<String, Parameter<?>>();
-        info.put("raster", new Parameter("raster", GridCoverage2D.class, Text.text("GridCoverage"),
-                Text.text("The input coverage")));
-        info.put("band", new Parameter("band", GridCoverage2D.class, Text.text("Band"), Text
-                .text("the index of the band to be vectorized")));
-        info.put("nodata", new Parameter("nodata", Double.class, Text.text("Outside"), Text
-                .text("a value to represent 'outside' or no data")));
-        return info;
-    }
-
-    /**
-     * Get information about the results
-     * @param parameters ???
-     * @return
-     * @throws java.lang.IllegalArgumentException
-     */
-    public Map<String, Parameter<?>> getResultInfo(Map<String, Object> parameters)
-            throws IllegalArgumentException {
-        Map<String, Parameter<?>> info = new HashMap<String, Parameter<?>>();
-        // we should be able to record the FeatureType here; but it is not well
-        // defined in a public schema?
-        SimpleFeatureType schema = getSchema(null);
-        Map<String, Object> metadata = new HashMap<String, Object>();
-        metadata.put(Parameter.FEATURE_TYPE, schema);
-        info.put("features", new Parameter("Features", FeatureCollection.class, Text
-                .text("Features"), Text.text("The generated features"), metadata));
-        return info;
-    }
-
-    /**
-     * @return the string: Raster2Vector
-     */
-    public InternationalString getTitle() {
-        return Text.text("Raster2Vector");
-    }
-
-    /**
-     * Get the version of this process
-     * @return
-     */
-    public String getVersion() {
-        return VERSION_STRING;
-    }
-
-    /**
-     * Check if this process supports a progress listener
-     * @return always returns true
-     */
-    public boolean supportsProgress() {
-        return true;
-    }
-
-    /**
-     * We can generate a schema; but we need to know the CoordinateReferenceSystem.
-     * 
-     * @param crs a coorindate reference system for the features
-     * @return a new SimpleFeatureType object
-     */
-    public static SimpleFeatureType getSchema(CoordinateReferenceSystem crs) {
-        SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-        typeBuilder.setName("R2Vpolygons");
-        if (crs != null) {
-            typeBuilder.setCRS(crs);
-        }
-        typeBuilder.add("shape", Polygon.class, (CoordinateReferenceSystem) null);
-        typeBuilder.add("code", Integer.class);
-        SimpleFeatureType type = typeBuilder.buildFeatureType();
-        return type;
-    }
-}
 /**
  * A class to vectorize discrete regions of uniform data in the specified band of a GridCoverage2D
  * object. Data are treated as double values regardless of the data type of the input grid coverage.
  * 
  * @author Michael Bedward <michael.bedward@gmail.com>
  */
-class Raster2Vector {
+class RasterToVectorProcess extends AbstractProcess {
 
     /* the JTS object that does all the topological work for us */
     private Polygonizer polygonizer;
@@ -230,41 +80,92 @@ class Raster2Vector {
 
     // positions in curData matrix just to avoid confusion
     private static final int TL = 0;
-
     private static final int TR = 1;
-
     private static final int BL = 2;
-
     private static final int BR = 3;
+
+    // these are used to identify the orientation of corner touches
+    // between possibly separate polygons with the same value
+    private static final int TL_BR = 4;
+    private static final int TR_BL = 5;
+    private static final int CROSS = 6;
 
     // Precision of comparison in the function different(a, b)
     private static final double EPSILON = 1.0e-10d;
 
-    /**
+    /*
      * array of Coor objects that store end-points of vertical lines under construction
      */
     private Map<Integer, LineSegment> vertLines;
 
-    /**
+    /*
      * end-points of horizontal line under construction
      */
     private LineSegment horizLine;
 
-    /**
+    /*
      * collection of line strings on the boundary of raster regions
      */
     private List<LineString> lines;
-
-    private TiledImage image;
-
-    /**
-     * Constructor (empty at present)
+    
+    /*
+     * list of corner touches between possibly separate polygons of
+     * the same value. Each Coordinate has x:y = col:row and z set
+     * to either TL_BR or TR_BL to indicate the orientation of the
+     * corner touch.
      */
-    public Raster2Vector() {
+    List<Coordinate> cornerTouches;
+
+    /*
+     * input image
+     */
+    private TiledImage image;
+    
+    /**
+     * Package-access constructor. Client code should use the public
+     * {@linkplain RasterToVectorFactory#create } method
+     * @param factory
+     */
+    RasterToVectorProcess(ProcessFactory factory) {
+        super(factory);
     }
 
     /**
-     * Convert the input raster coverage to vector polygons.
+     * Run the process.
+     * @param input a map of the following input parameters:
+     * <table>
+     * <tr>
+     * <td>Key</td><td>Description</td>
+     * </table>
+     * @param monitor
+     * @return
+     */
+    public Map<String, Object> execute(Map<String, Object> input, ProgressListener monitor) {
+        if (monitor == null) {
+            monitor = new NullProgressListener();
+        }
+        try {
+            GridCoverage2D raster = (GridCoverage2D) input.get(RasterToVectorFactory.RASTER.key);
+            int band = (Integer) input.get(RasterToVectorFactory.BAND.key);
+            Collection<Double> outsideValues = (Collection<Double>)input.get(
+                    RasterToVectorFactory.OUTSIDE.key);
+
+            FeatureCollection features = convert(raster, band, outsideValues, monitor);
+
+            Map<String, Object> results = new HashMap<String, Object>();
+            results.put("features", features);
+            return results;
+        } finally {
+            monitor.complete();
+        }
+
+    }
+    
+
+    /**
+     * Convert the input raster coverage to vector polygons. This is a package-access method.
+     * Client code should start the process via the 
+     * {@linkplain org.geotools.process.Process#execute } method.
      * 
      * @param cover
      *            the input coverage
@@ -279,19 +180,19 @@ class Raster2Vector {
      *       to extend the code to handle mutliple tiles.
      * 
      */
-    public FeatureCollection convert(GridCoverage2D grid, int band, double outside,
+    private FeatureCollection convert(GridCoverage2D grid, int band, Collection<Double> outsideValues,
             ProgressListener progress) {
         if (progress == null)
             progress = new NullProgressListener();
-
+        
         initialize(grid, new SubProgressListener(progress, 0.3f));
-        vectorizeAndCollectBoundaries(band, outside, new SubProgressListener(progress, 0.3f));
+        vectorizeAndCollectBoundaries(band, outsideValues, new SubProgressListener(progress, 0.3f));
 
         /***********************************************************
          * Assemble the LineStringss into Polygons, and create the collection of features to return
          * 
          ***********************************************************/
-        SimpleFeatureType schema = Raster2VectorFactory.getSchema(grid
+        SimpleFeatureType schema = RasterToVectorFactory.getSchema(grid
                 .getCoordinateReferenceSystem());
         FeatureCollection features = assembleFeatures(grid, band, schema, new SubProgressListener(
                 progress, 0.4f));
@@ -300,7 +201,8 @@ class Raster2Vector {
     }
 
     /**
-     * Assemble a feature collection from the raster
+     * Assemble a feature collection by polygonizing the boundary segments that
+     * have been collected by the vectorizing algorithm.
      * 
      * @param grid the input grid coverage
      * @param band the band containing the data to vectorize
@@ -383,6 +285,9 @@ class Raster2Vector {
             progress.progress(0.8f);
 
             vertLines = new HashMap<Integer, LineSegment>();
+            
+            cornerTouches = new ArrayList<Coordinate>();
+            
         } finally {
             progress.complete();
         }
@@ -395,7 +300,7 @@ class Raster2Vector {
      * @param outside a double value indicating 'outside' or nodata
      * @param progress a progress listener (may be null)
      */
-    private void vectorizeAndCollectBoundaries(int band, double outside, ProgressListener progress) {
+    private void vectorizeAndCollectBoundaries(int band, Collection<Double> outsideValues, ProgressListener progress) {
         if (progress == null)
             progress = new NullProgressListener();
 
@@ -403,6 +308,8 @@ class Raster2Vector {
             // a 2x2 matrix of double values used as a moving window
             double[] curData = new double[4];
             RandomIter imageIter = RandomIterFactory.create(image, null);
+            
+            double defOutside = (Double) outsideValues.toArray()[0];
 
             // we add a virtual border, one cell wide, coded as 'outside'
             // around the raster
@@ -411,14 +318,22 @@ class Raster2Vector {
                     throw new CancellationException();
                 }
                 progress.progress(((float) row) / ((float) maxRasterRow));
-                curData[TR] = curData[BR] = outside;
+                curData[TR] = curData[BR] = defOutside;
                 for (int col = minRasterCol - 1; col <= maxRasterCol; col++) {
                     boolean[] ok = inDataWindow(row, col);
 
                     curData[TL] = curData[TR];
                     curData[BL] = curData[BR];
-                    curData[TR] = (ok[TR] ? imageIter.getSampleDouble(col + 1, row, band) : outside);
-                    curData[BR] = (ok[BR] ? imageIter.getSampleDouble(col + 1, row + 1, band) : outside);
+                    
+                    curData[TR] = (ok[TR] ? imageIter.getSampleDouble(col + 1, row, band) : defOutside);
+                    if (outsideValues.contains(curData[TR])) {
+                        curData[TR] = defOutside;
+                    }
+
+                    curData[BR] = (ok[BR] ? imageIter.getSampleDouble(col + 1, row + 1, band) : defOutside);
+                    if (outsideValues.contains(curData[BR])) {
+                        curData[BR] = defOutside;
+                    }
 
                     updateCoordList(row, col, curData);
                 }
@@ -596,6 +511,22 @@ class Raster2Vector {
             seg = new LineSegment();
             seg.p0.y = row;
             vertLines.put(col, seg);
+
+            int z = -1;
+            if (different(curData[TL], curData[BR])) {
+                if (!different(curData[TR], curData[BL])) {
+                    z = CROSS;
+                }
+            } else {
+                if (different(curData[TR], curData[BL])) {
+                    z = TL_BR;
+                } else {
+                    z = TR_BL;
+                }
+            }
+            if (z != -1) {
+                cornerTouches.add(new Coordinate(col, row, z));
+            }
             break;
 
         case 11:
@@ -684,7 +615,7 @@ class Raster2Vector {
             transformLR.transform(pixelStart, rwStart);
             transformLR.transform(pixelEnd, rwEnd);
         } catch (TransformException ex) {
-            Logger.getLogger(Raster2Vector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RasterToVectorProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         Coordinate[] coords = new Coordinate[] { new Coordinate(rwStart.getX(), rwStart.getY()),
@@ -708,7 +639,7 @@ class Raster2Vector {
             transformLR.transform(pixelStart, rwStart);
             transformLR.transform(pixelEnd, rwEnd);
         } catch (TransformException ex) {
-            Logger.getLogger(Raster2Vector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RasterToVectorProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         Coordinate[] coords = new Coordinate[] { new Coordinate(rwStart.getX(), rwStart.getY()),
@@ -731,5 +662,5 @@ class Raster2Vector {
             return false;
         }
     }
-}
 
+}
