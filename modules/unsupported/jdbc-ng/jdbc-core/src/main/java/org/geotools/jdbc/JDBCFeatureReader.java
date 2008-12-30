@@ -33,10 +33,8 @@ import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
@@ -617,21 +615,21 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                         }
                     }
     
-                    // if the value is not of the type of the binding, try to
-                    // convert
-                    Class binding = type.getType().getBinding();
-    
-                    if ((value != null) && !(type.getType().getBinding().isAssignableFrom(binding))) {
-                        if (dataStore.getLogger().isLoggable(Level.FINER)) {
-                            String msg = value + " is not of type " + binding.getName()
-                                + ", attempting conversion";
-                            dataStore.getLogger().finer(msg);
-                        }
-    
+                    // they value may need conversion. We let converters chew the initial
+                    // value towards the target type, if the result is not the same as the
+                    // original, then a conversion happened and we may want to report it to the
+                    // user (being the feature type reverse engineerd, it's unlikely a true
+                    // conversion will be needed)
+                    if(value != null) {
+                        Class binding = type.getType().getBinding();
                         Object converted = Converters.convert(value, binding);
-    
-                        if (converted != null) {
+                        if(converted != null && converted != value) {
                             value = converted;
+                            if (dataStore.getLogger().isLoggable(Level.FINER)) {
+                                String msg = value + " is not of type " + binding.getName()
+                                    + ", attempting conversion";
+                                dataStore.getLogger().finer(msg);
+                            }
                         }
                     }
     
