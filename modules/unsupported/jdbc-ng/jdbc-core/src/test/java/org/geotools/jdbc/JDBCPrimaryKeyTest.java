@@ -16,12 +16,16 @@
  */
 package org.geotools.jdbc;
 
+import java.util.Collections;
+
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -135,5 +139,12 @@ public abstract class JDBCPrimaryKeyTest extends JDBCTestSupport {
         assertTrue( f.getID().startsWith( tname("multi") + ".4.") );
         
         features.close( i );
+        
+        //test with a filter
+        FilterFactory ff = dataStore.getFilterFactory();
+        
+        Id id = ff.id( Collections.singleton( ff.featureId( tname("multi") + ".1.x") ) );
+        features = fs.getFeatures( id );
+        assertEquals( 1, features.size() );
     }
 }

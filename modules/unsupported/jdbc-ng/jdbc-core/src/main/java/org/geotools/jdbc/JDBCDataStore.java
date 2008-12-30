@@ -59,6 +59,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -2958,7 +2959,7 @@ public final class JDBCDataStore extends ContentDataStore
                     }
 
                     public int getColumnCount() {
-                        return 1;
+                        return key.getColumns().size();
                     }
 
                     public int getColumnDecimalDigits(int colIndex) {
@@ -2988,7 +2989,42 @@ public final class JDBCDataStore extends ContentDataStore
                             FID = FID.substring(featureType.getTypeName().length() + 1);
                         }
 
-                        return new Object[]{URLDecoder.decode(FID,"UTF-8")};
+                        FID = URLDecoder.decode(FID,"UTF-8");
+
+                        //check for case of multi column primary key and try to backwards map using
+                        // "." as a seperator of values
+                        Object[] values = null;
+                        if ( key.getColumns().size() > 1 ) {
+                            String[] split = FID.split( "\\." );
+
+                            //copy over to avoid array store exception
+                            values = new Object[split.length];
+                            for ( int i = 0; i < split.length; i++ ) {
+                                values[i] = split[i];
+                            }
+                        }
+                        else {
+                            //single value case
+                            values = new Object[]{ FID };
+                        }
+                        if ( values.length != key.getColumns().size() ) {
+                            throw new IllegalArgumentException( "Illegal fid: " + FID + ". Expected "
+                                + key.getColumns().size() + " values but got " + values.length );
+                        }
+
+                        //convert to the type of the key
+                        //JD: usually this would be done by the dialect directly when the value
+                        // actually gets set but the FIDMapper interface does not report types
+                        for ( int i = 0; i < values.length; i++ ) {
+                            if ( values[i] != null ) {
+                                Object converted = Converters.convert( values[i], key.getColumns().get( i ).getType() );
+                                if ( converted != null ) {
+                                    values[i] = converted;
+                                }
+                            }
+                        }
+
+                        return values;
                     }
 
                     public boolean hasAutoIncrementColumns() {
