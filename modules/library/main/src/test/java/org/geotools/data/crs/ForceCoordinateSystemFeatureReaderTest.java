@@ -86,7 +86,7 @@ public class ForceCoordinateSystemFeatureReaderTest extends TestCase {
         assertFalse( original.hasNext() );
         assertFalse( modified.hasNext() );
         
-        assertNull(modified.schema);
+        assertSame(modified.builder.getFeatureType(), original.getFeatureType());
     }
     
     public void testDifferentCRS() throws Exception {
@@ -117,7 +117,7 @@ public class ForceCoordinateSystemFeatureReaderTest extends TestCase {
         assertFalse( original.hasNext() );
         assertFalse( modified.hasNext() );
         
-        assertNotNull(modified.schema);
+        assertNotNull(modified.builder);
     }
     
     public void testNullDestination() throws Exception {
@@ -165,6 +165,6 @@ public class ForceCoordinateSystemFeatureReaderTest extends TestCase {
         assertFalse( original.hasNext() );
         assertFalse( modified.hasNext() );
         
-        assertNotNull(modified.schema);
+        assertNotNull(modified.builder);
     }
 }

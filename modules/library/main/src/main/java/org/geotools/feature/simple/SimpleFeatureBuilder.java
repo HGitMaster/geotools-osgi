@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataUtilities;
+import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.type.Types;
@@ -486,9 +487,14 @@ public class SimpleFeatureBuilder {
     }
         
     /**
-     * Copies an existing feature, retyping it in the process.
+     * Copies an existing feature, retyping it in the process. 
+     * <p> Be warned, this method will
+     * create its own SimpleFeatureBuilder, which will trigger a scan of the SPI looking for 
+     * the current default feature factory, which is expensive and has scalability issues.<p>  
+     * If you need good performance consider using 
+     * {@link SimpleFeatureBuilder#retype(SimpleFeature, SimpleFeatureBuilder)} instead.
      * <p>
-     * If the feature type contians attributes in which the oringial feature 
+     * If the feature type contains attributes in which the original feature 
      * does not have a value for, the value in the resulting feature is set to
      * <code>null</code>.
      * </p>
@@ -499,8 +505,29 @@ public class SimpleFeatureBuilder {
      */
     public static SimpleFeature retype(SimpleFeature feature, SimpleFeatureType featureType) {
         SimpleFeatureBuilder builder = new SimpleFeatureBuilder(featureType);
-        for ( Iterator a = featureType.getAttributeDescriptors().iterator(); a.hasNext(); ) {
-            AttributeDescriptor att = (AttributeDescriptor) a.next();
+        for (AttributeDescriptor att : featureType.getAttributeDescriptors()) {
+            Object value = feature.getAttribute( att.getName() );
+            builder.set(att.getName(), value);
+        }
+        return builder.buildFeature(feature.getID());
+    }
+    
+    /**
+     * Copies an existing feature, retyping it in the process. 
+     * <p>
+     * If the feature type contains attributes in which the original feature 
+     * does not have a value for, the value in the resulting feature is set to
+     * <code>null</code>.
+     * </p>
+     * @param feature The original feature.
+     * @param SimpleFeatureBuilder A builder for the target feature type
+     *  
+     * @return The copied feature, with a new type.
+     * @since 2.5.3
+     */
+    public static SimpleFeature retype(SimpleFeature feature, SimpleFeatureBuilder builder) {
+        builder.reset();
+        for (AttributeDescriptor att : builder.getFeatureType().getAttributeDescriptors()) {
             Object value = feature.getAttribute( att.getName() );
             builder.set(att.getName(), value);
         }
