@@ -503,7 +503,6 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
             // this allows PostGIS to page the results and respect the fetch size
             if(getState().getTransaction() == Transaction.AUTO_COMMIT) {
                 cx.setAutoCommit(false);
-                cx.setReadOnly(true);
             }
             
             SQLDialect dialect = getDataStore().getSQLDialect();
