@@ -29,8 +29,10 @@ import java.util.Map;
 
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.SQLDialect;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.PropertyDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -157,16 +159,56 @@ public class H2Dialect extends SQLDialect {
         if ( att instanceof GeometryDescriptor ) {
             //try to narrow down the type with a comment
             Class binding = att.getType().getBinding();
-            if (Point.class.isAssignableFrom(binding) 
-                || LineString.class.isAssignableFrom(binding)
-                || Polygon.class.isAssignableFrom(binding) 
-                || MultiPoint.class.isAssignableFrom( binding ) 
-                || MultiLineString.class.isAssignableFrom(binding) 
-                || MultiPolygon.class.isAssignableFrom( binding )) {
+            if (isConcreteGeometry(binding)) {
                 sql.append( " COMMENT '").append( binding.getSimpleName().toUpperCase() )
                     .append( "'");
             }
         }
+    }
+    
+    @Override
+    public void postCreateTable(String schemaName,
+            SimpleFeatureType featureType, Connection cx) throws SQLException {
+        
+        Statement st = cx.createStatement();
+        try {
+            //post process the feature type and set up constraints based on geometry type
+            for ( PropertyDescriptor ad : featureType.getDescriptors() ) {
+                if ( ad instanceof GeometryDescriptor ) {
+                    Class binding = ad.getType().getBinding();
+                    if ( isConcreteGeometry( binding ) ) {
+                        String propertyName = ad.getName().getLocalPart();
+                        StringBuffer sql = new StringBuffer();
+                        sql.append( "ALTER TABLE ");
+                        encodeTableName(featureType.getTypeName(), sql);
+                        sql.append( " ADD CONSTRAINT " );
+                        encodeTableName( propertyName + "GeometryType", sql );
+                        sql.append( " CHECK ");
+                        encodeColumnName( propertyName, sql );
+                        sql.append( " IS NULL OR");
+                        sql.append( " GeometryType(");
+                        encodeColumnName( propertyName, sql );
+                        sql.append( ") = '").append( binding.getSimpleName().toUpperCase() )
+                            .append( "'");
+                            
+                        LOGGER.fine( sql.toString() );
+                        st.execute( sql.toString() );
+                    }
+                }
+            }
+        }
+        finally {
+            dataStore.closeSafe( st );
+        }
+    }
+    
+    boolean isConcreteGeometry( Class binding ) {
+        return Point.class.isAssignableFrom(binding) 
+            || LineString.class.isAssignableFrom(binding)
+            || Polygon.class.isAssignableFrom(binding) 
+            || MultiPoint.class.isAssignableFrom( binding ) 
+            || MultiLineString.class.isAssignableFrom(binding) 
+            || MultiPolygon.class.isAssignableFrom( binding );
     }
     
     public Integer getGeometrySRID(String schemaName, String tableName, String columnName,

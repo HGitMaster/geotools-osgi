@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.PreparedStatementSQLDialect;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
@@ -87,6 +88,12 @@ public class H2DialectPrepared extends PreparedStatementSQLDialect {
     @Override
     public void encodePostCreateTable(String tableName, StringBuffer sql) {
         delegate.encodePostCreateTable(tableName, sql);
+    }
+    
+    @Override
+    public void postCreateTable(String schemaName,
+            SimpleFeatureType featureType, Connection cx) throws SQLException {
+        delegate.postCreateTable(schemaName, featureType, cx);
     }
         
     @Override
