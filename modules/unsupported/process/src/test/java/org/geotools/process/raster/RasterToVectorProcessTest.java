@@ -129,7 +129,7 @@ public class RasterToVectorProcessTest {
         double perimeter = 0;
         double area = 0;
 
-        FeatureCollection fc = (FeatureCollection) result.get(RasterToVectorFactory.FEATURES);
+        FeatureCollection fc = (FeatureCollection) result.get(RasterToVectorFactory.RESULT_FEATURES);
         FeatureIterator iter = fc.features();
         try {
             while (iter.hasNext()) {

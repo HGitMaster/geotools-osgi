@@ -31,21 +31,24 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.Collections;
+import java.util.TreeMap;
 
 
 /**
- * Process for converting a raster to a vector.
+ * Process for converting a raster regions to vector polygons.
  * <p>
  * The algorithm used is adapted from the GRASS raster to vector C code. It moves
  * a 2x2 kernel over the input raster. The data in the kernel are matched to a
  * table of the 12 possible configurations indicating which horizontal and/or
  * vertical pixel boundaries need to be traced.
  * 
- * @author Michael Bedward <michael.bedward@gmail.com>
+ * @author Michael Bedward, Jody Garnett
+ * @since 2.6
  */
 public class RasterToVectorFactory implements ProcessFactory {
 
-    private static final String VERSION_STRING = "0.0.2";
+    private static final String VERSION_STRING = "0.0.3";
     
     /** Grid coverage to vectorize */
     public static final Parameter<GridCoverage2D> RASTER = new Parameter<GridCoverage2D>(
@@ -67,28 +70,48 @@ public class RasterToVectorFactory implements ProcessFactory {
             Text.text("Value representing NODATA or outside"),
             true, 1, -1, null, null);
 
+    private static final Map<String, Parameter<?>> parameterInfo = new TreeMap<String, Parameter<?>>();
+    static {
+        parameterInfo.put(RASTER.key, RASTER);
+        parameterInfo.put(BAND.key, BAND);
+        parameterInfo.put(OUTSIDE.key, OUTSIDE);
+    }
+    
     /**
-     * Key to retrieve the vectorized features from the results map returned
+     * Parameter to retrieve the vectorized features from the results map returned
      * by {@linkplain RasterToVectorProcess#execute(java.util.Map, org.opengis.util.ProgressListener) }
      */
-    public static final String FEATURES = "features";
+    public static final Parameter<FeatureCollection> RESULT_FEATURES;
     
-    public RasterToVectorFactory() {
+    private static final Map<String, Parameter<?>> resultInfo = new TreeMap<String, Parameter<?>>();
+    static {
+        // Jody: we should be able to record the FeatureType here; but it is not well
+        // defined in a public schema?
+        SimpleFeatureType schema = getSchema(null);
+        Map<String, Object> metadata = new HashMap<String, Object>();
+        metadata.put(Parameter.FEATURE_TYPE, schema);
+
+        RESULT_FEATURES  = new Parameter<FeatureCollection>(
+            "features", FeatureCollection.class, Text.text("Features"),
+            Text.text("Vectorized region boundaries as polygon features"),
+            metadata);
+
+        resultInfo.put(RESULT_FEATURES.key, RESULT_FEATURES);
     }
 
     /**
-     * Create a new instance of RasterToVectorProcess
+     * Return a new instance of a RasterToVectorProcess
      */
     public Process create() {
         return new RasterToVectorProcess(this);
     }
 
     /**
-     * Get a descrption for this proecess
-     * @return the string: Raster to Vector transformation
+     * Get the description of this process
+     * @return the string: Raster region to vector polygon conversion
      */
     public InternationalString getDescription() {
-        return Text.text("Raster to Vector transformation");
+        return Text.text("Raster region to vector polygon conversion");
     }
 
     /**
@@ -96,51 +119,44 @@ public class RasterToVectorFactory implements ProcessFactory {
      * @return the string: RasterToVectorProcess
      */
     public String getName() {
-        return "Raster2Vector";
+        return "RasterToVectorProcess";
     }
 
     /**
-     * Get a description of the input parameters.
+     * Get a map of input parameters required by the 
+     * {@linkplain RasterToVectorProcess#execute(java.util.Map, org.opengis.util.ProgressListener) }
+     * method
      *
-     * @return a Map describing valid input parameters
+     * @return a Map of input parameters
      */
     public Map<String, Parameter<?>> getParameterInfo() {
-        Map<String, Parameter<?>> info = new HashMap<String, Parameter<?>>();
-        info.put(RASTER.key, RASTER);
-        info.put(BAND.key, BAND);
-        info.put(OUTSIDE.key, OUTSIDE);
-        return info;
+        return Collections.unmodifiableMap(parameterInfo);
     }
 
     /**
-     * Get information about the results
-     * @param parameters ???
-     * @return
+     * Get information about the results that are returned as Map by the
+     * {@linkplain RasterToVectorProcess#execute(java.util.Map, org.opengis.util.ProgressListener) }
+     * method
+     * @param parameters ignored at present so may be null
+     * @return a Map of output parameters
      * @throws java.lang.IllegalArgumentException
      */
     public Map<String, Parameter<?>> getResultInfo(Map<String, Object> parameters)
             throws IllegalArgumentException {
-        Map<String, Parameter<?>> info = new HashMap<String, Parameter<?>>();
-        // we should be able to record the FeatureType here; but it is not well
-        // defined in a public schema?
-        SimpleFeatureType schema = getSchema(null);
-        Map<String, Object> metadata = new HashMap<String, Object>();
-        metadata.put(Parameter.FEATURE_TYPE, schema);
-        info.put("features", new Parameter("Features", FeatureCollection.class, Text
-                .text("Features"), Text.text("The generated features"), metadata));
-        return info;
+        return Collections.unmodifiableMap(resultInfo);
     }
 
     /**
-     * @return the string: RasterToVectorProcess
+     * Get the process title
+     * @return title
      */
     public InternationalString getTitle() {
-        return Text.text("Raster2Vector");
+        return Text.text("Vectorize raster regions");
     }
 
     /**
      * Get the version of this process
-     * @return
+     * @return version as a string
      */
     public String getVersion() {
         return VERSION_STRING;
@@ -155,14 +171,16 @@ public class RasterToVectorFactory implements ProcessFactory {
     }
 
     /**
-     * We can generate a schema; but we need to know the CoordinateReferenceSystem.
+     * Return the feature type of the vectorized polygons.
+     * Note: We can generate a schema; but we need to know the CoordinateReferenceSystem.
      * 
      * @param crs a coorindate reference system for the features
-     * @return a new SimpleFeatureType object
+     * @return a new SimpleFeatureType with name: r2vPolygons and two attributes:
+     * shape (Polygon) and code (Integer)
      */
     public static SimpleFeatureType getSchema(CoordinateReferenceSystem crs) {
         SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-        typeBuilder.setName("R2Vpolygons");
+        typeBuilder.setName("r2vPolygons");
         if (crs != null) {
             typeBuilder.setCRS(crs);
         }

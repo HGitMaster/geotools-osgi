@@ -54,10 +54,33 @@ import org.opengis.util.ProgressListener;
 /**
  * A class to vectorize discrete regions of uniform data in the specified band of a GridCoverage2D
  * object. Data are treated as double values regardless of the data type of the input grid coverage.
+ * <p>
+ * Instances of this class are created with {@linkplain RasterToVectorFactory#create() }.
+ * <p>
+ * Simple example of use:
  * 
- * @author Michael Bedward <michael.bedward@gmail.com>
+ * <pre>{@code \u0000
+ * GridCoverage2D grid = doSomething();
+ * RasterToVectorFactory factory = new RasterToVectorFactory();
+ * RasterToVectorProcess r2v = factory.create();
+ * 
+ * Map<String, Object> params = new HashMap<String, Object>()
+ * params.put(RasterToVectorFactory.RASTER.key, grid);
+ * params.put(RasterToVectorFactory.BAND.key, 0);
+ * Set<Double> outside = new HashSet<Double>();  // can be any Collection class
+ * outside.add(0d);
+ * outside.add(2d);
+ * outside.add(3d);
+ * params.put(RasterToVectorFactory.OUTSIDE.key, outside);
+ *  
+ * Map<String, Object results = r2v.execute(params, new NullProgressListener());
+ * FeatureCollection boundaries = (FeatureCollection) results.get(RasterToVectorFactory.RESULT_FEATURES.key);
+ *}</pre>
+ * 
+ * @author Michael Bedward, Jody Garnett
+ * @since 2.6
  */
-class RasterToVectorProcess extends AbstractProcess {
+public class RasterToVectorProcess extends AbstractProcess {
 
     /* the JTS object that does all the topological work for us */
     private Polygonizer polygonizer;
@@ -131,14 +154,21 @@ class RasterToVectorProcess extends AbstractProcess {
     }
 
     /**
-     * Run the process.
+     * Run the process and return a Map of result objects. 
+     * <p>
+     * Presently, the returned Map will contain a single object: the FeatureCollection
+     * of vector polygons which can be retrieved as follows
+     * <p>
+     * {@code FeatureCollection features = 
+     * (FeatureCollection) resultsMap.get(RasterToVectorFactory.RESULT_FEATURES.key);}
+     * 
      * @param input a map of the following input parameters:
      * <table>
      * <tr>
      * <td>Key</td><td>Description</td>
      * </table>
      * @param monitor
-     * @return
+     * @return a Map containing result objects 
      */
     public Map<String, Object> execute(Map<String, Object> input, ProgressListener monitor) {
         if (monitor == null) {
@@ -153,12 +183,11 @@ class RasterToVectorProcess extends AbstractProcess {
             FeatureCollection features = convert(raster, band, outsideValues, monitor);
 
             Map<String, Object> results = new HashMap<String, Object>();
-            results.put("features", features);
+            results.put(RasterToVectorFactory.RESULT_FEATURES.key, features);
             return results;
         } finally {
             monitor.complete();
         }
-
     }
     
 
@@ -172,12 +201,9 @@ class RasterToVectorProcess extends AbstractProcess {
      * @param band
      *            the index of the band to be vectorized
      * @param outside
-     *            a value to represent 'outside' or no data
+     *            a collection of one or more values which represent 'outside' or no data
      *
      * @return a FeatureCollection containing simple polygon features
-     * 
-     * @todo Presently it is assumed that there is only a single tile in the coverage raster. Need
-     *       to extend the code to handle mutliple tiles.
      * 
      */
     private FeatureCollection convert(GridCoverage2D grid, int band, Collection<Double> outsideValues,
@@ -208,7 +234,7 @@ class RasterToVectorProcess extends AbstractProcess {
      * @param band the band containing the data to vectorize
      * @param type feature type
      * @param progress a progress listener (may be null)
-     * @return
+     * @return a new FeatureCollection containing the boundary polygons
      */
     private FeatureCollection assembleFeatures(GridCoverage2D grid, int band,
             SimpleFeatureType type, ProgressListener progress) {
