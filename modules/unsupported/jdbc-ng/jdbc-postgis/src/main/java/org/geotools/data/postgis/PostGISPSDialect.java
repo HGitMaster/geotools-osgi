@@ -119,6 +119,12 @@ public class PostGISPSDialect extends PreparedStatementSQLDialect {
             Map<String, Class<?>> mappings) {
         delegate.registerSqlTypeNameToClassMappings(mappings);
     }
+    
+    @Override
+    public void registerSqlTypeToSqlTypeNameOverrides(
+            Map<Integer, String> overrides) {
+        delegate.registerSqlTypeToSqlTypeNameOverrides(overrides);
+    }
 
 
     public void setLooseBBOXEnabled(boolean looseBBOXEnabled) {
