@@ -19,6 +19,9 @@ package org.geotools.data.postgis;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
@@ -31,6 +34,11 @@ public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
     
     /** parameter for database port */
     public static final Param PORT = new Param("port", Integer.class, "Port", true, 5432);
+
+    /**
+     * Wheter a prepared statements based dialect should be used, or not
+     */
+    public static final Param PREPARED_STATEMENTS = new Param("preparedStatements", Boolean.class, "Use prepared statements", false, Boolean.FALSE);
     
     @Override
     protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
@@ -39,7 +47,7 @@ public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
 
     @Override
     protected String getDatabaseID() {
-        return "PostGIS";
+        return "PostGIS2";
     }
     
     @Override
@@ -64,8 +72,11 @@ public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
         Boolean loose = (Boolean) LOOSEBBOX.lookUp(params);
         dialect.setLooseBBOXEnabled(loose == null || Boolean.TRUE.equals(loose));
         
-        // setup proper fetch size
-        dataStore.setFetchSize(200);
+        // setup the ps dialect if need be
+        Boolean usePs = (Boolean) PREPARED_STATEMENTS.lookUp(params);
+        if(Boolean.TRUE.equals(usePs)) {
+            dataStore.setSQLDialect(new PostGISPSDialect(dataStore, dialect));
+        }
         
         return dataStore;
     }
@@ -75,6 +86,7 @@ public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
         super.setupParameters(parameters);
         parameters.put(LOOSEBBOX.key, LOOSEBBOX);
         parameters.put(PORT.key, PORT);
+        parameters.put(PREPARED_STATEMENTS.key, PREPARED_STATEMENTS);
     }
     
     @Override
@@ -90,4 +102,12 @@ public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
         return "jdbc:postgresql" + "://" + host + ":" + port + "/" + db;
     }
 
+    @Override
+    protected DataSource createDataSource(Map params, SQLDialect dialect)
+            throws IOException {
+        BasicDataSource ds = (BasicDataSource) super.createDataSource(params, dialect);
+        // disable server side prepare
+        ds.addConnectionProperty("prepareThreshold", "-1");
+        return ds;
+    }
 }

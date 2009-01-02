@@ -18,7 +18,6 @@ package org.geotools.data.postgis;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -27,9 +26,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.geotools.data.jdbc.FilterToSQL;
+import org.geotools.jdbc.BasicSQLDialect;
 import org.geotools.jdbc.JDBCDataStore;
-import org.geotools.jdbc.PreparedFilterToSQL;
-import org.geotools.jdbc.PreparedStatementSQLDialect;
+import org.geotools.jdbc.SQLDialect;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -47,10 +47,10 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKBWriter;
+import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKTReader;
 
-public class PostGISDialect extends PreparedStatementSQLDialect {
+public class PostGISDialect extends BasicSQLDialect {
 
     final static Map<String, Class> TYPE_TO_CLASS_MAP = new HashMap<String, Class>() {
         {
@@ -114,11 +114,31 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
         return true;
     }
 
+    ThreadLocal<WKBAttributeIO> wkbReader = new ThreadLocal<WKBAttributeIO>();
+//    WKBAttributeIO reader;
     @Override
     public Geometry decodeGeometryValue(GeometryDescriptor descriptor,
             ResultSet rs, String column, GeometryFactory factory, Connection cx)
             throws IOException, SQLException {
-        return (Geometry) new WKBAttributeIO(factory).read(rs, column);
+        WKBAttributeIO reader = wkbReader.get();
+        if(reader == null) {
+            reader = new WKBAttributeIO(factory);
+            wkbReader.set(reader);
+        }
+        
+        return (Geometry) reader.read(rs, column);
+    }
+    
+    public Geometry decodeGeometryValue(GeometryDescriptor descriptor,
+            ResultSet rs, int column, GeometryFactory factory, Connection cx)
+            throws IOException, SQLException {
+        WKBAttributeIO reader = wkbReader.get();
+        if(reader == null) {
+            reader = new WKBAttributeIO(factory);
+            wkbReader.set(reader);
+        }
+        
+        return (Geometry) reader.read(rs, column);
     }
 
     @Override
@@ -130,10 +150,13 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
         sql.append("encode(");
         if (dimensions > 2) {
             sql.append("asEWKB(");
+            encodeColumnName(gatt.getLocalName(), sql);
         } else {
             sql.append("asBinary(");
+            sql.append("force_2d(");
+            encodeColumnName(gatt.getLocalName(), sql);
+            sql.append(")");
         }
-        encodeColumnName(gatt.getLocalName(), sql);
         sql.append(",'XDR'),'base64')");
     }
 
@@ -292,27 +315,6 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
     }
 
     @Override
-    public void prepareGeometryValue(Geometry g, int srid, Class binding,
-            StringBuffer sql) {
-        if (g != null) {
-            sql.append("GeomFromWKB(?, " + srid + ")");
-        } else {
-            sql.append("?");
-        }
-    }
-
-    @Override
-    public void setGeometryValue(Geometry g, int srid, Class binding,
-            PreparedStatement ps, int column) throws SQLException {
-        if (g != null) {
-            byte[] bytes = new WKBWriter().write(g);
-            ps.setBytes(column, bytes);
-        } else {
-            ps.setNull(column, Types.OTHER, "Geometry");
-        }
-    }
-
-    @Override
     public String getSequenceForColumn(String schemaName, String tableName,
             String columnName, Connection cx) throws SQLException {
         Statement st = cx.createStatement();
@@ -389,14 +391,7 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
         //        
         // return null;
     }
-
-    @Override
-    public PreparedFilterToSQL createPreparedFilterToSQL() {
-        PostgisFilterToSql fts = new PostgisFilterToSql(this);
-        fts.setLooseBBOXEnabled(looseBBOXEnabled);
-        return fts;
-    }
-
+    
     @Override
     public void registerClassToSqlMappings(Map<Class<?>, Integer> mappings) {
         super.registerClassToSqlMappings(mappings);
@@ -411,6 +406,13 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
         super.registerSqlTypeNameToClassMappings(mappings);
 
         mappings.put("geometry", Geometry.class);
+    }
+    
+    @Override
+    public void registerSqlTypeToSqlTypeNameOverrides(
+            Map<Integer, String> overrides) {
+        overrides.put(Types.VARCHAR, "VARCHAR");
+        overrides.put(Types.BOOLEAN, "BOOL");
     }
 
     @Override
@@ -530,9 +532,20 @@ public class PostGISDialect extends PreparedStatementSQLDialect {
     }
 
     @Override
-    public void initializeConnection(Connection cx) throws SQLException {
-        super.initializeConnection(cx);
-        // if we don't do this partial fetches are disallowed
-//        cx.setAutoCommit(false);
+    public void encodeGeometryValue(Geometry value, int srid, StringBuffer sql)
+            throws IOException {
+        if(value == null) {
+            sql.append("NULL");
+        } else {
+            sql.append("GeomFromText('" + value.toText() + "', " + srid + ")");
+        }
     }
+
+    @Override
+    public FilterToSQL createFilterToSQL() {
+        PostgisFilterToSQL sql = new PostgisFilterToSQL(this);
+        sql.setLooseBBOXEnabled(looseBBOXEnabled);
+        return sql;
+    }
+
 }
