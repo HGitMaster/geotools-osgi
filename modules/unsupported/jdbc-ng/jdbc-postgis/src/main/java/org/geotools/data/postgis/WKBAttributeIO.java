@@ -37,7 +37,7 @@ import com.vividsolutions.jts.io.WKBWriter;
  * An attribute IO implementation that can manage the WKB
  *
  * @author Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/jdbc-ng/jdbc-postgis/src/main/java/org/geotools/data/postgis/WKBAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/jdbc-ng/jdbc-postgis/src/main/java/org/geotools/data/postgis/WKBAttributeIO.java $
  * @since 2.4.1
  */
 public class WKBAttributeIO {
@@ -84,6 +84,21 @@ public class WKBAttributeIO {
     public Object read(ResultSet rs, String columnName) throws IOException {
         try {
             byte bytes[] = rs.getBytes(columnName);
+            if (bytes == null) // ie. its a null column -> return a null geometry!
+                return null;
+            return wkb2Geometry(Base64.decode(bytes));
+        } catch (SQLException e) {
+            throw new DataSourceException("SQL exception occurred while reading the geometry.", e);
+        }
+    }
+    
+    /**
+     * @see org.geotools.data.jdbc.attributeio.AttributeIO#read(java.sql.ResultSet,
+     *      int)
+     */
+    public Object read(ResultSet rs, int columnIndex) throws IOException {
+        try {
+            byte bytes[] = rs.getBytes(columnIndex);
             if (bytes == null) // ie. its a null column -> return a null geometry!
                 return null;
             return wkb2Geometry(Base64.decode(bytes));
