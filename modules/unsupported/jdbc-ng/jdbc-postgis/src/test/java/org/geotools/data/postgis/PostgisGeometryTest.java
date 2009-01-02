@@ -7,7 +7,7 @@ public class PostgisGeometryTest extends JDBCGeometryTest {
 
     @Override
     protected JDBCGeometryTestSetup createTestSetup() {
-        return new PostgisGeometryTestSetup();
+        return new PostgisGeometryTestSetup(new PostGISTestSetup());
     }
     
     @Override

@@ -7,7 +7,7 @@ public class PostgisPrimaryKeyTest extends JDBCPrimaryKeyTest {
 
     @Override
     protected JDBCPrimaryKeyTestSetup createTestSetup() {
-        return new PostgisPrimaryKeyTestSetup();
+        return new PostgisPrimaryKeyTestSetup(new PostGISTestSetup());
     }
 
 }

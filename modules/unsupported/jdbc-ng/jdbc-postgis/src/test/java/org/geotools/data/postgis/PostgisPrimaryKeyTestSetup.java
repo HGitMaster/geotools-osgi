@@ -1,11 +1,12 @@
 package org.geotools.data.postgis;
 
 import org.geotools.jdbc.JDBCPrimaryKeyTestSetup;
+import org.geotools.jdbc.JDBCTestSetup;
 
 public class PostgisPrimaryKeyTestSetup extends JDBCPrimaryKeyTestSetup {
 
-    protected PostgisPrimaryKeyTestSetup() {
-        super(new PostGISTestSetup());
+    public PostgisPrimaryKeyTestSetup(JDBCTestSetup delegate) {
+        super(delegate);
     }
 
     @Override

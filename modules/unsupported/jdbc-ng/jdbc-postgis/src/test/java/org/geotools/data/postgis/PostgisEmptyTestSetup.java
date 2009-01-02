@@ -1,11 +1,12 @@
 package org.geotools.data.postgis;
 
 import org.geotools.jdbc.JDBCEmptyTestSetup;
+import org.geotools.jdbc.JDBCTestSetup;
 
 public class PostgisEmptyTestSetup extends JDBCEmptyTestSetup {
 
-    protected PostgisEmptyTestSetup() {
-        super(new PostGISTestSetup());
+    public PostgisEmptyTestSetup(JDBCTestSetup delegate) {
+        super(delegate);
         
     }
 

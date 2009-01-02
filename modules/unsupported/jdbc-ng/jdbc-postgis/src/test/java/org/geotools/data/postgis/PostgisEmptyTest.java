@@ -7,7 +7,7 @@ public class PostgisEmptyTest extends JDBCEmptyTest {
 
     @Override
     protected JDBCEmptyTestSetup createTestSetup() {
-        return new PostgisEmptyTestSetup();
+        return new PostgisEmptyTestSetup(new PostGISTestSetup());
     }
 
 }

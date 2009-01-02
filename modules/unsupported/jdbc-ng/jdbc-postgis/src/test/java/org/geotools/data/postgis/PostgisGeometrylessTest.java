@@ -7,7 +7,7 @@ public class PostgisGeometrylessTest extends JDBCGeometrylessTest {
 
     @Override
     protected JDBCGeometrylessTestSetup createTestSetup() {
-        return new PostgisGeometrylessTestSetup();
+        return new PostgisGeometrylessTestSetup(new PostGISTestSetup());
     }
 
 }

@@ -1,11 +1,12 @@
 package org.geotools.data.postgis;
 
 import org.geotools.jdbc.JDBCDataStoreAPITestSetup;
+import org.geotools.jdbc.JDBCTestSetup;
 
 public class PostgisDataStoreAPITestSetup extends JDBCDataStoreAPITestSetup {
 
-    protected PostgisDataStoreAPITestSetup() {
-        super(new PostGISTestSetup());
+    public PostgisDataStoreAPITestSetup(JDBCTestSetup delegate) {
+        super(delegate);
     }
 
     @Override

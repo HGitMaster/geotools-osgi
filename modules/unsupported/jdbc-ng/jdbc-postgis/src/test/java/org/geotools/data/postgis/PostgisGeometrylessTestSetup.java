@@ -1,11 +1,12 @@
 package org.geotools.data.postgis;
 
 import org.geotools.jdbc.JDBCGeometrylessTestSetup;
+import org.geotools.jdbc.JDBCTestSetup;
 
 public class PostgisGeometrylessTestSetup extends JDBCGeometrylessTestSetup {
 
-    protected PostgisGeometrylessTestSetup() {
-        super(new PostGISTestSetup());
+    public PostgisGeometrylessTestSetup(JDBCTestSetup delegate) {
+        super(delegate);
     }
 
     @Override

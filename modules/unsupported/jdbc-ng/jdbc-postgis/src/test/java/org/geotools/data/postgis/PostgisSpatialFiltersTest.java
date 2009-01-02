@@ -7,7 +7,7 @@ public class PostgisSpatialFiltersTest extends JDBCSpatialFiltersTest {
 
     @Override
     protected JDBCDataStoreAPITestSetup createTestSetup() {
-        return new PostgisDataStoreAPITestSetup();
+        return new PostgisDataStoreAPITestSetup(new PostGISTestSetup());
     }
 
 }

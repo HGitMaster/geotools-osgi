@@ -7,7 +7,7 @@ public class PostgisDataStoreAPITest extends JDBCDataStoreAPITest {
 
     @Override
     protected JDBCDataStoreAPITestSetup createTestSetup() {
-        return new PostgisDataStoreAPITestSetup();
+        return new PostgisDataStoreAPITestSetup(new PostGISTestSetup());
     }
 
     @Override

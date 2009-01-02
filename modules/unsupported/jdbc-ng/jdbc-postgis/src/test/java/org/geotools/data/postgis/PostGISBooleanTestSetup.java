@@ -17,11 +17,12 @@
 package org.geotools.data.postgis;
 
 import org.geotools.jdbc.JDBCBooleanTestSetup;
+import org.geotools.jdbc.JDBCTestSetup;
 
 public class PostGISBooleanTestSetup extends JDBCBooleanTestSetup {
 
-    protected PostGISBooleanTestSetup() {
-        super(new PostGISTestSetup());
+    public PostGISBooleanTestSetup(JDBCTestSetup delegate) {
+        super(delegate);
     }
 
     @Override

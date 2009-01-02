@@ -23,7 +23,7 @@ public class PostGISBooleanTest extends JDBCBooleanTest {
 
     @Override
     protected JDBCBooleanTestSetup createTestSetup() {
-        return new PostGISBooleanTestSetup();
+        return new PostGISBooleanTestSetup(new PostGISTestSetup());
     }
 
 }
