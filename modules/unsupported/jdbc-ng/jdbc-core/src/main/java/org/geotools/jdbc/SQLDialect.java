@@ -17,14 +17,12 @@
 package org.geotools.jdbc;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -32,10 +30,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.referencing.CRS;
-import org.geotools.util.Converters;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -48,7 +44,6 @@ import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Divide;
-import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.Multiply;
 import org.opengis.filter.expression.Subtract;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -580,6 +575,7 @@ public abstract class SQLDialect {
      */
     public abstract Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs,
         String column, GeometryFactory factory, Connection cx ) throws IOException, SQLException;
+    
     /**
      * Decodes a geometry value from the result of a query specifying the column 
      * as an index.
@@ -589,7 +585,7 @@ public abstract class SQLDialect {
      * </p>
      * @see {@link #decodeGeometryValue(GeometryDescriptor, ResultSet, String, GeometryFactory)}.
      */
-    public final Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs,
+    public Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs,
         int column, GeometryFactory factory, Connection cx ) throws IOException, SQLException {
         
         String columnName = rs.getMetaData().getColumnName( column );
