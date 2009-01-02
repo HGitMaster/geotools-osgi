@@ -167,7 +167,7 @@ public abstract class JDBCTestSetup {
      */
     private DataSource createDataSource() throws IOException {
         Properties db = new Properties();
-        db.load( getClass().getResourceAsStream( "db.properties") );
+        fillConnectionProperties(db);
 
         BasicDataSource dataSource = new BasicDataSource();
         
@@ -191,6 +191,16 @@ public abstract class JDBCTestSetup {
         // return a closeable data source (DisposableDataSource interface)
         // so that the connection pool will be tore down on datastore dispose
         return new DBCPDataSource(dataSource);
+    }
+
+    /**
+     * Fills in the connection properties. Default implementation uses a db.properties
+     * file to be located in the same package as the test class.
+     * @param db
+     * @throws IOException
+     */
+    protected void fillConnectionProperties(Properties db) throws IOException {
+        db.load( getClass().getResourceAsStream( "db.properties") );
     }
     
     protected void initializeDataSource( BasicDataSource ds, Properties db ) {
