@@ -830,7 +830,10 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         LOGGER.finer("exporting LiteralExpression");
 
         // type to convert the literal to
-        Class target = (Class) context;
+        Class target = null;
+        if ( context instanceof Class ) {
+            target = (Class) context;
+        }
 
         try {
             //evaluate the expression
