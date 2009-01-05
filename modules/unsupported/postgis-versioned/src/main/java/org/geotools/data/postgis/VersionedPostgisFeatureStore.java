@@ -419,7 +419,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         Set revisionIdSet = new HashSet();
         for (Iterator it = revisions.iterator(); it.hasNext();) {
             Long rev = (Long) it.next();
-            revisionIdSet.add(ff.featureId(rev.toString()));
+            revisionIdSet.add(ff.featureId(VersionedPostgisDataStore.TBL_CHANGESETS + "." + rev.toString()));
         }
         if(revisionIdSet.isEmpty())
             return new EmptyFeatureCollection(schema);
