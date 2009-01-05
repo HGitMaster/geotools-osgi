@@ -1504,16 +1504,16 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertTrue((count == 3) || (count == -1));
 
         ReferencedEnvelope bounds = road.getBounds(Query.ALL);
-        assertTrue((bounds == null) || bounds.equals(roadBounds));
+        assertTrue((bounds == null) || new Envelope(bounds).equals(roadBounds));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> all = road.getFeatures();
         assertEquals(3, all.size());
-        assertEquals(roadBounds, all.getBounds());
+        assertEquals(roadBounds, new Envelope(all.getBounds()));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(roadFeatures);
 
         assertCovers("all", expected, all);
-        assertEquals(roadBounds, all.getBounds());
+        assertEquals(roadBounds, new Envelope(all.getBounds()));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> some = road.getFeatures(rd12Filter);
         assertEquals(2, some.size());
@@ -1521,7 +1521,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         ReferencedEnvelope e = new ReferencedEnvelope();
         e.include(roadFeatures[0].getBounds());
         e.include(roadFeatures[1].getBounds());
-        assertEquals(e, some.getBounds());
+        assertEquals(e, new Envelope(some.getBounds()));
         assertEquals(some.getSchema(), road.getSchema());
 
         DefaultQuery query = new DefaultQuery("road", rd12Filter, new String[] { "name" });
@@ -1549,12 +1549,12 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         ReferencedEnvelope b = half.getBounds();
         ReferencedEnvelope expectedBounds = isEnvelopeComputingEnabled() ? roadBounds : new ReferencedEnvelope();
-        assertEquals(expectedBounds, b); 
+        assertEquals(expectedBounds, new Envelope(b)); 
     }
     
     public void testBoundsReproject() throws Exception {
         FeatureSource<SimpleFeatureType, SimpleFeature> road = data.getFeatureSource("road");
-        assertEquals(roadBounds, road.getBounds());
+        assertEquals(new Envelope(roadBounds), road.getBounds());
         
         CoordinateReferenceSystem epsg4326 = CRS.decode("EPSG:4326");
         CoordinateReferenceSystem epsg3003 = CRS.decode("EPSG:3003");
@@ -1588,12 +1588,12 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> all = river.getFeatures();
         assertEquals(2, all.size());
-        assertEquals(riverBounds, all.getBounds());
+        assertEquals(riverBounds, new Envelope(all.getBounds()));
         assertTrue("rivers", covers(all.features(), riverFeatures));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(riverFeatures);
         assertCovers("all", expected, all);
-        assertEquals(riverBounds, all.getBounds());
+        assertEquals(riverBounds, new Envelope(all.getBounds()));
     }
 
     public void testGetFeaturesSortBy() throws NoSuchElementException, IOException,

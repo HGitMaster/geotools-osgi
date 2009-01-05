@@ -174,7 +174,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
             s.execute("CREATE TABLE " + f.schema + ".road (fid varchar PRIMARY KEY, id int )");
             s.execute("SELECT AddGeometryColumn('" + f.schema
-                + "', 'road', 'geom', 0, 'LINESTRING', 2);");
+                + "', 'road', 'geom', 4326, 'LINESTRING', 2);");
             s.execute("ALTER TABLE " + f.schema + ".road add name varchar;");
 
             for (int i = 0; i < roadFeatures.length; i++) {
@@ -185,7 +185,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
                 String ql = "INSERT INTO " + f.schema + ".road (fid,id,geom,name) VALUES ("
                     + "'" + fid + "'," + feature.getAttribute("id") + ","
                     + "GeometryFromText('"
-                    + ((Geometry) feature.getAttribute("geom")).toText() + "', 0 ),"
+                    + ((Geometry) feature.getAttribute("geom")).toText() + "', 4326 ),"
                     + "'" + feature.getAttribute("name") + "')";
 
                 s.execute(ql);
@@ -219,7 +219,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
             s.execute("CREATE TABLE " + f.schema + ".lake ( id int ) WITH OIDS");
             s.execute("SELECT AddGeometryColumn('" + f.schema
-                + "', 'lake', 'geom', 0, 'POLYGON', 2);");
+                + "', 'lake', 'geom', 4326, 'POLYGON', 2);");
             s.execute("ALTER TABLE " + f.schema + ".lake add name varchar;");
             
             for (int i = 0; i < lakeFeatures.length; i++) {
@@ -228,7 +228,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
                 //strip out the lake. 
                 String ql = "INSERT INTO " + f.schema + ".lake (id,geom,name) VALUES ("
                     + feature.getAttribute("id") + "," + "GeometryFromText('"
-                    + ((Geometry) feature.getAttribute("geom")).toText() + "', 0 ),"
+                    + ((Geometry) feature.getAttribute("geom")).toText() + "', 4326 ),"
                     + "'" + feature.getAttribute("name") + "')";
 
                 s.execute(ql);
@@ -301,7 +301,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
             s.execute("CREATE TABLE " + f.schema + ".river(fid varchar PRIMARY KEY, id int)");
             s.execute("SELECT AddGeometryColumn('" + f.schema
-                + "', 'river', 'geom', 0, 'MULTILINESTRING', 2);");
+                + "', 'river', 'geom', 4326, 'MULTILINESTRING', 2);");
             s.execute("ALTER TABLE " + f.schema + ".river add river varchar");
             s.execute("ALTER TABLE " + f.schema + ".river add flow float8");
             
@@ -312,7 +312,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
                     "INSERT INTO " + f.schema + ".river (fid, id, geom, river, flow) VALUES ("
                     + "'" + fid + "'," + feature.getAttribute("id") + ","
                     + "GeometryFromText('" + feature.getAttribute("geom").toString()
-                    + "', 0 )," + "'" + feature.getAttribute("river") + "',"
+                    + "', 4326 )," + "'" + feature.getAttribute("river") + "',"
                     + feature.getAttribute("flow") + ")");
             }
             
