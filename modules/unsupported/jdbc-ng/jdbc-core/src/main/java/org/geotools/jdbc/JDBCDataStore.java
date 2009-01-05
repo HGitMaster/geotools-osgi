@@ -2075,6 +2075,13 @@ public final class JDBCDataStore extends ContentDataStore
                     sqlTypeNames[i] = sqlTypeName;
                 }
             }
+            
+            //check the overrides
+            String sqlTypeName = getSqlTypeToSqlTypeNameOverrides().get( sqlType );
+            if ( sqlTypeName != null ) {
+                sqlTypeNames[i] = sqlTypeName;
+            }
+
         }
 
         //figure out the type names that correspond to the sql types from 
