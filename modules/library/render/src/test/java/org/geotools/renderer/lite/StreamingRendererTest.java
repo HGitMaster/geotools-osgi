@@ -129,12 +129,12 @@ public class StreamingRendererTest extends TestCase {
         final Exception sentinel = new RuntimeException("This is the one that should be thrown in hasNext()");
         
         // setup the mock necessary to have the renderer hit into the exception in hasNext()
-        FeatureIterator it2 = createNiceMock(FeatureIterator.class);
+        Iterator it2 = createNiceMock(Iterator.class);
         expect(it2.hasNext()).andThrow(sentinel).anyTimes();
         replay(it2);
         
         FeatureCollection fc = createNiceMock(FeatureCollection.class);
-        expect(fc.features()).andReturn(it2);
+        expect(fc.iterator()).andReturn(it2);
         expect(fc.size()).andReturn(200);
         expect(fc.getSchema()).andReturn(testFeatureType).anyTimes();
         replay(fc);
