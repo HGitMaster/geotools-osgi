@@ -175,7 +175,6 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
 
     public FeatureCollection getFeatures(Filter filter)
         throws IOException {
-        System.out.println("GET FEATURES FOR: " + filter);
         /* PostPreProcessFilterSplittingVisitor may return
            a mixture of logical filters (or, and, not) and bbox filters,
            and for now I do not know how to handle this */
@@ -194,7 +193,6 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         }else if (spatial_restrictions == Filter.INCLUDE ) {
             // we could not isolate any spatial restriction
             // delegate to source
-            System.out.println("get requesting features from source for include filter: " + filter);
             return this.fs.getFeatures(filter);
         } else {
             FeatureCollection fc;
@@ -204,7 +202,6 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
                 fc = _getFeatures(spatial_restrictions);
             } catch (UnsupportedOperationException e) {
                 logger.log(Level.WARNING, "Querying cache : " + e.toString());
-                System.out.println("ERROR: get requesting features from source for filter: " + filter);
                 return this.fs.getFeatures(filter);
             }
 
