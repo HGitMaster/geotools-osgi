@@ -10,11 +10,26 @@
         <Rule>
           <LineSymbolizer>
             <Stroke>
+              <CssParameter name="stroke">0x666666</CssParameter>
+              <CssParameter name="stroke-width">4</CssParameter>
+            </Stroke>
+          </LineSymbolizer>
+          <LineSymbolizer>
+            <Stroke>
+              <CssParameter name="stroke">0xFFFFFF</CssParameter>
+              <CssParameter name="stroke-width">2</CssParameter>
+            </Stroke>
+          </LineSymbolizer>
+          <LineSymbolizer>
+            <Stroke>
               <GraphicStroke>
                 <Graphic>
                   <Mark>
-                    <WellKnownName>circle</WellKnownName>
-                    <Fill/>
+                    <WellKnownName>shape://vertline</WellKnownName>
+                    <Stroke>
+                      <CssParameter name="stroke">0x666666</CssParameter>
+                      <CssParameter name="stroke-width">2</CssParameter>
+                    </Stroke>
                   </Mark>
                   <Size>8</Size>
                 </Graphic>
