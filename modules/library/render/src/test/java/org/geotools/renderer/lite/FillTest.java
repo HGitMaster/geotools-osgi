@@ -29,7 +29,7 @@ public class FillTest extends TestCase {
         bounds = fs.getBounds();
         bounds.expandBy(0.2, 0.2);
         
-        System.setProperty("org.geotools.test.interactive", "true");
+//        System.setProperty("org.geotools.test.interactive", "true");
         
     }
     
