@@ -25,10 +25,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MediaTracker;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
@@ -42,6 +44,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -121,7 +124,7 @@ labeling code.
 
 This change could affect the j2d renderer as it appears to use the
 "AbsoluteLineDisplacement" flag.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/SLDStyleFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/SLDStyleFactory.java $
 */
 
 public class SLDStyleFactory {
@@ -177,9 +180,25 @@ public class SLDStyleFactory {
     /** Symbolizers that do not depend on attributes */
     Map staticSymbolizers = new SoftValueHashMap(); 
 
-    
+    /**
+     * Build a default rendering hint to avoid NPE
+     */
+    RenderingHints renderingHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
 
     private long hits;
+
+    public RenderingHints getRenderingHints() {
+        return renderingHints;
+    }
+
+    /**
+     * The factory builds a fair number of buffered images to deal with
+     * external graphics that need resizing and the like. This hints will
+     * be used in those drawing operations.
+     */
+    public void setRenderingHints(RenderingHints renderingHints) {
+        this.renderingHints = renderingHints;
+    }
 
     private long requests;
 
@@ -695,6 +714,7 @@ public class SLDStyleFactory {
             image = new BufferedImage((int) size, (int) size, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D ig2d = image.createGraphics();
+            ig2d.setRenderingHints(renderingHints);
             double rotation = 0.0;
             rotation = evalToDouble(graphicStroke.getRotation(), feature, 0.0);
             rotation *= (Math.PI / 180.0);
@@ -844,8 +864,10 @@ public class SLDStyleFactory {
         BufferedImage image = getImage(gr, feature, -1);
         boolean isImage = false;
 
+        int size;
         if (image != null) {
             isImage = true;
+            size = image.getWidth();
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("got an image in graphic fill");
             }
@@ -860,46 +882,36 @@ public class SLDStyleFactory {
                 return null;
             }
 
-            int size = 200;
-
-            image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-
+            size = evalToInt(gr.getSize(), feature, 16);
+            image = new BufferedImage(size * 3, size * 3, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = image.createGraphics();
-            double rotation = 0.0;
-
-            rotation = evalToDouble(gr.getRotation(), feature, 0.0);
-            rotation *= (Math.PI / 180.0);
-
-            fillDrawMark(g2d, 100, 100, mark, (int) (size * .9), rotation, feature);
-
-            java.awt.MediaTracker track = new java.awt.MediaTracker(obs);
-            track.addImage(image, 1);
-
+            g2d.setRenderingHints(renderingHints);
+            double rotation = evalToDouble(gr.getRotation(), feature, 0.0);
+            for(int i = -1; i < 2; i++) {
+                for(int j = -1; j < 2; j++) {
+                    double tx = size * 1.5 + size * i;
+                    double ty = size * 1.5 + size * j;
+                    fillDrawMark(g2d, tx, ty, mark, size, rotation, feature);
+                }
+            }
+            g2d.dispose();
+            
             try {
-                track.waitForID(1);
-            } catch (InterruptedException e) {
-                // TODO: what should we do with this?
-                LOGGER.warning("An unterupptedException occurred while drawing a local image..."
-                    + e);
+                ImageIO.write(image, "png", new java.io.File("c:/temp/sampler.png"));
+            } catch(Exception e) {
+                System.out.println(e);
+            }
+            
+            image = image.getSubimage(size, size, size, size);
+            
+            try {
+                ImageIO.write(image, "png", new java.io.File("c:/temp/texture.png"));
+            } catch(Exception e) {
+                System.out.println(e);
             }
         }
 
-        // default size is 16 for marks, the native image size for graphics
-        int size = evalToInt(gr.getSize(), feature, isImage ? image.getWidth() : 16);
-        double width = image.getWidth();
-        double height = image.getHeight();
-
-        double unitSize = Math.max(width, height);
-        double drawSize = (double) size / unitSize;
-
-        width *= drawSize;
-        height *= -drawSize;
-
-        if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer("size = " + size + " unitsize " + unitSize + " drawSize " + drawSize);
-        }
-
-        Rectangle2D.Double rect = new Rectangle2D.Double(0.0, 0.0, width, height);
+        Rectangle2D.Double rect = new Rectangle2D.Double(0.0, 0.0, size, size);
         TexturePaint imagePaint = new TexturePaint(image, rect);
 
         if (LOGGER.isLoggable(Level.FINER)) {
@@ -1052,31 +1064,19 @@ public class SLDStyleFactory {
 
     private void fillDrawMark(Graphics2D g2d, double tx, double ty, Mark mark, int size,
         double rotation, Object feature) {
-        AffineTransform temp = g2d.getTransform();
+        Shape originalShape = getShape(mark, feature);
+
+        // rescale and reposition the original shape so it's centered at tx, ty
+        // and has the desired size
         AffineTransform markAT = new AffineTransform();
-        Shape shape = getShape(mark, feature);
-
-        Point2D mapCentre = new Point2D.Double(tx, ty);
-        Point2D graphicCentre = new Point2D.Double();
-        temp.transform(mapCentre, graphicCentre);
-        markAT.translate(graphicCentre.getX(), graphicCentre.getY());
-
-        double shearY = temp.getShearY();
-        double scaleY = temp.getScaleY();
-
-        double originalRotation = Math.atan(shearY / scaleY);
-
-        if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer("originalRotation " + originalRotation);
-        }
-
-        markAT.rotate(rotation - originalRotation);
-
-        double unitSize = 1.0; // getbounds is broken !!!
-        double drawSize = (double) size / unitSize;
+        markAT.translate(tx, ty);
+        markAT.rotate(rotation);
+        double unitSize = 1.0;
+        double drawSize = (double) (size) / unitSize;
         markAT.scale(drawSize, -drawSize);
 
-        g2d.setTransform(markAT);
+        // resize/rotate/rescale the shape
+        Shape shape = markAT.createTransformedShape(originalShape);
 
         if (mark.getFill() != null) {
             if (LOGGER.isLoggable(Level.FINER)) {
@@ -1098,8 +1098,6 @@ public class SLDStyleFactory {
             g2d.setStroke(getStroke(mark.getStroke(), feature));
             g2d.draw(shape);
         }
-
-        g2d.setTransform(temp);
 
         if (mark.getFill() != null) {
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));

@@ -138,7 +138,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32066 2008-12-23 16:30:24Z aaime $
+ * @version $Id: StreamingRenderer.java 32170 2009-01-07 14:37:22Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -1453,7 +1453,7 @@ public final class StreamingRenderer implements GTRenderer {
         // this is the reader's CRS
         CoordinateReferenceSystem rCS = null;
         try {
-            features.getSchema().getGeometryDescriptor().getType().getCoordinateReferenceSystem();
+            rCS = features.getSchema().getGeometryDescriptor().getType().getCoordinateReferenceSystem();
         } catch(NullPointerException e) {
             // life sucks sometimes
         }
@@ -2173,6 +2173,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	public void setJava2DHints(RenderingHints hints) {
 		this.java2dHints = hints;
+		styleFactory.setRenderingHints(hints);
 	}
 
 	/*
