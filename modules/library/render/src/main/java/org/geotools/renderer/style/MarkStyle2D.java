@@ -28,8 +28,8 @@ import org.geotools.resources.Utilities;
  * Style to represent points as small filled and stroked shapes
  *
  * @author Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/MarkStyle2D.java $
- * @version $Id: MarkStyle2D.java 30649 2008-06-12 19:44:08Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/MarkStyle2D.java $
+ * @version $Id: MarkStyle2D.java 32162 2009-01-07 13:48:06Z aaime $
  */
 public class MarkStyle2D extends PolygonStyle2D {
     Shape shape;
@@ -70,7 +70,7 @@ public class MarkStyle2D extends PolygonStyle2D {
             ts.shape = shape;
             ts.translate(x, y);
             ts.rotate(rotation);
-            ts.scale(scale, -scale);
+            ts.scale(scale, scale);
 
             return ts;
         } else {

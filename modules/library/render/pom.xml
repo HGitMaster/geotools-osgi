@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
+        Version: $Id: pom.xml 32162 2009-01-07 13:48:06Z aaime $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -137,6 +137,17 @@
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-property</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     
     <!-- 
          FROM HERE ON, BATIK DEPENDENCIES - I'VE TRIED WITH 1.6-1 BUT
@@ -212,12 +223,6 @@
       <artifactId>batik-parser</artifactId>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
   </dependencies>
   
 
