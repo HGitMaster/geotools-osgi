@@ -90,7 +90,7 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
         assertEquals(setSize, v.harvest.size());
         assertEquals(index.getStatistics().getNumberOfNodes(), v.visited_nodes);
 
-        Set comp_result = noIndexQuery(regions, query, AbstractSpatialIndex.IntersectionQuery);
+        Set<String> comp_result = noIndexQuery(regions, query, AbstractSpatialIndex.IntersectionQuery);
         assertEquals(comp_result, v.harvest);
         v = new HarvestingVisitor();
         query = new Region(new double[] { .25, .25 }, new double[] { .75, .75 });
@@ -107,7 +107,7 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
         assertEquals(setSize, v.harvest.size());
         assertEquals(index.getStatistics().getNumberOfNodes(), v.visited_nodes);
 
-        Set comp_result = noIndexQuery(regions, query, AbstractSpatialIndex.ContainmentQuery);
+        Set<String> comp_result = noIndexQuery(regions, query, AbstractSpatialIndex.ContainmentQuery);
         assertEquals(comp_result, v.harvest);
         v = new HarvestingVisitor();
         query = new Region(new double[] { .25, .25 }, new double[] { .75, .75 });
@@ -122,7 +122,7 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
         Point query = new Point(new double[] { generator.nextDouble(), generator.nextDouble() });
         index.intersectionQuery(query, v);
 
-        Set comp_result = noIndexQuery(regions, query, AbstractSpatialIndex.IntersectionQuery);
+        Set<String> comp_result = noIndexQuery(regions, query, AbstractSpatialIndex.IntersectionQuery);
         assertEquals(comp_result, v.harvest);
     }
 
@@ -140,8 +140,8 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
         assertEquals(index.getStatistics().getNumberOfNodes(), v.visited_nodes);
     }
 
-    HashSet noIndexQuery(ArrayList searchset, Shape query, int type) {
-        HashSet harvest = new HashSet();
+    HashSet<String> noIndexQuery(ArrayList<Region> searchset, Shape query, int type) {
+        HashSet<String> harvest = new HashSet<String>();
 
         for (int i = 0; i < setSize; i++) {
             Region r = (Region) regions.get(i);
@@ -158,7 +158,7 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
     protected abstract AbstractSpatialIndex createIndex();
 
     class HarvestingVisitor implements Visitor {
-        HashSet harvest = new HashSet(20);
+        HashSet<Object> harvest = new HashSet<Object>(20);
         int visited_nodes = 0;
 
         public void visitData(Data d) {

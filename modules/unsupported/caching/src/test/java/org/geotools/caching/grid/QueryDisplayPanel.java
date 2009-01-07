@@ -59,7 +59,7 @@ public class QueryDisplayPanel extends JPanel {
 
             while (it.hasNext()) {
                 SimpleFeature f = (SimpleFeature) it.next();
-                LineString geom = (LineString) f.getDefaultGeometryValue();
+                LineString geom = (LineString) f.getDefaultGeometry();
                 Coordinate start = geom.getCoordinateN(0);
                 Coordinate current;
 

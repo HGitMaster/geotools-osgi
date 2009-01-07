@@ -17,16 +17,33 @@
 package org.geotools.caching;
 
 import java.io.IOException;
+import java.util.Collection;
+
 import com.vividsolutions.jts.geom.Envelope;
+
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.Feature;
 
 
 public interface FeatureCache extends FeatureSource {
     public void clear();
 
+    /**
+    *
+    * @param fc the feature collection to add to the cache
+    * @param e the envelope that encompasses the feature collection added
+    *  
+    * @throws CacheOversizedException
+    */
     public void put(FeatureCollection fc, Envelope e) throws CacheOversizedException;
 
+    /**
+     *
+     * @param fc the feature collection to add to the cache
+     *  
+     * @throws CacheOversizedException
+     */
     public void put(FeatureCollection fc) throws CacheOversizedException;
 
     public FeatureCollection get(Envelope e) throws IOException;

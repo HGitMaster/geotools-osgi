@@ -18,6 +18,7 @@ package org.geotools.caching.spatialindex.grid;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
 import org.geotools.caching.spatialindex.AbstractSpatialIndexTest;
 import org.geotools.caching.spatialindex.Region;
@@ -41,4 +42,5 @@ public class GridTest extends AbstractSpatialIndexTest {
         super.testInsertion();
         System.out.println("Root insertions = " + index.root_insertions);
     }
+
 }

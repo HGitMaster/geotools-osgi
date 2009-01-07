@@ -132,7 +132,7 @@ class DrawingVisitor implements Visitor {
         graph.setStroke(DATA_STROKE);
 
         SimpleFeature f = (SimpleFeature) d.getData();
-        LineString geom = (LineString) f.getDefaultGeometryValue();
+        LineString geom = (LineString) f.getDefaultGeometry();
         Coordinate start = geom.getCoordinateN(0);
         Coordinate current;
 

@@ -34,7 +34,7 @@ public class DiskGridFeatureCacheTest extends GridFeatureCacheTest {
     protected AbstractFeatureCache createInstance(int capacity)
         throws FeatureCacheException, IOException {
         Storage storage = DiskStorage.createInstance();
-        this.cache = new GridFeatureCache(ds.getFeatureSource(dataset.getSchema().getTypeName()),
+        this.cache = new GridFeatureCache(ds.getFeatureSource(dataset.getSchema().getName()),
                 100, capacity, storage);
 
         return this.cache;

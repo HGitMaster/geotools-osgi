@@ -69,7 +69,7 @@ public class RegionNodeIdentifierTest extends TestCase {
     }
 
     public void testHashMap() {
-        HashMap map = new HashMap();
+        HashMap<RegionNodeIdentifier, GridNode> map = new HashMap<RegionNodeIdentifier, GridNode>();
         map.put(id1, node1);
         map.put(id2, node2);
         map.put(id3, node3);

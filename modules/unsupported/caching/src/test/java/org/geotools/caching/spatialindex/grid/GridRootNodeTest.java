@@ -100,7 +100,7 @@ public class GridRootNodeTest extends GridNodeTest {
 
         double size = node.getShape().getArea() / node.capacity;
 
-        for (Iterator it = node.children.iterator(); it.hasNext();) {
+        for (Iterator<NodeIdentifier> it = node.children.iterator(); it.hasNext();) {
             NodeIdentifier next = (NodeIdentifier) it.next();
             assertTrue(node.getShape().intersects(next.getShape()));
             assertEquals(size, next.getShape().getArea(), 1e-2);
@@ -113,7 +113,7 @@ public class GridRootNodeTest extends GridNodeTest {
 
         double size = node3D.getShape().getArea() / node3D.capacity;
 
-        for (Iterator it = node3D.children.iterator(); it.hasNext();) {
+        for (Iterator<NodeIdentifier> it = node3D.children.iterator(); it.hasNext();) {
             NodeIdentifier next = (NodeIdentifier) it.next();
             assertTrue(node3D.getShape().intersects(next.getShape()));
             assertEquals(size, next.getShape().getArea(), 1e-2);

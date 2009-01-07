@@ -29,8 +29,9 @@ import java.util.Map;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.geotools.feature.DefaultFeatureBuilder;
+
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 
 
 /** Simple marshaller that can write features to an ObjectOutputStream.
@@ -64,7 +65,7 @@ public class SimpleFeatureMarshaller {
      */
     public static final int FEATURE = -1;
     public static final int SIMPLEATTRIBUTE = 0;
-    static DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
+    
     HashMap<TypeKey, SimpleFeatureType> types;
 
     /** Default constructor.
@@ -106,13 +107,15 @@ public class SimpleFeatureMarshaller {
         s.writeInt(type.hashCode());
         s.writeObject(type.getName().getURI());
         s.writeObject(f.getID());
-
-        int natt = f.attributes().size();
+        
+        int natt = f.getAttributes().size();
         s.writeInt(natt);
-
-        for (Iterator it = f.attributes().iterator(); it.hasNext();) {
-            Attribute att = (Attribute) it.next();
-            marshallSimpleAttribute(att.getValue(), s);
+        
+        for (Iterator it = f.getAttributes().iterator(); it.hasNext();) {
+        	Object att = it.next();
+        	marshallSimpleAttribute(att, s);
+//            Attribute att = (Attribute) it.next();
+//            marshallSimpleAttribute(att.getValue(), s);
         }
     }
 
@@ -186,7 +189,8 @@ public class SimpleFeatureMarshaller {
         String fid = (String) s.readObject();
         int natt = s.readInt();
 
-        builder.setType(type);
+        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
+        //builder.setType(type);
 
         if (!(natt == type.getAttributeCount())) {
             throw new IOException("Schema error");
@@ -195,8 +199,8 @@ public class SimpleFeatureMarshaller {
         for (int i = 0; i < natt; i++) {
             builder.add(unmarshallSimpleAttribute(s));
         }
-
-        return builder.feature(fid);
+        //return builder.feature(fid);
+        return builder.buildFeature(fid);
     }
 
     /** Read attribute values from a stream.

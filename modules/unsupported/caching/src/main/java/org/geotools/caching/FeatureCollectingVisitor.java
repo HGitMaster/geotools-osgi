@@ -20,21 +20,21 @@ import org.geotools.caching.spatialindex.Data;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.Visitor;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 public class FeatureCollectingVisitor implements Visitor {
     FeatureCollection fc;
     int visited_nodes = 0;
 
-    public FeatureCollectingVisitor(FeatureType type) {
-        fc = new DefaultFeatureCollection("FeatureCollectingVisitor", type);
-    }
+	public FeatureCollectingVisitor(SimpleFeatureType type) {
+		fc = new DefaultFeatureCollection("FeatureCollectingVisitor", type);
+	}
 
     public void visitData(Data d) {
-        fc.add((Feature) d.getData());
+        fc.add((SimpleFeature) d.getData());
     }
 
     public void visitNode(Node n) {

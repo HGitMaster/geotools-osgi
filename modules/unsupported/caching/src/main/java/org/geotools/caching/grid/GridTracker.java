@@ -27,7 +27,6 @@ import org.geotools.caching.spatialindex.Shape;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.grid.Grid;
 import org.geotools.caching.spatialindex.grid.GridNode;
-import org.geotools.caching.spatialindex.store.MemoryStorage;
 
 
 public class GridTracker extends Grid implements EvictableTree {
@@ -71,7 +70,6 @@ public class GridTracker extends Grid implements EvictableTree {
             do {
                 int nextid = root.gridIndexToNodeId(cursor);
                 NodeIdentifier nextnode = root.getChildIdentifier(nextid);
-
                 if (!nextnode.isValid()) {
                     missing.add(nextnode.getShape());
                 } else if (!foundValid) {

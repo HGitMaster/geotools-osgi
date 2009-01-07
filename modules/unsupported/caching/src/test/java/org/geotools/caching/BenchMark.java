@@ -22,12 +22,9 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.filter.Filter;
+
 import org.geotools.caching.grid.DataUtilities;
 import org.geotools.caching.grid.GridFeatureCache;
-import org.geotools.caching.grid.GridInspector;
 import org.geotools.caching.spatialindex.store.BufferedDiskStorage;
 import org.geotools.caching.spatialindex.store.DiskStorage;
 import org.geotools.caching.spatialindex.store.MemoryStorage;
@@ -36,11 +33,16 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 public class BenchMark {
@@ -97,9 +99,9 @@ public class BenchMark {
 
     void initLocalControl() throws IOException {
         MemoryDataStore ds = new MemoryDataStore();
-        ds.createSchema(dataset.getSchema());
+        ds.createSchema((SimpleFeatureType)dataset.getSchema());
         ds.addFeatures(dataset);
-        control = (FeatureStore) ds.getFeatureSource(dataset.getSchema().getTypeName());
+        control = (FeatureStore) ds.getFeatureSource(dataset.getSchema().getName());
     }
 
     //    import org.geotools.data.wfs.WFSDataStore;
@@ -297,7 +299,7 @@ public class BenchMark {
             }
 
             if (!found) {
-                System.out.println("Not found : " + next.getID() + "," + next.getBounds()
+                System.out.println("Not found : " + next.getIdentifier() + "," + next.getBounds()
                     + " (size " + (next.getBounds().getWidth() * next.getBounds().getHeight()));
                 ret.add(next);
             }

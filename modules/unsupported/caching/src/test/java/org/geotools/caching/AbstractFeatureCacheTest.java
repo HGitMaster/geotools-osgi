@@ -16,40 +16,30 @@
  */
 package org.geotools.caching;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.feature.simple.SimpleFeatureCollection;
-import org.opengis.filter.Filter;
-import org.geotools.caching.AbstractFeatureCache;
-import org.geotools.caching.CacheOversizedException;
-import org.geotools.caching.FeatureCacheException;
-import org.geotools.caching.FeatureCollectingVisitor;
-import org.geotools.caching.spatialindex.AbstractSpatialIndex;
-import org.geotools.caching.spatialindex.Data;
-import org.geotools.caching.spatialindex.Node;
-import org.geotools.caching.spatialindex.Shape;
-import org.geotools.caching.spatialindex.Visitor;
-import org.geotools.caching.spatialindex.store.MemoryStorage;
+
+import junit.framework.TestCase;
+
 import org.geotools.caching.util.Generator;
-import org.geotools.data.FeatureStore;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.spatial.BBOXImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 public abstract class AbstractFeatureCacheTest extends TestCase {
-    protected static FeatureCollection dataset;
+    protected static FeatureCollection<SimpleFeatureType, SimpleFeature> dataset;
     protected static int numdata = 100;
     protected static List<Filter> filterset;
     public final static Filter unitsquarefilter;
@@ -61,10 +51,10 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
         dataset = new DefaultFeatureCollection("Test", Generator.type);
 
         for (int i = 0; i < numdata; i++) {
-            Feature f = gen.createFeature(i);
+            SimpleFeature f = gen.createFeature(i);
             dataset.add(f);
         }
-
+        
         filterset = new ArrayList<Filter>(numfilters);
 
         for (int i = 0; i < numfilters; i++) {
@@ -83,7 +73,9 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
     protected void setUp() {
         try {
             ds = new MemoryDataStore();
-            ds.createSchema(dataset.getSchema());
+            FeatureType ft = dataset.getSchema();
+            SimpleFeatureType sft = (SimpleFeatureType)ft;
+            ds.createSchema(sft);
             ds.addFeatures(dataset);
             cache = createInstance(1000);
         } catch (FeatureCacheException e) {
@@ -109,7 +101,7 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
     public void testRegister() {
         Filter f = (Filter) filterset.get(0);
         Envelope e = AbstractFeatureCache.extractEnvelope((BBOXImpl) f);
-        List matches = cache.match(e);
+        List<Envelope> matches = cache.match(e);
         assertEquals(1, matches.size());
         assertTrue(((Envelope) matches.get(0)).contains(e));
         cache.register((Envelope) matches.get(0));
@@ -144,7 +136,7 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
         FeatureCollection fc = cache.get(unitsquare);
         assertEquals(dataset.size(), fc.size());
 
-        List matches = cache.match(unitsquare);
+        List<Envelope> matches = cache.match(unitsquare);
         assertTrue(matches.isEmpty());
     }
 
@@ -157,7 +149,7 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
             fc = cache.get(unitsquare); // should not cause CacheOversizedException
             assertEquals(dataset.size(), fc.size());
 
-            List matches = cache.match(unitsquare);
+            List<Envelope> matches = cache.match(unitsquare);
             assertFalse(matches.isEmpty()); // but cache should not have registered oversized query
             pass = true;
             cache.put(dataset); // must cause CacheOversizedException
@@ -179,7 +171,7 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
         FeatureCollection fc = cache.getFeatures(unitsquarefilter);
         assertEquals(dataset.size(), fc.size());
 
-        List matches = cache.match(unitsquare);
+        List<Envelope> matches = cache.match(unitsquare);
         assertTrue(matches.isEmpty());
     }
 
@@ -188,47 +180,53 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
         cache.get(e);
         cache.clear();
 
-        List matches = cache.match(e);
+        List<Envelope> matches = cache.match(e);
         assertEquals(1, matches.size());
         assertTrue(((Envelope) matches.get(0)).contains(e));
     }
 
     public void testGetBounds() throws IOException {
-        Envelope env = cache.getBounds();
-        assertEquals(dataset.getBounds(), env);
+        ReferencedEnvelope env = cache.getBounds();
+        
+        //dataset.getBounds() returns an envelope with a null crs; wee need
+        //to add the crs to ensure assertequals returns true
+        ReferencedEnvelope bnds = new ReferencedEnvelope(dataset.getBounds(), dataset.getSchema().getCoordinateReferenceSystem());
+        
+        //assertEquals(dataset.getBounds(), env);
+        assertEquals(bnds, env);
     }
 
     public abstract void testEviction() throws IOException, FeatureCacheException;
 
-    class PrintingVisitor implements Visitor {
-        public boolean isDataVisitor() {
-            return true;
-        }
-
-        public void visitData(Data d) {
-            System.out.println("    " + d.getData());
-        }
-
-        public void visitNode(Node n) {
-            System.out.println(n + " is " + n.getIdentifier().isValid() + " and has "
-                + n.getDataCount() + " data :");
-        }
-    }
-
-    public class CountingVisitor implements Visitor {
-        int data = 0;
-        int nodes = 0;
-
-        public boolean isDataVisitor() {
-            return true;
-        }
-
-        public void visitData(Data d) {
-            data++;
-        }
-
-        public void visitNode(Node n) {
-            nodes++;
-        }
-    }
+//    class PrintingVisitor implements Visitor {
+//        public boolean isDataVisitor() {
+//            return true;
+//        }
+//
+//        public void visitData(Data d) {
+//            System.out.println("    " + d.getData());
+//        }
+//
+//        public void visitNode(Node n) {
+//            System.out.println(n + " is " + n.getIdentifier().isValid() + " and has "
+//                + n.getDataCount() + " data :");
+//        }
+//    }
+//
+//    public class CountingVisitor implements Visitor {
+//        int data = 0;
+//        int nodes = 0;
+//
+//        public boolean isDataVisitor() {
+//            return true;
+//        }
+//
+//        public void visitData(Data d) {
+//            data++;
+//        }
+//
+//        public void visitNode(Node n) {
+//            nodes++;
+//        }
+//    }
 }

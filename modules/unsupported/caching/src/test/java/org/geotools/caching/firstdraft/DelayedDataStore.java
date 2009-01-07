@@ -17,6 +17,11 @@
 package org.geotools.caching.firstdraft;
 
 import java.io.IOException;
+import java.util.List;
+
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
@@ -24,8 +29,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 
 
@@ -67,7 +72,7 @@ public class DelayedDataStore implements DataStore {
         }
     }
 
-    public void createSchema(FeatureType arg0) throws IOException {
+    public void createSchema(SimpleFeatureType arg0) throws IOException {
         this.sourceDataStore.createSchema(arg0);
     }
 
@@ -110,7 +115,7 @@ public class DelayedDataStore implements DataStore {
         return this.sourceDataStore.getLockingManager();
     }
 
-    public FeatureType getSchema(String arg0) throws IOException {
+    public SimpleFeatureType getSchema(String arg0) throws IOException {
         return this.sourceDataStore.getSchema(arg0);
     }
 
@@ -124,8 +129,38 @@ public class DelayedDataStore implements DataStore {
         return this.sourceDataStore.getView(arg0);
     }
 
-    public void updateSchema(String arg0, FeatureType arg1)
+    public void updateSchema(String arg0, SimpleFeatureType arg1)
         throws IOException {
         this.sourceDataStore.updateSchema(arg0, arg1);
     }
+
+	public void dispose() {
+		sourceDataStore.dispose();
+		
+	}
+
+	public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(
+			Name typeName) throws IOException {
+		 idle();
+		return sourceDataStore.getFeatureSource(typeName);
+	}
+
+	public ServiceInfo getInfo() {
+		return sourceDataStore.getInfo();
+	}
+
+	public List<Name> getNames() throws IOException {
+		return sourceDataStore.getNames();
+	}
+
+	public SimpleFeatureType getSchema(Name name) throws IOException {
+		 idle();
+		return sourceDataStore.getSchema(name);
+	}
+
+	public void updateSchema(Name typeName, SimpleFeatureType featureType)
+			throws IOException {
+		 idle();
+		sourceDataStore.updateSchema(typeName, featureType);		
+	}
 }

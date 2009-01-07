@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+
+import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
@@ -40,6 +40,7 @@ import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNotEqualTo;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.BinarySpatialOperator;
@@ -52,7 +53,9 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
-import org.geotools.filter.FilterFactoryImpl;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /** The purpose of this class is to split any Filter into two filters :
@@ -68,19 +71,26 @@ import org.geotools.filter.FilterFactoryImpl;
  *
  */
 public class BBoxFilterSplitter implements FilterVisitor {
-    private Stack envelopes = new Stack();
-    private Stack otherRestrictions = new Stack();
+    
+    private static final Envelope UNIVERSE_ENVELOPE = new Envelope(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+    private static final Envelope EMPTY_ENVELOPE = new Envelope();
+    
+    //envelopes that can be used to limit the 
+    //bounds of the data collected; if empty then equivalent to excludes filter
+    private Stack<Envelope> envelopes = new Stack<Envelope>();
+    
+    private Stack<Filter> otherRestrictions = new Stack<Filter>();
     private String geom = null;
     private String srs = null;
 
     //private Stack notEnvelopes = new Stack() ;
-    public Object visit(ExcludeFilter arg0, Object arg1) {
-        // TODO Auto-generated method stub
+    public Object visit(ExcludeFilter f, Object arg1) {
+        envelopes.push(new Envelope(EMPTY_ENVELOPE));
         return null;
     }
 
-    public Object visit(IncludeFilter arg0, Object arg1) {
-        // TODO Auto-generated method stub
+    public Object visit(IncludeFilter f, Object arg1) {
+        envelopes.push(new Envelope(UNIVERSE_ENVELOPE));
         return null;
     }
 
@@ -88,28 +98,26 @@ public class BBoxFilterSplitter implements FilterVisitor {
         int envSize = envelopes.size();
         int othSize = otherRestrictions.size();
 
-        for (Iterator it = f.getChildren().iterator(); it.hasNext();) {
+        for (Iterator<Filter> it = f.getChildren().iterator(); it.hasNext();) {
             Filter child = (Filter) it.next();
             child.accept(this, arg1);
         }
 
         if (envelopes.size() >= (envSize + 2)) {
             Envelope e = (Envelope) envelopes.pop();
-
             for (int i = envelopes.size(); i > envSize; i--) {
-                e = e.intersection((Envelope) envelopes.pop());
-            }
+                Envelope tmp = (Envelope)envelopes.pop();
+                e = e.intersection(tmp);
 
+            }
             envelopes.push(e);
         }
 
         if (otherRestrictions.size() >= (othSize + 2)) {
-            List pops = new ArrayList();
-
+            List<Filter> pops = new ArrayList<Filter>();
             for (int i = otherRestrictions.size(); i > othSize; i--) {
                 pops.add((Filter) otherRestrictions.pop());
             }
-
             otherRestrictions.push(new FilterFactoryImpl().and(pops));
         }
 
@@ -118,13 +126,11 @@ public class BBoxFilterSplitter implements FilterVisitor {
 
     public Object visit(Id f, Object arg1) {
         otherRestrictions.push(f);
-
         return null;
     }
 
     public Object visit(Not f, Object arg1) {
         otherRestrictions.push(f);
-
         return null;
     }
 
@@ -132,7 +138,7 @@ public class BBoxFilterSplitter implements FilterVisitor {
         int envSize = envelopes.size();
         int othSize = otherRestrictions.size();
 
-        for (Iterator it = f.getChildren().iterator(); it.hasNext();) {
+        for (Iterator<Filter> it = f.getChildren().iterator(); it.hasNext();) {
             Filter child = (Filter) it.next();
             child.accept(this, arg1);
         }
@@ -149,11 +155,15 @@ public class BBoxFilterSplitter implements FilterVisitor {
             // the trick is we cannot separate this filter in the form of SpatialRestriction && OtherRestriction
             // so we add this part to OtherRestriction
             envelopes.pop();
+            envelopes.push(UNIVERSE_ENVELOPE);
         }
 
         // in all case, we'll need original filter as computed SpatialRestriction is a rough approximation
+        int size = otherRestrictions.size();
         multiplePop(otherRestrictions, othSize);
-        otherRestrictions.push(f);
+        if (size > othSize){
+            otherRestrictions.push(f);
+        }
 
         return null;
     }
@@ -214,16 +224,24 @@ public class BBoxFilterSplitter implements FilterVisitor {
 
     public Object visit(BBOX f, Object arg1) {
         if (geom == null) {
-            geom = f.getPropertyName();
+            if (f.getExpression1() instanceof PropertyName){
+                geom = ((PropertyName)f.getExpression1()).getPropertyName();
+            }
             srs = f.getSRS();
-        } else if ((geom != f.getPropertyName()) || (srs != f.getSRS())) {
-            throw new UnsupportedOperationException(
-                "This splitter can not be used against a filter where different BBOX filters refer to different Geometry attributes.");
+                        
+        }else{
+            String newgeom = f.getExpression1() instanceof PropertyName ? ((PropertyName)f.getExpression1()).getPropertyName() : null;
+            String newsrs = f.getSRS();
+        
+            if ((geom != newgeom) ||  srs != srs  ) {
+                throw new UnsupportedOperationException(
+                    "This splitter can not be used against a filter where different BBOX filters refer to different Geometry attributes.");
+            }
         }
-
+       
         Envelope e = new Envelope(f.getMinX(), f.getMaxX(), f.getMinY(), f.getMaxY());
         envelopes.push(e);
-
+        
         return null;
     }
 
@@ -268,7 +286,7 @@ public class BBoxFilterSplitter implements FilterVisitor {
     }
 
     public Object visit(Equals f, Object arg1) {
-        //		 we don't know how to handle this geometric restriction as a BBox
+        //       we don't know how to handle this geometric restriction as a BBox
         // so we treat this as an attribute filter
         otherRestrictions.push(f);
 
@@ -285,7 +303,13 @@ public class BBoxFilterSplitter implements FilterVisitor {
             Geometry g = (Geometry) l.getValue();
             envelopes.push(g.getEnvelopeInternal());
         }
-
+        
+        if (f.getExpression1() instanceof PropertyName){
+            geom = ((PropertyName)f.getExpression1()).getPropertyName();
+        }else if (f.getExpression2() instanceof PropertyName){
+            geom = ((PropertyName)f.getExpression2()).getPropertyName();
+        }
+        
         otherRestrictions.push(f);
     }
 
@@ -338,11 +362,14 @@ public class BBoxFilterSplitter implements FilterVisitor {
     public Filter getFilterPre() {
         Envelope e = getEnvelope();
 
-        if (e == null) {
+        if (e == null || e.isNull()) {
+            return Filter.EXCLUDE;
+            //return Filter.INCLUDE;
+        } else if (e.equals(UNIVERSE_ENVELOPE)){
             return Filter.INCLUDE;
         } else {
-            return new FilterFactoryImpl().bbox(geom, e.getMinX(), e.getMinY(), e.getMaxX(),
-                e.getMaxY(), srs);
+            Filter myfilter = new FilterFactoryImpl().bbox(geom, e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY(), srs);
+            return myfilter;
         }
     }
 

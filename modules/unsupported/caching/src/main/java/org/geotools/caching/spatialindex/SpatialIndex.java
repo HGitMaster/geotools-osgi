@@ -29,7 +29,6 @@
 package org.geotools.caching.spatialindex;
 
 import java.util.Properties;
-import org.geotools.caching.firstdraft.spatialindex.storagemanager.PropertySet;
 
 
 /** A generic contract for spatial indexes, such as quadtrees or r-trees.

@@ -34,7 +34,7 @@ public class BufferedGridFeatureCacheTest extends GridFeatureCacheTest {
     protected AbstractFeatureCache createInstance(int capacity)
         throws FeatureCacheException, IOException {
         Storage storage = BufferedDiskStorage.createInstance();
-        this.cache = new GridFeatureCache(ds.getFeatureSource(dataset.getSchema().getTypeName()),
+        this.cache = new GridFeatureCache(ds.getFeatureSource(dataset.getSchema().getName()),
                 100, capacity, storage);
 
         return this.cache;

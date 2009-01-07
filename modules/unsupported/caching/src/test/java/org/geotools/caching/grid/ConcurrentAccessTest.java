@@ -35,6 +35,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.vividsolutions.jts.geom.Envelope;
+
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.spatialindex.store.BufferedDiskStorage;
@@ -74,7 +76,7 @@ public class ConcurrentAccessTest extends TestCase {
             }
 
             dataset = DataUtilities.createUnitsquareDataSet(numdata, 1025);
-            ds.createSchema(dataset.getSchema());
+            ds.createSchema((SimpleFeatureType)dataset.getSchema());
             ds.addFeatures(dataset);
 
             if (hardest) {

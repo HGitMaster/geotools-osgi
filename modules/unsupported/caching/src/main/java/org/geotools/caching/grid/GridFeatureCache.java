@@ -18,14 +18,14 @@ package org.geotools.caching.grid;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.logging.Level;
-import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.filter.Filter;
+
+import org.opengis.feature.Feature;
 import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.CacheOversizedException;
 import org.geotools.caching.FeatureCacheException;
@@ -34,11 +34,16 @@ import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 public class GridFeatureCache extends AbstractFeatureCache {
@@ -54,23 +59,43 @@ public class GridFeatureCache extends AbstractFeatureCache {
      * @param indexcapacity = number of tiles in index
      * @param capacity = max number of features to cache
      * @throws FeatureCacheException
+     * @throws IOException 
      */
     public GridFeatureCache(FeatureSource fs, int indexcapacity, int capacity, Storage store)
         throws FeatureCacheException {
-        super(fs);
+    	
+    	this(fs, getFeatureBounds(fs), indexcapacity, capacity, store);   
+    }
+    
+    /**
+     * Creates a new grid feature cache.
+     * @param fs			FeatureStore from which to cache features
+     * @param env			The size of the feature cache; once defined features outside this bounds cannot be added to the featurestore/cache
+     * @param indexcapactiy	number of tiles in the index
+     * @param capcity		maximum number of features to cache
+     * @param store			the cache storage
+     */
+    public GridFeatureCache(FeatureSource fs, ReferencedEnvelope env, int indexcapactiy, int capcity, Storage store){
+    	super(fs);
 
-        Envelope universe;
-
-        try {
-            universe = fs.getBounds();
-        } catch (IOException e) {
-            throw new FeatureCacheException(e);
-        }
-
-        this.tracker = new GridTracker(convert(universe), indexcapacity, store);
-        this.capacity = capacity;
-
-        //this.tracker.addWriteNodeCommand(new EvictOnWriteCommand()) ;
+    	tracker = new GridTracker(convert(env), indexcapactiy, store);
+    	this.capacity = capcity;
+    }
+    
+    /**
+     * Private function used to get the bounds of a feature collection and convert the IOException
+     * to a FeatureCacheException
+     * 
+     * @param fs
+     * @return
+     * @throws FeatureCacheException
+     */
+    private static ReferencedEnvelope getFeatureBounds(FeatureSource fs) throws FeatureCacheException{
+    	try{
+    		return fs.getBounds();
+    	}catch(IOException ex){
+    		throw new FeatureCacheException(ex);
+    	}
     }
 
     protected Filter match(BBOXImpl sr) {
@@ -119,7 +144,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
         }
 
         List missing_tiles = tracker.searchMissingTiles(search);
-
+        
         // TODO: groug regions
         if (missing_tiles.size() > max_tiles) {
             missing.add(e);
@@ -163,8 +188,11 @@ public class GridFeatureCache extends AbstractFeatureCache {
         writeLog(Thread.currentThread().getName() + " : Got W lock, putting data");
 
         try {
+            //put then register put fails
             register(e);
             put(fc);
+        }catch (Exception ex){
+        	unregister(e);
         } finally {
             writeLog(Thread.currentThread().getName() + " : Released W lock, data inserted (put)");
             lock.writeLock().unlock();
@@ -185,18 +213,25 @@ public class GridFeatureCache extends AbstractFeatureCache {
         writeLog(Thread.currentThread().getName() + " : Got W lock, removing data");
 
         try {
-            this.tracker.intersectionQuery(convert(e), v);
+        	if (e == null){
+        		//no envelope specified so assume everything
+        		e = getBounds();
+        	}
+        	this.tracker.intersectionQuery(convert(e), v);
+        }catch (IOException ex) {
+        	//TODO: do something about this error
         } finally {
             writeLog(Thread.currentThread().getName() + " : Released W lock, data removed");
             lock.writeLock().unlock();
         }
     }
 
-    public Envelope getBounds() throws IOException {
-        return convert((Region) this.tracker.getRoot().getShape());
+    public ReferencedEnvelope getBounds() throws IOException {
+    	CoordinateReferenceSystem crs = this.fs.getSchema().getCoordinateReferenceSystem(); 
+        return new ReferencedEnvelope ( convert((Region) this.tracker.getRoot().getShape()), crs);
     }
 
-    public Envelope getBounds(Query query) throws IOException {
+    public ReferencedEnvelope getBounds(Query query) throws IOException {
         return this.fs.getBounds(query);
     }
 
@@ -222,14 +257,15 @@ public class GridFeatureCache extends AbstractFeatureCache {
                 //System.out.println("Put #" + puts + " > number of evictions = " + evictions) ;
             }
 
-            FeatureIterator it = fc.features();
-
-            while (it.hasNext()) {
-                Feature f = it.next();
-                this.tracker.insertData(f, convert(f.getBounds()), f.hashCode());
+            FeatureIterator<SimpleFeature> it = fc.features();
+            try{
+                while (it.hasNext()) {
+                    SimpleFeature f = it.next();
+                    this.tracker.insertData(f, convert((Envelope)f.getBounds()), f.hashCode());
+                }
+            }finally{
+                fc.close(it);
             }
-
-            fc.close(it);
         } finally {
             writeLog(Thread.currentThread().getName() + " : Released W lock, data inserted (put)");
             lock.writeLock().unlock();
@@ -244,10 +280,25 @@ public class GridFeatureCache extends AbstractFeatureCache {
         Region r = convert(e);
         ValidatingVisitor v = new ValidatingVisitor(r);
 
+        writeLog(Thread.currentThread().getName() + " : Asking W lock, registering");
+        lock.writeLock().lock();
+        writeLog(Thread.currentThread().getName() + " : Got W lock, registering");
         try {
-            writeLog(Thread.currentThread().getName() + " : Asking W lock, registering");
-            lock.writeLock().lock();
-            writeLog(Thread.currentThread().getName() + " : Got W lock, registering");
+            this.tracker.containmentQuery(r, v);
+        } finally {
+            writeLog(Thread.currentThread().getName() + " : Released W lock, registered envelope");
+            lock.writeLock().unlock();
+        }
+    }
+    
+    protected void unregister(Envelope e){
+    	Region r = convert(e);
+    	InvalidatingVisitor v = new InvalidatingVisitor(r);
+    	
+    	writeLog(Thread.currentThread().getName() + " : Asking W lock, registering");
+        lock.writeLock().lock();
+        writeLog(Thread.currentThread().getName() + " : Got W lock, registering");
+        try {
             this.tracker.containmentQuery(r, v);
         } finally {
             writeLog(Thread.currentThread().getName() + " : Released W lock, registered envelope");

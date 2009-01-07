@@ -18,10 +18,21 @@ package org.geotools.caching.grid;
 
 import org.geotools.caching.spatialindex.Data;
 import org.geotools.caching.spatialindex.Node;
+import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Visitor;
 
 
 class InvalidatingVisitor implements Visitor {
+	
+    private Region region;
+
+    public InvalidatingVisitor(Region r) {
+        this.region = r;
+    }
+    
+    public InvalidatingVisitor() {
+    }
+    
     public boolean isDataVisitor() {
         return false;
     }
@@ -31,11 +42,13 @@ class InvalidatingVisitor implements Visitor {
     }
 
     public void visitNode(Node n) {
-        n.getIdentifier().setValid(false);
+		if (region == null || region.contains(n.getShape())) {
+			n.getIdentifier().setValid(false);
 
-        if (n instanceof GridCacheNode) {
-            GridCacheNode node = (GridCacheNode) n;
-            node.clear();
-        }
-    }
+			if (n instanceof GridCacheNode) {
+				GridCacheNode node = (GridCacheNode) n;
+				node.clear();
+			}
+		}
+	}
 }

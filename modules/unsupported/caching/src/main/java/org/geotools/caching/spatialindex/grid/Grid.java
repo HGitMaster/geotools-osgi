@@ -198,9 +198,8 @@ public class Grid extends AbstractSpatialIndex {
 
         if (this.root.getShape().contains(shape)) {
             insertData(this.root, data, shape, id);
-
-            return;
         } else {
+        	//System.out.println("out of bounds:" + shape.getMBR() + ":" + this.root.getShape().getMBR());
             insertDataOutOfBounds(data, shape, id);
         }
     }
