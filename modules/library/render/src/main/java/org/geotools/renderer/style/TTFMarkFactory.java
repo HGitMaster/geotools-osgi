@@ -24,6 +24,7 @@ import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
@@ -99,10 +100,17 @@ public class TTFMarkFactory implements MarkFactory {
         }
 
         // build the shape out of the font
-        Font unitSizeFont = font.deriveFont(1.0f);
-        GlyphVector textGlyphVector = unitSizeFont.createGlyphVector(FONT_RENDER_CONTEXT,
+        GlyphVector textGlyphVector = font.createGlyphVector(FONT_RENDER_CONTEXT,
                 new char[] { (char) character });
-        return textGlyphVector.getOutline();
+        Shape s = textGlyphVector.getOutline();
+        
+        // have the shape be centered in the origin, and sitting in a square of side 1
+        Rectangle2D bounds = s.getBounds2D();
+        AffineTransform tx = new AffineTransform();
+        double max = Math.max(bounds.getWidth(), bounds.getHeight());
+        tx.translate(-0.5, 0.5);
+        tx.scale(1 / max, 1 / max);
+        return tx.createTransformedShape(s);
     }
 
     public static void main(String[] args) {
