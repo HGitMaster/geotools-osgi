@@ -56,8 +56,17 @@ public class FontCache {
 
     /**
      * Returns the default, system wide font cache
+     * @deprecated Use {@link #getDefaultInstance()} instead
      */
     public static FontCache getDefaultInsance() {
+        return getDefaultInstance();
+    }
+    
+    /**
+     * Returns the default, system wide font cache
+     * @since 2.6
+     */
+    public static FontCache getDefaultInstance() {
         if (defaultInstance == null) {
             defaultInstance = new FontCache();
         }
@@ -183,6 +192,16 @@ public class FontCache {
 
             return null;
         }
+    }
+    
+    /**
+     * Adds the specified font in the font cache. Useful if you want to load
+     * fonts that are not installed in the Operating System and cannot provide
+     * a full path to fonts either.
+     * @param f
+     */
+    public void registerFont(Font f) {
+        loadedFonts.put(f.getName(), f);
     }
 
 }
