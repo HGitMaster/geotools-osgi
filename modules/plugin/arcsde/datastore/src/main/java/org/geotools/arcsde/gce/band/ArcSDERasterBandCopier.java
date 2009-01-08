@@ -1,8 +1,7 @@
 /*
- *    GeoTools - The Open Source Java GIS Toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *
- *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,7 +33,7 @@ public abstract class ArcSDERasterBandCopier {
         if (sePixelType == SeRaster.SE_PIXEL_TYPE_8BIT_U) {
             ret = new UnsignedByteBandCopier();
         } else if (sePixelType == SeRaster.SE_PIXEL_TYPE_1BIT) {
-            ret = new OneBitBandCopier();
+        	ret = new OneBitBandCopier();
         } else if (sePixelType == SeRaster.SE_PIXEL_TYPE_32BIT_REAL) {
             ret = new FloatBandCopier();
         } else {
@@ -47,19 +46,23 @@ public abstract class ArcSDERasterBandCopier {
     }
 
     /**
-     * @param tile The actual tile you wish to copy from
-     * @param raster The raster into which data should be copied
-     * @param copyOffX The x-coordinate of the TILE at which the raster should start copying
-     * @param copyOffY The y-coordinate of the TILE at which the raster should start copying
-     * @param targetBand The band in the supplied raster into which the data from this tile should
-     *            be copied
+     * @param tile
+     *            The actual tile you wish to copy from
+     * @param raster
+     *            The raster into which data should be copied
+     * @param copyOffX
+     *            The x-coordinate of the TILE at which the raster should start
+     *            copying
+     * @param copyOffY
+     *            The y-coordinate of the TILE at which the raster should start
+     *            copying
+     * @param targetBand
+     *            The band in the supplied raster into which the data from this
+     *            tile should be copied
      * @throws DataSourceException
      */
-    public abstract void copyPixelData(SeRasterTile tile,
-            WritableRaster raster,
-            int copyOffX,
-            int copyOffY,
-            int targetBand) throws DataSourceException;
+    public abstract void copyPixelData(SeRasterTile tile, WritableRaster raster, int copyOffX,
+            int copyOffY, int targetBand) throws DataSourceException;
 
     protected Object createTransferObject(int transferType, int numPixels) {
         if (transferType == DataBuffer.TYPE_BYTE) {

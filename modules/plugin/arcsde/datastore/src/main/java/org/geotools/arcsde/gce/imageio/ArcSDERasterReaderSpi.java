@@ -1,8 +1,7 @@
 /*
- *    GeoTools - The Open Source Java GIS Toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *
- *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,6 +29,7 @@ import org.geotools.arcsde.gce.ArcSDEPyramid;
  * An ImageIO Service Provider Interface for creating ArcSDERasterReaders.
  * 
  * @author sfarber
+ * 
  */
 public class ArcSDERasterReaderSpi extends ImageReaderSpi {
 
@@ -47,15 +47,18 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
     }
 
     /**
-     * Creates an ArcSDERasterReader (an ImageIO compatible ImageReader). This reader requires the
-     * following keys to be set in the {@link java.util.Map} passed to this method:<br/>
+     * Creates an ArcSDERasterReader (an ImageIO compatible ImageReader). This
+     * reader requires the following keys to be set in the {@link java.util.Map}
+     * passed to this method:<br/>
+     * 
      * <ul>
-     * <li>ArcSDERasterReaderSpi.PYRAMID - a {@link ArcSDEPyramid} describing the pyramid that this
-     * reader will be reading</li>
-     * <li>ArcSDERasterReaderSpi.RASTER_COLUMN - a String containing the Raster column for this
-     * readers RASTER_TABLE</li>
-     * <li>ArcSDERasterReaderSpi.RASTER_TABLE - a String containing the name of the ArcSDE raster
-     * table to read. Probably needs to be qualified with the schema name.</li>
+     * <li>ArcSDERasterReaderSpi.PYRAMID - a {@link ArcSDEPyramid} describing
+     * the pyramid that this reader will be reading</li>
+     * <li>ArcSDERasterReaderSpi.RASTER_COLUMN - a String containing the Raster
+     * column for this readers RASTER_TABLE</li>
+     * <li>ArcSDERasterReaderSpi.RASTER_TABLE - a String containing the name of
+     * the ArcSDE raster table to read. Probably needs to be qualified with the
+     * schema name.</li>
      * </ul>
      */
     @Override
@@ -85,7 +88,8 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
     }
 
     /**
-     * We completely ignore the setInput() call in this reader, so we'll happily accept anything.
+     * We completely ignore the setInput() call in this reader, so we'll happily
+     * accept anything.
      */
     @Override
     public Class[] getInputTypes() {

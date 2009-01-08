@@ -1,19 +1,3 @@
-/*
- *    GeoTools - The Open Source Java GIS Toolkit
- *    http://geotools.org
- *
- *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- */
 package org.geotools.arcsde.gce.band;
 
 import java.awt.image.WritableRaster;
@@ -75,13 +59,13 @@ public class FloatBandCopier extends ArcSDERasterBandCopier {
                 : raster.getHeight();
 
         for (x = 0; x < imgWidth; x++) {
-            // final float[] imageDataRow = new float[imgHeight];
+            //final float[] imageDataRow = new float[imgHeight];
             for (y = 0; y < imgHeight; y++) {
                 final int pixArrayOffset = (y + copyOffY) * tileWidth + (x + copyOffX);
                 if (haveBMData) {
                     if (((bitmaskData[pixArrayOffset / 8] >> (7 - (pixArrayOffset % 8))) & 0x01) == 0x00) {
                         // it's a no-data pixel. Make it transparent/no-data
-                        // TODO: support nodata values here
+                        // TODO:  support nodata values here
                         raster.setSample(x, y, targetBand, 0.0f);
                         continue;
                     }

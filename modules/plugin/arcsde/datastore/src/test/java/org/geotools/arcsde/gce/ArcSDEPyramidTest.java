@@ -17,19 +17,19 @@
  */
 package org.geotools.arcsde.gce;
 
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.io.InputStream;
-import java.util.Properties;
 
-import junit.framework.TestCase;
-
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
-import org.geotools.arcsde.pool.SessionPool;
-import org.geotools.arcsde.pool.SessionPoolFactory;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -46,32 +46,29 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * 
  * @author Saul Farber, (based on ArcSDEPoolTest by Gabriel Roldan)
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
- * @version $Id: ArcSDEPyramidTest.java 30722 2008-06-13 18:15:42Z acuster $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
+ * @version $Id: ArcSDEPyramidTest.java 32181 2009-01-08 15:44:06Z groldan $
  */
-public class ArcSDEPyramidTest extends TestCase {
+public class ArcSDEPyramidTest {
 
-    private SessionPool pool;
+    private static RasterTestData testData;
 
-    private Properties conProps;
+    private static ArcSDEConnectionPool pool;
 
-    public ArcSDEPyramidTest(String name) {
-        super(name);
+    @BeforeClass
+    public static void oneTimeSetUp() throws Exception {
+        testData = new RasterTestData();
+        testData.setUp();
+        pool = testData.getConnectionPool();
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        conProps = new Properties();
-        InputStream in = org.geotools.test.TestData.url(null, "raster-testparams.properties")
-                .openStream();
-        conProps.load(in);
-        in.close();
-        pool = SessionPoolFactory.getInstance().createSharedPool(
-                new ArcSDEConnectionConfig(conProps));
-
+    @AfterClass
+    public static void oneTimeTearDown() throws Exception {
+        testData.tearDown();
     }
 
+    @Test
     public void testArcSDEPyramidHypothetical() throws Exception {
 
         ArcSDEPyramid pyramid = new ArcSDEPyramid(10, 10, 2);
@@ -102,23 +99,25 @@ public class ArcSDEPyramidTest extends TestCase {
     /*
      * NEED TO PORT TO NEW RASTER TEST FRAMEWORK (use RasterTestData, loadable sample data, etc)
      */
-    public void donttestArcSDEPyramidThreeBand() throws Exception {
+    @Test
+    @Ignore
+    public void testArcSDEPyramidThreeBand() throws Exception {
 
-        ISession session = pool.getSession();
+        ArcSDEPooledConnection conn = pool.getConnection();
         SeRasterAttr rAttr;
         try {
-            SeQuery q = session.createAndExecuteQuery(new String[] { "RASTER" },
-                    new SeSqlConstruct(conProps.getProperty("threebandtable")));
+            SeQuery q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(testData
+                    .getRasterTestDataProperty("threebandtable")));
             SeRow r = q.fetch();
             rAttr = r.getRaster(0);
         } catch (SeException se) {
-            session.dispose();
+            conn.close();
             throw new RuntimeException(se.getSeError().getErrDesc(), se);
         }
 
-        CoordinateReferenceSystem crs = CRS.decode(conProps.getProperty("tableCRS"));
+        CoordinateReferenceSystem crs = CRS.decode(testData.getRasterTestDataProperty("tableCRS"));
         ArcSDEPyramid pyramid = new ArcSDEPyramid(rAttr, crs);
-        session.dispose();
+        conn.close();
 
         assertTrue(pyramid.getPyramidLevel(0).getYOffset() != 0);
 
@@ -148,25 +147,29 @@ public class ArcSDEPyramidTest extends TestCase {
     /*
      * NEED TO PORT TO NEW RASTER TEST FRAMEWORK (use RasterTestData, loadable sample data, etc)
      */
+    @Test
     public void testArcSDEPyramidFourBand() throws Exception {
 
-        ISession session = pool.getSession();
+        ArcSDEPooledConnection conn = pool.getConnection();
         SeRasterAttr rAttr;
         try {
-            String tableName = conProps.getProperty("fourbandtable");
-            if( tableName == null ) return;
-			SeQuery q = session.createAndExecuteQuery(new String[] { "RASTER" },
+            String tableName = testData.getRasterTestDataProperty("fourbandtable");
+            if (tableName == null)
+                return;
+            SeQuery q = new SeQuery(conn, new String[] { "RASTER" },
                     new SeSqlConstruct(tableName));
+            q.prepareQuery();
+            q.execute();
             SeRow r = q.fetch();
             rAttr = r.getRaster(0);
         } catch (SeException se) {
-            session.dispose();
+            conn.close();
             throw new RuntimeException(se.getSeError().getErrDesc(), se);
         }
 
-        CoordinateReferenceSystem crs = CRS.decode(conProps.getProperty("tableCRS"));
+        CoordinateReferenceSystem crs = CRS.decode(testData.getRasterTestDataProperty("tableCRS"));
         ArcSDEPyramid pyramid = new ArcSDEPyramid(rAttr, crs);
-        session.dispose();
+        conn.close();
 
         assertTrue(pyramid.getPyramidLevel(0).getYOffset() != 0);
 

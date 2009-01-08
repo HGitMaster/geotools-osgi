@@ -62,8 +62,7 @@ public class RGBGridCoverageReaderTest {
 
     @Test
     public void testReadRGBRaster() throws Exception {
-        Properties p = rasterTestData.getTestData().getConProps();
-        ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(p);
+        ArcSDEConnectionConfig config = rasterTestData.getConnectionPool().getConfig();
 
         String rgbUrl = "sde://" + config.getUserName() + ":" + config.getUserPassword() + "@"
                 + config.getServerName() + ":" + config.getPortNumber() + "/"

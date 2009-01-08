@@ -1,8 +1,7 @@
 /*
- *    GeoTools - The Open Source Java GIS Toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *
- *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,7 +22,7 @@ import java.util.HashMap;
 
 import javax.imageio.ImageReadParam;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeRasterBand;
@@ -67,7 +66,7 @@ import com.esri.sde.sdk.client.SeRasterBand;
  */
 public class ArcSDERasterImageReadParam extends ImageReadParam {
 
-    protected ISession session;
+    protected ArcSDEPooledConnection connection;
 
     protected HashMap<Integer, Integer> bandMapper;
 
@@ -79,11 +78,11 @@ public class ArcSDERasterImageReadParam extends ImageReadParam {
         this.bandMapper = bandMapper;
     }
 
-    public ISession getConnection() {
-        return session;
+    public ArcSDEPooledConnection getConnection() {
+        return connection;
     }
 
-    public void setConnection(ISession session) {
-        this.session = session;
+    public void setConnection(ArcSDEPooledConnection connection) {
+        this.connection = connection;
     }
 }

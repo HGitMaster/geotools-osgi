@@ -23,28 +23,25 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedImageAdapter;
 
 import org.geotools.arcsde.data.TestData;
 import org.geotools.arcsde.gce.producer.ArcSDERasterFloatProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterOneBitPerBandProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterOneBytePerBandProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterProducer;
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
@@ -61,36 +58,28 @@ import com.esri.sde.sdk.client.SeTable;
 import com.esri.sde.sdk.pe.PeFactory;
 import com.esri.sde.sdk.pe.PePCSDefs;
 import com.esri.sde.sdk.pe.PeProjectedCS;
-import com.sun.media.jai.util.PlanarImageProducer;
 
 public class RasterTestData {
 
     private TestData testData;
 
-    private Properties conProps;
-
     private Logger LOGGER = Logging.getLogger(this.getClass());
+
+    private ArcSDEConnectionPool _pool;
 
     public void setUp() throws IOException {
         // load a raster dataset into SDE
         testData = new TestData();
         testData.setUp();
-
-        conProps = new Properties();
-        String propsFile = "raster-testparams.properties";
-        URL conParamsSource = org.geotools.test.TestData.url(null, propsFile);
-
-        InputStream in = conParamsSource.openStream();
-        if (in == null) {
-            throw new IllegalStateException("cannot find test params: "
-                    + conParamsSource.toExternalForm());
-        }
-        conProps.load(in);
-        in.close();
     }
 
-    public TestData getTestData() {
-        return testData;
+    public ArcSDEConnectionPool getConnectionPool() throws DataSourceException {
+        if (this._pool == null) {
+            ArcSDEConnectionPoolFactory pfac = ArcSDEConnectionPoolFactory.getInstance();
+            ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(testData.getConProps());
+            this._pool = pfac.createPool(config);
+        }
+        return this._pool;
     }
 
     /*
@@ -124,7 +113,7 @@ public class RasterTestData {
     }
 
     public String getRasterTestDataProperty(String propName) {
-        return conProps.getProperty(propName);
+        return testData.getConProps().getProperty(propName);
     }
 
     /**
@@ -134,19 +123,18 @@ public class RasterTestData {
      * @throws Exception
      */
     public void load1bitRaster() throws Exception {
-        // we're definitely piggybacking on the testData class here
-        ISession session = testData.getConnectionPool().getSession();
+        ArcSDEPooledConnection conn = getConnectionPool().getConnection();
         final String tableName = get1bitRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, session);
-        session.dispose();
+        createRasterBusinessTempTable(tableName, conn);
+        conn.close();
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 500, 898000 + 500);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
-        String rasterFilename = conProps.getProperty("sampledata.onebitraster");
+        String rasterFilename = testData.getConProps().getProperty("sampledata.onebitraster");
         ArcSDERasterProducer producer = new ArcSDERasterOneBitPerBandProducerImpl();
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_1BIT, imgExtent,
@@ -160,19 +148,18 @@ public class RasterTestData {
      * @throws Exception
      */
     public void loadRGBRaster() throws Exception {
-        // we're definitely piggybacking on the testData class here
-        ISession session = testData.getConnectionPool().getSession();
         final String tableName = getRGBRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, session);
-        session.dispose();
+        ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+        createRasterBusinessTempTable(tableName, conn);
+        conn.close();
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 501, 898000 + 501);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
-        String rasterFilename = conProps.getProperty("sampledata.rgbraster");
+        String rasterFilename = testData.getConProps().getProperty("sampledata.rgbraster");
         ArcSDERasterProducer prod = new ArcSDERasterOneBytePerBandProducerImpl();
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_8BIT_U, imgExtent,
@@ -180,19 +167,20 @@ public class RasterTestData {
     }
 
     public void loadRGBColorMappedRaster() throws Exception {
-        // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
-        ISession session = testData.getConnectionPool().getSession();
         final String tableName = getRGBColorMappedRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
+
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, session);
-        session.dispose();
+        // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
+        ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+        createRasterBusinessTempTable(tableName, conn);
+        conn.close();
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 500, 898000 + 500);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
-        String rasterFilename = conProps.getProperty("sampledata.rgbraster-colormapped");
+        String rasterFilename = testData.getConProps().getProperty("sampledata.rgbraster-colormapped");
         ArcSDERasterProducer prod = new ArcSDERasterOneBytePerBandProducerImpl();
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_8BIT_U, imgExtent,
@@ -200,19 +188,19 @@ public class RasterTestData {
     }
 
     public void loadOneByteGrayScaleRaster() throws Exception {
-        // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
-        ISession session = testData.getConnectionPool().getSession();
         final String tableName = getGrayScaleOneByteRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, session);
-        session.dispose();
+        // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
+        ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+        createRasterBusinessTempTable(tableName, conn);
+        conn.close();
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 500, 898000 + 500);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
-        String rasterFilename = conProps.getProperty("sampledata.onebyteonebandraster");
+        String rasterFilename = testData.getConProps().getProperty("sampledata.onebyteonebandraster");
         ArcSDERasterProducer prod = new ArcSDERasterOneBytePerBandProducerImpl();
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_8BIT_U, imgExtent,
@@ -220,19 +208,19 @@ public class RasterTestData {
     }
 
     public void loadFloatRaster() throws Exception {
-        // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
-        ISession session = testData.getConnectionPool().getSession();
         final String tableName = getFloatRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, session);
-        session.dispose();
+        // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
+        ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+        createRasterBusinessTempTable(tableName, conn);
+        conn.close();
 
         SeExtent imgExtent = new SeExtent(245900, 899600, 246300, 900000);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
-        String rasterFilename = conProps.getProperty("sampledata.floatraster");
+        String rasterFilename = testData.getConProps().getProperty("sampledata.floatraster");
         ArcSDERasterProducer prod = new ArcSDERasterFloatProducerImpl();
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_32BIT_REAL,
@@ -251,10 +239,11 @@ public class RasterTestData {
         return crs;
     }
 
-    public void createRasterBusinessTempTable(String tableName, ISession session) throws Exception {
+    public void createRasterBusinessTempTable(String tableName, ArcSDEPooledConnection conn)
+            throws Exception {
 
         SeColumnDefinition[] colDefs = new SeColumnDefinition[1];
-        SeTable table = session.createSeTable(tableName);
+        SeTable table = new SeTable(conn, tableName);
 
         // first column to be SDE managed feature id
         colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INTEGER, 10, 0, false);
@@ -263,7 +252,7 @@ public class RasterTestData {
         /*
          * Register the column to be used as feature id and managed by sde
          */
-        SeRegistration reg = session.createSeRegistration(table.getName());
+        SeRegistration reg = new SeRegistration(conn, table.getName());
         LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
         reg.setRowIdColumnName("ROW_ID");
         final int rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
@@ -271,94 +260,75 @@ public class RasterTestData {
         reg.alter();
     }
 
-    public void importRasterImage(final String tableName,
-            SeCoordinateReference crs,
-            final String rasterFilename,
-            final int sePixelType,
-            SeExtent extent,
+    public void importRasterImage(final String tableName, SeCoordinateReference crs,
+            final String rasterFilename, final int sePixelType, SeExtent extent,
             ArcSDERasterProducer prod) throws Exception {
         importRasterImage(tableName, crs, rasterFilename, sePixelType, extent, prod, null);
     }
 
-    public void importRasterImage(final String tableName,
-            final SeCoordinateReference crs,
-            final String rasterFilename,
-            final int sePixelType,
-            final SeExtent extent,
-            final ArcSDERasterProducer prod,
-            final IndexColorModel colorModel) throws Exception {
+    public void importRasterImage(final String tableName, final SeCoordinateReference crs,
+            final String rasterFilename, final int sePixelType, final SeExtent extent,
+            final ArcSDERasterProducer prod, final IndexColorModel colorModel) throws Exception {
 
-        final ISession session = testData.getConnectionPool().getSession();
-        final Command<Void> command = new Command<Void>() {
-
-            @Override
-            public Void execute(ISession session, SeConnection connection) throws SeException,
-                    IOException {
-                // much of this code is from
-                // http://edndoc.esri.com/arcsde/9.2/concepts/rasters/dataloading/dataloading.htm
-                SeRasterColumn rasCol = session.createSeRasterColumn();
-                rasCol.setTableName(tableName);
-                rasCol.setDescription("Sample geotools ArcSDE raster test-suite data.");
-                rasCol.setRasterColumnName("RASTER");
-                rasCol.setCoordRef(crs);
-                rasCol.setConfigurationKeyword(testData.getConfigKeyword());
-
-                rasCol.create();
-
-                // now start loading the actual raster data
-                BufferedImage sampleImage = ImageIO.read(org.geotools.test.TestData.getResource(
-                        null, rasterFilename));
-
-                int imageWidth = sampleImage.getWidth(), imageHeight = sampleImage.getHeight();
-
-                SeRasterAttr attr = new SeRasterAttr(true);
-                attr.setImageSize(imageWidth, imageHeight, sampleImage.getSampleModel()
-                        .getNumBands());
-                attr.setTileSize(128, 128);
-                attr.setPixelType(sePixelType);
-                attr.setCompressionType(SeRaster.SE_COMPRESSION_NONE);
-                // no pyramiding
-                // attr.setPyramidInfo(3, true, SeRaster.SE_INTERPOLATION_BILINEAR);
-                attr.setMaskMode(false);
-                attr.setImportMode(false);
-
-                attr.setExtent(extent);
-                // attr.setImageOrigin();
-
-                prod.setSeRasterAttr(attr);
-                prod.setSourceImage(sampleImage);
-                attr.setRasterProducer(prod);
-
-                try {
-                    SeInsert insert = new SeInsert(connection);
-                    insert.intoTable(tableName, new String[] { "RASTER" });
-                    // no buffered writes on raster loads
-                    insert.setWriteMode(false);
-                    SeRow row = insert.getRowToSet();
-                    row.setRaster(0, attr);
-
-                    insert.execute();
-                    insert.close();
-                } catch (SeException se) {
-                    se.printStackTrace();
-                    throw se;
-                }
-
-                // if there's a colormap to insert, let's add that too
-                if (colorModel != null) {
-                    attr = getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0,
-                            new int[] { 1 });
-                    // attr.getBands()[0].setColorMap(SeRaster.SE_COLORMAP_DATA_BYTE, );
-                    // NOT IMPLEMENTED FOR NOW!
-                }
-                return null;
-            }
-        };
-
+        final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
         try {
-            session.issue(command);
+            // much of this code is from
+            // http://edndoc.esri.com/arcsde/9.2/concepts/rasters/dataloading/dataloading.htm
+            SeRasterColumn rasCol = new SeRasterColumn(conn);
+            rasCol.setTableName(tableName);
+            rasCol.setDescription("Sample geotools ArcSDE raster test-suite data.");
+            rasCol.setRasterColumnName("RASTER");
+            rasCol.setCoordRef(crs);
+            rasCol.setConfigurationKeyword(testData.getConfigKeyword());
+
+            rasCol.create();
+
+            // now start loading the actual raster data
+            BufferedImage sampleImage = ImageIO.read(org.geotools.test.TestData.getResource(null,
+                    rasterFilename));
+
+            int imageWidth = sampleImage.getWidth(), imageHeight = sampleImage.getHeight();
+
+            SeRasterAttr attr = new SeRasterAttr(true);
+            attr.setImageSize(imageWidth, imageHeight, sampleImage.getSampleModel().getNumBands());
+            attr.setTileSize(128, 128);
+            attr.setPixelType(sePixelType);
+            attr.setCompressionType(SeRaster.SE_COMPRESSION_NONE);
+            // no pyramiding
+            // attr.setPyramidInfo(3, true, SeRaster.SE_INTERPOLATION_BILINEAR);
+            attr.setMaskMode(false);
+            attr.setImportMode(false);
+
+            attr.setExtent(extent);
+            // attr.setImageOrigin();
+
+            prod.setSeRasterAttr(attr);
+            prod.setSourceImage(sampleImage);
+            attr.setRasterProducer(prod);
+
+            try {
+                SeInsert insert = new SeInsert(conn);
+                insert.intoTable(tableName, new String[] { "RASTER" });
+                // no buffered writes on raster loads
+                insert.setWriteMode(false);
+                SeRow row = insert.getRowToSet();
+                row.setRaster(0, attr);
+
+                insert.execute();
+                insert.close();
+            } catch (SeException se) {
+                se.printStackTrace();
+                throw se;
+            }
+
+            // if there's a colormap to insert, let's add that too
+            if (colorModel != null) {
+                attr = getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
+                // attr.getBands()[0].setColorMap(SeRaster.SE_COLORMAP_DATA_BYTE, );
+                // NOT IMPLEMENTED FOR NOW!
+            }
         } finally {
-            session.dispose();
+            conn.close();
         }
     }
 
@@ -398,8 +368,7 @@ public class RasterTestData {
      * @param image2
      * @return
      */
-    public static boolean imageEquals(RenderedImage image1,
-            RenderedImage image2,
+    public static boolean imageEquals(RenderedImage image1, RenderedImage image2,
             boolean ignoreAlpha) {
 
         final int h = image1.getHeight();
@@ -444,16 +413,16 @@ public class RasterTestData {
         return true;
     }
 
-    public SeRasterAttr getRasterAttributes(final String rasterName,
-            Rectangle tiles,
-            int level,
+    public SeRasterAttr getRasterAttributes(final String rasterName, Rectangle tiles, int level,
             int[] bands) throws IOException, UnavailableArcSDEConnectionException {
 
-        ISession session = testData.getConnectionPool().getSession();
+        ArcSDEPooledConnection conn = getConnectionPool().getConnection();
 
         try {
-            SeQuery query = session.createAndExecuteQuery(new String[] { session.getRasterColumn(
+            SeQuery query = new SeQuery(conn, new String[] { conn.getRasterColumn(
                     rasterName).getName() }, new SeSqlConstruct(rasterName));
+            query.prepareQuery();
+            query.execute();
             final SeRow r = query.fetch();
 
             // Now build a SeRasterConstraint object which queries the db for
@@ -476,7 +445,7 @@ public class RasterTestData {
         } catch (SeException se) {
             throw new DataSourceException(se);
         } finally {
-            session.dispose();
+            conn.close();
         }
     }
 }

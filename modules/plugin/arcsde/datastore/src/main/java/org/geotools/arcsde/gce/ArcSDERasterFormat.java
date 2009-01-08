@@ -1,8 +1,7 @@
 /*
- *    GeoTools - The Open Source Java GIS Toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *
- *    (C) 2003-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,13 +17,13 @@
 package org.geotools.arcsde.gce;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
+import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -72,7 +71,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object source)
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object
+     *      source)
      */
     @Override
     public GridCoverageReader getReader(Object source) {
@@ -83,7 +83,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     public GridCoverageReader getReader(Object source, Hints hints) {
         try {
             return new ArcSDERasterGridCoverage2DReader(source, hints);
-        } catch (IOException dse) {
+        } catch (DataSourceException dse) {
             LOGGER
                     .log(Level.SEVERE, "Unable to creata ArcSDERasterReader for " + source + ".",
                             dse);
@@ -102,7 +102,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object input)
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object
+     *      input)
      */
     @Override
     public boolean accepts(Object input) {

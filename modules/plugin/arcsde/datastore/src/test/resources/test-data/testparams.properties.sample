@@ -23,3 +23,29 @@ configKeyword=DEFAULTS
 #CAUTION: be sure you do not specify a table name which already
 #exists and that you don't have to loose!
 temp_table=DELETE_ME
+
+
+
+############################
+# Raster test parameters
+############################
+
+
+#sample 1bit tiff image
+sampledata.onebitraster=1bit-raster.tiff
+
+#sample three-band RGB image
+sampledata.rgbraster=RGBphoto-raster.tiff
+
+#sample three-band raster that's indexed
+sampledata.rgbraster-colormapped=RGBphoto-raster-colormapped.png
+
+#sample four-band (with alpha) raster
+sampledata.rgbaraster=RGBAphoto-raster.tiff
+
+#sample one-band, one-byte, non-colormapped "greyscale" raster
+sampledata.onebyteonebandraster=GrayscalePhoto-raster.tiff
+
+#sample one-band, 32-bit signed real-valued raster
+sampledata.floatraster=Float-raster.tiff
+

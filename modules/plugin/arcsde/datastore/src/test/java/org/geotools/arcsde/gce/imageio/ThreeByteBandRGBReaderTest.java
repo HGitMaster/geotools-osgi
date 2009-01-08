@@ -28,7 +28,7 @@ import javax.imageio.ImageIO;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.ArcSDEPyramid;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
 import org.junit.AfterClass;
@@ -58,14 +58,14 @@ public class ThreeByteBandRGBReaderTest {
 
         ArcSDEPyramid pyramid;
         String tableName;
-        ISession session = null;
+        ArcSDEPooledConnection conn = null;
         try {
             tableName = rasterTestData.getRGBRasterTableName();
             SeRasterAttr rattr = rasterTestData.getRasterAttributes(tableName, new Rectangle(0, 0,
                     0, 0), 0, new int[] { 1, 2, 3 });
 
-            session = rasterTestData.getTestData().getConnectionPool().getSession();
-            SeRasterColumn rcol = session.createSeRasterColumn(rattr.getRasterColumnId());
+            conn = rasterTestData.getConnectionPool().getConnection();
+            SeRasterColumn rcol = new SeRasterColumn(conn, rattr.getRasterColumnId());
 
             CoordinateReferenceSystem crs = CRS.decode("EPSG:2805");
             pyramid = new ArcSDEPyramid(rattr, crs);
@@ -78,8 +78,8 @@ public class ThreeByteBandRGBReaderTest {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
             throw se;
         } finally {
-            if (session != null) {
-                session.dispose();
+            if (conn != null) {
+                conn.close();
             }
         }
     }
@@ -100,9 +100,9 @@ public class ThreeByteBandRGBReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        ISession session = null;
+        ArcSDEPooledConnection conn = null;
         try {
-            session = rasterTestData.getTestData().getConnectionPool().getSession();
+            conn = rasterTestData.getConnectionPool().getConnection();
 
             SeRasterAttr rattr = rasterTestData.getRasterAttributes(rasterTestData
                     .getRGBRasterTableName(), new Rectangle(0, 0, 0, 0), 0, new int[] { 1, 2, 3 });
@@ -123,7 +123,7 @@ public class ThreeByteBandRGBReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(session);
+            rParam.setConnection(conn);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
             for (int x = 0; x < w; x++) {
@@ -152,8 +152,8 @@ public class ThreeByteBandRGBReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (session != null && !session.isClosed())
-                session.dispose();
+            if (conn != null && !conn.isClosed())
+                conn.close();
         }
     }
 
@@ -168,9 +168,9 @@ public class ThreeByteBandRGBReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        ISession session = null;
+        ArcSDEPooledConnection conn = null;
         try {
-            session = rasterTestData.getTestData().getConnectionPool().getSession();
+            conn = rasterTestData.getConnectionPool().getConnection();
 
             SeRasterAttr rattr = rasterTestData.getRasterAttributes(rasterTestData
                     .getRGBRasterTableName(), new Rectangle(0, 0, 0, 0), 0, new int[] { 1, 2, 3 });
@@ -193,7 +193,7 @@ public class ThreeByteBandRGBReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(session);
+            rParam.setConnection(conn);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             rParam.setDestination(image);
             rParam.setDestinationOffset(imageOffset);
@@ -217,8 +217,8 @@ public class ThreeByteBandRGBReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (session != null && !session.isClosed())
-                session.dispose();
+            if (conn != null && !conn.isClosed())
+                conn.close();
         }
     }
 
@@ -230,9 +230,9 @@ public class ThreeByteBandRGBReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        ISession session = null;
+        ArcSDEPooledConnection conn = null;
         try {
-            session = rasterTestData.getTestData().getConnectionPool().getSession();
+            conn = rasterTestData.getConnectionPool().getConnection();
             SeRasterAttr rattr = rasterTestData.getRasterAttributes(rasterTestData
                     .getRGBRasterTableName(), new Rectangle(0, 0, 0, 0), 0, new int[] { 1, 2, 3 });
             ArcSDEPyramid p = new ArcSDEPyramid(rattr, CRS.decode("EPSG:4326"));
@@ -247,7 +247,7 @@ public class ThreeByteBandRGBReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(session);
+            rParam.setConnection(conn);
             rParam.setSourceRegion(new Rectangle(p.getPyramidLevel(0).getSize()));
             image = new BufferedImage(p.getPyramidLevel(0).getSize().width, p.getPyramidLevel(0)
                     .getSize().height, BufferedImage.TYPE_3BYTE_BGR);
@@ -266,8 +266,8 @@ public class ThreeByteBandRGBReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (session != null && !session.isClosed())
-                session.dispose();
+            if (conn != null && !conn.isClosed())
+                conn.close();
         }
     }
 }

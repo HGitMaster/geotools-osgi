@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import org.geotools.arcsde.gce.ArcSDEPyramid;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
 import org.junit.AfterClass;
@@ -51,7 +51,7 @@ public class OneByteBandNoColormapReaderTest {
         rasterTestData.setUp();
         rasterTestData.loadOneByteGrayScaleRaster();
 
-        ISession session = null;
+        ArcSDEPooledConnection conn = null;
         SeQuery q = null;
         ArcSDEPyramid pyramid;
         SeRow r;
@@ -59,15 +59,17 @@ public class OneByteBandNoColormapReaderTest {
         try {
 
             // Set up a pyramid and readerprops for the sample three-band imagery
-            session = rasterTestData.getTestData().getConnectionPool().getSession();
+            conn = rasterTestData.getConnectionPool().getConnection();
             tableName = rasterTestData.getGrayScaleOneByteRasterTableName();
-            q = session.createAndExecuteQuery(new String[] { "RASTER" }, new SeSqlConstruct(
+            q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(
                     tableName));
+            q.prepareQuery();
+            q.execute();
             r = q.fetch();
             SeRasterAttr rattrThreeBand = r.getRaster(0);
             q.close();
 
-            SeRasterColumn rcol = session.createSeRasterColumn(rattrThreeBand.getRasterColumnId());
+            SeRasterColumn rcol = new SeRasterColumn(conn, rattrThreeBand.getRasterColumnId());
 
             CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef()
                     .getCoordSysDescription());
@@ -83,8 +85,8 @@ public class OneByteBandNoColormapReaderTest {
         } finally {
             if (q != null)
                 q.close();
-            if (session != null) {
-                session.dispose();
+            if (conn != null) {
+                conn.close();
             }
         }
     }

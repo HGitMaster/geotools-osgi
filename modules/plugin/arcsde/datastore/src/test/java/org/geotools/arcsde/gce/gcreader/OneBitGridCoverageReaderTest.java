@@ -55,7 +55,7 @@ public class OneBitGridCoverageReaderTest {
         rasterTestData.setUp();
         rasterTestData.load1bitRaster();
 
-        ArcSDEConnectionConfig config = rasterTestData.getTestData().getConnectionPool()
+        ArcSDEConnectionConfig config = rasterTestData.getConnectionPool()
                 .getConfig();
         sderasterurlbase = "sde://" + config.getUserName() + ":" + config.getUserPassword() + "@"
                 + config.getServerName() + ":" + config.getPortNumber() + "/"

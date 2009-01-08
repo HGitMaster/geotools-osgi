@@ -1,8 +1,7 @@
 /*
- *    GeoTools - The Open Source Java GIS Toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *
- *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -41,7 +40,7 @@ import javax.imageio.metadata.IIOMetadata;
 import org.geotools.arcsde.gce.ArcSDEPyramid;
 import org.geotools.arcsde.gce.ArcSDEPyramidLevel;
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeException;
@@ -193,7 +192,7 @@ public class ArcSDERasterReader extends ImageReader {
                     + " to " + maxTileX + "," + maxTileY + " in level " + imageIndex + ")");
 
         // Now we do the actual reading from SDE.
-        ISession session = sdeirp.getConnection();
+        ArcSDEPooledConnection scon = sdeirp.getConnection();
         SeQuery query = null;
         BufferedImage destination;
 
@@ -202,8 +201,10 @@ public class ArcSDERasterReader extends ImageReader {
             // one gets SDE Raster output. First, query the
             // database for the single row in the raster business table.
             // FIXME: Raster catalogs need to specify what their row number is.
-            query = session.createAndExecuteQuery(new String[] { _rasterColumn },
-                    new SeSqlConstruct(_rasterTable));
+            query = new SeQuery(scon, new String[] { _rasterColumn }, new SeSqlConstruct(
+                    _rasterTable));
+            query.prepareQuery();
+            query.execute();
             // Next, fetch the single row back.
             final SeRow r = query.fetch();
 
@@ -455,8 +456,8 @@ public class ArcSDERasterReader extends ImageReader {
                 new byte[] { 0x0 });
         return ret;
     }
-
-    // public static SeRasterBand
+    
+    //public static SeRasterBand
 
     public static BufferedImage createCompatibleBufferedImage(int width,
             int height,

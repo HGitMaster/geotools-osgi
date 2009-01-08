@@ -1,8 +1,7 @@
 /*
- *    GeoTools - The Open Source Java GIS Toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *
- *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,15 +33,14 @@ import java.util.logging.Logger;
 
 import javax.media.jai.ImageLayout;
 
-import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterImageReadParam;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
-import org.geotools.arcsde.pool.ISession;
-import org.geotools.arcsde.pool.SessionPool;
-import org.geotools.arcsde.pool.SessionPoolFactory;
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.CoverageFactoryFinder;
@@ -104,7 +102,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
     /**
      * The connectionpool we're using to fetch images from this ArcSDE raster layer
      */
-    private SessionPool connectionPool = null;
+    private ArcSDEConnectionPool connectionPool = null;
 
     /** The name of the raster table we're pulling images from in this reader * */
     private String rasterTable = null;
@@ -146,9 +144,9 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * 
      * @param input Source object (probably a connection-type URL) for which we want to build the
      *            ArcSDERasterReader
-     * @throws IOException
+     * @throws DataSourceException
      */
-    public ArcSDERasterGridCoverage2DReader(Object input) throws IOException {
+    public ArcSDERasterGridCoverage2DReader(Object input) throws DataSourceException {
         this(input, null);
     }
 
@@ -158,9 +156,9 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * @param input Source object (probably a connection-type URL) for which we want to build the
      *            ArcSDERasterReader
      * @param hints Hints to be used by this reader throughout his life.
-     * @throws IOException
+     * @throws DataSourceException
      */
-    public ArcSDERasterGridCoverage2DReader(Object input, final Hints hints) throws IOException {
+    public ArcSDERasterGridCoverage2DReader(Object input, final Hints hints) throws DataSourceException {
 
         if (hints != null)
             this.hints.add(hints);
@@ -260,7 +258,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             Rectangle requestedDim,
             Integer forcedLevel) throws IOException {
 
-        ISession session = null;
+        ArcSDEPooledConnection scon = null;
+
         try {
 
             if (LOGGER.isLoggable(Level.INFO))
@@ -314,10 +313,10 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 RasterQueryInfo rasterGridInfo = pyramidInfo.fitExtentToRasterPixelGrid(reqEnv,
                         level);
 
-                session = connectionPool.getSession();
+                scon = connectionPool.getConnection();
 
                 ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
-                rParam.setConnection(session);
+                rParam.setConnection(scon);
 
                 outputImage = createInitialBufferedImage(rasterGridInfo.image.width,
                         rasterGridInfo.image.height);
@@ -459,8 +458,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 LOGGER.log(Level.SEVERE, uce.getLocalizedMessage(), uce);
             throw new DataSourceException(uce);
         } finally {
-            if (session != null)
-                session.dispose();
+            if (scon != null)
+                scon.close();
         }
     }
 
@@ -545,17 +544,16 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * Gets the coordinate system that will be associated to the {@link GridCoverage}. The WGS84
      * coordinate system is used by default.
      */
-    private void calculateCoordinateReferenceSystem() throws IOException {
+    private void calculateCoordinateReferenceSystem() throws DataSourceException {
 
         if (rasterAttributes == null) {
             throw new DataSourceException("Raster Attributes are null, can't calculated CRS info.");
         }
 
-        ISession session = null;
+        ArcSDEPooledConnection con = null;
         try {
-            session = connectionPool.getSession();
-            SeRasterColumn rCol = session
-                    .createSeRasterColumn(rasterAttributes.getRasterColumnId());
+            con = connectionPool.getConnection();
+            SeRasterColumn rCol = new SeRasterColumn(con, rasterAttributes.getRasterColumnId());
 
             PeProjectedCS pcs = new PeProjectedCS(rCol.getCoordRef().getProjectionDescription());
             epsgCode = -1;
@@ -592,7 +590,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             throw new DataSourceException(e);
         } catch (SeException e) {
             LOGGER.log(Level.SEVERE, "", e);
-            throw new ArcSdeException(e);
+            throw new DataSourceException(e.getSeError().getErrDesc(), e);
         } catch (FactoryException e) {
             LOGGER.log(Level.SEVERE, "", e);
             throw new DataSourceException(e);
@@ -600,8 +598,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             LOGGER.log(Level.SEVERE, "", e);
             throw new DataSourceException(e);
         } finally {
-            if (session != null && !session.isClosed())
-                session.dispose();
+            if (con != null && !con.isClosed())
+                con.close();
         }
     }
 
@@ -613,7 +611,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * @throws DataSourceException
      * @throws IOException
      */
-    private void setupConnectionPool(Object input) throws IOException {
+    private void setupConnectionPool(Object input) throws DataSourceException {
         if (input == null) {
             final DataSourceException ex = new DataSourceException(
                     "No source set to read this coverage.");
@@ -659,15 +657,15 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             LOGGER.fine("Building ArcSDEGridCoverageReader2D for " + sdeConfig
                     + ", with raster table " + rasterTable);
 
-        connectionPool = SessionPoolFactory.getInstance().createSharedPool(sdeConfig);
+        connectionPool = ArcSDEConnectionPoolFactory.getInstance().createPool(sdeConfig);
 
         try {
-            ISession session = connectionPool.getSession();
+            ArcSDEPooledConnection scon = connectionPool.getConnection();
 
-            SeTable sTable = session.getTable(rasterTable);
+            SeTable sTable = scon.getTable(rasterTable);
             SeQuery q = null;
             try {
-                SeColumnDefinition[] cols = session.describe(sTable);
+                SeColumnDefinition[] cols = sTable.describe();
                 ArrayList fetchColumns = new ArrayList();
                 for (int i = 0; i < cols.length; i++) {
                     if (cols[i].getType() == SeColumnDefinition.TYPE_RASTER)
@@ -678,7 +676,9 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                             "Couldn't find any TYPE_RASTER columns in ArcSDE table " + rasterTable);
 
                 rasterColumns = (String[]) fetchColumns.toArray(new String[fetchColumns.size()]);
-                q = session.createAndExecuteQuery(rasterColumns, new SeSqlConstruct(rasterTable));
+                q = new SeQuery(scon, rasterColumns, new SeSqlConstruct(rasterTable));
+                q.prepareQuery();
+                q.execute();
 
                 SeRow r = q.fetch();
                 rasterAttributes = r.getRaster(0);
@@ -688,8 +688,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 throw new DataSourceException("Error fetching raster connection data from "
                         + rasterTable + ": " + se.getSeError().getErrDesc(), se);
             } finally {
-                if (!session.isClosed())
-                    session.dispose();
+                if (!scon.isClosed())
+                    scon.close();
             }
 
         } catch (UnavailableArcSDEConnectionException uce) {

@@ -1,8 +1,7 @@
 /*
- *    GeoTools - The Open Source Java GIS Toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *
- *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,11 +25,12 @@ import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeExtent;
 
 /**
- * Represents one level in an ArcSDE pyramid. Holds information about a given pyramid level, like
- * resolution, x/y offsets, number of tiles high/wide, total pixel size and total envelope covered
- * by this level.
+ * Represents one level in an ArcSDE pyramid. Holds information about a given
+ * pyramid level, like resolution, x/y offsets, number of tiles high/wide, total
+ * pixel size and total envelope covered by this level.
  * 
  * @author sfarber
+ * 
  */
 public class ArcSDEPyramidLevel {
     private int pyramidLevel, xOffset, yOffset, xTiles, yTiles;
@@ -41,13 +41,8 @@ public class ArcSDEPyramidLevel {
 
     public Dimension size;
 
-    public ArcSDEPyramidLevel(int level,
-                              SeExtent extent,
-                              CoordinateReferenceSystem crs,
-                              SDEPoint offset,
-                              int xTiles,
-                              int yTiles,
-                              Dimension size) {
+    public ArcSDEPyramidLevel(int level, SeExtent extent, CoordinateReferenceSystem crs,
+            SDEPoint offset, int xTiles, int yTiles, Dimension size) {
         this.pyramidLevel = level;
         this.xRes = (extent.getMaxX() - extent.getMinX()) / size.width;
         this.yRes = (extent.getMaxY() - extent.getMinY()) / size.height;
@@ -117,12 +112,12 @@ public class ArcSDEPyramidLevel {
     public ReferencedEnvelope getEnvelope() {
         return new ReferencedEnvelope(this.envelope);
     }
-
+    
     /**
      * @return The total number of pixels in the image at this level
      */
     public Dimension getSize() {
-        return size;
+    	return size;
     }
 
     @Override

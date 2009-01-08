@@ -23,9 +23,10 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.pool.SessionPool;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.util.logging.Logging;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -66,13 +67,15 @@ public class UnsignedByteRGBBandCopierTest {
     public void testLiveRGBRasterTile() throws Exception {
         final String tableName = rasterTestData.getRGBRasterTableName();
 
-        ISession session = null;
+        ArcSDEPooledConnection conn = null;
         try {
-            SessionPool pool = rasterTestData.getTestData().getConnectionPool();
+            ArcSDEConnectionPool pool = rasterTestData.getConnectionPool();
 
-            session = pool.getSession();
-            SeQuery q = session.createAndExecuteQuery(new String[] { "RASTER" },
+            conn = pool.getConnection();
+            SeQuery q = new SeQuery(conn, new String[] { "RASTER" },
                     new SeSqlConstruct(tableName));
+            q.prepareQuery();
+            q.execute();
             SeRow r = q.fetch();
             SeRasterAttr rAttr = r.getRaster(0);
 
@@ -104,10 +107,10 @@ public class UnsignedByteRGBBandCopierTest {
                     fromSdeImage, originalImage.getSubimage(0, 0, 128, 128)));
 
         } catch (SeException se) {
-            LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
+            throw new ArcSdeException(se);
         } finally {
-            if (session != null)
-                session.dispose();
+            if (conn != null)
+                conn.close();
         }
     }
 
