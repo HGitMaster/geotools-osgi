@@ -125,21 +125,24 @@ public class DB2SQLDialect extends SQLDialect  {
     	ps.close();
     	rs.close();
     	
-    	if (wkt==null) return null; // nothing found
+    	if (orgid !=0 && org!=null ) {
+	        try {
+	        	return CRS.decode(org+":" + orgid);        
+	        } catch(Exception e) {
+	            if(LOGGER.isLoggable(Level.WARNING)) 
+	                LOGGER.log(Level.WARNING, "Could not decode " + org+":"+orgid + " using the geotools database", e);
+	        }
+    	}
     	
-        try {
-        	return CRS.parseWKT(wkt);
-            
-        } catch(Exception e) {     
-            if(LOGGER.isLoggable(Level.WARNING)) 
-                LOGGER.log(Level.WARNING, "Could not decode db2 wkt definition for " + srid  );            	    	
-        }
-        try {
-        	return CRS.decode(org+":" + orgid);        
-        } catch(Exception e) {
-            if(LOGGER.isLoggable(Level.WARNING)) 
-                LOGGER.log(Level.WARNING, "Could not decode " + org+":"+orgid + " using the geotools database", e);
-        }
+    	    	    	
+    	if (wkt!=null) {    	    	    	
+    		try {
+    			return CRS.parseWKT(wkt);            
+    		} catch(Exception e) {     
+    			if(LOGGER.isLoggable(Level.WARNING)) 
+    				LOGGER.log(Level.WARNING, "Could not decode db2 wkt definition for " + srid  );            	    	
+    		}
+    	}		
        return null;    
     }
     

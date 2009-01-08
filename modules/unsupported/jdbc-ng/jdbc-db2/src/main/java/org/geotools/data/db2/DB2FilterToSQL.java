@@ -29,6 +29,7 @@ import org.geotools.filter.DefaultExpression;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.PreparedFilterToSQL;
+import org.geotools.jdbc.PreparedStatementSQLDialect;
 
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -52,6 +53,7 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -122,7 +124,17 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 	    private static String INSPATIALOP = "InSpatialOP";
 	    
 	    static private HashMap<Class<?>,String> DB2_SPATIAL_PREDICATES = new HashMap<Class<?>,String>();
-	    // Only intended for test purposes
+	    public DB2FilterToSQL(PreparedStatementSQLDialect dialect) {
+			super(dialect);
+			// TODO Auto-generated constructor stub
+		}
+
+		public DB2FilterToSQL(Writer out) {
+			super(out);
+			// TODO Auto-generated constructor stub
+		}
+
+		// Only intended for test purposes
 	    public HashMap getPredicateMap() {
 	    	return DB2_SPATIAL_PREDICATES;
 	    }
@@ -159,12 +171,6 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 	            "ST_Distance");
 	    }
 
-	    /**
-	     * Construct an SQLEncoderDB2
-	     */
-	    public DB2FilterToSQL() {
-	        super();
-	    }
 
 	    /** HashMap<Class,String> example [BBOX.class,"EnvelopesIntersect"] */ 
 	    static private HashMap getPredicateTable() {
@@ -585,22 +591,8 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 				//return super.visit(expression, context);
 			}
 			
-	        Geometry   literalValue = (Geometry) expression.getValue();
-	        literalValues.add(literalValue);
-	        SRIDs.add(currentSRID);   
-	        Class dbType = literalValue==null ? Geometry.class : literalValue.getClass();
-	        literalTypes.add(dbType);
-	        
-	        try {
-	        	StringBuffer buff = new StringBuffer();
-	        	DB2Util.prepareGeometryValue(literalValue, getSRID(), dbType, buff);
-	            out.write( buff.toString() );
-	        } 
-	        catch (IOException e) {
-	            throw new RuntimeException( e );
-	        }
-	        
-	        return context;
+			currentSRID=getSRID();
+			return super.visit(expression, context);
     }
 
     public boolean isLooseBBOXEnabled() {

@@ -60,7 +60,7 @@ public class DB2SQLDialectPrepared extends PreparedStatementSQLDialect {
   
 	@Override
 	public PreparedFilterToSQL createPreparedFilterToSQL() {
-		return new DB2FilterToSQL();
+		return new DB2FilterToSQL(this);
 	}
 
 	@Override
