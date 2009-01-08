@@ -36,6 +36,7 @@ import org.geotools.data.jdbc.JDBCFeatureStore;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -77,8 +78,8 @@ import com.vividsolutions.jts.io.WKTWriter;
  * do some solid tests to see which is actually faster.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureStore.java $
- * @version $Id: PostgisFeatureStore.java 31653 2008-10-13 10:14:01Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureStore.java $
+ * @version $Id: PostgisFeatureStore.java 32187 2009-01-08 20:41:14Z jdeolive $
  *
  * @task HACK: too little code reuse with PostgisDataStore.
  * @task TODO: make individual operations truly atomic.  If the transaction is
@@ -134,6 +135,13 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             @Override
             protected boolean supportsReverseOrderSorting() {
                 return true;
+            }
+            
+            @Override
+            public boolean isReliableFIDSupported() {
+                //parent implementation does same thing but we already have fid mapper handy
+                // so might as well save a lookup
+                return !isNullFidMapper(fidMapper);
             }
         };
     }
