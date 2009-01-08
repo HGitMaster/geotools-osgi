@@ -1198,18 +1198,6 @@
     </repository>
 
     <repository>
-    	<id>com.springsource.repository.bundles.release</id>
-    	<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-    	<url>http://repository.springsource.com/maven/bundles/release</url>
-    </repository>
-
-    <repository>
-    	<id>com.springsource.repository.bundles.external</id>
-    	<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-    	<url>http://repository.springsource.com/maven/bundles/external</url>
-    </repository>
-
-    <repository>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -1218,10 +1206,10 @@
       <url>http://maven.geotools.fr/repository</url>
     </repository>
 
-    <repository>  
-      <id>berlios</id>
-      <name>Berlios Temp Repository</name>
-      <url>http://geotools-osgi.berlios.de/repository</url>
+    <repository>
+    	<id>com.springsource.repository.bundles.external</id>
+    	<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+    	<url>http://repository.springsource.com/maven/bundles/external</url>
     </repository>
 
   </repositories>
