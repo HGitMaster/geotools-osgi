@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 31811 2008-11-09 23:16:15Z jgarnett $
+        Version: $Id: pom.xml 32177 2009-01-08 00:56:14Z bencaradocdavies $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -71,6 +71,12 @@
          <module>notifying-collections</module>
        </modules>
      </profile>
+     <profile>
+       <id>app-schema</id>
+       <modules>
+         <module>app-schema</module>
+       </modules>
+     </profile>
 
      <!-- ================================================== -->
      <!--     Modules kicked out of the build                -->
@@ -80,7 +86,6 @@
      <profile>
        <id>archive</id>
        <modules>
-         <module>community-schemas</module>
          <module>hsql</module>
          <module>geomedia</module>
          <module>ogr</module>
