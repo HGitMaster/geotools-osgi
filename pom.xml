@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32061 2008-12-22 20:36:44Z jdeolive $
+        Version: $Id: pom.xml 32196 2009-01-09 19:03:04Z groldan $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -831,6 +831,13 @@
         <artifactId>mockrunner</artifactId>
         <version>0.3.6</version>
         <scope>test</scope>
+      </dependency>
+
+     <!-- ArcSDE -->
+      <dependency>
+        <groupId>com.ibm.icu</groupId>
+        <artifactId>icu4j</artifactId>
+        <version>3.4.4</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
