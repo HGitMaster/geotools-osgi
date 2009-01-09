@@ -27,9 +27,10 @@ import org.geotools.arcsde.pool.ISession;
  * Utility used to qualify table names
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: TableQualifier.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: TableQualifier.java 32195 2009-01-09 19:00:35Z groldan $
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/TableQualifier.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/view/TableQualifier.java $
  * @since 2.3.x
  */
 class TableQualifier {
@@ -37,11 +38,14 @@ class TableQualifier {
      * Returns a Table with the same name as the argument one but fully qualified in the ArcSDE
      * sense.
      * 
-     * @param session connection to obtain database and user name from
-     * @param table table whose schema name is to be qualified
+     * @param session
+     *            connection to obtain database and user name from
+     * @param table
+     *            table whose schema name is to be qualified
      * @return a qualified Table.
-     * @throws IllegalStateException if an SDE error is catched up while asking <code>conn</code>
-     *             for the database and user name.
+     * @throws IllegalStateException
+     *             if an SDE error is catched up while asking <code>conn</code> for the database and
+     *             user name.
      */
     public static Table qualify(ISession session, Table table) throws IllegalStateException {
         if (table == null) {

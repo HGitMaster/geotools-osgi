@@ -30,6 +30,7 @@ import org.geotools.arcsde.pool.ISession;
 import org.geotools.arcsde.pool.SessionPool;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.Transaction;
+import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -43,12 +44,12 @@ import com.esri.sde.sdk.client.SeVersion;
  * @author Jake Fear
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcTransactionState.java $
- * @version $Id: ArcTransactionState.java 30722 2008-06-13 18:15:42Z acuster $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/ArcTransactionState.java $
+ * @version $Id: ArcTransactionState.java 32195 2009-01-09 19:00:35Z groldan $
  */
 final class ArcTransactionState implements Transaction.State {
-    private static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(ArcTransactionState.class.getPackage().getName());
+    private static final Logger LOGGER = Logging.getLogger(ArcTransactionState.class.getName());
 
     /**
      * ConnectionPool we can use to look up a Session for our Transaction.
@@ -79,8 +80,9 @@ final class ArcTransactionState implements Transaction.State {
      * Creates a new ArcTransactionState object.
      * 
      * @param listenerManager
-     * @param pool connection pool where to grab a connection and hold it while there's a
-     *            transaction open (signaled by any use of {@link #getConnection()}
+     * @param pool
+     *            connection pool where to grab a connection and hold it while there's a transaction
+     *            open (signaled by any use of {@link #getConnection()}
      */
     ArcTransactionState(SessionPool pool, final FeatureListenerManager listenerManager) {
         this.pool = pool;
@@ -114,7 +116,8 @@ final class ArcTransactionState implements Transaction.State {
      * event at {@link #commit()} and {@link #rollback()}.
      * </p>
      * 
-     * @param typeName the type name of the feature changed (inserted/removed/modified).
+     * @param typeName
+     *            the type name of the feature changed (inserted/removed/modified).
      */
     public void addChange(final String typeName) {
         typesChanged.add(typeName);
@@ -126,8 +129,7 @@ final class ArcTransactionState implements Transaction.State {
      * <p>
      * Preconditions:
      * <ul>
-     * <li>{@link #setTransaction(Transaction)} already called with non <code>null</code>
-     * argument.
+     * <li>{@link #setTransaction(Transaction)} already called with non <code>null</code> argument.
      * <li>
      * </ul>
      * </p>
@@ -205,9 +207,10 @@ final class ArcTransactionState implements Transaction.State {
 
     /**
      * @see Transaction.State#setTransaction(Transaction)
-     * @param transaction transaction information, <code>null</code> signals this state lifecycle
-     *            end.
-     * @throws IllegalStateException if close() is called while a transaction is in progress
+     * @param transaction
+     *            transaction information, <code>null</code> signals this state lifecycle end.
+     * @throws IllegalStateException
+     *             if close() is called while a transaction is in progress
      */
     public void setTransaction(final Transaction transaction) {
         if (Transaction.AUTO_COMMIT.equals(transaction)) {
@@ -231,7 +234,8 @@ final class ArcTransactionState implements Transaction.State {
     /**
      * If this state has been closed throws an unchecked exception as its clearly a broken workflow.
      * 
-     * @throws IllegalStateException if the transaction state has been closed.
+     * @throws IllegalStateException
+     *             if the transaction state has been closed.
      */
     private void failIfClosed() throws IllegalStateException {
         if (pool == null) {

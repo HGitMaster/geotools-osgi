@@ -43,14 +43,14 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.esri.sde.sdk.client.SeException;
 
-
 /**
  * Test suite for {@link ArcSDEDataStoreFactory}
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/ArcSDEDataStoreFactoryTest.java $
- * @version $Id: ArcSDEDataStoreFactoryTest.java 31904 2008-11-22 20:51:53Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/ArcSDEDataStoreFactoryTest.java $
+ * @version $Id: ArcSDEDataStoreFactoryTest.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.4.x
  */
 public class ArcSDEDataStoreFactoryTest {
@@ -78,7 +78,6 @@ public class ArcSDEDataStoreFactoryTest {
     private Map illegalParams;
 
     private TestData testData;
-
 
     @Before
     public void setUp() throws Exception {

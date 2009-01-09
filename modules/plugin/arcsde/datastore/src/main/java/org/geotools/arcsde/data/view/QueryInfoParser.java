@@ -46,9 +46,10 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * process view definition of ArcSDE Java API.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: QueryInfoParser.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: QueryInfoParser.java 32195 2009-01-09 19:00:35Z groldan $
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/QueryInfoParser.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/view/QueryInfoParser.java $
  * @since 2.3.x
  */
 public class QueryInfoParser {

@@ -36,6 +36,7 @@ import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.Parameter;
 import org.geotools.data.Transaction;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeRelease;
@@ -47,13 +48,14 @@ import com.esri.sde.sdk.pe.PeFactory;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/ArcSDEDataStoreFactory.java $
- * @version $Id: ArcSDEDataStoreFactory.java 30772 2008-06-20 11:36:13Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/ArcSDEDataStoreFactory.java $
+ * @version $Id: ArcSDEDataStoreFactory.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     /** package's logger */
-    protected static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(ArcSDEDataStoreFactory.class.getPackage().getName());
+    protected static final Logger LOGGER = Logging
+            .getLogger(ArcSDEDataStoreFactory.class.getName());
 
     /** friendly factory description */
     private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 8.x and 9.x";
@@ -93,8 +95,9 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
         paramMetadata.add(new Param("user", String.class, description, true));
 
         description = "the database user's password.";
-        paramMetadata.add(new Param("password", String.class, new SimpleInternationalString(description),
-                false, null, Collections.singletonMap(Parameter.IS_PASSWORD, Boolean.TRUE)));
+        paramMetadata.add(new Param("password", String.class, new SimpleInternationalString(
+                description), false, null, Collections.singletonMap(Parameter.IS_PASSWORD,
+                Boolean.TRUE)));
 
         // optional parameters:
         description = "Minimun number of open connections";
@@ -162,7 +165,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     }
 
     /**
-     * @throws UnsupportedOperationException always as the operation is not supported
+     * @throws UnsupportedOperationException
+     *             always as the operation is not supported
      * @see DataStoreFactorySpi#createNewDataStore(Map)
      */
     public DataStore createNewDataStore(java.util.Map map) {
@@ -185,10 +189,12 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      * </ul>
      * </p>
      * 
-     * @param params connection parameters
+     * @param params
+     *            connection parameters
      * @return a new <code>SdeDataStore</code> pointing to the database defined by
      *         <code>params</code>
-     * @throws java.io.IOException if something goes wrong creating the datastore.
+     * @throws java.io.IOException
+     *             if something goes wrong creating the datastore.
      */
     public DataStore createDataStore(Map params) throws java.io.IOException {
         if (JSDE_CLIENT_VERSION == JSDE_VERSION_DUMMY) {
@@ -197,7 +203,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
 
         ArcSDEDataStore sdeDStore = null;
         ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(params);
-        //create a new session pool to be used only by this datastore
+        // create a new session pool to be used only by this datastore
         final SessionPool connPool = poolFactory.createPool(config);
 
         // check to see if our sdk is compatible with this arcsde instance
@@ -324,8 +330,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
             return false;
         }
         try {
-            LOGGER.finer(SeConnection.class.getName() + " is in place.");
-            LOGGER.finer(PeCoordinateSystem.class.getName() + " is in place.");
+            LOGGER.finest(SeConnection.class.getName() + " is in place.");
+            LOGGER.finest(PeCoordinateSystem.class.getName() + " is in place.");
         } catch (Throwable t) {
             return false;
         }

@@ -17,7 +17,8 @@
  */
 package org.geotools.arcsde.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +30,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 
-import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -59,14 +59,15 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * This test case does not still use the ArcSDEDataStore testing data supplied with in
- * {@code test-data/import}, so it is excluded in project.xml.
+ * This test case does not still use the ArcSDEDataStore testing data supplied with in {@code
+ * test-data/import}, so it is excluded in project.xml.
  * 
  * @author cdillard
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/FilterTest.java.fixme $
- * @version $Id: FilterTest.java 31904 2008-11-22 20:51:53Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/FilterTest.java.fixme $
+ * @version $Id: FilterTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class FilterTest {
     private static final Comparator<SimpleFeature> FEATURE_COMPARATOR = new Comparator<SimpleFeature>() {
@@ -114,7 +115,6 @@ public class FilterTest {
 
     }
 
-
     private static void collectResults(FeatureReader<SimpleFeatureType, SimpleFeature> fr,
             Collection c) throws NoSuchElementException, IOException, IllegalAttributeException {
         while (fr.hasNext()) {
@@ -125,8 +125,10 @@ public class FilterTest {
     /**
      * Are the two collections similar?
      * 
-     * @param c1 Collection first
-     * @param c2 Collection second
+     * @param c1
+     *            Collection first
+     * @param c2
+     *            Collection second
      * @return true if they have the same content
      */
     private void assertFeatureListsSimilar(Collection<SimpleFeature> c1,
@@ -146,7 +148,8 @@ public class FilterTest {
             if (i == 0) {
                 assertEquals("Feature Type", f1.getType(), f2.getType());
             }
-            assertEquals("Feature[" + i + "] identifiers Equal", f1.getIdentifier().getID(), f2.getIdentifier().getID());
+            assertEquals("Feature[" + i + "] identifiers Equal", f1.getIdentifier().getID(), f2
+                    .getIdentifier().getID());
             if (!f1.equals(f2)) {
                 // go through properties and figure out differneces...
                 for (PropertyDescriptor property : f1.getType().getDescriptors()) {
@@ -175,8 +178,10 @@ public class FilterTest {
     /**
      * Are the two collections similar?
      * 
-     * @param c1 Collection first
-     * @param c2 Collection second
+     * @param c1
+     *            Collection first
+     * @param c2
+     *            Collection second
      * @return true if they have the same content
      */
     private boolean compareFeatureLists2(Collection<SimpleFeature> c1, Collection<SimpleFeature> c2) {
@@ -211,7 +216,6 @@ public class FilterTest {
 
         return true;
     }
-
 
     private static LineString buildSegment(double x1, double y1, double x2, double y2) {
         Coordinate[] coordArray = new Coordinate[] { new Coordinate(x1, y1), new Coordinate(x2, y2) };
@@ -249,7 +253,6 @@ public class FilterTest {
 
         runTestWithFilter(ft, filter);
     }
-
 
     @Test
     public void testContainsFilter() throws Exception {

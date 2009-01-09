@@ -58,8 +58,9 @@ import com.vividsolutions.jts.io.WKTReader;
  * 
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/GeometryBuilderTest.java $
- * @version $Id: GeometryBuilderTest.java 31904 2008-11-22 20:51:53Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/GeometryBuilderTest.java $
+ * @version $Id: GeometryBuilderTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class GeometryBuilderTest {
 
@@ -297,8 +298,10 @@ public class GeometryBuilderTest {
      * tests each geometry in <code>geometries</code> using
      * <code>testConstructShape(Geometry)</code>
      * 
-     * @param geometries DOCUMENT ME!
-     * @throws Exception DOCUMENT ME!
+     * @param geometries
+     *            DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
     private static void testBuildSeShapes(Geometry[] geometries) throws Exception {
         for (int i = 0; i < geometries.length; i++) {
@@ -313,8 +316,10 @@ public class GeometryBuilderTest {
      * number of points in <code>geometry</code>, and then creates an equivalent Geometry object,
      * wich in turn is checked for equality against <code>geometry</code>.
      * 
-     * @param geometry DOCUMENT ME!
-     * @throws Exception DOCUMENT ME!
+     * @param geometry
+     *            DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
     private static void testConstructShape(Geometry geometry) throws Exception {
         LOGGER.finer("testConstructShape: testing " + geometry);
@@ -331,8 +336,8 @@ public class GeometryBuilderTest {
         SeShape equivalentShape = builder.constructShape(geometry, cr);
         int expectedNumOfPoints = geometry.getNumPoints();
 
-        Assert.assertEquals(geometry + " - " + equivalentShape, expectedNumOfPoints, equivalentShape
-                .getNumOfPoints());
+        Assert.assertEquals(geometry + " - " + equivalentShape, expectedNumOfPoints,
+                equivalentShape.getNumOfPoints());
         LOGGER.fine("geometry and SeShape contains the same number of points: "
                 + equivalentShape.getNumOfPoints());
 
@@ -377,9 +382,11 @@ public class GeometryBuilderTest {
      * geometries back, which are tested for equality against the original ones.
      * </p>
      * 
-     * @param expectedGeometries the list of geometries (of the same type) to assert the building
-     *            from their corresponding arcsde representation.
-     * @throws Exception for any problem that could arise
+     * @param expectedGeometries
+     *            the list of geometries (of the same type) to assert the building from their
+     *            corresponding arcsde representation.
+     * @throws Exception
+     *             for any problem that could arise
      */
     private void testBuildJTSGeometries(final Geometry[] expectedGeometries) throws Exception {
 
@@ -412,12 +419,17 @@ public class GeometryBuilderTest {
     /**
      * DOCUMENT ME!
      * 
-     * @param jtsGeom DOCUMENT ME!
-     * @param seCRS DOCUMENT ME!
+     * @param jtsGeom
+     *            DOCUMENT ME!
+     * @param seCRS
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
-     * @throws SeException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws SeException
+     *             DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws DataSourceException
+     *             DOCUMENT ME!
      */
     private double[][][] geometryToSdeCoords(final Geometry jtsGeom,
             final SeCoordinateReference seCRS) throws SeException, IOException {
@@ -478,7 +490,8 @@ public class GeometryBuilderTest {
      * given a geometry class, tests that ArcSDEGeometryBuilder.defaultValueFor that class returns
      * an empty geometry of the same geometry class
      * 
-     * @param geometryClass DOCUMENT ME!
+     * @param geometryClass
+     *            DOCUMENT ME!
      */
     private void testGetDefaultValue(Class geometryClass) {
         Geometry geom = ArcSDEGeometryBuilder.defaultValueFor(geometryClass);

@@ -34,10 +34,11 @@ import org.opengis.filter.Filter;
  * A FeatureWriter aware of transactions.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: TransactionFeatureWriter.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: TransactionFeatureWriter.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/TransactionFeatureWriter.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/TransactionFeatureWriter.java $
  */
 class TransactionFeatureWriter extends ArcSdeFeatureWriter {
     private ArcTransactionState state;
@@ -50,20 +51,20 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
      * @param featureType
      * @param filteredContent
      * @param listenerManager
-     * @param transactionalConnection the {@link Session} to work over, with a
-     *            {@link Session#isTransactionActive() transaction active}
-     * @param transaction a transaction <b>already configured</b> with the
-     *            {@link ArcTransactionState} needed for this writer to work.
+     * @param transactionalConnection
+     *            the {@link Session} to work over, with a {@link Session#isTransactionActive()
+     *            transaction active}
+     * @param transaction
+     *            a transaction <b>already configured</b> with the {@link ArcTransactionState}
+     *            needed for this writer to work.
      * @throws NoSuchElementException
      * @throws IOException
      */
-    public TransactionFeatureWriter(final FIDReader fidReader,
-                                    final SimpleFeatureType featureType,
-                                    final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
-                                    final ArcTransactionState state,
-                                    final ArcSdeVersionHandler versionHandler,
-                                    final FeatureListenerManager listenerManager) throws NoSuchElementException,
-                                                                                 IOException {
+    public TransactionFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
+            final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
+            final ArcTransactionState state, final ArcSdeVersionHandler versionHandler,
+            final FeatureListenerManager listenerManager) throws NoSuchElementException,
+            IOException {
 
         super(fidReader, featureType, filteredContent, state.getConnection(), listenerManager,
                 versionHandler);

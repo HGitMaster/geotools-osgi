@@ -47,18 +47,16 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
     }
 
     /**
-     * Creates an ArcSDERasterReader (an ImageIO compatible ImageReader). This
-     * reader requires the following keys to be set in the {@link java.util.Map}
-     * passed to this method:<br/>
+     * Creates an ArcSDERasterReader (an ImageIO compatible ImageReader). This reader requires the
+     * following keys to be set in the {@link java.util.Map} passed to this method:<br/>
      * 
      * <ul>
-     * <li>ArcSDERasterReaderSpi.PYRAMID - a {@link ArcSDEPyramid} describing
-     * the pyramid that this reader will be reading</li>
-     * <li>ArcSDERasterReaderSpi.RASTER_COLUMN - a String containing the Raster
-     * column for this readers RASTER_TABLE</li>
-     * <li>ArcSDERasterReaderSpi.RASTER_TABLE - a String containing the name of
-     * the ArcSDE raster table to read. Probably needs to be qualified with the
-     * schema name.</li>
+     * <li>ArcSDERasterReaderSpi.PYRAMID - a {@link ArcSDEPyramid} describing the pyramid that this
+     * reader will be reading</li>
+     * <li>ArcSDERasterReaderSpi.RASTER_COLUMN - a String containing the Raster column for this
+     * readers RASTER_TABLE</li>
+     * <li>ArcSDERasterReaderSpi.RASTER_TABLE - a String containing the name of the ArcSDE raster
+     * table to read. Probably needs to be qualified with the schema name.</li>
      * </ul>
      */
     @Override
@@ -88,8 +86,7 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
     }
 
     /**
-     * We completely ignore the setInput() call in this reader, so we'll happily
-     * accept anything.
+     * We completely ignore the setInput() call in this reader, so we'll happily accept anything.
      */
     @Override
     public Class[] getInputTypes() {

@@ -17,7 +17,10 @@
  */
 package org.geotools.arcsde.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -53,8 +56,9 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
- * @version $Id: ArcSDEDataStoreTest.java 31904 2008-11-22 20:51:53Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
+ * @version $Id: ArcSDEDataStoreTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class ArcSDEDataStoreTest {
     /** package logger */
@@ -86,9 +90,8 @@ public class ArcSDEDataStoreTest {
     }
 
     /**
-     * loads {@code testData/testparams.properties} into a Properties object,
-     * wich is used to obtain test tables names and is used as parameter to find
-     * the DataStore
+     * loads {@code testData/testparams.properties} into a Properties object, wich is used to obtain
+     * test tables names and is used as parameter to find the DataStore
      * 
      * @throws Exception
      *             DOCUMENT ME!
@@ -119,9 +122,8 @@ public class ArcSDEDataStoreTest {
     }
 
     /**
-     * This test is currently broken. It's a placeholder for some logic that
-     * sfarber wrote which tries to guess the SRS of a featureclass, based on
-     * connecting to it via an SeLayer.
+     * This test is currently broken. It's a placeholder for some logic that sfarber wrote which
+     * tries to guess the SRS of a featureclass, based on connecting to it via an SeLayer.
      * 
      * @throws Throwable
      */
@@ -189,10 +191,10 @@ public class ArcSDEDataStoreTest {
     }
 
     /**
-     * test that a ArcSDEDataStore that connects to de configured test database
-     * contains the tables defined by the parameters "point_table", "line_table"
-     * and "polygon_table", wether ot not they're defined as single table names
-     * or as full qualified sde table names (i.e. SDE.SDE.TEST_POINT)
+     * test that a ArcSDEDataStore that connects to de configured test database contains the tables
+     * defined by the parameters "point_table", "line_table" and "polygon_table", wether ot not
+     * they're defined as single table names or as full qualified sde table names (i.e.
+     * SDE.SDE.TEST_POINT)
      * 
      * @throws IOException
      * @throws SeException
@@ -202,10 +204,10 @@ public class ArcSDEDataStoreTest {
         String[] featureTypes = store.getTypeNames();
         assertNotNull(featureTypes);
 
-//        if (LOGGER.isLoggable(Level.FINE)) {
-//            for (int i = 0; i < featureTypes.length; i++)
-//                System.out.println(featureTypes[i]);
-//        }
+        // if (LOGGER.isLoggable(Level.FINE)) {
+        // for (int i = 0; i < featureTypes.length; i++)
+        // System.out.println(featureTypes[i]);
+        // }
         testTypeExists(featureTypes, testData.getTempTableName());
     }
 
@@ -229,14 +231,12 @@ public class ArcSDEDataStoreTest {
     /**
      * Tests the creation of new feature types, with CRS and all.
      * <p>
-     * This test also ensures that the arcsde datastore is able of creating
-     * schemas where the geometry attribute is not the last one. This is
-     * important since to do so, the ArcSDE datastore must break the usual way
-     * of creating schemas with the ArcSDE Java API, in which one first creates
-     * the (non spatially enabled) "table" with all the non spatial attributes
-     * and finally creates the "layer", adding the spatial attribute to the
-     * previously created table. So, this test ensures the datastore correctly
-     * works arround this limitation.
+     * This test also ensures that the arcsde datastore is able of creating schemas where the
+     * geometry attribute is not the last one. This is important since to do so, the ArcSDE
+     * datastore must break the usual way of creating schemas with the ArcSDE Java API, in which one
+     * first creates the (non spatially enabled) "table" with all the non spatial attributes and
+     * finally creates the "layer", adding the spatial attribute to the previously created table.
+     * So, this test ensures the datastore correctly works arround this limitation.
      * </p>
      * 
      * @throws IOException
@@ -280,9 +280,8 @@ public class ArcSDEDataStoreTest {
     // ///////////////// HELPER FUNCTIONS ////////////////////////
 
     /**
-     * checks for the existence of <code>table</code> in
-     * <code>featureTypes</code>. <code>table</code> must be a full
-     * qualified sde feature type name. (i.e "TEST_POINT" ==
+     * checks for the existence of <code>table</code> in <code>featureTypes</code>.
+     * <code>table</code> must be a full qualified sde feature type name. (i.e "TEST_POINT" ==
      * "SDE.SDE.TEST_POINT")
      * 
      * @param featureTypes

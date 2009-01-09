@@ -48,7 +48,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
- * @version $Id: ArcSDEPyramidTest.java 32181 2009-01-08 15:44:06Z groldan $
+ * @version $Id: ArcSDEPyramidTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class ArcSDEPyramidTest {
 
@@ -156,8 +156,7 @@ public class ArcSDEPyramidTest {
             String tableName = testData.getRasterTestDataProperty("fourbandtable");
             if (tableName == null)
                 return;
-            SeQuery q = new SeQuery(conn, new String[] { "RASTER" },
-                    new SeSqlConstruct(tableName));
+            SeQuery q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();

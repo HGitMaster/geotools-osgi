@@ -25,9 +25,9 @@ import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeExtent;
 
 /**
- * Represents one level in an ArcSDE pyramid. Holds information about a given
- * pyramid level, like resolution, x/y offsets, number of tiles high/wide, total
- * pixel size and total envelope covered by this level.
+ * Represents one level in an ArcSDE pyramid. Holds information about a given pyramid level, like
+ * resolution, x/y offsets, number of tiles high/wide, total pixel size and total envelope covered
+ * by this level.
  * 
  * @author sfarber
  * 
@@ -112,12 +112,12 @@ public class ArcSDEPyramidLevel {
     public ReferencedEnvelope getEnvelope() {
         return new ReferencedEnvelope(this.envelope);
     }
-    
+
     /**
      * @return The total number of pixels in the image at this level
      */
     public Dimension getSize() {
-    	return size;
+        return size;
     }
 
     @Override

@@ -16,7 +16,13 @@
  */
 package org.geotools.arcsde.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -104,7 +110,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/da/src/test/java/org
  *         /geotools/arcsde/data/ArcSDEFeatureStoreTest.java $
- * @version $Id: ArcSDEFeatureStoreTest.java 31904 2008-11-22 20:51:53Z groldan $
+ * @version $Id: ArcSDEFeatureStoreTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class ArcSDEFeatureStoreTest {
     /** package logger */
@@ -795,7 +801,8 @@ public class ArcSDEFeatureStoreTest {
             Name name = originalAtt.getName();
             // bah, date equals does not work, I don't care for this test
             String localName = name.getLocalPart();
-            if (!"INT32_COL".equals(localName) && !"SHAPE".equals(localName) && !"DATE_COL".equals(localName)) {
+            if (!"INT32_COL".equals(localName) && !"SHAPE".equals(localName)
+                    && !"DATE_COL".equals(localName)) {
                 assertEquals(name + " does not match", originalAtt.getValue(), actualAtt.getValue());
             }
         }

@@ -33,7 +33,7 @@ public abstract class ArcSDERasterBandCopier {
         if (sePixelType == SeRaster.SE_PIXEL_TYPE_8BIT_U) {
             ret = new UnsignedByteBandCopier();
         } else if (sePixelType == SeRaster.SE_PIXEL_TYPE_1BIT) {
-        	ret = new OneBitBandCopier();
+            ret = new OneBitBandCopier();
         } else if (sePixelType == SeRaster.SE_PIXEL_TYPE_32BIT_REAL) {
             ret = new FloatBandCopier();
         } else {
@@ -51,14 +51,12 @@ public abstract class ArcSDERasterBandCopier {
      * @param raster
      *            The raster into which data should be copied
      * @param copyOffX
-     *            The x-coordinate of the TILE at which the raster should start
-     *            copying
+     *            The x-coordinate of the TILE at which the raster should start copying
      * @param copyOffY
-     *            The y-coordinate of the TILE at which the raster should start
-     *            copying
+     *            The y-coordinate of the TILE at which the raster should start copying
      * @param targetBand
-     *            The band in the supplied raster into which the data from this
-     *            tile should be copied
+     *            The band in the supplied raster into which the data from this tile should be
+     *            copied
      * @throws DataSourceException
      */
     public abstract void copyPixelData(SeRasterTile tile, WritableRaster raster, int copyOffX,

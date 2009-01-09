@@ -38,8 +38,9 @@ import org.junit.Test;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/pool/SessionPoolTest.java $
- * @version $Id: SessionPoolTest.java 31904 2008-11-22 20:51:53Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/pool/SessionPoolTest.java $
+ * @version $Id: SessionPoolTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class SessionPoolTest {
     /** DOCUMENT ME! */
@@ -59,8 +60,10 @@ public class SessionPoolTest {
      * loads {@code test-data/testparams.properties} to get connection parameters and sets up a
      * ArcSDEConnectionConfig with them for tests to set up SessionPool's as requiered
      * 
-     * @throws Exception DOCUMENT ME!
-     * @throws IllegalStateException DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
+     * @throws IllegalStateException
+     *             DOCUMENT ME!
      */
     @Before
     public void setUp() throws Exception {
@@ -94,7 +97,8 @@ public class SessionPoolTest {
     /**
      * closes the connection pool if it's still open
      * 
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
     @After
     public void tearDown() throws Exception {
@@ -108,19 +112,23 @@ public class SessionPoolTest {
     }
 
     /**
-     * Sets up a new SessionPool with the connection parameters stored in
-     * <code>connParams</code> and throws an exception if something goes wrong
+     * Sets up a new SessionPool with the connection parameters stored in <code>connParams</code>
+     * and throws an exception if something goes wrong
      * 
-     * @param connParams a set of connection parameters from where the new SessionPool will
-     *            connect to the SDE database and create connections
+     * @param connParams
+     *            a set of connection parameters from where the new SessionPool will connect to the
+     *            SDE database and create connections
      * @return DOCUMENT ME!
-     * @throws IllegalArgumentException if the set of connection parameters are not propperly set
-     * @throws NullPointerException if <code>connParams</code> is null
-     * @throws DataSourceException if the pool can't create the connections with the passed
-     *             arguments (i.e. can't connect to SDE database)
+     * @throws IllegalArgumentException
+     *             if the set of connection parameters are not propperly set
+     * @throws NullPointerException
+     *             if <code>connParams</code> is null
+     * @throws IOException
+     *             if the pool can't create the connections with the passed arguments (i.e. can't
+     *             connect to SDE database)
      */
     private SessionPool createPool(Map connParams) throws IllegalArgumentException,
-            NullPointerException, DataSourceException {
+            NullPointerException, IOException {
         this.connectionConfig = new ArcSDEConnectionConfig(connParams);
         LOGGER.fine("creating a new SessionPool with " + connectionConfig);
 
@@ -139,7 +147,8 @@ public class SessionPoolTest {
      * tests that a connection to a live ArcSDE database can be established with the parameters
      * defined int testparams.properties, and a SessionPool can be properly setted up
      * 
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
      */
     @Test
     public void testConnect() throws IOException {
@@ -163,11 +172,13 @@ public class SessionPoolTest {
     /**
      * Checks that after creation the pool has the specified initial number of connections.
      * 
-     * @throws DataSourceException DOCUMENT ME!
-     * @throws UnavailableArcSDEConnectionException DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws UnavailableArcSDEConnectionException
+     *             DOCUMENT ME!
      */
     @Test
-    public void testInitialCount() throws DataSourceException, UnavailableArcSDEConnectionException {
+    public void testInitialCount() throws IOException, UnavailableArcSDEConnectionException {
         int MIN_CONNECTIONS = 2;
         int MAX_CONNECTIONS = 6;
 
@@ -191,11 +202,11 @@ public class SessionPoolTest {
      * Tests that the pool creation fails if a wrong set of parameters is passed (i.e.
      * maxConnections is lower than minConnections)
      * 
-     * @throws DataSourceException
+     * @throws IOException
      * @throws UnavailableArcSDEConnectionException
      */
     @Test
-    public void testChecksLimits() throws DataSourceException, UnavailableArcSDEConnectionException {
+    public void testChecksLimits() throws IOException, UnavailableArcSDEConnectionException {
         int MIN_CONNECTIONS = 2;
 
         // override pool.minConnections and pool.maxConnections from
@@ -220,12 +231,13 @@ public class SessionPoolTest {
      * tests that no more than pool.maxConnections connections can be created, and once one
      * connection is freed, it is ready to be used again.
      * 
-     * @throws DataSourceException DOCUMENT ME!
-     * @throws UnavailableArcSDEConnectionException DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws UnavailableArcSDEConnectionException
+     *             DOCUMENT ME!
      */
     @Test
-    public void testMaxConnections() throws DataSourceException,
-            UnavailableArcSDEConnectionException {
+    public void testMaxConnections() throws IOException, UnavailableArcSDEConnectionException {
         final int MIN_CONNECTIONS = 2;
         final int MAX_CONNECTIONS = 2;
 
@@ -264,10 +276,10 @@ public class SessionPoolTest {
     /**
      * a null database name should not be an impediment to create the pool
      * 
-     * @throws DataSourceException
+     * @throws IOException
      */
     @Test
-    public void testCreateWithNullDBName() throws DataSourceException {
+    public void testCreateWithNullDBName() throws IOException {
         Map params = new HashMap(this.connectionParameters);
         params.remove(ArcSDEConnectionConfig.INSTANCE_NAME_PARAM);
         createPool(params);
@@ -276,10 +288,10 @@ public class SessionPoolTest {
     /**
      * an empty database name should not be an impediment to create the pool
      * 
-     * @throws DataSourceException
+     * @throws IOException
      */
     @Test
-    public void testCreateWithEmptyDBName() throws DataSourceException {
+    public void testCreateWithEmptyDBName() throws IOException {
         Map params = new HashMap(this.connectionParameters);
         params.put(ArcSDEConnectionConfig.INSTANCE_NAME_PARAM, "");
         createPool(params);

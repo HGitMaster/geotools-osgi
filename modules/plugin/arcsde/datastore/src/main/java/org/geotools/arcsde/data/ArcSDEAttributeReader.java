@@ -24,6 +24,7 @@ import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ISession;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -46,19 +47,19 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSDEAttributeReader.java $
- * @version $Id: ArcSDEAttributeReader.java 30921 2008-07-05 07:51:23Z jgarnett $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/ArcSDEAttributeReader.java $
+ * @version $Id: ArcSDEAttributeReader.java 32195 2009-01-09 19:00:35Z groldan $
  */
 final class ArcSDEAttributeReader implements AttributeReader {
     /** Shared package's logger */
-    private static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger("org.geotools.data");
+    private static final Logger LOGGER = Logging.getLogger(ArcSDEAttributeReader.class.getName());
 
     /** query passed to the constructor */
     private ArcSDEQuery query;
 
     /** schema of the features this attribute reader iterates over */
-    private SimpleFeatureType schema;
+    private final SimpleFeatureType schema;
 
     /** current sde java api row being read */
     private SdeRow currentRow;
@@ -86,8 +87,8 @@ final class ArcSDEAttributeReader implements AttributeReader {
     private FIDReader fidReader;
 
     /**
-     * flag to avoid the processing done in <code>hasNext()</code> if next() was not called
-     * between calls to hasNext()
+     * flag to avoid the processing done in <code>hasNext()</code> if next() was not called between
+     * calls to hasNext()
      */
     private boolean hasNextAlreadyCalled = false;
 
@@ -101,13 +102,16 @@ final class ArcSDEAttributeReader implements AttributeReader {
     /**
      * The query that defines this readers interaction with an ArcSDE instance.
      * 
-     * @param query the {@link SeQuery} wrapper where to fetch rows from. Must NOT be already
+     * @param query
+     *            the {@link SeQuery} wrapper where to fetch rows from. Must NOT be already
      *            {@link ArcSDEQuery#execute() executed}.
-     * @param session the session the <code>query</code> is being ran over. This attribute reader
-     *            will close it only if it does not have a transaction in progress.
+     * @param session
+     *            the session the <code>query</code> is being ran over. This attribute reader will
+     *            close it only if it does not have a transaction in progress.
      * @throws IOException
      */
-    public ArcSDEAttributeReader(final ArcSDEQuery query, final ISession session) throws IOException {
+    public ArcSDEAttributeReader(final ArcSDEQuery query, final ISession session)
+            throws IOException {
         this.query = query;
         this.session = session;
         this.fidReader = query.getFidReader();
@@ -149,6 +153,7 @@ final class ArcSDEAttributeReader implements AttributeReader {
      */
     public void close() throws IOException {
         if (query != null) {
+            LOGGER.finest("Closing ArcSDEAttributeReader for " + schema.getTypeName());
             try {
                 query.close();
             } finally {
@@ -156,7 +161,6 @@ final class ArcSDEAttributeReader implements AttributeReader {
 
                 query = null;
                 session = null;
-                schema = null;
                 fidReader = null;
                 currentRow = null;
             }
@@ -202,8 +206,10 @@ final class ArcSDEAttributeReader implements AttributeReader {
     /**
      * Retrieves the next row, or throws a DataSourceException if not more rows are available.
      * 
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws DataSourceException
+     *             DOCUMENT ME!
      */
     public void next() throws IOException {
         if (this.currentRow == null) {
@@ -216,11 +222,13 @@ final class ArcSDEAttributeReader implements AttributeReader {
     /**
      * DOCUMENT ME!
      * 
-     * @param index DOCUMENT ME!
+     * @param index
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
-     * @throws IOException never, since the feature retrieve was done in <code>hasNext()</code>
-     * @throws ArrayIndexOutOfBoundsException if <code>index</code> is outside the bounds of the
-     *             schema attribute's count
+     * @throws IOException
+     *             never, since the feature retrieve was done in <code>hasNext()</code>
+     * @throws ArrayIndexOutOfBoundsException
+     *             if <code>index</code> is outside the bounds of the schema attribute's count
      */
     public Object read(int index) throws IOException, ArrayIndexOutOfBoundsException {
         Object value = currentRow.getObject(index);

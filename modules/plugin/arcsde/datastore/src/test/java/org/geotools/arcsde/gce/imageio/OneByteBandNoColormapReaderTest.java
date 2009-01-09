@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,6 +13,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.arcsde.gce.imageio;
 
@@ -45,7 +46,7 @@ public class OneByteBandNoColormapReaderTest {
     static Logger LOGGER = Logging.getLogger(OneByteBandNoColormapReaderTest.class
             .getCanonicalName());
 
-    @BeforeClass
+    //@BeforeClass
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
@@ -61,8 +62,7 @@ public class OneByteBandNoColormapReaderTest {
             // Set up a pyramid and readerprops for the sample three-band imagery
             conn = rasterTestData.getConnectionPool().getConnection();
             tableName = rasterTestData.getGrayScaleOneByteRasterTableName();
-            q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(
-                    tableName));
+            q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             r = q.fetch();
@@ -91,7 +91,7 @@ public class OneByteBandNoColormapReaderTest {
         }
     }
 
-    @AfterClass
+    //@AfterClass
     public static void tearDownAfterClass() throws Exception {
         rasterTestData.tearDown();
     }

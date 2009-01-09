@@ -17,8 +17,9 @@
  */
 package org.geotools.arcsde.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -59,7 +60,6 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.Id;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.PropertyIsGreaterThan;
-import org.opengis.filter.expression.Expression;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BBOX;
 
@@ -245,14 +245,14 @@ public class ArcSDEQueryTest {
         Assert.assertEquals(Filter.INCLUDE, geometryFilter);
         Assert.assertEquals(Filter.INCLUDE, unsupportedFilter);
     }
-    
+
     @Test
     public void testWipesOutInvalidFids() throws IOException {
         final String typeName = this.typeName;
         Set<Identifier> ids = new HashSet<Identifier>();
         ids.add(ff.featureId(typeName + ".1"));
         ids.add(ff.featureId(typeName + ".2"));
-        //some non valid ones...
+        // some non valid ones...
         ids.add(ff.featureId(typeName + ".a"));
         ids.add(ff.featureId("states_.1"));
 
@@ -270,7 +270,7 @@ public class ArcSDEQueryTest {
         }
         Filter sqlFilter = filters.getSqlFilter();
         assertTrue(sqlFilter instanceof Id);
-        Id id = (Id)sqlFilter;
+        Id id = (Id) sqlFilter;
         Assert.assertEquals(2, id.getIDs().size());
         Set<Identifier> validFids = new HashSet<Identifier>();
         validFids.add(ff.featureId(typeName + ".1"));

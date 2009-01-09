@@ -180,7 +180,8 @@ public class RasterTestData {
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 500, 898000 + 500);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
-        String rasterFilename = testData.getConProps().getProperty("sampledata.rgbraster-colormapped");
+        String rasterFilename = testData.getConProps().getProperty(
+                "sampledata.rgbraster-colormapped");
         ArcSDERasterProducer prod = new ArcSDERasterOneBytePerBandProducerImpl();
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_8BIT_U, imgExtent,
@@ -200,7 +201,8 @@ public class RasterTestData {
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 500, 898000 + 500);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
-        String rasterFilename = testData.getConProps().getProperty("sampledata.onebyteonebandraster");
+        String rasterFilename = testData.getConProps().getProperty(
+                "sampledata.onebyteonebandraster");
         ArcSDERasterProducer prod = new ArcSDERasterOneBytePerBandProducerImpl();
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_8BIT_U, imgExtent,
@@ -419,8 +421,8 @@ public class RasterTestData {
         ArcSDEPooledConnection conn = getConnectionPool().getConnection();
 
         try {
-            SeQuery query = new SeQuery(conn, new String[] { conn.getRasterColumn(
-                    rasterName).getName() }, new SeSqlConstruct(rasterName));
+            SeQuery query = new SeQuery(conn, new String[] { conn.getRasterColumn(rasterName)
+                    .getName() }, new SeSqlConstruct(rasterName));
             query.prepareQuery();
             query.execute();
             final SeRow r = query.fetch();

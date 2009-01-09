@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,6 +13,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.arcsde.pool;
 
@@ -37,8 +38,10 @@ public abstract class Command<R> {
      * Please keep in mind that a Command should be short in duration; you are sharing this
      * SeConnection with other threads.
      * 
-     * @param session the Session the command is being executed inside
-     * @param connection the session's connection, used to interact with ArcSDE
+     * @param session
+     *            the Session the command is being executed inside
+     * @param connection
+     *            the session's connection, used to interact with ArcSDE
      * @return the result of the command execution, or null if the command is not meant to return
      *         anything (a command meant to return something should fail if not able to)
      */

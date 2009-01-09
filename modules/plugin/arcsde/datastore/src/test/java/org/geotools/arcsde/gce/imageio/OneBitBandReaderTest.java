@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,6 +13,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.arcsde.gce.imageio;
 
@@ -70,8 +71,7 @@ public class OneBitBandReaderTest {
             // Set up a pyramid and readerprops for the sample three-band imagery
             conn = rasterTestData.getConnectionPool().getConnection();
             tableName = rasterTestData.get1bitRasterTableName();
-            q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(
-                    tableName));
+            q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             r = q.fetch();
@@ -109,7 +109,7 @@ public class OneBitBandReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-       ArcSDEPooledConnection conn = null;
+        ArcSDEPooledConnection conn = null;
         try {
             conn = rasterTestData.getConnectionPool().getConnection();
 

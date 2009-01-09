@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,12 +13,12 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.arcsde.gce.band;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -72,8 +72,8 @@ public class UnsignedByteGrayscaleBandCopierTest {
             ArcSDEConnectionPool pool = rasterTestData.getConnectionPool();
 
             session = pool.getConnection();
-            SeQuery q = new SeQuery(session, new String[] { "RASTER" },
-                    new SeSqlConstruct(tableName));
+            SeQuery q = new SeQuery(session, new String[] { "RASTER" }, new SeSqlConstruct(
+                    tableName));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();

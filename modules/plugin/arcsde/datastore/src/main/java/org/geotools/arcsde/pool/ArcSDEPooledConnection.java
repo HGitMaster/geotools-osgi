@@ -1,7 +1,8 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,7 +38,7 @@ import com.esri.sde.sdk.client.SeTable;
  * close().
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: ArcSDEPooledConnection.java 32181 2009-01-08 15:44:06Z groldan $
+ * @version $Id: ArcSDEPooledConnection.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.3.x
  * 
  * @deprecated still here waiting for gce to switch to {@link ISession}

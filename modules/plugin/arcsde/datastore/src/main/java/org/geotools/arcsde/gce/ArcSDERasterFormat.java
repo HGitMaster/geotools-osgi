@@ -39,7 +39,8 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * @author jeichar
  * @author Simone Giannecchini (simboss)
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/gce/ArcSDERasterFormat.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/gce/ArcSDERasterFormat.java $
  */
 public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
@@ -71,8 +72,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object
-     *      source)
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object source)
      */
     @Override
     public GridCoverageReader getReader(Object source) {
@@ -102,8 +102,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object
-     *      input)
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object input)
      */
     @Override
     public boolean accepts(Object input) {

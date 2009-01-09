@@ -142,7 +142,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
     /**
      * Creates a new instance of an ArcSDERasterReader
      * 
-     * @param input Source object (probably a connection-type URL) for which we want to build the
+     * @param input
+     *            Source object (probably a connection-type URL) for which we want to build the
      *            ArcSDERasterReader
      * @throws DataSourceException
      */
@@ -153,12 +154,15 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
     /**
      * Creates a new instance of an ArcSDERasterReader
      * 
-     * @param input Source object (probably a connection-type URL) for which we want to build the
+     * @param input
+     *            Source object (probably a connection-type URL) for which we want to build the
      *            ArcSDERasterReader
-     * @param hints Hints to be used by this reader throughout his life.
+     * @param hints
+     *            Hints to be used by this reader throughout his life.
      * @throws DataSourceException
      */
-    public ArcSDERasterGridCoverage2DReader(Object input, final Hints hints) throws DataSourceException {
+    public ArcSDERasterGridCoverage2DReader(Object input, final Hints hints)
+            throws DataSourceException {
 
         if (hints != null)
             this.hints.add(hints);
@@ -195,7 +199,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * To have an idea about the possible read parameters take a look at {@link AbstractGridFormat}
      * class and {@link ArcSDERasterFormat} class.
      * 
-     * @param params an array of {@link GeneralParameterValue} containing the parameters to control
+     * @param params
+     *            an array of {@link GeneralParameterValue} containing the parameters to control
      *            this read process.
      * @return a {@link GridCoverage2D}.
      * @see AbstractGridFormat
@@ -245,17 +250,19 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * you with best data available, and let the eventually renderer (generally the
      * GridCoverageRenderer) downsample/generalize the returned coverage.
      * 
-     * @param requestedDim The requested image dimensions in pixels
-     * @param readEnvelope The request envelope, in CRS units
-     * @param forcedLevel If this parameter is non-null, it contains the level of the pyramid at
-     *            which to render this request. Note that this parameter should be used with care,
-     *            as forcing a rendering at too low a level could cause significant memory overload!
+     * @param requestedDim
+     *            The requested image dimensions in pixels
+     * @param readEnvelope
+     *            The request envelope, in CRS units
+     * @param forcedLevel
+     *            If this parameter is non-null, it contains the level of the pyramid at which to
+     *            render this request. Note that this parameter should be used with care, as forcing
+     *            a rendering at too low a level could cause significant memory overload!
      * @return a GridCoverage
      * @throws IOException
      * @throws java.io.IOException
      */
-    private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-            Rectangle requestedDim,
+    private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope, Rectangle requestedDim,
             Integer forcedLevel) throws IOException {
 
         ArcSDEPooledConnection scon = null;
@@ -464,7 +471,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
     }
 
     /**
-     * @param sdeUrl - A StringBuffer containing a string of form
+     * @param sdeUrl
+     *            - A StringBuffer containing a string of form
      *            'sde://user:pass@sdehost:[port]/[dbname]
      * @return a ConnectionConfig object representing these parameters
      */
@@ -607,7 +615,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * Checks the input prvided to this {@link ArcSDERasterGridCoverage2DReader} and sets all the
      * other objects and flags accordingly.
      * 
-     * @param input provied to this {@link ArcSDERasterGridCoverage2DReader}.
+     * @param input
+     *            provied to this {@link ArcSDERasterGridCoverage2DReader}.
      * @throws DataSourceException
      * @throws IOException
      */
@@ -704,8 +713,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * support this raster layer, what sort of BufferedImage to create when rendering this layer and
      * how to describe each band in rendered layers.
      * 
-     * @throws DataSourceException if there's an error communicating with SDE about this raster
-     *             layer.
+     * @throws DataSourceException
+     *             if there's an error communicating with SDE about this raster layer.
      */
     private void calculateBandDependentInfo() throws DataSourceException {
         try {
@@ -733,7 +742,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 } else if (rasterAttributes.getBands()[0].hasColorMap()) {
                     // we support 1-band with colormap now
                     gridBands = new GridSampleDimension[1];
-                    Category cmCat = null;// buildCategory(rasterAttributes.getBands()[0].getColorMap());
+                    Category cmCat = null;//buildCategory(rasterAttributes.getBands()[0].getColorMap
+                                          // ());
                     gridBands[0] = new GridSampleDimension(cmCat.getName(),
                             new Category[] { cmCat }, null).geophysics(true);
                 } else if (rasterAttributes.getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_S

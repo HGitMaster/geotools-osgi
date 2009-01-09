@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,9 +13,11 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.arcsde.pool;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -52,7 +54,7 @@ public class ArcSDEConnectionReference extends SessionPool {
      */
     Transaction transaction = Transaction.AUTO_COMMIT;
 
-    protected ArcSDEConnectionReference(ArcSDEConnectionConfig config) throws DataSourceException {
+    protected ArcSDEConnectionReference(ArcSDEConnectionConfig config) throws IOException {
         super(config);
         if (config.maxConnections.intValue() != 1) {
             throw new IllegalArgumentException(

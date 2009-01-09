@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.geotools.arcsde.gce.ArcSDERasterFormat;
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
 
 import com.esri.sde.sdk.client.SeConnection;
@@ -37,13 +38,14 @@ import com.esri.sde.sdk.pe.PeCoordinateSystem;
  * @author aaime
  * @author Simone Giannecchini (simboss)
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/ArcSDERasterFormatFactory.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/ArcSDERasterFormatFactory.java $
  */
 public class ArcSDERasterFormatFactory implements GridFormatFactorySpi {
 
     /** package's logger */
-    protected static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(ArcSDERasterFormatFactory.class.getPackage().getName());
+    protected static final Logger LOGGER = Logging.getLogger(ArcSDERasterFormatFactory.class
+            .getName());
 
     /** friendly factory description */
     // private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 9.x Raster Support via

@@ -43,10 +43,11 @@ import com.esri.sde.sdk.client.SeVersion;
  * A pure session wrapper to aid in creating session decorators by extending this class.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: SessionWrapper.java 30842 2008-07-02 11:31:31Z groldan $
+ * @version $Id: SessionWrapper.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5.x
  * @source $URL:
- *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/pool/SessionWrapper.java $
+ *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/geotools
+ *         /arcsde/pool/SessionWrapper.java $
  */
 public class SessionWrapper implements ISession {
 
@@ -290,7 +291,6 @@ public class SessionWrapper implements ISession {
         wrapped.startTransaction();
     }
 
-    
     /**
      * @see ISession#getDefaultVersion()
      */

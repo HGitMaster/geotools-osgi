@@ -33,10 +33,8 @@ import org.geotools.arcsde.pool.ISession;
 import org.geotools.arcsde.pool.SessionPool;
 import org.geotools.arcsde.pool.SessionPoolFactory;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
-import org.geotools.data.DataSourceException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
@@ -73,10 +71,11 @@ import com.vividsolutions.jts.io.WKTReader;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/TestData.java $
- * @version $Id: TestData.java 32037 2008-12-18 13:46:11Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/TestData.java $
+ * @version $Id: TestData.java 32195 2009-01-09 19:00:35Z groldan $
  */
-@SuppressWarnings({"nls", "unchecked"})
+@SuppressWarnings( { "nls", "unchecked" })
 public class TestData {
     /** DOCUMENT ME! */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(TestData.class
@@ -92,14 +91,12 @@ public class TestData {
     // private SeTable tempTable;
 
     /**
-     * the set of test parameters loaded from
-     * {@code test-data/testparams.properties}
+     * the set of test parameters loaded from {@code test-data/testparams.properties}
      */
     private Properties conProps = null;
 
     /**
-     * the name of a table that can be manipulated without risk of loosing
-     * important data
+     * the name of a table that can be manipulated without risk of loosing important data
      */
     private String temp_table;
 
@@ -119,9 +116,9 @@ public class TestData {
     }
 
     /**
-     * Must be called from inside the test's setUp() method. Loads the test
-     * fixture from <code>testparams.properties</code>, besides that, does
-     * not creates any connection nor any other costly resource.
+     * Must be called from inside the test's setUp() method. Loads the test fixture from
+     * <code>testparams.properties</code>, besides that, does not creates any connection nor any
+     * other costly resource.
      * 
      * @throws IOException
      *             if the test fixture can't be loaded
@@ -180,8 +177,8 @@ public class TestData {
     }
 
     /**
-     * creates an ArcSDEDataStore using {@code test-data/testparams.properties}
-     * as holder of datastore parameters
+     * creates an ArcSDEDataStore using {@code test-data/testparams.properties} as holder of
+     * datastore parameters
      * 
      * @return DOCUMENT ME!
      * @throws IOException
@@ -194,7 +191,7 @@ public class TestData {
         return dataStore;
     }
 
-    public SessionPool getConnectionPool() throws DataSourceException {
+    public SessionPool getConnectionPool() throws IOException {
         if (this._pool == null) {
             SessionPoolFactory pfac = SessionPoolFactory.getInstance();
             ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(this.conProps);
@@ -246,8 +243,7 @@ public class TestData {
     }
 
     /**
-     * Gracefully deletes the temp table hiding any exception (no problem if it
-     * does not exist)
+     * Gracefully deletes the temp table hiding any exception (no problem if it does not exist)
      */
     public void deleteTempTable() {
         // only if the datastore was used
@@ -268,12 +264,10 @@ public class TestData {
     }
 
     /**
-     * Gracefully deletes the temp table hiding any exception (no problem if it
-     * does not exist)
+     * Gracefully deletes the temp table hiding any exception (no problem if it does not exist)
      * 
      * @param connPool
-     *            to get the connection to use in deleting
-     *            {@link #getTempTableName()}
+     *            to get the connection to use in deleting {@link #getTempTableName()}
      */
     public void deleteTempTable(SessionPool connPool) {
         try {
@@ -319,9 +313,8 @@ public class TestData {
     }
 
     /**
-     * Creates an ArcSDE feature type names as <code>getTemp_table()</code> on
-     * the underlying database and if <code>insertTestData == true</code> also
-     * inserts some sample values.
+     * Creates an ArcSDE feature type names as <code>getTemp_table()</code> on the underlying
+     * database and if <code>insertTestData == true</code> also inserts some sample values.
      * 
      * @param insertTestData
      *            wether to insert some sample rows or not
@@ -337,8 +330,8 @@ public class TestData {
 
         try {
             /*
-             * Create a qualified table name with current user's name and the
-             * name of the table to be created, "EXAMPLE".
+             * Create a qualified table name with current user's name and the name of the table to
+             * be created, "EXAMPLE".
              */
             final String tableName = getTempTableName(session);
 
@@ -367,10 +360,9 @@ public class TestData {
     }
 
     /**
-     * Truncates the temp layer and populates it with fresh data. This method
-     * cannot be called if {@link #createTempTable(boolean)} has not been called
-     * first, no matter if the table already exists, it needs instance state
-     * initialized by createTempTable
+     * Truncates the temp layer and populates it with fresh data. This method cannot be called if
+     * {@link #createTempTable(boolean)} has not been called first, no matter if the table already
+     * exists, it needs instance state initialized by createTempTable
      * 
      * @throws Exception
      */
@@ -429,15 +421,15 @@ public class TestData {
                 SeColumnDefinition[] colDefs = new SeColumnDefinition[9];
 
                 /*
-                 * Define the columns and their attributes for the table to be
-                 * created. NOTE: The valid range/values of size and scale
-                 * parameters vary from one database to another.
+                 * Define the columns and their attributes for the table to be created. NOTE: The
+                 * valid range/values of size and scale parameters vary from one database to
+                 * another.
                  */
                 boolean isNullable = true;
 
                 // first column to be SDE managed feature id
-                colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INT32, 10,
-                        0, false);
+                colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INT32, 10, 0,
+                        false);
 
                 colDefs[1] = new SeColumnDefinition(TEST_TABLE_COLS[0],
                         SeColumnDefinition.TYPE_INT32, 10, 0, isNullable);
@@ -465,14 +457,13 @@ public class TestData {
                     // ignore
                 }
                 /*
-                 * Create the table using the DBMS default configuration
-                 * keyword. Valid keywords are defined in the dbtune table.
+                 * Create the table using the DBMS default configuration keyword. Valid keywords are
+                 * defined in the dbtune table.
                  */
                 table.create(colDefs, configKeyword);
 
                 /*
-                 * Register the column to be used as feature id and managed by
-                 * sde
+                 * Register the column to be used as feature id and managed by sde
                  */
                 SeRegistration reg = new SeRegistration(connection, table.getName());
                 LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
@@ -487,11 +478,10 @@ public class TestData {
                 layer.setSpatialColumnName(TEST_TABLE_COLS[TEST_TABLE_COLS.length - 1]);
 
                 /*
-                 * Set the type of shapes that can be inserted into the layer.
-                 * Shape type can be just one or many. NOTE: Layers that contain
-                 * more than one shape type can only be accessed through the C
-                 * and Java APIs and Arc Explorer Java 3.x. They cannot be seen
-                 * from ArcGIS desktop applications.
+                 * Set the type of shapes that can be inserted into the layer. Shape type can be
+                 * just one or many. NOTE: Layers that contain more than one shape type can only be
+                 * accessed through the C and Java APIs and Arc Explorer Java 3.x. They cannot be
+                 * seen from ArcGIS desktop applications.
                  */
                 layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK
                         | SeLayer.SE_LINE_TYPE_MASK | SeLayer.SE_SIMPLE_LINE_TYPE_MASK
@@ -647,21 +637,22 @@ public class TestData {
     } // End method insertData
 
     /**
-     * Creates a FeatureCollection<SimpleFeatureType, SimpleFeature> with
-     * features whose schema adheres to the one created in
-     * <code>createTestData()</code> and returns it.
+     * Creates a FeatureCollection<SimpleFeatureType, SimpleFeature> with features whose schema
+     * adheres to the one created in <code>createTestData()</code> and returns it.
      * <p>
      * This schema is something like:
      * 
      * <pre>
-     *  colDefs[0] &quot;INT32_COL&quot;, SeColumnDefinition.TYPE_INTEGER, 10, 0, true
-     *  colDefs[1] = &quot;INT16_COL&quot;, SeColumnDefinition.TYPE_SMALLINT, 4, 0, true
-     *  colDefs[2] = &quot;FLOAT32_COL&quot;, SeColumnDefinition.TYPE_FLOAT, 5, 2, true
-     *  colDefs[3] = &quot;FLOAT64_COL&quot;, SeColumnDefinition.TYPE_DOUBLE, 15, 4, true
-     *  colDefs[4] = &quot;STRING_COL&quot;, SeColumnDefinition.TYPE_STRING, 25, 0, true
-     *  colDefs[5] = &quot;NSTRING_COL&quot;, SeColumnDefinition.TYPE_NSTRING, 25, 0, true
-     *  colDefs[6] = &quot;DATE_COL&quot;, SeColumnDefinition.TYPE_DATE, 1, 0, true
-     *  colDefs[7] = &quot;SHAPE&quot;, Geometry, 1, 0, true
+     * 
+     * colDefs[0] &quot;INT32_COL&quot;, SeColumnDefinition.TYPE_INTEGER, 10, 0, true colDefs[1] =
+     * &quot;INT16_COL&quot;, SeColumnDefinition.TYPE_SMALLINT, 4, 0, true colDefs[2] =
+     * &quot;FLOAT32_COL&quot;, SeColumnDefinition.TYPE_FLOAT, 5, 2, true colDefs[3] =
+     * &quot;FLOAT64_COL&quot;, SeColumnDefinition.TYPE_DOUBLE, 15, 4, true colDefs[4] =
+     * &quot;STRING_COL&quot;, SeColumnDefinition.TYPE_STRING, 25, 0, true colDefs[5] =
+     * &quot;NSTRING_COL&quot;, SeColumnDefinition.TYPE_NSTRING, 25, 0, true colDefs[6] =
+     * &quot;DATE_COL&quot;, SeColumnDefinition.TYPE_DATE, 1, 0, true colDefs[7] =
+     * &quot;SHAPE&quot;, Geometry, 1, 0, true
+     * 
      * </pre>
      * 
      * </p>
@@ -671,13 +662,11 @@ public class TestData {
      * @param numFeatures
      *            number of features to create.
      * @throws IOException
-     *             if the schema for te test table cannot be fetched from the
-     *             database.
+     *             if the schema for te test table cannot be fetched from the database.
      * @throws SeException
      */
     public FeatureCollection<SimpleFeatureType, SimpleFeature> createTestFeatures(
-            Class jtsGeomType, int numFeatures) throws IOException,
-            SeException {
+            Class jtsGeomType, int numFeatures) throws IOException, SeException {
         FeatureCollection<SimpleFeatureType, SimpleFeature> col = FeatureCollections
                 .newCollection();
         SimpleFeatureType type = getDataStore().getSchema(getTempTableName());
@@ -864,13 +853,12 @@ public class TestData {
     }
 
     /**
-     * Creates and returns a <code>SeCoordinateReference</code> CRS, though
-     * based on WGS84, is inclusive enough (in terms of valid coordinate range
-     * and presicion) to deal with most coordintates.
+     * Creates and returns a <code>SeCoordinateReference</code> CRS, though based on WGS84, is
+     * inclusive enough (in terms of valid coordinate range and presicion) to deal with most
+     * coordintates.
      * <p>
-     * Actually tested to deal with coordinates with 0.0002 units of separation
-     * as well as with large coordinates such as UTM (values greater than
-     * 500,000.00)
+     * Actually tested to deal with coordinates with 0.0002 units of separation as well as with
+     * large coordinates such as UTM (values greater than 500,000.00)
      * </p>
      * 
      * @return DOCUMENT ME!
@@ -898,7 +886,7 @@ public class TestData {
             testData.setUp();
             // testData.createSimpleTestTables();
             testData.createSampleLayers(2000);
-            //testData.deleteSampleLayers(5000);
+            // testData.deleteSampleLayers(5000);
             System.err.println("test tables successfully created");
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "while creating test tables got '" + e.getMessage() + "'");
@@ -937,8 +925,8 @@ public class TestData {
     }
 
     /**
-     * This private method is used to create a lot of layers in the test
-     * database in order to fix GEOT-1956
+     * This private method is used to create a lot of layers in the test database in order to fix
+     * GEOT-1956
      */
     private void createSampleLayers(final int numLayersToCreate) throws IOException {
         final SessionPool connectionPool = getConnectionPool();
@@ -1079,14 +1067,13 @@ public class TestData {
                         SeColumnDefinition.TYPE_BLOB, 4000, 0, isNullable);
 
                 /*
-                 * Create the table using the DBMS default configuration
-                 * keyword. Valid keywords are defined in the dbtune table.
+                 * Create the table using the DBMS default configuration keyword. Valid keywords are
+                 * defined in the dbtune table.
                  */
                 table.create(colDefs, configKeyword);
 
                 /*
-                 * Register the column to be used as feature id and managed by
-                 * sde
+                 * Register the column to be used as feature id and managed by sde
                  */
                 if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE != rowIdColumnType) {
                     SeRegistration reg = new SeRegistration(connection, table.getName());
@@ -1179,8 +1166,8 @@ public class TestData {
                 SeTable table;
 
                 /*
-                 * Create a qualified table name with current user's name and
-                 * the name of the table to be created, "EXAMPLE".
+                 * Create a qualified table name with current user's name and the name of the table
+                 * to be created, "EXAMPLE".
                  */
                 String dbname = connection.getDatabaseName();
                 String user = connection.getUser();
@@ -1213,8 +1200,7 @@ public class TestData {
                 layer.setSpatialColumnName("SHAPE");
 
                 /*
-                 * Register the column to be used as feature id and managed by
-                 * sde
+                 * Register the column to be used as feature id and managed by sde
                  */
                 SeRegistration reg = new SeRegistration(connection, table.getName());
                 LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());

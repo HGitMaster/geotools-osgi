@@ -38,22 +38,25 @@ public class ArcSDERasterFloatProducerImpl extends ArcSDERasterProducer {
                         // for each band...
                         for (int i = 0; i < sourceImage.getData().getNumBands(); i++) {
                             // get the data as floats, then convert to four-byte segments
-                            byte[] sdeRasterData = new byte[sourceImage.getWidth() * 4 * sourceImage.getHeight()];
-                            float[] srcImgData = ((DataBufferFloat)sourceImage.getData().getDataBuffer()).getData();
+                            byte[] sdeRasterData = new byte[sourceImage.getWidth() * 4
+                                    * sourceImage.getHeight()];
+                            float[] srcImgData = ((DataBufferFloat) sourceImage.getData()
+                                    .getDataBuffer()).getData();
                             for (int y = 0; y < sourceImage.getHeight(); y++) {
-                                //byte[] curRow = new byte[sourceImage.getWidth() * 4];
+                                // byte[] curRow = new byte[sourceImage.getWidth() * 4];
                                 for (int x = 0; x < sourceImage.getWidth(); x++) {
-                                    //final float sample = sourceImage.getData().getSampleFloat(x, y, i);
-                                    final float sample = srcImgData[y*sourceImage.getWidth() + x];
-                                    //convert float to bytes
+                                    // final float sample = sourceImage.getData().getSampleFloat(x,
+                                    // y, i);
+                                    final float sample = srcImgData[y * sourceImage.getWidth() + x];
+                                    // convert float to bytes
                                     int bits = Float.floatToIntBits(sample);
-                                    sdeRasterData[y*sourceImage.getWidth()*4 + x*4] = (byte)((bits & 0xff000000) >> 24);
-                                    sdeRasterData[y*sourceImage.getWidth()*4 + x*4+1] = (byte)((bits & 0x00ff0000) >> 16);
-                                    sdeRasterData[y*sourceImage.getWidth()*4 + x*4+2] = (byte)((bits & 0x0000ff00) >> 8);
-                                    sdeRasterData[y*sourceImage.getWidth()*4 + x*4+3] = (byte)(bits & 0x000000ff);
+                                    sdeRasterData[y * sourceImage.getWidth() * 4 + x * 4] = (byte) ((bits & 0xff000000) >> 24);
+                                    sdeRasterData[y * sourceImage.getWidth() * 4 + x * 4 + 1] = (byte) ((bits & 0x00ff0000) >> 16);
+                                    sdeRasterData[y * sourceImage.getWidth() * 4 + x * 4 + 2] = (byte) ((bits & 0x0000ff00) >> 8);
+                                    sdeRasterData[y * sourceImage.getWidth() * 4 + x * 4 + 3] = (byte) (bits & 0x000000ff);
                                 }
                             }
-                            
+
                             consumer.setScanLines(imageHeight, sdeRasterData, null);
                             consumer.rasterComplete(SeRasterConsumer.SINGLEFRAMEDONE);
                         }

@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/ArcSDEQuery.java $
- * @version $Id: ArcSDEQuery.java 31997 2008-12-11 17:32:50Z groldan $
+ * @version $Id: ArcSDEQuery.java 32195 2009-01-09 19:00:35Z groldan $
  */
 class ArcSDEQuery {
     /** Shared package's logger */
@@ -913,9 +913,10 @@ class ArcSDEQuery {
 
             SimplifyingFilterVisitor filterSimplifier = new SimplifyingFilterVisitor();
             final String typeName = this.featureType.getTypeName();
-            FIDValidator validator = new SimplifyingFilterVisitor.TypeNameDotNumberFidValidator(typeName);
+            FIDValidator validator = new SimplifyingFilterVisitor.TypeNameDotNumberFidValidator(
+                    typeName);
             filterSimplifier.setFIDValidator(validator);
-            
+
             this._sqlFilter = unpacker.getFilterPre();
             this._sqlFilter = (Filter) this._sqlFilter.accept(filterSimplifier, null);
 

@@ -73,10 +73,8 @@ public class ArcSDERasterReader extends ImageReader {
 
     private final String _rasterTable, _rasterColumn;
 
-    public ArcSDERasterReader(ArcSDERasterReaderSpi parent,
-                              ArcSDEPyramid rasterPyramid,
-                              String rasterTable,
-                              String rasterColumn) {
+    public ArcSDERasterReader(ArcSDERasterReaderSpi parent, ArcSDEPyramid rasterPyramid,
+            String rasterTable, String rasterColumn) {
         super(parent);
         _tileSize = rasterPyramid.getTileDimension();
         _rasterPyramid = rasterPyramid;
@@ -109,10 +107,12 @@ public class ArcSDERasterReader extends ImageReader {
      * table corresponds to one ArcSDERasterReader) in the manner described by the supplied
      * ImageReadParam.
      * 
-     * @param param This must be an ArcSDERasterImageReadParam, containing a valid, live
-     *            SeConnection through which this reader will "suck" its raster data from SDE.
-     * @param imageIndex This parameter specifies which image pyramid level (if there's more than
-     *            one) to read from. If there's only one pyramid level, this value should be 0.
+     * @param param
+     *            This must be an ArcSDERasterImageReadParam, containing a valid, live SeConnection
+     *            through which this reader will "suck" its raster data from SDE.
+     * @param imageIndex
+     *            This parameter specifies which image pyramid level (if there's more than one) to
+     *            read from. If there's only one pyramid level, this value should be 0.
      * @throws IOException
      */
     @Override
@@ -456,11 +456,10 @@ public class ArcSDERasterReader extends ImageReader {
                 new byte[] { 0x0 });
         return ret;
     }
-    
-    //public static SeRasterBand
 
-    public static BufferedImage createCompatibleBufferedImage(int width,
-            int height,
+    // public static SeRasterBand
+
+    public static BufferedImage createCompatibleBufferedImage(int width, int height,
             SeRasterAttr rasterAttributes) throws DataSourceException {
         try {
             /*

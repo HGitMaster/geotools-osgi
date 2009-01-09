@@ -33,19 +33,20 @@ import com.esri.sde.sdk.client.SeStreamOp;
 import com.esri.sde.sdk.client.SeVersion;
 
 /**
- * Handles a versioned table when in auto commit mode, meaning it sets up
- * streams to edit directly the default version.
+ * Handles a versioned table when in auto commit mode, meaning it sets up streams to edit directly
+ * the default version.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: AutoCommitDefaultVersionHandler.java 30722 2008-06-13 18:15:42Z
- *          acuster $
+ * @version $Id: AutoCommitDefaultVersionHandler.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5.x
  * @source $URL:
- *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/versioning/AutoCommitDefaultVersionHandler.java $
+ *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/geotools
+ *         /arcsde/data/versioning/AutoCommitDefaultVersionHandler.java $
  */
 public class AutoCommitDefaultVersionHandler implements ArcSdeVersionHandler {
 
-    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data.versioning");
+    private static final Logger LOGGER = Logging.getLogger(AutoCommitDefaultVersionHandler.class
+            .getName());
 
     private SeVersion defaultVersion;
 
@@ -125,9 +126,8 @@ public class AutoCommitDefaultVersionHandler implements ArcSdeVersionHandler {
     }
 
     /**
-     * This method should not be called, but
-     * {@link #editOperationFailed(SeStreamOp)} instead, as this is a handler
-     * for auto commit mode
+     * This method should not be called, but {@link #editOperationFailed(SeStreamOp)} instead, as
+     * this is a handler for auto commit mode
      * 
      * @throws UnsupportedOperationException
      * @see {@link ArcSdeVersionHandler#rollbackEditState()}
@@ -138,9 +138,8 @@ public class AutoCommitDefaultVersionHandler implements ArcSdeVersionHandler {
     }
 
     /**
-     * This method should not be called, but
-     * {@link #editOperationWritten(SeStreamOp)} instead, as this is a handler
-     * for auto commit mode
+     * This method should not be called, but {@link #editOperationWritten(SeStreamOp)} instead, as
+     * this is a handler for auto commit mode
      * 
      * @throws UnsupportedOperationException
      * @see {@link ArcSdeVersionHandler#rollbackEditState()}

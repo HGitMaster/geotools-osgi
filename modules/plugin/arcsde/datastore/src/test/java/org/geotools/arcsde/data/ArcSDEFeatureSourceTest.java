@@ -17,7 +17,11 @@
  */
 package org.geotools.arcsde.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,8 +39,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
-import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
@@ -46,7 +48,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
@@ -71,7 +72,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
- * @version $Id: ArcSDEFeatureSourceTest.java 31931 2008-11-28 19:27:58Z groldan $
+ * @version $Id: ArcSDEFeatureSourceTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class ArcSDEFeatureSourceTest {
     /** package logger */

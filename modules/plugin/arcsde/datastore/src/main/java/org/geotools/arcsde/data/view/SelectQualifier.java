@@ -44,22 +44,23 @@ import org.geotools.arcsde.pool.ISession;
  * Usage:
  * 
  * <pre>
- * <code>
+ * &lt;code&gt;
  *   PlainSelect unqualifiedSelect = ...
  *   SeConnection conn = ...
  *   SelectVisitor visitor = new SelectVisitor(conn);
  *   visitor.accept(unqualifiedSelect);
  *   
  *   PlainSelect qualifiedSelect = visitor.getQualifiedQuery();
- * </code>
+ * &lt;/code&gt;
  * </pre>
  * 
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: SelectQualifier.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: SelectQualifier.java 32195 2009-01-09 19:00:35Z groldan $
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/SelectQualifier.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/view/SelectQualifier.java $
  * @since 2.3.x
  */
 public class SelectQualifier implements net.sf.jsqlparser.statement.select.SelectVisitor {
@@ -72,7 +73,8 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
     /**
      * Creates a new SelectQualifier object.
      * 
-     * @param session DOCUMENT ME!
+     * @param session
+     *            DOCUMENT ME!
      */
     public SelectQualifier(ISession session) {
         this.session = session;
@@ -88,7 +90,8 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
      * DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
-     * @throws IllegalStateException DOCUMENT ME!
+     * @throws IllegalStateException
+     *             DOCUMENT ME!
      */
     public PlainSelect getQualifiedQuery() {
         if (qualifiedSelect == null) {
@@ -101,8 +104,10 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
     /**
      * DOCUMENT ME!
      * 
-     * @param plainSelect DOCUMENT ME!
-     * @throws IllegalStateException DOCUMENT ME!
+     * @param plainSelect
+     *            DOCUMENT ME!
+     * @throws IllegalStateException
+     *             DOCUMENT ME!
      */
     public void visit(PlainSelect plainSelect) throws IllegalStateException {
         qualifiedSelect = new PlainSelect();
@@ -158,7 +163,8 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
     /**
      * DOCUMENT ME!
      * 
-     * @param where DOCUMENT ME!
+     * @param where
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
      */
     private Expression qualifyWhere(Map tableAliases, Expression where) {
@@ -174,7 +180,8 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
     /**
      * DOCUMENT ME!
      * 
-     * @param orderByElements DOCUMENT ME!
+     * @param orderByElements
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
      */
     private List qualifyOrderBy(Map tableAliases, List orderByElements) {
@@ -199,7 +206,8 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
     /**
      * DOCUMENT ME!
      * 
-     * @param selectItems List&lt;{@link SelectItem}&gt;
+     * @param selectItems
+     *            List&lt;{@link SelectItem}&gt;
      * @return DOCUMENT ME!
      */
     private List qualifySelectItems(Map tableAlias, List selectItems) {
@@ -223,7 +231,8 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
     /**
      * DOCUMENT ME!
      * 
-     * @param fromItems List&lt;{@link FromItem}&gt;
+     * @param fromItems
+     *            List&lt;{@link FromItem}&gt;
      * @return DOCUMENT ME!
      */
     private List qualifyFromItems(List fromItems) {
@@ -247,8 +256,10 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
     /**
      * DOCUMENT ME!
      * 
-     * @param union DOCUMENT ME!
-     * @throws UnsupportedOperationException DOCUMENT ME!
+     * @param union
+     *            DOCUMENT ME!
+     * @throws UnsupportedOperationException
+     *             DOCUMENT ME!
      */
     public void visit(Union union) {
         throw new UnsupportedOperationException();

@@ -17,7 +17,10 @@
  */
 package org.geotools.arcsde.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
@@ -35,7 +38,7 @@ import com.esri.sde.sdk.client.SeTable;
 
 /**
  * @author Gabriel Roldan (TOPP)
- * @version $Id: FIDReaderTest.java 31197 2008-08-20 20:56:42Z groldan $
+ * @version $Id: FIDReaderTest.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5.x
  */
 public class FIDReaderTest {
@@ -83,7 +86,8 @@ public class FIDReaderTest {
 
     /**
      * Test method for
-     * {@link org.geotools.arcsde.data.FIDReader#getFidReader(org.geotools.arcsde.pool.ISession, com.esri.sde.sdk.client.SeTable, com.esri.sde.sdk.client.SeLayer, com.esri.sde.sdk.client.SeRegistration)}.
+     * {@link org.geotools.arcsde.data.FIDReader#getFidReader(org.geotools.arcsde.pool.ISession, com.esri.sde.sdk.client.SeTable, com.esri.sde.sdk.client.SeLayer, com.esri.sde.sdk.client.SeRegistration)}
+     * .
      * 
      * @throws IOException
      */
@@ -132,8 +136,7 @@ public class FIDReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.geotools.arcsde.data.FIDReader#setColumnIndex(int)}.
+     * Test method for {@link org.geotools.arcsde.data.FIDReader#setColumnIndex(int)}.
      */
     @Test
     @Ignore
@@ -142,8 +145,7 @@ public class FIDReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.geotools.arcsde.data.FIDReader#getColumnIndex()}.
+     * Test method for {@link org.geotools.arcsde.data.FIDReader#getColumnIndex()}.
      */
     @Test
     @Ignore
@@ -163,7 +165,8 @@ public class FIDReaderTest {
 
     /**
      * Test method for
-     * {@link org.geotools.arcsde.data.FIDReader#getPropertiesToFetch(org.opengis.feature.simple.SimpleFeatureType)}.
+     * {@link org.geotools.arcsde.data.FIDReader#getPropertiesToFetch(org.opengis.feature.simple.SimpleFeatureType)}
+     * .
      */
     @Test
     @Ignore

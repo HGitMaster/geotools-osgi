@@ -13,10 +13,7 @@ public class FloatBandCopier extends ArcSDERasterBandCopier {
     Logger LOGGER = org.geotools.util.logging.Logging.getLogger(this.getClass().toString());
 
     @Override
-    public void copyPixelData(SeRasterTile tile,
-            WritableRaster raster,
-            int copyOffX,
-            int copyOffY,
+    public void copyPixelData(SeRasterTile tile, WritableRaster raster, int copyOffX, int copyOffY,
             int targetBand) throws DataSourceException {
 
         if (LOGGER.isLoggable(Level.FINER))
@@ -37,7 +34,8 @@ public class FloatBandCopier extends ArcSDERasterBandCopier {
             pixelData = tile.getPixels(pixelData);
             // This is a virtually undocumented function. I figured out what it
             // was supposed to be by looking here:
-            // http://edndoc.esri.com/arcsde/9.2/api/japi/docs/com/esri/sde/sdk/client/SeRasterData.html#setScanLine(int,%20byte[],%20int,%20byte[],%20int)
+            // http://edndoc.esri.com/arcsde/9.2/api/japi/docs/com/esri/sde/sdk/client/SeRasterData.
+            // html#setScanLine(int,%20byte[],%20int,%20byte[],%20int)
             // Basically, it's an array of 1-bit values, fully packed (8 1-bit
             // indicators for 8 pixels packed into each byte).
             // If there's a '0' at the nth position, it means that the n'th
@@ -59,13 +57,13 @@ public class FloatBandCopier extends ArcSDERasterBandCopier {
                 : raster.getHeight();
 
         for (x = 0; x < imgWidth; x++) {
-            //final float[] imageDataRow = new float[imgHeight];
+            // final float[] imageDataRow = new float[imgHeight];
             for (y = 0; y < imgHeight; y++) {
                 final int pixArrayOffset = (y + copyOffY) * tileWidth + (x + copyOffX);
                 if (haveBMData) {
                     if (((bitmaskData[pixArrayOffset / 8] >> (7 - (pixArrayOffset % 8))) & 0x01) == 0x00) {
                         // it's a no-data pixel. Make it transparent/no-data
-                        // TODO:  support nodata values here
+                        // TODO: support nodata values here
                         raster.setSample(x, y, targetBand, 0.0f);
                         continue;
                     }

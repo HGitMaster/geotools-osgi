@@ -64,17 +64,18 @@ import com.esri.sde.sdk.client.SeVersion;
  * Exercises the ArcSDE Java API to ensure our assumptions are correct.
  * <p>
  * Some of this tests asserts the information from the documentation found on <a
- * href="http://arcsdeonline.esri.com">arcsdeonline </a>, and others are needed
- * to validate our assumptions in the API behavior due to the very little
- * documentation ESRI provides about the less obvious things.
+ * href="http://arcsdeonline.esri.com">arcsdeonline </a>, and others are needed to validate our
+ * assumptions in the API behavior due to the very little documentation ESRI provides about the less
+ * obvious things.
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEJavaApiTest.java $
- * @version $Id: ArcSDEJavaApiTest.java 31904 2008-11-22 20:51:53Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/ArcSDEJavaApiTest.java $
+ * @version $Id: ArcSDEJavaApiTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
-public class ArcSDEJavaApiTest  {
+public class ArcSDEJavaApiTest {
     /** package logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(ArcSDEJavaApiTest.class.getPackage().getName());
@@ -103,9 +104,8 @@ public class ArcSDEJavaApiTest  {
     }
 
     /**
-     * loads {@code test-data/testparams.properties} into a Properties object,
-     * wich is used to obtain test tables names and is used as parameter to find
-     * the DataStore
+     * loads {@code test-data/testparams.properties} into a Properties object, wich is used to
+     * obtain test tables names and is used as parameter to find the DataStore
      * 
      * @throws Exception
      *             DOCUMENT ME!
@@ -241,8 +241,7 @@ public class ArcSDEJavaApiTest  {
      * @param spatFilters
      *            spatial filters, may be null
      * @param the
-     *            state identifier to query over a versioned table, may be
-     *            {@code null}
+     *            state identifier to query over a versioned table, may be {@code null}
      * @return the sde calculated counts for the given filter
      * @throws IOException
      * @throws Exception
@@ -601,8 +600,8 @@ public class ArcSDEJavaApiTest  {
     }
 
     /**
-     * Ensures a polygon SeShape behaves as expected, building a simple polygon
-     * and a polygon with a hole.
+     * Ensures a polygon SeShape behaves as expected, building a simple polygon and a polygon with a
+     * hole.
      * 
      * @throws SeException
      *             if it is thrown while constructing the SeShape
@@ -610,8 +609,7 @@ public class ArcSDEJavaApiTest  {
     @Test
     public void testPolygonFormat() throws SeException {
         /*
-         * Generate an area shape composed of two polygons, the first with a
-         * hole
+         * Generate an area shape composed of two polygons, the first with a hole
          */
         int numPts = 4;
         int numParts = 1;
@@ -683,8 +681,7 @@ public class ArcSDEJavaApiTest  {
     @Test
     public void testMultiPolygonFormat() throws SeException {
         /*
-         * Generate an area shape composed of two polygons, the first with a
-         * hole
+         * Generate an area shape composed of two polygons, the first with a hole
          */
         int numPts = 18;
         int numParts = 2;
@@ -742,12 +739,10 @@ public class ArcSDEJavaApiTest  {
     }
 
     /**
-     * Creates an ArcSDE table, "EXAMPLE", and adds a spatial column, "SHAPE",
-     * to it.
+     * Creates an ArcSDE table, "EXAMPLE", and adds a spatial column, "SHAPE", to it.
      * <p>
-     * This code is directly taken from the createBaseTable mehtod of the
-     * arcsdeonline "Working with layers" example, to verify that it works prior
-     * to blame the gt implementation.
+     * This code is directly taken from the createBaseTable mehtod of the arcsdeonline
+     * "Working with layers" example, to verify that it works prior to blame the gt implementation.
      * </p>
      * 
      * @throws SeException
@@ -764,9 +759,8 @@ public class ArcSDEJavaApiTest  {
         final SeColumnDefinition[] colDefs = new SeColumnDefinition[7];
 
         /*
-         * Define the columns and their attributes for the table to be created.
-         * NOTE: The valid range/values of size and scale parameters vary from
-         * one database to another.
+         * Define the columns and their attributes for the table to be created. NOTE: The valid
+         * range/values of size and scale parameters vary from one database to another.
          */
         boolean isNullable = true;
         colDefs[0] = new SeColumnDefinition("INT32_COL", SeColumnDefinition.TYPE_INTEGER, 10, 0,
@@ -794,8 +788,8 @@ public class ArcSDEJavaApiTest  {
                 SeTable table = null;
 
                 /*
-                 * Create a qualified table name with current user's name and
-                 * the name of the table to be created, "EXAMPLE".
+                 * Create a qualified table name with current user's name and the name of the table
+                 * to be created, "EXAMPLE".
                  */
                 String tableName = (connection.getUser() + ".EXAMPLE");
                 table = new SeTable(connection, tableName);
@@ -808,8 +802,8 @@ public class ArcSDEJavaApiTest  {
                 }
 
                 /*
-                 * Create the table using the DBMS default configuration
-                 * keyword. Valid keywords are defined in the dbtune table.
+                 * Create the table using the DBMS default configuration keyword. Valid keywords are
+                 * defined in the dbtune table.
                  */
                 if (LOGGER.isLoggable(Level.FINE)) {
                     LOGGER.fine("\n--> Creating a table using DBMS Default Keyword");
@@ -824,11 +818,10 @@ public class ArcSDEJavaApiTest  {
                 layer.setSpatialColumnName("SHAPE");
 
                 /*
-                 * Set the type of shapes that can be inserted into the layer.
-                 * Shape type can be just one or many. NOTE: Layers that contain
-                 * more than one shape type can only be accessed through the C
-                 * and Java APIs and Arc Explorer Java 3.x. They cannot be seen
-                 * from ArcGIS desktop applications.
+                 * Set the type of shapes that can be inserted into the layer. Shape type can be
+                 * just one or many. NOTE: Layers that contain more than one shape type can only be
+                 * accessed through the C and Java APIs and Arc Explorer Java 3.x. They cannot be
+                 * seen from ArcGIS desktop applications.
                  */
                 layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK
                         | SeLayer.SE_LINE_TYPE_MASK | SeLayer.SE_SIMPLE_LINE_TYPE_MASK
@@ -865,12 +858,10 @@ public class ArcSDEJavaApiTest  {
     } // End method createBaseTable
 
     /**
-     * Creates an ArcSDE table, "EXAMPLE", and adds a spatial column, "SHAPE",
-     * to it.
+     * Creates an ArcSDE table, "EXAMPLE", and adds a spatial column, "SHAPE", to it.
      * <p>
-     * This code is directly taken from the createBaseTable mehtod of the
-     * arcsdeonline "Working with layers" example, to verify that it works prior
-     * to blame the gt implementation.
+     * This code is directly taken from the createBaseTable mehtod of the arcsdeonline
+     * "Working with layers" example, to verify that it works prior to blame the gt implementation.
      * </p>
      * 
      * @throws SeException
@@ -890,8 +881,8 @@ public class ArcSDEJavaApiTest  {
                     IOException {
                 final SeLayer layer = new SeLayer(connection);
                 /*
-                 * Create a qualified table name with current user's name and
-                 * the name of the table to be created, "EXAMPLE".
+                 * Create a qualified table name with current user's name and the name of the table
+                 * to be created, "EXAMPLE".
                  */
                 final String tableName = (connection.getUser() + ".NOTENDSWITHGEOM");
                 final SeTable table = new SeTable(connection, tableName);
@@ -905,8 +896,8 @@ public class ArcSDEJavaApiTest  {
                     }
 
                     /*
-                     * Create the table using the DBMS default configuration
-                     * keyword. Valid keywords are defined in the dbtune table.
+                     * Create the table using the DBMS default configuration keyword. Valid keywords
+                     * are defined in the dbtune table.
                      */
                     if (LOGGER.isLoggable(Level.FINE)) {
                         System.out.println("\n--> Creating a table using DBMS Default Keyword");
@@ -920,9 +911,9 @@ public class ArcSDEJavaApiTest  {
                     SeColumnDefinition[] colDefs = new SeColumnDefinition[7];
 
                     /*
-                     * Define the columns and their attributes for the table to
-                     * be created. NOTE: The valid range/values of size and
-                     * scale parameters vary from one database to another.
+                     * Define the columns and their attributes for the table to be created. NOTE:
+                     * The valid range/values of size and scale parameters vary from one database to
+                     * another.
                      */
                     boolean isNullable = true;
                     colDefs[0] = new SeColumnDefinition("INT32_COL",
@@ -952,12 +943,10 @@ public class ArcSDEJavaApiTest  {
                     layer.setSpatialColumnName("SHAPE");
 
                     /*
-                     * Set the type of shapes that can be inserted into the
-                     * layer. Shape type can be just one or many. NOTE: Layers
-                     * that contain more than one shape type can only be
-                     * accessed through the C and Java APIs and Arc Explorer
-                     * Java 3.x. They cannot be seen from ArcGIS desktop
-                     * applications.
+                     * Set the type of shapes that can be inserted into the layer. Shape type can be
+                     * just one or many. NOTE: Layers that contain more than one shape type can only
+                     * be accessed through the C and Java APIs and Arc Explorer Java 3.x. They
+                     * cannot be seen from ArcGIS desktop applications.
                      */
                     layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK
                             | SeLayer.SE_LINE_TYPE_MASK | SeLayer.SE_SIMPLE_LINE_TYPE_MASK
@@ -1051,8 +1040,8 @@ public class ArcSDEJavaApiTest  {
     }
 
     /**
-     * Does a query over a non autocommit transaction return the added/modified
-     * features and hides the deleted ones?
+     * Does a query over a non autocommit transaction return the added/modified features and hides
+     * the deleted ones?
      * 
      * @throws DataSourceException
      */
@@ -1150,9 +1139,8 @@ public class ArcSDEJavaApiTest  {
     }
 
     /**
-     * Creates a versioned table with two versions, the default one and another
-     * one, makes edits over the default one, checks states are consistent in
-     * both
+     * Creates a versioned table with two versions, the default one and another one, makes edits
+     * over the default one, checks states are consistent in both
      * 
      * @throws Exception
      */
@@ -1268,16 +1256,16 @@ public class ArcSDEJavaApiTest  {
         assertEquals(0, newVersionCount);
     }
 
-    private void insertIntoDifferentTransactionsAndMerge(ISession session) throws IOException{
+    private void insertIntoDifferentTransactionsAndMerge(ISession session) throws IOException {
         SeVersion defaultVersion = session.getDefaultVersion();
         SeState currentState = session.createState(defaultVersion.getStateId());
-        if(currentState.isOpen()){
-            try{
+        if (currentState.isOpen()) {
+            try {
                 currentState.close();
-            }catch(SeException e){
-                
+            } catch (SeException e) {
+
             }
         }
-       // SeState newState1 = session.createchi
+        // SeState newState1 = session.createchi
     }
 }

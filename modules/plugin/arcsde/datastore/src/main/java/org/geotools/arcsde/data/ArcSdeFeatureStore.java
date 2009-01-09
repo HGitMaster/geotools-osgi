@@ -17,10 +17,8 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.pool.Command;
@@ -46,7 +44,7 @@ import com.esri.sde.sdk.client.SeTable;
 public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
         FeatureStore<SimpleFeatureType, SimpleFeature> {
 
-    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
+    private static final Logger LOGGER = Logging.getLogger(ArcSdeFeatureStore.class.getName());
 
     public ArcSdeFeatureStore(final FeatureTypeInfo typeInfo, final ArcSDEDataStore arcSDEDataStore) {
         super(typeInfo, arcSDEDataStore);
@@ -92,7 +90,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     /**
      * @see FeatureStore#addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature>)
      */
-    public List<FeatureId> addFeatures(final FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
+    public List<FeatureId> addFeatures(
+            final FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
             throws IOException {
         // System.err.println(">>addFeatures called at " +
         // Thread.currentThread().getName());
@@ -122,8 +121,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     /**
      * @see FeatureStore#modifyFeatures(AttributeDescriptor[], Object[], Filter)
      */
-    public void modifyFeatures(final AttributeDescriptor[] attributes,
-            final Object[] values,
+    public void modifyFeatures(final AttributeDescriptor[] attributes, final Object[] values,
             final Filter filter) throws IOException {
         final ISession session = getSession();
         try {
@@ -152,8 +150,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     /**
      * @see FeatureStore#modifyFeatures(AttributeDescriptor, Object, Filter)
      */
-    public final void modifyFeatures(final AttributeDescriptor type,
-            final Object value,
+    public final void modifyFeatures(final AttributeDescriptor type, final Object value,
             final Filter filter) throws IOException {
         modifyFeatures(new AttributeDescriptor[] { type, }, new Object[] { value, }, filter);
     }
@@ -216,10 +213,10 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     }
 
     /**
-     * Truncates (removes all the features in) the ArcSDE table named <code>typeName</code> by
-     * using an SeTable with the provided <code>connection</code>. This means if the connection
-     * has a transaction in progress, the truncation takes effect upon commit, otherwise it takes
-     * effect immediately.
+     * Truncates (removes all the features in) the ArcSDE table named <code>typeName</code> by using
+     * an SeTable with the provided <code>connection</code>. This means if the connection has a
+     * transaction in progress, the truncation takes effect upon commit, otherwise it takes effect
+     * immediately.
      * 
      * @param typeName
      * @param session

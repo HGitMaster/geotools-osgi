@@ -1,7 +1,8 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,15 +25,14 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 
 /**
- * Singleton factory that maintains a single
- * {@link ArcSDEConnectionPool connection pool} per set of
+ * Singleton factory that maintains a single {@link ArcSDEConnectionPool connection pool} per set of
  * {@link ArcSDEConnectionConfig connection parameters}.
  * 
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/datastore/src/main/java/org/geotools/arcsde/pool/ArcSDEConnectionPoolFactory.java $
- * @version $Id: ArcSDEConnectionPoolFactory.java 24660 2007-03-02 16:10:44Z
- *          saul.farber $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/datastore/src/main
+ *         /java/org/geotools/arcsde/pool/ArcSDEConnectionPoolFactory.java $
+ * @version $Id: ArcSDEConnectionPoolFactory.java 32195 2009-01-09 19:00:35Z groldan $
  * @deprecated sill here waiting for gce to switch to {@link SessionPoolFactory}
  */
 public class ArcSDEConnectionPoolFactory {
@@ -44,8 +44,7 @@ public class ArcSDEConnectionPoolFactory {
     private static final ArcSDEConnectionPoolFactory singleton = new ArcSDEConnectionPoolFactory();
 
     /**
-     * Map{ArcSDEConnectionConfig,ArcSDEConnectionPool} with per config
-     * connection pool
+     * Map{ArcSDEConnectionConfig,ArcSDEConnectionPool} with per config connection pool
      */
     private final Map currentPools = new HashMap();
 
@@ -66,15 +65,14 @@ public class ArcSDEConnectionPoolFactory {
     }
 
     /**
-     * Creates a connection pool factory for the given connection parameters, or
-     * returns the existing one if there already exists one for that set of
-     * connection params.
+     * Creates a connection pool factory for the given connection parameters, or returns the
+     * existing one if there already exists one for that set of connection params.
      * 
      * @param config
      *             contains the connection parameters and pool preferences
      * 
-     * @return a pool for the given connection parameters, wether it already
-     *         existed or had to be created.
+     * @return a pool for the given connection parameters, wether it already existed or had to be
+     *         created.
      * 
      * @throws DataSourceException
      *             if the pool needs but can't be created
@@ -112,10 +110,9 @@ public class ArcSDEConnectionPoolFactory {
     }
 
     /**
-     * Ensures proper closure of connection pools at this object's finalization
-     * stage.
+     * Ensures proper closure of connection pools at this object's finalization stage.
      */
-    ////@Override
+    // //@Override
     protected void finalize() {
         closeAll();
     }

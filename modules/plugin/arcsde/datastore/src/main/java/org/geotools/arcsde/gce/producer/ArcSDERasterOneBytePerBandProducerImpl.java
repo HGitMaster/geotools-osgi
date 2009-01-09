@@ -32,9 +32,8 @@ public class ArcSDERasterOneBytePerBandProducerImpl extends ArcSDERasterProducer
         super(null, null, SeRasterScanLineGenerator.MASK_ALL_ON);
     }
 
-    public ArcSDERasterOneBytePerBandProducerImpl(SeRasterAttr attr,
-                                                  BufferedImage sourceImage,
-                                                  int maskType) {
+    public ArcSDERasterOneBytePerBandProducerImpl(SeRasterAttr attr, BufferedImage sourceImage,
+            int maskType) {
         super(attr, sourceImage, maskType);
     }
 

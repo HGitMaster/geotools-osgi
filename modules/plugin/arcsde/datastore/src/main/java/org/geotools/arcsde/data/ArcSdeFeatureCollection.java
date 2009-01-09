@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
-import org.geotools.arcsde.pool.ISession;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.store.DataFeatureCollection;
@@ -41,7 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </p>
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: ArcSdeFeatureCollection.java 31927 2008-11-28 18:46:51Z groldan $
+ * @version $Id: ArcSdeFeatureCollection.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
@@ -109,7 +107,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     @Override
     public FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
         final FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-        
+
         reader = featureSource.getfeatureReader(childrenSchema, query);
 
         return reader;
