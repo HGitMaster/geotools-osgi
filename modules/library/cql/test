@@ -1,0 +1,6 @@
+total 8
+drwxr-xr-x 4 mauro mauro   96 2009-01-08 16:07 modified-src
+-rw-r--r-- 1 mauro mauro 4307 2009-01-08 16:07 pom.xml
+drwxr-xr-x 6 mauro mauro  144 2009-01-08 16:07 src
+drwxr-xr-x 8 mauro mauro  328 2009-01-09 12:40 target
+-rw-r--r-- 1 mauro mauro    0 2009-01-09 12:41 test
