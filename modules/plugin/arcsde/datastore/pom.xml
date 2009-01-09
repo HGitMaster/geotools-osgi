@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
+        Version: $Id: pom.xml 32197 2009-01-09 19:03:30Z groldan $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                                http://maven.apache.org/maven-v4_0_0.xsd">
@@ -183,13 +183,7 @@
       </build>
     </profile>
     <profile>
-      <id>haveSDEJars</id>
-      <activation>
-        <property>
-          <name>haveSDEJars</name>
-          <value>true</value>
-        </property>
-      </activation>
+      <id>arcsde</id>
       <dependencies>
         <dependency>
           <groupId>com.esri</groupId>
@@ -200,6 +194,10 @@
           <groupId>com.esri</groupId>
           <artifactId>jsde_jpe_sdk</artifactId>
           <version>${sde.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>com.ibm.icu</groupId>
+          <artifactId>icu4j</artifactId>
         </dependency>
       </dependencies>
       <build>
@@ -226,31 +224,14 @@
                 <include>**/*Test.java</include>
               </includes>
               <excludes>
-                <!-- These tests are currently broken.  Don't enable them -->
-                <exclude>**/FilterTest.java</exclude>
-                <exclude>**/gce/**</exclude>
+                <!-- this ones contains no test cases yet but the surefire plugin tries to run it anyway leading to an initializationError -->
+                <exclude>**/OneByteBandNoColormapReaderTest.java</exclude>
+                <exclude>**/UnsignedByteRGBABandCopierTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
         </plugins>
       </build>
-    </profile>
-    <profile>
-      <!-- this profile auto-drags in the ArcSDE 9.2 dependecy
-           on the icu4j libraries -->
-      <activation>
-        <property>
-          <name>sde.version</name>
-          <value>9.2</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>com.esri</groupId>
-          <artifactId>jsde_icu4j</artifactId>
-          <version>${sde.version}</version>
-        </dependency>
-      </dependencies>
     </profile>
   </profiles>
 </project>
