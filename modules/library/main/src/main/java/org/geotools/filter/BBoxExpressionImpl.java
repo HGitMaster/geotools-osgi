@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.TopologyException;
  * 
  * @author Ian Turton, CCG
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/BBoxExpressionImpl.java $
- * @version $Id: BBoxExpressionImpl.java 32190 2009-01-09 11:13:13Z jesseeichar $
+ * @version $Id: BBoxExpressionImpl.java 32203 2009-01-12 12:51:24Z jesseeichar $
  */
 public class BBoxExpressionImpl
     extends org.geotools.filter.LiteralExpressionImpl implements BBoxExpression {
@@ -95,9 +95,9 @@ public class BBoxExpressionImpl
 
         Polygon polygon = gfac.createPolygon(ring, null);
         if (env instanceof ReferencedEnvelope) {
-			ReferencedEnvelope refEnv = (ReferencedEnvelope) env;
-			polygon.setUserData(CRS.toSRS(refEnv.getCoordinateReferenceSystem()));
-		}
-		super.setValue(polygon);
+            ReferencedEnvelope refEnv = (ReferencedEnvelope) env;
+            polygon.setUserData(refEnv.getCoordinateReferenceSystem());
+        }
+        super.setValue(polygon);
     }
 }

@@ -27,6 +27,7 @@ import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.geometry.BoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -235,8 +236,12 @@ public class BBOXImpl extends AbstractPreparedGeometryFilter implements BBOX {
     	        else if( value instanceof Geometry ){
     	            Geometry geom = (Geometry) value;
     	            env = geom.getEnvelopeInternal();
-    	            if( geom.getUserData() != null && geom.getUserData() instanceof String){
-    	                srs = (String) geom.getUserData();
+    	            if( geom.getUserData() != null){
+    	                if(geom.getUserData() instanceof String){
+    	                    srs = (String) geom.getUserData();
+    	                }else if (geom.getUserData() instanceof CoordinateReferenceSystem) {
+                            srs = CRS.toSRS((CoordinateReferenceSystem) geom.getUserData());
+                        }
     	            }
                 }
     	        else {
