@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Rob Hranac, TOPP
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/GeometryFilterImpl.java $
- * @version $Id: GeometryFilterImpl.java 32200 2009-01-12 08:44:47Z jesseeichar $
+ * @version $Id: GeometryFilterImpl.java 32201 2009-01-12 10:20:34Z jesseeichar $
  *
  * @task REVISIT: make this class (and all filters) immutable, implement
  *       cloneable and return new filters when calling addLeftGeometry and
@@ -159,7 +159,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
             }
         } else {
             // I guess we assume it is a good expression...
-            super.setExpression1(expression);
+            super.setExpression2(expression);
         }
     }
 
