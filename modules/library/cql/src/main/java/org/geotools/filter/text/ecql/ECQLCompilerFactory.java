@@ -15,21 +15,28 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.filter.text.commons;
+package org.geotools.filter.text.ecql;
+
+
+import org.geotools.filter.text.commons.AbstractCompilerFactory;
+import org.geotools.filter.text.commons.ICompiler;
+import org.opengis.filter.FilterFactory;
 
 /**
- * Languages supported by this module
- * 
- * <p>
- * Warning: This component is not published. It is part of module implementation. 
- * Client module should not use this feature.
- * </p>
- * 
+ * Provides the implementation of {@link ECQLCompiler}
+ *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  */
-public enum Language {
+final class ECQLCompilerFactory extends AbstractCompilerFactory {
 
-    ECQL, CQL;
+    /**
+     * Creates an instance of {@link ECQLCompiler}
+     */
+    @Override
+    protected ICompiler createCompiler(final String predicate, final FilterFactory filterFactory) {
+
+        return new ECQLCompiler(predicate, filterFactory);
+    }
 
 }

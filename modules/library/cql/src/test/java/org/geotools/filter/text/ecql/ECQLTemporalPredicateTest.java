@@ -15,21 +15,27 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.filter.text.commons;
+package org.geotools.filter.text.ecql;
+
+import org.geotools.filter.text.commons.Language;
+import org.geotools.filter.text.cql2.CQLTemporalPredicateTest;
+
 
 /**
- * Languages supported by this module
+ * ECQL Temporal predicate
  * 
  * <p>
- * Warning: This component is not published. It is part of module implementation. 
- * Client module should not use this feature.
+ * Executes all cql temporal predicate test using the ECQL parser
  * </p>
- * 
+ *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  */
-public enum Language {
+public class ECQLTemporalPredicateTest extends CQLTemporalPredicateTest {
 
-    ECQL, CQL;
-
+    public ECQLTemporalPredicateTest() {
+        // sets the TXT language used to execute this test case
+        super(Language.ECQL);
+    }
+    
 }

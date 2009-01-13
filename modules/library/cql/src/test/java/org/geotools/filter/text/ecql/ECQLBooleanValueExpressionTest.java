@@ -15,21 +15,25 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.filter.text.commons;
+package org.geotools.filter.text.ecql;
+
+import org.geotools.filter.text.commons.Language;
+import org.geotools.filter.text.cql2.CQLBooleanValueExpressionTest;
 
 /**
- * Languages supported by this module
- * 
+ * Boolean expression test
+ *
  * <p>
- * Warning: This component is not published. It is part of module implementation. 
- * Client module should not use this feature.
+ * Executes the and/or predicates test implemented for CQL using the {@link ECQLCompiler}}
  * </p>
- * 
+ * @see CQLBooleanValueExpression
+ *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  */
-public enum Language {
+public class ECQLBooleanValueExpressionTest extends CQLBooleanValueExpressionTest {
 
-    ECQL, CQL;
-
+    public ECQLBooleanValueExpressionTest() {
+        super(Language.ECQL);
+    }
 }

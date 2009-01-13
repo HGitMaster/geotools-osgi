@@ -15,21 +15,21 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.filter.text.commons;
+package org.geotools.filter.text.ecql;
+
+import org.geotools.filter.text.commons.Language;
+import org.geotools.filter.text.cql2.CQLExpressionTest;
 
 /**
- * Languages supported by this module
- * 
- * <p>
- * Warning: This component is not published. It is part of module implementation. 
- * Client module should not use this feature.
- * </p>
- * 
+ * Expression Test
+ *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  */
-public enum Language {
+public class ECQLExpressionTest extends CQLExpressionTest {
 
-    ECQL, CQL;
-
+    public ECQLExpressionTest(){
+        
+        super(Language.ECQL);
+    }
 }

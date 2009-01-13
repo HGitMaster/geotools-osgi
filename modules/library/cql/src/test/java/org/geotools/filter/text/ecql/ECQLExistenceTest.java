@@ -15,21 +15,24 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.filter.text.commons;
+package org.geotools.filter.text.ecql;
+
+import org.geotools.filter.text.commons.Language;
+import org.geotools.filter.text.cql2.CQLExistenceTest;
 
 /**
- * Languages supported by this module
+ * Test for ECQL Existence Predicate
  * 
  * <p>
- * Warning: This component is not published. It is part of module implementation. 
- * Client module should not use this feature.
+ * Same to CQL
  * </p>
  * 
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  */
-public enum Language {
-
-    ECQL, CQL;
-
+public class ECQLExistenceTest extends CQLExistenceTest {
+    
+    public ECQLExistenceTest(){
+        super(Language.ECQL);
+    }
 }
