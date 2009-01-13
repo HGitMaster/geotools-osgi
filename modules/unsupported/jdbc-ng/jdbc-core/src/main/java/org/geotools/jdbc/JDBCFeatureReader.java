@@ -88,7 +88,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
     /**
      * the feature source the reader originated from. 
      */
-    protected JDBCFeatureStore featureStore;
+    protected JDBCFeatureSource featureSource;
     /**
      * the datastore
      */
@@ -127,21 +127,21 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
     protected Exception tracer;
     protected String[] columnNames;
     
-    public JDBCFeatureReader( String sql, Connection cx, JDBCFeatureStore featureStore, SimpleFeatureType featureType, Hints hints ) 
+    public JDBCFeatureReader( String sql, Connection cx, JDBCFeatureSource featureSource, SimpleFeatureType featureType, Hints hints ) 
         throws SQLException {
-        init( featureStore, featureType, hints );
+        init( featureSource, featureType, hints );
         
         //create the result set
         this.cx = cx;
         st = cx.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        st.setFetchSize(featureStore.getDataStore().getFetchSize());
+        st.setFetchSize(featureSource.getDataStore().getFetchSize());
         rs = st.executeQuery(sql);
     }
     
-    public JDBCFeatureReader( PreparedStatement st, Connection cx, JDBCFeatureStore featureStore, SimpleFeatureType featureType, Hints hints ) 
+    public JDBCFeatureReader( PreparedStatement st, Connection cx, JDBCFeatureSource featureSource, SimpleFeatureType featureType, Hints hints ) 
         throws SQLException {
             
-        init( featureStore, featureType, hints );
+        init( featureSource, featureType, hints );
         
         //create the result set
         this.cx = cx;
@@ -149,7 +149,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         rs = st.executeQuery();
     }
     
-    protected void init( JDBCFeatureStore featureStore, SimpleFeatureType featureType, Hints hints ) {
+    protected void init( JDBCFeatureSource featureSource, SimpleFeatureType featureType, Hints hints ) {
         // init the tracer if we need to debug a connection leak
         if(TRACE_ENABLED) {
             tracer = new Exception();
@@ -157,10 +157,10 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         }
         
         // init base fields
-        this.featureStore = featureStore;
-        this.dataStore = featureStore.getDataStore();
+        this.featureSource = featureSource;
+        this.dataStore = featureSource.getDataStore();
         this.featureType = featureType;
-        this.tx = featureStore.getTransaction();
+        this.tx = featureSource.getTransaction();
         this.hints = hints;
         
         //grab a geometry factory... check for a special hint
@@ -184,7 +184,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         // from the datastore
         FeatureFactory ff = (FeatureFactory) hints.get(Hints.FEATURE_FACTORY);
         if(ff == null)
-            ff = featureStore.getDataStore().getFeatureFactory();
+            ff = featureSource.getDataStore().getFeatureFactory();
         builder = new SimpleFeatureBuilder(featureType, ff);
     }
     
@@ -659,7 +659,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
             dataStore.closeSafe( rs );
             dataStore.closeSafe( st );
 
-            dataStore.releaseConnection(cx, featureStore.getState() );
+            dataStore.releaseConnection(cx, featureSource.getState() );
         }
         else {
             //means we are already closed... should we throw an exception?
@@ -677,7 +677,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         rs = null;
         st = null;
         dataStore = null;
-        featureStore = null;
+        featureSource = null;
         featureType = null;
         geometryFactory = null;
         tx = null;

@@ -19,6 +19,7 @@ package org.geotools.jdbc;
 import java.util.Collections;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -146,5 +147,10 @@ public abstract class JDBCPrimaryKeyTest extends JDBCTestSupport {
         Id id = ff.id( Collections.singleton( ff.featureId( tname("multi") + ".1.x") ) );
         features = fs.getFeatures( id );
         assertEquals( 1, features.size() );
+    }
+    
+    public void testNullPrimaryKey() throws Exception {
+        JDBCFeatureSource fs = (JDBCFeatureSource) dataStore.getFeatureSource(tname("nokey"));
+        assertFalse( fs instanceof FeatureStore );
     }
 }

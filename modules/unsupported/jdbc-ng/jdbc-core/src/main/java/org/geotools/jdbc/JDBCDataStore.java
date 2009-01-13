@@ -582,7 +582,11 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected ContentFeatureSource createFeatureSource(ContentEntry entry)
         throws IOException {
-        //TODO: read only access
+        //check primary key to figure out if we must return a read only (feature source)
+        PrimaryKey pkey = getPrimaryKey(entry);
+        if ( pkey == null || pkey instanceof NullPrimaryKey ) {
+            return new JDBCFeatureSource(entry,null);
+        }
         return new JDBCFeatureStore(entry,null);
     }
 
