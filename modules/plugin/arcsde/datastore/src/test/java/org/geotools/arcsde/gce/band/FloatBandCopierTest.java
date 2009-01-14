@@ -35,6 +35,7 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterTestData;
+import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.util.logging.Logging;
@@ -75,7 +76,7 @@ public class FloatBandCopierTest {
 
     @Test
     public void testReadAlignedFloatTile() throws Exception {
-        final String tableName = rasterTestData.getFloatRasterTableName();
+        final String tableName = rasterTestData.getRasterTableName(RasterTableName.FLOAT);
 
         ArcSDEPooledConnection conn = null;
         try {

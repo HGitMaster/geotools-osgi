@@ -24,6 +24,9 @@ import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -51,6 +54,9 @@ import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterAttr;
 import com.esri.sde.sdk.client.SeRasterColumn;
 import com.esri.sde.sdk.client.SeRasterConstraint;
+import com.esri.sde.sdk.client.SeRasterConsumer;
+import com.esri.sde.sdk.client.SeRasterProducer;
+import com.esri.sde.sdk.client.SeRasterRenderedImage;
 import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
@@ -60,6 +66,16 @@ import com.esri.sde.sdk.pe.PePCSDefs;
 import com.esri.sde.sdk.pe.PeProjectedCS;
 
 public class RasterTestData {
+
+    /**
+     * Enumeration to create the raster test table names from
+     * 
+     * @see RasterTestData#getRasterTableName(RasterTableName)
+     */
+    public enum RasterTableName {
+        ONEBIT, RGB, RGB_CM, RGBA, GRAYSCALE, FLOAT
+
+    }
 
     private TestData testData;
 
@@ -82,39 +98,26 @@ public class RasterTestData {
         return this._pool;
     }
 
-    /*
-     * Names for the raster data test tables
-     */
-    public String get1bitRasterTableName() throws UnavailableArcSDEConnectionException, IOException {
-        return testData.getTempTableName() + "_ONEBITRASTER";
-    }
-
-    public String getRGBRasterTableName() throws UnavailableArcSDEConnectionException, IOException {
-        return testData.getTempTableName() + "_RGBRASTER";
-    }
-
-    public String getRGBARasterTableName() throws UnavailableArcSDEConnectionException, IOException {
-        return testData.getTempTableName() + "_RGBARASTER";
-    }
-
-    public String getRGBColorMappedRasterTableName() throws UnavailableArcSDEConnectionException,
-            IOException {
-        return testData.getTempTableName() + "_RGBRASTER_CM";
-    }
-
-    public String getGrayScaleOneByteRasterTableName() throws UnavailableArcSDEConnectionException,
-            IOException {
-        return testData.getTempTableName() + "_GRAYSCALERASTER";
-    }
-
-    public String getFloatRasterTableName() throws UnavailableArcSDEConnectionException,
-            IOException {
-        return testData.getTempTableName() + "_FLOATRASTER";
+    public String getRasterTableName(RasterTableName forTable) throws IOException {
+        String testTableName = testData.getTempTableName() + "_RASTER_" + forTable;
+        return testTableName;
     }
 
     public String getRasterTestDataProperty(String propName) {
         return testData.getConProps().getProperty(propName);
     }
+
+    // public void load1bitRaster() throws Exception {
+    // final String tableName = getRasterTableName(RasterTableName.ONEBIT);
+    // final int numberOfBands = 1;
+    // final int pixelType = SeRaster.SE_PIXEL_TYPE_1BIT;
+    // final boolean pyramiding = true;
+    // final boolean skipLevelOne = false;
+    // final int interpolationType = SeRaster.SE_INTERPOLATION_NEAREST;
+    // final IndexColorModel colorModel = null;
+    // loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding, skipLevelOne,
+    // interpolationType);
+    // }
 
     /**
      * Loads the 1bit raster test data into the table given in
@@ -124,7 +127,7 @@ public class RasterTestData {
      */
     public void load1bitRaster() throws Exception {
         ArcSDEPooledConnection conn = getConnectionPool().getConnection();
-        final String tableName = get1bitRasterTableName();
+        final String tableName = getRasterTableName(RasterTableName.ONEBIT);
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
@@ -148,7 +151,7 @@ public class RasterTestData {
      * @throws Exception
      */
     public void loadRGBRaster() throws Exception {
-        final String tableName = getRGBRasterTableName();
+        final String tableName = getRasterTableName(RasterTableName.RGB);
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
@@ -167,7 +170,7 @@ public class RasterTestData {
     }
 
     public void loadRGBColorMappedRaster() throws Exception {
-        final String tableName = getRGBColorMappedRasterTableName();
+        final String tableName = getRasterTableName(RasterTableName.RGB_CM);
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
@@ -189,7 +192,7 @@ public class RasterTestData {
     }
 
     public void loadOneByteGrayScaleRaster() throws Exception {
-        final String tableName = getGrayScaleOneByteRasterTableName();
+        final String tableName = getRasterTableName(RasterTableName.GRAYSCALE);
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
@@ -210,7 +213,7 @@ public class RasterTestData {
     }
 
     public void loadFloatRaster() throws Exception {
-        final String tableName = getFloatRasterTableName();
+        final String tableName = getRasterTableName(RasterTableName.FLOAT);
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
@@ -334,14 +337,237 @@ public class RasterTestData {
         }
     }
 
+    public void loadRGBARaster() throws Exception {
+        final String tableName = getRasterTableName(RasterTableName.RGBA);
+        final int numberOfBands = 4;
+        final int pixelType = SeRaster.SE_PIXEL_TYPE_8BIT_U;
+        final boolean pyramiding = true;
+        final boolean skipLevelOne = false;
+        final int interpolationType = SeRaster.SE_INTERPOLATION_NEAREST;
+        final IndexColorModel colorModel = null;
+        loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding, skipLevelOne,
+                interpolationType);
+    }
+
+    /**
+     * Creates a a raster in the database with NO pyramiding, some default settings and the provided
+     * parameters.
+     * <p>
+     * Default settings
+     * <ul>
+     * <li>CRS: PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M
+     * <li>Extent: minx=0, miny=0, maxx=512, maxy=512
+     * <li>Width: 256
+     * <li>Height: 256
+     * <li>Tile size: 64x64 (being less than the recommended minimum of 128, but ok for our testing
+     * purposes)
+     * <li>Compression: none
+     * <li>Pyramid: none
+     * </ul>
+     * </p>
+     * 
+     * @param tableName
+     *            the name of the table to create
+     * @param numberOfBands
+     *            the number of bands of the raster
+     * @param pixelType
+     *            the pixel (cell) depth of the raster bands (one of the {@code
+     *            SeRaster#SE_PIXEL_TYPE_*} constants)
+     * @param colorModel
+     *            the color model to apply to the raster, may be {@code null}. A non null value adds
+     *            as precondition that {@code numberOfBands == 1}
+     * @throws Exception
+     */
+    public void loadTestRaster(final String tableName, final int numberOfBands,
+            final int pixelType, final IndexColorModel colorModel) throws Exception {
+        final boolean pyramiding = false;
+        final boolean skipLevelOne = false;
+        final int interpolationType = SeRaster.SE_INTERPOLATION_NONE;
+        loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding, skipLevelOne,
+                interpolationType);
+    }
+
+    /**
+     * Creates a a raster in the database with some default settings and the provided parameters.
+     * <p>
+     * Default settings
+     * <ul>
+     * <li>CRS: PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M
+     * <li>Extent: minx=0, miny=0, maxx=512, maxy=512
+     * <li>Width: 256
+     * <li>Height: 256
+     * <li>Tile size: 64x64 (being less than the recommended minimum of 128, but ok for our testing
+     * purposes)
+     * <li>Compression: none
+     * </ul>
+     * </p>
+     * 
+     * @param tableName
+     *            the name of the table to create
+     * @param numberOfBands
+     *            the number of bands of the raster
+     * @param pixelType
+     *            the pixel (cell) depth of the raster bands (one of the {@code
+     *            SeRaster#SE_PIXEL_TYPE_*} constants)
+     * @param colorModel
+     *            the color model to apply to the raster, may be {@code null}. A non null value adds
+     *            as precondition that {@code numberOfBands == 1}
+     * @param pyramiding
+     *            whether to create tiles or not for the raster. If {@code true} and {@code
+     *            skipLevelOne == true} a pyramid with three levels will be created, avoiding to
+     *            create the pyramid tiles for level 0 (same dimension as the source raster). If
+     *            {@code skipLevelOne == false}, even for level 0 the pyramid tiles will be created,
+     *            that is, four levels.
+     * @param skipLevelOne
+     *            only relevant if {@code pyramiding == true}, {@code true} indicates not to create
+     *            pyramid tiles for the first level, since its equal in dimension than the source
+     *            raster
+     * @param interpolationType
+     *            only relevant if {@code pyramiding == true}, indicates which interpolation method
+     *            to use in building the pyramid tiles. Shall be one of
+     *            {@link SeRaster#SE_INTERPOLATION_NONE}, {@link SeRaster#SE_INTERPOLATION_BICUBIC},
+     *            {@link SeRaster#SE_INTERPOLATION_BILINEAR},
+     *            {@link SeRaster#SE_INTERPOLATION_NEAREST}.
+     * @throws Exception
+     */
+    public void loadTestRaster(final String tableName, final int numberOfBands,
+            final int pixelType, final IndexColorModel colorModel, final boolean pyramiding,
+            final boolean skipLevelOne, final int interpolationType) throws Exception {
+
+        if (colorModel != null && numberOfBands > 1) {
+            throw new IllegalArgumentException(
+                    "Indexed rasters shall contain a single band. numberOfBands = " + numberOfBands);
+        }
+        {
+            // clean out the table if it's currently in-place
+            testData.deleteTable(tableName);
+            // build the base business table. We'll add the raster data to it in a bit
+            // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
+            ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+            try {
+                createRasterBusinessTempTable(tableName, conn);
+            } finally {
+                conn.close();
+            }
+        }
+
+        final SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
+
+        final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+        try {
+            // much of this code is from
+            // http://edndoc.esri.com/arcsde/9.2/concepts/rasters/dataloading/dataloading.htm
+            SeRasterColumn rasCol = new SeRasterColumn(conn);
+            rasCol.setTableName(tableName);
+            rasCol.setDescription("Sample geotools ArcSDE raster test-suite data.");
+            rasCol.setRasterColumnName("RASTER");
+            rasCol.setCoordRef(crs);
+            rasCol.setConfigurationKeyword(testData.getConfigKeyword());
+
+            rasCol.create();
+
+            // now start loading the actual raster data
+            final int imageWidth = 256;
+            final int imageHeight = 256;
+
+            SeRasterAttr attr = new SeRasterAttr(true);
+            attr.setImageSize(imageWidth, imageHeight, numberOfBands);
+            attr.setTileSize(64, 64); // this is lower than the recommended minimum of 128,128 but
+            // it's ok for our testing purposes
+            attr.setPixelType(pixelType);
+            attr.setCompressionType(SeRaster.SE_COMPRESSION_NONE);
+            if (pyramiding) {
+                final int numOfLevels = skipLevelOne ? 3 : 4;
+                attr.setPyramidInfo(numOfLevels, skipLevelOne, interpolationType);
+            }
+            attr.setMaskMode(false);
+            attr.setImportMode(false);
+
+            SeExtent extent = new SeExtent(0, 0, 2 * imageWidth, 2 * imageHeight);
+            attr.setExtent(extent);
+            // attr.setImageOrigin();
+
+            SeRasterProducer prod = new SeRasterProducer() {
+                public void addConsumer(SeRasterConsumer consumer) {
+                }
+
+                public boolean isConsumer(SeRasterConsumer consumer) {
+                    return false;
+                }
+
+                public void removeConsumer(SeRasterConsumer consumer) {
+                }
+
+                /**
+                 * Note that due to some synchronization problems inherent in the SDE api code, the
+                 * startProduction() method MUST return before consumer.setScanLines() or
+                 * consumer.setRasterTiles() is called. Hence the thread implementation.
+                 */
+                public void startProduction(final SeRasterConsumer consumer) {
+                    if (!(consumer instanceof SeRasterRenderedImage)) {
+                        throw new IllegalArgumentException(
+                                "You must set SeRasterAttr.setImportMode(false) to "
+                                        + "load data using this SeProducer implementation.");
+                    }
+
+                    Thread runme = new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                PixelSampler sampler = PixelSampler.getSampler(pixelType);
+                                // for each band...
+                                for (int bandN = 0; bandN < numberOfBands; bandN++) {
+                                    final byte[] imgBandData;
+                                    imgBandData = sampler.getImgBandData(imageWidth, imageHeight);
+                                    consumer.setScanLines(imageHeight, imgBandData, null);
+                                    consumer.rasterComplete(SeRasterConsumer.SINGLEFRAMEDONE);
+                                }
+                                consumer.rasterComplete(SeRasterConsumer.STATICIMAGEDONE);
+                            } catch (Exception se) {
+                                se.printStackTrace();
+                                consumer.rasterComplete(SeRasterConsumer.IMAGEERROR);
+                            }
+                        }
+                    };
+                    runme.start();
+                }
+            };
+            attr.setRasterProducer(prod);
+
+            try {
+                SeInsert insert = new SeInsert(conn);
+                insert.intoTable(tableName, new String[] { "RASTER" });
+                // no buffered writes on raster loads
+                insert.setWriteMode(false);
+                SeRow row = insert.getRowToSet();
+                row.setRaster(0, attr);
+
+                insert.execute();
+                insert.close();
+            } catch (SeException se) {
+                se.printStackTrace();
+                throw se;
+            }
+
+            // if there's a colormap to insert, let's add that too
+            // if (colorModel != null) {
+            // attr = getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
+            // // attr.getBands()[0].setColorMap(SeRaster.SE_COLORMAP_DATA_BYTE, );
+            // // NOT IMPLEMENTED FOR NOW!
+            // }
+        } finally {
+            conn.close();
+        }
+    }
+
     public void tearDown() throws Exception {
         // destroy all sample tables;
-        testData.deleteTable(get1bitRasterTableName());
-        testData.deleteTable(getRGBRasterTableName());
-        testData.deleteTable(getRGBARasterTableName());
-        testData.deleteTable(getGrayScaleOneByteRasterTableName());
-        testData.deleteTable(getRGBColorMappedRasterTableName());
-        testData.deleteTable(getFloatRasterTableName());
+        testData.deleteTable(getRasterTableName(RasterTableName.ONEBIT));
+        testData.deleteTable(getRasterTableName(RasterTableName.RGB));
+        testData.deleteTable(getRasterTableName(RasterTableName.RGBA));
+        testData.deleteTable(getRasterTableName(RasterTableName.GRAYSCALE));
+        testData.deleteTable(getRasterTableName(RasterTableName.RGB_CM));
+        testData.deleteTable(getRasterTableName(RasterTableName.FLOAT));
     }
 
     /**
@@ -448,6 +674,196 @@ public class RasterTestData {
             throw new DataSourceException(se);
         } finally {
             conn.close();
+        }
+    }
+
+    private static abstract class PixelSampler {
+
+        private static Map<Integer, PixelSampler> byPixelTypeSamplers = new HashMap<Integer, PixelSampler>();
+        static {
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_1BIT),
+                    new SamplerType1Bit());
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_4BIT),
+                    new SamplerType4Bit());
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_8BIT_U),
+                    new SamplerType8BitUnsigned());
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_8BIT_S),
+                    new SamplerType8BitSigned());
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_16BIT_U),
+                    new SamplerType16BitUnsigned());
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_16BIT_S),
+                    new SamplerType16BitSigned());
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_32BIT_U),
+                    new SamplerType32BitUnsigned());
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_32BIT_S),
+                    new SamplerType32BitSigned());
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_32BIT_REAL),
+                    new SamplerType32BitReal());
+            byPixelTypeSamplers.put(Integer.valueOf(SeRaster.SE_PIXEL_TYPE_64BIT_REAL),
+                    new SamplerType64BitReal());
+        }
+
+        public static PixelSampler getSampler(final int sePixelType) {
+            PixelSampler sampler = byPixelTypeSamplers.get(Integer.valueOf(sePixelType));
+            if (sampler == null) {
+                throw new NoSuchElementException("no pixel sampler exists for pixel type "
+                        + sePixelType);
+            }
+            return sampler;
+        }
+
+        public abstract byte[] getImgBandData(final int imgWidth, final int imgHeight);
+
+        /**
+         * Pixel sampler for creating test data with pixel type {@link SeRaster#SE_PIXEL_TYPE_1BIT}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType1Bit extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                final byte[] imgBandData = new byte[(imgWidth * imgHeight) / 8];
+                for (int bytePos = 0; bytePos < imgBandData.length; bytePos++) {
+                    if (bytePos % 2 == 0) {
+                        imgBandData[bytePos] = (byte) 0xFF;
+                    } else {
+                        imgBandData[bytePos] = (byte) 0x00;
+                    }
+                }
+                return imgBandData;
+            }
+        }
+
+        /**
+         * Pixel sampler for creating test data with pixel type {@link SeRaster#SE_PIXEL_TYPE_4BIT}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType4Bit extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                throw new UnsupportedOperationException(
+                        "sampler for pixel type 4BIT not yet implemented");
+            }
+        }
+
+        /**
+         * Pixel sampler for creating test data with pixel type
+         * {@link SeRaster#SE_PIXEL_TYPE_8BIT_U}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType8BitUnsigned extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                // luckily the byte-packed data format in MultiPixelPackedSampleModel is identical
+                // to the one-bit-per-pixel format expected by ArcSDE.
+                final byte[] imgBandData = new byte[imgWidth * imgHeight];
+                for (int w = 0; w < imgWidth; w++) {
+                    for (int h = 0; h < imgHeight; h++) {
+                        imgBandData[(w * imgHeight) + h] = (byte) h;
+                    }
+                }
+                return imgBandData;
+            }
+        }
+
+        /**
+         * Pixel sampler for creating test data with pixel type
+         * {@link SeRaster#SE_PIXEL_TYPE_8BIT_S}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType8BitSigned extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                throw new UnsupportedOperationException(
+                        "sampler for pixel type 8BIT_S not yet implemented");
+            }
+        }
+
+        /**
+         * Pixel sampler for creating test data with pixel type
+         * {@link SeRaster#SE_PIXEL_TYPE_16BIT_U}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType16BitUnsigned extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                throw new UnsupportedOperationException(
+                        "sampler for pixel type 16BIT_U not yet implemented");
+            }
+        }
+
+        /**
+         * Pixel sampler for creating test data with pixel type
+         * {@link SeRaster#SE_PIXEL_TYPE_16BIT_S}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType16BitSigned extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                throw new UnsupportedOperationException(
+                        "sampler for pixel type 16BIT_S not yet implemented");
+            }
+        }
+
+        /**
+         * Pixel sampler for creating test data with pixel type
+         * {@link SeRaster#SE_PIXEL_TYPE_32BIT_U}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType32BitUnsigned extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                throw new UnsupportedOperationException(
+                        "sampler for pixel type 32BIT_U not yet implemented");
+            }
+        }
+
+        /**
+         * Pixel sampler for creating test data with pixel type
+         * {@link SeRaster#SE_PIXEL_TYPE_32BIT_S}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType32BitSigned extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                throw new UnsupportedOperationException(
+                        "sampler for pixel type 32BIT_S not yet implemented");
+            }
+        }
+
+        /**
+         * Pixel sampler for creating test data with pixel type
+         * {@link SeRaster#SE_PIXEL_TYPE_32BIT_REAL}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType32BitReal extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                throw new UnsupportedOperationException(
+                        "sampler for pixel type 16BIT_REAL not yet implemented");
+            }
+        }
+
+        /**
+         * Pixel sampler for creating test data with pixel type
+         * {@link SeRaster#SE_PIXEL_TYPE_64BIT_REAL}
+         * 
+         * @see PixelSampler#getImgBandData(int, int)
+         */
+        private static class SamplerType64BitReal extends PixelSampler {
+            @Override
+            public byte[] getImgBandData(int imgWidth, int imgHeight) {
+                throw new UnsupportedOperationException(
+                        "sampler for pixel type 64BIT_REAL not yet implemented");
+            }
         }
     }
 }

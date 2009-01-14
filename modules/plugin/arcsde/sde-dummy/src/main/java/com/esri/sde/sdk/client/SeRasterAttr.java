@@ -32,5 +32,7 @@ public class SeRasterAttr {
     public void setImportMode(boolean b) {}
     public void setExtent(SeExtent ext) {}
     public void setRasterProducer(SeRasterProducer p) {}
+
+    public void setPyramidInfo(int maxLevel, boolean skipLevelOne, int interpolation) throws SeException{}
     
 }

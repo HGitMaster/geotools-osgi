@@ -19,6 +19,7 @@ package org.geotools.arcsde.gce;
 
 import java.awt.Rectangle;
 
+import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ public class ArcSDERasterProducerTest {
         rtd.setUp();
         rtd.loadRGBColorMappedRaster();
 
-        SeRasterAttr attr = rtd.getRasterAttributes(rtd.getRGBColorMappedRasterTableName(),
+        SeRasterAttr attr = rtd.getRasterAttributes(rtd.getRasterTableName(RasterTableName.RGB_CM),
                 new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
         SeRasterBand[] bands = attr.getBands();
 
@@ -50,8 +51,9 @@ public class ArcSDERasterProducerTest {
         rtd.setUp();
         rtd.loadOneByteGrayScaleRaster();
 
-        SeRasterAttr attr = rtd.getRasterAttributes(rtd.getGrayScaleOneByteRasterTableName(),
-                new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
+        SeRasterAttr attr = rtd.getRasterAttributes(rtd
+                .getRasterTableName(RasterTableName.GRAYSCALE), new Rectangle(0, 0, 0, 0), 0,
+                new int[] { 1 });
         Assert.assertTrue(attr.getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_U);
         Assert.assertTrue(attr.getNumBands() == 1);
         Assert.assertTrue(attr.getBandInfo(1).hasColorMap() == false);
@@ -65,8 +67,8 @@ public class ArcSDERasterProducerTest {
         rtd.setUp();
         rtd.loadFloatRaster();
 
-        SeRasterAttr attr = rtd.getRasterAttributes(rtd.getFloatRasterTableName(), new Rectangle(0,
-                0, 0, 0), 0, new int[] { 1 });
+        SeRasterAttr attr = rtd.getRasterAttributes(rtd.getRasterTableName(RasterTableName.FLOAT),
+                new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
         Assert.assertTrue(attr.getPixelType() == SeRaster.SE_PIXEL_TYPE_32BIT_REAL);
         Assert.assertTrue(attr.getNumBands() == 1);
         Assert.assertTrue(attr.getBandInfo(1).hasColorMap() == false);

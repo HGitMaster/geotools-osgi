@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
 import org.geotools.arcsde.gce.RasterTestData;
+import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -66,7 +67,8 @@ public class RGBGridCoverageReaderTest {
 
         String rgbUrl = "sde://" + config.getUserName() + ":" + config.getUserPassword() + "@"
                 + config.getServerName() + ":" + config.getPortNumber() + "/"
-                + config.getDatabaseName() + "#" + rasterTestData.getRGBRasterTableName();
+                + config.getDatabaseName() + "#"
+                + rasterTestData.getRasterTableName(RasterTableName.RGB);
 
         GridCoverage2D gc;
         Format f = new ArcSDERasterFormatFactory().createFormat();

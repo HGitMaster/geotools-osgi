@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import org.geotools.arcsde.gce.ArcSDEPyramid;
 import org.geotools.arcsde.gce.RasterTestData;
+import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -46,7 +47,7 @@ public class OneByteBandNoColormapReaderTest {
     static Logger LOGGER = Logging.getLogger(OneByteBandNoColormapReaderTest.class
             .getCanonicalName());
 
-    //@BeforeClass
+    @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
@@ -61,7 +62,7 @@ public class OneByteBandNoColormapReaderTest {
 
             // Set up a pyramid and readerprops for the sample three-band imagery
             conn = rasterTestData.getConnectionPool().getConnection();
-            tableName = rasterTestData.getGrayScaleOneByteRasterTableName();
+            tableName = rasterTestData.getRasterTableName(RasterTableName.GRAYSCALE);
             q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
@@ -91,7 +92,7 @@ public class OneByteBandNoColormapReaderTest {
         }
     }
 
-    //@AfterClass
+    @AfterClass
     public static void tearDownAfterClass() throws Exception {
         rasterTestData.tearDown();
     }

@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterTestData;
+import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.util.logging.Logging;
@@ -65,7 +66,7 @@ public class UnsignedByteGrayscaleBandCopierTest {
 
     @Test
     public void testLiveGrayScaleRasterTile() throws Exception {
-        final String tableName = rasterTestData.getGrayScaleOneByteRasterTableName();
+        final String tableName = rasterTestData.getRasterTableName(RasterTableName.GRAYSCALE);
 
         ArcSDEPooledConnection session = null;
         try {

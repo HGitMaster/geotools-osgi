@@ -24,6 +24,7 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
 import org.geotools.arcsde.gce.RasterTestData;
+import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -70,7 +71,7 @@ public class OneBitGridCoverageReaderTest {
     @Test
     public void testRead1bitCoverageExact() throws Exception {
 
-        final String oneBitTableName = rasterTestData.get1bitRasterTableName();
+        final String oneBitTableName = rasterTestData.getRasterTableName(RasterTableName.ONEBIT);
 
         GridCoverage2D gc;
         Format f = new ArcSDERasterFormatFactory().createFormat();
@@ -106,7 +107,7 @@ public class OneBitGridCoverageReaderTest {
     @Test
     public void testRead1bitCoverageReproject() throws Exception {
 
-        final String oneBitTableName = rasterTestData.get1bitRasterTableName();
+        final String oneBitTableName = rasterTestData.getRasterTableName(RasterTableName.ONEBIT);
 
         GridCoverage2D gc;
         Format f = new ArcSDERasterFormatFactory().createFormat();

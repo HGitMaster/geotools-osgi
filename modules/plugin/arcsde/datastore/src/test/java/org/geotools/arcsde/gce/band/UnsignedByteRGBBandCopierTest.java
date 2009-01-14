@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterTestData;
+import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.util.logging.Logging;
@@ -67,7 +68,7 @@ public class UnsignedByteRGBBandCopierTest {
     public void testLiveRGBRasterTile() throws Exception {
 
         rasterTestData.loadRGBRaster();
-        final String tableName = rasterTestData.getRGBRasterTableName();
+        final String tableName = rasterTestData.getRasterTableName(RasterTableName.RGB);
 
         ArcSDEPooledConnection conn = null;
         try {

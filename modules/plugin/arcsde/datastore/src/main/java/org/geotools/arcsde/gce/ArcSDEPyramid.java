@@ -63,6 +63,8 @@ public class ArcSDEPyramid {
             tileWidth = rasterAttributes.getTileWidth();
             tileHeight = rasterAttributes.getTileHeight();
 
+            // TODO: revisit, I guess level 0 may not exist if the pyramid was created with the omit
+            // level 0 flag, leading to an exception in getExtentByLevel(0)
             for (int i = 0; i < numLevels; i++) {
                 if (i == 1 && rasterAttributes.skipLevelOne()) {
                     continue;

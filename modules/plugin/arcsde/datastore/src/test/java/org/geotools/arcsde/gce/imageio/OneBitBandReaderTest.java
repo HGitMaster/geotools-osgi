@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.gce.ArcSDEPyramid;
 import org.geotools.arcsde.gce.RasterTestData;
+import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -70,7 +71,7 @@ public class OneBitBandReaderTest {
 
             // Set up a pyramid and readerprops for the sample three-band imagery
             conn = rasterTestData.getConnectionPool().getConnection();
-            tableName = rasterTestData.get1bitRasterTableName();
+            tableName = rasterTestData.getRasterTableName(RasterTableName.ONEBIT);
             q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
