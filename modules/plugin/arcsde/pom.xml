@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+        Version: $Id: pom.xml 32215 2009-01-14 01:48:14Z groldan $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                                http://maven.apache.org/maven-v4_0_0.xsd">
@@ -60,12 +60,11 @@
   </developers>
 
   <properties>
-    <!-- default SDE version is 9.0.  These jars are freely available (err,
-        at least they're available on maven.geotools.fr and were down-
-        loaded without a click-through license.  If you have newer jars
-        and you wish to develop against them, then you need to inject
-        them yourself, and then set the sde.version maven property -->
-    <sde.version>9.0</sde.version>
+    <!-- default SDE version is 9.2.
+       if you want to use newer ESRI ArcSDE Java API jars, provided that you
+       installed them through mvn install:install-file in your local repo, just
+       run maven with mvn -Parcsde -Dsde.version={desired version} -->
+    <sde.version>9.2</sde.version>
   </properties>
 
 
