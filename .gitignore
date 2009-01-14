@@ -1,0 +1,6 @@
+modules/library/cql/target
+modules/library/main/.project
+modules/library/main/.classpath
+modules/library/main/.settings
+modules/library/main/target
+*~
