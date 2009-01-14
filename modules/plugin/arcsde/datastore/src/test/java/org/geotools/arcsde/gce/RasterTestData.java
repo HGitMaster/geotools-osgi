@@ -89,6 +89,14 @@ public class RasterTestData {
         testData.setUp();
     }
 
+    public void tearDown() throws Exception {
+        // destroy all sample tables;
+        for(RasterTableName table : RasterTableName.values()){
+            String tableName = getRasterTableName(table);
+            testData.deleteTable(tableName);
+        }
+    }
+
     public ArcSDEConnectionPool getConnectionPool() throws DataSourceException {
         if (this._pool == null) {
             ArcSDEConnectionPoolFactory pfac = ArcSDEConnectionPoolFactory.getInstance();
@@ -558,16 +566,6 @@ public class RasterTestData {
         } finally {
             conn.close();
         }
-    }
-
-    public void tearDown() throws Exception {
-        // destroy all sample tables;
-        testData.deleteTable(getRasterTableName(RasterTableName.ONEBIT));
-        testData.deleteTable(getRasterTableName(RasterTableName.RGB));
-        testData.deleteTable(getRasterTableName(RasterTableName.RGBA));
-        testData.deleteTable(getRasterTableName(RasterTableName.GRAYSCALE));
-        testData.deleteTable(getRasterTableName(RasterTableName.RGB_CM));
-        testData.deleteTable(getRasterTableName(RasterTableName.FLOAT));
     }
 
     /**
