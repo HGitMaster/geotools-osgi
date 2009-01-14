@@ -108,8 +108,8 @@ public class TTFMarkFactory implements MarkFactory {
         Rectangle2D bounds = s.getBounds2D();
         AffineTransform tx = new AffineTransform();
         double max = Math.max(bounds.getWidth(), bounds.getHeight());
-        tx.translate(-0.5, 0.5);
         tx.scale(1 / max, 1 / max);
+        tx.translate(-bounds.getCenterX(), -bounds.getCenterY());
         return tx.createTransformedShape(s);
     }
 
