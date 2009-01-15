@@ -248,7 +248,16 @@ public class WFSTransactionState implements State {
         while (i.hasNext()) {
             String target = (String) i.next();
             SimpleFeatureType schema = ds.getSchema(target);
-            ns.add(schema.getName().getNamespaceURI());
+
+            String namespaceURI = schema.getName().getNamespaceURI();
+            ns.add(namespaceURI);
+            try {
+                // if this is not added then sometimes the schema for the describe feature type cannot be loaded and
+                // an exception will be thrown during the commit 
+                SchemaFactory.getInstance(new URI(namespaceURI), new URI(namespaceURI));
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
         }
         hints.put(DocumentWriter.SCHEMA_ORDER, ns.toArray(new String[ns.size()])); // Transaction
 
