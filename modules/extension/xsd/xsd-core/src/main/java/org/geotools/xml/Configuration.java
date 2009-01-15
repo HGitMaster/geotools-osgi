@@ -30,10 +30,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import javax.xml.namespace.QName;
 import org.geotools.resources.Utilities;
@@ -222,7 +224,7 @@ public abstract class Configuration {
     /**
      * List of parser properties.
      */
-    private final List properties;
+    private final Set properties;
 
     /**
      * Internal context
@@ -246,7 +248,7 @@ public abstract class Configuration {
             dependencies.add(new XSConfiguration());
         }
 
-        properties = Collections.synchronizedList(new ArrayList());
+        properties = Collections.synchronizedSet(new HashSet());
         context = new DefaultPicoContainer();
     }
 
@@ -281,7 +283,7 @@ public abstract class Configuration {
      * </p>
      * @return A list of hte set parser properties.
      */
-    public final List /*<QName>*/ getProperties() {
+    public final Set /*<QName>*/ getProperties() {
         return properties;
     }
     
