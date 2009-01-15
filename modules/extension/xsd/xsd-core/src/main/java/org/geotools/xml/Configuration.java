@@ -284,6 +284,21 @@ public abstract class Configuration {
     public final List /*<QName>*/ getProperties() {
         return properties;
     }
+    
+    /**
+     * Searches the configuration and all dependent configuration for the speciifed property.
+     *
+     */
+    public final boolean hasProperty( QName property ) {
+        for ( Iterator c = allDependencies().iterator(); c.hasNext(); ) {
+            Configuration configuration = (Configuration) c.next();
+            if ( configuration.getProperties().contains( property ) ) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
     /**
      * Returns all dependencies in the configuration dependency tree.

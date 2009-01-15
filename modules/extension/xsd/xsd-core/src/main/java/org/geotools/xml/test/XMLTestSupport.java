@@ -410,6 +410,9 @@ public abstract class XMLTestSupport extends TestCase {
         
         SchemaIndex index = new SchemaIndexImpl( new XSDSchema[]{configuration.schema()} );
         context.registerComponentInstance(index);
+        
+        context.registerComponentInstance(configuration);
+        
         return bindingLoader.loadBinding(name, context);
     }
 

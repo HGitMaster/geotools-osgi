@@ -32,6 +32,7 @@ import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.gml3.GML;
 import org.geotools.xlink.XLINK;
 import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.SchemaIndex;
 import org.opengis.feature.simple.SimpleFeature;
@@ -154,8 +155,8 @@ public class GML3EncodingUtils {
     }
 
     public static Object AbstractFeatureType_getProperty(Object object,
-            QName name) {
-        return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name);
+            QName name, Configuration configuration) {
+        return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name, configuration);
     }
     
     public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex) {

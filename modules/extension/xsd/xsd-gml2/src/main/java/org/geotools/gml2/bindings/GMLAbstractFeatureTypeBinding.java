@@ -23,8 +23,10 @@ import javax.xml.namespace.QName;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.GML;
+import org.geotools.gml2.GMLConfiguration;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.BindingWalkerFactory;
+import org.geotools.xml.Configuration;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xml.SchemaIndex;
@@ -73,10 +75,14 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
     /** schema index for looking up types */
     SchemaIndex schemaIndex;
 
-    public GMLAbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory, SchemaIndex schemaIndex) {
+    /** configuration */
+    Configuration configuration;
+
+    public GMLAbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory, SchemaIndex schemaIndex, Configuration configuration) {
         this.ftCache = ftCache;
         this.bwFactory = bwFactory;
         this.schemaIndex = schemaIndex;
+        this.configuration = configuration;
     }
 
     /**
@@ -115,7 +121,7 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name);
+        return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name, configuration);
     }
     
     @Override

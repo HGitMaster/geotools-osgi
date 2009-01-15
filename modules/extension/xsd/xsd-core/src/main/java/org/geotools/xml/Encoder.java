@@ -244,6 +244,9 @@ public class Encoder {
         context.registerComponentInstance(namespaces);
         context.registerComponentInstance(new NamespaceSupportWrapper(namespaces));
 
+        //add configuration to context;
+        context.registerComponentInstance(configuration);
+
         //property extractors
         propertyExtractors = Schemas.getComponentInstancesOfType(context, PropertyExtractor.class);
 

@@ -25,6 +25,7 @@ import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml3.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.BindingWalkerFactory;
+import org.geotools.xml.Configuration;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xml.SchemaIndex;
@@ -71,11 +72,13 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
     FeatureTypeCache ftCache;
     BindingWalkerFactory bwFactory;
     SchemaIndex schemaIndex;
+    Configuration configuration;
     
-    public AbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory, SchemaIndex schemaIndex) {
+    public AbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory, SchemaIndex schemaIndex, Configuration configuration) {
         this.ftCache = ftCache;
         this.bwFactory = bwFactory;
         this.schemaIndex = schemaIndex;
+        this.configuration = configuration;
     }
 
     /**
@@ -131,7 +134,7 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
     public Object getProperty(Object object, QName name)
         throws Exception {
         
-        return GML3EncodingUtils.AbstractFeatureType_getProperty(object,name);
+        return GML3EncodingUtils.AbstractFeatureType_getProperty(object,name,configuration);
     }
     
     @Override

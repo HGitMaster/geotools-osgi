@@ -16,10 +16,8 @@
  */
 package org.geotools.gml3;
 
-import org.picocontainer.MutablePicoContainer;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
+import javax.xml.namespace.QName;
+
 import org.geotools.gml2.FeaturePropertyExtractor;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.bindings.GMLCoordTypeBinding;
@@ -71,6 +69,11 @@ import org.geotools.gml3.smil.SMIL20LANGConfiguration;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
+import org.picocontainer.MutablePicoContainer;
+
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 
 
 /**
@@ -80,6 +83,12 @@ import org.geotools.xml.Parser;
  *
  */
 public class GMLConfiguration extends Configuration {
+    
+    /**
+     * Boolean property which controls whether encoded features should include bounds.
+     */
+    public static final QName NO_FEATURE_BOUNDS = org.geotools.gml2.GMLConfiguration.NO_FEATURE_BOUNDS;
+
     public GMLConfiguration() {
         super(GML.getInstance());
 

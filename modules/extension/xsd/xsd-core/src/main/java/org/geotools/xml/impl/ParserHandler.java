@@ -223,6 +223,9 @@ public class ParserHandler extends DefaultHandler {
         //binding walker support
         context.registerComponentInstance(new BindingWalkerFactoryImpl(bindingLoader, context));
         
+        //register configuration itself
+        context.registerComponentInstance( config );
+
         docHandler.startDocument();
     }
 

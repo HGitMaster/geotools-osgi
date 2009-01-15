@@ -40,9 +40,11 @@ import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDConstants;
 import org.geotools.gml2.GML;
+import org.geotools.gml2.GMLConfiguration;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.util.logging.Logging;
 import org.geotools.xlink.XLINK;
+import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
@@ -277,7 +279,7 @@ public class GML2EncodingUtils {
     }
     
     public static Object AbstractFeatureType_getProperty(Object object,
-            QName name) {
+            QName name, Configuration configuration) {
       
         SimpleFeature feature = (SimpleFeature) object;
 
@@ -286,17 +288,20 @@ public class GML2EncodingUtils {
         }
       
         if (GML.boundedBy.equals(name)) {
-            BoundingBox bounds = feature.getBounds();
-
-            if (bounds.isEmpty()) {
-                //do a check for the case where the feature has no geometry 
-                // properties
-                if (feature.getDefaultGeometry() == null) {
-                    return null;
+            //check for flag not to include bounds
+            if ( !configuration.hasProperty( GMLConfiguration.NO_FEATURE_BOUNDS ) ) {
+                BoundingBox bounds = feature.getBounds();
+        
+                if (bounds.isEmpty()) {
+                    //do a check for the case where the feature has no geometry 
+                    // properties
+                    if (feature.getDefaultGeometry() == null) {
+                        return null;
+                    }
                 }
+        
+                return feature.getBounds();
             }
-
-            return feature.getBounds();
         }
         
         return null;
