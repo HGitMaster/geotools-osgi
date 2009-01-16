@@ -876,6 +876,18 @@ public final class LabelCacheImpl implements LabelCache {
      */
     private void setupPointTransform(AffineTransform tempTransform, Point centroid,
             TextStyle2D textStyle, LabelPainter painter) {
+        
+        tempTransform.translate(centroid.getX(), centroid.getY());
+        
+        double rotation = textStyle.getRotation();
+        if (rotation != rotation) // IEEE def'n x=x for all x except when x is
+            // NaN
+            rotation = 0.0;
+        if (Double.isInfinite(rotation))
+            rotation = 0; // weird number
+
+        tempTransform.rotate(rotation);
+        
         Rectangle2D textBounds = painter.getLabelBounds();
         // This now does "centering" taking into account the anchoring
         // and the real positioning of the text bounds (the bounds are placed
@@ -892,16 +904,7 @@ public final class LabelCacheImpl implements LabelCache {
             // just move it up (yes, its cheating)
             displacementY -= textStyle.getPerpendicularOffset();
         }
-        tempTransform.translate(centroid.getX() + displacementX, centroid.getY() + displacementY);
-
-        double rotation = textStyle.getRotation();
-        if (rotation != rotation) // IEEE def'n x=x for all x except when x is
-            // NaN
-            rotation = 0.0;
-        if (Double.isInfinite(rotation))
-            rotation = 0; // weird number
-
-        tempTransform.rotate(rotation);
+        tempTransform.translate(displacementX, displacementY);
     }
 
     /**
