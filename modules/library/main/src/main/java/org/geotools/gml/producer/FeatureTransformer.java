@@ -90,8 +90,8 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/gml/producer/FeatureTransformer.java $
- * @version $Id: FeatureTransformer.java 31924 2008-11-27 17:18:51Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/gml/producer/FeatureTransformer.java $
+ * @version $Id: FeatureTransformer.java 32242 2009-01-16 18:40:59Z aaime $
  *
  * @todo Add support for schemaLocation
  */
@@ -496,6 +496,8 @@ public class FeatureTransformer extends TransformerBase {
                             }
                         }
                         writeBounds(bounds);
+                    } else {
+                        writeNullBounds();                        
                     }
                    
                     for (int i = 0; i < results.length; i++) {
@@ -653,6 +655,27 @@ public class FeatureTransformer extends TransformerBase {
                 	env = new Envelope(new Coordinate(bounds.getMinX(), bounds.getMinY()),new Coordinate(bounds.getMaxX(), bounds.getMaxY()));
                 }
                 geometryTranslator.encode(env, srsName);
+                contentHandler.endElement("", "", boundedBy);
+            } catch (SAXException se) {
+                throw new RuntimeException(se);
+            }
+        }
+        
+        /**
+         * writes null bounds to the output
+         *
+         * @throws RuntimeException if it is thorwn while writing the element
+         *         or coordinates
+         */
+        public void writeNullBounds() {
+            try {
+                String boundedBy = geometryTranslator.getDefaultPrefix() + ":boundedBy";
+                String nullBox = geometryTranslator.getDefaultPrefix() + ":null";
+               
+                contentHandler.startElement("", "", boundedBy, NULL_ATTS);
+                contentHandler.startElement("", "", nullBox, NULL_ATTS);
+                contentHandler.characters("unknown".toCharArray(), 0, "unknown".length());
+                contentHandler.endElement("", "", nullBox);
                 contentHandler.endElement("", "", boundedBy);
             } catch (SAXException se) {
                 throw new RuntimeException(se);
