@@ -53,7 +53,6 @@ import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.sun.org.apache.bcel.internal.generic.GETFIELD;
 import com.vividsolutions.jts.geom.Envelope;
 
 
@@ -103,7 +102,7 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
      * </p>
      * 
      * @author Gabriel Roldan (TOPP)
-     * @version $Id: JDBCFeatureSource.java 32187 2009-01-08 20:41:14Z jdeolive $
+     * @version $Id: JDBCFeatureSource.java 32235 2009-01-16 13:08:22Z mcr $
      * @since 2.4.3
      * @see #supportsNaturalOrderSorting()
      * @see #supportsReverseOrderSorting()
