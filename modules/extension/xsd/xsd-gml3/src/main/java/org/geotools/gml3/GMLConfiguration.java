@@ -48,6 +48,8 @@ import org.geotools.gml3.bindings.LocationPropertyTypeBinding;
 import org.geotools.gml3.bindings.MeasureTypeBinding;
 import org.geotools.gml3.bindings.MultiCurvePropertyTypeBinding;
 import org.geotools.gml3.bindings.MultiCurveTypeBinding;
+import org.geotools.gml3.bindings.MultiGeometryPropertyTypeBinding;
+import org.geotools.gml3.bindings.MultiGeometryTypeBinding;
 import org.geotools.gml3.bindings.MultiLineStringPropertyTypeBinding;
 import org.geotools.gml3.bindings.MultiLineStringTypeBinding;
 import org.geotools.gml3.bindings.MultiPointPropertyTypeBinding;
@@ -156,6 +158,8 @@ public class GMLConfiguration extends Configuration {
         container.registerComponentImplementation(GML.MultiCurveType, MultiCurveTypeBinding.class);
         container.registerComponentImplementation(GML.MultiCurvePropertyType,
             MultiCurvePropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.MultiGeometryType, MultiGeometryTypeBinding.class);
+        container.registerComponentImplementation(GML.MultiGeometryPropertyType, MultiGeometryPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiLineStringPropertyType,
             MultiLineStringPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiLineStringType,

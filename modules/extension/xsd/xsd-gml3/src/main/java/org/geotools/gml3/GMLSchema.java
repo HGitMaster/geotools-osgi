@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -838,9 +839,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTIGEOMETRYTYPE_TYPE = new ComplexTypeImpl(new NameImpl(
-                "http://www.opengis.net/gml", "MultiGeometryType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
+    public static final AttributeType MULTIGEOMETRYTYPE_TYPE = new AttributeTypeImpl(new NameImpl(
+                "http://www.opengis.net/gml", "MultiGeometryType"), GeometryCollection.class,false,
+            false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null); 
 
     /**
      * <p>
@@ -10352,8 +10353,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTIGEOMETRYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new NameImpl(
-                "http://www.opengis.net/gml", "MultiGeometryPropertyType"), Collections.EMPTY_LIST,
+    public static final AttributeType MULTIGEOMETRYPROPERTYTYPE_TYPE = new AttributeTypeImpl(new NameImpl(
+                "http://www.opengis.net/gml", "MultiGeometryPropertyType"), GeometryCollection.class, 
             false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**

@@ -3410,6 +3410,7 @@ public final class GML extends XSD {
 
         //profile.add( new NameImpl(  GML.NAMESPACE, GML.AbstractGeometryType ) );
         profile.add(name(GML.GeometryPropertyType));
+        profile.add(name(GML.MultiGeometryPropertyType));
         
         return typeSchema.profile( profile );
         
