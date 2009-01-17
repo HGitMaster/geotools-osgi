@@ -125,6 +125,9 @@ public final class LabelCacheImpl implements LabelCache {
     /** non-grouped labels get thrown in here* */
     protected ArrayList<LabelCacheItem> labelCacheNonGrouped = new ArrayList<LabelCacheItem>();
 
+    /** List of reserved areas of the screen for which labels should fear to tread */
+    private List<Rectangle2D> reserved = new ArrayList<Rectangle2D>();
+
     // what to do if there's no grouping option
     public boolean DEFAULT_GROUP = false;
 
@@ -356,6 +359,10 @@ public final class LabelCacheImpl implements LabelCache {
         }
     }
 
+    public void put(Rectangle2D area) {
+        reserved.add( area );
+    }
+    
     private LabelCacheItem buildLabelCacheItem(String layerId, TextSymbolizer symbolizer,
             SimpleFeature feature, LiteShape2 shape, NumberRange scaleRange, String label,
             double priorityValue) {
@@ -504,6 +511,7 @@ public final class LabelCacheImpl implements LabelCache {
                     + " stop() or endLayer() must be called before end() is called");
         }
         LabelIndex glyphs = new LabelIndex();
+        glyphs.reserveArea( reserved );
 
         // Hack: let's reduce the display area width and height by one pixel.
         // If the rendered image is 256x256, proper rendering of polygons and

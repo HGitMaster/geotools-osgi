@@ -43,17 +43,18 @@ public class LabelIndex {
      * @param distance
      * @return
      */
+    @SuppressWarnings("unchecked")
     public boolean labelsWithinDistance(Rectangle2D bounds, double distance) {
         if (distance < 0)
             return false;
 
         Envelope e = toEnvelope(bounds);
         e.expandBy(distance);
-        List results = index.query(e);
+        List<InterferenceItem> results = index.query(e);
         if (results.size() == 0)
             return false;
-        for (Iterator it = results.iterator(); it.hasNext();) {
-            InterferenceItem item = (InterferenceItem) it.next();
+        for (Iterator<InterferenceItem> it = results.iterator(); it.hasNext();) {
+            InterferenceItem item = it.next();
             if (item.env.intersects(e)) {
                 return true;
             }
@@ -100,5 +101,19 @@ public class LabelIndex {
             this.item = item;
         }
 
+    }
+
+    /**
+     * Reserve the area indicated by these Geometry.
+     * 
+     * @param reserved
+     */
+    public void reserveArea(List<Rectangle2D> reserved) {
+        for( Rectangle2D area : reserved ){
+            Envelope env = toEnvelope(area);
+            
+            InterferenceItem item = new InterferenceItem(env,null);            
+            index.insert( env, item );
+        }
     }
 }

@@ -45,6 +45,7 @@ import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.renderer.label.LabelCacheImpl;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.TextStyle2D;
+import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.feature.simple.SimpleFeature;
@@ -125,6 +126,9 @@ public final class LabelCacheDefault implements LabelCache {
 
 	public double DEFAULT_PRIORITY = 1000.0;
 
+	/** List of screen areas that we should not place labels in */
+	protected List<Rectangle2D> reserved = new ArrayList<Rectangle2D>();
+	
 	/** Map<label, LabelCacheItem> the label cache */
 	protected Map<String,LabelCacheItem> labelCache = new HashMap<String,LabelCacheItem>();
 
@@ -231,6 +235,10 @@ public final class LabelCacheDefault implements LabelCache {
 		}
 	}
 
+	public void put(Rectangle2D area) {
+	       reserved.add( area );
+	}
+	
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#put(org.geotools.renderer.style.TextStyle2D,
 	 *      org.geotools.renderer.lite.LiteShape)
@@ -408,11 +416,13 @@ public final class LabelCacheDefault implements LabelCache {
 
     void paintLabels(Graphics2D graphics, Rectangle displayArea) {
         if( !activeLayers.isEmpty() ){
-			throw new IllegalStateException( activeLayers+" are layers that started rendering but have not completed," +
-					" stop() or endLayer() must be called before end() is called" );
-		}
-		List<Rectangle> glyphs=new ArrayList<Rectangle>();
-		
+	    throw new IllegalStateException( activeLayers+" are layers that started rendering but have not completed," +
+		" stop() or endLayer() must be called before end() is called" );
+        }        
+        
+        List<Rectangle2D> glyphs=new ArrayList<Rectangle2D>();
+        glyphs.addAll( reserved );      
+        
         // Hack: let's reduce the display area width and height by one pixel.
         // If the rendered image is 256x256, proper rendering of polygons and
         // lines occurr only if the display area is [0,0; 256,256], yet if you
@@ -619,10 +629,10 @@ public final class LabelCacheDefault implements LabelCache {
 											+ extraSpace, bounds.height
 											+ extraSpace);
 							if ((shieldBounds != null)) {
-								bounds.add(shieldBounds);
+							    bounds.add(shieldBounds);
 							}
-                            bounds.grow(haloRadius, haloRadius);
-							glyphs.add(bounds);
+                                                        bounds.grow(haloRadius, haloRadius);
+                                                        glyphs.add(bounds);
 						}
 					}
 				} finally {
@@ -731,12 +741,12 @@ public final class LabelCacheDefault implements LabelCache {
 	 *            extra space added to edges of bounds during check
 	 * @return true if labelItem overlaps a previously rendered glyph.
 	 */
-	private boolean overlappingItems(Rectangle bounds, List<Rectangle> glyphs,
+	private boolean overlappingItems(Rectangle bounds, List<Rectangle2D> glyphs,
 			int extraSpace) {
 		bounds = new Rectangle(bounds.x - extraSpace, bounds.y - extraSpace,
 				bounds.width + extraSpace, bounds.height + extraSpace);
-		Rectangle oldBounds;
-		for (Iterator<Rectangle> iter = glyphs.iterator(); iter.hasNext();) {
+		Rectangle2D oldBounds;
+		for (Iterator<Rectangle2D> iter = glyphs.iterator(); iter.hasNext();) {
 			oldBounds = iter.next();
 			if (oldBounds.intersects(bounds))
 				return true;

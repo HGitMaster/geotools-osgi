@@ -18,6 +18,7 @@ package org.geotools.renderer.lite;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import org.geotools.geometry.jts.LiteShape2;
@@ -26,8 +27,12 @@ import org.geotools.util.NumberRange;
 import org.geotools.util.Range;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
- * An interface for a label cache. 
+ * Used to cache labels prior to their being drawn on the screen.
+ * <p>
+ * Implementations exisit with different trade offs about what labels can fit where.
  * 
  * @author jeichar
  * @since 2.2
@@ -38,6 +43,7 @@ public interface LabelCache {
 	 * Called by renderer to indicate that the rendering process is starting.
 	 */
 	void start();
+	
 	/**
 	 * Called by renderer to indication the start of rendering a layer.  Will add the layer to the
 	 * set of active layers.
@@ -45,6 +51,7 @@ public interface LabelCache {
 	 * @param layerId an id for the layer
 	 */
 	void startLayer(String layerId);
+	
 	/**
 	 * Puts a Label in the cache.
 	 * 
@@ -58,12 +65,14 @@ public interface LabelCache {
 	void put( String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, NumberRange<Double> scaleRange) ;
 
 	/**
-	 * Reserve the provided geometry prior to labeling.
+	 * Reserve the provided geometry prior to sorting out where labels can go.
 	 * <p>
-	 * This facility is used to 
-	 * @param geometry
+	 * This facility is used to reserve an area so that labels do not end up
+	 * overlapping on screen constructs like scalebars or north arrows etc...
+	 * 
+	 * @param Geometry The Area of the screen to reserve (in screen coordinates)
 	 */
-	// void reserve( Geometry geometry );
+	void put( Rectangle2D geometry );
 	
 	/**
 	 * Called to indicate that a layer is done rendering.  The method may draw labels if appropriate
@@ -74,6 +83,7 @@ public interface LabelCache {
 	 * @param layerId an id for the layer
 	 */
 	void endLayer(String layerId, Graphics2D graphics, Rectangle displayArea);
+	
 	/**
 	 * Called to indicate that the map is done rendering.  The method may draw labels if appropriate
 	 * for the labeling algorithm 
@@ -82,25 +92,30 @@ public interface LabelCache {
 	 * @param displayArea The size of the display area.
 	 */
 	void end(Graphics2D graphics, Rectangle displayArea);
+	
 	/**
 	 * Tells the cache to stop labelling.  
 	 */
 	void stop();
+	
 	/**
 	 * Clears the cache completely 
 	 */
 	public void clear();
+	
 	/**
 	 * Clears the cache of all information relating to the layer identified.
 	 * @param layerId id of the layer
 	 */
 	public void clear(String layerId);
+	
 	/**
 	 * Leaves the label information in the cache but ignores it when calculating what labels are drawn.
 	 * 
 	 * @param layerId id of the layer to disable.
 	 */
 	public void disableLayer(String layerId);
+	
 	/**
 	 * Enable a layer after being disabled.  If startLayer is called this does not need to be called
 	 * as start layer implicitely activates the layer.
@@ -108,6 +123,7 @@ public interface LabelCache {
 	 * @param layerId layer to activate.
 	 */
 	public void enableLayer(String layerId);
+	
 	/**
 	 * Return a list with all the values in priority order.  Both grouped and non-grouped
 	 * @param labelCache

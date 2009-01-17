@@ -18,6 +18,7 @@ package org.geotools.renderer.shape;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import javax.media.jai.util.Range;
@@ -27,6 +28,8 @@ import org.geotools.renderer.lite.LabelCache;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Wrapper around another {@link LabelCache} that disables the following methods:
@@ -83,6 +86,10 @@ class IntegratingLabelCache implements LabelCache {
         wrapped.put(layerId, symbolizer, feature, shape, scaleRange);
     }
 
+    public void put( Rectangle2D area) {
+        wrapped.put( area );
+    }
+    
     public void start() {
         //
     }

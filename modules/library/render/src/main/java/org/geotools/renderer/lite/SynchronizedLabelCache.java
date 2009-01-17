@@ -18,12 +18,12 @@ package org.geotools.renderer.lite;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
-import org.geotools.util.Range;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -33,17 +33,17 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class SynchronizedLabelCache implements LabelCache {
 
-	private final LabelCache wrapped;
-	
-	public SynchronizedLabelCache() {
-		this(new LabelCacheDefault());
-	}
-    
-    public SynchronizedLabelCache(LabelCacheDefault default1) {
-    	wrapped=default1;
-	}
+    private final LabelCache wrapped;
 
-	public synchronized void start() {
+    public SynchronizedLabelCache() {
+        this(new LabelCacheDefault());
+    }
+
+    public SynchronizedLabelCache(LabelCache cache) {
+        wrapped = cache;
+    }
+
+    public synchronized void start() {
         wrapped.start();
     }
 
@@ -73,10 +73,13 @@ public class SynchronizedLabelCache implements LabelCache {
     }
 
     
-    public synchronized void put( String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, NumberRange scaleRange ) {
+    public synchronized void put( String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, NumberRange<Double> scaleRange ) {
         wrapped.put(layerId, symbolizer, feature, shape, scaleRange);
     }
 
+    public synchronized void put( Rectangle2D area) {
+        wrapped.put( area );
+    }
     
     public synchronized void startLayer( String layerId ) {
         wrapped.startLayer(layerId);
@@ -87,12 +90,12 @@ public class SynchronizedLabelCache implements LabelCache {
         wrapped.stop();
     }
 
-	public synchronized void disableLayer(String layerId) {
-		wrapped.disableLayer(layerId);
-	}
+    public synchronized void disableLayer(String layerId) {
+        wrapped.disableLayer(layerId);
+    }
 
-	public synchronized List orderedLabels() {
-		return wrapped.orderedLabels();
-	}
+    public synchronized List orderedLabels() {
+        return wrapped.orderedLabels();
+    }
     
 }
