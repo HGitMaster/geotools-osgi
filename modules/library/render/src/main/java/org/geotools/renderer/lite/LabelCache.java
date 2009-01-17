@@ -56,6 +56,15 @@ public interface LabelCache {
 	 * @param scaleRange the scaleRange that the symbolizer is legal
 	 */
 	void put( String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, NumberRange<Double> scaleRange) ;
+
+	/**
+	 * Reserve the provided geometry prior to labeling.
+	 * <p>
+	 * This facility is used to 
+	 * @param geometry
+	 */
+	// void reserve( Geometry geometry );
+	
 	/**
 	 * Called to indicate that a layer is done rendering.  The method may draw labels if appropriate
 	 * for the labeling algorithm 
@@ -100,9 +109,9 @@ public interface LabelCache {
 	 */
 	public void enableLayer(String layerId);
 	/**
-	 *   return a list with all the values in priority order.  Both grouped and non-grouped
+	 * Return a list with all the values in priority order.  Both grouped and non-grouped
 	 * @param labelCache
-	 * @return
+	 * @return list with all values in priority order
 	 */
 	public List orderedLabels();
 }
