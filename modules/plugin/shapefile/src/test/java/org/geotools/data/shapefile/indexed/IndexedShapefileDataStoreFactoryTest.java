@@ -65,7 +65,7 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
         ShapefileDataStore ds1 = testCreateDataStore(true, true);
         ShapefileDataStore ds2 = testCreateDataStore(true, true);
 
-        assertSame(ds1, ds2);
+        assertNotSame(ds1, ds2);
 
         ds2 = testCreateDataStore(true, false);
         assertNotSame(ds1, ds2);
