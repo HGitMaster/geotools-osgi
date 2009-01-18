@@ -28,19 +28,19 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.jdbc.JDBCFeatureSource;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
 import org.geotools.data.postgis.collection.PostgisFeatureCollection;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.function.ClassificationFunction;
 import org.geotools.filter.function.Classifier;
 import org.geotools.filter.function.ExplicitClassifier;
 import org.geotools.filter.function.UniqueIntervalFunction;
 import org.geotools.styling.FeatureTypeStyle;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.PropertyName;
 
 
 /**
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorOnlineTest.java $
  */
 public class StyleGeneratorOnlineTest extends DataTestCase {
     static boolean WKB_ENABLED = true;
@@ -96,8 +96,8 @@ public class StyleGeneratorOnlineTest extends DataTestCase {
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes();
 
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        AttributeExpression expr = ff.createAttributeExpression("authority");
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        PropertyName expr = ff.property("authority");
 
         String paletteName = "YlGn";
 

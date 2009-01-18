@@ -20,20 +20,21 @@ package org.geotools.brewer.color;
 //import edu.psu.geovista.colorbrewer.OriginalColor;
 import java.awt.Color;
 import java.util.List;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
-import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.function.ClassificationFunction;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 
 
 /**
  *
  * @author James Macgill
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/brewer/src/main/java/org/geotools/brewer/color/PaletteFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/brewer/src/main/java/org/geotools/brewer/color/PaletteFunction.java $
  */
 public class PaletteFunction extends FunctionExpressionImpl implements FunctionExpression {
     ClassificationFunction classifier;
@@ -42,7 +43,7 @@ public class PaletteFunction extends FunctionExpressionImpl implements FunctionE
 
     /** Creates a new instance of PaletteFunction */
     public PaletteFunction() {
-        this(FilterFactoryFinder.createFilterFactory());
+        this(CommonFactoryFinder.getFilterFactory(null));
     }
 
     public PaletteFunction(FilterFactory factory) {
@@ -61,7 +62,7 @@ public class PaletteFunction extends FunctionExpressionImpl implements FunctionE
     public void setParameters(List args) {
         super.setParameters(args);
         classifier = (ClassificationFunction) getExpression(0);
-        paletteName = ((LiteralExpression) getExpression(1)).getLiteral().toString();
+        paletteName = ((Literal) getExpression(1)).evaluate(null, String.class);
     }
 
     public Expression getEvaluationExpression() {
@@ -69,7 +70,7 @@ public class PaletteFunction extends FunctionExpressionImpl implements FunctionE
     }
 
     public void setEvaluationExpression(Expression e) {
-        classifier.setExpression(e);
+        classifier.setExpression((org.geotools.filter.Expression) e);
     }
 
     public ClassificationFunction getClassifier() {
@@ -81,11 +82,11 @@ public class PaletteFunction extends FunctionExpressionImpl implements FunctionE
     }
 
     public int getNumberOfClasses() {
-        return classifier.getNumberOfClasses();
+        return classifier.getClasses();
     }
 
     public void setNumberOfClasses(int i) {
-        classifier.setNumberOfClasses(i);
+        classifier.setClasses(i);
     }
 
     public String getPaletteName() {
@@ -111,7 +112,7 @@ public class PaletteFunction extends FunctionExpressionImpl implements FunctionE
     }
 
     public Object evaluate(SimpleFeature feature) {
-        int classNum = classifier.getNumberOfClasses();
+        int classNum = classifier.getClasses();
         ColorBrewer brewer = new ColorBrewer();
         int klass = ((Integer) classifier.evaluate(feature)).intValue();
 

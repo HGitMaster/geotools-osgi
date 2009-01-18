@@ -23,15 +23,15 @@ import java.util.List;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.MathExpression;
 import org.geotools.filter.function.ClassificationFunction;
 import org.geotools.filter.function.EqualIntervalFunction;
 import org.geotools.filter.function.RangedClassifier;
@@ -42,7 +42,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorTest.java $
  */
 public class StyleGeneratorTest extends DataTestCase {
     public StyleGeneratorTest(String arg0) {
@@ -78,21 +78,17 @@ public class StyleGeneratorTest extends DataTestCase {
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes();
 
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        MathExpression expr = null;
-        MathExpression expr2 = null;
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        Expression expr = null;
+        Expression expr2 = null;
         SimpleFeatureType type = roadType;
         String attribName = type.getDescriptor(0).getLocalName();
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc = DataUtilities.collection(roadFeatures);
         FeatureSource<SimpleFeatureType, SimpleFeature> fs = DataUtilities.source(fc);
 
         try {
-            expr = ff.createMathExpression(MathExpression.MATH_MULTIPLY);
-            expr.addLeftValue(ff.createAttributeExpression(attribName));
-            expr.addRightValue(ff.createAttributeExpression(attribName));
-            expr2 = ff.createMathExpression(MathExpression.MATH_ADD);
-            expr2.addLeftValue(expr);
-            expr2.addRightValue(ff.createLiteralExpression(3));
+            expr = ff.multiply(ff.property(attribName), ff.property(attribName));
+            expr2 = ff.add(expr, ff.literal(3));
         } catch (IllegalFilterException e) {
             fail(e.getMessage());
         }
