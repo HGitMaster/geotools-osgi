@@ -527,7 +527,13 @@ public class SLDTransformer extends TransformerBase {
                 // no filter
             }
             else {
-                filterTranslator.encode(filter);
+                try {
+                    contentHandler.startElement("", "", "ogc:Filter", NULL_ATTS);
+                    filterTranslator.encode(filter);
+                    contentHandler.endElement("","","ogc:Filter");
+                } catch (SAXException se) {
+                    throw new RuntimeException(se);
+                }
             }
 
             if (rule.hasElseFilter()) {
