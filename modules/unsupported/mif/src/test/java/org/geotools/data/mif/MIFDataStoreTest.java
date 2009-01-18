@@ -32,9 +32,9 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.filter.Filter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.LineString;
  * DOCUMENT ME!
  *
  * @author Luca S. Percich, AMA-MI
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/mif/src/test/java/org/geotools/data/mif/MIFDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/mif/src/test/java/org/geotools/data/mif/MIFDataStoreTest.java $
  */
 public class MIFDataStoreTest extends TestCase {
     private MIFDataStore ds;
