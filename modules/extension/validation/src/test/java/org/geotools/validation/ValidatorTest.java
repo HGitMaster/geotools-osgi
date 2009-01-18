@@ -30,10 +30,10 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.filter.Filter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * ValidatorTest<br>
  *
  * @author bowens<br> Created Jun 28, 2004<br>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/test/java/org/geotools/validation/ValidatorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/test/java/org/geotools/validation/ValidatorTest.java $
  * @version <br><b>Puropse:</b><br><p><b>Description:</b><br><p><b>Usage:</b><br><p>
  */
 public class ValidatorTest extends TestCase {

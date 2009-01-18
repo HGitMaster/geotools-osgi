@@ -29,10 +29,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.geotools.filter.ExpressionDOMParser;
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterDOMParser;
 import org.geotools.filter.FilterTransformer;
 import org.geotools.gml.producer.GeometryTransformer;
+import org.opengis.filter.Filter;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -45,8 +45,8 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/xml/ArgHelper.java $
- * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/main/java/org/geotools/validation/xml/ArgHelper.java $
+ * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
  */
 public class ArgHelper {
     private static final Mapping[] argumentTypeMappings = {
@@ -204,7 +204,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected interface Mapping {
         /**
@@ -300,7 +300,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      *
      * @see Mapping
      */
@@ -470,7 +470,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class GeometryMapping implements Mapping {
         /**
@@ -600,7 +600,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class EnvelopeMapping implements Mapping {
         /**
@@ -779,7 +779,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class ShortMapping implements Mapping {
         /**
@@ -892,7 +892,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class IntegerMapping implements Mapping {
         /**
@@ -1003,7 +1003,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class LongMapping implements Mapping {
         /**
@@ -1114,7 +1114,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class FloatMapping implements Mapping {
         /**
@@ -1225,7 +1225,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class DoubleMapping implements Mapping {
         /**
@@ -1336,7 +1336,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class DateMapping implements Mapping {
         /**
@@ -1469,7 +1469,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class URIMapping implements Mapping {
         /**
@@ -1588,7 +1588,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class BooleanMapping implements Mapping {
         /**
@@ -1699,7 +1699,7 @@ public class ArgHelper {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: dmzwiers $ (last modification)
-     * @version $Id: ArgHelper.java 30662 2008-06-12 21:44:16Z acuster $
+     * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
      */
     protected static class StringMapping implements Mapping {
         /**
