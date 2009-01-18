@@ -20,14 +20,15 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -48,7 +49,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * <p>
  * 
  * </p>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/TouchesIntegrity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/TouchesIntegrity.java $
  */
 public class TouchesIntegrity extends RelationIntegrity {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.validation");
@@ -128,7 +129,6 @@ public class TouchesIntegrity extends RelationIntegrity {
 	{
 		boolean success = true;
 		
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
 
 		//JD: fix this!!
@@ -211,7 +211,7 @@ public class TouchesIntegrity extends RelationIntegrity {
 	{
 		boolean success = true;
 		
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+		FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 		Filter filter = null;
 
 		//JD: fix this !!

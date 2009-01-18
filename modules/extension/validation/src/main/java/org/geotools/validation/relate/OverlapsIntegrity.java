@@ -22,21 +22,22 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BBoxExpression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -46,7 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * OverlapsIntegrity<br>
  * @author bowens, ptozer<br>
  * Created Apr 27, 2004<br>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/OverlapsIntegrity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/OverlapsIntegrity.java $
  * @version <br>
  * 
  * <b>Puropse:</b><br>
@@ -373,15 +374,11 @@ public class OverlapsIntegrity extends RelationIntegrity
 		if( bBox == null ){
 			return Filter.INCLUDE;
 		}
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-		BBoxExpression bboxExpr = ff.createBBoxExpression(bBox);
-		//GeometryFilter bbFilter = ff.createGeometryFilter(Filter.GEOMETRY_BBOX);
-		AttributeExpression geomExpr = ff.createAttributeExpression(ft, ft.getGeometryDescriptor().getLocalName());
-		GeometryFilter disjointFilter = ff.createGeometryFilter(FilterType.GEOMETRY_DISJOINT);
-		disjointFilter.addLeftGeometry(geomExpr);
-		disjointFilter.addRightGeometry(bboxExpr);
-		Filter filter = disjointFilter.not();
+		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+		PropertyName geomExpr = ff.property(ft.getGeometryDescriptor().getLocalName());
+		Literal bboxExpr = ff.literal(JTS.toGeometry(bBox)); 
+		Disjoint disjointFilter = ff.disjoint(geomExpr, bboxExpr);
 		
-		return filter;
+		return ff.not(disjointFilter);
 	}
 }
