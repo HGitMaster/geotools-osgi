@@ -22,6 +22,20 @@ import org.geotools.data.Parameter;
 import org.geotools.factory.Hints;
 import org.opengis.feature.type.Name;
 
+/**
+ * Captures the base elements of a request for a coverage source subclass.
+ * 
+ * <p>
+ * The request can be a request for reading data, a request for writing data,
+ * etc.
+ * 
+ * <p>
+ * Notice that using additional parameters and {@link Hints} a user can
+ * customize the request behavior and meaning.
+ * 
+ * @author Simone Giannecchini, GeoSolutions SAS
+ * 
+ */
 public interface CoverageRequest {
 
 	/**

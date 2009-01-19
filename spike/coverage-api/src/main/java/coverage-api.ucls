@@ -12,7 +12,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="362" y="37" width="120" height="43"/>  
+    <position x="477" y="36" width="-1" height="-1"/>  
   </interface>  
   <enumeration language="java" name="org.geotools.coverage.io.CoverageAccess.AccessType" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false" 
@@ -21,7 +21,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="589" y="369" width="116" height="43"/>  
+    <position x="662" y="49" width="-1" height="-1"/>  
   </enumeration>  
   <enumeration language="java" name="org.geotools.coverage.io.CoverageCapabilities" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageCapabilities.java" binary="false" 
@@ -30,7 +30,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="425" y="286" width="143" height="43"/>  
+    <position x="132" y="102" width="-1" height="-1"/>  
   </enumeration>  
   <interface language="java" name="org.geotools.coverage.io.CoverageReadRequest" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageReadRequest.java" binary="false" 
@@ -57,7 +57,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="223" y="286" width="134" height="43"/>  
+    <position x="207" y="307" width="-1" height="-1"/>  
   </interface>  
   <enumeration language="java" name="org.geotools.coverage.io.CoverageResponse.Status" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false" 
@@ -66,7 +66,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="248" y="369" width="116" height="43"/>  
+    <position x="468" y="300" width="-1" height="-1"/>  
   </enumeration>  
   <interface language="java" name="org.geotools.coverage.io.CoverageSource" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false" 
@@ -75,7 +75,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="223" y="120" width="118" height="43"/>  
+    <position x="266" y="184" width="-1" height="-1"/>  
   </interface>  
   <class language="java" name="org.geotools.coverage.io.CoverageSourceCapabilities" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSourceCapabilities.java" binary="false" 
@@ -84,7 +84,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="619" y="37" width="184" height="43"/>  
+    <position x="834" y="53" width="-1" height="-1"/>  
   </class>  
   <interface language="java" name="org.geotools.coverage.io.CoverageStore" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false" 
@@ -93,7 +93,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="294" y="203" width="110" height="43"/>  
+    <position x="499" y="185" width="-1" height="-1"/>  
   </interface>  
   <class language="java" name="org.geotools.coverage.io.CoverageStoreCapabilities" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStoreCapabilities.java" binary="false" 
@@ -102,7 +102,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="629" y="120" width="174" height="43"/>  
+    <position x="837" y="141" width="-1" height="-1"/>  
   </class>  
   <interface language="java" name="org.geotools.coverage.io.CoverageUpdateRequest" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageUpdateRequest.java" binary="false" 
@@ -111,7 +111,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="385" y="452" width="164" height="43"/>  
+    <position x="707" y="285" width="-1" height="-1"/>  
   </interface>  
   <interface language="java" name="org.geotools.coverage.io.Driver" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/Driver.java" binary="false" 
@@ -120,7 +120,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="73" y="120" width="110" height="43"/>  
+    <position x="305" y="43" width="-1" height="-1"/>  
   </interface>  
   <class language="java" name="org.geotools.coverage.io.Param" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/Param.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -128,7 +128,7 @@
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>    
-    <position x="127" y="37" width="110" height="43"/>  
+    <position x="170" y="42" width="-1" height="-1"/>  
   </class>  
   <interface language="java" name="org.geotools.coverage.io.range.Axis" project="2.6.x-gt-coverage-api" 
     file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/Axis.java" binary="false" 
@@ -157,68 +157,18 @@
     </display>    
     <position x="42" y="535" width="136" height="43"/>  
   </interface>  
-  <nesting>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse.Status" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>  
-  </nesting>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>    
-    <bendpoint x="232" y="203"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageRequest" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageRequest.java" binary="false"/>  
-  </dependency>  
-  <generalization>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageReadRequest" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageReadRequest.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageRequest" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageRequest.java" binary="false"/>  
-  </generalization>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.RangeType" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/RangeType.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.FieldType" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/FieldType.java" binary="false"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>    
-    <bendpoint x="371" y="120"/>  
-  </dependency>  
-  <generalization>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>  
-  </generalization>  
   <generalization>    
     <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageUpdateRequest" 
       file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageUpdateRequest.java" binary="false"/>    
     <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageRequest" 
       file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageRequest.java" binary="false"/>  
   </generalization>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>  
+  </dependency>  
   <generalization>    
     <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStoreCapabilities" 
       file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStoreCapabilities.java" 
@@ -227,70 +177,12 @@
       file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSourceCapabilities.java" 
       binary="false"/>  
   </generalization>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageCapabilities" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageCapabilities.java" binary="false"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageUpdateRequest" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageUpdateRequest.java" binary="false"/>    
-    <bendpoint x="394" y="286"/>    
-    <bendpoint x="394" y="369"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageReadRequest" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageReadRequest.java" binary="false"/>    
-    <bendpoint x="53" y="203"/>    
-    <bendpoint x="53" y="286"/>    
-    <bendpoint x="53" y="369"/>  
-  </dependency>  
-  <association>    
-    <display labels="true" multiplicity="true"/>    
-    <source navigable="false" project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageCapabilities" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageCapabilities.java" binary="false">      
-      <attribute name="access"/>      
-      <multiplicity minimum="0" maximum="1"/>    
-    </source>    
-    <target navigable="true" project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess.AccessType" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>  
-  </association>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageCapabilities" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageCapabilities.java" binary="false"/>    
-    <bendpoint x="434" y="203"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageReadRequest" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageReadRequest.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.RangeType" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/RangeType.java" binary="false"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.Driver" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/Driver.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.Driver" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/Driver.java" binary="false"/>  
-  </dependency>  
-  <dependency>    
-    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.FieldType" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/FieldType.java" binary="false"/>    
-    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.Axis" 
-      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/Axis.java" binary="false"/>  
-  </dependency>  
+  <nesting>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse.Status" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>  
+  </nesting>  
   <dependency>    
     <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
       file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>    
@@ -305,9 +197,110 @@
     <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess" 
       file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>    
     <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess.AccessType" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>  
+  </nesting>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.RangeType" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/RangeType.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.FieldType" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/FieldType.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess" 
       file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>    
-    <bendpoint x="598" y="120"/>    
-    <bendpoint x="598" y="203"/>    
-    <bendpoint x="598" y="286"/>  
-  </nesting>
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.Driver" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/Driver.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>    
+    <bendpoint x="232" y="203"/>  
+  </dependency>  
+  <generalization>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>  
+  </generalization>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageReadRequest" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageReadRequest.java" binary="false"/>    
+    <bendpoint x="53" y="203"/>    
+    <bendpoint x="53" y="286"/>    
+    <bendpoint x="53" y="369"/>  
+  </dependency>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageCapabilities" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageCapabilities.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.Driver" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/Driver.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>  
+  </dependency>  
+  <association>    
+    <display labels="true" multiplicity="true"/>    
+    <source navigable="false" project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageCapabilities" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageCapabilities.java" binary="false">      
+      <attribute name="access"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </source>    
+    <target navigable="true" project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageAccess.AccessType" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageAccess.java" binary="false"/>  
+  </association>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageStore" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageStore.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageUpdateRequest" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageUpdateRequest.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageResponse" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageResponse.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageRequest" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageRequest.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageSource" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageSource.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageCapabilities" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageCapabilities.java" binary="false"/>  
+  </dependency>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageReadRequest" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageReadRequest.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.RangeType" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/RangeType.java" binary="false"/>  
+  </dependency>  
+  <generalization>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageReadRequest" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageReadRequest.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.CoverageRequest" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/CoverageRequest.java" binary="false"/>  
+  </generalization>  
+  <dependency>    
+    <source project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.FieldType" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/FieldType.java" binary="false"/>    
+    <target project="2.6.x-gt-coverage-api" name="org.geotools.coverage.io.range.Axis" 
+      file="/2.6.x-gt-coverage-api/src/main/java/org/geotools/coverage/io/range/Axis.java" binary="false"/>  
+  </dependency>
 </class-diagram>

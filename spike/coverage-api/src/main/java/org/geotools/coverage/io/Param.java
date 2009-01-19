@@ -42,7 +42,7 @@ import org.opengis.util.InternationalString;
  * with GridCoverageExchnage. Param will be maintained as a wrapper for one
  * point release (at which time it will be deprecated).
  * </p>
- * @deprecated Can we remove this and just use Parameter
+ * @deprecated Can we remove this and just use Parameter?
  */
 @SuppressWarnings("unchecked")
 public class Param extends Parameter {

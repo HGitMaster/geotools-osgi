@@ -30,7 +30,12 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 
-
+/**
+ * Captures element of a request to read data from an underlying coverage.
+ * 
+ * @author Simone Giannecchini, GeoSolutions SAS
+ *
+ */
 public interface CoverageReadRequest extends CoverageRequest {
 
 	/**

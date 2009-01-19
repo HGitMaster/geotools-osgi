@@ -90,9 +90,6 @@ public interface CoverageAccess {
      */
     public Set<CoverageAccess.AccessType> getSupportedAccessTypes();
 
-    // 
-    // Describe Contents
-    //
     /**
      * Names of the available Coverages.
      * <p>
@@ -119,17 +116,19 @@ public interface CoverageAccess {
     // which would allow us to present a tree of data, rather than a flat list.
     // (not sure if this is a good idea - just getting it out there)
     //
-    
-    /**
-     * We need to defined how we want to represent the coverage description
-     * 
-     * @param coverageIndex
-     * @return
-     * 
-     * @todo consider geoapi {@link Extent} which can in turn wrap the Envelope
-     *       we are providing here In order to do so we need to resolve the
-     *       ambiguity of the 3D inseparable CRSs.
-     */
+
+	/**
+	 * This method can be used to acquire a rough description of a coverage
+	 * spatiotemporal domain.
+	 * 
+	 * @param coverageName
+	 * @param listener
+	 * @return {@link Envelope}
+	 * 
+	 * @todo consider geoapi {@link Extent} which can in turn wrap the Envelope
+	 *       we are providing here In order to do so we need to resolve the
+	 *       ambiguity of the 3D inseparable CRSs between vertical and horizontal domain.
+	 */
     public Envelope getExtent(Name coverageName, final ProgressListener listener);
     
     //

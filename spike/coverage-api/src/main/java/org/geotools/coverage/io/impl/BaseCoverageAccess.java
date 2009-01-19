@@ -8,6 +8,8 @@ import org.geotools.coverage.io.Driver;
  * implementing your own coverage classes.
  * <p>
  * This implementation provides 
+ * 
+ * @author Simone Giannecchini, GeoSolutions SAS
  */
 public abstract class BaseCoverageAccess implements CoverageAccess{
 	/**
