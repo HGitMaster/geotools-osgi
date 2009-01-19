@@ -121,7 +121,6 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 
 	    // The escaped version of the multiple wildcard for the REGEXP pattern.
 	    private static String escapedWildcardMulti = "\\.\\*";
-	    private static String INSPATIALOP = "InSpatialOP";
 	    
 	    static private HashMap<Class<?>,String> DB2_SPATIAL_PREDICATES = new HashMap<Class<?>,String>();
 	    public DB2FilterToSQL(PreparedStatementSQLDialect dialect) {
@@ -328,6 +327,8 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 	    protected Object visitBinarySpatialOperator(BinarySpatialOperator filter, Object extraData, String db2Predicate) {
 	        LOGGER.finer("Generating GeometryFilter WHERE clause for " + filter);
 
+	        currentSRID=getSRID();
+	        
 	        DefaultExpression left = (DefaultExpression) filter.getExpression1();
 	        DefaultExpression right = (DefaultExpression) filter.getExpression2();
 
@@ -339,9 +340,9 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 	        }
 	        try {
 	            this.out.write("db2gse." + db2Predicate + "(");
-	            left.accept(this, INSPATIALOP);
+	            left.accept(this, extraData);
 	            this.out.write(", ");
-	            right.accept(this, INSPATIALOP);
+	            right.accept(this, extraData);
 	            this.out.write(") = 1");
 	
 	            addSelectivity();  // add selectivity clause if needed
@@ -505,28 +506,6 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 		   return result; 
 		}
 
-		@Override
-		public Object visit(Literal expression, Object context) throws RuntimeException {
-			
-			if (isPrepareEnabled()==false)				
-				return super.visit(expression, context);
-					
-			if (INSPATIALOP.equals(context)==false) {
-				Class target = (Class) context;
-	            Object literal = evaluateLiteral( expression, target );
-	            try {
-	            	writeLiteral(literal);	            	
-				} catch (IOException e) {
-					throw new RuntimeException("IO problems writing literal", e);
-				}
-
-	            return context;
-				//return super.visit(expression, context);
-			}
-			
-			currentSRID=getSRID();
-			return super.visit(expression, context);
-    }
 
     public boolean isLooseBBOXEnabled() {
         return looseBBOXEnabled;

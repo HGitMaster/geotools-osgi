@@ -127,6 +127,16 @@ public class DB2SQLDialectPrepared extends PreparedStatementSQLDialect {
     	delegate.registerSqlTypeNameToClassMappings(mappings);
 
     }
+	
+	@Override
+    public void prepareFunctionArgument(Class clazz, StringBuffer sql) {
+		String castExpression = DB2Util.getCastExpression(clazz);
+		
+		if (castExpression!=null)
+			sql.append(castExpression);
+		else
+			super.prepareFunctionArgument(clazz, sql);        
+    }
 
 
 	@Override

@@ -229,7 +229,6 @@ public class DB2SQLDialect extends SQLDialect  {
         byte[] wkb = rs.getBytes(column);
 
         try {
-            //TODO: srid
             Polygon polygon = (Polygon) new WKBReader().read(wkb);            
             return polygon.getEnvelopeInternal();
         } catch (ParseException e) {
