@@ -44,6 +44,16 @@ public abstract class PreparedStatementSQLDialect extends SQLDialect {
     }
     
     /**
+     * Prepares a function argument for a prepared statement.
+     * 
+     * @param clazz The mapped class of the argument.
+     * @param sql The prepared sql statement buffer
+     */
+    public void prepareFunctionArgument(Class clazz, StringBuffer sql) {
+        sql.append("?");
+    }
+    
+    /**
      * Sets the geometry value into the prepared statement. 
      * @param g The geometry
      * @param srid the geometry native srid (should be forced into the encoded geometry)
