@@ -18,23 +18,25 @@ package org.geotools.gml2;
 
 import java.util.HashMap;
 
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 
-
+/**
+ * Holds a cache of FeatureTypes by Name.
+ */
 public class FeatureTypeCache {
-    HashMap<Name, SimpleFeatureType> map = new HashMap<Name, SimpleFeatureType>();
+    HashMap<Name, FeatureType> map = new HashMap<Name, FeatureType>();
 
-    public SimpleFeatureType get(Name name) {
+    public FeatureType get(Name name) {
         synchronized (this) {
-            return (SimpleFeatureType) map.get(name);
+            return map.get(name);
         }
     }
 
-    public void put(SimpleFeatureType type) {
+    public void put(FeatureType type) {
         synchronized (this) {
             if (map.get(type.getName()) != null) {
-                SimpleFeatureType other = map.get(type.getName());
+                FeatureType other = map.get(type.getName());
 
                 if (!other.equals(type)) {
                     String msg = "Type with same name already exists in cache.";
