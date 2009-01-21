@@ -73,7 +73,6 @@ import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.GmlObjectId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -2168,7 +2167,7 @@ public final class JDBCDataStore extends ContentDataStore
      * @param sort
      *            sort conditions
      */
-    protected String selectSQL(SimpleFeatureType featureType, Filter filter, SortBy[] sort) {
+    protected String selectSQL(SimpleFeatureType featureType, Filter filter, SortBy[] sort) throws IOException {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
 
@@ -2212,7 +2211,10 @@ public final class JDBCDataStore extends ContentDataStore
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
-                FilterToSQL toSQL = createFilterToSQL(featureType);
+                // grab the full feature type, as we might be encoding a filter
+                // that uses attributes that aren't returned in the results
+                SimpleFeatureType fullSchema = getSchema(featureType.getTypeName());
+                FilterToSQL toSQL = createFilterToSQL(fullSchema);
                 sql.append(" ").append(toSQL.encodeToString(filter));
             } catch (FilterToSQLException e) {
                 throw new RuntimeException(e);
@@ -2261,7 +2263,7 @@ public final class JDBCDataStore extends ContentDataStore
      *            statement
      */
     protected PreparedStatement selectSQLPS( SimpleFeatureType featureType, Filter filter, SortBy[] sort, Connection cx )
-        throws SQLException {
+        throws SQLException, IOException {
         
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
@@ -2305,7 +2307,10 @@ public final class JDBCDataStore extends ContentDataStore
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
-                toSQL = createPreparedFilterToSQL(featureType);
+                // grab the full feature type, as we might be encoding a filter
+                // that uses attributes that aren't returned in the results
+                SimpleFeatureType fullSchema = getSchema(featureType.getTypeName());
+                toSQL = createPreparedFilterToSQL(fullSchema);
                 sql.append(" ").append(toSQL.encodeToString(filter));
             } catch (FilterToSQLException e) {
                 throw new RuntimeException(e);
