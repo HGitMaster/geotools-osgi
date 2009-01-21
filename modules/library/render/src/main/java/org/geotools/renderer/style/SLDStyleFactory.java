@@ -896,19 +896,19 @@ public class SLDStyleFactory {
             }
             g2d.dispose();
             
-            try {
-                ImageIO.write(image, "png", new java.io.File("c:/temp/sampler.png"));
-            } catch(Exception e) {
-                System.out.println(e);
-            }
+//            try {
+//                ImageIO.write(image, "png", new java.io.File("c:/temp/sampler.png"));
+//            } catch(Exception e) {
+//                System.out.println(e);
+//            }
             
             image = image.getSubimage(size, size, size, size);
             
-            try {
-                ImageIO.write(image, "png", new java.io.File("c:/temp/texture.png"));
-            } catch(Exception e) {
-                System.out.println(e);
-            }
+//            try {
+//                ImageIO.write(image, "png", new java.io.File("c:/temp/texture.png"));
+//            } catch(Exception e) {
+//                System.out.println(e);
+//            }
         }
 
         Rectangle2D.Double rect = new Rectangle2D.Double(0.0, 0.0, size, size);
