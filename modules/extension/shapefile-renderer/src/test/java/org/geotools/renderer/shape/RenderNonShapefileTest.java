@@ -25,7 +25,6 @@ import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
-import org.geotools.map.FeatureSourceMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
@@ -34,54 +33,34 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+
 /**
- * Shapefile renderer delegates to Streaming Renderer if a layer is not a Shapefile layer. This
- * tests that.
- * 
+ * Shapefile renderer delegates to Streaming Renderer if a layer is not a Shapefile layer.  This tests that. 
  * @author Jesse
- * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  */
 public class RenderNonShapefileTest extends TestCase {
-
-    public void testRender() throws Exception {
-        MemoryDataStore store = new MemoryDataStore();
-        IndexedShapefileDataStore polys = TestUtilites.getPolygons();
-        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = polys
-                .getFeatureSource().getFeatures();
-        store.createSchema(polys.getSchema());
-        FeatureSource<SimpleFeatureType, SimpleFeature> target = store.getFeatureSource(store
-                .getTypeNames()[0]);
-        ((FeatureStore<SimpleFeatureType, SimpleFeature>) target).addFeatures(featureCollection);
-        Style testStyle = TestUtilites.createTestStyle(target.getSchema().getTypeName(), null);
-        MapLayer layer = new DefaultMapLayer(target, testStyle);
-        MapContext context = new DefaultMapContext(new MapLayer[] { layer });
-        ShapefileRenderer renderer = new ShapefileRenderer(context);
+	
+	public void testRender() throws Exception {
+		MemoryDataStore store=new MemoryDataStore();
+		
+		IndexedShapefileDataStore polys = TestUtilites.getPolygons();
+		
+		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = polys.getFeatureSource().getFeatures();
+		store.createSchema(polys.getSchema());
+		
+		FeatureSource<SimpleFeatureType, SimpleFeature> target = store.getFeatureSource(store.getTypeNames()[0]);
+		((FeatureStore<SimpleFeatureType, SimpleFeature>)target).addFeatures(featureCollection);
+		
+		Style testStyle = TestUtilites.createTestStyle(target.getSchema().getTypeName(), null);
+        MapLayer layer=new DefaultMapLayer(target,testStyle);
+		MapContext context=new DefaultMapContext(new MapLayer[]{layer});
+		
+		ShapefileRenderer renderer=new ShapefileRenderer(context);
+		
         Envelope env = context.getLayerBounds();
-        env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env.getMaxY());
+        env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(),
+                env.getMaxY());
         TestUtilites.showRender("testSimpleRender", renderer, 1000, env);
-    }
 
-    /**
-     * Test {@link FeatureSourceMapLayer} using version of {@link #testRender()}.
-     * 
-     * @throws Exception
-     */
-    public void testRenderFeatureSourceMapLayer() throws Exception {
-        MemoryDataStore store = new MemoryDataStore();
-        IndexedShapefileDataStore polys = TestUtilites.getPolygons();
-        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = polys
-                .getFeatureSource().getFeatures();
-        store.createSchema(polys.getSchema());
-        FeatureSource<SimpleFeatureType, SimpleFeature> target = store.getFeatureSource(store
-                .getTypeNames()[0]);
-        ((FeatureStore<SimpleFeatureType, SimpleFeature>) target).addFeatures(featureCollection);
-        Style testStyle = TestUtilites.createTestStyle(target.getSchema().getTypeName(), null);
-        MapLayer layer = new FeatureSourceMapLayer(target, testStyle);
-        MapContext context = new DefaultMapContext(new MapLayer[] { layer });
-        ShapefileRenderer renderer = new ShapefileRenderer(context);
-        Envelope env = context.getLayerBounds();
-        env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env.getMaxY());
-        TestUtilites.showRender("testSimpleRender", renderer, 1000, env);
-    }
-
+	}
 }

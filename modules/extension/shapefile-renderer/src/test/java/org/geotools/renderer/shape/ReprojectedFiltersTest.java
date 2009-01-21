@@ -14,9 +14,7 @@ import org.geotools.filter.text.cql2.CQL;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
-import org.geotools.map.FeatureSourceMapLayer;
 import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.RenderListener;
@@ -26,10 +24,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-/**
- * @author svn history suggests Andrea Aime was here
- * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- */
 public class ReprojectedFiltersTest extends TestCase {
 
     private ShapefileDataStore ds;
@@ -95,39 +89,4 @@ public class ReprojectedFiltersTest extends TestCase {
         assertEquals(1, features);
         assertEquals(0, errors);
     }
-
-    /**
-     * Test {@link FeatureSourceMapLayer} using a variant of {@link #testReprojectFilter()}.
-     * 
-     * @throws Exception
-     */
-    public void testReprojectFilterFeatureSourceMapLayer() throws Exception {
-        CoordinateReferenceSystem mercator = CRS.decode("EPSG:3395", true);
-        ReferencedEnvelope world = new ReferencedEnvelope(-180, 180, -80, 80, DefaultGeographicCRS.WGS84);
-        ReferencedEnvelope worldMercator = world.transform(mercator, true);
-        StyleBuilder sb = new StyleBuilder();
-        Style s = sb.createStyle(sb.createPolygonSymbolizer()); 
-        Filter f = CQL.toFilter("CONTAINS(the_geom, POINT(-100 32))");
-        MapContext mc = new DefaultMapContext(mercator);
-        MapLayer l = new FeatureSourceMapLayer(ds.getFeatureSource(), s);
-        l.setQuery(new DefaultQuery("statepop", f));
-        mc.addLayer(l);
-        ShapefileRenderer r = new ShapefileRenderer(mc);
-        r.addRenderListener(new RenderListener() {
-            public void featureRenderer(SimpleFeature feature) {
-                features++;
-                assertEquals("statepop.15", feature.getID());
-            }
-        
-            public void errorOccurred(Exception e) {
-                errors++;
-            }
-        });
-        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_4BYTE_ABGR);
-        final Graphics2D graphics = (Graphics2D) image.getGraphics();
-        r.paint(graphics, new Rectangle(image.getWidth(), image.getHeight()), worldMercator);
-        assertEquals(1, features);
-        assertEquals(0, errors);
-    }
-
 }
