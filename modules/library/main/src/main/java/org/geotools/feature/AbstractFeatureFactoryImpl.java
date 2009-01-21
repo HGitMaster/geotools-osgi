@@ -49,7 +49,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Gabriel Roldan
  * @author Justin Deoliveira
  * 
- * @version $Id: AbstractFeatureFactoryImpl.java 31059 2008-07-23 20:04:21Z jgarnett $
+ * @version $Id: AbstractFeatureFactoryImpl.java 32284 2009-01-21 06:09:14Z jive $
  */
 public abstract class AbstractFeatureFactoryImpl implements FeatureFactory {
  
@@ -122,6 +122,9 @@ public abstract class AbstractFeatureFactoryImpl implements FeatureFactory {
 	
     public SimpleFeature createSimpleFeature(Object[] array,
             SimpleFeatureType type, String id) {
+        if( type.isAbstract() ){
+            throw new IllegalArgumentException("Cannot create an feature of an abstract FeatureType "+type.getTypeName());
+        }
         return new SimpleFeatureImpl(array, type, ff.featureId(id), validating);
     }
 

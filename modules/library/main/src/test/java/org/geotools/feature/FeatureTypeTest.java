@@ -50,7 +50,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  *
  * @author  en
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/feature/FeatureTypeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/feature/FeatureTypeTest.java $
  */
 public class FeatureTypeTest extends DataTestCase {
   
@@ -67,7 +67,7 @@ public class FeatureTypeTest extends DataTestCase {
     return suite;
   }
   
-  public void XtestAbstractType() throws Exception {
+  public void testAbstractType() throws Exception {
     
     SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
     tb.setName("AbstractThing");
@@ -83,26 +83,23 @@ public class FeatureTypeTest extends DataTestCase {
     assertTrue(abstractType.isAbstract());
     assertTrue(abstractType2.isAbstract());
     
-    assertTrue(FeatureTypes.isDecendedFrom(abstractType, new URI("http://www.opengis.net/gml"),"Feature"));
-    assertTrue(FeatureTypes.isDecendedFrom(abstractType2, new URI("http://www.opengis.net/gml"),"Feature"));
-    assertTrue(FeatureTypes.isDecendedFrom(abstractType2, abstractType));
-    assertFalse(FeatureTypes.isDecendedFrom(abstractType,abstractType2));
+    //assertTrue("extends gml feature", FeatureTypes.isDecendedFrom(abstractType, new URI("http://www.opengis.net/gml"),"Feature"));
+    //assertTrue("extends gml feature", FeatureTypes.isDecendedFrom(abstractType2, new URI("http://www.opengis.net/gml"),"Feature"));
+    assertTrue("abstractType2 --|> abstractType", FeatureTypes.isDecendedFrom(abstractType2, abstractType));
+    assertFalse("abstractType2 !--|> abstractType", FeatureTypes.isDecendedFrom(abstractType,abstractType2));
     
     try {
       SimpleFeatureBuilder.build(abstractType, new Object[0], null);
       fail("abstract type allowed create");
-    } catch (IllegalAttributeException iae) {
-      
-    } catch (UnsupportedOperationException uoe) {
-      
+    } catch (IllegalArgumentException iae) {      
+    } catch (UnsupportedOperationException uoe) {      
     }
+    
     try {
       SimpleFeatureBuilder.build(abstractType2, new Object[0], null);
       fail("abstract type allowed create");
-    } catch (IllegalAttributeException iae) {
-      
-    } catch (UnsupportedOperationException uoe) {
-      
+    } catch (IllegalArgumentException iae) {      
+    } catch (UnsupportedOperationException uoe) {      
     }
     
   }
