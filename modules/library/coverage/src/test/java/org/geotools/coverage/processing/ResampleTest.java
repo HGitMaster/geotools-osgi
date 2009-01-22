@@ -59,14 +59,6 @@ import static org.junit.Assert.*;
  */
 public final class ResampleTest extends GridProcessingTestBase {
 
-   /**
-    * This gets rid of exception for not using native acceleration
-    */
-   static
-   {
-      System.setProperty("com.sun.media.jai.disableMediaLib", "true");
-   } 
-
     /**
      * The source grid coverage, to be initialized by {@link #setUp}.
      * Contains 8-bits indexed color model for a PNG image, with categories.

@@ -64,14 +64,6 @@ import org.opengis.referencing.operation.MathTransform;
  */
 public class GridCoverageRendererTest extends TestCase {
 
-   /**
-    * This gets rid of exception for not using native acceleration
-    */
-   static
-   {
-      System.setProperty("com.sun.media.jai.disableMediaLib", "true");
-   } 
-
 	public GridCoverageRendererTest(String testName) {
 		super(testName);
 
