@@ -164,7 +164,7 @@
     <!-- NOTE: The referencing module does not depends on JTS. -->
     <dependency>
       <groupId>java3d.osgi</groupId>
-      <artifactId>vecmath</artifactId>
+      <artifactId>java3d.osgi.vecmath</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
@@ -201,21 +201,11 @@
 				<configuration>
 					<archive>
 						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+                  <manifest>
+                     <addClasspath>false</addClasspath>
+                  </manifest>
 					</archive>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>bundle-manifest</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>manifest</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

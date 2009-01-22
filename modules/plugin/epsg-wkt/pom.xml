@@ -89,7 +89,7 @@
     </dependency>
     <dependency>
       <groupId>com.vividsolutions.osgi</groupId>
-      <artifactId>jts</artifactId>
+      <artifactId>com.vividsolutions.osgi.jts</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
@@ -106,21 +106,11 @@
 				<configuration>
 					<archive>
 						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+                  <manifest>
+                     <addClasspath>false</addClasspath>
+                  </manifest>
 					</archive>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>bundle-manifest</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>manifest</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

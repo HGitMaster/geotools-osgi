@@ -81,7 +81,7 @@
   <dependencies>
     <dependency>
       <groupId>com.vividsolutions.osgi</groupId>
-      <artifactId>jts</artifactId>
+      <artifactId>com.vividsolutions.osgi.jts</artifactId>
     </dependency>
   </dependencies>
 

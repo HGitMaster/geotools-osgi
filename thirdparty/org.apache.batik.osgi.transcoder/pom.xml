@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.batik.osgi</groupId>
-  <artifactId>transcoder</artifactId>
+  <artifactId>org.apache.batik.osgi.transcoder</artifactId>
   <packaging>bundle</packaging>
   <name>Apache Batik Transcoder</name>
-  <version>1.0</version>
+  <version>1.6</version>
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>thirdparty</artifactId>
@@ -13,11 +13,12 @@
   </parent> 
   <dependencies>
     <dependency>
-        <groupId>batik</groupId>
-	<artifactId>batik-transcoder</artifactId>
-	<version>1.6</version>
+      <groupId>batik</groupId>
+      <artifactId>batik-transcoder</artifactId>
+      <version>1.6</version>
+      <optional>true</optional>
+      <scope>compile</scope>
     </dependency>
-
   </dependencies>
   <build>
     <plugins>
@@ -30,7 +31,7 @@
 		<Bundle-Name>Apache Batic Transcoder</Bundle-Name>
                 <Bundle-SymbolicName>org.apache.batik.osgi.transcoder</Bundle-SymbolicName>
                 <Bundle-Description>OSGI bundle for Apache Batic Transcoder</Bundle-Description>
-		<Bundle-Version>1.0</Bundle-Version>
+		<Bundle-Version>1.6</Bundle-Version>
             	<Export-Package>org.apache.batik.transcoder.*
 		</Export-Package>
 		<Import-Package>com.sun.image.codec.jpeg;resolution:=optional,
@@ -51,7 +52,9 @@ org.apache.batik.bridge,
  org.apache.batik.xml,
  org.w3c.dom,
  org.xml.sax</Import-Package>
+          <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
           </instructions>
+          <unpackBundle>true</unpackBundle>
         </configuration>
       </plugin>
     </plugins>

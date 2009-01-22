@@ -97,17 +97,16 @@
     </dependency>
     <dependency>
       <groupId>com.vividsolutions.osgi</groupId>
-      <artifactId>jts</artifactId>
+      <artifactId>com.vividsolutions.osgi.jts</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
       <groupId>net.java.dev.osgi</groupId>
-      <artifactId>jsr-275</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <artifactId>net.java.dev.osgi.jsr-275</artifactId>
     </dependency>
     <dependency>
       <groupId>java3d.osgi</groupId>
-      <artifactId>vecmath</artifactId>
+      <artifactId>java3d.osgi.vecmath</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
@@ -141,7 +140,7 @@
     </dependency>
     <dependency>
       <groupId>javax.media.jai.osgi</groupId>
-      <artifactId>jai_imageio</artifactId>
+      <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>

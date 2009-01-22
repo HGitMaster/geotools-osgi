@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.vividsolutions.osgi</groupId>
-  <artifactId>jts</artifactId>
+  <artifactId>com.vividsolutions.osgi.jts</artifactId>
   <packaging>bundle</packaging>
   <name>Java Topology Suite</name>
-  <version>1.0</version>
+  <version>1.9</version>
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>thirdparty</artifactId>
@@ -14,10 +14,11 @@
   <dependencies>
     <dependency>
         <groupId>com.vividsolutions</groupId> 
-  	<artifactId>jts</artifactId> 
-        <version>1.9</version> 
+        <artifactId>jts</artifactId> 
+        <version>1.9</version>
+        <optional>true</optional> 
+        <scope>compile</scope>        
     </dependency>
-
   </dependencies>
   <build>
     <plugins>
@@ -27,13 +28,14 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-		<Bundle-Name>Java Topology Suite</Bundle-Name>
-                <Bundle-SymbolicName>com.vividsolutions.osgi.jts</Bundle-SymbolicName>
-                <Bundle-Description>OSGI bundle for Java Topology Suite</Bundle-Description>
-		<Bundle-Version>1.0</Bundle-Version>
-            	<Export-Package>com.vividsolutions.jts.*
-		</Export-Package>
+		      <Bundle-Name>Java Topology Suite</Bundle-Name>
+            <Bundle-SymbolicName>com.vividsolutions.osgi.jts</Bundle-SymbolicName>
+            <Bundle-Description>OSGI bundle for Java Topology Suite</Bundle-Description>
+            <Bundle-Version>1.9</Bundle-Version>
+            <Export-Package>com.vividsolutions.jts.*</Export-Package>
+            <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
           </instructions>
+          <unpackBundle>true</unpackBundle>
         </configuration>
       </plugin>
     </plugins>

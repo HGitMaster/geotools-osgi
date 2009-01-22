@@ -74,7 +74,7 @@
   <dependencies>
     <dependency>
       <groupId>com.vividsolutions.osgi</groupId>
-      <artifactId>jts</artifactId>
+      <artifactId>com.vividsolutions.osgi.jts</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>

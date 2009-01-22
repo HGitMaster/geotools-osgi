@@ -95,7 +95,7 @@
     </dependency>
     <dependency>
       <groupId>javax.media.jai.osgi</groupId>
-      <artifactId>jai_imageio</artifactId>
+      <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
       <scope>provided</scope>  <!-- Users should execute JAI installer. -->
     </dependency>
 

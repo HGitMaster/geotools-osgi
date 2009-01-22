@@ -94,8 +94,8 @@
     <!-- NOTE: The referencing module does not depends on JTS. -->
     <dependency>
       <groupId>java3d.osgi</groupId>
-      <artifactId>vecmath</artifactId>
-      <version>1.0</version>
+      <artifactId>java3d.osgi.vecmath</artifactId>
+      <version>1.3.1</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
