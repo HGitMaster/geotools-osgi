@@ -33,9 +33,11 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Or;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.filter.visitor.SimplifyingFilterVisitor;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 
 
@@ -48,7 +50,7 @@ public class FilterSplitterTest extends TestCase {
     protected Envelope bbenv;
     protected Envelope bb2env;
     protected Envelope bsoenv;
-
+    
     protected void setUp() {
         ff = new FilterFactoryImpl();
         bb = ff.bbox("geom", 0, 10, 1000, 1100, "srs");
@@ -90,18 +92,20 @@ public class FilterSplitterTest extends TestCase {
     public void testAndFilter() {
         BBoxFilterSplitter splitter = new BBoxFilterSplitter();
         Filter and = ff.and(bb, att);
-        and.accept(splitter, null);
+        and.accept(splitter, null);       
         assertEquals(bbenv, splitter.getEnvelope());
         assertEquals(bb, splitter.getFilterPre());
-        assertEquals(att, splitter.getFilterPost());
+        assertEquals(and, splitter.getFilterPost());
+        
+        
         and = ff.and(bb, bb2);
         splitter = new BBoxFilterSplitter();
         and.accept(splitter, null);
-
-        Envelope i = bbenv.intersection(bb2env);
+        Envelope i = new Envelope(bbenv);
+        i.expandToInclude(bb2env);
         Envelope s = splitter.getEnvelope();
         assertEquals(i, s);
-        assertEquals(Filter.INCLUDE, splitter.getFilterPost());
+        assertEquals(and, splitter.getFilterPost());
     }
 
     public void testOrFilter() {
@@ -128,15 +132,27 @@ public class FilterSplitterTest extends TestCase {
         BBoxFilterSplitter splitter = new BBoxFilterSplitter();
         Filter not = ff.not(bb);
         not.accept(splitter, null);
-        assertNull(splitter.getEnvelope());
+        assertEquals(Filter.INCLUDE, splitter.getFilterPre());
+        assertEquals(not, splitter.getFilterPost());
+        
+        //tests:  bb2 AND (NOT bb)
+        Filter and = ff.and(bb2, not);
+        splitter = new BBoxFilterSplitter();
+        and.accept(splitter, null);
+
+        assertEquals(bb2, splitter.getFilterPre());
+        assertEquals(and, splitter.getFilterPost());
+        
     }
 
     public void testBinarySpatialOperator() {
         BBoxFilterSplitter splitter = new BBoxFilterSplitter();
         Filter and = ff.and(bb, bso);
         and.accept(splitter, null);
-        assertEquals(bso, splitter.getFilterPost());
-        assertEquals(bbenv.intersection(bsoenv), splitter.getEnvelope());
+        Envelope testenv = bbenv;
+        testenv.expandToInclude(bsoenv);
+        assertEquals(testenv, splitter.getEnvelope());
+        assertEquals(and, splitter.getFilterPost());
         
         SimpleFeature sf = createTestFeature();
         assertTrue(splitter.getFilterPre().evaluate(sf));
@@ -152,8 +168,35 @@ public class FilterSplitterTest extends TestCase {
 
         Filter and = ff.and(filters);
         and.accept(splitter, null);
-        assertEquals(bbenv.intersection(bb2env), splitter.getEnvelope());
-        assertEquals(ff.and(att, bso), splitter.getFilterPost());
+        Envelope tmp = new Envelope(bbenv);
+        tmp.expandToInclude(bb2env);
+        tmp.expandToInclude(bsoenv);
+        assertEquals(tmp, splitter.getEnvelope());
+        assertEquals(and, splitter.getFilterPost());
+        
+        Filter bbox = ff.bbox("geom", 500, 210, 2000, 200, "srs");
+        
+        Coordinate[] coords = new Coordinate[] {
+                new Coordinate(205, 455), new Coordinate(205, 500), 
+                new Coordinate(210, 500),
+                new Coordinate(210, 455), new Coordinate(205, 455)
+            };
+        CoordinateArraySequence seq = new CoordinateArraySequence(coords);
+        LinearRing ls = new LinearRing(seq, new GeometryFactory());
+        Polygon ret = new Polygon(ls, null, new GeometryFactory());
+        Filter intersects = ((FilterFactoryImpl) ff).intersects(ff.property("geom"), ff.literal(ret));
+
+        and = ff.and(intersects, bbox);
+        splitter = new BBoxFilterSplitter();
+        and.accept(splitter, null);
+        
+        tmp = new Envelope(500, 2000, 200, 210);
+        tmp.expandToInclude(ret.getEnvelopeInternal());
+        assertEquals(ff.bbox("geom", tmp.getMinX(), tmp.getMinY(), tmp.getMaxX(), tmp.getMaxY(), "srs"), splitter.getFilterPre());
+        assertEquals(and, splitter.getFilterPost());
+        
+        
+        
     }
 
     public void testOrManyFilters() {
@@ -187,7 +230,7 @@ public class FilterSplitterTest extends TestCase {
     	and.accept(splitter, null);
     	assertNotNull(splitter.getEnvelope());
     	assertEquals(testfilter, splitter.getFilterPre());
-    	assertEquals(att, splitter.getFilterPost());
+    	assertEquals(and, splitter.getFilterPost());
     	
     	//tests:
     	//(bbox and bbox) or attribute
@@ -206,8 +249,8 @@ public class FilterSplitterTest extends TestCase {
     	and = ff.and(or, bb);
     	and.accept(splitter, null);
     	assertNotNull(splitter.getEnvelope());
-    	assertEquals(bb, splitter.getFilterPre());
-    	assertEquals(Filter.INCLUDE, splitter.getFilterPost());
+    	assertEquals(testfilter, splitter.getFilterPre());
+    	assertEquals(and, splitter.getFilterPost());
     	
     	//tests:
     	//(bbox or attribute) and bbox
@@ -217,7 +260,7 @@ public class FilterSplitterTest extends TestCase {
     	and.accept(splitter, null);
     	assertNotNull(splitter.getEnvelope());
     	assertEquals(bb, splitter.getFilterPre());
-    	assertEquals(or, splitter.getFilterPost());
+    	assertEquals(and, splitter.getFilterPost());
     	
     	//tests:
     	//(bbox and attribute) or bbox2
@@ -294,7 +337,7 @@ public class FilterSplitterTest extends TestCase {
         Filter and = ff.and(filters);
         and.accept(splitter, null);
         assertEquals(bb, splitter.getFilterPre());
-        assertEquals(Filter.INCLUDE, splitter.getFilterPost());		//if pre incorporates all geometries then we need nothing post
+        assertEquals(and, splitter.getFilterPost());		//if pre incorporates all geometries then we need nothing post
         
         //test include with another geometry filter using and with attribute 
     	splitter = new BBoxFilterSplitter();
@@ -305,7 +348,7 @@ public class FilterSplitterTest extends TestCase {
         and = ff.and(filters);
         and.accept(splitter, null);
         assertEquals(bb, splitter.getFilterPre());
-        assertEquals(att, splitter.getFilterPost());
+        assertEquals(and, splitter.getFilterPost());
     }
     /**
      * Tests filters that contain exclude filters
@@ -375,7 +418,7 @@ public class FilterSplitterTest extends TestCase {
         and = ff.and(filters);
         and.accept(splitter, null);
         assertEquals(Filter.EXCLUDE, splitter.getFilterPre());
-        assertEquals(att, splitter.getFilterPost());
+        assertEquals(Filter.INCLUDE, splitter.getFilterPost());
     }
     
     /**
@@ -404,7 +447,7 @@ public class FilterSplitterTest extends TestCase {
     	Filter and = ff.and(filters);
     	and.accept(splitter, null);
     	assertEquals(excludeFilter, splitter.getFilterPre());
-    	assertEquals(att, splitter.getFilterPost());	
+    	assertEquals(Filter.INCLUDE, splitter.getFilterPost());	
     }
     
     private SimpleFeature createTestFeature(){

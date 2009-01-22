@@ -105,12 +105,6 @@ public class GridNode implements Node, Serializable {
     public NodeIdentifier getIdentifier() {
         if (id == null) {
             id = new RegionNodeIdentifier(this);
-
-            //            if (grid.containsKey(id)) {
-            //                id = grid.node_ids.get(id);
-            //            } else {
-            //                grid.node_ids.put(id, id);
-            //            }
             id = (RegionNodeIdentifier) grid.findUniqueInstance(id);
         }
 
@@ -172,7 +166,6 @@ public class GridNode implements Node, Serializable {
         this.num_data = 0;
         this.data.clear();
         getIdentifier().setValid(false);
-
         //this.data_ids = new int[10];
     }
 
@@ -194,7 +187,7 @@ public class GridNode implements Node, Serializable {
         sb.append("\t#Data= " + num_data + "\n");
 
         for (Iterator<GridData> it = data.iterator(); it.hasNext();) {
-            sb.append("\t\t" + it.next().data.toString() + "\n");
+            sb.append("\t\t" + it.next().getData().toString() + "\n");
         }
 
         return sb.toString();

@@ -23,6 +23,7 @@ import java.util.Stack;
 
 import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.And;
+import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
@@ -93,7 +94,26 @@ public class BBoxFilterSplitter implements FilterVisitor {
         envelopes.push(new Envelope(UNIVERSE_ENVELOPE));
         return null;
     }
+    
+    public Object visit(Id f, Object arg1) {
+        otherRestrictions.push(f);
+        return null;
+    }
 
+    public Object visit(Not f, Object arg1) {
+        //visit child
+        f.getFilter().accept(this, arg1);
+        
+        //deal with envelope
+        if (envelopes.size() > 0){
+            //universe - envelope = universe 
+            Envelope e = envelopes.pop();
+            envelopes.push(new Envelope(UNIVERSE_ENVELOPE));
+        }
+        otherRestrictions.push(f);
+        return null;
+    }
+    
     public Object visit(And f, Object arg1) {
         int envSize = envelopes.size();
         int othSize = otherRestrictions.size();
@@ -106,34 +126,45 @@ public class BBoxFilterSplitter implements FilterVisitor {
         if (envelopes.size() >= (envSize + 2)) {
             Envelope e = (Envelope) envelopes.pop();
             for (int i = envelopes.size(); i > envSize; i--) {
-                Envelope tmp = (Envelope)envelopes.pop();
-                e = e.intersection(tmp);
-
+                Envelope curr = (Envelope) envelopes.pop();
+                if (curr.equals(EMPTY_ENVELOPE) || e.equals(EMPTY_ENVELOPE)){
+                    e = new Envelope(EMPTY_ENVELOPE);
+                }else if (curr.equals(UNIVERSE_ENVELOPE)){
+                    //do nothing leave e alone
+                    //universe & envelope = enevelope
+                }else if (e.equals(UNIVERSE_ENVELOPE )){
+                    e = curr;
+                }else{
+                    //must expand to include instead of intersects
+                    //because two bounding boxes may be disjoint
+                    //but a geometry may still intersect both of the
+                    //bounding boxes
+                    e.expandToInclude(curr);
+                }
             }
             envelopes.push(e);
         }
 
-        if (otherRestrictions.size() >= (othSize + 2)) {
-            List<Filter> pops = new ArrayList<Filter>();
-            for (int i = otherRestrictions.size(); i > othSize; i--) {
-                pops.add((Filter) otherRestrictions.pop());
-            }
-            otherRestrictions.push(new FilterFactoryImpl().and(pops));
+//        if (otherRestrictions.size() >= (othSize + 2)) {
+//            List<Filter> pops = new ArrayList<Filter>();
+//            for (int i = otherRestrictions.size(); i > othSize; i--) {
+//                pops.add((Filter) otherRestrictions.pop());
+//            }
+//            otherRestrictions.push(new FilterFactoryImpl().and(pops));
+//        }
+        // in all case, we'll need original filter as computed SpatialRestriction is a rough approximation
+        int size = otherRestrictions.size();
+        multiplePop(otherRestrictions, othSize);
+        Envelope top = envelopes.peek();
+        if (!(top.equals(EMPTY_ENVELOPE))){
+        //if (size > othSize){
+            otherRestrictions.push(f);
+        //}
         }
 
         return null;
     }
-
-    public Object visit(Id f, Object arg1) {
-        otherRestrictions.push(f);
-        return null;
-    }
-
-    public Object visit(Not f, Object arg1) {
-        otherRestrictions.push(f);
-        return null;
-    }
-
+    
     public Object visit(Or f, Object arg1) {
         int envSize = envelopes.size();
         int othSize = otherRestrictions.size();
@@ -155,7 +186,7 @@ public class BBoxFilterSplitter implements FilterVisitor {
             // the trick is we cannot separate this filter in the form of SpatialRestriction && OtherRestriction
             // so we add this part to OtherRestriction
             envelopes.pop();
-            envelopes.push(UNIVERSE_ENVELOPE);
+            envelopes.push(new Envelope(UNIVERSE_ENVELOPE));
         }
 
         // in all case, we'll need original filter as computed SpatialRestriction is a rough approximation

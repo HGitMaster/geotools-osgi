@@ -31,13 +31,15 @@ package org.geotools.caching.spatialindex;
 import java.util.Properties;
 
 
-/** A generic contract for spatial indexes, such as quadtrees or r-trees.
+/** 
+ * A generic contract for spatial indexes, such as quadtrees or r-trees.
  * Provides methods to insert, delete and query the index.
  * Note that implementations may be n-dimensional.
  *
  * @author Marios Hadjieleftheriou, marioh@cs.ucr.edu
  * @copyright Copyright (C) 2002  Navel Ltd.
  * Modified by Christophe Rousson
+ * Modified by Emily Gouge
  */
 public interface SpatialIndex {
     public static final String INDEX_TYPE_PROPERTY = "SpatialIndex.Type";
@@ -54,22 +56,19 @@ public interface SpatialIndex {
     public void clear() throws IllegalStateException;
 
     /** Insert new data in the index.
-     * id is used to identify data, when several data have the same shape,
-     * and should be provided by the user.
      *
      * @param data to insert
      * @param a n-dims shape
-     * @param id of the data
      */
-    public void insertData(final Object data, final Shape shape, int id);
+    public void insertData(final Object data, final Shape shape);
 
-    /** Delete data both identified by its shape and id.
+    /** Delete data both identified by its shape 
      *
+     * @param data to find and delete
      * @param shape
-     * @param id
      * @return <code>true</code> if data has been found and deleted
      */
-    public boolean deleteData(final Shape shape, int id);
+    public boolean deleteData(final Object data, final Shape shape);
 
     /** Traverse index to match data such as :
      *  <code>query.contains(Data.getShape())</code>
@@ -156,9 +155,11 @@ public interface SpatialIndex {
      */
     public Statistics getStatistics();
 
-    /** Cause pending write operations to happen immediatly.
+    /** Cause pending write operations to happen immediately.
      * Use this method to persist the index before disposal.
      *
      */
     public void flush();
+    
+    public void initializeFromStorage(Storage storage);
 }

@@ -27,27 +27,25 @@ import org.geotools.caching.spatialindex.Shape;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.grid.Grid;
 import org.geotools.caching.spatialindex.grid.GridNode;
+import org.geotools.caching.spatialindex.grid.GridRootNode;
 
 
 public class GridTracker extends Grid implements EvictableTree {
-    GridTrackerStatistics stats;
-    EvictionPolicy policy;
-    boolean doRecordAccess = true;
 
+    private EvictionPolicy policy;
+    private boolean doRecordAccess = true;
+
+    /**
+     * 
+     * @param mbr
+     * @param capacity the number of tiles in the index
+     * @param store
+     */
     public GridTracker(Region mbr, int capacity, Storage store) {
-        this.mbr = mbr;
-        this.dimension = mbr.getDimension();
-        this.store = store;
-        store.setParent(this);
+        super(mbr, capacity, store);
         this.policy = new LRUEvictionPolicy(this);
-
-        GridCacheRootNode root = new GridCacheRootNode(this, mbr, capacity);
-        this.root = root.getIdentifier();
-        root.split();
-        writeNode(root);
-        this.stats = new GridTrackerStatistics();
-        super.stats = this.stats;
-        this.stats.addToNodesCounter(root.getCapacity() + 1); // root has root.capacity nodes, +1 for root itself :)
+        super.stats = new GridTrackerStatistics();
+        this.stats.addToNodesCounter(((GridRootNode)super.rootNode).getCapacity() + 1); // root has root.capacity nodes, +1 for root itself :)
     }
 
     NodeIdentifier getRoot() {
@@ -64,17 +62,17 @@ public class GridTracker extends Grid implements EvictableTree {
             int[] mins = new int[this.dimension];
             int[] maxs = new int[this.dimension];
             findMatchingTiles(search, cursor, mins, maxs);
-
-            GridCacheRootNode root = (GridCacheRootNode) readNode(this.root);
-
+            
+            GridRootNode root = (GridRootNode) this.rootNode;
+            
             do {
                 int nextid = root.gridIndexToNodeId(cursor);
-                NodeIdentifier nextnode = root.getChildIdentifier(nextid);
-                if (!nextnode.isValid()) {
-                    missing.add(nextnode.getShape());
-                } else if (!foundValid) {
-                    foundValid = true;
-                }
+				NodeIdentifier nextnode = root.getChildIdentifier(nextid);
+				if (!nextnode.isValid()) {
+					missing.add(nextnode.getShape());
+				} else if (!foundValid) {
+					foundValid = true;
+				}
             } while (increment(cursor, mins, maxs));
         }
 
@@ -101,18 +99,21 @@ public class GridTracker extends Grid implements EvictableTree {
     //        this.stats.addToNodesCounter(root.getCapacity() + 1);
     //    }
     public int getEvictions() {
-        return stats.getEvictions();
+        return getStatistics().getEvictions();
     }
 
+    public EvictionPolicy getEvictionPolicy(){
+        return this.policy;
+    }
     public void evict(NodeIdentifier node) {
-        //    	System.out.println("evicting : " + node);
+        //      System.out.println("evicting : " + node);
         GridNode nodeToEvict = (GridNode) readNode(node); // FIXME: avoid to read node before eviction
         int ret = nodeToEvict.getDataCount();
         nodeToEvict.clear();
         nodeToEvict.getIdentifier().setValid(false);
         writeNode(nodeToEvict);
-        this.stats.addToDataCounter(-ret);
-        this.stats.addToEvictionCounter(1);
+        getStatistics().addToDataCounter(-ret);
+        getStatistics().addToEvictionCounter(1);
     }
 
     @Override
@@ -124,6 +125,9 @@ public class GridTracker extends Grid implements EvictableTree {
         return super.readNode(id);
     }
 
+    public GridTrackerStatistics getStatistics(){
+        return ((GridTrackerStatistics)super.getStatistics());
+    }
     @Override
     protected void writeNode(Node node) {
         super.writeNode(node);

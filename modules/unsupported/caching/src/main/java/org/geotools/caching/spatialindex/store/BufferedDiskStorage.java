@@ -16,6 +16,8 @@
  */
 package org.geotools.caching.spatialindex.store;
 
+import java.io.File;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Properties;
@@ -24,6 +26,7 @@ import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
+import org.opengis.feature.type.FeatureType;
 
 
 public class BufferedDiskStorage implements Storage {
@@ -33,8 +36,8 @@ public class BufferedDiskStorage implements Storage {
     LinkedHashMap<NodeIdentifier, BufferEntry> buffer;
     int buffer_size;
 
-    private BufferedDiskStorage(int buffer_size) {
-        this.buffer_size = buffer_size;
+    private BufferedDiskStorage(int buffersize) {
+        this.buffer_size = buffersize;
         buffer = new LinkedHashMap<NodeIdentifier, BufferEntry>(buffer_size, .75f, true);
     }
 
@@ -51,6 +54,7 @@ public class BufferedDiskStorage implements Storage {
 
             return instance;
         } catch (NullPointerException e) {
+            e.printStackTrace();
             throw new IllegalArgumentException("BufferedDiskStorage : invalid property set.");
         }
     }
@@ -90,7 +94,7 @@ public class BufferedDiskStorage implements Storage {
                 Iterator<NodeIdentifier> it = buffer.keySet().iterator();
                 BufferEntry removed = buffer.remove(it.next());
 
-                if (removed.dirty) {
+                if (removed != null && removed.dirty) {
                     storage.put(removed.node);
                 }
 
@@ -158,5 +162,17 @@ public class BufferedDiskStorage implements Storage {
         BufferEntry(Node node) {
             this.node = node;
         }
+    }
+
+    public void addFeatureType( FeatureType ft ) {
+        this.storage.addFeatureType(ft);
+    }
+
+    public Collection<FeatureType> getFeatureTypes() {
+        return this.storage.getFeatureTypes();
+    }
+    
+    public void clearFeatureTypes(){
+        this.storage.clearFeatureTypes();
     }
 }

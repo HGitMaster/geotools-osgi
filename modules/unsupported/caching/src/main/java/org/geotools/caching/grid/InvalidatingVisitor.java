@@ -21,15 +21,29 @@ import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Visitor;
 
-
-class InvalidatingVisitor implements Visitor {
+/**
+ * 
+ * Visitor that invalidates cache nodes.
+ * 
+ * <p>Will also try to clear all items cached in node.</p>
+ */
+public class InvalidatingVisitor implements Visitor {
 	
     private Region region;
 
+    /**
+     * Creates a new Invalidating Visitor.
+     * 
+     * @param r the region to invalid nodes within
+     */
     public InvalidatingVisitor(Region r) {
         this.region = r;
     }
     
+    /**
+     * Creates a new Invalidating Visitor that will invalidate
+     * all nodes visited (no matter where they are).
+     */
     public InvalidatingVisitor() {
     }
     
@@ -40,11 +54,10 @@ class InvalidatingVisitor implements Visitor {
     public void visitData(Data d) {
         // do nothing
     }
-
+    
     public void visitNode(Node n) {
-		if (region == null || region.contains(n.getShape())) {
+		if (this.region == null || this.region.contains(n.getShape())) {
 			n.getIdentifier().setValid(false);
-
 			if (n instanceof GridCacheNode) {
 				GridCacheNode node = (GridCacheNode) n;
 				node.clear();

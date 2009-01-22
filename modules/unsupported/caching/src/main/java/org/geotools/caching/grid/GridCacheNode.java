@@ -21,7 +21,10 @@ import org.geotools.caching.spatialindex.grid.Grid;
 import org.geotools.caching.spatialindex.grid.GridData;
 import org.geotools.caching.spatialindex.grid.GridNode;
 
-
+/**
+ * A Cache node for the grid feature cache.
+ * 
+ */
 public class GridCacheNode extends GridNode {
     /**
      *
@@ -33,6 +36,10 @@ public class GridCacheNode extends GridNode {
     }
 
     @Override
+    /**
+     * Only adds data if node is valid.
+     * @return true if data could be added to node; false otherwise
+     */
     protected boolean insertData(GridData data) {
         if (getIdentifier().isValid()) {
             return super.insertData(data);
@@ -40,8 +47,4 @@ public class GridCacheNode extends GridNode {
 
         return false;
     }
-
-    //    protected GridData getData(int i) {
-    //        return this.data[i];
-    //    }
 }

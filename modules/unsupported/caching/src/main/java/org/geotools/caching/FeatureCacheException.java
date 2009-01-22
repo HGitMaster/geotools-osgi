@@ -16,6 +16,9 @@
  */
 package org.geotools.caching;
 
+/**
+ * Exception thrown by the FeatureCache when unexpected error occurs.
+ */
 public class FeatureCacheException extends Exception {
     /**
      *

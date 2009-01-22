@@ -66,7 +66,7 @@ public class SimpleFeatureMarshaller {
     public static final int FEATURE = -1;
     public static final int SIMPLEATTRIBUTE = 0;
     
-    HashMap<TypeKey, SimpleFeatureType> types;
+    private HashMap<TypeKey, SimpleFeatureType> types;
 
     /** Default constructor.
      */
@@ -240,21 +240,22 @@ class TypeKey implements Serializable {
      *
      */
     private static final long serialVersionUID = 3939840339831295334L;
-    int typeHash;
+    //int typeHash;
     String typeName;
 
     public TypeKey(SimpleFeatureType type) {
-        this.typeHash = type.hashCode();
+        //this.typeHash = type.hashCode();
         this.typeName = type.getName().getURI();
     }
 
     public TypeKey(int hash, String name) {
-        this.typeHash = hash;
+//        this.typeHash = hash;
         this.typeName = name;
     }
 
     public int hashCode() {
-        return typeHash;
+  //      return typeHash;
+       return  typeName.hashCode();
     }
 
     public boolean equals(Object o) {
@@ -265,7 +266,8 @@ class TypeKey implements Serializable {
         if (o instanceof TypeKey) {
             TypeKey key = (TypeKey) o;
 
-            return (typeHash == key.typeHash) && (typeName.equals(key.typeName));
+            //return (typeHash == key.typeHash) && (typeName.equals(key.typeName));
+            return typeName.equals(key.typeName);
         } else {
             return false;
         }

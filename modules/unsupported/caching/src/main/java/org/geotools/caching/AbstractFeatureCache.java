@@ -18,7 +18,6 @@ package org.geotools.caching;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -38,6 +37,7 @@ import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.data.memory.MemoryFeatureCollection;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
@@ -45,7 +45,6 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.OrImpl;
 import org.geotools.filter.spatial.BBOXImpl;
-import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
@@ -55,21 +54,39 @@ import org.opengis.filter.FilterFactory;
 import com.vividsolutions.jts.geom.Envelope;
 
 
+/**
+ * Abstract implementation of a feature cache.
+ * <p>
+ * This implementation uses envelopes to deal with determining what
+ * has been added to the cache already and what items need to be
+ * retrieved from the feature source.
+ * </p>
+ * 
+ */
 public abstract class AbstractFeatureCache implements FeatureCache, FeatureListener {
 
     protected static Logger logger;
-    static FilterFactory ff;
+    protected static FilterFactory ff;
 
     static {
         ff = new FilterFactoryImpl();
         logger = org.geotools.util.logging.Logging.getLogger("org.geotools.caching");
     }
 
-    protected FeatureSource fs;
+    protected FeatureSource fs;             //the feature source that backs the given feature type
+    
+    //statistics about the cache
     protected int source_hits = 0;
     protected int source_feature_reads = 0;
+    
+    //lock for reading/writing to cache
     protected ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
+    /**
+     * Creates a new feature cache from the given feature source.
+     * 
+     * @param fs
+     */
     public AbstractFeatureCache(FeatureSource fs) {
         this.fs = fs;
         fs.addFeatureListener(this);
@@ -104,23 +121,34 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
                    public void setTransaction(Transaction transaction) {
                        this.fs.setTransaction(transaction);
                    } */
+    /**
+     * Adds a feature listener
+     */
     public void addFeatureListener(FeatureListener listener) {
         this.fs.addFeatureListener(listener);
     }
 
+    /**
+     * Returns the DataAccess of the underlying feature source
+     */
     public DataAccess getDataStore() {
         return this.fs.getDataStore();
     }
 
+    /**
+     * Gets all features from that are contained within the feature source.
+     */
     public FeatureCollection getFeatures() throws IOException {
         return this.getFeatures(Filter.INCLUDE);
     }
 
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Gets all features which satistfy the given query.
+     */
     public FeatureCollection getFeatures(Query query) throws IOException {
-    	String typename = query.getTypeName();
-    	String schemaname = this.getSchema().getTypeName();
+        String typename = query.getTypeName();
+        String schemaname = this.getSchema().getTypeName();
         if ((query.getTypeName() != null)
                 && (typename != schemaname)) {
             return new EmptyFeatureCollection(this.getSchema());
@@ -173,6 +201,9 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         }
     }
 
+    /**
+     * Get all features with satisfy a given filter.
+     */
     public FeatureCollection getFeatures(Filter filter)
         throws IOException {
         /* PostPreProcessFilterSplittingVisitor may return
@@ -210,6 +241,13 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         }
     }
 
+    /**
+     * Gets features with satisfy a given filter.
+     *
+     * @param filter
+     * @return
+     * @throws IOException
+     */
     protected FeatureCollection _getFeatures(Filter filter)
         throws IOException {
         if (filter instanceof BBOXImpl) {
@@ -265,7 +303,7 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
             FeatureCollection fromSource = this.fs.getFeatures(notcached);
 
             try {
-            	//get notice we discovered some new part of the universe
+                //get notice we discovered some new part of the universe
                 register(notcached);
                 // add new data to cache - will raise an exception if cache is oversized 
                 put(fromCache);
@@ -273,7 +311,7 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
                 logger.log(Level.INFO, "Adding data to cache : " + e.toString());
                 remove(extractEnvelope((BBOXImpl) notcached));
             } catch (Exception ex){
-            	unregister(notcached);
+                unregister(notcached);
             }
 
             // merge result sets
@@ -283,6 +321,9 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         }
     }
 
+    /**
+     * Get all features within a given envelope.
+     */
     public FeatureCollection get(Envelope e) throws IOException { // TODO: read lock
 
         FeatureCollection fromCache;
@@ -315,66 +356,70 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         lock.writeLock().lock();
         writeLog(Thread.currentThread().getName() + " : Got W lock, getting data");
         try {
-			notcached = match(e); // check again because another thread may have inserted data in between
-			if (notcached.isEmpty()) {
-				fromCache = peek(e);
-				return fromCache;
-			}
-			
-			//get items from cache
-			fromCache = peek(e);
-			 
-			// get what data we are missing from the cache based on the not cached array.
-			Filter filter = null;
-			if (notcached.size() == 1){
-			    Envelope env = notcached.get(0);
-			    filter = ff.bbox(geometryname, env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY(), srs);
-			}else{
-			    //or the envelopes together into a single or filter
-			    ArrayList<Filter> filters = new ArrayList<Filter>(notcached.size());
-	            for (Iterator<Envelope> it = notcached.iterator(); it.hasNext();) {
-	                Envelope next = (Envelope) it.next();
-	                Filter bbox = ff.bbox(geometryname, next.getMinX(), next.getMinY(), next.getMaxX(), next.getMaxY(), srs);
-	                filters.add(bbox);
-	            }
-	            filter = ff.or(filters);
-			}
-			
-			//get the data from the source
-			fromSource = this.fs.getFeatures(filter);
-			
-			//update stats
-			source_hits++;
-			source_feature_reads += fromSource.size();
+            notcached = match(e); // check again because another thread may have inserted data in between
+            if (notcached.isEmpty()) {
+                fromCache = peek(e);
+                return fromCache;
+            }
+            
+            //get items from cache
+            fromCache = peek(e);
+             
+            // get what data we are missing from the cache based on the not cached array.
+            Filter filter = null;
+            if (notcached.size() == 1){
+                Envelope env = notcached.get(0);
+                filter = ff.bbox(geometryname, env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY(), srs);
+            }else{
+                //or the envelopes together into a single or filter
+                ArrayList<Filter> filters = new ArrayList<Filter>(notcached.size());
+                for (Iterator<Envelope> it = notcached.iterator(); it.hasNext();) {
+                    Envelope next = (Envelope) it.next();
+                    Filter bbox = ff.bbox(geometryname, next.getMinX(), next.getMinY(), next.getMaxX(), next.getMaxY(), srs);
+                    filters.add(bbox);
+                }
+                filter = ff.or(filters);
+            }
+            
+            //get the data from the source
+            fromSource = this.fs.getFeatures(filter);
+            //cache these features in a local feature collection while we deal with them
+            FeatureCollection localSource = new MemoryFeatureCollection((SimpleFeatureType)fromSource.getSchema());
+            localSource.addAll(fromSource);
+            fromSource = localSource;
+            
+            //update stats
+            source_hits++;
+            source_feature_reads += fromSource.size();
 
-			fromCache.addAll(fromSource);
-			
-			//add it to the cache; 
-			try {
-				isOversized(fromSource);
-				try{
-					register(filter); // get notice we discovered some new part of the universe
-					//put(fromSource);  // add new data to cache - will raise an exception if cache is over sized
-					// add new data to cache - will raise an exception if cache is over sized
-					//here we are adding the everything (include the stuff that's already in the cache
-					//which is done to prevent multiple wfs calls 
-					put(fromCache);  
-					
-				}catch (Exception ex){
-					//something happened here so we better unregister this area
-					//so if we try again next time we'll try getting data again
-					unregister(filter);
-				}
-			} catch (CacheOversizedException e1) {
-				logger.log(Level.INFO, "Adding data to cache : " + e1.toString());
-			}
+            fromCache.addAll(fromSource);
+            
+            //add it to the cache; 
+            try {
+                isOversized(fromSource);
+                try{
+                    register(filter); // get notice we discovered some new part of the universe
+                    //put(fromSource);  // add new data to cache - will raise an exception if cache is over sized
+                    // add new data to cache - will raise an exception if cache is over sized
+                    //here we are adding the everything (include the stuff that's already in the cache
+                    //which is done to prevent multiple wfs calls 
+                    put(fromCache);  
+                    
+                }catch (Exception ex){
+                    //something happened here so we better unregister this area
+                    //so if we try again next time we'll try getting data again
+                    unregister(filter);
+                }
+            } catch (CacheOversizedException e1) {
+                logger.log(Level.INFO, "Adding data to cache : " + e1.toString());
+            }
 
-		} finally {
-			// release W-lock
-			writeLog(Thread.currentThread().getName() + " : Released W lock, inserted new data");
-			lock.writeLock().unlock();
-		}
-		
+        } finally {
+            // release W-lock
+            writeLog(Thread.currentThread().getName() + " : Released W lock, inserted new data");
+            lock.writeLock().unlock();
+        }
+        
         return fromCache;
     }
 
@@ -384,20 +429,65 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
      */
     protected abstract Filter match(BBOXImpl sr);
 
+    /**
+     * Returns a list of envelopes that are not in the cache but
+     * within the given bounds.
+     *
+     * @param e
+     * @return
+     */
     protected abstract List<Envelope> match(Envelope e);
 
+    /**
+     * Registers a given bounding box filter with the cache. 
+     * <p>This informs the cache that it has data
+     * for the given area.</p>
+     *
+     * @param f
+     */
     protected void register(BBOXImpl f){
         register(extractEnvelope(f));
     }
 
+    /**
+     * Registers a given envelope with the cache. 
+     * <p>This informs the cache that it has data
+     * for the given area.</p>
+     *
+     * @param e
+     */
     protected abstract void register(Envelope e);
 
+    /**
+     * Unregisters a given envelope with the cache.
+     * <p>This informs the cache that there is no data for the 
+     * given envelope or that the data is incomplete.</p>
+     *
+     * @param e
+     */
     protected abstract void unregister(Envelope e);
     
+    /**
+     * Unregisters a given bounding box filter with the cache.
+     * <p>This informs the cache that there is no data for the 
+     * given envelope or that the data is incomplete.</p>
+     *
+     * @param e
+     */
     protected void unregister(BBOXImpl f){
         unregister(extractEnvelope(f));
     }
     
+    /**
+     * Unregisters filter from the cache.
+     * <p>
+     * Filter needs to be an instance of BBOXImpl or a collection
+     * of BBOXImpls that are combined using or.  Any other combination
+     * will result in a UnsupportedOperationException.
+     * </p>
+     *
+     * @param f
+     */
     protected void unregister(Filter f){
         if (f instanceof OrImpl) {
             for (Iterator<Filter> it = ((OrImpl)f).getChildren().iterator(); it.hasNext();) {
@@ -411,21 +501,45 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         }
     }
     
+    /**
+     * Determines if the given feature collection is too big to put into the
+     * cache.
+     *
+     * @param fc
+     * @throws CacheOversizedException if feature collection is to big for cache
+     */
     protected abstract void isOversized(FeatureCollection fc)
         throws CacheOversizedException;
 
+    /**
+     * Converts a BBOXImpl filter into an envelope.
+     *
+     * @param filter
+     * @return
+     */
     public static Envelope extractEnvelope(BBOXImpl filter) {
         return new Envelope(filter.getMinX(), filter.getMaxX(), filter.getMinY(), filter.getMaxY());
     }
 
+    /**
+     * Returns the feature schema of the underlying feature source.
+     */
     public SimpleFeatureType getSchema() {
         return (SimpleFeatureType)this.fs.getSchema();
     }
 
+    /**
+     * Removes a feature listener.
+     */
     public void removeFeatureListener(FeatureListener listener) {
         this.fs.removeFeatureListener(listener);
     }
 
+    /**
+     * This event is fired when the features in the feature source
+     * have changed.
+     * 
+     */
     public void changed(FeatureEvent event) {
         // TODO: what to do if change is outside of root mbr ?
         // implementations should handle this case
@@ -433,15 +547,17 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         remove(event.getBounds());
     }
 
-    public static Region convert(Envelope e) {
-        return new Region(new double[] { e.getMinX(), e.getMinY() },
-            new double[] { e.getMaxX(), e.getMaxY() });
-    }
-
-    public static Envelope convert(Region r) {
-        return new Envelope(r.getLow(0), r.getHigh(0), r.getLow(1), r.getHigh(1));
-    }
-
+    
+    /**
+     * Registers filter from the cache.
+     * <p>
+     * Filter needs to be an instance of BBOXImpl or a collection
+     * of BBOXImpls that are combined using or.  Any other combination
+     * will result in a UnsupportedOperationException.
+     * </p>
+     *
+     * @param f
+     */
     protected void register(Filter f) {
         if (f instanceof OrImpl) {
             for (Iterator<Filter> it = ((OrImpl)f).getChildren().iterator(); it.hasNext();) {
@@ -455,6 +571,13 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         }
     }
 
+    /**
+     * Returns a string containing statistics about 
+     * data source reading.
+     * <p>Stats include: Source hits and Feature Source Reads</p>
+     *
+     * @return
+     */
     public String sourceAccessStats() {
         StringBuffer sb = new StringBuffer();
         sb.append("Source hits = " + source_hits);
@@ -465,24 +588,36 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
 
     public abstract String getStats();
 
+    /**
+     * Gets a read lock
+     */
     public void readLock() {
         lock.readLock().lock();
     }
 
+    /**
+     * Unlocks the read lock
+     */
     public void readUnLock() {
         lock.readLock().unlock();
     }
 
+    /**
+     * Gets a write lock
+     */
     public void writeLock() {
         lock.writeLock().lock();
     }
 
+    /**
+     * unlocks the write lock
+     */
     public void writeUnLock() {
         lock.writeLock().unlock();
     }
 
     public void writeLog(String msg) {
-//    	System.out.println(msg);
+//      System.out.println(msg);
 //        try {
 //            FileWriter log = new FileWriter("log/threads.log", true);
 //            log.write(msg + "\n");
@@ -494,25 +629,51 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
     
     
     /**
-	 * @return the resource info from the main feature source being cached
-	 */
-	public ResourceInfo getInfo() {
-		return fs.getInfo();
-	}
+     * @return the resource info from the main feature source being cached
+     */
+    public ResourceInfo getInfo() {
+        return fs.getInfo();
+    }
 
-	/**
-	 * @return the name from the main feature source being cached
-	 */
-	public Name getName() {
-		//pass along to existing feature source
-		return fs.getName();
-	}
+    /**
+     * @return the name from the main feature source being cached
+     */
+    public Name getName() {
+        //pass along to existing feature source
+        return fs.getName();
+    }
 
-	/**
-	 * @return the query capabilities from the main feature source being cached
-	 */
-	public QueryCapabilities getQueryCapabilities() {
-		// pass along to feature source
-		return fs.getQueryCapabilities();
-	}
+    /**
+     * @return the query capabilities from the main feature source being cached
+     */
+    public QueryCapabilities getQueryCapabilities() {
+        // pass along to feature source
+        return fs.getQueryCapabilities();
+    }
+    
+    
+    
+    /**
+     * Converts and envelope to a region.
+     *
+     * @param e
+     * @return
+     */
+    public static Region convert(Envelope e) {
+        return new Region(new double[] { e.getMinX(), e.getMinY() },
+            new double[] { e.getMaxX(), e.getMaxY() });
+    }
+
+    /**
+     * Converts a region to an envelope.
+     *
+     * @param r
+     * @return
+     */
+    public static Envelope convert(Region r) {
+        return new Envelope(r.getLow(0), r.getHigh(0), r.getLow(1), r.getHigh(1));
+    }
 }
+
+
+

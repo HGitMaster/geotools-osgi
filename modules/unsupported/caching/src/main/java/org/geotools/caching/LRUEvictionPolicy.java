@@ -16,13 +16,18 @@
  */
 package org.geotools.caching;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.geotools.caching.spatialindex.NodeIdentifier;
 
-
+/**
+ * Least-Recently Used Eviction Policy
+ * <p>
+ * Removes the oldest items from the cache.
+ * </p>
+ */
 public class LRUEvictionPolicy implements EvictionPolicy {
     Map<NodeIdentifier, Object> queue;
     EvictableTree tree;
@@ -34,11 +39,10 @@ public class LRUEvictionPolicy implements EvictionPolicy {
 
     public void evict() {
         Iterator<NodeIdentifier> it = queue.keySet().iterator();
-
         if (it.hasNext()) {
             NodeIdentifier node = it.next();
-            it.remove();
             tree.evict(node);
+            queue.remove(node);
         }
     }
 

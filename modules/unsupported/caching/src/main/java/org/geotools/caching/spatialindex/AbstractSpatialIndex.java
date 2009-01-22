@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
 
+import org.geotools.caching.spatialindex.grid.GridRootNode;
+
 
 /** This is a base class for implementing spatial indexes.
  * It provides common routines useful for every type of indexes.
@@ -61,6 +63,10 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
 
     public void addWriteNodeCommand(NodeCommand nc) {
         writeNodeCommands.add(nc);
+    }
+    
+    public Storage getStorage(){
+        return this.store;
     }
 
     public void intersectionQuery(Shape query, Visitor v) {
@@ -118,14 +124,14 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
             current = new NodePointer(readNode(this.root));
             notYetVisitedNodes.push(current);
         }
-
+        
         while (!notYetVisitedNodes.isEmpty() || !visitedNodes.isEmpty()) {
             if (!notYetVisitedNodes.isEmpty()) {
                 current = notYetVisitedNodes.pop();
                 v.visitNode(current.node);
 
                 if (v.isDataVisitor()) { // skip if visitor does nothing with data
-                                         // visitData check for actual containement or intersection
+                                         // visitData check for actual containment or intersection
                     visitData(current.node, v, query, type);
                 }
             } else {
@@ -136,9 +142,10 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
                 NodeIdentifier child = current.next();
 
                 if (query.intersects(child.getShape())) {
-                    notYetVisitedNodes.push(new NodePointer(readNode(child)));
+                    Node n = readNode(child);
+                    NodePointer np = new NodePointer(n);
+                    notYetVisitedNodes.push(np);
                     visitedNodes.push(current);
-
                     break;
                 }
             }
@@ -181,14 +188,14 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
         }
     }
 
-    public boolean deleteData(Shape shape, int id) {
+    public boolean deleteData(Object data, Shape shape) {
         if (shape.getDimension() != dimension) {
             throw new IllegalArgumentException(
                 "deleteData: Shape has the wrong number of dimensions.");
         }
 
         if (this.root.getShape().intersects(shape)) {
-            return deleteData(this.root, shape, id);
+            return deleteData(this.root, shape, data);
         } else {
             return false;
         }
@@ -199,21 +206,36 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      *
      * @param node
      * @param shape of data to delete
-     * @param id of data to delete
+     * @param data the data to delete
      * @return true if some data has been found and deleted.
      */
-    protected abstract boolean deleteData(NodeIdentifier n, Shape shape, int id);
+    protected abstract boolean deleteData(NodeIdentifier n, Shape shape, Object data);
 
-    public void insertData(Object data, Shape shape, int id) {
+    
+    /**
+     * Inserts data into the spatial index.
+     * 
+     * <p>Items with the same "data" and  "shape" 
+     * will be considered equal and only one copy of them will be added to the
+     * cache.
+     * </p>
+     * 
+     * @param data to insert
+     * @param shape associated with data
+     * @param id the id of the data
+     * 
+     * 
+     */
+    public void insertData(Object data, Shape shape) {
         if (shape.getDimension() != dimension) {
             throw new IllegalArgumentException(
                 "insertData: Shape has the wrong number of dimensions.");
         }
 
         if (this.root.getShape().contains(shape)) {
-            insertData(this.root, data, shape, id);
+            insertData(this.root, data, shape);
         } else {
-            insertDataOutOfBounds(data, shape, id);
+            insertDataOutOfBounds(data, shape);
         }
     }
 
@@ -227,7 +249,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * @param shape of data
      * @param id of data
      */
-    protected abstract void insertData(NodeIdentifier n, Object data, Shape shape, int id);
+    protected abstract void insertData(NodeIdentifier n, Object data, Shape shape);
 
     /** Insert new data with shape not contained in the current index.
      * Some indexes may require to recreate the root or the index,
@@ -237,7 +259,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * @param shape
      * @param id
      */
-    protected abstract void insertDataOutOfBounds(Object data, Shape shape, int id);
+    protected abstract void insertDataOutOfBounds(Object data, Shape shape);
 
     public Statistics getStatistics() {
         return stats;

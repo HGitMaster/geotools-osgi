@@ -17,17 +17,19 @@
 package org.geotools.caching.grid;
 
 import org.geotools.caching.spatialindex.Region;
-import org.geotools.caching.spatialindex.grid.GridData;
 import org.geotools.caching.spatialindex.grid.GridNode;
 import org.geotools.caching.spatialindex.grid.GridRootNode;
 
-
+/**
+ * The caching "root node" of a grid cache.
+ * 
+ */
 public class GridCacheRootNode extends GridRootNode {
     /**
      *
      */
     private static final long serialVersionUID = 6955051761313024458L;
-    transient GridTracker grid;
+    private transient GridTracker grid;
 
     /** Create a not yet initialized root node.
      *
@@ -49,7 +51,7 @@ public class GridCacheRootNode extends GridRootNode {
         super.split();
     }
 
-    int getCapacity() {
+    public int getCapacity() {
         return super.capacity;
     }
 
@@ -77,18 +79,4 @@ public class GridCacheRootNode extends GridRootNode {
     protected GridNode createNode(Region reg) {
         return new GridCacheNode(grid, reg);
     }
-
-    //    @Override
-    //    protected boolean insertData(GridData data) {
-    //        if (getIdentifier().isValid()) {
-    //
-    //            return super.insertData(data);
-    //        }
-    //
-    //        return false;
-    //    }
-
-    //    protected GridData getData(int i) {
-    //        return this.data[i];
-    //    }
 }

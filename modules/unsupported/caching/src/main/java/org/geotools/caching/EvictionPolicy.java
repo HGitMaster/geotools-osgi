@@ -18,8 +18,13 @@ package org.geotools.caching;
 
 import org.geotools.caching.spatialindex.NodeIdentifier;
 
-
+/**
+ * Eviction policy interface.  Used to determine which items are removed
+ * from the cache when the maximum cache size is reached.
+ * 
+ */
 public interface EvictionPolicy {
+   
     public void evict();
 
     public void access(NodeIdentifier node);

@@ -77,7 +77,6 @@ public class GridRootNode extends GridNode {
         }
 
         tiles_size = Math.pow(area / capacity, 1d / dims);
-
         int newcapacity = 1;
 
         for (int i = 0; i < dims; i++) {
@@ -104,7 +103,7 @@ public class GridRootNode extends GridNode {
         int dims = tiles_number.length;
         double[] pos = new double[dims];
         double[] nextpos = new double[dims];
-        int id = 0;
+        //int id = 0;
 
         for (int i = 0; i < dims; i++) {
             pos[i] = mbr.getLow(i);
@@ -116,7 +115,7 @@ public class GridRootNode extends GridNode {
             GridNode child = createNode(reg);
             this.grid.writeNode(child);
             this.children.add(child.getIdentifier());
-            id++;
+          //  id++;
         } while (increment(pos, nextpos));
     }
 
@@ -168,6 +167,10 @@ public class GridRootNode extends GridNode {
         throws IndexOutOfBoundsException {
         return (NodeIdentifier) children.get(index);
     }
+    
+    public void setChildIdentifier(int index, NodeIdentifier id){
+        children.set(index, id);
+    }
 
     public int getChildrenCount() {
         return children.size();
@@ -216,21 +219,31 @@ public class GridRootNode extends GridNode {
     }
 
     public void clear() {
-        //getIdentifier().setValid(false);
         for (Iterator<NodeIdentifier> it = children.iterator(); it.hasNext();) {
-            GridNode child = (GridNode) grid.readNode(it.next());
+            NodeIdentifier childid = it.next();
+            GridNode child = (GridNode) grid.readNode(childid);
             child.clear();
             grid.writeNode(child);
         }
-
         super.clear();
     }
-
+    
     public String toReadableText() {
         StringBuffer sb = new StringBuffer();
         sb.append("RootNode *****");
         sb.append(super.toReadableText());
 
         return sb.toString();
+    }
+    
+    public int getCapacity(){
+        return this.capacity;
+    }
+    
+    public int getMaximumTileCount(int dim){
+    	if (dim < 0 || dim > tiles_number.length){
+    		return -1;
+    	}
+    	return tiles_number[dim];
     }
 }

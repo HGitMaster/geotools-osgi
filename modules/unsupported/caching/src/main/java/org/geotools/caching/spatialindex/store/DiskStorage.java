@@ -30,17 +30,35 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.grid.GridNode;
+import org.geotools.data.DataUtilities;
+import org.geotools.feature.SchemaException;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.InternationalString;
 
 
 /** A storage that stores data in a file on disk.
@@ -55,19 +73,28 @@ public class DiskStorage implements Storage {
     public final static String DATA_FILE_PROPERTY = "DiskStorage.DataFile";
     public final static String INDEX_FILE_PROPERTY = "DiskStorage.IndexFile";
     public final static String PAGE_SIZE_PROPERTY = "DiskStorage.PageSize";
+    
     protected static Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.caching.spatialindex.store");
+    
     int stats_bytes = 0;
     int stats_n = 0;
-    private RandomAccessFile data_file;
-    private FileChannel data_channel;
+    
     private File dataFile;
     private File indexFile;
+    
+    private RandomAccessFile data_file;
+    private FileChannel data_channel;
+    
     private int page_size;
     private int nextPage = 0;
+    
     private TreeSet<Integer> emptyPages;
     private HashMap<NodeIdentifier, Entry> pageIndex;
+    
+    private Collection<FeatureType> featureTypes;
+    
     protected SpatialIndex parent;
-
+    
     private DiskStorage(File f, int page_size) throws IOException {
         this(f, page_size, new File(f.getCanonicalPath() + ".idx"));
     }
@@ -81,6 +108,17 @@ public class DiskStorage implements Storage {
         this.page_size = page_size;
         emptyPages = new TreeSet<Integer>();
         pageIndex = new HashMap<NodeIdentifier, Entry>();
+        
+        this.featureTypes = new HashSet<FeatureType>();
+        
+        //this will overwrite the pageindex size and other variables
+        if (index_file.exists()) {
+            initializeFromIndex();
+        } else {
+           // throw new IOException(index_file + " does not exist !");
+            //do nothing; we have nothing to restore so don't worry about it
+        }
+        
     }
 
     private DiskStorage(File f, File index_file) throws IOException {
@@ -88,7 +126,9 @@ public class DiskStorage implements Storage {
         data_file = new RandomAccessFile(f, "rw");
         data_channel = data_file.getChannel();
         this.indexFile = index_file;
-
+        
+        this.featureTypes = new HashSet<FeatureType>();
+        
         if (index_file.exists()) {
             initializeFromIndex();
         } else {
@@ -129,11 +169,13 @@ public class DiskStorage implements Storage {
                 return new DiskStorage(f, page_size);
             }
         } catch (IOException e) {
+            e.printStackTrace();
             logger.log(Level.WARNING,
                 "DiskStorage : error occured when creating new instance : " + e);
 
             return null;
         } catch (NullPointerException e) {
+            e.printStackTrace();
             throw new IllegalArgumentException("DiskStorage : invalid property set.");
         }
     }
@@ -158,31 +200,31 @@ public class DiskStorage implements Storage {
         this.parent = parent;
     }
 
+    /**
+     * Removes all entries from the disk store and clears the
+     * associated feature types.
+     */
     public synchronized void clear() {
-        for (Iterator<java.util.Map.Entry<NodeIdentifier, Entry>> it = pageIndex.entrySet()
-                                                                                .iterator();
-                it.hasNext();) {
+        for (Iterator<java.util.Map.Entry<NodeIdentifier, Entry>> it = pageIndex.entrySet().iterator();it.hasNext();) {
             java.util.Map.Entry<NodeIdentifier, Entry> next = it.next();
             Entry e = next.getValue();
-
 //            synchronized (next.getKey()) {
             int n = 0;
-
             while (n < e.pages.size()) {
             	emptyPages.add(e.pages.get(n));
             	n++;
             }
-
             it.remove();
 //            }
         }
+        this.featureTypes.clear();
     }
 
     public synchronized Node get(NodeIdentifier id) {
         Node node = null;
         byte[] data;
         Entry e;
-
+        
 //        synchronized (findUniqueInstance(id)) {
         e = pageIndex.get(id);
 
@@ -200,6 +242,8 @@ public class DiskStorage implements Storage {
         	throw new IllegalStateException(e1);
         } catch (ClassNotFoundException e1) {
         	throw new IllegalStateException(e1);
+        } catch (Exception ex){
+            ex.printStackTrace();
         }
         return node;
     }
@@ -223,7 +267,6 @@ public class DiskStorage implements Storage {
         		int bytes_read = data_channel.read(buffer);
         		// }
         		if (bytes_read != page_size) {
-        			System.out.println(bytes_read);
         			throw new IllegalStateException("Data file might be corrupted.");
         		}
 
@@ -251,10 +294,14 @@ public class DiskStorage implements Storage {
     Node readNode(byte[] data) throws IOException, ClassNotFoundException {
     	ByteArrayInputStream bais = new ByteArrayInputStream(data);
         ObjectInputStream ois = new ObjectInputStream(bais);
-        Node node = (Node) ois.readObject();
+        Node node = null;
+        try{
+            node = (Node) ois.readObject();
+        }finally{
+            ois.close();
+            bais.close();            
+        }
         node.init(parent);
-        ois.close();
-        bais.close();
         return node;
     }
 
@@ -282,8 +329,7 @@ public class DiskStorage implements Storage {
         } else {
 //            synchronized (pageIndex) {
         	if (!pageIndex.containsKey(e.id)) {
-        		pageIndex.put(e.id, null); // advertise we created a new entry
-        	} else {
+        		pageIndex.put(e.id, null); // advertise we created a new entry        	} else {
         		old = pageIndex.get(e.id);
         	}
 //            }
@@ -298,13 +344,16 @@ public class DiskStorage implements Storage {
     byte[] writeNode(Node n) throws IOException {
     	ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(n);
-        byte[] data = baos.toByteArray();
-        stats_bytes += data.length;
-        stats_n++;
-        oos.close();
-        baos.close();
-        return data;
+        try{
+            oos.writeObject(n);
+            byte[] data = baos.toByteArray();
+            stats_bytes += data.length;
+            stats_n++;
+            return data;
+        }finally{
+            oos.close();
+            baos.close();
+        }
     }
 
     void writeData(byte[] data, Entry e, Entry old) {
@@ -387,29 +436,58 @@ public class DiskStorage implements Storage {
         try {
             FileOutputStream os = new FileOutputStream(indexFile);
             ObjectOutputStream oos = new ObjectOutputStream(os);
-            oos.writeInt(this.page_size);
-            oos.writeInt(this.nextPage);
-            oos.writeObject(this.emptyPages);
-            oos.writeObject(this.pageIndex);
-            oos.close();
-            os.close();
-            data_channel.close();
-            data_file.close();
+            try {
+                oos.writeInt(this.page_size);
+                oos.writeInt(this.nextPage);
+                oos.writeObject(this.emptyPages);
+                oos.writeObject(this.pageIndex);
+
+                oos.writeInt(this.featureTypes.size());
+                for( Iterator iterator = featureTypes.iterator(); iterator.hasNext(); ) {
+                    FeatureType type = (FeatureType) iterator.next();
+                    String rep = DataUtilities.spec((SimpleFeatureType) type);
+                    oos.writeObject(type.getName().getNamespaceURI() + "." + type.getName().getLocalPart());
+                    oos.writeObject(rep);
+                }
+            } finally {
+                oos.close();
+                os.close();
+            }
+            
+//            data_channel.close();
+//            data_file.close();
         } catch (IOException e) {
+            e.printStackTrace();
             logger.log(Level.WARNING, "Cannot close DiskStorage normally : " + e);
         }
     }
-
+    
     protected void initializeFromIndex() throws IOException {
         FileInputStream is = new FileInputStream(indexFile);
         ObjectInputStream ois = new ObjectInputStream(is);
-        this.page_size = ois.readInt();
-        this.nextPage = ois.readInt();
-
         try {
+            this.page_size = ois.readInt();
+            this.nextPage = ois.readInt();
+            
             this.emptyPages = (TreeSet<Integer>) ois.readObject();
             this.pageIndex = (HashMap<NodeIdentifier, Entry>) ois.readObject();
+                      
+            int featuretypesize = ois.readInt();
+            this.featureTypes = new HashSet<FeatureType>();
+            for(int i = 0; i < featuretypesize; i++){
+                String name = (String)ois.readObject();
+                String rep = (String)ois.readObject();
+                try {
+                    FeatureType ft = DataUtilities.createType(name, rep);
+                    featureTypes.add(ft);
+                    
+                } catch (SchemaException e) {
+                    e.printStackTrace();
+                }
+            }
+            //this.data_channel.position(nextPage);
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
             throw (IOException) new IOException().initCause(e);
         } finally {
             ois.close();
@@ -448,25 +526,46 @@ public class DiskStorage implements Storage {
     void logPageAccess(int page, int length) throws IOException {
         File log = new File("log/" + page + ".log");
         FileWriter fw = new FileWriter(log, true);
-        fw.write(System.currentTimeMillis() + " : " + Thread.currentThread().getName()
-            + " writing " + length + " bytes.\n");
-        fw.close();
+        try{
+            fw.write(System.currentTimeMillis() + " : " + Thread.currentThread().getName() + " writing " + length + " bytes.\n");
+        }finally{
+            fw.close();
+        }
     }
 
     void logGet() throws IOException {
         FileWriter getlog = new FileWriter("log/get.log", true);
-        getlog.write(Thread.currentThread().getName() + " : " + System.currentTimeMillis() + "\n");
-        getlog.close();
+        try{
+            getlog.write(Thread.currentThread().getName() + " : " + System.currentTimeMillis() + "\n");
+        }finally{
+            getlog.close();
+        }
     }
 
     void writeReadable(Node n, int page) {
         try {
             FileWriter fw = new FileWriter("log/" + page + ".node");
-            fw.write(((GridNode) n).toReadableText());
-            fw.close();
+            try{
+                fw.write(((GridNode) n).toReadableText());
+            }finally{
+                fw.close();
+            }
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addFeatureType( FeatureType ft ) {
+        this.featureTypes.add(ft);
+    }
+
+    public Collection<FeatureType> getFeatureTypes() {
+        return Collections.unmodifiableCollection(this.featureTypes);
+    }
+    
+    public void clearFeatureTypes(){
+        this.featureTypes.clear();
     }
 }
 
@@ -496,3 +595,4 @@ class Entry implements Serializable {
         return sb.toString();
     }
 }
+

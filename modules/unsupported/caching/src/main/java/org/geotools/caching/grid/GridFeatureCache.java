@@ -18,14 +18,12 @@ package org.geotools.caching.grid;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import org.opengis.feature.Feature;
 import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.CacheOversizedException;
 import org.geotools.caching.FeatureCacheException;
@@ -40,16 +38,25 @@ import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
+/**
+ * An implementation of a feature cache.
+ * 
+ * <p>This implementation holds a write log on the
+ * cache while it access features from the feature source.  As
+ * a result during this time no other features can read or write
+ * to the cache.</p>
+ * 
+ */
 public class GridFeatureCache extends AbstractFeatureCache {
-    GridTracker tracker;
-    int max_tiles = 10;
-    int capacity;
+    protected GridTracker tracker;
+    protected int max_tiles = 10;
+    protected int capacity;
 
     //int evictions = 0 ;
     //int puts = 0 ;
@@ -77,9 +84,30 @@ public class GridFeatureCache extends AbstractFeatureCache {
      */
     public GridFeatureCache(FeatureSource fs, ReferencedEnvelope env, int indexcapactiy, int capcity, Storage store){
     	super(fs);
-
     	tracker = new GridTracker(convert(env), indexcapactiy, store);
     	this.capacity = capcity;
+
+    	//lets compare the feature type in the store to the feature type of the current feature source
+    	//if they differ we need to  clear the cache as the features have changed.
+    	if (store.getFeatureTypes().size() == 0){
+    	    store.addFeatureType(fs.getSchema());
+    	}else if (store.getFeatureTypes().size() ==1){
+    	    SimpleFeatureType sft = (SimpleFeatureType)store.getFeatureTypes().iterator().next();
+    	    if (!sft.equals(fs.getSchema())){
+    	        tracker.clear();
+    	        store.clearFeatureTypes();
+    	        store.addFeatureType(fs.getSchema());
+    	    }
+    	}else{
+    	    //we have multiple feature types; really this shouldn't happen
+    	    tracker.clear();
+    	    store.clearFeatureTypes();
+    	    store.addFeatureType(fs.getSchema());
+    	}
+    	
+    	//flush cache here to write to disk
+    	tracker.flush();
+    	
     }
     
     /**
@@ -90,7 +118,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
      * @return
      * @throws FeatureCacheException
      */
-    private static ReferencedEnvelope getFeatureBounds(FeatureSource fs) throws FeatureCacheException{
+    protected static ReferencedEnvelope getFeatureBounds(FeatureSource fs) throws FeatureCacheException{
     	try{
     		return fs.getBounds();
     	}catch(IOException ex){
@@ -98,6 +126,20 @@ public class GridFeatureCache extends AbstractFeatureCache {
     	}
     }
 
+    /**
+     * Returns the feature schema of the underlying feature source; checks the feature
+     * store first to see if it's in there
+     */
+    @Override
+    public SimpleFeatureType getSchema() {
+        if (tracker.getStorage().getFeatureTypes().size() == 1){
+            return (SimpleFeatureType)tracker.getStorage().getFeatureTypes().iterator().next();
+        }
+        //we don't really know what's going on so let's just return
+        //what we have cached
+        return (SimpleFeatureType)this.fs.getSchema();
+    }
+    
     protected Filter match(BBOXImpl sr) {
         Region search = convert(extractEnvelope(sr));
         Stack missing = tracker.searchMissingTiles(search);
@@ -135,9 +177,12 @@ public class GridFeatureCache extends AbstractFeatureCache {
         Region search = convert(e);
         ArrayList<Envelope> missing = new ArrayList<Envelope>();
 
-        if (!this.tracker.getRoot().getShape().contains(search)) { // query is outside of root mbr
-                                                                   // we limit our search to the inside of the root mbr
-
+        if (!this.tracker.getRoot().getShape().intersects(search)){
+            //this request is outside of the cached area so nothing to be found
+            return new ArrayList<Envelope>();
+        }
+        if (!this.tracker.getRoot().getShape().contains(search)) { 
+            // query is partially outside of root mbr;  we limit our search to the inside of the root mbr
             Envelope r = convert((Region) this.tracker.getRoot().getShape());
             r = r.intersection(e);
             search = convert(r);
@@ -145,7 +190,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
 
         List missing_tiles = tracker.searchMissingTiles(search);
         
-        // TODO: groug regions
+        // TODO: group regions
         if (missing_tiles.size() > max_tiles) {
             missing.add(e);
         } else {
@@ -251,17 +296,17 @@ public class GridFeatureCache extends AbstractFeatureCache {
         try {
             while (tracker.getStatistics().getNumberOfData() > (capacity - size)) { // was capacity - fc.size()
                 writeLog(Thread.currentThread().getName() + " : evicting");
-                tracker.policy.evict();
+                tracker.getEvictionPolicy().evict();
 
                 //evictions++ ;
                 //System.out.println("Put #" + puts + " > number of evictions = " + evictions) ;
             }
-
+            
             FeatureIterator<SimpleFeature> it = fc.features();
             try{
                 while (it.hasNext()) {
                     SimpleFeature f = it.next();
-                    this.tracker.insertData(f, convert((Envelope)f.getBounds()), f.hashCode());
+                    this.tracker.insertData(f, convert((Envelope)f.getBounds()));
                 }
             }finally{
                 fc.close(it);
@@ -270,6 +315,9 @@ public class GridFeatureCache extends AbstractFeatureCache {
             writeLog(Thread.currentThread().getName() + " : Released W lock, data inserted (put)");
             lock.writeLock().unlock();
         }
+        
+        //flush cache at this point to write to store
+        this.tracker.flush();
     }
 
     protected void register(BBOXImpl f) {
@@ -284,7 +332,12 @@ public class GridFeatureCache extends AbstractFeatureCache {
         lock.writeLock().lock();
         writeLog(Thread.currentThread().getName() + " : Got W lock, registering");
         try {
+        	//we don't want to track access while we register; this will
+        	//ensure that just because a node touches another node it
+        	//isn't considered an access; it might be better to improve the way containment query is done.
+        	this.tracker.setDoRecordAccess(false);
             this.tracker.containmentQuery(r, v);
+            this.tracker.setDoRecordAccess(true);
         } finally {
             writeLog(Thread.currentThread().getName() + " : Released W lock, registered envelope");
             lock.writeLock().unlock();
@@ -311,7 +364,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
         sb.append("GridFeatureCache [");
         sb.append(" Source = " + this.fs);
         sb.append(" Capacity = " + this.capacity);
-        sb.append(" Nodes = " + this.tracker.stats.getNumberOfNodes());
+        sb.append(" Nodes = " + this.tracker.getStatistics().getNumberOfNodes());
         sb.append(" ]");
         sb.append("\n" + tracker.getIndexProperties());
 

@@ -16,25 +16,77 @@
  */
 package org.geotools.caching.spatialindex;
 
+import java.util.Collection;
 import java.util.Properties;
 
+import org.opengis.feature.type.FeatureType;
 
+/**
+ * Interface for cache storage options.
+ * 
+ */
 public interface Storage {
+    
     public static final String STORAGE_TYPE_PROPERTY = "Storage.Type";
 
+    /**
+     * Adds a given node to the store.
+     *
+     * @param n
+     */
     public void put(Node n);
 
+    /**
+     * Removes a node from the store given a node identifier
+     *
+     * @param id  identifier of the node to remove
+     */
     public void remove(NodeIdentifier id);
 
+    /**
+     * Reads a node from the store given an node identifier
+     *
+     * @param id  identifier of the node to read
+     * @return
+     */
     public Node get(NodeIdentifier id);
 
+    /**
+     * Clears all information from the store.
+     */
     public void clear();
 
     public void setParent(SpatialIndex index);
 
+    /**
+     * Get properties about the given storage.  The actual
+     * properties returned depend on the type of storage.
+     *
+     * @return
+     */
     public Properties getPropertySet();
 
+    /**
+     * Flushes the cache writing everything to the store.
+     */
     public void flush();
 
     public NodeIdentifier findUniqueInstance(NodeIdentifier id);
+        
+    /**
+     * @returns an unmodifiable collection of all the features types of the stored features
+     */
+    public Collection<FeatureType> getFeatureTypes();
+
+    /**
+     * Adds a feature type to the store.
+     *
+     * @param ft feature type to add
+     */
+    public void addFeatureType(FeatureType ft);
+    
+    /**
+     * Removes all feature types associated with the store.
+     */
+    public void clearFeatureTypes();
 }

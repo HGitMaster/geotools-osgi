@@ -17,8 +17,10 @@
 package org.geotools.caching.spatialindex.grid;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
@@ -29,6 +31,8 @@ import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.Visitor;
 import org.geotools.caching.spatialindex.store.StorageFactory;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 
 /** A grid implementation of SpatialIndex.
@@ -50,10 +54,13 @@ public class Grid extends AbstractSpatialIndex {
     public static final String ROOT_MBR_MINY_PROPERTY = "Grid.RootMbrMinY";
     public static final String ROOT_MBR_MAXX_PROPERTY = "Grid.RootMbrMaxX";
     public static final String ROOT_MBR_MAXY_PROPERTY = "Grid.RootMbrMaxY";
+    
     private int capacity;
     protected Region mbr;
     public int root_insertions = 0;
     protected int MAX_INSERTION = 4;
+    
+    
 
     //protected HashMap<RegionNodeIdentifier,RegionNodeIdentifier> node_ids = new HashMap<RegionNodeIdentifier,RegionNodeIdentifier>();
 
@@ -61,7 +68,8 @@ public class Grid extends AbstractSpatialIndex {
      * and with at least <code>capacity</code> nodes.
      *
      * @param mbr
-     * @param capacity
+     * @param capacity - the number of tiles in the index
+     * @param store - the backend index storage
      */
     public Grid(Region mbr, int capacity, Storage store) {
         this.capacity = capacity;
@@ -69,12 +77,23 @@ public class Grid extends AbstractSpatialIndex {
         this.store = store;
         store.setParent(this);
         this.dimension = mbr.getDimension();
-
-        GridRootNode root = new GridRootNode(this, mbr, capacity);
-        this.root = root.getIdentifier();
-        root.split();
-        writeNode(root);
-        this.stats.addToNodesCounter(root.capacity + 1); // root has root.capacity nodes, +1 for root itself :)
+        this.root = null;
+        
+        try{
+            initializeFromStorage(this.store);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        if (this.root == null){
+            //nothing read from storage so we need to create new ones
+            this.store.clear();
+            
+            GridRootNode root = new GridRootNode(this, mbr, capacity);
+            this.root = root.getIdentifier();
+            root.split();
+            writeNode(root);
+            this.stats.addToNodesCounter(root.capacity + 1); // root has root.capacity nodes, +1 for root itself :)
+        }
     }
 
     protected Grid() {
@@ -123,6 +142,17 @@ public class Grid extends AbstractSpatialIndex {
             }
         }
     }
+    
+    protected Node visitNode(NodeIdentifier id, Visitor v, Shape query, int type){
+    	 if (((type == Grid.IntersectionQuery) && (query.intersects(id.getShape())))
+                 || ((type == Grid.ContainmentQuery) && (query.contains(id.getShape())))) {
+    		 
+    		 GridNode node = (GridNode)readNode(id);
+    		 return node;
+    	 }else{
+    		 return null;
+    	 }
+    }
 
     public void clear() throws IllegalStateException {
         // we drop all nodes and recreate grid ; GC will do the rest
@@ -132,6 +162,7 @@ public class Grid extends AbstractSpatialIndex {
         writeNode(root);
         this.stats.reset();
         this.stats.addToNodesCounter(root.capacity + 1);
+        
     }
 
     public Properties getIndexProperties() {
@@ -146,7 +177,7 @@ public class Grid extends AbstractSpatialIndex {
         return pset;
     }
 
-    protected boolean deleteDataRecursively(NodeIdentifier nodeid, Shape shape, int id) {
+    protected boolean deleteDataRecursively(NodeIdentifier nodeid, Shape shape, Object data) {
         int[] mins = new int[this.dimension];
         int[] maxs = new int[this.dimension];
         int[] cursor = new int[this.dimension];
@@ -157,25 +188,25 @@ public class Grid extends AbstractSpatialIndex {
         GridRootNode node = (GridRootNode) readNode(nodeid);
 
         do {
-            NodeIdentifier nextid = node.getChildIdentifier(node.gridIndexToNodeId(cursor));
+            NodeIdentifier nextid = node.getChildIdentifier(node.gridIndexToNodeId(cursor)) ;
 
             //GridNode nextnode = (GridNode) readNode(nextid) ;
             if (nextid.getShape().intersects(shape)) {
-                ret = ret || deleteData(nextid, shape, id);
+                ret = ret || deleteData(nextid, shape, data);
             }
         } while (increment(cursor, mins, maxs));
 
         return ret;
     }
 
-    protected boolean deleteData(NodeIdentifier nodeid, Shape shape, int id) {
+    protected boolean deleteData(NodeIdentifier nodeid, Shape shape, Object data) {
         GridNode node = (GridNode) readNode(nodeid);
         boolean ret = false;
+        GridData todelete = new GridData(shape, data);
 
         for (Iterator<GridData> it = node.data.iterator(); it.hasNext();) {
-            GridData data = it.next();
-
-            if (data.id == id) {
+            GridData gridData = it.next();
+            if (gridData.equals(todelete)){
                 it.remove();
                 node.num_data--;
                 this.stats.addToDataCounter(-1);
@@ -184,36 +215,38 @@ public class Grid extends AbstractSpatialIndex {
         }
 
         if (node instanceof GridRootNode) {
-            ret = ret || deleteDataRecursively(nodeid, shape, id); // if deleted before, we are done and do not visit children nodes.
+            ret = ret || deleteDataRecursively(nodeid, shape, data); // if deleted before, we are done and do not visit children nodes.
         }
 
         return ret;
     }
 
-    public void insertData(Object data, Shape shape, int id) {
+    public void insertData(Object data, Shape shape) {
         if (shape.getDimension() != dimension) {
             throw new IllegalArgumentException(
                 "insertData: Shape has the wrong number of dimensions.");
         }
 
         if (this.root.getShape().contains(shape)) {
-            insertData(this.root, data, shape, id);
+            insertData(this.root, data, shape);
         } else {
         	//System.out.println("out of bounds:" + shape.getMBR() + ":" + this.root.getShape().getMBR());
-            insertDataOutOfBounds(data, shape, id);
+            insertDataOutOfBounds(data, shape);
         }
     }
 
-    protected void _insertData(NodeIdentifier n, Object data, Shape shape, int id) {
+    
+    
+    protected void _insertData(NodeIdentifier n, Object data, Shape shape) {
         GridNode node = (GridNode) readNode(n);
-
-        if (node.insertData(new GridData(id, shape, data))) {
+        GridData gd = new GridData(shape, data);
+        if (node.insertData(gd)) {
             writeNode(node);
             this.stats.addToDataCounter(1);
         }
     }
 
-    protected void insertData(NodeIdentifier n, Object data, Shape shape, int id) {
+    protected void insertData(NodeIdentifier n, Object data, Shape shape) {
         /*
          * This version inserts data in tile if tile contains data's MBR (ie shape),
          * otherwise inserts data at root node.
@@ -253,15 +286,15 @@ public class Grid extends AbstractSpatialIndex {
         }
 
         if (tiles > MAX_INSERTION) {
-            _insertData(this.root, data, shape, id);
+            _insertData(this.root, data, shape);
             root_insertions++;
         } else {
             GridRootNode node = (GridRootNode) readNode(n);
-
+            
             do {
                 int nextid = node.gridIndexToNodeId(cursor);
                 NodeIdentifier nextnode = node.getChildIdentifier(nextid);
-                _insertData(nextnode, data, shape, id);
+                _insertData(nextnode, data, shape);
             } while (increment(cursor, mins, maxs));
         }
     }
@@ -275,12 +308,16 @@ public class Grid extends AbstractSpatialIndex {
      * @param maxs
      */
     protected void findMatchingTiles(Shape shape, int[] cursor, final int[] mins, final int[] maxs) {
-        GridRootNode node = (GridRootNode) readNode(this.root);
-
+        
         for (int i = 0; i < this.dimension; i++) {
-            mins[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
+            mins[i] = (int) ((shape.getMBR().getLow(i) - this.mbr.getLow(i)) / ((GridRootNode)this.rootNode).tiles_size);
             cursor[i] = mins[i];
-            maxs[i] = (int) ((shape.getMBR().getHigh(i) - node.mbr.getLow(i)) / node.tiles_size);
+            maxs[i] = (int) ((shape.getMBR().getHigh(i) - this.mbr.getLow(i)) / ((GridRootNode)this.rootNode).tiles_size);
+            int maxcnt = ((GridRootNode)this.rootNode).getMaximumTileCount(i);
+            if (maxs[i] >= maxcnt){
+            	//max tile count is 2 then we was the maximum index to be 1
+            	maxs[i] = maxcnt-1;
+            }
         }
     }
 
@@ -314,7 +351,7 @@ public class Grid extends AbstractSpatialIndex {
         return cont;
     }
 
-    protected void insertDataOutOfBounds(Object data, Shape shape, int id) {
+    protected void insertDataOutOfBounds(Object data, Shape shape) {
         throw new IllegalArgumentException("Grids cannot expand : Shape out of grid : " + shape);
     }
 
@@ -333,5 +370,36 @@ public class Grid extends AbstractSpatialIndex {
 
     public NodeIdentifier findUniqueInstance(NodeIdentifier id) {
         return store.findUniqueInstance(id);
+    }
+
+    public void initializeFromStorage( Storage storage ) {
+        //add feature types to marshaller so it'll know how to build features
+        Collection<FeatureType> types = store.getFeatureTypes();
+        for( Iterator<FeatureType> iterator = types.iterator(); iterator.hasNext(); ) {
+            GridData.getFeatureMarshaller().registerType((SimpleFeatureType)iterator.next());            
+        }
+        
+        //find the root node an initialize it here
+        GridRootNode tmpRootNode = new GridRootNode(this, mbr, capacity);
+        NodeIdentifier id = findUniqueInstance(tmpRootNode.getIdentifier());
+        this.rootNode = null;
+        try{
+            this.rootNode = storage.get(id);
+        }catch (Exception ex){
+            //could not find root node in storage
+        }
+        if (this.rootNode == null){
+            this.root = null;
+        }else{
+            this.root = this.rootNode.getIdentifier();
+            this.capacity = ((GridRootNode)this.rootNode).getCapacity();
+            //here we need to match node identifies in the root.children list to the 
+            //node identifiers in the data store
+            for (int i = 0; i < this.rootNode.getChildrenCount(); i ++){
+                ((GridRootNode)this.rootNode).setChildIdentifier(i, findUniqueInstance(this.rootNode.getChildIdentifier(i)));
+            }
+        }   
+
+        
     }
 }

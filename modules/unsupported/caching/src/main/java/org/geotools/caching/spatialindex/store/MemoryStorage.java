@@ -16,12 +16,16 @@
  */
 package org.geotools.caching.spatialindex.store;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Properties;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
+import org.opengis.feature.type.FeatureType;
 
 
 /** A simple in-memory storage relying on LinkedHashMap.
@@ -32,9 +36,11 @@ import org.geotools.caching.spatialindex.Storage;
  */
 public class MemoryStorage implements Storage {
     HashMap<NodeIdentifier, NodeEntry> map;
+    ArrayList<FeatureType> featureTypes = null;
 
     private MemoryStorage() {
         this.map = new HashMap<NodeIdentifier, NodeEntry>();
+        featureTypes = new ArrayList();
     }
 
     public static Storage createInstance(Properties pset) {
@@ -85,6 +91,19 @@ public class MemoryStorage implements Storage {
             return id;
         }
     }
+
+    public void addFeatureType( FeatureType ft ) {
+        featureTypes.add(ft);
+    }
+
+    public Collection<FeatureType> getFeatureTypes() {
+        return Collections.unmodifiableCollection(featureTypes);
+    }
+
+    public void clearFeatureTypes(){
+        featureTypes.clear();
+    }
+    
 }
 
 

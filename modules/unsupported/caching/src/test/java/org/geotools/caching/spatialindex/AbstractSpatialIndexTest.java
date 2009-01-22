@@ -38,6 +38,7 @@ import java.util.Set;
  *
  */
 public abstract class AbstractSpatialIndexTest extends TestCase {
+	private static final String DATA_PREFIX = "Object: ";
     protected AbstractSpatialIndex index;
     int setSize = 1000;
     protected ArrayList<Region> regions = new ArrayList<Region>(setSize);
@@ -47,10 +48,11 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
 
     protected void setUp() {
         index = createIndex();
-
+        regions = new ArrayList<Region>(setSize);
+        
         double width = universe.getHigh(0) - universe.getLow(0);
         double height = universe.getHigh(1) - universe.getLow(1);
-
+        
         for (int i = 0; i < setSize; i++) {
             double centerx = (meansize) + (generator.nextDouble() * (width - (2 * meansize)));
             double centery = (meansize) + (generator.nextDouble() * (height - (2 * meansize)));
@@ -59,7 +61,7 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
             Region reg = new Region(new double[] { centerx - (w / 2), centery - (h / 2) },
                     new double[] { centerx + (w / 2), centery + (h / 2) });
             regions.add(reg);
-            index.insertData("Object: " + i, reg, i);
+            index.insertData(DATA_PREFIX + i, reg);
         }
     }
 
@@ -72,15 +74,13 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
 
     public void testDeletion() {
         int dels = setSize;
-
+        long beforesize = index.getStatistics().getNumberOfData();
+        
         for (int i = 0; i < dels; i++) {
-            //assertTrue(index.deleteData((Region) regions.get(i), i));
-            if (!index.deleteData((Region) regions.get(i), i)) {
-                index.deleteData((Region) regions.get(i), i);
-            }
+        	assertTrue(index.deleteData(DATA_PREFIX + i, (Region)regions.get(i)));
         }
 
-        //assertEquals(setSize - dels, index.getStatistics().getNumberOfData());
+        assertEquals(beforesize - dels, index.getStatistics().getNumberOfData());
     }
 
     public void testIntersectionQuery() {
@@ -106,14 +106,13 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
         index.containmentQuery(query, v);
         assertEquals(setSize, v.harvest.size());
         assertEquals(index.getStatistics().getNumberOfNodes(), v.visited_nodes);
-
         Set<String> comp_result = noIndexQuery(regions, query, AbstractSpatialIndex.ContainmentQuery);
         assertEquals(comp_result, v.harvest);
+        
         v = new HarvestingVisitor();
         query = new Region(new double[] { .25, .25 }, new double[] { .75, .75 });
         index.containmentQuery(query, v);
         comp_result = noIndexQuery(regions, query, AbstractSpatialIndex.ContainmentQuery);
-
         assertEquals(comp_result, v.harvest);
     }
 
