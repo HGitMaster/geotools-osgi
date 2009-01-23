@@ -1218,6 +1218,9 @@ public class ShapefileRenderer implements GTRenderer {
     		this.labelCache=cache;
     		this.painter=new StyledShapePainter(cache);
     	}
+    	if(hints != null && hints.containsKey(StreamingRenderer.LINE_WIDTH_OPTIMIZATION_KEY)) {
+            styleFactory.setLineOptimizationEnabled(Boolean.TRUE.equals(hints.get(StreamingRenderer.LINE_WIDTH_OPTIMIZATION_KEY)));
+        }
         rendererHints = hints;
     }
     
