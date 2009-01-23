@@ -119,7 +119,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 31945 2008-12-03 23:22:28Z groldan $
+     * @version $Id: WFSDataStoreFactory.java 32302 2009-01-23 01:16:54Z jive $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -629,8 +629,15 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         queryString = queryString == null || "".equals(queryString.trim()) ? "" : queryString
                 .toUpperCase();
 
-        final Version defaultVersion = Version.highest();
-        // final Version defaultVersion = Version.v1_0_0;
+        // final Version defaultVersion = Version.highest();
+        
+        // We cannot use the highest vesion as the default yet
+        // since v1_1_0 does not implement a read/write datastore
+        // and is still having trouble with requests from
+        // different projections etc...
+        //
+        // this is a result of the udig code sprint QA run
+        final Version defaultVersion = Version.v1_0_0;
         // which version to use
         Version requestVersion = defaultVersion;
 
