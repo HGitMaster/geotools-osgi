@@ -138,7 +138,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32170 2009-01-07 14:37:22Z aaime $
+ * @version $Id: StreamingRenderer.java 32305 2009-01-23 18:15:41Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -266,6 +266,20 @@ public final class StreamingRenderer implements GTRenderer {
      */
     public static final String TEXT_RENDERING_KEY = "textRenderingMethod";
     private String textRenderingModeDEFAULT = TEXT_RENDERING_STRING;
+    
+    /**
+     * Wheter the thin line widht optimization should be used, or not.
+     * <p>When rendering non antialiased lines adopting a width of 0 makes the
+     * java2d renderer get into a fast path that generates the same output
+     * as a 1 pixel wide line<p>
+     * Unfortunately for antialiased rendering that optimization does not help,
+     * and disallows controlling the width of thin lines. It is provided as
+     * an explicit option as the optimization has been hard coded for years,
+     * removing it whena antialiasing is on by default will invalidate lots
+     * of existing styles (making lines appear thicker).
+     */
+    public static final String LINE_WIDTH_OPTIMIZATION_KEY = "lineWidthOptimization";
+    
 
 	public static final String LABEL_CACHE_KEY = "labelCache";
 	public static final String FORCE_CRS_KEY = "forceCRS";
@@ -2139,7 +2153,7 @@ public final class StreamingRenderer implements GTRenderer {
             return textRenderingModeDEFAULT;
         return result;
     }
-
+    
 	/**
 	 * Returns the generalization distance in the screen space.
 	 * 
@@ -2193,6 +2207,9 @@ public final class StreamingRenderer implements GTRenderer {
     		
     		this.labelCache=cache;
     		this.painter=new StyledShapePainter(cache);
+    	}
+    	if(hints != null && hints.containsKey(LINE_WIDTH_OPTIMIZATION_KEY)) {
+    	    styleFactory.setLineOptimizationEnabled(Boolean.TRUE.equals(hints.get(LINE_WIDTH_OPTIMIZATION_KEY)));
     	}
         rendererHints = hints;
     }

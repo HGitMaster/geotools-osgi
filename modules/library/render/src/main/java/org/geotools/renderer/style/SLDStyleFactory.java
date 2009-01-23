@@ -184,21 +184,13 @@ public class SLDStyleFactory {
      * Build a default rendering hint to avoid NPE
      */
     RenderingHints renderingHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
+    
+    /**
+     * Whether to turn all line widths less than 1.5 pixels to 0 to speed up line rendering.
+     */
+    private boolean lineOptimizationEnabled = true;
 
     private long hits;
-
-    public RenderingHints getRenderingHints() {
-        return renderingHints;
-    }
-
-    /**
-     * The factory builds a fair number of buffered images to deal with
-     * external graphics that need resizing and the like. This hints will
-     * be used in those drawing operations.
-     */
-    public void setRenderingHints(RenderingHints renderingHints) {
-        this.renderingHints = renderingHints;
-    }
 
     private long requests;
 
@@ -206,6 +198,35 @@ public class SLDStyleFactory {
      * Holds value of property mapScaleDenominator.
      */
     private double mapScaleDenominator = Double.NaN;;
+
+    /**
+     * The factory builds a fair number of buffered images to deal with
+     * external graphics that need resizing and the like. This hints will
+     * be used in those drawing operations.
+     */
+    public RenderingHints getRenderingHints() {
+        return renderingHints;
+    }
+
+    public void setRenderingHints(RenderingHints renderingHints) {
+        this.renderingHints = renderingHints;
+    }
+    
+    /**
+     * Enabled by default, this optimization speeds up line rendering when
+     * the line width is less than 1.5 pixels when antialiasing is disblaed.
+     * Unfortunately it also prevents fine line width control when antialiasing
+     * is enabled. Given that the optimization has been hard coded for more than
+     * six years, we give the user control on this one since turning this off
+     * will change the rendering of all existing styles using thin line widths. 
+     */
+    public boolean isLineOptimizationEnabled() {
+        return lineOptimizationEnabled;
+    }
+
+    public void setLineOptimizationEnabled(boolean lineOptimizationEnabled) {
+        this.lineOptimizationEnabled = lineOptimizationEnabled;
+    }
 
 
     public double getHitRatio() {
@@ -769,7 +790,7 @@ public class SLDStyleFactory {
 
         // Simple optimization: let java2d use the fast drawing path if the line width
         // is small enough...
-        if (width < 1.5) {
+        if (width < 1.5 & lineOptimizationEnabled) {
             width = 0;
         }
 
@@ -1270,5 +1291,7 @@ public class SLDStyleFactory {
     private float evalOpacity(Expression e, Object f){
         return evalToFloat(e,f,1);
     }
+
+   
 
 }
