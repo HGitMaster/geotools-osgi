@@ -70,7 +70,10 @@ public class ArcSDERasterFormatFactory implements GridFormatFactorySpi {
         return true;
     }
 
-    public Format createFormat() {
+    /**
+     * @see GridFormatFactorySpi#createFormat()
+     */
+    public ArcSDERasterFormat createFormat() {
         return new ArcSDERasterFormat();
     }
 

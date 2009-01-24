@@ -19,6 +19,7 @@ package org.geotools.arcsde.gce.gcreader;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 
 import javax.imageio.ImageIO;
@@ -27,7 +28,6 @@ import org.geotools.arcsde.ArcSDERasterFormatFactory;
 import org.geotools.arcsde.gce.ArcSDERasterFormat;
 import org.geotools.arcsde.gce.RasterTestData;
 import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -43,10 +43,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public class RGBGridCoverageReaderTest {
+public class FloatGridCoverageReaderTest {
 
     static RasterTestData rasterTestData;
 
@@ -54,52 +55,52 @@ public class RGBGridCoverageReaderTest {
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
-        rasterTestData.loadRGBRaster();
+        rasterTestData.loadFloatRaster();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        rasterTestData.tearDown();
+        // rasterTestData.tearDown();
     }
 
     @Test
-    public void testReadRGBRaster() throws Exception {
-        ArcSDEConnectionConfig config = rasterTestData.getConnectionPool().getConfig();
+    public void testReadFloatRaster() throws Exception {
+        final String rgbUrl = rasterTestData.createCoverageUrl(RasterTableName.FLOAT);
 
-        String rgbUrl = "sde://" + config.getUserName() + ":" + config.getUserPassword() + "@"
-                + config.getServerName() + ":" + config.getPortNumber() + "/"
-                + config.getDatabaseName() + "#"
-                + rasterTestData.getRasterTableName(RasterTableName.RGB);
-
-        GridCoverage2D gc;
-         ArcSDERasterFormat f = new ArcSDERasterFormatFactory().createFormat();
+        ArcSDERasterFormat format = new ArcSDERasterFormatFactory().createFormat();
         // a fix
 
-        GeneralParameterValue[] requestParams = new Parameter[1];
+        // SeExtent imgExtent = new SeExtent(245900, 899600, 246300, 900000);
+        // SeCoordinateReference crs =
+        // getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
 
         CoordinateReferenceSystem crs = CRS.decode("EPSG:2805");
 
-        GridGeometry2D gg2d = new GridGeometry2D(new GeneralGridRange(new Rectangle(256, 128)),
-                new ReferencedEnvelope(231000, 231000 + 128, 898000, 898000 + 64, crs));
+        GridGeometry2D gg2d = new GridGeometry2D(new GeneralGridRange(new Rectangle(201, 201)),
+                new ReferencedEnvelope(245900, 246300, 899600, 900000, crs));
 
+        GeneralParameterValue[] requestParams = new Parameter[1];
         requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, gg2d);
 
-        AbstractGridCoverage2DReader r = f.getReader(rgbUrl);
-        gc = (GridCoverage2D) r.read(requestParams);
-        Assert.assertNotNull(gc);
+        AbstractGridCoverage2DReader reader = format.getReader(rgbUrl);
 
-        ImageIO.write(gc.view(ViewType.PHOTOGRAPHIC).getRenderedImage(), "PNG", new File("/tmp/"
-                + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+        Assert.assertNotNull(reader);
 
-        BufferedImage expected = ImageIO.read(TestData.file(null, rasterTestData
-                .getRasterTestDataProperty("sampledata.rgbraster")));
-        expected = expected.getSubimage(0, expected.getHeight() - 128, 256, 128);
+        GridCoverage2D coverage = (GridCoverage2D) reader.read(requestParams);
 
-        ImageIO.write(expected, "PNG", new File("/tmp/"
-                + Thread.currentThread().getStackTrace()[1].getMethodName() + "-original.png"));
+        Assert.assertNotNull(coverage);
 
-        Assert.assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(gc
-                .view(ViewType.PHOTOGRAPHIC).getRenderedImage(), expected));
+        RenderedImage actualImage = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
+        ImageIO.write(actualImage, "TIFF", new File("/tmp/testReadFloatRaster.tiff"));
+
+        final String sampleFileName = rasterTestData
+                .getRasterTestDataProperty("sampledata.floatraster");
+        BufferedImage expected = ImageIO.read(TestData.file(null, sampleFileName));
+
+        ImageIO.write(expected, "TIFF", new File("/tmp/testReadFloatRaster-original.tiff"));
+
+        Assert.assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+                actualImage, expected));
 
     }
 }

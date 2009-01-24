@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/ArcSDEQuery.java $
- * @version $Id: ArcSDEQuery.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEQuery.java 32322 2009-01-24 20:11:52Z groldan $
  */
 class ArcSDEQuery {
     /** Shared package's logger */
@@ -681,7 +681,9 @@ class ArcSDEQuery {
 
                     Envelope envelope = new Envelope(extent.getMinX(), extent.getMaxX(), extent
                             .getMinY(), extent.getMaxY());
-                    LOGGER.fine("got extent: " + extent + ", built envelope: " + envelope);
+                    if(LOGGER.isLoggable(Level.FINE)){
+                        LOGGER.fine("got extent: " + extent + ", built envelope: " + envelope);
+                    }
                     return envelope;
                 }
             });
@@ -762,6 +764,7 @@ class ArcSDEQuery {
         });
     }
 
+    private SdeRow currentRow;
     /**
      * Fetches an SeRow of data.
      * 
@@ -777,9 +780,23 @@ class ArcSDEQuery {
         }
 
         final SeQuery seQuery = getSeQuery();
-        SdeRow currentRow;
-        try {
-            currentRow = session.fetch(seQuery);
+        //commented out while SeToJTSGeometryFactory is in development
+//        if(currentRow == null){
+//            GeometryFactory geomFac = new SeToJTSGeometryFactory();
+//            currentRow = new SdeRow(geomFac);
+//            int geometryIndex = -1;
+//            for(int i = 0; i < schema.getAttributeCount(); i++){
+//                if(schema.getDescriptor(i) instanceof GeometryDescriptor){
+//                    geometryIndex = i;
+//                    break;
+//                }
+//            }
+//            currentRow.setGeometryIndex(geometryIndex);
+//        }
+//        try {
+//            currentRow = session.fetch(seQuery, currentRow);
+         try{
+             currentRow = session.fetch(seQuery);
         } catch (IOException e) {
             close();
             String msg = "Error fetching row for " + this.schema.getTypeName() + "[";

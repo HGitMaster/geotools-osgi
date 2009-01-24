@@ -5,12 +5,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeRasterTile;
 
 public class FloatBandCopier extends ArcSDERasterBandCopier {
 
-    Logger LOGGER = org.geotools.util.logging.Logging.getLogger(this.getClass().toString());
+    Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
     @Override
     public void copyPixelData(SeRasterTile tile, WritableRaster raster, int copyOffX, int copyOffY,

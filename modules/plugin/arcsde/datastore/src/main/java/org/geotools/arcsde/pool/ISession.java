@@ -191,6 +191,8 @@ public interface ISession {
      */
     public abstract SdeRow fetch(final SeQuery query) throws IOException;
 
+    public abstract SdeRow fetch(SeQuery seQuery, SdeRow currentRow) throws IOException;
+
     public abstract void close(final SeState state) throws IOException;
 
     public abstract void close(final SeStreamOp stream) throws IOException;
@@ -220,4 +222,5 @@ public interface ISession {
     public abstract SeVersion getDefaultVersion() throws IOException;
 
     public SeState createChildState(long parentStateId) throws IOException;
+
 }

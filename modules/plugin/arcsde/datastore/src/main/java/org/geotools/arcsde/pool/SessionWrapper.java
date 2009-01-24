@@ -43,7 +43,7 @@ import com.esri.sde.sdk.client.SeVersion;
  * A pure session wrapper to aid in creating session decorators by extending this class.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: SessionWrapper.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: SessionWrapper.java 32322 2009-01-24 20:11:52Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/geotools
@@ -191,6 +191,13 @@ public class SessionWrapper implements ISession {
      */
     public SdeRow fetch(SeQuery query) throws IOException {
         return wrapped.fetch(query);
+    }
+
+    /**
+     * @see org.geotools.arcsde.pool.ISession#fetch(SeQuery, SdeRow)
+     */
+    public SdeRow fetch(SeQuery query, SdeRow currentRow) throws IOException {
+        return wrapped.fetch(query, currentRow);
     }
 
     /**

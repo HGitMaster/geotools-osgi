@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.arcsde.gce;
+package org.geotools.arcsde.gce.imageio;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -42,7 +42,17 @@ public class ArcSDEPyramid {
 
     ArrayList<ArcSDEPyramidLevel> pyramidList;
 
-    int tileWidth, tileHeight;
+    private int tileWidth;
+
+    public int getTileWidth() {
+        return tileWidth;
+    }
+
+    public int getTileHeight() {
+        return tileHeight;
+    }
+
+    private int tileHeight;
 
     /**
      * Creates an in-memory representation of an ArcSDE Raster Pyramid. Basically it wraps the
@@ -230,12 +240,11 @@ public class ArcSDEPyramid {
         pyramidList = new ArrayList(numLayers);
     }
 
-}
+    public static class RasterQueryInfo {
 
-class RasterQueryInfo {
+        public Rectangle image;
 
-    public Rectangle image;
+        public ReferencedEnvelope envelope;
 
-    public ReferencedEnvelope envelope;
-
+    }
 }

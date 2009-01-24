@@ -16,5 +16,8 @@ public class SeRasterColumn {
     public void setConfigurationKeyword(String s) {}
     
     public void create() {}
+    public String getTableName() {
+        return null;
+    }
 
 }

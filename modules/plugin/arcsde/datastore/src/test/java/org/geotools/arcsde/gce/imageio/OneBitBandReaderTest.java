@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import org.geotools.arcsde.gce.ArcSDEPyramid;
 import org.geotools.arcsde.gce.RasterTestData;
 import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
@@ -54,7 +53,7 @@ public class OneBitBandReaderTest {
 
     static HashMap<String, Object> readerProps;
 
-    static Logger LOGGER = Logging.getLogger(OneBitBandReaderTest.class.getCanonicalName());
+    static Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {

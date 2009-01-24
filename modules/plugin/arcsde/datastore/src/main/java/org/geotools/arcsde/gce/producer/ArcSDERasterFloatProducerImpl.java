@@ -22,7 +22,6 @@ public class ArcSDERasterFloatProducerImpl extends ArcSDERasterProducer {
     public void setSourceImage(BufferedImage sourceImage) {
         // TODO: check that the image is compatible
         this.sourceImage = sourceImage;
-
     }
 
     public void startProduction(final SeRasterConsumer consumer) {
@@ -34,7 +33,7 @@ public class ArcSDERasterFloatProducerImpl extends ArcSDERasterProducer {
                 public void run() {
                     try {
                         final int imageHeight = sourceImage.getHeight();
-
+                        float min = 0, max = 0;
                         // for each band...
                         for (int i = 0; i < sourceImage.getData().getNumBands(); i++) {
                             // get the data as floats, then convert to four-byte segments
@@ -48,6 +47,8 @@ public class ArcSDERasterFloatProducerImpl extends ArcSDERasterProducer {
                                     // final float sample = sourceImage.getData().getSampleFloat(x,
                                     // y, i);
                                     final float sample = srcImgData[y * sourceImage.getWidth() + x];
+                                    min = Math.min(min, sample);
+                                    max = Math.max(max, sample);
                                     // convert float to bytes
                                     int bits = Float.floatToIntBits(sample);
                                     sdeRasterData[y * sourceImage.getWidth() * 4 + x * 4] = (byte) ((bits & 0xff000000) >> 24);
@@ -60,6 +61,7 @@ public class ArcSDERasterFloatProducerImpl extends ArcSDERasterProducer {
                             consumer.setScanLines(imageHeight, sdeRasterData, null);
                             consumer.rasterComplete(SeRasterConsumer.SINGLEFRAMEDONE);
                         }
+                        System.out.println("min value: " + min + ", max value: " + max);
                         consumer.rasterComplete(SeRasterConsumer.STATICIMAGEDONE);
                     } catch (Exception se) {
                         se.printStackTrace();

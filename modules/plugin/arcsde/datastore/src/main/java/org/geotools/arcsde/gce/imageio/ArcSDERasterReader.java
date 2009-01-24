@@ -16,19 +16,34 @@
  */
 package org.geotools.arcsde.gce.imageio;
 
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_1BIT;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_REAL;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_S;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.ComponentSampleModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferFloat;
 import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
+import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,22 +52,47 @@ import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 
-import org.geotools.arcsde.gce.ArcSDEPyramid;
-import org.geotools.arcsde.gce.ArcSDEPyramidLevel;
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
+import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
-import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterAttr;
+import com.esri.sde.sdk.client.SeRasterBand;
 import com.esri.sde.sdk.client.SeRasterConstraint;
 import com.esri.sde.sdk.client.SeRasterTile;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.esri.sde.sdk.client.SeRasterBand.SeRasterBandColorMap;
 
+/**
+ * 
+ * <p>
+ * Support matrix:
+ * 
+ * <pre>
+ * &lt;code&gt;
+ *         Pixel Type                      1 Band     1 Band colormapped    3-4 Bands
+ * SeRaster#SE_PIXEL_TYPE_16BIT_S
+ * SeRaster#SE_PIXEL_TYPE_16BIT_U
+ * SeRaster#SE_PIXEL_TYPE_1BIT                Y
+ * SeRaster#SE_PIXEL_TYPE_32BIT_REAL
+ * SeRaster#SE_PIXEL_TYPE_32BIT_S
+ * SeRaster#SE_PIXEL_TYPE_32BIT_U
+ * SeRaster#SE_PIXEL_TYPE_4BIT
+ * SeRaster#SE_PIXEL_TYPE_64BIT_REAL
+ * SeRaster#SE_PIXEL_TYPE_8BIT_S              
+ * SeRaster#SE_PIXEL_TYPE_8BIT_U              Y                                 Y 
+ * &lt;/code&gt;
+ * </pre>
+ * 
+ * </p>
+ * 
+ * @author Saul Farber
+ * @author Gabriel Roldan
+ */
 public class ArcSDERasterReader extends ImageReader {
 
     private static final boolean DEBUG = false;
@@ -64,9 +104,8 @@ public class ArcSDERasterReader extends ImageReader {
                 .createFromBufferedImageType(BufferedImage.TYPE_INT_ARGB));
     }
 
-    private static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(ArcSDERasterReader.class.toString());
-
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
+    
     private final ArcSDEPyramid _rasterPyramid;
 
     private final Dimension _tileSize;
@@ -220,7 +259,7 @@ public class ArcSDERasterReader extends ImageReader {
             query.queryRasterTile(rConstraint);
 
             final SeRasterAttr rattr = r.getRaster(0);
-            final int pixelType = rattr.getPixelType();
+            final RasterCellType pixelType = RasterCellType.valueOf(rattr.getPixelType());
 
             // the destination image for our eventual raster read. Can be provided
             // (if the given one is non-null) or we can be expected to generate
@@ -266,7 +305,7 @@ public class ArcSDERasterReader extends ImageReader {
             // Copying from an ArcSDE Raster to the specified image format, we
             // can optionally have a band mapper which specifies which data band
             // goes to which image band.
-            HashMap<Integer, Integer> bandMapper = sdeirp.getBandMapper();
+            Map<Integer, Integer> bandMapper = sdeirp.getBandMapper();
 
             // And we need to create a bandcopier for this raster type.
             final ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(pixelType,
@@ -459,46 +498,77 @@ public class ArcSDERasterReader extends ImageReader {
 
     // public static SeRasterBand
 
-    public static BufferedImage createCompatibleBufferedImage(int width, int height,
-            SeRasterAttr rasterAttributes) throws DataSourceException {
+    public static BufferedImage createCompatibleBufferedImage(final int width, final int height,
+            final SeRasterAttr rasterAttributes) throws DataSourceException {
         try {
-            /*
-             * for (int i = 0; i < rasterAttributes.getNumBands(); i++) { if
-             * (rasterAttributes.getBandInfo(i + 1).hasColorMap()) { throw new
-             * IllegalArgumentException("Currently ArcSDERasterReader doesn't support reading from
-             * colormapped rasters"); } }
-             */
 
-            if (rasterAttributes.getNumBands() == 1) {
-                if (rasterAttributes.getPixelType() == SeRaster.SE_PIXEL_TYPE_1BIT) {
-                    LOGGER.fine("Discovered 1-bit single-band raster.  Using return image "
+            final int numBands = rasterAttributes.getNumBands();
+            final int pixelType = rasterAttributes.getPixelType();
+            final RasterCellType cellType = RasterCellType.valueOf(pixelType);
+
+            if (numBands == 1) {
+                final SeRasterBand band = rasterAttributes.getBands()[0];
+                final boolean hasColorMap = band.hasColorMap();
+                if (cellType == TYPE_1BIT) {
+                    LOGGER.fine("Discovered 1-bit single-band raster. Using return image "
                             + "type: TYPE_BYTE_BINARY and 1-bit black/white category.");
                     return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
-                } else if (rasterAttributes.getBands()[0].hasColorMap()
-                        && (rasterAttributes.getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_U || rasterAttributes
-                                .getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_S)) {
-                    LOGGER.fine("Discovered 8-bit single-band raster with colormap. "
-                            + " Using return image type: TYPE_BYTE_INDEX");
-                    IndexColorModel rcm = sdeColorMapToJavaColorModel(rasterAttributes.getBands()[0]
-                            .getColorMap());
-                    // cache the colormodel
-                    final BufferedImage ret = new BufferedImage(width, height,
-                            BufferedImage.TYPE_BYTE_INDEXED, rcm);
-                    return ret;
-
-                } else if (rasterAttributes.getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_S
-                        || rasterAttributes.getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_U) {
-                    LOGGER.fine("Discovered 8-bit single-band raster. "
-                            + " Using return image type: TYPE_BYTE_GRAY");
-                    return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+                } else if (cellType == TYPE_32BIT_REAL) {
+                    LOGGER.fine("Discovered 32-bit floating point single-band raster. "
+                            + "Returning image with float sample model, and gray colorspace.");
+                    final SampleModel sampleModel;
+                    final DataBuffer dataBuffer;
+                    final WritableRaster raster;
+                    final ColorSpace colorSpace;
+                    final ColorModel colorModel;
+                    final int sampleModelDataType = DataBuffer.TYPE_FLOAT;
+                    {
+                        final int pixelStride = 1;
+                        final int scanlineStride = width;
+                        final int[] bandOffsets = { 0 };
+                        sampleModel = new ComponentSampleModel(sampleModelDataType, width, height,
+                                pixelStride, scanlineStride, bandOffsets);
+                    }
+                    dataBuffer = new DataBufferFloat(width * height);
+                    raster = Raster.createWritableRaster(sampleModel, dataBuffer, null);
+                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+                    colorModel = new ComponentColorModel(colorSpace, false, true,
+                            Transparency.OPAQUE, sampleModelDataType);
+                    final BufferedImage compatibleImage = new BufferedImage(colorModel, raster,
+                            false, null);
+                    return compatibleImage;
                 } else {
-                    throw new IllegalArgumentException("One-band, "
-                            + "non-colormapped raster layers with type "
-                            + rasterAttributes.getPixelType() + " are not supported.");
+                    final boolean is8Bit = cellType == TYPE_8BIT_U || cellType == TYPE_8BIT_S;
+                    if (is8Bit) {
+                        if (hasColorMap) {
+                            // Hold on adding 8-bit colormapped support until we figure out the
+                            // deadlock inside SeRasterBand.getColorMap()
+                            // if (true) {
+                            // throw new IllegalArgumentException(
+                            // "8-bit colormapped raster layers are not supported");
+                            // }
+                            LOGGER.fine("Discovered 8-bit single-band raster with colormap. "
+                                    + " Using return image type: TYPE_BYTE_INDEX");
+                            SeRasterBandColorMap colorMap = band.getColorMap();
+                            IndexColorModel rcm = sdeColorMapToJavaColorModel(colorMap);
+                            // cache the colormodel
+                            final BufferedImage ret = new BufferedImage(width, height,
+                                    BufferedImage.TYPE_BYTE_INDEXED, rcm);
+                            return ret;
+                        } else {
+                            LOGGER.fine("Discovered 8-bit single-band raster. "
+                                    + " Using return image type: TYPE_BYTE_GRAY");
+                            return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("One-band, "
+                                + "non-colormapped raster layers with type " + pixelType
+                                + " are not supported.");
+                    }
                 }
 
-            } else if (rasterAttributes.getNumBands() == 3 || rasterAttributes.getNumBands() == 4) {
-                if (rasterAttributes.getPixelType() != SeRaster.SE_PIXEL_TYPE_8BIT_U) {
+            } else if (numBands == 3 || numBands == 4) {
+                if (cellType != TYPE_8BIT_U) {
                     throw new IllegalArgumentException("3 or 4 band rasters are only supported"
                             + " if they have pixel type 8-bit unsigned pixels.");
                 }
@@ -510,9 +580,9 @@ public class ArcSDERasterReader extends ImageReader {
             } else {
                 StringBuffer errmsg = new StringBuffer();
                 errmsg.append("ArcSDERasterReader doesn't support ");
-                errmsg.append(rasterAttributes.getNumBands());
+                errmsg.append(numBands);
                 errmsg.append("-banded images of type ");
-                errmsg.append(rasterAttributes.getPixelType());
+                errmsg.append(cellType);
                 throw new IllegalArgumentException(errmsg.toString());
             }
 

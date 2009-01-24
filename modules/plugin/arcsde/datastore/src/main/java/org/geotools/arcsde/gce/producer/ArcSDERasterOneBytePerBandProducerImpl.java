@@ -57,34 +57,34 @@ public class ArcSDERasterOneBytePerBandProducerImpl extends ArcSDERasterProducer
     public void startProduction(final SeRasterConsumer consumer) {
         if (!sourceImage.getColorModel().getColorSpace().isCS_sRGB()) {
             // it's a grayscale image...load it differently?
-            Thread runme;
-            if (consumer instanceof SeRasterRenderedImage) {
-
-                runme = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            final int imageHeight = sourceImage.getHeight();
-
-                            // for each band...
-                            for (int i = 0; i < sourceImage.getData().getNumBands(); i++) {
-                                final byte[] imgBandData = ((DataBufferByte) sourceImage.getData()
-                                        .getDataBuffer()).getData(i);
-                                consumer.setScanLines(imageHeight, imgBandData, null);
-                                consumer.rasterComplete(SeRasterConsumer.SINGLEFRAMEDONE);
-                            }
-                            consumer.rasterComplete(SeRasterConsumer.STATICIMAGEDONE);
-                        } catch (Exception se) {
-                            se.printStackTrace();
-                            consumer.rasterComplete(SeRasterConsumer.IMAGEERROR);
-                        }
-                    }
-                };
-            } else {
+            if (!(consumer instanceof SeRasterRenderedImage)) {
                 throw new IllegalArgumentException("You must set "
                         + "SeRasterAttr.setImportMode(false) to load "
                         + "data using this SeProducer implementation.");
+
             }
+
+            Thread runme;
+            runme = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        final int imageHeight = sourceImage.getHeight();
+
+                        // for each band...
+                        for (int i = 0; i < sourceImage.getData().getNumBands(); i++) {
+                            final byte[] imgBandData = ((DataBufferByte) sourceImage.getData()
+                                    .getDataBuffer()).getData(i);
+                            consumer.setScanLines(imageHeight, imgBandData, null);
+                            consumer.rasterComplete(SeRasterConsumer.SINGLEFRAMEDONE);
+                        }
+                        consumer.rasterComplete(SeRasterConsumer.STATICIMAGEDONE);
+                    } catch (Exception se) {
+                        se.printStackTrace();
+                        consumer.rasterComplete(SeRasterConsumer.IMAGEERROR);
+                    }
+                }
+            };
             runme.start();
 
         } else {

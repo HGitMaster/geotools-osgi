@@ -32,6 +32,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
 import org.geotools.data.Transaction;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
@@ -281,11 +282,13 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     }
 
     /**
-     * @return empty set
+     * ArcSDE features are always "detached", so we return the FEATURE_DETACHED hint here.
+     * 
+     * @return singleton with {@link Hints#FEATURE_DETACHED}
      * @see FeatureSource#getSupportedHints()
      */
     public final Set getSupportedHints() {
-        return Collections.EMPTY_SET;
+        return Collections.singleton(Hints.FEATURE_DETACHED);
     }
 
     public ArcSdeVersionHandler getVersionHandler() throws IOException {

@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/ArcSDEAttributeReader.java $
- * @version $Id: ArcSDEAttributeReader.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEAttributeReader.java 32322 2009-01-24 20:11:52Z groldan $
  */
 final class ArcSDEAttributeReader implements AttributeReader {
     /** Shared package's logger */
@@ -250,6 +250,10 @@ final class ArcSDEAttributeReader implements AttributeReader {
                 }
             } catch (SeException e) {
                 throw new ArcSdeException(e);
+            }
+        }else if(value instanceof Geometry){
+            if (!this.schemaGeometryClass.isAssignableFrom(value.getClass())) {
+                value = adaptGeometry((Geometry) value, schemaGeometryClass);
             }
         }
 

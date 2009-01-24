@@ -1,6 +1,7 @@
 package com.esri.sde.sdk.client;
 
 import java.awt.Dimension;
+import java.awt.image.DataBufferByte;
 
 public class SeRasterAttr {
 	
@@ -34,5 +35,28 @@ public class SeRasterAttr {
     public void setRasterProducer(SeRasterProducer p) {}
 
     public void setPyramidInfo(int maxLevel, boolean skipLevelOne, int interpolation) throws SeException{}
+
+    public void setColorMap(int colorMapType, DataBufferByte dataBuffer)throws SeException {
+    }
+
+    public int getImageWidth() throws SeException {
+        return 0;
+    }
+
+    public int getImageHeight() throws SeException {
+        return 0;
+    }
+
+    public int getCompressionType() {
+        return 0;
+    }
+
+    public SDEPoint getTileOrigin() {
+        return null;
+    }
+
+    public int getInterpolation() {
+        return 0;
+    }
     
 }

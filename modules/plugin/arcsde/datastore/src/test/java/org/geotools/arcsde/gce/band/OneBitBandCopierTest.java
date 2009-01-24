@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterTestData;
 import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
+import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.util.logging.Logging;
@@ -51,7 +52,7 @@ public class OneBitBandCopierTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        LOGGER = Logging.getLogger(OneBitBandCopierTest.class.getCanonicalName());
+        LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
         if (rasterTestData == null) {
             rasterTestData = new RasterTestData();
             rasterTestData.setUp();
@@ -89,8 +90,9 @@ public class OneBitBandCopierTest {
             q.queryRasterTile(rConstraint);
 
             BufferedImage fromSdeImage = new BufferedImage(128, 128, BufferedImage.TYPE_BYTE_BINARY);
-            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr
-                    .getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
+            final RasterCellType pixelType = RasterCellType.valueOf(rAttr.getPixelType());
+            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(pixelType, rAttr
+                    .getTileWidth(), rAttr.getTileHeight());
 
             SeRasterTile rTile = r.getRasterTile();
             for (int i = 0; i < bands.length; i++) {
@@ -145,8 +147,9 @@ public class OneBitBandCopierTest {
 
             BufferedImage fromSdeImage = new BufferedImage(targetImgWidth, targetImgHeight,
                     BufferedImage.TYPE_BYTE_BINARY);
-            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr
-                    .getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
+            final RasterCellType pixelType = RasterCellType.valueOf(rAttr.getPixelType());
+            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(pixelType, rAttr
+                    .getTileWidth(), rAttr.getTileHeight());
 
             SeRasterTile rTile = r.getRasterTile();
             for (int i = 0; i < bands.length; i++) {

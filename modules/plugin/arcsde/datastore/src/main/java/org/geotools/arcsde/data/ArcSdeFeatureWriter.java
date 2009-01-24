@@ -268,7 +268,16 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                 try {
                     // A call to SeDelete.byId immediately deletes the row from the
                     // database. The application does not need to call execute()
+                    // try{
                     seDelete.byId(qualifiedName, objectID);
+                    // }catch(SeException e){
+                    // final int FID_DOESNT_EXIST = -22;
+                    // if(e.getSeError().getSdeError() == FID_DOESNT_EXIST){
+                    // //ignore
+                    // }else{
+                    // throw e;
+                    // }
+                    // }
                     versionHandler.editOperationWritten(seDelete);
                     if (handleTransaction) {
                         session.commitTransaction();

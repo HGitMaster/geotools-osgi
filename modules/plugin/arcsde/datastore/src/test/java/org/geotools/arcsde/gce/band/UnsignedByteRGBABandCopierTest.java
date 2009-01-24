@@ -32,7 +32,7 @@ public class UnsignedByteRGBABandCopierTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        LOGGER = Logging.getLogger(UnsignedByteRGBABandCopierTest.class.getCanonicalName());
+        LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
         if (rasterTestData == null) {
             rasterTestData = new RasterTestData();
             rasterTestData.setUp();

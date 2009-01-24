@@ -27,12 +27,14 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
+import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterImageReadParam;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
+import org.geotools.util.logging.Logging;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.esri.sde.sdk.client.SeQuery;
@@ -51,12 +53,11 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEImageIOReaderOutputFormatsTest.java $
- * @version $Id: ArcSDEImageIOReaderOutputFormatsTest.java 32181 2009-01-08 15:44:06Z groldan $
+ * @version $Id: ArcSDEImageIOReaderOutputFormatsTest.java 32322 2009-01-24 20:11:52Z groldan $
  */
 public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
-    private static Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger("org.geotools.arcsde.gce");
+    private static Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
     private ArcSDEConnectionPool pool = null;
 

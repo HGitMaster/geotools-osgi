@@ -25,12 +25,13 @@ import org.geotools.data.DataSourceException;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
+import com.esri.sde.sdk.geom.GeometryFactory;
 
 /**
  * Wrapper for an SeRow so it allows asking multiple times for the same property.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: SdeRow.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: SdeRow.java 32322 2009-01-24 20:11:52Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/SdeRow.java $
@@ -43,13 +44,37 @@ public class SdeRow {
 
     private int[] colStatusIndicator;
 
-    private final int nCols;
+    private int nCols;
+
+    /**
+     * A possible non set SDE geometry factory that provides the means for geometry fetching other
+     * than SeRow.getShape(). That is, if this geometryFactory is non null, it will be used to fetch
+     * the geometric attributes. Otherwise SeRow.getShape():SeShape will be used
+     */
+    private GeometryFactory geometryFactory;
+
+    private int geometryIndex = -1;
+
+    public SdeRow(GeometryFactory geometryFactory) {
+        this.geometryFactory = geometryFactory;
+    }
 
     public SdeRow(SeRow row) throws IOException {
-        this.nCols = row.getNumColumns();
+        this(row, null);
+    }
 
-        values = new Object[nCols];
-        colStatusIndicator = new int[nCols];
+    public SdeRow(SeRow row, GeometryFactory geometryFactory) throws IOException {
+        this.geometryFactory = geometryFactory;
+        setRow(row);
+    }
+
+    public void setRow(SeRow row) throws ArcSdeException {
+        final int ncols = row.getNumColumns();
+        if (this.nCols != ncols) {
+            this.nCols = ncols;
+            values = new Object[nCols];
+            colStatusIndicator = new int[nCols];
+        }
 
         int i = 0;
         int statusIndicator = 0;
@@ -62,32 +87,18 @@ public class SdeRow {
                 if (statusIndicator == SeRow.SE_IS_ALREADY_FETCHED
                         || statusIndicator == SeRow.SE_IS_REPEATED_FEATURE
                         || statusIndicator == SeRow.SE_IS_NULL_VALUE) {
+                    // ignore, will use previous values
                 } else {
-                    values[i] = row.getObject(i);
+                    if (this.geometryFactory != null && this.geometryIndex == i) {
+                        values[i] = row.getGeometry(geometryFactory, i);
+                    } else {
+                        values[i] = row.getObject(i);
+                    }
                 }
             }
         } catch (SeException e) {
             throw new ArcSdeException("getting property #" + i, e);
         }
-    }
-
-    /**
-     * Creates a new SdeRow object.
-     * 
-     * @param row
-     *            DOCUMENT ME!
-     * @param previousValues
-     *            needed in case of its a joined result, thus arcsde does not returns geometry
-     *            attributes duplicated, just on their first occurrence (sigh)
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
-     * @deprecated
-     */
-    public SdeRow(SeRow row, Object[] previousValues) throws IOException {
-        this(row);
-        setPreviousValues(previousValues);
     }
 
     public void setPreviousValues(Object[] previousValues) {
@@ -161,6 +172,15 @@ public class SdeRow {
 
     public Integer getInteger(int index) throws IOException {
         return (Integer) getObject(index);
+    }
+
+    /**
+     * @param geometryIndex
+     *            a value >= 0 indicates which index in the row contains the geometry attribute. If
+     *            not set, geometryFactory will be ignored
+     */
+    public void setGeometryIndex(int geometryIndex) {
+        this.geometryIndex = geometryIndex;
     }
 
 }

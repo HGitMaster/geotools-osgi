@@ -19,6 +19,7 @@ package org.geotools.arcsde.gce.imageio;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageReadParam;
 
@@ -67,13 +68,13 @@ public class ArcSDERasterImageReadParam extends ImageReadParam {
 
     protected ArcSDEPooledConnection connection;
 
-    protected HashMap<Integer, Integer> bandMapper;
+    protected Map<Integer, Integer> bandMapper;
 
-    public HashMap<Integer, Integer> getBandMapper() {
+    public Map<Integer, Integer> getBandMapper() {
         return bandMapper;
     }
 
-    public void setBandMapper(HashMap<Integer, Integer> bandMapper) {
+    public void setBandMapper(Map<Integer, Integer> bandMapper) {
         this.bandMapper = bandMapper;
     }
 

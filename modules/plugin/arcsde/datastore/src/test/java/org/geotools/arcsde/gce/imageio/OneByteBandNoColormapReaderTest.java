@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.gce.ArcSDEPyramid;
 import org.geotools.arcsde.gce.RasterTestData;
 import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
@@ -44,8 +43,7 @@ public class OneByteBandNoColormapReaderTest {
 
     static HashMap<String, Object> readerProps;
 
-    static Logger LOGGER = Logging.getLogger(OneByteBandNoColormapReaderTest.class
-            .getCanonicalName());
+    static Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {

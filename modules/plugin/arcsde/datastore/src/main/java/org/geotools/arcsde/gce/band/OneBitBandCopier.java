@@ -22,12 +22,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeRasterTile;
 
 public class OneBitBandCopier extends ArcSDERasterBandCopier {
 
-    Logger LOGGER = org.geotools.util.logging.Logging.getLogger(this.getClass().toString());
+    Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
     /**
      * @see org.geotools.arcsde.gce.band.ArcSDERasterBandCopier#copyPixelData(com.esri.sde.sdk.client.SeRasterTile,

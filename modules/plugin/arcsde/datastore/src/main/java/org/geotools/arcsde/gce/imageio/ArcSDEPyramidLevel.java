@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.arcsde.gce;
+package org.geotools.arcsde.gce.imageio;
 
 import java.awt.Dimension;
 

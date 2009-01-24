@@ -24,40 +24,40 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.media.jai.ImageLayout;
 
-import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
+import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
+import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterImageReadParam;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
+import org.geotools.arcsde.gce.imageio.ArcSDEPyramid.RasterQueryInfo;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
-import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
-import org.geotools.coverage.Category;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DefaultServiceInfo;
+import org.geotools.data.ServiceInfo;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.util.NumberRange;
+import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -68,21 +68,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeExtent;
-import com.esri.sde.sdk.client.SeQuery;
-import com.esri.sde.sdk.client.SeRaster;
-import com.esri.sde.sdk.client.SeRasterAttr;
-import com.esri.sde.sdk.client.SeRasterBand;
-import com.esri.sde.sdk.client.SeRasterColumn;
-import com.esri.sde.sdk.client.SeRow;
-import com.esri.sde.sdk.client.SeSqlConstruct;
-import com.esri.sde.sdk.client.SeTable;
-import com.esri.sde.sdk.pe.PeFactory;
-import com.esri.sde.sdk.pe.PeProjectedCS;
-import com.esri.sde.sdk.pe.PeProjectionException;
-
 /**
  * This class can read an ArcSDE Raster datasource and create a {@link GridCoverage2D} from the
  * data.
@@ -90,66 +75,32 @@ import com.esri.sde.sdk.pe.PeProjectionException;
  * @author Saul Farber (based on ArcGridReader)
  * @since 2.3.x
  */
-public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage2DReader implements
+@SuppressWarnings("deprecation")
+final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage2DReader implements
         GridCoverageReader {
 
     private static final boolean DEBUG = false;
 
     /** Logger. */
-    private final static Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(ArcSDERasterGridCoverage2DReader.class.getPackage().getName());
+    private final static Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
+
+    /**
+     * Holds all the needed coverage metadata
+     */
+    private final RasterInfo rasterInfo;
+
+    private DefaultServiceInfo serviceInfo;
 
     /**
      * The connectionpool we're using to fetch images from this ArcSDE raster layer
      */
     private ArcSDEConnectionPool connectionPool = null;
 
-    /** The name of the raster table we're pulling images from in this reader * */
-    private String rasterTable = null;
-
-    /**
-     * raster column names on this raster. If there's more than one raster column (is this
-     * possible?) then we just use the first one.
-     */
-    private String[] rasterColumns;
-
-    /** An SDE API object which holds lots of metadata about the raster layer * */
-    private SeRasterAttr rasterAttributes = null;
-
-    /** The epsg code for the native projection of this raster * */
-    private int epsgCode = -1;
-
-    /** Array holding information on each level of the pyramid in this raster. * */
-    private ArcSDEPyramid pyramidInfo;
-
     /**
      * Local copy of the javax.imageio.ImageReader subclass for reading from this ArcSDE Raster
      * Source *
      */
     private ArcSDERasterReader imageIOReader;
-
-    /**
-     * hashmap storing ArcSDERasterBand data-typed objects keyed to their SeRasterBand.getId()s *
-     */
-    private HashMap<Long, ArcSDERasterBandCopier> bandInfo;
-
-    private GridSampleDimension[] gridBands;
-
-    private BufferedImage sampleImage;
-
-    private Point _levelZeroPRP;
-
-    /**
-     * Creates a new instance of an ArcSDERasterReader
-     * 
-     * @param input
-     *            Source object (probably a connection-type URL) for which we want to build the
-     *            ArcSDERasterReader
-     * @throws DataSourceException
-     */
-    public ArcSDERasterGridCoverage2DReader(Object input) throws DataSourceException {
-        this(input, null);
-    }
 
     /**
      * Creates a new instance of an ArcSDERasterReader
@@ -159,36 +110,46 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      *            ArcSDERasterReader
      * @param hints
      *            Hints to be used by this reader throughout his life.
-     * @throws DataSourceException
+     * @throws IOException
      */
-    public ArcSDERasterGridCoverage2DReader(Object input, final Hints hints)
-            throws DataSourceException {
-
-        if (hints != null)
+    public ArcSDERasterGridCoverage2DReader(final ArcSDEConnectionPool connectionPool,
+            final RasterInfo rasterInfo, final Hints hints) throws IOException {
+        if (hints != null) {
             this.hints.add(hints);
-
-        setupConnectionPool(input);
-        calculateCoordinateReferenceSystem();
-        pyramidInfo = new ArcSDEPyramid(rasterAttributes, crs);
-        if (_levelZeroPRP != null) {
-            _levelZeroPRP = new Point(_levelZeroPRP.x * pyramidInfo.tileWidth, _levelZeroPRP.y
-                    * pyramidInfo.tileHeight);
         }
-        calculateBandDependentInfo();
-        setupCoverageMetadata();
-        setupImageIOReader();
 
+        this.connectionPool = connectionPool;
+        this.rasterInfo = rasterInfo;
         this.coverageFactory = CoverageFactoryFinder.getGridCoverageFactory(this.hints);
 
-        LOGGER.info("ArcSDE raster " + coverageName + " based on table " + rasterTable
-                + " has been configured.");
+        super.crs = rasterInfo.getCoverageCrs();
+        super.originalEnvelope = rasterInfo.getOriginalEnvelope();
+        super.originalGridRange = rasterInfo.getOriginalGridRange();
+        super.coverageName = rasterInfo.getRasterTable();
+
+        setupImageIOReader();
+
+        LOGGER.info("ArcSDE raster has been configured: " + rasterInfo);
     }
 
     /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
+     * @see GridCoverageReader#getFormat()
      */
     public Format getFormat() {
         return new ArcSDERasterFormat();
+    }
+
+    @Override
+    public ServiceInfo getInfo() {
+        if (serviceInfo == null) {
+            serviceInfo = new DefaultServiceInfo();
+            serviceInfo.setTitle(rasterInfo.getRasterTable() + " is an ArcSDE Raster");
+            serviceInfo.setDescription(rasterInfo.toString());
+            Set<String> keywords = new HashSet<String>();
+            keywords.add("ArcSDE");
+            serviceInfo.setKeywords(keywords);
+        }
+        return serviceInfo;
     }
 
     /**
@@ -234,13 +195,17 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                     + "GPV[] including a Parameter for READ_GRIDGEOMETRY2D.");
         }
         if (readEnvelope == null) {
+            final ArcSDEPyramid pyramidInfo = rasterInfo.getPyramidInfo();
             readEnvelope = new GeneralEnvelope(pyramidInfo.getPyramidLevel(
                     pyramidInfo.getNumLevels() - 1).getEnvelope());
         }
         if (LOGGER.isLoggable(Level.FINE))
             LOGGER.fine("ArcSDE raster image requested: [" + readEnvelope + ", " + requestedDim
                     + "]");
-        return createCoverage(readEnvelope, requestedDim, null);
+
+        GridCoverage2D coverage = createCoverage(readEnvelope, requestedDim, null);
+
+        return coverage;
     }
 
     /**
@@ -262,8 +227,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * @throws IOException
      * @throws java.io.IOException
      */
-    private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope, Rectangle requestedDim,
-            Integer forcedLevel) throws IOException {
+    private GridCoverage2D createCoverage(GeneralEnvelope requestedEnvelope,
+            Rectangle requestedDim, Integer forcedLevel) throws IOException {
 
         ArcSDEPooledConnection scon = null;
 
@@ -277,6 +242,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                     requestedEnvelope.getMaximum(0), requestedEnvelope.getMinimum(1),
                     requestedEnvelope.getMaximum(1), requestedEnvelope
                             .getCoordinateReferenceSystem());
+
+            final ArcSDEPyramid pyramidInfo = rasterInfo.getPyramidInfo();
 
             final CoordinateReferenceSystem nativeCRS = pyramidInfo.getPyramidLevel(0)
                     .getEnvelope().getCoordinateReferenceSystem();
@@ -340,17 +307,18 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                         maxImageY - minImageY);
                 // check for inaccessible negative-indexed level-zero tiles.
                 // Shift to level 1 if necessary.
-                if (level == 0 && _levelZeroPRP != null) {
-                    if ((maxImageY > _levelZeroPRP.y && minImageY < _levelZeroPRP.y)
-                            || (maxImageX > _levelZeroPRP.x && minImageX < _levelZeroPRP.x)) {
+                final Point levelZeroPRP = rasterInfo.getLevelZeroPRP();
+                if (level == 0 && levelZeroPRP != null) {
+                    if ((maxImageY > levelZeroPRP.y && minImageY < levelZeroPRP.y)
+                            || (maxImageX > levelZeroPRP.x && minImageX < levelZeroPRP.x)) {
                         LOGGER.warning("Using pyramid level 1 to render this "
                                 + "request, as the data is unavailable at "
                                 + "a negatively indexed tile.");
                         return createCoverage(requestedEnvelope, requestedDim, Integer.valueOf(1));
-                    } else if (maxImageY > _levelZeroPRP.y && maxImageX > _levelZeroPRP.x) {
+                    } else if (maxImageY > levelZeroPRP.y && maxImageX > levelZeroPRP.x) {
                         // we're on the south side of the PRP...need to shift
                         // everything up
-                        sourceRegion.translate(_levelZeroPRP.x * -1, _levelZeroPRP.y * -1);
+                        sourceRegion.translate(levelZeroPRP.x * -1, levelZeroPRP.y * -1);
                     } else {
                         // all the data we want is negatively indexed on one axis or another. Since
                         // we can't get at it, we'll have to shift up to level 1;
@@ -389,13 +357,13 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 // of all available bands...
                 // for now we'll just grab the first three, and assume they're
                 // RGB in order.
-                SeRasterBand[] seBands = rasterAttributes.getBands();
-                int[] bands = new int[Math.min(3, seBands.length)];
-                HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
-                for (int i = 0; i < bands.length; i++) {
-                    bands[i] = i + 1;
-                    bandMapper.put(new Integer((int) seBands[i].getId().longValue()),
-                            new Integer(i));
+                List<RasterBandInfo> seBands = rasterInfo.getBands();
+                int[] bands = new int[Math.min(3, seBands.size())];
+                Map<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
+                for (int bandIndex = 0; bandIndex < bands.length; bandIndex++) {
+                    bands[bandIndex] = bandIndex + 1;
+                    bandMapper.put(new Integer((int) seBands.get(bandIndex).getBandId()),
+                            new Integer(bandIndex));
                 }
                 rParam.setSourceBands(bands);
                 rParam.setBandMapper(bandMapper);
@@ -449,384 +417,46 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             }
 
             // Create the coverage
+            final GridSampleDimension[] gridBands = rasterInfo.getGridSampleDimensions();
             return coverageFactory.create(coverageName, outputImage, new GeneralEnvelope(
                     outputImageEnvelope), gridBands, null, null);
 
-        } catch (DataSourceException e) {
-            if (LOGGER.isLoggable(Level.SEVERE))
+        } catch (IOException e) {
+            if (LOGGER.isLoggable(Level.SEVERE)) {
                 LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-            throw new DataSourceException(e);
-        } catch (SeException se) {
-            if (LOGGER.isLoggable(Level.SEVERE))
-                LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
-            throw new DataSourceException(se);
-        } catch (UnavailableArcSDEConnectionException uce) {
-            if (LOGGER.isLoggable(Level.SEVERE))
-                LOGGER.log(Level.SEVERE, uce.getLocalizedMessage(), uce);
-            throw new DataSourceException(uce);
+            }
+            throw e;
         } finally {
-            if (scon != null)
+            if (scon != null) {
                 scon.close();
+            }
         }
     }
 
-    /**
-     * @param sdeUrl
-     *            - A StringBuffer containing a string of form
-     *            'sde://user:pass@sdehost:[port]/[dbname]
-     * @return a ConnectionConfig object representing these parameters
-     */
-    static ArcSDEConnectionConfig sdeURLToConnectionConfig(StringBuffer sdeUrl) {
-        // annoyingly, geoserver currently stores the user-entered SDE string as
-        // a File, and passes us the
-        // File object. The File object strips the 'sde://user...' into a
-        // 'sde:/user..'. So we need to check
-        // for both forms of the url.
-        String sdeHost, sdeUser, sdePass, sdeDBName;
-        int sdePort;
-        if (sdeUrl.indexOf("sde:/") == -1) {
-            throw new IllegalArgumentException(
-                    "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName -- Got "
-                            + sdeUrl);
-        }
-        if (sdeUrl.indexOf("sde://") == -1) {
-            sdeUrl.delete(0, 5);
-        } else {
-            sdeUrl.delete(0, 6);
-        }
+    private void setupImageIOReader() throws IOException {
+        final ArcSDEPyramid pyramidInfo = rasterInfo.getPyramidInfo();
+        final String rasterTable = rasterInfo.getRasterTable();
+        final String[] rasterColumns = rasterInfo.getRasterColumns();
 
-        int idx = sdeUrl.indexOf(":");
-        if (idx == -1) {
-            throw new IllegalArgumentException(
-                    "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-        }
-        sdeUser = sdeUrl.substring(0, idx);
-        sdeUrl.delete(0, idx);
-
-        idx = sdeUrl.indexOf("@");
-        if (idx == -1) {
-            throw new IllegalArgumentException(
-                    "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-        }
-        sdePass = sdeUrl.substring(1, idx);
-        sdeUrl.delete(0, idx);
-
-        idx = sdeUrl.indexOf(":");
-        if (idx == -1) {
-            // there's no "port" specification. Assume 5151;
-            sdePort = 5151;
-
-            idx = sdeUrl.indexOf("/");
-            if (idx == -1) {
-                throw new IllegalArgumentException(
-                        "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-            }
-            sdeHost = sdeUrl.substring(1, idx).toString();
-            sdeUrl.delete(0, idx);
-        } else {
-            sdeHost = sdeUrl.substring(1, idx).toString();
-            sdeUrl.delete(0, idx);
-
-            idx = sdeUrl.indexOf("/");
-            if (idx == -1) {
-                throw new IllegalArgumentException(
-                        "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-            }
-            sdePort = Integer.parseInt(sdeUrl.substring(1, idx).toString());
-            sdeUrl.delete(0, idx);
-        }
-
-        idx = sdeUrl.indexOf("#");
-        if (idx == -1) {
-            throw new IllegalArgumentException(
-                    "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-        }
-        sdeDBName = sdeUrl.substring(1, idx).toString();
-        sdeUrl.delete(0, idx);
-
-        return new ArcSDEConnectionConfig("arcsde", sdeHost, sdePort + "", sdeDBName, sdeUser,
-                sdePass);
-    }
-
-    /**
-     * Gets the coordinate system that will be associated to the {@link GridCoverage}. The WGS84
-     * coordinate system is used by default.
-     */
-    private void calculateCoordinateReferenceSystem() throws DataSourceException {
-
-        if (rasterAttributes == null) {
-            throw new DataSourceException("Raster Attributes are null, can't calculated CRS info.");
-        }
-
-        ArcSDEPooledConnection con = null;
-        try {
-            con = connectionPool.getConnection();
-            SeRasterColumn rCol = new SeRasterColumn(con, rasterAttributes.getRasterColumnId());
-
-            PeProjectedCS pcs = new PeProjectedCS(rCol.getCoordRef().getProjectionDescription());
-            epsgCode = -1;
-            int[] projcs = PeFactory.projcsCodelist();
-            for (int i = 0; i < projcs.length; i++) {
-                try {
-                    PeProjectedCS candidate = PeFactory.projcs(projcs[i]);
-                    // in ArcSDE 9.2, if the PeFactory doesn't support a
-                    // projection it claimed
-                    // to support, it returns 'null'. So check for it.
-                    if (candidate != null && candidate.getName().trim().equals(pcs.getName()))
-                        epsgCode = projcs[i];
-                } catch (PeProjectionException pe) {
-                    // Strangely SDE includes codes in the projcsCodeList() that
-                    // it doesn't actually support.
-                    // Catch the exception and skip them here.
-                }
-            }
-
-            if (epsgCode == -1) {
-                LOGGER.warning("Couldn't determine EPSG code for this raster."
-                        + "  Using SDE's WKT-like coordSysDescription() instead.");
-                crs = CRS.parseWKT(rCol.getCoordRef().getCoordSysDescription());
-            } else {
-                crs = CRS.decode("EPSG:" + epsgCode);
-            }
-
-            SeExtent sdeExtent = rasterAttributes.getExtent();
-            originalEnvelope = new GeneralEnvelope(crs);
-            originalEnvelope.setRange(0, sdeExtent.getMinX(), sdeExtent.getMaxX());
-            originalEnvelope.setRange(1, sdeExtent.getMinY(), sdeExtent.getMaxY());
-        } catch (UnavailableArcSDEConnectionException e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            throw new DataSourceException(e);
-        } catch (SeException e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            throw new DataSourceException(e.getSeError().getErrDesc(), e);
-        } catch (FactoryException e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            throw new DataSourceException(e);
-        } catch (PeProjectionException e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            throw new DataSourceException(e);
-        } finally {
-            if (con != null && !con.isClosed())
-                con.close();
-        }
-    }
-
-    /**
-     * Checks the input prvided to this {@link ArcSDERasterGridCoverage2DReader} and sets all the
-     * other objects and flags accordingly.
-     * 
-     * @param input
-     *            provied to this {@link ArcSDERasterGridCoverage2DReader}.
-     * @throws DataSourceException
-     * @throws IOException
-     */
-    private void setupConnectionPool(Object input) throws DataSourceException {
-        if (input == null) {
-            final DataSourceException ex = new DataSourceException(
-                    "No source set to read this coverage.");
-            if (LOGGER.isLoggable(Level.SEVERE))
-                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-            throw ex;
-        }
-
-        // this will be our connection string
-        String sdeUrl = null;
-
-        if (input instanceof String) {
-            sdeUrl = (String) input;
-            LOGGER.warning("connecting to ArcSDE Raster: " + sdeUrl);
-        } else if (input instanceof File) {
-            sdeUrl = ((File) input).getPath();
-            LOGGER.warning("connectiong via file-hack to ArcSDE Raster: " + sdeUrl);
-        } else {
-            throw new IllegalArgumentException("Unsupported input type: " + input.getClass());
-        }
-
-        ArcSDEConnectionConfig sdeConfig = sdeURLToConnectionConfig(new StringBuffer(sdeUrl));
-        if (sdeUrl.indexOf(";") != -1) {
-            final String extraParams = sdeUrl.substring(sdeUrl.indexOf(";") + 1, sdeUrl.length());
-            sdeUrl = sdeUrl.substring(0, sdeUrl.indexOf(";"));
-
-            // Right now we only support one kind of extra parameter, so we'll
-            // pull it out here.
-            if (extraParams.indexOf("LZERO_ORIGIN_TILE=") != -1) {
-                String offsetTile = extraParams
-                        .substring(extraParams.indexOf("LZERO_ORIGIN_TILE=") + 18);
-                int xOffsetTile = Integer
-                        .parseInt(offsetTile.substring(0, offsetTile.indexOf(",")));
-                int yOffsetTile = Integer.parseInt(offsetTile
-                        .substring(offsetTile.indexOf(",") + 1));
-                _levelZeroPRP = new Point(xOffsetTile, yOffsetTile);
-            }
-
-        }
-        rasterTable = sdeUrl.substring(sdeUrl.indexOf("#") + 1);
-
-        if (LOGGER.isLoggable(Level.FINE))
-            LOGGER.fine("Building ArcSDEGridCoverageReader2D for " + sdeConfig
-                    + ", with raster table " + rasterTable);
-
-        connectionPool = ArcSDEConnectionPoolFactory.getInstance().createPool(sdeConfig);
-
-        try {
-            ArcSDEPooledConnection scon = connectionPool.getConnection();
-
-            SeTable sTable = scon.getTable(rasterTable);
-            SeQuery q = null;
-            try {
-                SeColumnDefinition[] cols = sTable.describe();
-                ArrayList fetchColumns = new ArrayList();
-                for (int i = 0; i < cols.length; i++) {
-                    if (cols[i].getType() == SeColumnDefinition.TYPE_RASTER)
-                        fetchColumns.add(cols[i].getName());
-                }
-                if (fetchColumns.size() == 0)
-                    throw new DataSourceException(
-                            "Couldn't find any TYPE_RASTER columns in ArcSDE table " + rasterTable);
-
-                rasterColumns = (String[]) fetchColumns.toArray(new String[fetchColumns.size()]);
-                q = new SeQuery(scon, rasterColumns, new SeSqlConstruct(rasterTable));
-                q.prepareQuery();
-                q.execute();
-
-                SeRow r = q.fetch();
-                rasterAttributes = r.getRaster(0);
-
-                q.close();
-            } catch (SeException se) {
-                throw new DataSourceException("Error fetching raster connection data from "
-                        + rasterTable + ": " + se.getSeError().getErrDesc(), se);
-            } finally {
-                if (!scon.isClosed())
-                    scon.close();
-            }
-
-        } catch (UnavailableArcSDEConnectionException uce) {
-            throw new DataSourceException("Unable to fetch a connection to ArcSDE server at "
-                    + connectionPool.getConfig().getServerName() + ".", uce);
-        }
-
-    }
-
-    /**
-     * Inspects the band layout of this raster layer to determine whether this reader can actually
-     * support this raster layer, what sort of BufferedImage to create when rendering this layer and
-     * how to describe each band in rendered layers.
-     * 
-     * @throws DataSourceException
-     *             if there's an error communicating with SDE about this raster layer.
-     */
-    private void calculateBandDependentInfo() throws DataSourceException {
-        try {
-
-            sampleImage = ArcSDERasterReader.createCompatibleBufferedImage(1, 1, rasterAttributes);
-
-            SeRasterBand[] sdeBands = rasterAttributes.getBands();
-            bandInfo = new HashMap<Long, ArcSDERasterBandCopier>();
-            for (int i = 0; i < sdeBands.length; i++) {
-                bandInfo.put(Long.valueOf(sdeBands[i].getId().longValue()), ArcSDERasterBandCopier
-                        .getInstance(rasterAttributes.getPixelType(), pyramidInfo.tileHeight,
-                                pyramidInfo.tileWidth));
-            }
-
-            if (rasterAttributes.getNumBands() == 1) {
-                if (rasterAttributes.getPixelType() == SeRaster.SE_PIXEL_TYPE_1BIT) {
-                    NumberRange sampleValueRange = new NumberRange(0, 1);
-                    Category bitBandCat = new Category(this.coverageName + ": Band One (1-bit)",
-                            new Color[] { Color.BLACK, Color.WHITE }, sampleValueRange,
-                            LinearTransform1D.IDENTITY);
-                    gridBands = new GridSampleDimension[1];
-                    gridBands[0] = new GridSampleDimension(bitBandCat.getName(),
-                            new Category[] { bitBandCat }, null).geophysics(true);
-
-                } else if (rasterAttributes.getBands()[0].hasColorMap()) {
-                    // we support 1-band with colormap now
-                    gridBands = new GridSampleDimension[1];
-                    Category cmCat = null;//buildCategory(rasterAttributes.getBands()[0].getColorMap
-                                          // ());
-                    gridBands[0] = new GridSampleDimension(cmCat.getName(),
-                            new Category[] { cmCat }, null).geophysics(true);
-                } else if (rasterAttributes.getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_S
-                        || rasterAttributes.getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_U) {
-                    LOGGER
-                            .warning("Discovered 8-bit single-band raster.  Using return image type: TYPE_BYTE_GRAY");
-                    NumberRange sampleValueRange = new NumberRange(0, 255);
-                    Category greyscaleBandCat = new Category(this.coverageName
-                            + ": Band One (grayscale)", new Color[] { Color.BLACK, Color.WHITE },
-                            sampleValueRange, LinearTransform1D.IDENTITY);
-                    gridBands = new GridSampleDimension[1];
-                    gridBands[0] = new GridSampleDimension(greyscaleBandCat.getName(),
-                            new Category[] { greyscaleBandCat }, null).geophysics(true);
-                } else {
-                    throw new IllegalArgumentException(
-                            "One-band, non-colormapped raster layers with type "
-                                    + rasterAttributes.getPixelType() + " are not supported.");
-                }
-
-            } else if (rasterAttributes.getNumBands() == 3 || rasterAttributes.getNumBands() == 4) {
-                if (rasterAttributes.getPixelType() != SeRaster.SE_PIXEL_TYPE_8BIT_U) {
-                    throw new IllegalArgumentException(
-                            "3 or 4 band rasters are only supported if they have pixel type 8-bit unsigned pixels.");
-                }
-                NumberRange sampleValueRange = new NumberRange(0, 255);
-                Category nan = new Category("no-data", new Color[] { new Color(0x00000000) },
-                        new NumberRange(0, 0), LinearTransform1D.IDENTITY);
-                Category white = new Category("valid-data", new Color[] { new Color(0xff000000) },
-                        new NumberRange(255, 255), LinearTransform1D.IDENTITY);
-                Category redBandCat = new Category("red", new Color[] { Color.BLACK, Color.RED },
-                        sampleValueRange, LinearTransform1D.IDENTITY);
-                Category blueBandCat = new Category("blue",
-                        new Color[] { Color.BLACK, Color.BLUE }, sampleValueRange,
-                        LinearTransform1D.IDENTITY);
-                Category greenBandCat = new Category("green", new Color[] { Color.BLACK,
-                        Color.GREEN }, sampleValueRange, LinearTransform1D.IDENTITY);
-
-                gridBands = new GridSampleDimension[4];
-                gridBands[0] = new GridSampleDimension("Red band", new Category[] { redBandCat },
-                        null);
-                gridBands[1] = new GridSampleDimension("Green band",
-                        new Category[] { blueBandCat }, null);
-                gridBands[2] = new GridSampleDimension("Blue band",
-                        new Category[] { greenBandCat }, null);
-                gridBands[3] = new GridSampleDimension("NODATA Mask Band", new Category[] { nan,
-                        white }, null);
-
-            }
-        } catch (SeException se) {
-            LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
-            throw new DataSourceException(se);
-        }
-    }
-
-    private void setupCoverageMetadata() {
-
-        ArcSDEPyramidLevel highestRes = pyramidInfo.getPyramidLevel(pyramidInfo.getNumLevels() - 1);
-        Rectangle actualDim = new Rectangle(0, 0, highestRes.getNumTilesWide()
-                * pyramidInfo.tileWidth, highestRes.getNumTilesHigh() * pyramidInfo.tileHeight);
-        originalGridRange = new GeneralGridRange(actualDim);
-
-        coverageName = rasterTable;
-    }
-
-    private void setupImageIOReader() throws DataSourceException {
-        HashMap readerMap = new HashMap();
+        Map<String, Object> readerMap = new HashMap<String, Object>();
         readerMap.put(ArcSDERasterReaderSpi.PYRAMID, pyramidInfo);
         readerMap.put(ArcSDERasterReaderSpi.RASTER_TABLE, rasterTable);
         readerMap.put(ArcSDERasterReaderSpi.RASTER_COLUMN, rasterColumns[0]);
 
         try {
-            imageIOReader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
-                    .createReaderInstance(readerMap);
+            ArcSDERasterReaderSpi arcSDERasterReaderSpi = new ArcSDERasterReaderSpi();
+            imageIOReader = arcSDERasterReaderSpi.createReaderInstance(readerMap);
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE,
                     "Error creating ImageIOReader in ArcSDERasterGridCoverage2DReader", ioe);
-            throw new DataSourceException(ioe);
+            throw ioe;
         }
     }
 
     private BufferedImage createInitialBufferedImage(final int width, final int height)
             throws DataSourceException {
 
+        final BufferedImage sampleImage = rasterInfo.getSampleImage();
         final WritableRaster newras = sampleImage.getRaster().createCompatibleWritableRaster(width,
                 height);
         final BufferedImage ret = new BufferedImage(sampleImage.getColorModel(), newras,
@@ -837,8 +467,9 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
         // isn't. Let's fix that and set
         // the image to white.
         int[] pixels = new int[width * height];
+        final int transparentWhite = 0x00ffffff;
         for (int i = 0; i < width * height; i++) {
-            pixels[i] = 0x00ffffff;
+            pixels[i] = transparentWhite;
         }
         ret.setRGB(0, 0, width, height, pixels, 0, 1);
 

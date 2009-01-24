@@ -1,7 +1,8 @@
 package com.esri.sde.sdk.client;
 
 import java.util.Calendar;
-import java.util.logging.Level;
+
+import com.esri.sde.sdk.geom.GeometryFactory;
 
 public class SeRow {
 	
@@ -29,5 +30,8 @@ public class SeRow {
     public void setLong(int index, Long value) {}
     public SeShape getShape(int i) {return null;}
     public void setNString(int index, String convertedValue) {}
+    public Object getGeometry(GeometryFactory seGeomFac, int i)throws SeException {
+        return null;
+    }
 	
 }

@@ -18,61 +18,73 @@
 package org.geotools.arcsde.gce;
 
 import java.awt.Rectangle;
+import java.io.IOException;
 
 import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterAttr;
 import com.esri.sde.sdk.client.SeRasterBand;
+import com.esri.sde.sdk.client.SeRasterBand.SeRasterBandColorMap;
 
 public class ArcSDERasterProducerTest {
 
+    private static RasterTestData testData;
+
+    @BeforeClass
+    public static void oneTimeSetup() throws IOException {
+        testData = new RasterTestData();
+        testData.setUp();
+    }
+
+    @AfterClass
+    public static void oneTimeTearDown() throws Exception {
+        testData.tearDown();
+    }
+
     @Test
     public void testCreateRGBColorMappedRaster() throws Exception {
-        RasterTestData rtd = new RasterTestData();
-        rtd.setUp();
-        rtd.loadRGBColorMappedRaster();
+        testData.loadRGBColorMappedRaster();
 
-        SeRasterAttr attr = rtd.getRasterAttributes(rtd.getRasterTableName(RasterTableName.RGB_CM),
-                new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
+        SeRasterAttr attr = testData.getRasterAttributes(testData
+                .getRasterTableName(RasterTableName.RGB_CM), new Rectangle(0, 0, 0, 0), 0,
+                new int[] { 1 });
         SeRasterBand[] bands = attr.getBands();
 
         Assert.assertTrue(bands.length == 1);
-        // Assert.assertTrue(bands[0].getColorMap() != null);
-
-        rtd.tearDown();
+        Assert.assertTrue(bands[0].hasColorMap());
+        // SeRasterBandColorMap colorMap = bands[0].getColorMap();
+        // Assert.assertTrue(colorMap != null);
     }
 
     @Test
     public void testCreateGrayscaleByteRaster() throws Exception {
-        RasterTestData rtd = new RasterTestData();
-        rtd.setUp();
-        rtd.loadOneByteGrayScaleRaster();
+        testData.loadOneByteGrayScaleRaster();
 
-        SeRasterAttr attr = rtd.getRasterAttributes(rtd
+        SeRasterAttr attr = testData.getRasterAttributes(testData
                 .getRasterTableName(RasterTableName.GRAYSCALE), new Rectangle(0, 0, 0, 0), 0,
                 new int[] { 1 });
         Assert.assertTrue(attr.getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_U);
         Assert.assertTrue(attr.getNumBands() == 1);
         Assert.assertTrue(attr.getBandInfo(1).hasColorMap() == false);
 
-        rtd.tearDown();
     }
 
     @Test
     public void testCreateFloatRaster() throws Exception {
-        RasterTestData rtd = new RasterTestData();
-        rtd.setUp();
-        rtd.loadFloatRaster();
+        testData.loadFloatRaster();
 
-        SeRasterAttr attr = rtd.getRasterAttributes(rtd.getRasterTableName(RasterTableName.FLOAT),
-                new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
+        SeRasterAttr attr = testData.getRasterAttributes(testData
+                .getRasterTableName(RasterTableName.FLOAT), new Rectangle(0, 0, 0, 0), 0,
+                new int[] { 1 });
         Assert.assertTrue(attr.getPixelType() == SeRaster.SE_PIXEL_TYPE_32BIT_REAL);
         Assert.assertTrue(attr.getNumBands() == 1);
         Assert.assertTrue(attr.getBandInfo(1).hasColorMap() == false);
-
-        rtd.tearDown();
+        Assert.assertEquals(201, attr.getImageWidth());
+        Assert.assertEquals(201, attr.getImageHeight());
     }
 }

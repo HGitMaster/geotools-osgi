@@ -19,26 +19,31 @@ package org.geotools.arcsde.gce.band;
 import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 
+import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.data.DataSourceException;
 
-import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterTile;
 
 public abstract class ArcSDERasterBandCopier {
 
     protected int tileWidth, tileHeight;
 
-    public static ArcSDERasterBandCopier getInstance(int sePixelType, int tileWidth, int tileHeight) {
+    public static ArcSDERasterBandCopier getInstance(RasterCellType pixelType, int tileWidth,
+            int tileHeight) {
         ArcSDERasterBandCopier ret;
-        if (sePixelType == SeRaster.SE_PIXEL_TYPE_8BIT_U) {
+        switch (pixelType) {
+        case TYPE_8BIT_U:
             ret = new UnsignedByteBandCopier();
-        } else if (sePixelType == SeRaster.SE_PIXEL_TYPE_1BIT) {
+            break;
+        case TYPE_1BIT:
             ret = new OneBitBandCopier();
-        } else if (sePixelType == SeRaster.SE_PIXEL_TYPE_32BIT_REAL) {
+            break;
+        case TYPE_32BIT_REAL:
             ret = new FloatBandCopier();
-        } else {
+            break;
+        default:
             throw new IllegalArgumentException(
-                    "Don't know how to create ArcSDE band reader for pixel type " + sePixelType);
+                    "Don't know how to create ArcSDE band reader for pixel type " + pixelType);
         }
         ret.tileWidth = tileWidth;
         ret.tileHeight = tileHeight;

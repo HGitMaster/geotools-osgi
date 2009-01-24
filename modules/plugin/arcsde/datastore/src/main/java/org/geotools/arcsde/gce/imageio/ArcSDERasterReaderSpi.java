@@ -23,7 +23,6 @@ import java.util.Map;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 
-import org.geotools.arcsde.gce.ArcSDEPyramid;
 
 /**
  * An ImageIO Service Provider Interface for creating ArcSDERasterReaders.
@@ -60,7 +59,7 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
      * </ul>
      */
     @Override
-    public ImageReader createReaderInstance(final Object extension) throws IOException {
+    public ArcSDERasterReader createReaderInstance(final Object extension) throws IOException {
         if (extension instanceof Map) {
             final ArcSDEPyramid p = (ArcSDEPyramid) ((Map) extension).get(PYRAMID);
             final String t = (String) ((Map) extension).get(RASTER_TABLE);
