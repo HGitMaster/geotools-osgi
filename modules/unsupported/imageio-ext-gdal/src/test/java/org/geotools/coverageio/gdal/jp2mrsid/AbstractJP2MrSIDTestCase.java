@@ -22,17 +22,17 @@ import java.util.logging.Logger;
 
 import org.gdal.gdal.Driver;
 import org.gdal.gdal.gdal;
+
 import org.geotools.coverageio.gdal.AbstractGDALBasedTestCase;
 
 /**
  * @author Daniele Romagnoli, GeoSolutions
  * @author Simone Giannecchini (simboss), GeoSolutions
  * 
- * Base JP2K testing class.
+ * Base JP2MrSID testing class.
  */
 public abstract class AbstractJP2MrSIDTestCase extends
         AbstractGDALBasedTestCase {
-    // TODO: Change these temp settings.
     // Define the GDAL_SKIP env variable to enable the proper plugin.
     protected final static Logger LOGGER = org.geotools.util.logging.Logging
     .getLogger("org.geotools.coverageio.gdal.jp2mrsid");
@@ -52,12 +52,11 @@ public abstract class AbstractJP2MrSIDTestCase extends
             }
         } catch (UnsatisfiedLinkError e) {
             if (LOGGER.isLoggable(Level.WARNING))
-                LOGGER.warning(new StringBuffer("GDAL library unavailable.")
-                        .toString());
+                LOGGER.warning("GDAL library unavailable.");
         }
     }
 
     public AbstractJP2MrSIDTestCase(String name) {
-        super(name, "JP2K", new JP2MrSIDFormatFactory());
+        super(name, "JP2MrSID", new JP2MrSIDFormatFactory());
     }
 }

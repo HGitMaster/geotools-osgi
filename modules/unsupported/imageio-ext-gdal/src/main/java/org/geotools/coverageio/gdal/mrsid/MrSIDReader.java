@@ -111,103 +111,108 @@ public final class MrSIDReader extends BaseGDALGridCoverage2DReader implements
         if (getCoverageGridRange() != null && getCoverageCRS() != null
                 && getCoverageEnvelope() != null)
             return;
-        final IIOMetadata metadata = reader.getImageMetadata(0);
-        if (!(metadata instanceof GDALCommonIIOImageMetadata)) {
-            throw new DataSourceException(
-                    "Unexpected error! Metadata should be an instance of the expected class:"
-                            + " GDALCommonIIOImageMetadata.");
-        }
-        final GDALCommonIIOImageMetadata gridMetadata = (GDALCommonIIOImageMetadata) metadata;
-
-        // getting metadata
-        final Node root = gridMetadata
-                .getAsTree(MrSIDIIOImageMetadata.mrsidImageMetadataName);
-
-        // //
-        //
-        // getting Image Properties
-        //
-        // //
-        Node child = root.getFirstChild();
-        NamedNodeMap attributes = child.getAttributes();
-        if (getCoverageGridRange() == null) {
-            final String sWidth = attributes.getNamedItem("IMAGE__WIDTH")
-                    .getNodeValue();
-            final String sHeight = attributes.getNamedItem("IMAGE__HEIGHT")
-                    .getNodeValue();
-
-            if ((sHeight != null) && (sWidth != null)
-                    && !(sWidth.trim().equalsIgnoreCase(""))
-                    && !(sHeight.trim().equalsIgnoreCase(""))) {
-                final int width = Integer.parseInt(sWidth);
-                final int height = Integer.parseInt(sHeight);
-                setCoverageGridRange(new GeneralGridRange(new Rectangle(0, 0,
-                        width, height)));
-            }
-        }
-        // //
-        //
-        // getting GeoReferencing Properties
-        //
-        // //
-        child = child.getNextSibling();
-        attributes = child.getAttributes();
-
-        if (getCoverageEnvelope() == null) {
-            final String xResolution = attributes.getNamedItem(
-                    "IMAGE__X_RESOLUTION").getNodeValue();
-            final String yResolution = attributes.getNamedItem(
-                    "IMAGE__Y_RESOLUTION").getNodeValue();
-            final String xyOrigin = attributes.getNamedItem("IMAGE__XY_ORIGIN")
-                    .getNodeValue();
-
-            if ((xResolution != null) && (yResolution != null)
-                    && (xyOrigin != null)
-                    && !(xResolution.trim().equalsIgnoreCase(""))
-                    && !(yResolution.trim().equalsIgnoreCase(""))
-                    && !(xyOrigin.trim().equalsIgnoreCase(""))) {
-                double cellsizeX = Double.parseDouble(xResolution);
-                double cellsizeY = Double.parseDouble(yResolution);
-                final String[] origins = xyOrigin.split(",");
-                double xul = Double.parseDouble(origins[0]);
-                double yul = Double.parseDouble(origins[1]);
-
-                xul -= (cellsizeX / 2d);
-                yul -= (cellsizeY / 2d);
-
-                final double xll = xul;
-                final double yur = yul;
-                final int width = getCoverageGridRange().getLength(0);
-                final int height = getCoverageGridRange().getLength(1);
-                final double xur = xul + (cellsizeX * width);
-                final double yll = yul - (cellsizeY * height);
-                setCoverageEnvelope(new GeneralEnvelope(
-                        new double[] { xll, yll }, new double[] { xur, yur }));
-            }
-        }
-        // Retrieving projection Information
-        if (getCoverageCRS() == null) {
-            Node attribute = attributes.getNamedItem("IMG__WKT");
-
-            if (attribute != null) {
-                String wkt = attribute.getNodeValue();
-
-                if ((wkt != null) && (wkt.trim().length() > 0)) {
-                    try {
-                        setCoverageCRS(CRS.parseWKT(wkt));
-                    } catch (FactoryException fe) {
-                        if (LOGGER.isLoggable(Level.FINE)) {
-                            LOGGER.log(Level.FINE, "Unable to get CRS from"
-                                    + " WKT contained in metadata."
-                                    + " Looking for a PRJ.");
-                        }
-
-                        // unable to get CRS from WKT
-                        setCoverageCRS(null);
-                    }
-                }
-            }
-        }
+        
+        // Uncomment this section in case we stop using the default CRS.
+        // The CRS information coming from GDAL are computed from the
+        // same MrSID metadata.
+        
+//    final IIOMetadata metadata = reader.getImageMetadata(0);
+//    if (!(metadata instanceof GDALCommonIIOImageMetadata)) {
+//        throw new DataSourceException(
+//                "Unexpected error! Metadata should be an instance of the expected class:"
+//                        + " GDALCommonIIOImageMetadata.");
+//    }
+//    final GDALCommonIIOImageMetadata gridMetadata = (GDALCommonIIOImageMetadata) metadata;
+//
+//    // getting metadata
+//    final Node root = gridMetadata
+//            .getAsTree(MrSIDIIOImageMetadata.mrsidImageMetadataName);
+//
+//    // //
+//    //
+//    // getting Image Properties
+//    //
+//    // //
+//    Node child = root.getFirstChild();
+//    NamedNodeMap attributes = child.getAttributes();
+//    if (getCoverageGridRange() == null) {
+//        final String sWidth = attributes.getNamedItem("IMAGE__WIDTH")
+//                .getNodeValue();
+//        final String sHeight = attributes.getNamedItem("IMAGE__HEIGHT")
+//                .getNodeValue();
+//
+//        if ((sHeight != null) && (sWidth != null)
+//                && !(sWidth.trim().equalsIgnoreCase(""))
+//                && !(sHeight.trim().equalsIgnoreCase(""))) {
+//            final int width = Integer.parseInt(sWidth);
+//            final int height = Integer.parseInt(sHeight);
+//            setCoverageGridRange(new GeneralGridRange(new Rectangle(0, 0,
+//                    width, height)));
+//        }
+//    }
+//    // //
+//    //
+//    // getting GeoReferencing Properties
+//    //
+//    // //
+//    child = child.getNextSibling();
+//    attributes = child.getAttributes();
+//
+//    if (getCoverageEnvelope() == null) {
+//        final String xResolution = attributes.getNamedItem(
+//                "IMAGE__X_RESOLUTION").getNodeValue();
+//        final String yResolution = attributes.getNamedItem(
+//                "IMAGE__Y_RESOLUTION").getNodeValue();
+//        final String xyOrigin = attributes.getNamedItem("IMAGE__XY_ORIGIN")
+//                .getNodeValue();
+//
+//        if ((xResolution != null) && (yResolution != null)
+//                && (xyOrigin != null)
+//                && !(xResolution.trim().equalsIgnoreCase(""))
+//                && !(yResolution.trim().equalsIgnoreCase(""))
+//                && !(xyOrigin.trim().equalsIgnoreCase(""))) {
+//            double cellsizeX = Double.parseDouble(xResolution);
+//            double cellsizeY = Double.parseDouble(yResolution);
+//            final String[] origins = xyOrigin.split(",");
+//            double xul = Double.parseDouble(origins[0]);
+//            double yul = Double.parseDouble(origins[1]);
+//
+//            xul -= (cellsizeX / 2d);
+//            yul -= (cellsizeY / 2d);
+//
+//            final double xll = xul;
+//            final double yur = yul;
+//            final int width = getCoverageGridRange().getLength(0);
+//            final int height = getCoverageGridRange().getLength(1);
+//            final double xur = xul + (cellsizeX * width);
+//            final double yll = yul - (cellsizeY * height);
+//            setCoverageEnvelope(new GeneralEnvelope(
+//                    new double[] { xll, yll }, new double[] { xur, yur }));
+//        }
+//    }
+//    // Retrieving projection Information
+//    if (getCoverageCRS() == null) {
+//        Node attribute = attributes.getNamedItem("IMG__WKT");
+//
+//        if (attribute != null) {
+//            String wkt = attribute.getNodeValue();
+//
+//            if ((wkt != null) && (wkt.trim().length() > 0)) {
+//                try {
+//                    setCoverageCRS(CRS.parseWKT(wkt));
+//                } catch (FactoryException fe) {
+//                    if (LOGGER.isLoggable(Level.FINE)) {
+//                        LOGGER.log(Level.FINE, "Unable to get CRS from"
+//                                + " WKT contained in metadata."
+//                                + " Looking for a PRJ.");
+//                    }
+//
+//                    // unable to get CRS from WKT
+//                    setCoverageCRS(null);
+//                }
+//            }
+//        }
+//    }
     }
 
     /**

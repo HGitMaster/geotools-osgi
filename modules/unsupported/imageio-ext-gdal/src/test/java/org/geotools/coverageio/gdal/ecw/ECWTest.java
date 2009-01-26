@@ -22,7 +22,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
@@ -32,7 +31,6 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverageio.gdal.BaseGDALGridCoverage2DReader;
-import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
@@ -92,13 +90,7 @@ public final class ECWTest extends AbstractECWTestCase {
 		//
 		// /////////////////////////////////////////////////////////////////////
 		GridCoverage2D gc = (GridCoverage2D) reader.read(null);
-		assertNotNull(gc);
-
-		if (TestData.isInteractiveTest()) {
-			gc.show();
-		} else {
-			gc.getRenderedImage().getData();
-		}
+		forceDataLoading(gc);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -131,17 +123,8 @@ public final class ECWTest extends AbstractECWTestCase {
 		assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
 				.getScale(((AffineTransform) ((GridGeometry2D) gc
 						.getGridGeometry()).getGridToCRS2D())) / 2, true));
-		// this should be fine since we give 1 pixel tolerance
-		assertEquals(oldW / 4.0 / (cropFactor), gc.getRenderedImage()
-				.getWidth(), 1);
-		assertEquals(oldH / 4.0 / (cropFactor), gc.getRenderedImage()
-				.getHeight(), 1);
 
-		if (TestData.isInteractiveTest()) {
-			gc.show();
-		} else {
-			gc.getRenderedImage().getData();
-		}
+		forceDataLoading(gc);
 
 		// /////////////////////////////////////////////////////////////////////
 		//

@@ -26,7 +26,7 @@ import org.geotools.coverageio.gdal.AbstractGDALBasedTestCase;
  * @author Daniele Romagnoli, GeoSolutions
  * @author Simone Giannecchini (simboss), GeoSolutions
  *
- * Base JP2K testing class.
+ * Base JP2Kakadu testing class.
  */
 public abstract class AbstractJP2KTestCase extends AbstractGDALBasedTestCase {
     protected final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(

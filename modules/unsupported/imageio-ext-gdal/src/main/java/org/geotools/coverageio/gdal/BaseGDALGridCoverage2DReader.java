@@ -233,7 +233,7 @@ public abstract class BaseGDALGridCoverage2DReader extends
                 }
             }
             // Grid2World Transformation
-            final double tr = PixelTranslation
+            final double tr = -PixelTranslation
                     .getPixelTranslation(PixelInCell.CELL_CORNER);
             tempTransform.translate(tr, tr);
             this.raster2Model = ProjectiveTransform.create(tempTransform);

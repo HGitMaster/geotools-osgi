@@ -20,10 +20,13 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 
 import junit.framework.TestCase;
 
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.test.TestData;
 
 /**
  * @author Daniele Romagnoli, GeoSolutions
@@ -32,9 +35,19 @@ import org.geotools.coverage.grid.io.GridFormatFactorySpi;
  * Base testing class initializing JAI properties to be used during tests.
  */
 public class AbstractGDALBasedTestCase extends TestCase {
-	
-	protected final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
-            "org.geotools.coverageio.gdal");
+
+    protected final static Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.coverageio.gdal");
+
+    protected static void forceDataLoading(final GridCoverage2D gc) {
+        assertNotNull(gc);
+
+        if (TestData.isInteractiveTest()) {
+            gc.show();
+        } else {
+            PlanarImage.wrapRenderedImage(gc.getRenderedImage()).getTiles();
+        }
+    }
 
     /**
      * A String containing the name of the supported format. It will be used to
@@ -58,10 +71,10 @@ public class AbstractGDALBasedTestCase extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         ImageIO.setUseCache(false);
-        JAI.getDefaultInstance().getTileCache().setMemoryCapacity(10 * 1024 * 1024);
+        JAI.getDefaultInstance().getTileCache().setMemoryCapacity(16 * 1024 * 1024);
         JAI.getDefaultInstance().getTileCache().setMemoryThreshold(1.0f);
-        JAI.getDefaultInstance().getTileScheduler().setParallelism(50);
-        JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(50);
+        JAI.getDefaultInstance().getTileScheduler().setParallelism(2);
+        JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(2);
         JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(5);
         JAI.getDefaultInstance().getTileScheduler().setPriority(5);
     }

@@ -87,15 +87,8 @@ public final class JP2KTest extends AbstractJP2KTestCase {
         gg.setValue(new GridGeometry2D(reader.getOriginalGridRange(), oldEnvelope));
 
         final GridCoverage2D gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg });
-
-        assertNotNull(gc);
-
-        if (TestData.isInteractiveTest()) {
-            gc.show();
-        } else {
-            gc.getRenderedImage().getData();
-        }
-
+        forceDataLoading(gc);
+        
         if (TestData.isInteractiveTest()) {
             // printing CRS information
             LOGGER.info(gc.getCoordinateReferenceSystem().toWKT());

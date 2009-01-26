@@ -17,16 +17,18 @@
  */
 package org.geotools.coverageio.gdal.erdasimg;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import org.geotools.coverageio.gdal.AbstractGDALBasedTestCase;
+import org.geotools.test.TestData;
 
 
 /**
  * @author Daniele Romagnoli, GeoSolutions
  * @author Simone Giannecchini (simboss), GeoSolutions
  *
- * Base DTED testing class.
+ * Base ErdasImg testing class.
  */
 public abstract class AbstractErdasImgTestCase extends AbstractGDALBasedTestCase {
     protected final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
@@ -34,5 +36,14 @@ public abstract class AbstractErdasImgTestCase extends AbstractGDALBasedTestCase
 
     public AbstractErdasImgTestCase(String name) {
         super(name, "ErdasImagine", new ErdasImgFormatFactory());
+    }
+    
+    protected void setUp() throws Exception {
+        super.setUp();
+        File file = TestData.file(this, "test.zip");
+        assertTrue(file.exists());
+
+        // unzip it
+        TestData.unzipFile(this, "test.zip");
     }
 }

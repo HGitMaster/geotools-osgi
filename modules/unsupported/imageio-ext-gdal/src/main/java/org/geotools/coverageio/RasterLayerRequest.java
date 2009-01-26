@@ -20,7 +20,6 @@ import it.geosolutions.imageio.imageioimpl.imagereadmt.DefaultCloneableImageRead
 
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +32,7 @@ import javax.imageio.ImageReader;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
@@ -41,15 +40,16 @@ import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.coverageio.gdal.BaseGDALGridFormat;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
-import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotools.metadata.iso.spatial.PixelTranslation;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
-import org.geotools.referencing.operation.transform.IdentityTransform;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterValue;
@@ -68,7 +68,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author Daniele Romagnoli, GeoSolutions
  * @author Simone Giannecchini, GeoSolutions
  */
-class CoverageRequest {
+class RasterLayerRequest {
 
     /** Logger. */
     private final static Logger LOGGER = org.geotools.util.logging.Logging
@@ -93,26 +93,26 @@ class CoverageRequest {
     private GeneralEnvelope coverageEnvelope = null;
 
     /** The base envelope 2D */
-    private Envelope2D baseEnvelope2D;
+    private ReferencedEnvelope coverageBBox;
 
     /** WGS84 envelope 2D for this coverage */
-    private Envelope2D wgs84BaseEnvelope2D;
+    private ReferencedEnvelope coverageGeographicBBox;
 
     /** The CRS for the coverage */
-    private CoordinateReferenceSystem coverageCRS = null;
+    private CoordinateReferenceSystem coverageCRS;
 
     /** The CRS related to the base envelope 2D */
-    private CoordinateReferenceSystem spatialReferenceSystem2D;
+    private CoordinateReferenceSystem coverageCRS2D;
 
     /** The Coverage name */
     private String coverageName;
 
     /** The base grid range for the coverage */
-    private GeneralGridRange baseGridRange;
+    private Rectangle coverageRasterArea;
 
-    private double[] highestRes;
+    private double[] coverageFullResolution;
 
-    private MathTransform raster2Model;
+    private MathTransform2D coverageGridToWorld2D;
 
     // ////////////////////////////////////////////////////////////////////////
     //
@@ -121,22 +121,13 @@ class CoverageRequest {
     // ////////////////////////////////////////////////////////////////////////
 
     /** The envelope requested */
-    private GeneralEnvelope requestedEnvelope2D;
-
-    /**
-     * The adjusted requested envelope. It is the envelope obtained by properly
-     * intersecting the requested envelope with the base envelope.
-     */
-    private GeneralEnvelope adjustedRequestedEnvelope2D;
+    private BoundingBox requestedBBox;
 
     /** The desired overview Policy for this request */
     private OverviewPolicy overviewPolicy;
 
     /** The region where to fit the requested envelope */
-    private Rectangle requestedRasterDimension;
-
-    /** */
-    private MathTransform2D requestedGridToWorld2D;
+    private Rectangle requestedRasterArea;
 
     private Hints hints;
 
@@ -155,14 +146,14 @@ class CoverageRequest {
     private ImageReadParam imageReadParam = null;
 
     /** The source */
-    private Rectangle sourceRasterRegion;
+    private Rectangle coverageRequestedRasterArea;
 
     /**
      * If set to {@code true} a transformation is requested to obtain the
      * desired data. This usually happens when the requested envelope will be
      * adjusted with intersection/crop of the base envelope.
      */
-    private boolean needTransformation;
+    private boolean adjustGridToWorldSet;
 
     /**
      * Set to {@code true} if this request will produce an empty result, and the
@@ -183,14 +174,21 @@ class CoverageRequest {
     /** An optional layout to be adopted */
     private ImageLayout layout = null;
 
+	private double[] approximateCoverageWGS84FullResolution;
+
+	private double[] approximateWGS84RequestedResolution;
+
+	private double[] requestedResolution;
+
     /**
      * Build a new {@code CoverageRequest} given a set of input parameters.
      * 
      * @param params
      *                The {@code GeneralParameterValue}s to initialize this
      *                request
+     * @param baseGridCoverage2DReader 
      */
-    public CoverageRequest(GeneralParameterValue[] params) {
+    public RasterLayerRequest(GeneralParameterValue[] params, BaseGridCoverage2DReader reader) {
 
         // //
         //
@@ -205,6 +203,7 @@ class CoverageRequest {
                 extractParameter(param, name);
             }
         }
+        setBaseParameters(reader);
     }
 
     /**
@@ -219,7 +218,7 @@ class CoverageRequest {
 
         // //
         //
-        // GridGeometry2D parameter
+        // Requested GridGeometry2D parameter
         //
         // //
         if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName())) {
@@ -228,10 +227,8 @@ class CoverageRequest {
                 return;
             }
 
-            requestedGridToWorld2D = gg.getGridToCRS2D();
-            requestedEnvelope2D = new GeneralEnvelope((Envelope) gg
-                    .getEnvelope2D());
-            requestedRasterDimension = gg.getGridRange2D().getBounds();
+            requestedBBox = new ReferencedEnvelope((Envelope) gg.getEnvelope2D());
+            requestedRasterArea = gg.getGridRange2D().getBounds();
             return;
         }
 
@@ -309,19 +306,25 @@ class CoverageRequest {
 
     /**
      * Compute this specific request settings all the parameters needed by a
-     * visiting {@link CoverageResponse} object.
+     * visiting {@link RasterLayerResponse} object.
      */
-    public void prepare() {
+    public synchronized void prepare() {
         try {
+        	
+            
             // //
             //
-            // Set envelope and source region
+        	// Preparation, we are going to set all the relevant params
+            //
+            // //        	
+            prepareCoverageSpatialElements();
+            
+            // //
+            //
+            // Adjust requested bounding box and source region in order to fall within the source coverage
             //
             // //
-            sourceRasterRegion = new Rectangle();
-            adjustedRequestedEnvelope2D = evaluateRequestedParams(
-                    requestedEnvelope2D, sourceRasterRegion,
-                    requestedRasterDimension, requestedGridToWorld2D);
+            prepareRequestResponseSpatialElements();
 
             // //
             //
@@ -335,35 +338,42 @@ class CoverageRequest {
             } else {
                 imageReadParam = new ImageReadParam();
             }
-            if (adjustedRequestedEnvelope2D != null) {
-                final GeneralEnvelope req = (adjustedRequestedEnvelope2D
-                        .isEmpty()) ? requestedEnvelope2D
-                        : adjustedRequestedEnvelope2D;
-                setReadParameters(overviewPolicy, imageReadParam, req,
-                        requestedRasterDimension);
+
+            // //
+            //
+            // Set the read parameters
+            //
+            // //
+            if(requestedBBox != null && !requestedBBox.isEmpty())//&&requestedBBoxInSourceCRS2D!=null&&requestedRasterArea!=null)
+            {
+
+            	//set subsampling
+            	setReadParameters();
+            	
+            	// Concatenating an adjustment to the native grid2world is requested since the requested envelope is non empty
+                adjustGridToWorldSet=true;
+                
+                return;
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-            adjustedRequestedEnvelope2D = null;
+            requestedBBox = null;
+            coverageRequestedRasterArea=null;
         } catch (TransformException e) {
             LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-            adjustedRequestedEnvelope2D = null;
-        }
-        if (adjustedRequestedEnvelope2D != null && sourceRasterRegion != null
-                && !sourceRasterRegion.isEmpty()) {
-            imageReadParam.setSourceRegion(sourceRasterRegion);
-        }
+            requestedBBox = null;
+            coverageRequestedRasterArea=null;
+        } catch (FactoryException e) {
+            LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+            requestedBBox = null;
+            coverageRequestedRasterArea=null;
+		}
 
-        // A transformation is requested in case the requested envelope has been
-        // adjusted
-        needTransformation = (adjustedRequestedEnvelope2D != null && !adjustedRequestedEnvelope2D
-                .isEmpty());
+        //make sure we signal the problem
+        emptyRequest=true;
 
-        // In case the adjusted requested envelope is null, no intersection
-        // between requested envelope and base envelope have been found. Hence,
-        // no valid coverage will be loaded and the request should be considered
-        // as producing an empty result.
-        emptyRequest = adjustedRequestedEnvelope2D == null;
+
+
 
     }
 
@@ -411,20 +421,19 @@ class CoverageRequest {
      * Return a crop region from a specified envelope, leveraging on the grid to
      * world transformation.
      * 
-     * @param envelope
+     * @param refinedRequestedBBox
      *                the crop envelope
      * @return a {@code Rectangle} representing the crop region.
      * @throws TransformException
      *                 in case a problem occurs when going back to raster space.
      */
-    private Rectangle getCropRegion(GeneralEnvelope envelope)
+    private Rectangle getCropRegion()
             throws TransformException {
         final MathTransform gridToWorldTransform = getOriginalGridToWorld(PixelInCell.CELL_CORNER);
-        final MathTransform worldToGridTransform = gridToWorldTransform
-                .inverse();
-        final GeneralEnvelope rasterArea = CRS.transform(worldToGridTransform,
-                envelope);
+        final MathTransform worldToGridTransform = gridToWorldTransform.inverse();
+        final GeneralEnvelope rasterArea = CRS.transform(worldToGridTransform,requestedBBox);
         final Rectangle2D ordinates = rasterArea.toRectangle2D();
+        // THIS IS FUNDAMENTAL IN ORDER TO AVOID PROBLEMS WHEN DOING TILING
         return ordinates.getBounds();
     }
 
@@ -454,11 +463,12 @@ class CoverageRequest {
      * @throws TransformException
      * @todo this versions is deeply GDAL based.
      */
-    protected void setReadParameters(OverviewPolicy overviewPolicy,
-            ImageReadParam readParam, GeneralEnvelope requestedEnvelope,
-            Rectangle requestedDim) throws IOException, TransformException {
-        double[] requestedRes = null;
+    protected void setReadParameters() throws IOException, TransformException {
 
+
+    	//set source region
+    	imageReadParam.setSourceRegion(this.coverageRequestedRasterArea);
+    	
         // //
         //
         // Initialize overview policy
@@ -473,7 +483,7 @@ class CoverageRequest {
         // default values for subsampling
         //
         // //
-        readParam.setSourceSubsampling(1, 1, 0, 0);
+        imageReadParam.setSourceSubsampling(1, 1, 0, 0);
 
         // //
         //
@@ -490,35 +500,47 @@ class CoverageRequest {
         // by the user.
         //
         // //
-        if (requestedEnvelope != null) {
-            final GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper();
-            geMapper.setEnvelope(requestedEnvelope);
-            geMapper.setGridRange(new GeneralGridRange(requestedDim));
-
-            // CELL_CORNER comes from GDAL based reader.
-            geMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
-            AffineTransform transform = geMapper.createAffineTransform();
-            requestedRes = CoverageUtilities.getResolution(transform);
-
-            if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "requested resolution: ("
-                        + requestedRes[0] + "," + requestedRes[1] + ")");
-            }
-        }
-
-        if (requestedRes == null) {
-            return;
-        }
-
+//        if (requestedEnvelope != null) {
+//            final GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper();
+//            geMapper.setEnvelope(requestedEnvelope);
+//            geMapper.setGridRange(new GridEnvelope2D(requestedDim));
+//
+//            // CELL_CORNER comes from GDAL based reader.
+//            geMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
+//            AffineTransform transform = geMapper.createAffineTransform();
+//            requestedRes = CoverageUtilities.getResolution(transform);
+//
+//            if (LOGGER.isLoggable(Level.FINE)) {
+//                LOGGER.log(Level.FINE, "requested resolution: ("
+//                        + requestedRes[0] + "," + requestedRes[1] + ")");
+//            }
+//        }
+        
         // ////////////////////////////////////////////////////////////////////
         //
         // DECIMATION ON READING since GDAL will automatically use the
         // overviews
         //
-        // ////////////////////////////////////////////////////////////////////
-        if ((requestedRes[0] > highestRes[0])
-                || (requestedRes[1] > highestRes[1])) {
-            setDecimationParameters(readParam, requestedRes);
+        // ////////////////////////////////////////////////////////////////////        
+        double[] requestedRes = null;
+        double[] fullRes = null;
+        if (approximateWGS84RequestedResolution == null) {
+        	requestedRes = requestedResolution;
+        	fullRes=coverageFullResolution;
+        	
+        	
+        }
+        else
+        {
+        	requestedRes = approximateWGS84RequestedResolution;
+        	fullRes=approximateCoverageWGS84FullResolution;
+        }
+
+
+        if ((requestedRes[0] > fullRes[0])
+                || (requestedRes[1] > fullRes[1])) {
+            setDecimationParameters(requestedRes,fullRes);
+
         }
     }
 
@@ -532,14 +554,14 @@ class CoverageRequest {
      * operation with {@link ImageIO} to do crop-on-read.
      * 
      * 
-     * @param requestedEnvelope
+     * @param requestedBBox
      *                is the envelope we are requested to load.
-     * @param sourceRegion
+     * @param sourceRasterArea
      *                represents the area to load in raster space. This
      *                parameter cannot be null since it gets filled with
      *                whatever the crop region is depending on the
      *                <code>requestedEnvelope</code>.
-     * @param requestedDim
+     * @param requestedRasterArea
      *                is the requested region where to load data of the
      *                specified envelope.
      * @param readGridToWorld
@@ -553,69 +575,65 @@ class CoverageRequest {
      * @throws DataSourceException
      *                 in case something bad occurs
      */
-    private GeneralEnvelope evaluateRequestedParams(
-            GeneralEnvelope requestedEnvelope, Rectangle sourceRegion,
-            Rectangle requestedDim, MathTransform2D readGridToWorld)
+    private void prepareRequestResponseSpatialElements()
             throws DataSourceException {
-        GeneralEnvelope adjustedRequestedEnvelope = new GeneralEnvelope(2);
         try {
             // ////////////////////////////////////////////////////////////////
             //
-            // Check if we have something to load by intersecting the
+            // DO WE HAVE A REQUESTED AREA?
+        	//
+        	// Check if we have something to load by intersecting the
             // requested envelope with the bounds of this data set.
             //
             // ////////////////////////////////////////////////////////////////
-            if (requestedEnvelope != null) {
-                initBaseEnvelope2D();
-                final GeneralEnvelope requestedEnvelope2D = getRequestedEnvelope2D(requestedEnvelope);
+            if (requestedBBox != null) {
+
 
                 // ////////////////////////////////////////////////////////////
                 //
-                // INTERSECT ENVELOPES AND CROP Destination REGION
+                // ADJUST ENVELOPES AND RASTER REQUESTED AREA to fall withing the coverage bbox
                 //
                 // ////////////////////////////////////////////////////////////
-                adjustedRequestedEnvelope = getIntersection(
-                        requestedEnvelope2D, requestedDim, readGridToWorld);
-                if (adjustedRequestedEnvelope == null)
-                    return null;
+                adjustRequestedBBox();
+                if (requestedBBox == null||requestedBBox.isEmpty())
+                {	  	
+                    if (LOGGER.isLoggable(Level.FINE)) 
+                        LOGGER.log(Level.FINE, "RequestedBBox empty or null");
+                	//this means that we do not have anything to load at all!
+                    emptyRequest=true;
+                    return;
+                }
 
                 // /////////////////////////////////////////////////////////////////////
                 //
-                // CROP SOURCE REGION
+                // CROP SOURCE REGION using the refined requested envelope
                 //
                 // /////////////////////////////////////////////////////////////////////
-                sourceRegion.setRect(getCropRegion(adjustedRequestedEnvelope));
-                if (sourceRegion.isEmpty()) {
-                    if (LOGGER.isLoggable(Level.INFO)) {
-                        LOGGER.log(Level.INFO,
-                                "Too small envelope resulting in "
-                                        + "empty cropped raster region");
-                    }
-                    return null;
+                coverageRequestedRasterArea.setRect(getCropRegion());
+                if (coverageRequestedRasterArea.isEmpty()) 
+                {
+                    if (LOGGER.isLoggable(Level.FINE)) 
+                        LOGGER.log(Level.FINE, "Requested envelope too small resulting in empty cropped raster region");
                     // TODO: Future versions may define a 1x1 rectangle starting
                     // from the lower coordinate
-                }
-                if (!sourceRegion.intersects(baseGridRange.toRectangle())
-                        || sourceRegion.isEmpty())
+                    emptyRequest=true;
+	                return;
+	            }
+                if (!coverageRequestedRasterArea.intersects(coverageRasterArea))
                     throw new DataSourceException("The crop region is invalid.");
-                sourceRegion.setRect(sourceRegion.intersection(baseGridRange
-                        .toRectangle()));
+                XRectangle2D.intersect(coverageRequestedRasterArea, coverageRasterArea, coverageRequestedRasterArea);
 
                 if (LOGGER.isLoggable(Level.FINE)) {
                     StringBuffer sb = new StringBuffer(
                             "Adjusted Requested Envelope = ").append(
-                            adjustedRequestedEnvelope.toString()).append("\n")
+                            		requestedBBox.toString()).append("\n")
                             .append("Requested raster dimension = ").append(
-                                    requestedDim.toString()).append("\n")
+                                    requestedRasterArea.toString()).append("\n")
                             .append("Corresponding raster source region = ")
-                            .append(sourceRegion.toString());
+                            .append(coverageRequestedRasterArea.toString());
                     LOGGER.log(Level.FINE, sb.toString());
                 }
-
-            } else {
-                // don't use the source region. Set an empty one
-                sourceRegion.setBounds(new Rectangle(0, 0, Integer.MIN_VALUE,
-                        Integer.MIN_VALUE));
+                return;
             }
         } catch (TransformException e) {
             throw new DataSourceException(
@@ -624,155 +642,51 @@ class CoverageRequest {
             throw new DataSourceException(
                     "Unable to create a coverage for this source", e);
         }
-        return adjustedRequestedEnvelope;
+        
+//        get it all!
+        requestedBBox=coverageBBox;
+        requestedRasterArea=(Rectangle) coverageRasterArea.clone();
+        coverageRequestedRasterArea=(Rectangle) coverageRasterArea.clone();
+        requestedResolution=coverageFullResolution.clone();
+
     }
 
-    /**
-     * Return a 2D version of a requestedEnvelope
-     * 
-     * @param requestedEnvelope
-     *                the {@code GeneralEnvelope} to be returned as 2D.
-     * @return the 2D requested envelope
-     * @throws FactoryException
-     * @throws TransformException
-     */
-    private GeneralEnvelope getRequestedEnvelope2D(
-            GeneralEnvelope requestedEnvelope) throws FactoryException,
-            TransformException {
-        GeneralEnvelope requestedEnvelope2D = null;
-        final MathTransform transformTo2D;
-        CoordinateReferenceSystem requestedEnvelopeCRS2D = requestedEnvelope
-                .getCoordinateReferenceSystem();
-
-        // //
-        //
-        // Find the transformation to 2D
-        //
-        // //
-        if (requestedEnvelopeCRS2D.getCoordinateSystem().getDimension() != 2) {
-            transformTo2D = CRS.findMathTransform(requestedEnvelopeCRS2D, CRS
-                    .getHorizontalCRS(requestedEnvelopeCRS2D));
-            requestedEnvelopeCRS2D = CRS
-                    .getHorizontalCRS(requestedEnvelopeCRS2D);
-        } else
-            transformTo2D = IdentityTransform.create(2);
-
-        if (!transformTo2D.isIdentity()) {
-            requestedEnvelope2D = CRS.transform(transformTo2D,
-                    requestedEnvelope);
-            requestedEnvelope2D
-                    .setCoordinateReferenceSystem(requestedEnvelopeCRS2D);
-        } else
-            requestedEnvelope2D = new GeneralEnvelope(requestedEnvelope);
-
-        assert requestedEnvelopeCRS2D.getCoordinateSystem().getDimension() == 2;
-        return requestedEnvelope2D;
-    }
-
-    /**
+	/**
      * Initialize the 2D properties (CRS and Envelope) of this coverage
      * 
      * @throws FactoryException
      * @throws TransformException
      */
-    private void initBaseEnvelope2D() throws FactoryException,
+    private void prepareCoverageSpatialElements() throws FactoryException,
             TransformException {
+    	//basic initialization
+    	coverageGeographicBBox =GridCoverageUtilities.getReferencedEnvelopeFromGeographicBoundingBox(new GeographicBoundingBoxImpl(coverageEnvelope));
+        coverageRequestedRasterArea = new Rectangle();
+        
         // //
         //
         // Get the original envelope 2d and its spatial reference system
         //
         // //
-        if (spatialReferenceSystem2D == null) {
-            if (coverageCRS.getCoordinateSystem().getDimension() != 2) {
-                spatialReferenceSystem2D = CRS.getHorizontalCRS(coverageCRS);
-                assert spatialReferenceSystem2D.getCoordinateSystem()
-                        .getDimension() == 2;
-                baseEnvelope2D = new Envelope2D(
-                        CRS
-                                .transform(
-                                        CRS
-                                                .findMathTransform(
-                                                        coverageCRS,
-                                                        (CoordinateReferenceSystem) spatialReferenceSystem2D),
-                                        coverageEnvelope));
-            } else {
-                spatialReferenceSystem2D = coverageCRS;
-                baseEnvelope2D = new Envelope2D(coverageEnvelope);
-            }
-        }
-    }
-
-    /**
-     * Compute the WGS84 version for the envelope of this coverage
-     * 
-     * @throws FactoryException
-     * @throws TransformException
-     */
-    private void initWGS84BaseEnvelope() throws FactoryException,
-            TransformException {
-        synchronized (this) {
-            if (wgs84BaseEnvelope2D == null)
-                wgs84BaseEnvelope2D = (Envelope2D) getEnvelopeAsWGS84(
-                        coverageEnvelope, true);
-        }
-    }
-
-    /**
-     * Get a WGS84 envelope for the specified envelope. The get2D parameter
-     * allows to specify if we need the returned coverage as an
-     * {@code Envelope2D} or a more general {@code GeneralEnvelope} instance.
-     * 
-     * 
-     * @param envelope
-     * @param get2D
-     *                if {@code true}, the requested envelope will be an
-     *                instance of {@link Envelope2D}. If {@code false} it will
-     *                be an instance of {@link GeneralEnvelope
-     * @return a WGS84 envelope as {@link Envelope2D} in case of request for a
-     *         2D WGS84 Envelope, or a {@link GeneralEnvelope} otherwise.
-     * @throws FactoryException
-     * @throws TransformException
-     */
-    private Envelope getEnvelopeAsWGS84(Envelope envelope, boolean get2D)
-            throws FactoryException, TransformException {
-        Envelope requestedWGS84;
-        final MathTransform transformToWGS84;
-        final CoordinateReferenceSystem crs = envelope
-                .getCoordinateReferenceSystem();
-
-        // //
-        //
-        // get a math transform to go to WGS84
-        //
-        // //
-        if (!CRS.equalsIgnoreMetadata(crs, DefaultGeographicCRS.WGS84)) {
-            transformToWGS84 = CRS.findMathTransform(crs,
-                    DefaultGeographicCRS.WGS84, true);
+        coverageCRS2D = CRS.getHorizontalCRS(coverageCRS);
+        assert coverageCRS2D.getCoordinateSystem().getDimension() == 2;
+        if (coverageCRS.getCoordinateSystem().getDimension() != 2) {
+            final MathTransform transform=CRS.findMathTransform(coverageCRS,(CoordinateReferenceSystem) coverageCRS2D);
+            final GeneralEnvelope bbox = CRS.transform(transform,coverageEnvelope);
+            bbox.setCoordinateReferenceSystem(coverageCRS2D);
+			coverageBBox = new ReferencedEnvelope(bbox);
         } else {
-            transformToWGS84 = IdentityTransform.create(2);
+        	//it is already a bbox
+            coverageBBox = new ReferencedEnvelope(coverageEnvelope);
         }
-
-        // do we need to transform the requested envelope?
-        if (!transformToWGS84.isIdentity()) {
-            GeneralEnvelope env = CRS.transform(transformToWGS84, envelope);
-            if (get2D) {
-                requestedWGS84 = new Envelope2D(env);
-                ((Envelope2D) requestedWGS84)
-                        .setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
-            } else {
-                requestedWGS84 = env;
-                ((GeneralEnvelope) requestedWGS84)
-                        .setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
-            }
-
-        } else {
-            if (get2D)
-                return new Envelope2D(envelope);
-            else
-                return new GeneralEnvelope(envelope);
-        }
-        return requestedWGS84;
+        
+        // compute the approximated full resolution in wgs84
+        final GridToEnvelopeMapper geMapper= new GridToEnvelopeMapper(new GridEnvelope2D(coverageRasterArea),coverageGeographicBBox);
+        approximateCoverageWGS84FullResolution=CoverageUtilities.getResolution(geMapper.createAffineTransform());
     }
+
+
+
 
     /**
      * This method is responsible for evaluating possible subsampling factors
@@ -786,12 +700,10 @@ class CoverageRequest {
      *                the requested resolutions from which to determine the
      *                decimation parameters.
      */
-    protected void setDecimationParameters(ImageReadParam readP,
-            double[] requestedRes) {
+    protected void setDecimationParameters(double[] requestedRes,double[] fullResolution) {
         {
-            final int w = baseGridRange.getLength(0);
-            final int h = baseGridRange.getLength(1);
-
+            final int w = coverageRasterArea.width;
+            final int h = coverageRasterArea.height;
             // ///////////////////////////////////////////////////////////////
             // DECIMATION ON READING
             // Setting subsampling factors with some checkings
@@ -799,10 +711,10 @@ class CoverageRequest {
             // 2) the subsampling factors cannot be such that the w or h are 0
             // ///////////////////////////////////////////////////////////////
             if (requestedRes == null) {
-                readP.setSourceSubsampling(1, 1, 0, 0);
+                imageReadParam.setSourceSubsampling(1, 1, 0, 0);
             } else {
                 int subSamplingFactorX = (int) Math.floor(requestedRes[0]
-                        / highestRes[0]);
+                        / fullResolution[0]);
                 subSamplingFactorX = (subSamplingFactorX == 0) ? 1
                         : subSamplingFactorX;
 
@@ -814,7 +726,7 @@ class CoverageRequest {
                         : subSamplingFactorX;
 
                 int subSamplingFactorY = (int) Math.floor(requestedRes[1]
-                        / highestRes[1]);
+                        / fullResolution[1]);
                 subSamplingFactorY = (subSamplingFactorY == 0) ? 1
                         : subSamplingFactorY;
 
@@ -825,7 +737,7 @@ class CoverageRequest {
                 subSamplingFactorY = (subSamplingFactorY == 0) ? 1
                         : subSamplingFactorY;
 
-                readP.setSourceSubsampling(subSamplingFactorX,
+                imageReadParam.setSourceSubsampling(subSamplingFactorX,
                         subSamplingFactorY, 0, 0);
             }
         }
@@ -840,31 +752,14 @@ class CoverageRequest {
      * @return the original grid to world transformation
      */
     public MathTransform getOriginalGridToWorld(final PixelInCell pixInCell) {
-        // we do not have to change the pixel datum
-        if (pixInCell == PixelInCell.CELL_CENTER)
-            return raster2Model;
-
-        // we do have to change the pixel datum
-        if (raster2Model instanceof AffineTransform) {
-            final AffineTransform tr = new AffineTransform(
-                    (AffineTransform) raster2Model);
-            tr.concatenate(AffineTransform.getTranslateInstance(-0.5, -0.5));
-            return ProjectiveTransform.create(tr);
-        }
-        if (raster2Model instanceof IdentityTransform) {
-            final AffineTransform tr = new AffineTransform(1, 0, 0, 1, 0, 0);
-            tr.concatenate(AffineTransform.getTranslateInstance(-0.5, -0.5));
-            return ProjectiveTransform.create(tr);
-        }
-        throw new IllegalStateException(
-                "This grid to world transform is invalud!");
+    	return PixelTranslation.translate(coverageGridToWorld2D, PixelInCell.CELL_CENTER, pixInCell);
     }
 
     /**
      * Returns the intersection between the base envelope and the requested
      * envelope.
      * 
-     * @param requestedEnvelope2D
+     * @param requestedBBox
      *                the requested 2D envelope to be intersected with the base
      *                envelope.
      * @param requestedDim
@@ -877,64 +772,91 @@ class CoverageRequest {
      * @throws TransformException
      * @throws FactoryException
      */
-    private GeneralEnvelope getIntersection(
-            GeneralEnvelope requestedEnvelope2D, Rectangle requestedDim,
-            MathTransform2D readGridToWorld) throws TransformException,
+    private void adjustRequestedBBox() throws TransformException,
             FactoryException {
 
-        GeneralEnvelope adjustedRequestedEnvelope = new GeneralEnvelope(2);
-        final CoordinateReferenceSystem requestedEnvelopeCRS2D = requestedEnvelope2D
-                .getCoordinateReferenceSystem();
-        boolean tryWithWGS84 = false;
-
+        final CoordinateReferenceSystem requestedBBoxCRS2D = requestedBBox.getCoordinateReferenceSystem();
         try {
-            // convert the requested envelope 2D to this coverage native crs.
-            MathTransform transform = null;
-            if (!CRS.equalsIgnoreMetadata(requestedEnvelopeCRS2D,
-                    spatialReferenceSystem2D))
-                transform = CRS.findMathTransform(requestedEnvelopeCRS2D,
-                        spatialReferenceSystem2D, true);
+        	////
+        	//
+            // STEP 1: requested BBox to native CRS
+        	//
+        	////
+            MathTransform destinationToSourceTransform = null;
+            if (!CRS.equalsIgnoreMetadata(requestedBBoxCRS2D,coverageCRS2D))
+                destinationToSourceTransform = CRS.findMathTransform(requestedBBoxCRS2D,coverageCRS2D, true);
             // now transform the requested envelope to source crs
-            if (transform != null && !transform.isIdentity())
-                adjustedRequestedEnvelope = CRS.transform(transform,
-                        requestedEnvelope2D);
+            if (destinationToSourceTransform != null && !destinationToSourceTransform.isIdentity())
+            {
+            	final GeneralEnvelope temp = CRS.transform(destinationToSourceTransform,requestedBBox);
+            	temp.setCoordinateReferenceSystem(coverageCRS2D);
+            	requestedBBox= new ReferencedEnvelope(temp);
+            	
+            }
             else
-                adjustedRequestedEnvelope.setEnvelope(requestedEnvelope2D);
+            	//we do not need to do anything, but we do this in order to aboid problems with the envelope checks
+            	requestedBBox=new ReferencedEnvelope(
+            			requestedBBox.getMinX(),
+            			requestedBBox.getMaxX(),
+            			requestedBBox.getMinY(),
+            			requestedBBox.getMaxY(),
+            			coverageCRS2D);
+            
 
+        	////
+        	//
+            // STEP 2: intersect requested BBox in native CRS with native bbox
+        	//
+        	////
             // intersect the requested area with the bounds of this
             // layer in native crs
-            if (!adjustedRequestedEnvelope.intersects(baseEnvelope2D, true))
-                return null;
-            adjustedRequestedEnvelope.intersect(baseEnvelope2D);
-            adjustedRequestedEnvelope
-                    .setCoordinateReferenceSystem(spatialReferenceSystem2D);
-
-            // //
-            //
-            // transform the intersection envelope from the destination world
-            // space to the requested raster space
-            //
-            // //
-            final Envelope requestedEnvelopeCropped = (transform != null && !transform
-                    .isIdentity()) ? CRS.transform(transform.inverse(),
-                    adjustedRequestedEnvelope) : adjustedRequestedEnvelope;
-            final Rectangle2D ordinates = CRS.transform(
-                    readGridToWorld.inverse(), requestedEnvelopeCropped)
-                    .toRectangle2D();
-            final GeneralGridRange finalRange = new GeneralGridRange(ordinates
-                    .getBounds());
-            final Rectangle tempRect = finalRange.toRectangle();
-            // check that we stay inside the source rectangle
-            XRectangle2D.intersect(tempRect, requestedDim, tempRect);
-            requestedDim.setRect(tempRect);
+            if (!requestedBBox.intersects((BoundingBox)coverageBBox))
+            {
+            	requestedBBox =  null;
+            	return;
+            }
+            // XXX Optimize when referenced envelope has intersection method that actually retains the CRS, this is the JTS one
+            requestedBBox=new ReferencedEnvelope(((ReferencedEnvelope) requestedBBox).intersection(coverageBBox),coverageCRS2D);
+            //compute approximate full resolution
+            // compute the approximated full resolution in wgs84
+            final GridToEnvelopeMapper geMapper= new GridToEnvelopeMapper(new GridEnvelope2D(requestedRasterArea),requestedBBox);
+            requestedResolution=CoverageUtilities.getResolution(geMapper.createAffineTransform());
+ 
+//        	////
+//        	//
+//            // STEP 3: Go back to destination space with the nevelope
+//        	//
+//        	////            
+//            // transform the intersection envelope from the destination world
+//            // space to the requested raster space
+//            if (destinationToSourceTransform != null&& !destinationToSourceTransform.isIdentity() )
+//            {
+//            	final GeneralEnvelope temp =CRS.transform(destinationToSourceTransform.inverse(),requestedBBoxInSourceCRS2D) ;
+//            	temp.setCoordinateReferenceSystem(requestedBBoxCRS2D);
+//            	requestedBBox = new ReferencedEnvelope(temp);
+//            	
+//            }
+//            else
+//            	//we do not need to do anything
+//            	requestedBBox=new ReferencedEnvelope(
+//            			requestedBBoxInSourceCRS2D.getMinX(),
+//            			requestedBBoxInSourceCRS2D.getMaxX(),
+//            			requestedBBoxInSourceCRS2D.getMinY(),
+//            			requestedBBoxInSourceCRS2D.getMaxY(),
+//            			coverageCRS2D);
+//            
+            
+            return;
         } catch (TransformException te) {
             // something bad happened while trying to transform this
             // envelope. let's try with wgs84
-            tryWithWGS84 = true;
+            if(LOGGER.isLoggable(Level.FINE))
+            	LOGGER.log(Level.FINE,te.getLocalizedMessage(),te);
         } catch (FactoryException fe) {
             // something bad happened while trying to transform this
             // envelope. let's try with wgs84
-            tryWithWGS84 = true;
+            if(LOGGER.isLoggable(Level.FINE))
+            	LOGGER.log(Level.FINE,fe.getLocalizedMessage(),fe);
         }
 
         // //
@@ -943,25 +865,31 @@ class CoverageRequest {
         // requested envelope
         //              
         // //
-        if (tryWithWGS84) {
-            initWGS84BaseEnvelope();
-            final GeneralEnvelope requestedEnvelopeWGS84 = (GeneralEnvelope) getEnvelopeAsWGS84(
-                    requestedEnvelope2D, false);
+    	//convert to WGS84
+    	final GeographicBoundingBoxImpl geographicRequestedBBox = new GeographicBoundingBoxImpl(requestedBBox);
+        ReferencedEnvelope approximateWGS84requestedBBox =GridCoverageUtilities.getReferencedEnvelopeFromGeographicBoundingBox(geographicRequestedBBox);
 
-            // checking the intersection in wgs84
-            if (!requestedEnvelopeWGS84.intersects(wgs84BaseEnvelope2D, true))
-                return null;
-
-            // intersect
-            adjustedRequestedEnvelope = new GeneralEnvelope(
-                    requestedEnvelopeWGS84);
-            adjustedRequestedEnvelope.intersect(wgs84BaseEnvelope2D);
-            adjustedRequestedEnvelope = CRS.transform(CRS.findMathTransform(
-                    requestedEnvelopeWGS84.getCoordinateReferenceSystem(),
-                    spatialReferenceSystem2D, true), adjustedRequestedEnvelope);
-
+        // checking the intersection in wgs84 with the geographicbbox for this coverage
+        if (!approximateWGS84requestedBBox.intersects((BoundingBox)coverageGeographicBBox))
+        {
+        	requestedBBox =  null;
+        	return;
         }
-        return adjustedRequestedEnvelope;
+        //compute approximate full resolution
+        // compute the approximated full resolution in wgs84
+        final GridToEnvelopeMapper geMapper= new GridToEnvelopeMapper(new GridEnvelope2D(requestedRasterArea),approximateWGS84requestedBBox);
+        approximateWGS84RequestedResolution=CoverageUtilities.getResolution(geMapper.createAffineTransform());
+
+        // intersect with the coverage native WGS84 bbox
+        // note that for the moment we got to use general envelope since there is no intersection othrewise
+        // TODO fix then we'll have intersection in ReferencedEnvelope
+        approximateWGS84requestedBBox=new ReferencedEnvelope(approximateWGS84requestedBBox.intersection(coverageGeographicBBox),DefaultGeographicCRS.WGS84);
+        final MathTransform transform = CRS.findMathTransform(DefaultGeographicCRS.WGS84,coverageCRS2D, true);
+    	final GeneralEnvelope approximateRequestedBBoInNativeCRS =CRS.transform(transform, approximateWGS84requestedBBox) ;
+    	approximateRequestedBBoInNativeCRS.setCoordinateReferenceSystem(coverageCRS2D);
+    	requestedBBox = new ReferencedEnvelope(approximateRequestedBBoInNativeCRS);        
+
+
     }
 
     /**
@@ -973,14 +901,14 @@ class CoverageRequest {
      *                coverage properties as well as basic parameters to be used
      *                by the incoming read operations.
      */
-    public void setBaseParameters(final BaseGridCoverage2DReader reader) {
+    private void setBaseParameters(final BaseGridCoverage2DReader reader) {
         input = reader.getInputFile();
         this.coverageEnvelope = reader.getCoverageEnvelope().clone();
-        this.baseGridRange = reader.getCoverageGridRange();
+        this.coverageRasterArea = reader.getCoverageGridRange().toRectangle();
         this.coverageCRS = reader.getCoverageCRS();
         this.coverageName = reader.getCoverageName();
-        this.raster2Model = reader.getRaster2Model();
-        this.highestRes = reader.getHighestRes();
+        this.coverageGridToWorld2D = (MathTransform2D) reader.getRaster2Model();
+        this.coverageFullResolution = reader.getHighestRes();
         this.hints = reader.getHints().clone();
         if (layout != null) {
             this.hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
@@ -1021,17 +949,9 @@ class CoverageRequest {
 
     /**
      * @return
-     * @uml.property name="needTransformation"
-     */
-    public boolean needTransformation() {
-        return needTransformation;
-    }
-
-    /**
-     * @return
      * @uml.property name="emptyRequest"
      */
-    public boolean isEmptyRequest() {
+    public synchronized boolean isEmptyRequest() {
         return emptyRequest;
     }
 
@@ -1045,10 +965,10 @@ class CoverageRequest {
 
     /**
      * @return
-     * @uml.property name="raster2Model"
+     * @uml.property name="coverageGridToWorld2D"
      */
     public MathTransform getRaster2Model() {
-        return raster2Model;
+        return coverageGridToWorld2D;
     }
 
     /**
@@ -1074,4 +994,8 @@ class CoverageRequest {
     public String getCoverageName() {
         return coverageName;
     }
+
+    public boolean isAdjustGridToWorldSet() {
+		return adjustGridToWorldSet;
+	}
 }

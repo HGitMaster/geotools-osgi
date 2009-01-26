@@ -19,10 +19,9 @@ package org.geotools.coverageio;
 import it.geosolutions.imageio.stream.input.FileImageInputStreamExtImpl;
 
 import java.awt.Rectangle;
-import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
-import java.awt.image.IndexColorModel;
+import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
@@ -32,27 +31,29 @@ import java.util.logging.Logger;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
-import javax.media.jai.IHSColorSpace;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.TypeMap;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.opengis.coverage.ColorInterpretation;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
 /**
- * A CoverageResponse. An instance of this class is produced everytime a
+ * A RasterLayerResponse. An instance of this class is produced everytime a
  * requestCoverage is called to a reader.
  * 
  * @author Daniele Romagnoli, GeoSolutions
  */
-class CoverageResponse {
+@SuppressWarnings("deprecation")
+class RasterLayerResponse {
 
     /** Logger. */
     private final static Logger LOGGER = org.geotools.util.logging.Logging
@@ -61,10 +62,10 @@ class CoverageResponse {
     /**
      * The GridCoverage produced after a {@link #compute()} method call
      */
-    protected GridCoverage gridCoverage;
+    private GridCoverage gridCoverage;
 
-    /** The {@link CoverageRequest} originating this response */
-    protected CoverageRequest originatingCoverageRequest;
+    /** The {@link RasterLayerRequest} originating this response */
+    private RasterLayerRequest originatingCoverageRequest;
 
     /** The readerSPI to be used for data read operations */
     private ImageReaderSpi readerSpi;
@@ -93,13 +94,13 @@ class CoverageResponse {
     private String coverageName;
 
     /**
-     * Construct a {@code CoverageResponse} given a specific
-     * {@link CoverageRequest}, a {@code GridCoverageFactory} to produce
+     * Construct a {@code RasterLayerResponse} given a specific
+     * {@link RasterLayerRequest}, a {@code GridCoverageFactory} to produce
      * {@code GridCoverage}s and an {@code ImageReaderSpi} to be used for
      * instantiating an Image Reader for a read operation,
      * 
      * @param request
-     *                a {@link CoverageRequest} originating this response.
+     *                a {@link RasterLayerRequest} originating this response.
      * @param coverageFactory
      *                a {@code GridCoverageFactory} to produce a
      *                {@code GridCoverage} when calling the {@link #compute()}
@@ -107,7 +108,7 @@ class CoverageResponse {
      * @param readerSpi
      *                the Image Reader Service provider interface.
      */
-    public CoverageResponse(CoverageRequest request,
+    public RasterLayerResponse(RasterLayerRequest request,
             GridCoverageFactory coverageFactory, ImageReaderSpi readerSpi) {
         originatingCoverageRequest = request;
         hints = request.getHints();
@@ -129,11 +130,11 @@ class CoverageResponse {
     }
 
     /**
-     * @return the {@link CoverageRequest} originating this response.
+     * @return the {@link RasterLayerRequest} originating this response.
      * 
      * @uml.property name="originatingCoverageRequest"
      */
-    public CoverageRequest getOriginatingCoverageRequest() {
+    public RasterLayerRequest getOriginatingCoverageRequest() {
         return originatingCoverageRequest;
     }
 
@@ -146,21 +147,16 @@ class CoverageResponse {
      */
     public void compute() throws IOException {
         originatingCoverageRequest.prepare();
-        boolean isEmptyRequest = originatingCoverageRequest.isEmptyRequest();
-
-        if (isEmptyRequest)
+        if (originatingCoverageRequest.isEmptyRequest())
+        	//something bad happened
             gridCoverage = null;
         else {
-            ImageReadParam imageReadParam = originatingCoverageRequest
-                    .getImageReadParam();
-            File input = originatingCoverageRequest.getInput();
-            boolean useMultithreading = originatingCoverageRequest
-                    .useMultithreading();
-            boolean newTransform = originatingCoverageRequest
-                    .needTransformation();
-            boolean useJAI = originatingCoverageRequest.useJAI();
-            gridCoverage = createCoverage(input, imageReadParam, useJAI,
-                    useMultithreading, newTransform);
+            final ImageReadParam imageReadParam = originatingCoverageRequest.getImageReadParam();
+            final File input = originatingCoverageRequest.getInput();
+            final boolean useMultithreading = originatingCoverageRequest.useMultithreading();
+            final boolean newTransform = originatingCoverageRequest.isAdjustGridToWorldSet();
+            final boolean useJAI = originatingCoverageRequest.useJAI();
+            gridCoverage = createCoverage(input, imageReadParam, useJAI,useMultithreading, newTransform);
         }
     }
 
@@ -183,7 +179,7 @@ class CoverageResponse {
      */
     private GridCoverage createCoverage(File input,
             ImageReadParam imageReadParam, final boolean useJAI,
-            final boolean useMultithreading, final boolean newTransform)
+            final boolean useMultithreading, final boolean adjustGridToWorld)
             throws IOException {
         // ////////////////////////////////////////////////////////////////////
         //
@@ -198,7 +194,7 @@ class CoverageResponse {
         // Creating the coverage
         //
         // /////////////////////////////////////////////////////////////////////
-        if (newTransform) {
+        if (adjustGridToWorld) {
             // I need to calculate a new transformation (raster2Model)
             // between the cropped image and the required envelope
             final int ssWidth = image.getWidth();
@@ -254,67 +250,18 @@ class CoverageResponse {
      */
     protected GridCoverage createCoverageFromImage(PlanarImage image,
             MathTransform raster2Model) throws IOException {
-        // creating bands
-        final int numBands = image.getSampleModel().getNumBands();
-        final GridSampleDimension[] bands = new GridSampleDimension[numBands];
-
-        // checking the names
-        final ColorModel cm = image.getColorModel();
-        final String[] names = new String[numBands];
-
-        // in case of index color model we are already done.
-        if (cm instanceof IndexColorModel) {
-            names[0] = "index band";
-        } else {
-            // in case of multiband image we are not done yet.
-            final ColorSpace cs = cm.getColorSpace();
-
-            if (cs instanceof IHSColorSpace) {
-                names[0] = "Intensity band";
-                names[1] = "Hue band";
-                names[2] = "Saturation band";
-            } else {
-                // not IHS, let's take the type
-                final int type = cs.getType();
-
-                switch (type) {
-                case ColorSpace.CS_GRAY:
-                case ColorSpace.TYPE_GRAY:
-                    names[0] = "GRAY";
-
-                    break;
-
-                case ColorSpace.CS_sRGB:
-                case ColorSpace.CS_LINEAR_RGB:
-                case ColorSpace.TYPE_RGB:
-                    names[0] = "RED";
-                    names[1] = "GREEN";
-                    names[2] = "BLUE";
-
-                    break;
-
-                case ColorSpace.TYPE_CMY:
-                    names[0] = "CYAN";
-                    names[1] = "MAGENTA";
-                    names[2] = "YELLOW";
-
-                    break;
-
-                case ColorSpace.TYPE_CMYK:
-                    names[0] = "CYAN";
-                    names[1] = "MAGENTA";
-                    names[2] = "YELLOW";
-                    names[3] = "K";
-
-                    break;
-                }
-            }
-        }
-
-        // setting bands names.
-        for (int i = 0; i < numBands; i++) {
-            bands[i] = new GridSampleDimension(names[i]).geophysics(true);
-        }
+		// creating bands
+        final SampleModel sm=image.getSampleModel();
+        final ColorModel cm=image.getColorModel();
+		final int numBands = sm.getNumBands();
+		final GridSampleDimension[] bands = new GridSampleDimension[numBands];
+		// setting bands names.
+		for (int i = 0; i < numBands; i++) {
+		        final ColorInterpretation colorInterpretation=TypeMap.getColorInterpretation(cm, i);
+		        if(colorInterpretation==null)
+		               throw new IOException("Unrecognized sample dimension type");
+			bands[i] = new GridSampleDimension(colorInterpretation.name()).geophysics(true);
+		}
 
         // creating coverage
         if (raster2Model != null) {
@@ -335,7 +282,7 @@ class CoverageResponse {
      * @return a {@link GridCoverage}
      * @throws IOException
      */
-    protected final GridCoverage createCoverageFromImage(PlanarImage image)
+    protected GridCoverage createCoverageFromImage(PlanarImage image)
             throws IOException {
         return createCoverageFromImage(image, null);
     }
@@ -378,15 +325,25 @@ class CoverageResponse {
 
             // Check if to use a simple JAI ImageRead operation or a
             // multithreaded one
-            final String jaiOperation = useMultithreading ? "ImageReadMT"
-                    : "ImageRead";
+            final String jaiOperation = useMultithreading ? GridCoverageUtilities.IMAGEREADMT: GridCoverageUtilities.IMAGEREAD;
             raster = JAI.create(jaiOperation, pbjImageRead, hints);
         } else {
             final ImageReader reader = readerSpi.createReaderInstance();
-            reader.setInput(new FileImageInputStreamExtImpl(input), true, true);
-            raster = PlanarImage.wrapRenderedImage(reader.read(0,
-                    imageReadParam));
-            reader.dispose();
+            try {
+                reader.setInput(new FileImageInputStreamExtImpl(input), true, true);
+                raster = PlanarImage.wrapRenderedImage(reader.read(0,imageReadParam));
+            }
+            finally {
+            	if(reader!=null)
+            		try {
+            			reader.dispose();
+            		}catch (Exception e) {
+						if(LOGGER.isLoggable(Level.FINE))
+							LOGGER.log(Level.FINE,e.getLocalizedMessage(),e);
+					}
+            }
+
+            
         }
         return raster;
     }

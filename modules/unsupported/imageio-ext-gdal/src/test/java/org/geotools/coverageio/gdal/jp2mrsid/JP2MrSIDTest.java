@@ -17,11 +17,15 @@
  */
 package org.geotools.coverageio.gdal.jp2mrsid;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.media.jai.PlanarImage;
+
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
-import org.geotools.coverageio.BaseGridCoverage2DReader;
-import org.geotools.coverageio.gdal.jp2kak.JP2KReader;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.test.TestData;
 import org.opengis.parameter.GeneralParameterValue;
@@ -31,7 +35,7 @@ import org.opengis.parameter.ParameterValue;
  * @author Daniele Romagnoli, GeoSolutions
  * @author Simone Giannecchini (simboss), GeoSolutions
  *
- * Testing {@link JP2KReader}
+ * Testing {@link JP2MrSIDReader}
  */
 public final class JP2MrSIDTest extends AbstractJP2MrSIDTestCase {
     /**
@@ -40,7 +44,7 @@ public final class JP2MrSIDTest extends AbstractJP2MrSIDTestCase {
     private final static String fileName = "sample.jp2";
 
     /**
-     * Creates a new instance of JP2KTest
+     * Creates a new instance of JP2MrSIDTest
      *
      * @param name
      */
@@ -56,8 +60,19 @@ public final class JP2MrSIDTest extends AbstractJP2MrSIDTestCase {
         if (!testingEnabled()) {
             return;
         }
+        
+        File file =null;
+        try {
+            file = TestData.file(this, fileName);
+        }catch (FileNotFoundException fnfe){
+            LOGGER.warning("test-data not found: " + fileName + "\nTests are skipped");
+            return;
+        } catch (IOException ioe) {
+            LOGGER.warning("test-data not found: " + fileName + "\nTests are skipped");
+            return;
+        }
 
-        final BaseGridCoverage2DReader reader = new JP2MrSIDReader(TestData.file(this, fileName));
+        final JP2MrSIDReader reader = new JP2MrSIDReader(file);
         final ParameterValue gg = (ParameterValue) ((AbstractGridFormat) reader.getFormat()).READ_GRIDGEOMETRY2D
             .createValue();
         final GeneralEnvelope oldEnvelope = reader.getOriginalEnvelope();
@@ -70,7 +85,7 @@ public final class JP2MrSIDTest extends AbstractJP2MrSIDTestCase {
         if (TestData.isInteractiveTest()) {
             gc.show();
         } else {
-            gc.getRenderedImage().getData();
+            PlanarImage.wrapRenderedImage(gc.getRenderedImage()).getTiles();
         }
 
         if (TestData.isInteractiveTest()) {

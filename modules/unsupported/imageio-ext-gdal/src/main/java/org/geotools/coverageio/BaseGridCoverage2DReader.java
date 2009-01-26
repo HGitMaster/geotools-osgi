@@ -50,9 +50,8 @@ import org.geotools.data.WorldFileReader;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.metadata.iso.spatial.PixelTranslation;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.LinearTransform;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -61,6 +60,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -72,32 +72,25 @@ import org.opengis.referencing.operation.TransformException;
  * 
  */
 @SuppressWarnings("deprecation")
-public abstract class BaseGridCoverage2DReader extends
-        AbstractGridCoverage2DReader implements GridCoverageReader {
+public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DReader implements GridCoverageReader {
 
     /** Logger. */
-    private final static Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger("org.geotools.coverageio.gdal");
+    private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.coverageio.gdal");
 
-    /** registering ImageReadMT JAI operation (for multithreaded ImageRead) */
+    /** registering ImageReadMT JAI operation (for multithread ImageRead) */
     static {
-        ImageReadDescriptorMT.register(JAI.getDefaultInstance());
+    	try {
+    		ImageReadDescriptorMT.register(JAI.getDefaultInstance());
+    	}
+    	catch (Exception e) {
+    		if(LOGGER.isLoggable(Level.FINE))
+    			LOGGER.log(Level.FINE,e.getLocalizedMessage(),e);
+		}
     }
-
-    // ////////////////////////////////////////////////////////////////////////
-    //    
-    // Constant fields
-    //    
-    // ////////////////////////////////////////////////////////////////////////
-    /** The default world file extension */
-    private final static String DEFAULT_WORLDFILE_EXT = ".wld";
-
-    /** The system-dependent default name-separator character. */
-    private final static char SEPARATOR = File.separatorChar;
 
     /**
      * The format specific world file extension. As an instance, world file
-     * related to ecw datasets have .eww extension while mrsid world file are
+     * related to ecw datasets have .ecw extension while mrsid world file are
      * .sdw
      */
     private final String worldFileExt;
@@ -119,10 +112,10 @@ public abstract class BaseGridCoverage2DReader extends
     // ////////////////////////////////////////////////////////////////////////
 
     /** Envelope read from file */
-    private GeneralEnvelope coverageEnvelope = null;
+    private GeneralEnvelope nativeEnvelope = null;
 
     /** The CRS for the coverage */
-    private CoordinateReferenceSystem coverageCRS = null;
+    private CoordinateReferenceSystem nativeCRS = null;
 
     // ////////////////////////////////////////////////////////////////////////
     //  
@@ -139,10 +132,14 @@ public abstract class BaseGridCoverage2DReader extends
     /**
      * The base {@link GridRange} for the {@link GridCoverage2D} of this reader.
      */
-    private GeneralGridRange coverageGridRange = null;
+    private GeneralGridRange nativeGridRange = null;
 
     /** Absolute path to the parent dir for this coverage. */
     private String parentPath;
+
+	private ServiceInfo serviceInfo;
+
+	private ResourceInfo resourceInfo;
 
     /**
      * Creates a new instance of a {@link BaseGridCoverage2DReader}. I assume
@@ -159,10 +156,13 @@ public abstract class BaseGridCoverage2DReader extends
      *                an instance of a proper {@code ImageReaderSpi}.
      * @throws DataSourceException
      */
-    protected BaseGridCoverage2DReader(Object input, final Hints hints,
+    protected BaseGridCoverage2DReader(
+    		final Object input, 
+    		final Hints hints,
             final String worldFileExtension,
             final ImageReaderSpi formatSpecificSpi) throws DataSourceException {
 
+    	ImageReader reader=null;;
         try {
             // //
             //
@@ -187,14 +187,16 @@ public abstract class BaseGridCoverage2DReader extends
             //
             // //
             checkSource(input);
-            final ImageReader reader = readerSPI.createReaderInstance();
-            reader.setInput(inputFile);
+            
+
 
             // //
             //
             // Setting Envelope, GridRange and CRS
             //
             // //
+            reader = readerSPI.createReaderInstance();
+            reader.setInput(inputFile);
             setCoverageProperties(reader);
 
             // //
@@ -204,13 +206,6 @@ public abstract class BaseGridCoverage2DReader extends
             // //
             getResolutionInfo(reader);
 
-            // //
-            //
-            // Reset and dispose reader
-            //
-            // //
-            reader.reset();
-            reader.dispose();
         } catch (IOException e) {
             if (LOGGER.isLoggable(Level.SEVERE))
                 LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -222,9 +217,33 @@ public abstract class BaseGridCoverage2DReader extends
 
             throw new DataSourceException(e);
         }
+        finally {
+
+            // //
+            //
+            // Reset and dispose reader
+            //
+            // //
+        	if(reader!=null) {
+        		try {
+        			reader.reset();
+        		}catch (Exception e) {
+                    if (LOGGER.isLoggable(Level.FINE))
+                        LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
+				}
+        		
+        		try {
+        			reader.dispose();
+        		}catch (Exception e) {
+                    if (LOGGER.isLoggable(Level.FINE))
+                        LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
+				}        		
+                
+        	}
+        }
     }
 
-    /** Package scope highest resolution info accessor */
+    /** Package scope highest resolution serviceInfo accessor */
     double[] getHighestRes() {
         return highestRes;
     }
@@ -259,16 +278,10 @@ public abstract class BaseGridCoverage2DReader extends
     private void checkSource(Object input) throws UnsupportedEncodingException,
             DataSourceException, IOException, FileNotFoundException {
         if (input == null) {
-            final DataSourceException ex = new DataSourceException(
+            final IllegalArgumentException ex = new IllegalArgumentException(
                     "No source set to read this coverage.");
-
-            if (LOGGER.isLoggable(Level.SEVERE)) {
-                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-            }
-
             throw ex;
         }
-
         this.source = null;
 
         // //
@@ -354,7 +367,6 @@ public abstract class BaseGridCoverage2DReader extends
         // //
         final Rectangle originalDim = new Rectangle(0, 0, reader.getWidth(0),
                 reader.getHeight(0));
-
         if (getCoverageGridRange() == null) {
             setCoverageGridRange(new GeneralGridRange(originalDim));
         }
@@ -386,8 +398,8 @@ public abstract class BaseGridCoverage2DReader extends
             throws IllegalArgumentException, IOException {
 
         // Setup a new coverage request
-        final CoverageRequest request = new CoverageRequest(params);
-        request.setBaseParameters(this);
+        final RasterLayerRequest request = new RasterLayerRequest(params,this);
+        
 
         // compute the request.
         return (GridCoverage2D) requestCoverage(request).getGridCoverage();
@@ -404,7 +416,7 @@ public abstract class BaseGridCoverage2DReader extends
         prjPath = new StringBuilder(this.parentPath).append(File.separatorChar)
                 .append(coverageName).append(".prj").toString();
 
-        // read the prj info from the file
+        // read the prj serviceInfo from the file
         PrjFileReader projReader = null;
 
         try {
@@ -451,7 +463,7 @@ public abstract class BaseGridCoverage2DReader extends
      */
     protected void parseWorldFile() throws IOException {
         final String worldFilePath = new StringBuffer(this.parentPath).append(
-                SEPARATOR).append(coverageName).toString();
+                GridCoverageUtilities.SEPARATOR).append(coverageName).toString();
 
         File file2Parse = null;
         boolean worldFileExists = false;
@@ -471,7 +483,7 @@ public abstract class BaseGridCoverage2DReader extends
         //
         // //
         if (!worldFileExists) {
-            file2Parse = new File(worldFilePath + DEFAULT_WORLDFILE_EXT);
+            file2Parse = new File(worldFilePath + GridCoverageUtilities.DEFAULT_WORLDFILE_EXT);
             worldFileExists = file2Parse.exists();
         }
 
@@ -486,17 +498,12 @@ public abstract class BaseGridCoverage2DReader extends
             // CELL_CENTER condition
             //
             // //
-            final AffineTransform tempTransform = new AffineTransform(
-                    (AffineTransform) raster2Model);
-            tempTransform.translate(-0.5, -0.5);
-
+            MathTransform tempTransform =PixelTranslation.translate(raster2Model, PixelInCell.CELL_CENTER, PixelInCell.CELL_CORNER);
             try {
-                final LinearTransform gridToWorldTransform = ProjectiveTransform
-                        .create(tempTransform);
                 final Envelope gridRange = new GeneralEnvelope(
                         getCoverageGridRange().toRectangle());
                 final GeneralEnvelope coverageEnvelope = CRS.transform(
-                        gridToWorldTransform, gridRange);
+                		tempTransform, gridRange);
                 setCoverageEnvelope(coverageEnvelope);
             } catch (TransformException e) {
                 if (LOGGER.isLoggable(Level.WARNING)) {
@@ -516,16 +523,20 @@ public abstract class BaseGridCoverage2DReader extends
      * 
      * @return ServiceInfo describing getSource().
      */
-    public ServiceInfo getInfo() {
-        DefaultServiceInfo info = new DefaultServiceInfo();
-        info.setDescription(source.toString());
+    public synchronized ServiceInfo getInfo() {
+    	if (serviceInfo!=null)
+    		return new DefaultServiceInfo(this.serviceInfo);
+    	
+        DefaultServiceInfo localInfo = new DefaultServiceInfo();
+        serviceInfo=localInfo;
+        localInfo.setDescription(source.toString());
 
         if (source instanceof URL) {
             URL url = (URL) source;
-            info.setTitle(url.getFile());
+            localInfo.setTitle(url.getFile());
 
             try {
-                info.setSource(url.toURI());
+                localInfo.setSource(url.toURI());
             } catch (URISyntaxException e) {
             }
         } else if (source instanceof File) {
@@ -533,13 +544,13 @@ public abstract class BaseGridCoverage2DReader extends
             String filename = file.getName();
 
             if ((filename == null) || (filename.length() == 0)) {
-                info.setTitle(file.getName());
+                localInfo.setTitle(file.getName());
             }
 
-            info.setSource(file.toURI());
+            localInfo.setSource(file.toURI());
         }
 
-        return info;
+        return new DefaultServiceInfo(localInfo);
     }
 
     /**
@@ -549,28 +560,33 @@ public abstract class BaseGridCoverage2DReader extends
      *                Name indicing grid coverage to describe
      * @return ResourceInfo describing grid coverage indicated
      */
-    public ResourceInfo getInfo(String subname) {
-        DefaultResourceInfo info = new DefaultResourceInfo();
-        info.setName(subname);
-        info.setBounds(new ReferencedEnvelope(this.getOriginalEnvelope()));
-        info.setCRS(this.getCrs());
-        info.setTitle(subname);
+    public synchronized ResourceInfo getInfo(String subname) {
 
-        return info;
+        if (this.resourceInfo!=null)
+    		return new DefaultResourceInfo(this.resourceInfo);
+    	
+        DefaultResourceInfo localInfo = new DefaultResourceInfo();
+	resourceInfo=localInfo;    	
+	localInfo.setName(subname);
+        localInfo.setBounds(new ReferencedEnvelope(this.getOriginalEnvelope()));
+        localInfo.setCRS(this.getCrs());
+        localInfo.setTitle(subname);
+
+        return new DefaultResourceInfo(this.resourceInfo);
     }
 
     /**
-     * Returns a {@link CoverageResponse} from the specified
-     * {@link CoverageRequest}.
+     * Returns a {@link RasterLayerResponse} from the specified
+     * {@link RasterLayerRequest}.
      * 
      * @param request
-     *                a previously set {@link CoverageRequest} defining a set of
+     *                a previously set {@link RasterLayerRequest} defining a set of
      *                parameters to get a specific coverage
-     * @return the computed {@code CoverageResponse}
+     * @return the computed {@code RasterLayerResponse}
      * @todo Future versions may cache requestes<->responses using hashing
      */
-    private CoverageResponse requestCoverage(CoverageRequest request) {
-        final CoverageResponse response = new CoverageResponse(request,
+    private RasterLayerResponse requestCoverage(RasterLayerRequest request) {
+        final RasterLayerResponse response = new RasterLayerResponse(request,
                 coverageFactory, readerSPI);
         try {
             response.compute();
@@ -582,48 +598,48 @@ public abstract class BaseGridCoverage2DReader extends
     }
 
     /**
-     * @param coverageCRS
-     *                the coverageCRS to set
+     * @param nativeCRS
+     *                the nativeCRS to set
      */
     protected void setCoverageCRS(CoordinateReferenceSystem coverageCRS) {
-        this.coverageCRS = coverageCRS;
+        this.nativeCRS = coverageCRS;
     }
 
     /**
-     * @return the coverageCRS
+     * @return the nativeCRS
      */
     protected CoordinateReferenceSystem getCoverageCRS() {
-        return coverageCRS;
+        return nativeCRS;
     }
 
     /**
-     * @param coverageEnvelope
-     *                the coverageEnvelope to set
+     * @param nativeEnvelope
+     *                the nativeEnvelope to set
      */
     protected void setCoverageEnvelope(GeneralEnvelope coverageEnvelope) {
-        this.coverageEnvelope = coverageEnvelope;
+        this.nativeEnvelope = coverageEnvelope;
     }
 
     /**
-     * @return the coverageEnvelope
+     * @return the nativeEnvelope
      */
     protected GeneralEnvelope getCoverageEnvelope() {
-        return coverageEnvelope;
+        return nativeEnvelope;
     }
 
     /**
-     * @param coverageGridRange
-     *                the coverageGridRange to set
+     * @param nativeGridRange
+     *                the nativeGridRange to set
      */
     protected void setCoverageGridRange(GeneralGridRange coverageGridRange) {
-        this.coverageGridRange = coverageGridRange;
+        this.nativeGridRange = coverageGridRange;
     }
 
     /**
-     * @return the coverageGridRange
+     * @return the nativeGridRange
      */
     protected GeneralGridRange getCoverageGridRange() {
-        return coverageGridRange;
+        return nativeGridRange;
     }
 
     /**
@@ -639,4 +655,19 @@ public abstract class BaseGridCoverage2DReader extends
     public String getCoverageName() {
         return coverageName;
     }
+
+    /**
+     * @return the gridCoverage count
+     */
+    public int getGridCoverageCount() {
+        return 1;
+    }
+
+    /**
+     * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
+     */
+    public boolean hasMoreGridCoverages() {
+        return false;
+    }
+
 }

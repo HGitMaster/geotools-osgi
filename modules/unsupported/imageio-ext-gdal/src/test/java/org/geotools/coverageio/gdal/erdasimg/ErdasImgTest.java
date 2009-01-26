@@ -93,13 +93,7 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
         //
         // /////////////////////////////////////////////////////////////////////
         GridCoverage2D gc = (GridCoverage2D) reader.read(null);
-        assertNotNull(gc);
-
-        if (TestData.isInteractiveTest()) {
-            gc.show();
-        } else {
-            gc.getRenderedImage().getData();
-        }
+        forceDataLoading(gc);
 
         // /////////////////////////////////////////////////////////////////////
         //
@@ -131,11 +125,6 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
                     new Rectangle(0, 0, (int) (range.width / 2.0 / cropFactor),
                         (int) (range.height / 2.0 / cropFactor))), cropEnvelope));
         gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg });
-        assertNotNull(gc);
-        if (TestData.isInteractiveTest()) {
-            gc.show();
-        } else {
-            gc.getRenderedImage().getData();
-        }
+        forceDataLoading(gc);
     }
 }

@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $
+        Version: $Id: pom.xml 32339 2009-01-26 23:34:28Z danieleromagnoli $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -19,6 +19,9 @@
     <version>2.6-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <imageio.ext.version>1.0.1</imageio.ext.version>
+  </properties>
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -88,47 +91,52 @@
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-gdalmrsid</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${imageio.ext.version}</version>
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-gdalecw</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${imageio.ext.version}</version>
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-gdaldted</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${imageio.ext.version}</version>
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-gdalkakadujp2</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${imageio.ext.version}</version>
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-gdalmrsidjp2</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${imageio.ext.version}</version>
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-gdalecwjp2</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${imageio.ext.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>it.geosolutions.imageio-ext</groupId>
+      <artifactId>imageio-ext-gdalehdr</artifactId>
+      <version>${imageio.ext.version}</version>
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-gdalerdasimg</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${imageio.ext.version}</version>
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-gdalnitf</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${imageio.ext.version}</version>
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-imagereadmt</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${imageio.ext.version}</version>
     </dependency>
    
     <!-- Test dependencies -->

@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -70,14 +71,6 @@ public final class NITFTest extends AbstractNITFTestCase {
 			return;
 		}
 
-		// Preparing an useful layout in case the image is striped.
-		final ImageLayout l = new ImageLayout();
-		l.setTileGridXOffset(0).setTileGridYOffset(0).setTileHeight(512)
-				.setTileWidth(512);
-
-		Hints hints = new Hints();
-		hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, l));
-
 		// get a reader
 		File file =null;
 		try{
@@ -91,6 +84,14 @@ public final class NITFTest extends AbstractNITFTestCase {
 			LOGGER.warning("Test File not found, please download it at: http://dl.maptools.org/dl/gdal/data/nitf/cadrg/001zc013.on1");
 			return;
 		}
+		
+		// Preparing an useful layout in case the image is striped.
+                final ImageLayout l = new ImageLayout();
+                l.setTileGridXOffset(0).setTileGridYOffset(0).setTileHeight(512)
+                                .setTileWidth(512);
+
+                Hints hints = new Hints();
+                hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, l));
 			 
 		final BaseGDALGridCoverage2DReader reader = new NITFReader(file, hints);
 
@@ -100,13 +101,7 @@ public final class NITFTest extends AbstractNITFTestCase {
 		//
 		// /////////////////////////////////////////////////////////////////////
 		GridCoverage2D gc = (GridCoverage2D) reader.read(null);
-		assertNotNull(gc);
-
-		if (TestData.isInteractiveTest()) {
-			gc.show();
-		} else {
-			gc.getRenderedImage().getData();
-		}
+		forceDataLoading(gc);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -134,11 +129,6 @@ public final class NITFTest extends AbstractNITFTestCase {
 				(int) (range.width / 2.0 / cropFactor),
 				(int) (range.height / 2.0 / cropFactor))), cropEnvelope));
 		gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg });
-		assertNotNull(gc);
-		if (TestData.isInteractiveTest()) {
-			gc.show();
-		} else {
-			gc.getRenderedImage().getData();
-		}
+		forceDataLoading(gc);
 	}
 }
