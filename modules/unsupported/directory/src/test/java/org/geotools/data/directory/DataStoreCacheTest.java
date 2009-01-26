@@ -12,7 +12,7 @@ import org.junit.Test;
 public class DataStoreCacheTest extends TestSupport {
     
     private static final String DESTDIR = "shapes";
-    private static final int DELAY = 100;
+    private static final int DELAY = 1000;
 
     @Test
     public void testInitialization() throws Exception {
