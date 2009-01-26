@@ -1,1 +1,1 @@
-org.geotools.data.dir.DirectoryDataStoreFactory
+org.geotools.data.directory.DirectoryDataStoreFactory
