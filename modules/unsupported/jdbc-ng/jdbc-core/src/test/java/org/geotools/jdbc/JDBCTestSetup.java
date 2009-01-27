@@ -185,6 +185,8 @@ public abstract class JDBCTestSetup {
         dataSource.setAccessToUnderlyingConnectionAllowed(true);
         dataSource.setMinIdle(1);
         dataSource.setMaxActive(4);
+        // if we cannot get a connection within 5 seconds give up
+        dataSource.setMaxWait(5000);
         
         initializeDataSource( dataSource, db );
         

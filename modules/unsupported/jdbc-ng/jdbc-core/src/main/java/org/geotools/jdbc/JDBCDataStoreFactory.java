@@ -89,6 +89,10 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
     public static final Param FETCHSIZE = new Param("fetch size", Integer.class,
             "number of records read with each iteraction with the dbms", false, 1000);
     
+    /** Maximum amount of time the pool will wait when trying to grab a new connection **/
+    public static final Param MAXWAIT = new Param("Connection timeout", Integer.class,
+            "number of seconds the connection pool will wait before timing out attempting to get a new connection (default, 20 seconds)", false, 20);
+    
     @Override
     public String getDisplayName() {
         return getDescription();
@@ -228,6 +232,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         parameters.put(MAXCONN.key, MAXCONN);
         parameters.put(MINCONN.key, MINCONN);
         parameters.put(FETCHSIZE.key, FETCHSIZE);
+        parameters.put(MAXWAIT.key, MAXWAIT);
         if(getValidationQuery() != null)
             parameters.put(VALIDATECONN.key, VALIDATECONN);
     }
@@ -323,6 +328,12 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
             dataSource.setPassword(passwd);
         }
         
+        // max wait
+        Integer maxWait = (Integer) MAXWAIT.lookUp(params);
+        if (maxWait != null && maxWait != -1) {
+            dataSource.setMaxWait(maxWait * 1000);
+        }
+        
         // connection pooling options
         Integer minConn = (Integer) MINCONN.lookUp(params);
         if ( minConn != null ) {
@@ -336,8 +347,12 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         
         Boolean validate = (Boolean) VALIDATECONN.lookUp(params);
         if(validate != null && validate && getValidationQuery() != null) {
+            dataSource.setTestOnBorrow(true);
             dataSource.setValidationQuery(getValidationQuery());
         }
+        
+        // some datastores might need this
+        dataSource.setAccessToUnderlyingConnectionAllowed(true);
 
         return dataSource;
     }
