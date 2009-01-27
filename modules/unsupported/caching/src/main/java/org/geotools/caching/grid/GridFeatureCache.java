@@ -93,7 +93,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
     	    store.addFeatureType(fs.getSchema());
     	}else if (store.getFeatureTypes().size() ==1){
     	    SimpleFeatureType sft = (SimpleFeatureType)store.getFeatureTypes().iterator().next();
-    	    if (!sft.equals(fs.getSchema())){
+    	    if (!sft.equals(fs.getSchema()) && fs.getSchema() != null){
     	        tracker.clear();
     	        store.clearFeatureTypes();
     	        store.addFeatureType(fs.getSchema());
@@ -103,6 +103,11 @@ public class GridFeatureCache extends AbstractFeatureCache {
     	    tracker.clear();
     	    store.clearFeatureTypes();
     	    store.addFeatureType(fs.getSchema());
+    	}
+    	
+    	//setup bounds
+    	if (env != null && !env.equals(store.getBounds())){
+    	    store.setBounds(env);
     	}
     	
     	//flush cache here to write to disk
@@ -272,7 +277,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
     }
 
     public ReferencedEnvelope getBounds() throws IOException {
-    	CoordinateReferenceSystem crs = this.fs.getSchema().getCoordinateReferenceSystem(); 
+    	CoordinateReferenceSystem crs = getSchema().getCoordinateReferenceSystem(); 
         return new ReferencedEnvelope ( convert((Region) this.tracker.getRoot().getShape()), crs);
     }
 

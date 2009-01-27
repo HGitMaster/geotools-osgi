@@ -25,6 +25,7 @@ import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.type.FeatureType;
 
 
@@ -35,9 +36,10 @@ import org.opengis.feature.type.FeatureType;
  *
  */
 public class MemoryStorage implements Storage {
-    HashMap<NodeIdentifier, NodeEntry> map;
-    ArrayList<FeatureType> featureTypes = null;
-
+    private HashMap<NodeIdentifier, NodeEntry> map;
+    private ArrayList<FeatureType> featureTypes = null;
+    private ReferencedEnvelope bounds = null;
+    
     private MemoryStorage() {
         this.map = new HashMap<NodeIdentifier, NodeEntry>();
         featureTypes = new ArrayList();
@@ -102,6 +104,14 @@ public class MemoryStorage implements Storage {
 
     public void clearFeatureTypes(){
         featureTypes.clear();
+    }
+
+    public ReferencedEnvelope getBounds() {
+        return bounds;
+    }
+
+    public void setBounds( ReferencedEnvelope bounds ) {
+        this.bounds = bounds;
     }
     
 }

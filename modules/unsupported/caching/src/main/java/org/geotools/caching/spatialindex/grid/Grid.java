@@ -31,6 +31,7 @@ import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.Visitor;
 import org.geotools.caching.spatialindex.store.StorageFactory;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 
@@ -76,7 +77,6 @@ public class Grid extends AbstractSpatialIndex {
         this.mbr = mbr;
         this.store = store;
         store.setParent(this);
-        this.dimension = mbr.getDimension();
         this.root = null;
         
         try{
@@ -85,6 +85,7 @@ public class Grid extends AbstractSpatialIndex {
             ex.printStackTrace();
         }
         if (this.root == null){
+            this.dimension = mbr.getDimension();
             //nothing read from storage so we need to create new ones
             this.store.clear();
             
@@ -379,8 +380,16 @@ public class Grid extends AbstractSpatialIndex {
             GridData.getFeatureMarshaller().registerType((SimpleFeatureType)iterator.next());            
         }
         
+        
         //find the root node an initialize it here
-        GridRootNode tmpRootNode = new GridRootNode(this, mbr, capacity);
+        ReferencedEnvelope bounds = store.getBounds();
+        if(bounds == null){
+            //cannot do anything because we need to know the bounds of the data.
+            return;
+        }
+        this.mbr = new Region(new double[] { bounds.getMinX(), bounds.getMinY() }, new double[] { bounds.getMaxX(), bounds.getMaxY() });
+        this.dimension = this.mbr.getDimension();
+        GridRootNode tmpRootNode = new GridRootNode(this, this.mbr, capacity);
         NodeIdentifier id = findUniqueInstance(tmpRootNode.getIdentifier());
         this.rootNode = null;
         try{
@@ -393,6 +402,7 @@ public class Grid extends AbstractSpatialIndex {
         }else{
             this.root = this.rootNode.getIdentifier();
             this.capacity = ((GridRootNode)this.rootNode).getCapacity();
+            
             //here we need to match node identifies in the root.children list to the 
             //node identifiers in the data store
             for (int i = 0; i < this.rootNode.getChildrenCount(); i ++){

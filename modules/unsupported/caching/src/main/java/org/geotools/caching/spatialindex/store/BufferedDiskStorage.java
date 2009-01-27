@@ -26,6 +26,7 @@ import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.type.FeatureType;
 
 
@@ -174,5 +175,13 @@ public class BufferedDiskStorage implements Storage {
     
     public void clearFeatureTypes(){
         this.storage.clearFeatureTypes();
+    }
+
+    public ReferencedEnvelope getBounds() {
+        return this.storage.getBounds();
+    }
+
+    public void setBounds( ReferencedEnvelope bounds ) {
+        this.storage.setBounds(bounds);
     }
 }

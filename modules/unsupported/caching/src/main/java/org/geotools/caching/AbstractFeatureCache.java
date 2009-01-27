@@ -330,8 +330,8 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         FeatureCollection fromSource;
         List<Envelope> notcached = null;
         
-        String geometryname = fs.getSchema().getGeometryDescriptor().getLocalName();
-        String srs = fs.getSchema().getGeometryDescriptor().getCoordinateReferenceSystem().toString();
+        String geometryname = getSchema().getGeometryDescriptor().getLocalName();
+        String srs = getSchema().getGeometryDescriptor().getCoordinateReferenceSystem().toString();
 
         //      acquire R-lock
         writeLog(Thread.currentThread().getName() + " : Asking R lock, matching filter");
@@ -382,11 +382,18 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
             }
             
             //get the data from the source
-            fromSource = this.fs.getFeatures(filter);
-            //cache these features in a local feature collection while we deal with them
-            FeatureCollection localSource = new MemoryFeatureCollection((SimpleFeatureType)fromSource.getSchema());
-            localSource.addAll(fromSource);
-            fromSource = localSource;
+            try{
+                //cache these features in a local feature collection while we deal with them
+                FeatureCollection localSource = new MemoryFeatureCollection(getSchema());
+                fromSource = this.fs.getFeatures(filter);
+                localSource.addAll(fromSource);
+                fromSource = localSource;
+            }catch (Exception ex){
+                //something happened getting data from source
+                //return what we have from the cache
+                logger.log(Level.INFO, "Error getting data for cache from source feature store.", ex);
+                return fromCache;
+            }
             
             //update stats
             source_hits++;
@@ -399,7 +406,6 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
                 isOversized(fromSource);
                 try{
                     register(filter); // get notice we discovered some new part of the universe
-                    //put(fromSource);  // add new data to cache - will raise an exception if cache is over sized
                     // add new data to cache - will raise an exception if cache is over sized
                     //here we are adding the everything (include the stuff that's already in the cache
                     //which is done to prevent multiple wfs calls 
@@ -660,6 +666,7 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
      * @return
      */
     public static Region convert(Envelope e) {
+        if (e == null) return null;
         return new Region(new double[] { e.getMinX(), e.getMinY() },
             new double[] { e.getMaxX(), e.getMaxY() });
     }

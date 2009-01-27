@@ -49,6 +49,7 @@ import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.grid.GridNode;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeType;
@@ -92,6 +93,7 @@ public class DiskStorage implements Storage {
     private HashMap<NodeIdentifier, Entry> pageIndex;
     
     private Collection<FeatureType> featureTypes;
+    private ReferencedEnvelope bounds;
     
     protected SpatialIndex parent;
     
@@ -441,6 +443,7 @@ public class DiskStorage implements Storage {
                 oos.writeInt(this.nextPage);
                 oos.writeObject(this.emptyPages);
                 oos.writeObject(this.pageIndex);
+                oos.writeObject(this.bounds);
 
                 oos.writeInt(this.featureTypes.size());
                 for( Iterator iterator = featureTypes.iterator(); iterator.hasNext(); ) {
@@ -471,7 +474,8 @@ public class DiskStorage implements Storage {
             
             this.emptyPages = (TreeSet<Integer>) ois.readObject();
             this.pageIndex = (HashMap<NodeIdentifier, Entry>) ois.readObject();
-                      
+            this.bounds = (ReferencedEnvelope)ois.readObject();
+            
             int featuretypesize = ois.readInt();
             this.featureTypes = new HashSet<FeatureType>();
             for(int i = 0; i < featuretypesize; i++){
@@ -566,6 +570,14 @@ public class DiskStorage implements Storage {
     
     public void clearFeatureTypes(){
         this.featureTypes.clear();
+    }
+    
+    public void setBounds(ReferencedEnvelope bounds){
+        this.bounds = bounds;
+    }
+    
+    public ReferencedEnvelope getBounds(){
+        return this.bounds;
     }
 }
 

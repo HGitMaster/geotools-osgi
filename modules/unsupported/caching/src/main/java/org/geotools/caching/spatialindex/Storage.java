@@ -19,6 +19,7 @@ package org.geotools.caching.spatialindex;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.type.FeatureType;
 
 /**
@@ -89,4 +90,9 @@ public interface Storage {
      * Removes all feature types associated with the store.
      */
     public void clearFeatureTypes();
+    
+    
+    public void setBounds(ReferencedEnvelope bounds);
+    
+    public ReferencedEnvelope getBounds();
 }
