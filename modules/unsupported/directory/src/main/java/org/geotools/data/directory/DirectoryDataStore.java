@@ -60,13 +60,13 @@ public class DirectoryDataStore implements DataStore {
 
     public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(
             String typeName) throws IOException {
-        FeatureSource fs = getDataStore(typeName).getFeatureSource(typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = getDataStore(typeName).getFeatureSource(typeName);
         if(fs instanceof FeatureLocking) {
-            return new DirectoryFeatureLocking((FeatureLocking) fs, this);
+            return new DirectoryFeatureLocking((FeatureLocking<SimpleFeatureType, SimpleFeature>) fs, this);
         } else if(fs instanceof FeatureStore) {
-            return new DirectoryFeatureStore((FeatureStore) fs, this);
+            return new DirectoryFeatureStore((FeatureStore<SimpleFeatureType, SimpleFeature>) fs, this);
         } else {
-            return new DirectoryFeatureSource((FeatureSource) fs, this);
+            return new DirectoryFeatureSource((FeatureSource<SimpleFeatureType, SimpleFeature>) fs, this);
         }
     }
 

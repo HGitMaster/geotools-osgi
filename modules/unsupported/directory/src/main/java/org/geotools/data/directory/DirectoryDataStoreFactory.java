@@ -16,8 +16,10 @@
  */
 package org.geotools.data.directory;
 
+import java.awt.RenderingHints;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
@@ -44,7 +46,7 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
     public static final Param NAMESPACE = new Param("namespace", URI.class,
             "uri to a the namespace", false); // not required
 
-    public DataStore createDataStore(Map params) throws IOException {
+    public DataStore createDataStore(Map<String, Serializable> params) throws IOException {
         if (!canProcess(params)) {
             throw new IOException("Invalid parameters for DirectoryDataStore");
         }
@@ -60,7 +62,7 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
         return new DirectoryDataStore(f, namespace);
     }
 
-    public DataStore createNewDataStore(Map params) throws IOException {
+    public DataStore createNewDataStore(Map<String, Serializable> params) throws IOException {
         if (!canProcess(params)) {
             throw new IOException("Invalid parameters for DirectoryDataStore");
         }
@@ -80,7 +82,7 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
         return new Param[] { DIRECTORY, NAMESPACE };
     }
 
-    public boolean canProcess(Map params) {
+    public boolean canProcess(Map<String, Serializable> params) {
         try {
             URL url = (URL) DIRECTORY.lookUp(params);
         	File f = new File( url.getFile() );
@@ -98,7 +100,7 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
      * Returns the implementation hints. The default implementation returns en
      * empty map.
      */
-    public Map getImplementationHints() {
-        return Collections.EMPTY_MAP;
+    public Map<RenderingHints.Key, ?> getImplementationHints() {
+        return Collections.emptyMap();
     }
 }
