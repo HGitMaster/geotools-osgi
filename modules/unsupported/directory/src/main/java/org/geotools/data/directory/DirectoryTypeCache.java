@@ -20,6 +20,7 @@ package org.geotools.data.directory;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -53,16 +54,31 @@ import org.geotools.util.logging.Logging;
 class DirectoryTypeCache {
     static final Logger LOGGER = Logging.getLogger(DirectoryTypeCache.class);
 
-    Set<String> featureTypes = new HashSet<String>();
-
+    /**
+     * The feature type cache, a map from the feature type to the 
+     * information of where the feature type is coming from
+     */
     Map<String, FileEntry> ftCache = new ConcurrentHashMap<String, FileEntry>();
 
+    /**
+     * The directory we're gathering data from
+     */
     File directory;
 
+    /**
+     * The target namespace
+     */
     URI namespaceURI;
 
+    /**
+     * The watcher, which is used to tell when the type cache is stale
+     * and needs updating
+     */
     DirectoryWatcher watcher;
     
+    /**
+     * A lock used for isolating cache updates
+     */
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     
     /**
@@ -111,7 +127,7 @@ class DirectoryTypeCache {
                 updateCache();
             // TODO: check about re-creating the datastore when the cache
             // is turned into a soft map
-            return ftCache.get(typeName).store;
+            return ftCache.get(typeName).getStore(true);
         } finally {
             lock.readLock().unlock();
         }
@@ -143,9 +159,13 @@ class DirectoryTypeCache {
         
         try {
             for (FileEntry entry : ftCache.values()) {
-                // TODO: remember to avoid creating a data store when the cache
-                // is moved to a lazy
-                stores.add(entry.store);
+                try {
+                    DataStore store = entry.getStore(false);
+                    if(store != null)
+                        stores.add(store);
+                } catch(Exception e) {
+                    LOGGER.log(Level.FINE, "Error occurred trying to grab a datastore", e);
+                }
             }
         } finally {
             lock.readLock().unlock();
@@ -228,7 +248,7 @@ class DirectoryTypeCache {
                 // do we have the same datastore in the current cache?
                 FileEntry entry = null;
                 for (FileEntry cachedEntry : dirCache) {
-                    if(cachedEntry.store.getClass().equals(store.getClass())) {
+                    if(cachedEntry.getStore(true).getClass().equals(store.getClass())) {
                         entry = cachedEntry;
                         break;
                     }
@@ -236,13 +256,13 @@ class DirectoryTypeCache {
                 
                 // if not found, then create a new one
                 if(entry == null) {
-                    entry = new FileEntry(directory, store);
+                    entry = new FileEntry(directory, factoryAdapter, store);
                 }
                 
                 // if we have an entry, then grab all the feature types in it
                 // and build the corresponding entries in the ft cache
                 if (entry != null) {
-                    for (String typeName : entry.store.getTypeNames()) {
+                    for (String typeName : entry.getStore(true).getTypeNames()) {
                         // don't override existing entries
                         if (!result.containsKey(typeName))
                             result.put(typeName, entry);
@@ -267,20 +287,22 @@ class DirectoryTypeCache {
             if (entry == null) {
                 // look for datastore
                 DataStore store = null;
+                FactoryAdapter adapter = null;
                 for (FactoryAdapter factoryAdapter : factories) {
+                    adapter = factoryAdapter;
                     store = factoryAdapter.getStore(curr, namespaceURI);
                     if (store != null)
                         break;
                 }
                 if (store != null) {
-                    entry = new FileEntry(curr, store);
+                    entry = new FileEntry(curr, adapter, store);
                 }
             }
 
             // if we have an entry, then grab all the feature types in it
             // and build the corresponding entries in the ft cache
             if (entry != null) {
-                for (String typeName : entry.store.getTypeNames()) {
+                for (String typeName : entry.getStore(true).getTypeNames()) {
                     // don't override existing entries
                     if (!result.containsKey(typeName))
                         result.put(typeName, entry);
@@ -315,17 +337,17 @@ class DirectoryTypeCache {
         // are going to remove, but are not referred by any feature type we're
         // going to keep. Clean the ftCache from removed feature types at the same
         // time.
-        Set<DataStore> disposable = new HashSet<DataStore>(); 
+        Set<FileEntry> disposable = new HashSet<FileEntry>(); 
         for (String removedFT : removed) {
             FileEntry entry = ftCache.get(removedFT);
-            disposable.add(entry.store);
+            disposable.add(entry);
             ftCache.remove(removedFT);
         }
         for (FileEntry entry : result.values()) {
-            disposable.remove(entry.store);
+            disposable.remove(entry);
         }
-        for (DataStore dataStore : disposable) {
-            dataStore.dispose();
+        for (FileEntry entry : disposable) {
+            entry.dispose();
         }
         
         // now let's add all the new ones
@@ -385,17 +407,12 @@ class DirectoryTypeCache {
      * Disposes of the file cache and all the cached data stores
      */
     void dispose() {
-        // first collect all data stores to have a unique list
-        // of all the ones around
-        Set<DataStore> stores = new HashSet<DataStore>();
+        // dispose all of the entries, they can be disposed more than
+        // once so just scanning the values is ok (generally speaking we'll
+        // find the same entry more than once among the values, once per
+        // registered feature type in the same data store in general)
         for (FileEntry entry : ftCache.values()) {
-            // TODO: don't force re-creation when we  
-            // switch to lazyly handled data stores
-            stores.add(entry.store);
-        }
-        // now dispose each one just once
-        for (DataStore dataStore : stores) {
-            dataStore.dispose();
+            entry.dispose();
         }
     }
 
@@ -416,14 +433,32 @@ class DirectoryTypeCache {
     class FileEntry {
         File file;
 
-        DataStore store;
+        SoftReference<DataStore> ref;
+        
+        FactoryAdapter adapter;
 
-        long lastModified;
-
-        public FileEntry(File file, DataStore store) {
+        public FileEntry(File file, FactoryAdapter adapter, DataStore store) {
             this.file = file;
-            this.store = store;
-            lastModified = file.lastModified();
+            this.adapter = adapter;
+            this.ref = new DataStoreSoftReference(store);
+        }
+        
+        DataStore getStore(boolean force) throws IOException {
+            DataStore store = ref != null ? ref.get() : null;
+            if(store == null && force) {
+                store = adapter.getStore(file, namespaceURI);
+                ref = new DataStoreSoftReference(store);
+            } 
+            return store;
+        }
+        
+        void dispose() {
+            DataStore store = ref != null ? ref.get() : null;
+            if(store != null)
+                store.dispose();
+            ref.clear();
         }
     }
+    
+    
 }

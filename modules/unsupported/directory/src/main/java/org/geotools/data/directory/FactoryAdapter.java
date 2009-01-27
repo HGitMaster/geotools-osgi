@@ -78,7 +78,7 @@ class FactoryAdapter {
             if (factory.canProcess(params))
                 return factory.createDataStore(params);
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Factory " + factory.getClass()
+            LOGGER.log(Level.FINE, "Factory " + factory.getClass()
                     + " reports it can process parameters, "
                     + "but then fails during creation", e);
         }

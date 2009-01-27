@@ -40,7 +40,7 @@ import org.geotools.data.DataStoreFactorySpi;
  */
 public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
     /** The directory to be scanned for file data stores */
-    public static final Param DIRECTORY = new Param("data_directory url",
+    public static final Param DIRECTORY = new Param("Directory",
             URL.class, "Directory containing geospatial files", true);
 
     public static final Param NAMESPACE = new Param("namespace", URI.class,
