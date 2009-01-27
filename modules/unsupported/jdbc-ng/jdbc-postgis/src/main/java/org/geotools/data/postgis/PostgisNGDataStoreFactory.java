@@ -19,9 +19,6 @@ package org.geotools.data.postgis;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
@@ -102,12 +99,4 @@ public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
         return "jdbc:postgresql" + "://" + host + ":" + port + "/" + db;
     }
 
-    @Override
-    protected DataSource createDataSource(Map params, SQLDialect dialect)
-            throws IOException {
-        BasicDataSource ds = (BasicDataSource) super.createDataSource(params, dialect);
-        // disable server side prepare
-        ds.addConnectionProperty("prepareThreshold", "-1");
-        return ds;
-    }
 }

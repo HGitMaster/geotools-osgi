@@ -27,6 +27,8 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataStore;
 import org.geotools.data.Parameter;
+import org.geotools.data.jdbc.datasource.DBCPDataSource;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.util.SimpleInternationalString;
@@ -354,7 +356,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         // some datastores might need this
         dataSource.setAccessToUnderlyingConnectionAllowed(true);
 
-        return dataSource;
+        return new DBCPDataSource(dataSource);
     }
 
     /**
