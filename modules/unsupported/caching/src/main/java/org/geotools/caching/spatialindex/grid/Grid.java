@@ -157,12 +157,15 @@ public class Grid extends AbstractSpatialIndex {
 
     public void clear() throws IllegalStateException {
         // we drop all nodes and recreate grid ; GC will do the rest
-        GridRootNode root = (GridRootNode) readNode(this.root);
-        root.clear();
-        //this.store.clear();
+        this.store.clear();
+        //create a new root node
+        GridRootNode root = new GridRootNode(this, mbr, capacity);
+        this.root = root.getIdentifier();
+        root.split();
         writeNode(root);
         this.stats.reset();
-        this.stats.addToNodesCounter(root.capacity + 1);
+        this.stats.addToNodesCounter(root.capacity + 1); // root has root.capacity nodes, +1 for root itself :)
+        this.flush();
         
     }
 

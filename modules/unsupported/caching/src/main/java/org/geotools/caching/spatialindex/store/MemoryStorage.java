@@ -78,6 +78,10 @@ public class MemoryStorage implements Storage {
     public void flush() {
         // do nothing
     }
+    
+    public void dispose(){
+        clear();
+    }
 
     public Properties getPropertySet() {
         Properties pset = new Properties();

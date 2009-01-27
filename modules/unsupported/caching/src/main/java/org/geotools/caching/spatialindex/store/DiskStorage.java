@@ -219,7 +219,6 @@ public class DiskStorage implements Storage {
             it.remove();
 //            }
         }
-        this.featureTypes.clear();
     }
 
     public synchronized Node get(NodeIdentifier id) {
@@ -434,6 +433,16 @@ public class DiskStorage implements Storage {
 //        }
     }
 
+    public synchronized void dispose(){
+        flush();
+        try{
+            this.data_channel.close();
+            this.data_file.close();
+        }catch (Exception ex){
+            logger.log(Level.WARNING, "Error disposing of disk storage", ex);
+        }
+    }
+    
     public synchronized void flush() {
         try {
             FileOutputStream os = new FileOutputStream(indexFile);

@@ -71,6 +71,10 @@ public class BufferedDiskStorage implements Storage {
         buffer.clear();
         storage.clear();
     }
+    
+    public void dispose(){
+        storage.dispose();
+    }
 
     public Node get(NodeIdentifier id) {
         BufferEntry entry = buffer.get(id);

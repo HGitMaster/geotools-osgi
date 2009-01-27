@@ -68,9 +68,18 @@ public interface Storage {
     public Properties getPropertySet();
 
     /**
-     * Flushes the cache writing everything to the store.
+     * Flushes the store writing everything to the store.
+     * <p>Currently this is really only used by the BufferedDiskStorage
+     * to write everything in the buffer to the store.
+     * </p>
      */
     public void flush();
+    
+    /**
+     * Disposes of the store.
+     */
+    public void dispose();
+    
 
     public NodeIdentifier findUniqueInstance(NodeIdentifier id);
         
@@ -91,8 +100,17 @@ public interface Storage {
      */
     public void clearFeatureTypes();
     
-    
+    /**
+     * Sets the bounds of the data in the cache.
+     *
+     * @param bounds
+     */
     public void setBounds(ReferencedEnvelope bounds);
     
+    /**
+     * Gets the bounds of the cached data.
+     *
+     * @return
+     */
     public ReferencedEnvelope getBounds();
 }

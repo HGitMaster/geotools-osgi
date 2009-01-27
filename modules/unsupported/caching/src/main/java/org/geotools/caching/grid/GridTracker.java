@@ -52,6 +52,13 @@ public class GridTracker extends Grid implements EvictableTree {
         return this.root;
     }
 
+    /**
+     * Disposes of the store
+     */
+    public void dispose(){
+        this.store.dispose();
+    }
+    
     Stack searchMissingTiles(Region search) { // search must be within root mbr !
 
         Stack<Shape> missing = new Stack<Shape>();

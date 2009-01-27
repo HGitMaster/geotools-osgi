@@ -81,4 +81,11 @@ public interface FeatureCache extends FeatureSource {
      * @param e
      */
     public void remove(Envelope e);
+    
+    /**
+     * Disposes of the feature cache closing any open store
+     * connections.
+     */
+    public void dispose();
+    
 }

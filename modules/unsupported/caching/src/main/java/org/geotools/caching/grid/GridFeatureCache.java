@@ -18,6 +18,7 @@ package org.geotools.caching.grid;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,15 +33,21 @@ import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -217,8 +224,18 @@ public class GridFeatureCache extends AbstractFeatureCache {
             lock.writeLock().unlock();
         }
     }
+    
+    public void dispose(){
+        lock.writeLock().lock();
+        try{
+            this.tracker.dispose();
+        }finally{
+            lock.writeLock().unlock();
+        }
+    }
 
     public FeatureCollection peek(Envelope e) {
+
         FeatureCollectingVisitor v = new FeatureCollectingVisitor(this.getSchema());
         lock.readLock().lock();
 

@@ -105,31 +105,12 @@ public class NonBlockingGridFeatureCache extends GridFeatureCache {
             lock.readLock().unlock();
         }
 
-        // here we have what's in the cache
-        // so lets get what's not in the cache
-        // get what data we are missing from the cache based on the not cached array.
-        Filter filter = null;
-        if (notcached.size() == 1) {
-            Envelope env = notcached.get(0);
-            filter = ff.bbox(geometryname, env.getMinX(), env.getMinY(), env.getMaxX(), env
-                    .getMaxY(), srs);
-        } else {
-            // or the envelopes together into a single or filter
-            ArrayList<Filter> filters = new ArrayList<Filter>(notcached.size());
-            for( Iterator<Envelope> it = notcached.iterator(); it.hasNext(); ) {
-                Envelope next = (Envelope) it.next();
-                Filter bbox = ff.bbox(geometryname, next.getMinX(), next.getMinY(), next.getMaxX(),
-                        next.getMaxY(), srs);
-                filters.add(bbox);
-            }
-            filter = ff.or(filters);
-        }
+        //next we need to  get missing data from cache        
+        Filter filter = createFilter(notcached, geometryname, srs);
 
-        // got a miss from cache, need to get more data
         // cache these features in a local feature collection while we deal with them
         FeatureCollection localSource = new MemoryFeatureCollection(getSchema());
         try {
-            // get the data from the source
             fromSource = this.fs.getFeatures(filter);
             localSource.addAll(fromSource);
             fromSource = localSource;
@@ -151,14 +132,12 @@ public class NonBlockingGridFeatureCache extends GridFeatureCache {
             source_hits++;
             source_feature_reads += fromSource.size();
             try {
-                isOversized(fromSource);
+                isOversized(fromSource);        
                 try {
-                    register(filter); // get notice we discovered some new part of the universe
-                    put(fromSource);
-
+                    register(filter);       //get notice we discovered some new part of the universe
+                    put(fromSource);        
                 } catch (Exception ex) {
-                    // something happened here so we better unregister this area
-                    // so if we try again next time we'll try getting data again
+                    // something happened here so we better unregister this area so if we try again next time we'll try getting data again
                     unregister(filter);
                 }
             } catch (CacheOversizedException e1) {
@@ -173,5 +152,34 @@ public class NonBlockingGridFeatureCache extends GridFeatureCache {
 
         fromCache.addAll(fromSource);
         return fromCache;
+    }
+
+    /**
+     * Converts a list of envelopes into an associated filter.
+     *
+     * @param notcached     list of envelopes  
+     * @param geometryname  geometry name attribute
+     * @param srs           srs of geometry attribute
+     * @return
+     */
+    private Filter createFilter(List<Envelope> notcached, String geometryname,
+            String srs) {
+        Filter filter;
+        if (notcached.size() == 1) {
+            Envelope env = notcached.get(0);
+            filter = ff.bbox(geometryname, env.getMinX(), env.getMinY(), env.getMaxX(), env
+                    .getMaxY(), srs);
+        } else {
+            // or the envelopes together into a single or filter
+            ArrayList<Filter> filters = new ArrayList<Filter>(notcached.size());
+            for( Iterator<Envelope> it = notcached.iterator(); it.hasNext(); ) {
+                Envelope next = (Envelope) it.next();
+                Filter bbox = ff.bbox(geometryname, next.getMinX(), next.getMinY(), next.getMaxX(),
+                        next.getMaxY(), srs);
+                filters.add(bbox);
+            }
+            filter = ff.or(filters);
+        }
+        return filter;
     }
 }
