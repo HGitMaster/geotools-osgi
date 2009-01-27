@@ -40,11 +40,11 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
 
 
 /**
- * TODO WARNING THIS IS A WORK IN PROGRESS.
- * 
- * TXT Compiler
+ * ECQLCompiler
  * 
  * <p>
+ * Builds the filter, expression or arguments related with the visited 
+ * node of syntax tree 
  * </p>
  * 
  * @author Jody Garnett
@@ -128,7 +128,7 @@ public class ECQLCompiler extends ECQLParser implements org.geotools.filter.text
     }
 
     /**
-     * @return the txt source
+     * @return the ECQLsource
      */
     public final String getSource(){
         return this.source;
@@ -387,7 +387,7 @@ public class ECQLCompiler extends ECQLParser implements org.geotools.filter.text
                 // ----------------------------------------
                 // Spatial Relate Like
                 // ----------------------------------------
-//                FIXME under debate
+//                TODO  these will be extensions in the ECQL (under analysis)
 //            case JJTPATTERN9IM_NODE:
 //                return this.builder.buildPattern9IM();
 //

@@ -86,7 +86,7 @@ import org.opengis.filter.expression.Expression;
  * @since 2.5
  * @author Mauricio Pazos (Axios Engineering)
  * @author Gabriel Roldan (Axios Engineering)
- * @version $Id: CQL.java 31897 2008-11-21 16:12:31Z mauricio.pazos $
+ * @version $Id: CQL.java 32351 2009-01-27 18:35:12Z mpazos $
  * @source $URL:
  *        http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQL.java $
  */
@@ -136,7 +136,7 @@ public class CQL {
 
     /**
      * Parses the input string in OGC CQL format into an Expression, using the
-     * systems default FilterFactory implementation.
+     * systems default {@link FilterFactory} implementation.
      *
      * @param cqlExpression
      *            a string containing an OGC CQL expression.
@@ -149,8 +149,8 @@ public class CQL {
     }
 
     /**
-     * Parses the input string in OGC CQL format into an Expression, using the
-     * provided FilterFactory.
+     * Parses the input string in OGC CQL format into an {@link Expression}, using the
+     * provided {@link FilterFactory}.
      *
      * @param cqlExpression
      *            a string containing a OGC CQL expression.
@@ -176,9 +176,9 @@ public class CQL {
      * <code>Filter</code>s, using the provided FilterFactory.
      *
      * @param cqlFilterList
-     *            a list of OGC CQL predicates separated by <code>|</code>
+     *            a list of OGC CQL predicates separated by "<code>;</code>"
      *
-     * @return a List of {@link Filter}, one for each input CQL statement
+     * @return a {@link List} of {@link Filter}, one for each input CQL statement
      */
     public static List<Filter> toFilterList(final String cqlFilterList)
         throws CQLException {
@@ -215,12 +215,12 @@ public class CQL {
         return output.toString();        
     }
     /**
-     * Parses the input string, which has to be a list of OGC CQL predicates
-     * separated by <code>|</code> into a <code>List</code> of
+     * Parses the input string which has to be a list of OGC CQL predicates
+     * separated by "<code>;</code>" into a <code>List</code> of
      * <code>Filter</code>s, using the provided FilterFactory.
      *
      * @param cqlSequencePredicate
-     *            a list of OGC CQL predicates separated by <code>|</code>
+     *            a list of OGC CQL predicates separated by "<code>;</code>"
      *
      * @param filterFactory
      *            the {@link FilterFactory} to use for the creation of the
