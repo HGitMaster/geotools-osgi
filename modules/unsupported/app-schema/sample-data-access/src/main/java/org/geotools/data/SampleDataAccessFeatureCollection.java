@@ -36,7 +36,7 @@ import org.opengis.util.ProgressListener;
  * Collection of features from a {@link SampleDataAccess}.
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: SampleDataAccessFeatureCollection.java 32071 2008-12-24 03:03:33Z bencaradocdavies $
+ * @version $Id: SampleDataAccessFeatureCollection.java 32358 2009-01-28 07:28:02Z bencaradocdavies $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/sample-data-access/src/main/java/org/geotools/data/SampleDataAccessFeatureCollection.java $
  * @since 2.6
  */
@@ -124,13 +124,12 @@ public class SampleDataAccessFeatureCollection extends ArrayList<Feature> implem
     }
 
     /**
-     * Not yet implemented.
+     * Return type of features.
      * 
      * @see org.geotools.feature.FeatureCollection#getSchema()
      */
     public FeatureType getSchema() {
-        // FIXME implement this
-        return null;
+        return SampleDataAccessData.MAPPEDFEATURE_TYPE;
     }
 
     /**

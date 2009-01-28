@@ -40,7 +40,7 @@ import org.opengis.filter.Filter;
  * {@link FeatureSource} for {@link SampleDataAccess}.
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: SampleDataAccessFeatureSource.java 32071 2008-12-24 03:03:33Z bencaradocdavies $
+ * @version $Id: SampleDataAccessFeatureSource.java 32358 2009-01-28 07:28:02Z bencaradocdavies $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/sample-data-access/src/main/java/org/geotools/data/SampleDataAccessFeatureSource.java $
  * @since 2.6
  */
@@ -112,8 +112,8 @@ public class SampleDataAccessFeatureSource implements FeatureSource<FeatureType,
      * @see org.geotools.data.FeatureSource#getFeatures(org.opengis.filter.Filter)
      */
     public FeatureCollection<FeatureType, Feature> getFeatures(Filter filter) throws IOException {
-        // FIXME implement this
-        return null;
+        // FIXME temporary hack
+        return getFeatures();
     }
 
     /**
@@ -122,8 +122,8 @@ public class SampleDataAccessFeatureSource implements FeatureSource<FeatureType,
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
     public FeatureCollection<FeatureType, Feature> getFeatures(Query query) throws IOException {
-        // FIXME implement this
-        return null;
+        // FIXME temporary hack
+        return getFeatures();
     }
 
     /**
@@ -142,8 +142,7 @@ public class SampleDataAccessFeatureSource implements FeatureSource<FeatureType,
      * @see org.geotools.data.FeatureSource#getName()
      */
     public Name getName() {
-        // FIXME implement this
-        return null;
+        return SampleDataAccessData.MAPPEDFEATURE_TYPE_NAME;
     }
 
     /**
@@ -157,13 +156,12 @@ public class SampleDataAccessFeatureSource implements FeatureSource<FeatureType,
     }
 
     /**
-     * Not yet implemented.
+     * Return feature type.
      * 
      * @see org.geotools.data.FeatureSource#getSchema()
      */
     public FeatureType getSchema() {
-        // FIXME implement this
-        return null;
+        return SampleDataAccessData.MAPPEDFEATURE_TYPE;
     }
 
     /**
