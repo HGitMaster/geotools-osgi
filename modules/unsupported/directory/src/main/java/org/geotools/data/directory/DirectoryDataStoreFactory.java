@@ -40,7 +40,7 @@ import org.geotools.data.DataStoreFactorySpi;
  */
 public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
     /** The directory to be scanned for file data stores */
-    public static final Param DIRECTORY = new Param("Directory",
+    public static final Param URLP = new Param("url",
             URL.class, "Directory containing geospatial files", true);
 
     public static final Param NAMESPACE = new Param("namespace", URI.class,
@@ -51,10 +51,10 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
             throw new IOException("Invalid parameters for DirectoryDataStore");
         }
 
-        URL url = (URL) DIRECTORY.lookUp(params);
+        URL url = (URL) URLP.lookUp(params);
         File f = new File(url.getFile());
         if (!f.isDirectory()) {
-            throw new IOException("Invalid parameter " + DIRECTORY.key
+            throw new IOException("Invalid parameter " + URLP.key
                     + " : is not a valid directory");
         }
 
@@ -79,12 +79,12 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
     }
 
     public Param[] getParametersInfo() {
-        return new Param[] { DIRECTORY, NAMESPACE };
+        return new Param[] { URLP, NAMESPACE };
     }
 
     public boolean canProcess(Map<String, Serializable> params) {
         try {
-            URL url = (URL) DIRECTORY.lookUp(params);
+            URL url = (URL) URLP.lookUp(params);
         	File f = new File( url.getFile() );
             return f != null && f.exists() && f.isDirectory();
         } catch (Exception e) {
