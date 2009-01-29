@@ -13,7 +13,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Gabriel Roldan (TOPP)
  * @author Andrea Aime (OpenGeo)
- * @version $Id: JDBCQueryCapabilities.java 32368 2009-01-29 10:45:55Z aaime $
+ * @version $Id: JDBCQueryCapabilities.java 32370 2009-01-29 11:23:52Z aaime $
  * @since 2.5.4
  */
 class JDBCQueryCapabilities extends QueryCapabilities {
@@ -24,10 +24,6 @@ class JDBCQueryCapabilities extends QueryCapabilities {
         this.source = source;
     }
 
-    /**
-     * Overrides to delegate to the three template methods in order to check for sorting
-     * capabilities over the natural and reverse order, and each specific attribute type.
-     */
     @Override
     public boolean supportsSorting(final SortBy[] sortAttributes) {
         if(super.supportsSorting(sortAttributes))
@@ -35,15 +31,10 @@ class JDBCQueryCapabilities extends QueryCapabilities {
         
         for (int i = 0; i < sortAttributes.length; i++) {
             SortBy sortBy = sortAttributes[i];
-            if (SortBy.NATURAL_ORDER == sortBy) {
-                if(!supportsNaturalOrderSorting()){
-                    return false;
-                }
-            }else if (SortBy.REVERSE_ORDER == sortBy) {
-                if(!supportsReverseOrderSorting()){
-                    return false;
-                }
-            }else{
+            if (SortBy.NATURAL_ORDER == sortBy || SortBy.REVERSE_ORDER == sortBy) {
+                // we do only if we have a non null primary key
+                return !(source.getPrimaryKey() instanceof NullPrimaryKey);
+            } else {
                 PropertyName propertyName = sortBy.getPropertyName();
                 SortOrder sortOrder = sortBy.getSortOrder();
                 if (!supportsPropertySorting(propertyName, sortOrder)) {
@@ -55,28 +46,8 @@ class JDBCQueryCapabilities extends QueryCapabilities {
     }
 
     /**
-     * Indicates whether sorting by {@link SortBy#NATURAL_ORDER} is supported; defaults to
-     * <code>false</code>.
-     * 
-     * @return false, override if NATURAL_ORDER sorting is supported.
-     */
-    protected boolean supportsNaturalOrderSorting() {
-        return false;
-    }
-
-    /**
-     * Indicates whether sorting by {@link SortBy#REVERSE_ORDER} is supported; defaults to
-     * <code>false</code>.
-     * 
-     * @return false, override if REVERSE_ORDER sorting is supported.
-     */
-    protected boolean supportsReverseOrderSorting() {
-        return false;
-    }
-
-    /**
-     * Template method to check for sorting support in the given sort order for a specific
-     * attribute type, given by a PropertyName expression.
+     * Checks for sorting support in the given sort order for a specific attribute type, 
+     * given by a PropertyName expression.
      * <p>
      * This default implementation assumes both orders are supported as long as the property
      * name corresponds to the name of one of the attribute types in the complete FeatureType,

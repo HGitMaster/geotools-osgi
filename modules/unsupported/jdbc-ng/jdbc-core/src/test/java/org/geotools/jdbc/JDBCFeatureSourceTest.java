@@ -297,4 +297,32 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         // we have a primary key, right?
         assertTrue(caps.isReliableFIDSupported());
     }
+    
+    public void testNaturalSortingAsc() throws Exception {
+        DefaultQuery q = new DefaultQuery(featureSource.getSchema().getTypeName());
+        q.setSortBy(new SortBy[] {SortBy.NATURAL_ORDER});
+        FeatureIterator<SimpleFeature> features = featureSource.getFeatures(q).features();
+        String prevId = null;
+        while(features.hasNext()) {
+            String currId = features.next().getID();
+            if(prevId != null)
+                assertTrue(prevId.compareTo(currId) <= 0);
+            prevId = currId;
+        }
+        features.close();
+    }
+    
+    public void testNaturalSortingdesc() throws Exception {
+        DefaultQuery q = new DefaultQuery(featureSource.getSchema().getTypeName());
+        q.setSortBy(new SortBy[] {SortBy.REVERSE_ORDER});
+        FeatureIterator<SimpleFeature> features = featureSource.getFeatures(q).features();
+        String prevId = null;
+        while(features.hasNext()) {
+            String currId = features.next().getID();
+            if(prevId != null)
+                assertTrue(prevId.compareTo(currId) >= 0);
+            prevId = currId;
+        }
+        features.close();
+    }
 }

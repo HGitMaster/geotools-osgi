@@ -2222,26 +2222,51 @@ public final class JDBCDataStore extends ContentDataStore
         }
 
         //sorting
+        sort(featureType, sort, key, sql);
+
+        return sql.toString();
+    }
+
+    /**
+     * Encodes the sort-by portion of an sql query
+     * @param featureType
+     * @param sort
+     * @param key
+     * @param sql
+     * @throws IOException
+     */
+    void sort(SimpleFeatureType featureType, SortBy[] sort,
+            PrimaryKey key, StringBuffer sql) throws IOException {
         if ((sort != null) && (sort.length > 0)) {
             sql.append(" ORDER BY ");
 
             for (int i = 0; i < sort.length; i++) {
-                dialect.encodeColumnName(getPropertyName(featureType, sort[i].getPropertyName()),
-                    sql);
-
+                String order;
                 if (sort[i].getSortOrder() == SortOrder.DESCENDING) {
-                    sql.append(" DESC");
+                    order = " DESC";
                 } else {
-                    sql.append(" ASC");
+                    order = " ASC";
                 }
-
-                sql.append(",");
+                
+                if(SortBy.NATURAL_ORDER.equals(sort[i])|| SortBy.REVERSE_ORDER.equals(sort[i])) {
+                    if(key instanceof NullPrimaryKey)
+                        throw new IOException("Cannot do natural order without a primary key");
+                    
+                    for ( PrimaryKeyColumn col : key.getColumns() ) {
+                        dialect.encodeColumnName(col.getName(), sql);
+                        sql.append(order);
+                        sql.append(",");
+                    }
+                } else {
+                    dialect.encodeColumnName(getPropertyName(featureType, sort[i].getPropertyName()),
+                            sql);
+                    sql.append(order);
+                    sql.append(",");
+                }
             }
 
             sql.setLength(sql.length() - 1);
         }
-
-        return sql.toString();
     }
 
     /**
@@ -2318,24 +2343,7 @@ public final class JDBCDataStore extends ContentDataStore
         }
 
         //sorting
-        if ((sort != null) && (sort.length > 0)) {
-            sql.append(" ORDER BY ");
-
-            for (int i = 0; i < sort.length; i++) {
-                dialect.encodeColumnName(getPropertyName(featureType, sort[i].getPropertyName()),
-                    sql);
-
-                if (sort[i].getSortOrder() == SortOrder.DESCENDING) {
-                    sql.append(" DESC");
-                } else {
-                    sql.append(" ASC");
-                }
-
-                sql.append(",");
-            }
-
-            sql.setLength(sql.length() - 1);
-        }
+        sort(featureType, sort, key, sql);
 
         LOGGER.fine( sql.toString() );
         PreparedStatement ps = cx.prepareStatement(sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
