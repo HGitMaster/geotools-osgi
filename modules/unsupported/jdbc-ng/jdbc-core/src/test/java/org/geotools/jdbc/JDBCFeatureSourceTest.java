@@ -16,13 +16,11 @@
  */
 package org.geotools.jdbc;
 
-import java.awt.RenderingHints;
 import java.util.Iterator;
 
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
-import org.geotools.data.Transaction;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
@@ -39,7 +37,6 @@ import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.spatial.BBOX;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
@@ -280,5 +277,24 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
             fi.next();
         }
         fi.close();
+    }
+    
+    public void testQueryCapabilitiesSort() throws Exception {
+        FilterFactory ff = dataStore.getFilterFactory();
+        QueryCapabilities caps = featureSource.getQueryCapabilities();
+        
+        // check we advertise support for sorting on basic attributes 
+        assertTrue(caps.supportsSorting(new SortBy[] {ff.sort(aname("intProperty"), SortOrder.ASCENDING)}));
+        assertTrue(caps.supportsSorting(new SortBy[] {ff.sort(aname("stringProperty"), SortOrder.DESCENDING)}));
+        assertTrue(caps.supportsSorting(new SortBy[] {ff.sort(aname("doubleProperty"), SortOrder.ASCENDING)}));
+        
+        // but we cannot sort geometries
+        assertFalse(caps.supportsSorting(new SortBy[] {ff.sort(aname("geometry"), SortOrder.ASCENDING)}));
+    }
+    
+    public void testQueryCapabilitiesReliableFid() throws Exception {
+        QueryCapabilities caps = featureSource.getQueryCapabilities();
+        // we have a primary key, right?
+        assertTrue(caps.isReliableFIDSupported());
     }
 }

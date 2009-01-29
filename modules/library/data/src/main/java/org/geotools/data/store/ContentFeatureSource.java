@@ -100,7 +100,10 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     protected SimpleFeatureType schema;
     
-    private QueryCapabilities queryCapabilities;
+    /**
+     * The query capabilities returned by this feature source
+     */
+    protected QueryCapabilities queryCapabilities;
     
   
     /**
@@ -116,7 +119,6 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
     public ContentFeatureSource(ContentEntry entry, Query query) {
         this.entry = entry;
         this.query = query;
-        this.queryCapabilities = new QueryCapabilities();
         
         //set up hints
         hints = new HashSet<Hints.Key>();
@@ -834,6 +836,17 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      * </p>
      */
     protected abstract SimpleFeatureType buildFeatureType() throws IOException;
+    
+    /**
+     * Builds the query capabilities for this feature source. The default 
+     * implementation returns a newly built QueryCapabilities, subclasses
+     * are advised to build their own.
+     * @return
+     * @throws IOException
+     */
+    protected QueryCapabilities buildQueryCapabilities() {
+        return new QueryCapabilities();
+    }
 
     /**
      * Returns a new feature collection containing all the features of the 
@@ -912,6 +925,12 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
     //protected abstract FeatureCollection<SimpleFeatureType, SimpleFeature> readonly(ContentState state, Filter filter);
 
     public QueryCapabilities getQueryCapabilities() {
-        return this.queryCapabilities;
+        // lazy initialization, so that the subclass has all its data structures ready
+        // when the method is called (it might need to consult them in order to decide
+        // what query capabilities are really supported)
+        if(queryCapabilities == null) {
+            queryCapabilities = buildQueryCapabilities();
+        }
+        return queryCapabilities;
     }
 }

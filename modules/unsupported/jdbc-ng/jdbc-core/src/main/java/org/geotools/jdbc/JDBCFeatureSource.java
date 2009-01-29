@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentEntry;
@@ -70,6 +71,11 @@ public class JDBCFeatureSource extends ContentFeatureSource {
         
         //TODO: cache this
         primaryKey = ((JDBCDataStore) entry.getDataStore()).getPrimaryKey(entry);
+    }
+    
+    @Override
+    protected QueryCapabilities buildQueryCapabilities() {
+        return new JDBCQueryCapabilities(this);
     }
     
     @Override
