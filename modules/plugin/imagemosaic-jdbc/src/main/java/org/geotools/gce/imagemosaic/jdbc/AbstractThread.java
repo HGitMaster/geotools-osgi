@@ -24,10 +24,15 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
+import java.io.File;
+import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.imageio.ImageIO;
 
 
 /**
@@ -109,16 +114,28 @@ abstract class AbstractThread extends Thread {
      * @return rescaled image fitting into the requested pixel dimension
      */
     protected BufferedImage rescaleImage(BufferedImage image) {
-        BufferedImage scaledImage = new BufferedImage((int) Math.floor(
+    	
+    	BufferedImage scaledImage = null;
+    	int imageType=image.getType();
+    	
+        if ((imageType==BufferedImage.TYPE_BYTE_BINARY || imageType==BufferedImage.TYPE_BYTE_INDEXED) 
+        		&& (image.getColorModel() instanceof IndexColorModel) ) 
+        	scaledImage=new BufferedImage((int) Math.floor(
+                    image.getWidth() * rescaleX),
+                    (int) Math.floor(image.getHeight() * rescaleY),
+                    image.getType(),(IndexColorModel)image.getColorModel());
+        else
+        	scaledImage = new BufferedImage((int) Math.floor(
                     image.getWidth() * rescaleX),
                 (int) Math.floor(image.getHeight() * rescaleY),
-                BufferedImage.TYPE_INT_ARGB);
+                image.getType());
+        
         final Graphics2D g2D = (Graphics2D) scaledImage.getGraphics();
 
         g2D.addRenderingHints(getRenderingHints());
         g2D.drawImage(image,
             AffineTransform.getScaleInstance(rescaleX, rescaleY), null);
-
+        
         return scaledImage;
     }
 }

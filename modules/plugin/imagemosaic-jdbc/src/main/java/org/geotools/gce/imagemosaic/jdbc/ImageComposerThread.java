@@ -28,6 +28,7 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
@@ -68,10 +69,37 @@ class ImageComposerThread extends AbstractThread {
         return new Dimension((int) Math.round(width), (int) Math.round(height));
     }
 
-    private BufferedImage getStartImage() {
+    private BufferedImage getStartImage( BufferedImage copyFrom) {    	    	
         Dimension dim = getStartDimension();
-        BufferedImage image = new BufferedImage((int) dim.getWidth(),
-                (int) dim.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        
+        int imageType=copyFrom.getType();
+        if (imageType==BufferedImage.TYPE_CUSTOM) 
+        	imageType=ImageMosaicJDBCReader.DEFAULT_IMAGE_TYPE;
+        
+        BufferedImage image = null;
+        if ((imageType==BufferedImage.TYPE_BYTE_BINARY || imageType==BufferedImage.TYPE_BYTE_INDEXED) 
+        		&& (copyFrom.getColorModel() instanceof IndexColorModel) ) 
+        	image = new BufferedImage((int) dim.getWidth(),(int) dim.getHeight(), imageType, (IndexColorModel) copyFrom.getColorModel());
+        else 
+        	image = new BufferedImage((int) dim.getWidth(),(int) dim.getHeight(), imageType);
+                
+        Graphics2D g2D = (Graphics2D) image.getGraphics();
+        Color save = g2D.getColor();
+        g2D.setColor(outputTransparentColor);
+        g2D.fillRect(0, 0, image.getWidth(), image.getHeight());
+        g2D.setColor(save);
+
+        return image;
+    }
+    
+    private BufferedImage getStartImage( int imageType) {    	    	
+        Dimension dim = getStartDimension();
+        
+        if (imageType==BufferedImage.TYPE_CUSTOM) 
+        	imageType=ImageMosaicJDBCReader.DEFAULT_IMAGE_TYPE;
+        
+        BufferedImage image = new BufferedImage((int) dim.getWidth(),(int) dim.getHeight(), imageType);
+                
         Graphics2D g2D = (Graphics2D) image.getGraphics();
         Color save = g2D.getColor();
         g2D.setColor(outputTransparentColor);
@@ -81,15 +109,22 @@ class ImageComposerThread extends AbstractThread {
         return image;
     }
 
+    
+
     @Override
     public void run() {
-        BufferedImage image = getStartImage();
+        BufferedImage image = null;
+        Graphics2D g2D = null;
 
-        Graphics2D g2D = (Graphics2D) image.getGraphics();
         TileQueueElement queueObject = null;
 
         try {
             while ((queueObject = tileQueue.take()).isEndElement()==false) {
+            		
+            	if (image==null) {
+            		image = getStartImage(queueObject.getTileImage());
+            		g2D=(Graphics2D) image.getGraphics();
+            	}
             	
                 int posx = (int) ((queueObject.getEnvelope().getMinimum(0) -
                         requestEnvelope.getMinimum(0)) / levelInfo.getResX());
@@ -103,6 +138,10 @@ class ImageComposerThread extends AbstractThread {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        
+    	if (image==null)  // no tiles ??
+    		image = getStartImage(ImageMosaicJDBCReader.DEFAULT_IMAGE_TYPE);
+        
 
         GeneralEnvelope resultEnvelope=null;
         
