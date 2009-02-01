@@ -19,6 +19,7 @@ import static java.awt.RenderingHints.*;
 public class FillTest extends TestCase {
     private static final long TIME = 2000;
     FeatureSource<SimpleFeatureType, SimpleFeature> fs;
+    FeatureSource<SimpleFeatureType, SimpleFeature> bfs;
     ReferencedEnvelope bounds;
 
     @Override
@@ -26,6 +27,7 @@ public class FillTest extends TestCase {
         File property = new File(TestData.getResource(this, "square.properties").toURI());
         PropertyDataStore ds = new PropertyDataStore(property.getParentFile());
         fs = ds.getFeatureSource("square");
+        bfs = ds.getFeatureSource("bigsquare");
         bounds = fs.getBounds();
         bounds.expandBy(0.2, 0.2);
         
@@ -94,5 +96,21 @@ public class FillTest extends TestCase {
         renderer.setContext(mc);
         
         RendererBaseTest.showRender("ImageFill", renderer, TIME, bounds);
+    }
+    
+    public void testFTSComposition() throws Exception {
+    	
+    	Style bgStyle = RendererBaseTest.loadStyle(this, "fillSolid.sld");
+        Style fgStyle = RendererBaseTest.loadStyle(this, "fillSolidFTS.sld");
+        
+        DefaultMapContext mc = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        mc.addLayer(bfs, bgStyle);
+        mc.addLayer(fs, fgStyle);
+        
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setJava2DHints(new RenderingHints(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON));
+        renderer.setContext(mc);
+        
+        RendererBaseTest.showRender("FTS composition", renderer, TIME, bounds);
     }
 }

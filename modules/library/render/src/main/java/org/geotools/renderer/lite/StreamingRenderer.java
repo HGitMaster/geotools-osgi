@@ -16,6 +16,7 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -138,7 +139,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32305 2009-01-23 18:15:41Z aaime $
+ * @version $Id: StreamingRenderer.java 32383 2009-02-01 18:17:21Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -1643,11 +1644,11 @@ public final class StreamingRenderer implements GTRenderer {
 		}
 		// have to re-form the image now.
 		// graphics.setTransform( new AffineTransform() );
+		graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 		for (int t = 0; t < n_lfts; t++) {
-			if (fts_array[t].myImage != null) // this is the case for the
-			// first one (ie.
-			// fts_array[t].graphics ==
-			// graphics)
+			// first fts won't have an image, it's using the user provided graphics
+			// straight, so we don't need to compose it back in.
+			if (fts_array[t].myImage != null) 
 			{
 				graphics.drawImage(fts_array[t].myImage, 0, 0, null);
 				fts_array[t].myImage.flush();
