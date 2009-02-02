@@ -28,11 +28,13 @@ import org.geotools.data.Transaction;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -42,12 +44,23 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * Simple data store wrapper for feature collections. Allows to use feature collections in the user
  * interface layer and everything else where a data store or a feature source is needed.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/collection/CollectionDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/collection/CollectionDataStore.java $
  */
 public class CollectionDataStore extends AbstractDataStore {
     SimpleFeatureType featureType;
     FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
 
+    /**
+     * Builds a data store wrapper around an empty collection.
+     *
+     * @param collection
+     */
+    public CollectionDataStore(SimpleFeatureType schema) {
+        this.collection = FeatureCollections.newCollection();
+        this.featureType = schema;
+        collection.addListener(new FeatureCollectionListener());
+    }
+    
     /**
      * Builds a data store wrapper on top of a feature collection
      *
