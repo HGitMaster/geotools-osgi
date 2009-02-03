@@ -202,7 +202,7 @@ public class RasterTestData {
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_1BIT, imgExtent,
                 producer);
-        
+
         return tableName;
     }
 
@@ -229,7 +229,7 @@ public class RasterTestData {
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_8BIT_U, imgExtent,
                 prod);
-        
+
         return tableName;
     }
 
@@ -275,7 +275,7 @@ public class RasterTestData {
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_8BIT_U, imgExtent,
                 prod);
-        
+
         return tableName;
     }
 
@@ -297,7 +297,7 @@ public class RasterTestData {
 
         importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_32BIT_REAL,
                 imgExtent, prod);
-        
+
         return tableName;
     }
 
@@ -376,7 +376,7 @@ public class RasterTestData {
             attr.setPixelType(sePixelType);
             attr.setCompressionType(SeRaster.SE_COMPRESSION_NONE);
 
-            int maxLevels = imageWidth / tileWidth;
+            int maxLevels = (imageWidth / (2 * tileWidth)) - 1;
             attr.setPyramidInfo(maxLevels, false, SeRaster.SE_INTERPOLATION_BILINEAR);
             attr.setMaskMode(false);
             attr.setImportMode(false);
@@ -506,7 +506,7 @@ public class RasterTestData {
 
         loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding, skipLevelOne,
                 interpolationType);
-        
+
         return tableName;
     }
 
@@ -1117,7 +1117,7 @@ public class RasterTestData {
             public byte[] getImgBandData(int imgWidth, int imgHeight, final int bandN,
                     final int numBands) {
                 throw new UnsupportedOperationException(
-                "sampler for pixel type 32BIT_U not yet implemented");
+                        "sampler for pixel type 32BIT_U not yet implemented");
             }
         }
 
