@@ -84,10 +84,10 @@ public class DefaultTemporalGeometricPrimitiveTest {
         assertFalse(temporalGeomericPrimitive2.distance(other).equals(result));
 
         //calcul Distance between Period objects
-        temporalGeomericPrimitive1 = new DefaultPeriod(new DefaultInstant(position1), new DefaultInstant(position2));
-        temporalGeomericPrimitive2 = new DefaultPeriod(new DefaultInstant(position2), i1);
-        result = temporalGeomericPrimitive1.distance(other);
-        assertFalse(temporalGeomericPrimitive2.distance(other).equals(result));
+//        temporalGeomericPrimitive1 = new DefaultPeriod(new DefaultInstant(position1), new DefaultInstant(position2));
+//        temporalGeomericPrimitive2 = new DefaultPeriod(new DefaultInstant(position2), i1);
+//        result = temporalGeomericPrimitive1.distance(other);
+//        assertFalse(temporalGeomericPrimitive2.distance(other).equals(result));
     }
 
     /**
