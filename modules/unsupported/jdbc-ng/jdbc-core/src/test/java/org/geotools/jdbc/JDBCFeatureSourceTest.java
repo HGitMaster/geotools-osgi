@@ -38,6 +38,8 @@ import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.spatial.BBOX;
 
+import com.sun.org.apache.bcel.internal.generic.StoreInstruction;
+
 
 public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
     ContentFeatureSource featureSource;
@@ -256,12 +258,57 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         // check actual iteration
         Iterator<SimpleFeature> it = features.iterator();
         int count = 0;
+        ReferencedEnvelope env = new ReferencedEnvelope(features.getSchema().getCoordinateReferenceSystem());
         while(it.hasNext()) {
-            it.next();
+            SimpleFeature f = it.next();
+            env.expandToInclude(ReferencedEnvelope.reference(f.getBounds()));
             count++;
         }
         assertEquals(2, count);
         features.close(it);
+        
+        assertEquals(env, features.getBounds());
+    }
+    
+    public void testGetFeaturesWithOffset() throws Exception {
+        DefaultQuery q = new DefaultQuery(featureSource.getSchema().getTypeName());
+        q.setSortBy(new SortBy[] {dataStore.getFilterFactory().sort(aname("intProperty"), SortOrder.ASCENDING)});
+        q.setStartIndex(2);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures(q);
+        
+        // check size
+        assertEquals(1, features.size());
+        
+        // check actual iteration
+        Iterator<SimpleFeature> it = features.iterator();
+        assertTrue(it.hasNext());
+        SimpleFeature f = it.next();
+        ReferencedEnvelope fe = ReferencedEnvelope.reference(f.getBounds());
+        assertEquals(2, f.getAttribute(aname("intProperty")));
+        assertFalse(it.hasNext());
+        features.close(it);
+        assertEquals(fe, features.getBounds());
+    }
+    
+    public void testGetFeaturesWithOffsetLimit() throws Exception {
+        DefaultQuery q = new DefaultQuery(featureSource.getSchema().getTypeName());
+        // no sorting, let's see if the database can use native one
+        q.setStartIndex(1);
+        q.setMaxFeatures(1);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures(q);
+        
+        // check size
+        assertEquals(1, features.size());
+        
+        // check actual iteration
+        Iterator<SimpleFeature> it = features.iterator();
+        assertTrue(it.hasNext());
+        SimpleFeature f = it.next();
+        ReferencedEnvelope fe = ReferencedEnvelope.reference(f.getBounds());
+        assertEquals(1, f.getAttribute(aname("intProperty")));
+        assertFalse(it.hasNext());
+        features.close(it);
+        assertEquals(fe, features.getBounds());
     }
     
     /**

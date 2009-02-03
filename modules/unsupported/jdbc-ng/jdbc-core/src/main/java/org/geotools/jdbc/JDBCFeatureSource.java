@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
@@ -358,10 +359,15 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                 Connection cx = dataStore.getConnection(getState());
                 try {
                     int count = dataStore.getCount(getSchema(), preFilter, cx);
+                    if(query.getStartIndex() != null && query.getStartIndex() > 0) {
+                        if(query.getStartIndex() > count)
+                            count = 0;
+                        else
+                            count -= query.getStartIndex();
+                    }
                     if(query.getMaxFeatures() > 0 && count > query.getMaxFeatures())
-                        return query.getMaxFeatures();
-                    else
-                        return count;
+                        count = query.getMaxFeatures();
+                    return count;
                 }
                 finally {
                     dataStore.releaseConnection(cx, getState());
@@ -380,7 +386,10 @@ public class JDBCFeatureSource extends ContentFeatureSource {
         Filter postFilter = split[1];
         
         try {
-            if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
+            
+            if ((postFilter != null) && (postFilter != Filter.INCLUDE) 
+                    || (query.getMaxFeatures() < Integer.MAX_VALUE && !canLimit())
+                    || (query.getStartIndex() != null && query.getStartIndex() > 0 && !canOffset())) {
                 //calculate manually, don't use datastore optimization
                 getDataStore().getLogger().fine("Calculating bounds manually");
 
@@ -389,7 +398,9 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                 ReferencedEnvelope bounds = new ReferencedEnvelope(flatCRS);
 
                 // grab a reader
-                FeatureReader<SimpleFeatureType, SimpleFeature> i = getReader(postFilter);
+                DefaultQuery q = new DefaultQuery(query);
+                q.setFilter(postFilter);
+                FeatureReader<SimpleFeatureType, SimpleFeature> i = getReader(q);
                 try {
                     if (i.hasNext()) {
                         SimpleFeature f = (SimpleFeature) i.next();

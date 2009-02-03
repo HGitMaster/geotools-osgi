@@ -22,7 +22,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.geotools.data.DataUtilities;
@@ -40,7 +39,6 @@ import org.geotools.data.Transaction;
 import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.visitor.PropertyNameResolvingVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -48,9 +46,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
-import org.opengis.referencing.FactoryException;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.OperationNotFoundException;
 
 
 /**
@@ -496,7 +493,19 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
         query = joinQuery( query );
         query = resolvePropertyNames(query);
         
-         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReaderInternal( query );
+        // see if we need to enable native sorting in order to support stable paging
+        final int offset = query.getStartIndex() != null ? query.getStartIndex() : 0;
+        if(offset > 0 & query.getSortBy() == null) {
+            if(!getQueryCapabilities().supportsSorting(query.getSortBy()))
+                throw new IOException("Feature source does not support this sorting " +
+                        "so there is no way a stable paging (offset/limit) can be performed");
+            
+            DefaultQuery dq = new DefaultQuery(query);
+            dq.setSortBy(new SortBy[] {SortBy.NATURAL_ORDER});
+            query = dq;
+        }
+        
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReaderInternal( query );
         
         //
         //apply wrappers based on subclass capabilities
@@ -522,7 +531,15 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
             }    
         }
         
-        //max feature limit
+        // offset
+        if( !canOffset() && offset > 0 ) {
+            // skip the first n records
+            for(int i = 0; i < offset && reader.hasNext(); i++) {
+                reader.next();
+            }
+        }
+        
+        // max feature limit
         if ( !canLimit() ) {
             if (query.getMaxFeatures() != -1 && query.getMaxFeatures() < Integer.MAX_VALUE ) {
                 reader = new MaxFeatureReader<SimpleFeatureType, SimpleFeature>(reader, query.getMaxFeatures());
@@ -608,9 +625,27 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      * feature reader created by the subclass to be wrapped in a max feature capping 
      * decorator when the query specifies a max feature cap. 
      * </p>
-     * TODO: link to decorating feature reader
+     * @see MaxFeatureReader
      */
     protected boolean canLimit() {
+        return false;
+    }
+    
+    /**
+     * Determines if the datastore can natively skip the first <code>offset</code> number of features 
+     * returned in a query.
+     * <p>
+     * If the subclass can handle a map feature cap natively then it should override
+     * this method to return <code>true</code>. In this case it <b>must</b> do 
+     * the cap or throw an exception. 
+     * </p>
+     * <p>
+     * Not overriding this method or returning <code>false</code> will case the
+     * feature reader created by the subclass to be be accesset offset times before
+     * being returned to the caller. 
+     * </p>
+     */
+    protected boolean canOffset() {
         return false;
     }
     

@@ -13,7 +13,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Gabriel Roldan (TOPP)
  * @author Andrea Aime (OpenGeo)
- * @version $Id: JDBCQueryCapabilities.java 32370 2009-01-29 11:23:52Z aaime $
+ * @version $Id: JDBCQueryCapabilities.java 32391 2009-02-03 10:12:01Z aaime $
  * @since 2.5.4
  */
 class JDBCQueryCapabilities extends QueryCapabilities {
@@ -77,4 +77,6 @@ class JDBCQueryCapabilities extends QueryCapabilities {
     public boolean isReliableFIDSupported() {
         return !(source.getPrimaryKey() instanceof NullPrimaryKey);
     }
+    
+    
 }
