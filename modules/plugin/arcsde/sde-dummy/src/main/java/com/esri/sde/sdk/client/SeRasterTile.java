@@ -10,5 +10,9 @@ public class SeRasterTile {
     public int getNumPixels() { return -1; }
     public int getColumnIndex() { return -1; }
     public int getRowIndex() { return -1; }
+    public int[] getPixels(int[] pixelData)throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

@@ -40,6 +40,7 @@ import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
+import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
@@ -57,20 +58,17 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform1D;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
+import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeQuery;
@@ -82,9 +80,6 @@ import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.esri.sde.sdk.client.SeTable;
 import com.esri.sde.sdk.client.SeTable.SeTableStats;
-import com.esri.sde.sdk.pe.PeFactory;
-import com.esri.sde.sdk.pe.PeProjectedCS;
-import com.esri.sde.sdk.pe.PeProjectionException;
 
 /**
  * An implementation of the ArcSDE Raster Format. Based on the ArcGrid module.
@@ -456,19 +451,33 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             }
         }
 
-        String[] rasterColumns;
-        List<RasterBandInfo> bands;
-        CoordinateReferenceSystem coverageCrs;
-        GeneralEnvelope originalEnvelope;
-        ArcSDEPyramid pyramidInfo;
-        BufferedImage sampleImage;
-        List<GridSampleDimension> gridSampleDimensions;
+        final String[] rasterColumns;
+        final List<RasterBandInfo> bands;
+        final CoordinateReferenceSystem coverageCrs;
+        final GeneralEnvelope originalEnvelope;
+        final ArcSDEPyramid pyramidInfo;
+        final BufferedImage sampleImage;
+        final List<GridSampleDimension> gridSampleDimensions;
+        final ArcSDERasterReader imageIOReader;
 
         rasterColumns = getRasterColumns(scon, rasterTable);
         final SeRasterAttr rasterAttributes = getSeRasterAttr(scon, rasterTable, rasterColumns);
-
-        coverageCrs = calculateCoordinateReferenceSystem(scon, rasterAttributes);
-
+        final RasterCellType cellType;
+        try {
+            cellType = RasterCellType.valueOf(rasterAttributes.getPixelType());
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
+        }
+        {
+            SeRasterColumn rCol;
+            try {
+                rCol = new SeRasterColumn(scon, rasterAttributes.getRasterColumnId());
+            } catch (SeException e) {
+                throw new ArcSdeException(e);
+            }
+            SeCoordinateReference seCoordRef = rCol.getCoordRef();
+            coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
+        }
         pyramidInfo = new ArcSDEPyramid(rasterAttributes, coverageCrs);
 
         if (levelZeroPRP != null) {
@@ -476,14 +485,19 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             int tileHeight = pyramidInfo.getTileHeight();
             levelZeroPRP = new Point(levelZeroPRP.x * tileWidth, levelZeroPRP.y * tileHeight);
         }
-        sampleImage = ArcSDERasterReader.createCompatibleBufferedImage(1, 1, rasterAttributes);
 
         bands = setUpBandInfo(scon, rasterTable, rasterAttributes);
+
+        sampleImage = RasterUtils.createCompatibleBufferedImage(1, 1, bands.size(), cellType, bands
+                .get(0).getColorMap());
+
         gridSampleDimensions = buildGridSampleDimensions(scon, rasterTable, rasterAttributes);
 
         originalEnvelope = calculateOriginalEnvelope(rasterAttributes, coverageCrs);
 
         GeneralGridRange originalGridRange = calculateOriginalGridRange(pyramidInfo);
+
+        imageIOReader = createImageIOReader(rasterTable, rasterColumns, pyramidInfo, sampleImage);
 
         RasterInfo rasterInfo = new RasterInfo();
         try {
@@ -502,8 +516,31 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         rasterInfo.setCoverageCrs(coverageCrs);
         rasterInfo.setOriginalEnvelope(originalEnvelope);
         rasterInfo.setOriginalGridRange(originalGridRange);
+        rasterInfo.setImageIOReader(imageIOReader);
 
         return rasterInfo;
+    }
+
+    private ArcSDERasterReader createImageIOReader(final String rasterTable,
+            final String[] rasterColumns, final ArcSDEPyramid pyramidInfo,
+            final BufferedImage sampleImage) throws IOException {
+
+        Map<String, Object> readerMap = new HashMap<String, Object>();
+        readerMap.put(ArcSDERasterReaderSpi.PYRAMID, pyramidInfo);
+        readerMap.put(ArcSDERasterReaderSpi.RASTER_TABLE, rasterTable);
+        readerMap.put(ArcSDERasterReaderSpi.RASTER_COLUMN, rasterColumns[0]);
+        readerMap.put(ArcSDERasterReaderSpi.SAMPLE_IMAGE, sampleImage);
+
+        ArcSDERasterReader imageIOReader;
+        try {
+            ArcSDERasterReaderSpi arcSDERasterReaderSpi = new ArcSDERasterReaderSpi();
+            imageIOReader = arcSDERasterReaderSpi.createReaderInstance(readerMap);
+        } catch (IOException ioe) {
+            LOGGER.log(Level.SEVERE,
+                    "Error creating ImageIOReader in ArcSDERasterGridCoverage2DReader", ioe);
+            throw ioe;
+        }
+        return imageIOReader;
     }
 
     private GeneralGridRange calculateOriginalGridRange(ArcSDEPyramid pyramidInfo) {
@@ -611,7 +648,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                         try {
                             // let the server limit the number of values (from the giomgr.defs
                             // config file)
-                            final int maxDistinctValues = 10000;
+                            final int maxDistinctValues = 0;
                             // which stats to calculate
                             final int mask = SeTableStats.SE_ALL_STATS;// SeTableStats.SE_MIN_STATS
                             // |
@@ -633,7 +670,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                         final NumberRange<Float> sampleValueRange;
                         sampleValueRange = NumberRange.create(minimum, maximum);
                         final Color minColor = Color.BLACK;
-                        final Color maxColor = Color.WHITE;
+                        final Color maxColor = Color.RED;
                         final Color[] colorRange = { minColor, maxColor };
                         final MathTransform1D sampleToGeophysics = identity;
                         floatBandCategory = new Category(bandName, colorRange, sampleValueRange,
@@ -659,13 +696,31 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                                 new Category[] { cmCat }, null).geophysics(true));
 
                     } else if (pixelType == TYPE_8BIT_S || pixelType == TYPE_8BIT_U) {
-                        LOGGER.warning("Discovered 8-bit single-band raster.  "
+                        LOGGER.fine("Discovered 8-bit single-band raster.  "
                                 + "Using return image type: TYPE_BYTE_GRAY");
+                        // TODO: I guess if its TYPE_8BIT_S the range shouldn't be 0-255
                         NumberRange<Integer> sampleValueRange = NumberRange.create(0, 255);
                         Category greyscaleBandCat = new Category(coverageName
                                 + ": Band One (grayscale)",
                                 new Color[] { Color.BLACK, Color.WHITE }, sampleValueRange,
                                 identity);
+                        gridBands.add(new GridSampleDimension(greyscaleBandCat.getName(),
+                                new Category[] { greyscaleBandCat }, null).geophysics(true));
+                    } else if (pixelType == RasterCellType.TYPE_16BIT_U) {
+                        final int minimum = 0;
+                        final int maximum = 65535;
+                        NumberRange<Integer> sampleValueRange = NumberRange
+                                .create(minimum, maximum);
+                        Category greyscaleBandCat = new Category("Band 1", new Color[] {
+                                Color.BLACK, Color.WHITE }, sampleValueRange, identity);
+                        gridBands.add(new GridSampleDimension(greyscaleBandCat.getName(),
+                                new Category[] { greyscaleBandCat }, null).geophysics(true));
+                    } else if (pixelType == RasterCellType.TYPE_16BIT_S) {
+                        final short minimum = Short.MIN_VALUE;
+                        final short maximum = Short.MAX_VALUE;
+                        NumberRange<Short> sampleValueRange = NumberRange.create(minimum, maximum);
+                        Category greyscaleBandCat = new Category("Band 1", new Color[] {
+                                Color.BLACK, Color.WHITE }, sampleValueRange, identity);
                         gridBands.add(new GridSampleDimension(greyscaleBandCat.getName(),
                                 new Category[] { greyscaleBandCat }, null).geophysics(true));
                     } else {
@@ -760,59 +815,6 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             detachedBandInfo.add(bandInfo);
         }
         return detachedBandInfo;
-    }
-
-    /**
-     * Gets the coordinate system that will be associated to the {@link GridCoverage}. The WGS84
-     * coordinate system is used by default.
-     * 
-     * @param rasterAttributes
-     */
-    private CoordinateReferenceSystem calculateCoordinateReferenceSystem(
-            ArcSDEPooledConnection con, SeRasterAttr rasterAttributes) throws DataSourceException {
-
-        try {
-            SeRasterColumn rCol = new SeRasterColumn(con, rasterAttributes.getRasterColumnId());
-
-            PeProjectedCS pcs = new PeProjectedCS(rCol.getCoordRef().getProjectionDescription());
-            int epsgCode = -1;
-            int[] projcs = PeFactory.projcsCodelist();
-            for (int i = 0; i < projcs.length; i++) {
-                try {
-                    PeProjectedCS candidate = PeFactory.projcs(projcs[i]);
-                    // in ArcSDE 9.2, if the PeFactory doesn't support a
-                    // projection it claimed
-                    // to support, it returns 'null'. So check for it.
-                    if (candidate != null && candidate.getName().trim().equals(pcs.getName())) {
-                        epsgCode = projcs[i];
-                        break;
-                    }
-                } catch (PeProjectionException pe) {
-                    // Strangely SDE includes codes in the projcsCodeList() that
-                    // it doesn't actually support.
-                    // Catch the exception and skip them here.
-                }
-            }
-
-            CoordinateReferenceSystem crs;
-            if (epsgCode == -1) {
-                LOGGER.warning("Couldn't determine EPSG code for this raster."
-                        + "  Using SDE's WKT-like coordSysDescription() instead.");
-                crs = CRS.parseWKT(rCol.getCoordRef().getCoordSysDescription());
-            } else {
-                crs = CRS.decode("EPSG:" + epsgCode);
-            }
-            return crs;
-        } catch (SeException e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            throw new ArcSdeException(e);
-        } catch (FactoryException e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            throw new DataSourceException(e);
-        } catch (PeProjectionException e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            throw new DataSourceException(e);
-        }
     }
 
 }

@@ -18,7 +18,6 @@
 package org.geotools.arcsde.gce.gcreader;
 
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 
@@ -37,7 +36,6 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
-import org.geotools.test.TestData;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -45,7 +43,7 @@ import org.junit.Test;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public class FloatGridCoverageReaderTest {
+public class ShortGridCoverageReaderTest {
 
     static RasterTestData rasterTestData;
 
@@ -53,7 +51,7 @@ public class FloatGridCoverageReaderTest {
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
-        rasterTestData.loadFloatRaster();
+        rasterTestData.loadShortRaster();
     }
 
     @AfterClass
@@ -62,25 +60,21 @@ public class FloatGridCoverageReaderTest {
     }
 
     @Test
-    public void testReadFloatRaster() throws Exception {
-        final String floatUrl = rasterTestData.createCoverageUrl(RasterCellType.TYPE_32BIT_REAL, 1);
+    public void testReadShortRaster_SingleBand_No_CM() throws Exception {
+        final String connectionUrl = rasterTestData.createCoverageUrl(RasterCellType.TYPE_16BIT_S, 1);
 
         ArcSDERasterFormat format = new ArcSDERasterFormatFactory().createFormat();
-        // a fix
-
-        // SeExtent imgExtent = new SeExtent(245900, 899600, 246300, 900000);
-        // SeCoordinateReference crs =
-        // getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
 
         CoordinateReferenceSystem crs = CRS.decode("EPSG:2805");
 
-        GridGeometry2D gg2d = new GridGeometry2D(new GeneralGridRange(new Rectangle(201, 201)),
-                new ReferencedEnvelope(245900, 246300, 899600, 900000, crs));
+        GeneralGridRange querySize = new GeneralGridRange(new Rectangle(256, 256));
+        ReferencedEnvelope queryEnvelope = new ReferencedEnvelope(0, 512, 0, 512, crs);
+        GridGeometry2D queryGeom = new GridGeometry2D(querySize, queryEnvelope);
 
         GeneralParameterValue[] requestParams = new Parameter[1];
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, gg2d);
+        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, queryGeom);
 
-        AbstractGridCoverage2DReader reader = format.getReader(floatUrl);
+        AbstractGridCoverage2DReader reader = format.getReader(connectionUrl);
 
         Assert.assertNotNull(reader);
 
@@ -89,16 +83,8 @@ public class FloatGridCoverageReaderTest {
         Assert.assertNotNull(coverage);
 
         RenderedImage actualImage = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
-        ImageIO.write(actualImage, "TIFF", new File("/tmp/testReadFloatRaster.tiff"));
-
-        final String sampleFileName = rasterTestData
-                .getRasterTestDataProperty("sampledata.floatraster");
-        BufferedImage expected = ImageIO.read(TestData.file(null, sampleFileName));
-
-        ImageIO.write(expected, "TIFF", new File("/tmp/testReadFloatRaster-original.tiff"));
-
-        Assert.assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
-                actualImage, expected));
+        ImageIO.write(actualImage, "TIFF", new File(
+                "/tmp/testReadShortRaster_SingleBand_No_CM.tiff"));
 
     }
 }

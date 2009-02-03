@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -54,23 +53,23 @@ public class OneBitBandReaderTest {
     static HashMap<String, Object> readerProps;
 
     static Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
+    
+    static String tableName;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
-        rasterTestData.load1bitRaster();
+        tableName = rasterTestData.load1bitRaster();
 
         ArcSDEPooledConnection conn = null;
         SeQuery q = null;
         ArcSDEPyramid pyramid;
         SeRow r;
-        String tableName;
         try {
 
             // Set up a pyramid and readerprops for the sample three-band imagery
             conn = rasterTestData.getConnectionPool().getConnection();
-            tableName = rasterTestData.getRasterTableName(RasterTableName.ONEBIT);
             q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();

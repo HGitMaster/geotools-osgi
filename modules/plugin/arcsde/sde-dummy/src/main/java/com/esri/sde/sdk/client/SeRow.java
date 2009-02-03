@@ -23,7 +23,7 @@ public class SeRow {
 	public void setShape(int i, SeShape s) {}
 	public void setRaster(int i, SeRasterAttr a) {}
 	public SeRasterAttr getRaster(int i) { return null; }
-	public SeRasterTile getRasterTile() { return null; }
+	public SeRasterTile getRasterTile() throws SeException { return null; }
 	public short getNumColumns() { return -1; }
 	public int getIndicator(int i) { return -1; }
     public Integer getInteger(int i) throws SeException {return null;}

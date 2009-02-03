@@ -28,7 +28,6 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -50,17 +49,17 @@ public class ThreeByteBandRGBReaderTest {
 
     static Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
+    private static String tableName;
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
-        rasterTestData.loadRGBRaster();
+        tableName = rasterTestData.loadRGBRaster();
 
         ArcSDEPyramid pyramid;
-        String tableName;
         ArcSDEPooledConnection conn = null;
         try {
-            tableName = rasterTestData.getRasterTableName(RasterTableName.RGB);
             SeRasterAttr rattr = rasterTestData.getRasterAttributes(tableName, new Rectangle(0, 0,
                     0, 0), 0, new int[] { 1, 2, 3 });
 
@@ -104,8 +103,7 @@ public class ThreeByteBandRGBReaderTest {
         try {
             conn = rasterTestData.getConnectionPool().getConnection();
 
-            SeRasterAttr rattr = rasterTestData.getRasterAttributes(rasterTestData
-                    .getRasterTableName(RasterTableName.RGB), new Rectangle(0, 0, 0, 0), 0,
+            SeRasterAttr rattr = rasterTestData.getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0,
                     new int[] { 1, 2, 3 });
 
             SeRasterBand[] bands = rattr.getBands();
@@ -173,8 +171,7 @@ public class ThreeByteBandRGBReaderTest {
         try {
             conn = rasterTestData.getConnectionPool().getConnection();
 
-            SeRasterAttr rattr = rasterTestData.getRasterAttributes(rasterTestData
-                    .getRasterTableName(RasterTableName.RGB), new Rectangle(0, 0, 0, 0), 0,
+            SeRasterAttr rattr = rasterTestData.getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0,
                     new int[] { 1, 2, 3 });
 
             SeRasterBand[] bands = rattr.getBands();
@@ -235,8 +232,7 @@ public class ThreeByteBandRGBReaderTest {
         ArcSDEPooledConnection conn = null;
         try {
             conn = rasterTestData.getConnectionPool().getConnection();
-            SeRasterAttr rattr = rasterTestData.getRasterAttributes(rasterTestData
-                    .getRasterTableName(RasterTableName.RGB), new Rectangle(0, 0, 0, 0), 0,
+            SeRasterAttr rattr = rasterTestData.getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0,
                     new int[] { 1, 2, 3 });
             ArcSDEPyramid p = new ArcSDEPyramid(rattr, CRS.decode("EPSG:4326"));
 

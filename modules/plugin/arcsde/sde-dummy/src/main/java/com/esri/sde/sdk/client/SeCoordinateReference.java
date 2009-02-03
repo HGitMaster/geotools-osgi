@@ -15,4 +15,8 @@ public class SeCoordinateReference {
 	public void setXY(int i, int j, int k){}
 	public void setXYByEnvelope(SeExtent s) {}
     public void setPrecision(int precision){}
+    public void setCoordSysByID(SeObjectId seObjectId) {
+        // TODO Auto-generated method stub
+        
+    }
 }

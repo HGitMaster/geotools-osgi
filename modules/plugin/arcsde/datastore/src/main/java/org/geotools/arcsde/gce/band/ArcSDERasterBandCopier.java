@@ -41,6 +41,12 @@ public abstract class ArcSDERasterBandCopier {
         case TYPE_32BIT_REAL:
             ret = new FloatBandCopier();
             break;
+        case TYPE_16BIT_U:
+            ret = new UnsignedShortBandCopier();
+            break;
+        case TYPE_16BIT_S:
+            ret = new ShortBandCopier();
+            break;
         default:
             throw new IllegalArgumentException(
                     "Don't know how to create ArcSDE band reader for pixel type " + pixelType);
@@ -67,16 +73,4 @@ public abstract class ArcSDERasterBandCopier {
     public abstract void copyPixelData(SeRasterTile tile, WritableRaster raster, int copyOffX,
             int copyOffY, int targetBand) throws DataSourceException;
 
-    protected Object createTransferObject(int transferType, int numPixels) {
-        if (transferType == DataBuffer.TYPE_BYTE) {
-            return new byte[numPixels];
-        } else if (transferType == DataBuffer.TYPE_INT) {
-            return new int[numPixels];
-        } else {
-            throw new IllegalArgumentException(
-                    "Can't transfer ArcSDE Raster data to a java.awt.Raster with a transferType of "
-                            + transferType);
-        }
-
-    }
 }

@@ -25,7 +25,6 @@ import java.awt.Rectangle;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid.RasterQueryInfo;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -55,7 +54,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
- * @version $Id: ArcSDEPyramidTest.java 32322 2009-01-24 20:11:52Z groldan $
+ * @version $Id: ArcSDEPyramidTest.java 32400 2009-02-03 16:35:03Z groldan $
  */
 public class ArcSDEPyramidTest {
 
@@ -108,9 +107,8 @@ public class ArcSDEPyramidTest {
      */
     @Test
     public void testArcSDEPyramidThreeBand() throws Exception {
-
-        testData.loadRGBRaster();
-        final String tableName = testData.getRasterTableName(RasterTableName.RGB);
+        
+        final String tableName = testData.loadRGBRaster();
         SeConnection conn = pool.getConnection();
         final SeRasterAttr rAttr;
         try {
@@ -163,12 +161,11 @@ public class ArcSDEPyramidTest {
     @Test
     public void testArcSDEPyramidFourBand() throws Exception {
 
-        testData.loadRGBARaster();
+        final String tableName = testData.loadRGBARaster();
         
         SeConnection conn = pool.getConnection();
         SeRasterAttr rAttr;
         try {
-            String tableName = testData.getRasterTableName(RasterTableName.RGBA);
             SeQuery q = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();

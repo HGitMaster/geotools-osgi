@@ -18,6 +18,8 @@ package org.geotools.arcsde.gce.band;
 
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+import java.io.DataInputStream;
+import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

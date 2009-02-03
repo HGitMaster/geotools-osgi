@@ -25,7 +25,6 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
@@ -50,13 +49,15 @@ public class OneBitBandCopierTest {
 
     static Logger LOGGER;
 
+    static String tableName;
+    
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
         if (rasterTestData == null) {
             rasterTestData = new RasterTestData();
             rasterTestData.setUp();
-            rasterTestData.load1bitRaster();
+            tableName = rasterTestData.load1bitRaster();
         }
     }
 
@@ -67,7 +68,6 @@ public class OneBitBandCopierTest {
 
     @Test
     public void testLiveOneBitAlignedRasterTile() throws Exception {
-        final String tableName = rasterTestData.getRasterTableName(RasterTableName.ONEBIT);
 
         ArcSDEPooledConnection conn = null;
         try {
@@ -120,7 +120,6 @@ public class OneBitBandCopierTest {
 
     @Test
     public void testLiveOneBitUnalignedRasterTile() throws Exception {
-        final String tableName = rasterTestData.getRasterTableName(RasterTableName.ONEBIT);
 
         ArcSDEPooledConnection conn = null;
         try {

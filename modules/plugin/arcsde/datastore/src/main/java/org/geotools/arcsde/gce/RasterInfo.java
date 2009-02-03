@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
+import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.geometry.GeneralEnvelope;
@@ -32,7 +33,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Gabriel Roldan
  */
-class RasterInfo {
+public class RasterInfo {
     /** The name of the raster table we're pulling images from in this reader * */
     private String rasterTable = null;
 
@@ -64,6 +65,12 @@ class RasterInfo {
     private int imageHeight;
 
     /**
+     * Local copy of the javax.imageio.ImageReader subclass for reading from this ArcSDE Raster
+     * Source.
+     */
+    private ArcSDERasterReader imageIOReader;
+
+    /**
      * @param rasterTable
      *            the rasterTable to set
      */
@@ -74,7 +81,7 @@ class RasterInfo {
     /**
      * @return the raster table name
      */
-    String getRasterTable() {
+    public String getRasterTable() {
         return rasterTable;
     }
 
@@ -89,7 +96,7 @@ class RasterInfo {
     /**
      * @return the raster column names
      */
-    String[] getRasterColumns() {
+    public String[] getRasterColumns() {
         return rasterColumns;
     }
 
@@ -104,7 +111,7 @@ class RasterInfo {
     /**
      * @return the pyramidInfo
      */
-    ArcSDEPyramid getPyramidInfo() {
+    public ArcSDEPyramid getPyramidInfo() {
         return pyramidInfo;
     }
 
@@ -147,7 +154,7 @@ class RasterInfo {
     /**
      * @return the sampleImage
      */
-    BufferedImage getSampleImage() {
+    public BufferedImage getSampleImage() {
         return sampleImage;
     }
 
@@ -162,7 +169,7 @@ class RasterInfo {
     /**
      * @return the levelZeroPRP
      */
-    Point getLevelZeroPRP() {
+    public Point getLevelZeroPRP() {
         return levelZeroPRP;
     }
 
@@ -177,7 +184,7 @@ class RasterInfo {
     /**
      * @return the bands
      */
-    List<RasterBandInfo> getBands() {
+    public List<RasterBandInfo> getBands() {
         return bands;
     }
 
@@ -224,6 +231,14 @@ class RasterInfo {
      */
     public GeneralEnvelope getOriginalEnvelope() {
         return originalEnvelope;
+    }
+
+    public ArcSDERasterReader getImageIOReader() {
+        return this.imageIOReader;
+    }
+
+    public void setImageIOReader(ArcSDERasterReader imageIOReader) {
+        this.imageIOReader = imageIOReader;
     }
 
     @Override

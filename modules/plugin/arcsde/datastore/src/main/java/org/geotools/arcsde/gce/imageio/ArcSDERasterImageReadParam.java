@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.imageio.ImageReadParam;
 
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.geometry.GeneralEnvelope;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeRasterBand;
@@ -66,9 +67,23 @@ import com.esri.sde.sdk.client.SeRasterBand;
  */
 public class ArcSDERasterImageReadParam extends ImageReadParam {
 
-    protected ArcSDEPooledConnection connection;
+    private ArcSDEPooledConnection connection;
 
-    protected Map<Integer, Integer> bandMapper;
+    private Map<Integer, Integer> bandMapper;
+
+    private GeneralEnvelope outputImageEnvelope;
+
+    private BufferedImage s;
+
+    private BufferedImage actualDestination;
+
+    public GeneralEnvelope getOutputImageEnvelope() {
+        return outputImageEnvelope;
+    }
+
+    public void setOutputImageEnvelope(GeneralEnvelope outputImageEnvelope) {
+        this.outputImageEnvelope = outputImageEnvelope;
+    }
 
     public Map<Integer, Integer> getBandMapper() {
         return bandMapper;
@@ -84,5 +99,16 @@ public class ArcSDERasterImageReadParam extends ImageReadParam {
 
     public void setConnection(ArcSDEPooledConnection connection) {
         this.connection = connection;
+    }
+
+    /**
+     * @return
+     */
+    public BufferedImage getActualDestination() {
+        return actualDestination;
+    }
+
+    public void setActualDestination(BufferedImage outputImage) {
+        this.actualDestination = outputImage;
     }
 }

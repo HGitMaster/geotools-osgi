@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -63,13 +62,15 @@ public class OneByteBandColorMappedReaderTest {
 
     static Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
+    static String tableName;
+    
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
         // rasterTestData.loadRGBColorMappedRaster();
         try {
-            rasterTestData.load8bitUnsignedColorMappedRaster();
+            tableName = rasterTestData.load8bitUnsignedColorMappedRaster();
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -77,7 +78,7 @@ public class OneByteBandColorMappedReaderTest {
         SeQuery query = null;
         ArcSDEPyramid pyramid;
         SeRow row;
-        final String tableName = rasterTestData.getRasterTableName(RasterTableName.EIGHT_BIT_U_CM);
+
         final ArcSDEPooledConnection conn = rasterTestData.getConnectionPool().getConnection();
         try {
             query = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(tableName));

@@ -19,7 +19,9 @@ package org.geotools.arcsde.gce;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
+import java.awt.image.IndexColorModel;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
@@ -32,13 +34,14 @@ import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeRasterBand;
+import com.esri.sde.sdk.client.SeRasterBand.SeRasterBandColorMap;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * 
  * @author Gabriel Roldan
  */
-class RasterBandInfo {
+public class RasterBandInfo {
 
     private final long bandId;
 
@@ -51,6 +54,8 @@ class RasterBandInfo {
     private final int bandNumber;
 
     private final boolean hasColorMap;
+
+    private final IndexColorModel colorMap;
 
     private final CompressionType compressionType;
 
@@ -78,7 +83,11 @@ class RasterBandInfo {
 
     private final Double tileOrigin;
 
-    private ArcSDERasterBandCopier rasterBandCopier;
+    private final ArcSDERasterBandCopier rasterBandCopier;
+
+    private final double statsMin;
+
+    private final double statsMax;
 
     public RasterBandInfo(SeRasterBand band) throws IOException {
 
@@ -92,6 +101,21 @@ class RasterBandInfo {
         bandHeight = band.getBandHeight();
         bandWidth = band.getBandWidth();
         hasColorMap = band.hasColorMap();
+        if (hasColorMap) {
+            // TODO: hold on on getting the color map until the blocking issue is resolved
+            Logger.getLogger("org.geotools.arcsde.gce").warning(
+                    "Skipping getting the color map for band " + band);
+            colorMap = null;
+            // SeRasterBandColorMap sdeColorMap;
+            // try {
+            // sdeColorMap = band.getColorMap();
+            // } catch (SeException e) {
+            // throw new ArcSdeException("Getting band's color map", e);
+            // }
+            // colorMap = RasterUtils.sdeColorMapToJavaColorModel(sdeColorMap);
+        } else {
+            colorMap = null;
+        }
         compressionType = CompressionType.valueOf(band.getCompressionType());
         SeExtent extent = band.getExtent();
         bandExtent = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(), extent
@@ -102,6 +126,17 @@ class RasterBandInfo {
         maxPyramidLevel = band.getMaxLevel();
         isSkipPyramidLevelOne = band.skipLevelOne();
         hasStats = band.hasStats();
+        if (hasStats) {
+            try {
+                statsMin = band.getStatsMin();
+                statsMax = band.getStatsMax();
+            } catch (SeException e) {
+                throw new ArcSdeException(e);
+            }
+        } else {
+            statsMin = java.lang.Double.NaN;
+            statsMax = java.lang.Double.NaN;
+        }
         tileWidth = band.getTileWidth();
         tileHeight = band.getTileHeight();
         SDEPoint tOrigin;
@@ -196,6 +231,10 @@ class RasterBandInfo {
 
     public Double getTileOrigin() {
         return tileOrigin;
+    }
+
+    public IndexColorModel getColorMap() {
+        return colorMap;
     }
 
     @Override

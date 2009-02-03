@@ -16,32 +16,15 @@
  */
 package org.geotools.arcsde.gce.imageio;
 
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_1BIT;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_REAL;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
-
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.ComponentSampleModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferFloat;
-import java.awt.image.IndexColorModel;
-import java.awt.image.Raster;
-import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
@@ -52,6 +35,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 
+import org.geotools.arcsde.gce.RasterUtils;
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
@@ -60,12 +44,10 @@ import org.geotools.util.logging.Logging;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRasterAttr;
-import com.esri.sde.sdk.client.SeRasterBand;
 import com.esri.sde.sdk.client.SeRasterConstraint;
 import com.esri.sde.sdk.client.SeRasterTile;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
-import com.esri.sde.sdk.client.SeRasterBand.SeRasterBandColorMap;
 
 /**
  * 
@@ -105,30 +87,32 @@ public class ArcSDERasterReader extends ImageReader {
     }
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
-    
-    private final ArcSDEPyramid _rasterPyramid;
 
-    private final Dimension _tileSize;
+    private final ArcSDEPyramid pyramidInfo;
 
-    private final String _rasterTable, _rasterColumn;
+    private final String rasterTable;
 
-    public ArcSDERasterReader(ArcSDERasterReaderSpi parent, ArcSDEPyramid rasterPyramid,
-            String rasterTable, String rasterColumn) {
+    private final String rasterColumn;
+
+    private BufferedImage sampleImage;
+
+    public ArcSDERasterReader(final ArcSDERasterReaderSpi parent, final ArcSDEPyramid pyramidInfo,
+            final String rasterTable, final String rasterColumn, final BufferedImage sampleImage) {
         super(parent);
-        _tileSize = rasterPyramid.getTileDimension();
-        _rasterPyramid = rasterPyramid;
-        _rasterTable = rasterTable;
-        _rasterColumn = rasterColumn;
+        this.pyramidInfo = pyramidInfo;
+        this.rasterTable = rasterTable;
+        this.rasterColumn = rasterColumn;
+        this.sampleImage = sampleImage;
     }
 
     @Override
     public int getHeight(int imageIndex) throws IOException {
-        return _rasterPyramid.getPyramidLevel(imageIndex).size.height;
+        return pyramidInfo.getPyramidLevel(imageIndex).size.height;
     }
 
     @Override
     public int getWidth(int imageIndex) throws IOException {
-        return _rasterPyramid.getPyramidLevel(imageIndex).size.width;
+        return pyramidInfo.getPyramidLevel(imageIndex).size.width;
     }
 
     @Override
@@ -138,7 +122,7 @@ public class ArcSDERasterReader extends ImageReader {
 
     @Override
     public int getNumImages(boolean allowSearch) throws IOException {
-        return _rasterPyramid.getNumLevels();
+        return pyramidInfo.getNumLevels();
     }
 
     /**
@@ -153,9 +137,11 @@ public class ArcSDERasterReader extends ImageReader {
      *            This parameter specifies which image pyramid level (if there's more than one) to
      *            read from. If there's only one pyramid level, this value should be 0.
      * @throws IOException
+     * 
+     * @see ImageReader#read(int, ImageReadParam)
      */
     @Override
-    public BufferedImage read(int imageIndex, ImageReadParam param) throws IOException {
+    public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
 
         // we only read from ArcSDERasterImageReadParams.
         if (!(param instanceof ArcSDERasterImageReadParam)) {
@@ -179,13 +165,20 @@ public class ArcSDERasterReader extends ImageReader {
                     "You must provide a hashmap bandmapper to the ArcSDERasterReader via the param.setBandMapper() method");
         }
 
+        return read(imageIndex, sdeirp);
+    }
+
+    private BufferedImage read(final int imageIndex, final ArcSDERasterImageReadParam param)
+            throws IOException {
+
         // start collecting our background information for doing the read.
 
-        // the source region is the actual pixel extent of this particar pyramid
-        // layer
+        // the source region is the actual pixel extent of this particar pyramid layer
         final Rectangle sourceRegion = param.getSourceRegion();
 
-        final ArcSDEPyramidLevel curLevel = _rasterPyramid.getPyramidLevel(imageIndex);
+        final int tileWidth = pyramidInfo.getTileWidth();
+        final int tileHeight = pyramidInfo.getTileHeight();
+        final ArcSDEPyramidLevel curLevel = pyramidInfo.getPyramidLevel(imageIndex);
 
         // if we're reading "off the top" or "off the left" side of the image,
         // then there's some "blank" part of the returned image that we need
@@ -205,33 +198,31 @@ public class ArcSDERasterReader extends ImageReader {
         }
 
         // figure out which tiles exactly, we'll be fetching
-        final int minTileX = sourceRegion.x / _tileSize.width;
-        final int minTileY = sourceRegion.y / _tileSize.height;
+        final int minTileX = sourceRegion.x / tileWidth;
+        final int minTileY = sourceRegion.y / tileHeight;
         if (LOGGER.isLoggable(Level.FINER))
             LOGGER
                     .finer("figured minTiles: " + minTileX + "," + minTileY + ".  Image is "
                             + curLevel.getNumTilesWide() + "x" + curLevel.getNumTilesHigh()
                             + " tiles wxh.");
-        int maxTileX = (sourceRegion.x + sourceRegion.width + _tileSize.width - 1)
-                / _tileSize.width - 1;
-        int maxTileY = (sourceRegion.y + sourceRegion.height + _tileSize.height - 1)
-                / _tileSize.height - 1;
+        int maxTileX = (sourceRegion.x + sourceRegion.width + tileWidth - 1) / tileWidth - 1;
+        int maxTileY = (sourceRegion.y + sourceRegion.height + tileHeight - 1) / tileHeight - 1;
         if (maxTileX >= curLevel.getNumTilesWide())
             maxTileX = curLevel.getNumTilesWide() - 1;
         if (maxTileY >= curLevel.getNumTilesHigh())
             maxTileY = curLevel.getNumTilesHigh() - 1;
 
         // figure out what our offset into the tile grid is
-        final int tilegridOffsetX = sourceRegion.x % _tileSize.width;
-        final int tilegridOffsetY = sourceRegion.y % _tileSize.height;
+        final int tilegridOffsetX = sourceRegion.x % tileWidth;
+        final int tilegridOffsetY = sourceRegion.y % tileHeight;
 
-        if (LOGGER.isLoggable(Level.INFO))
+        if (LOGGER.isLoggable(Level.INFO)) {
             LOGGER.info("Reading " + param.getSourceRegion() + " offset by "
-                    + sdeirp.getDestinationOffset() + " (tiles " + minTileX + "," + minTileY
+                    + param.getDestinationOffset() + " (tiles " + minTileX + "," + minTileY
                     + " to " + maxTileX + "," + maxTileY + " in level " + imageIndex + ")");
-
+        }
         // Now we do the actual reading from SDE.
-        ArcSDEPooledConnection scon = sdeirp.getConnection();
+        ArcSDEPooledConnection scon = param.getConnection();
         SeQuery query = null;
         BufferedImage destination;
 
@@ -240,8 +231,8 @@ public class ArcSDERasterReader extends ImageReader {
             // one gets SDE Raster output. First, query the
             // database for the single row in the raster business table.
             // FIXME: Raster catalogs need to specify what their row number is.
-            query = new SeQuery(scon, new String[] { _rasterColumn }, new SeSqlConstruct(
-                    _rasterTable));
+            query = new SeQuery(scon, new String[] { rasterColumn },
+                    new SeSqlConstruct(rasterTable));
             query.prepareQuery();
             query.execute();
             // Next, fetch the single row back.
@@ -252,7 +243,7 @@ public class ArcSDERasterReader extends ImageReader {
             SeRasterConstraint rConstraint = new SeRasterConstraint();
             rConstraint.setEnvelope(minTileX, minTileY, maxTileX, maxTileY);
             rConstraint.setLevel(imageIndex);
-            rConstraint.setBands(sdeirp.getSourceBands());
+            rConstraint.setBands(param.getSourceBands());
 
             // Finally, execute the raster query aganist the already-opened
             // SeQuery object which already has an SeRow fetched against it.
@@ -268,10 +259,8 @@ public class ArcSDERasterReader extends ImageReader {
             if (destination == null) {
                 final int imageWidth = intoDestinationImageOffset.x + sourceRegion.width;
                 final int imageHeight = intoDestinationImageOffset.y + sourceRegion.height;
-
-                // destination = new BufferedImage(imageWidth, imageHeight,
-                // BufferedImage.TYPE_INT_ARGB);
-                destination = createCompatibleBufferedImage(imageWidth, imageHeight, rattr);
+                destination = RasterUtils.createInitialBufferedImage(sampleImage, imageWidth,
+                        imageHeight);
             } else if (!(intoDestinationImageOffset.x == 0 && intoDestinationImageOffset.y == 0)) {
                 int destWidth = sourceRegion.width, destHeight = sourceRegion.height;
                 if (intoDestinationImageOffset.x + sourceRegion.width > destination.getWidth())
@@ -305,11 +294,11 @@ public class ArcSDERasterReader extends ImageReader {
             // Copying from an ArcSDE Raster to the specified image format, we
             // can optionally have a band mapper which specifies which data band
             // goes to which image band.
-            Map<Integer, Integer> bandMapper = sdeirp.getBandMapper();
+            Map<Integer, Integer> bandMapper = param.getBandMapper();
 
             // And we need to create a bandcopier for this raster type.
             final ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(pixelType,
-                    _tileSize.width, _tileSize.height);
+                    tileWidth, tileHeight);
 
             // Now, magically, calls to r.getRasterTile() will fetch our list
             // of tiles.
@@ -345,20 +334,19 @@ public class ArcSDERasterReader extends ImageReader {
                 if (curTileX == 0) {
                     destImageOffsetX = 0;
                 } else {
-                    destImageOffsetX = (_tileSize.width - tilegridOffsetX)
-                            + ((curTileX - 1) * _tileSize.width);
+                    destImageOffsetX = (tileWidth - tilegridOffsetX) + ((curTileX - 1) * tileWidth);
                 }
 
                 final int curTileY = curTile.getRowIndex() - minTileY;
                 if (curTileY == 0) {
                     destImageOffsetY = 0;
                 } else {
-                    destImageOffsetY = (_tileSize.height - tilegridOffsetY)
-                            + ((curTileY - 1) * _tileSize.height);
+                    destImageOffsetY = (tileHeight - tilegridOffsetY)
+                            + ((curTileY - 1) * tileHeight);
                 }
 
                 if (curTile.getColumnIndex() == maxTileX
-                        && (destImageOffsetX + _tileSize.width > destination.getWidth())) {
+                        && (destImageOffsetX + tileWidth > destination.getWidth())) {
                     // if we're in the final tile, and the image doesn't cover the whole tile,
                     // be sure to grab just the bit of the image that DOES grab the tile...so
                     // that the bufferedImage.getSubimage() call below isn't asked for too "much"
@@ -368,32 +356,32 @@ public class ArcSDERasterReader extends ImageReader {
                     // if we're at the beginning of a row or column, we don't
                     // need to grab the entire sub-image. We need to grab
                     // just the bit that overlaps the current tile.
-                    destImageTileWidth = (_tileSize.width - curTileOffsetX);
+                    destImageTileWidth = (tileWidth - curTileOffsetX);
                 } else {
-                    destImageTileWidth = _tileSize.width;
+                    destImageTileWidth = tileWidth;
                 }
 
                 if (curTile.getColumnIndex() == curLevel.getNumTilesWide() - 1) {
                     // it's possible we don't actually want to read the whole tile, if the tile
                     // has "padding" on the edge
-                    if (curLevel.getSize().getWidth() % _tileSize.width != 0)
+                    if (curLevel.getSize().getWidth() % tileWidth != 0)
                         destImageTileWidth = Math.min(destImageTileWidth,
-                                (curLevel.getSize().width % _tileSize.width) - curTileOffsetX);
+                                (curLevel.getSize().width % tileWidth) - curTileOffsetX);
                 }
 
                 if (curTile.getRowIndex() == maxTileY
-                        && (destImageOffsetY + _tileSize.height > destination.getHeight())) {
+                        && (destImageOffsetY + tileHeight > destination.getHeight())) {
                     destImageTileHeight = destination.getHeight() - destImageOffsetY;
                 } else if (curTileY == 0) {
-                    destImageTileHeight = (_tileSize.height - curTileOffsetY);
+                    destImageTileHeight = (tileHeight - curTileOffsetY);
                 } else {
-                    destImageTileHeight = _tileSize.height;
+                    destImageTileHeight = tileHeight;
                 }
 
                 if (curTile.getRowIndex() == curLevel.getNumTilesHigh() - 1) {
-                    if (curLevel.getSize().getHeight() % _tileSize.height != 0)
+                    if (curLevel.getSize().getHeight() % tileHeight != 0)
                         destImageTileHeight = Math.min(destImageTileHeight,
-                                (curLevel.getSize().height % _tileSize.height) - curTileOffsetY);
+                                (curLevel.getSize().height % tileHeight) - curTileOffsetY);
                 }
 
                 // LOGGER.info("creating subtile at " + new
@@ -489,106 +477,4 @@ public class ArcSDERasterReader extends ImageReader {
         return null;
     }
 
-    public static IndexColorModel sdeColorMapToJavaColorModel(SeRasterBandColorMap sdeColorMap) {
-
-        IndexColorModel ret = new IndexColorModel(8, 3, new byte[] { 0x0 }, new byte[] { 0x0 },
-                new byte[] { 0x0 });
-        return ret;
-    }
-
-    // public static SeRasterBand
-
-    public static BufferedImage createCompatibleBufferedImage(final int width, final int height,
-            final SeRasterAttr rasterAttributes) throws DataSourceException {
-        try {
-
-            final int numBands = rasterAttributes.getNumBands();
-            final int pixelType = rasterAttributes.getPixelType();
-            final RasterCellType cellType = RasterCellType.valueOf(pixelType);
-
-            if (numBands == 1) {
-                final SeRasterBand band = rasterAttributes.getBands()[0];
-                final boolean hasColorMap = band.hasColorMap();
-                if (cellType == TYPE_1BIT) {
-                    LOGGER.fine("Discovered 1-bit single-band raster. Using return image "
-                            + "type: TYPE_BYTE_BINARY and 1-bit black/white category.");
-                    return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
-                } else if (cellType == TYPE_32BIT_REAL) {
-                    LOGGER.fine("Discovered 32-bit floating point single-band raster. "
-                            + "Returning image with float sample model, and gray colorspace.");
-                    final SampleModel sampleModel;
-                    final DataBuffer dataBuffer;
-                    final WritableRaster raster;
-                    final ColorSpace colorSpace;
-                    final ColorModel colorModel;
-                    final int sampleModelDataType = DataBuffer.TYPE_FLOAT;
-                    {
-                        final int pixelStride = 1;
-                        final int scanlineStride = width;
-                        final int[] bandOffsets = { 0 };
-                        sampleModel = new ComponentSampleModel(sampleModelDataType, width, height,
-                                pixelStride, scanlineStride, bandOffsets);
-                    }
-                    dataBuffer = new DataBufferFloat(width * height);
-                    raster = Raster.createWritableRaster(sampleModel, dataBuffer, null);
-                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-                    colorModel = new ComponentColorModel(colorSpace, false, true,
-                            Transparency.OPAQUE, sampleModelDataType);
-                    final BufferedImage compatibleImage = new BufferedImage(colorModel, raster,
-                            false, null);
-                    return compatibleImage;
-                } else {
-                    final boolean is8Bit = cellType == TYPE_8BIT_U || cellType == TYPE_8BIT_S;
-                    if (is8Bit) {
-                        if (hasColorMap) {
-                            // Hold on adding 8-bit colormapped support until we figure out the
-                            // deadlock inside SeRasterBand.getColorMap()
-                            // if (true) {
-                            // throw new IllegalArgumentException(
-                            // "8-bit colormapped raster layers are not supported");
-                            // }
-                            LOGGER.fine("Discovered 8-bit single-band raster with colormap. "
-                                    + " Using return image type: TYPE_BYTE_INDEX");
-                            SeRasterBandColorMap colorMap = band.getColorMap();
-                            IndexColorModel rcm = sdeColorMapToJavaColorModel(colorMap);
-                            // cache the colormodel
-                            final BufferedImage ret = new BufferedImage(width, height,
-                                    BufferedImage.TYPE_BYTE_INDEXED, rcm);
-                            return ret;
-                        } else {
-                            LOGGER.fine("Discovered 8-bit single-band raster. "
-                                    + " Using return image type: TYPE_BYTE_GRAY");
-                            return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-                        }
-                    } else {
-                        throw new IllegalArgumentException("One-band, "
-                                + "non-colormapped raster layers with type " + pixelType
-                                + " are not supported.");
-                    }
-                }
-
-            } else if (numBands == 3 || numBands == 4) {
-                if (cellType != TYPE_8BIT_U) {
-                    throw new IllegalArgumentException("3 or 4 band rasters are only supported"
-                            + " if they have pixel type 8-bit unsigned pixels.");
-                }
-                LOGGER.fine("Three or four banded non-colormapped raster detected.  Assuming "
-                        + "bands 1,2 and 3 constitue a 3-band RGB image.  Using return "
-                        + "image type: TYPE_INT_ARGB (alpha will be used to support "
-                        + "no-data pixels)");
-                return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            } else {
-                StringBuffer errmsg = new StringBuffer();
-                errmsg.append("ArcSDERasterReader doesn't support ");
-                errmsg.append(numBands);
-                errmsg.append("-banded images of type ");
-                errmsg.append(cellType);
-                throw new IllegalArgumentException(errmsg.toString());
-            }
-
-        } catch (SeException se) {
-            LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
-            throw new DataSourceException(se);
-        }
-    }
 }

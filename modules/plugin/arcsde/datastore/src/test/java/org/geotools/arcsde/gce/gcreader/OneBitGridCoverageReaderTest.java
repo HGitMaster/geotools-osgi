@@ -24,7 +24,6 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -50,12 +49,13 @@ public class OneBitGridCoverageReaderTest {
     static RasterTestData rasterTestData;
 
     static String sderasterurlbase;
+    static String tableName;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
-        rasterTestData.load1bitRaster();
+        tableName = rasterTestData.load1bitRaster();
 
         ArcSDEConnectionConfig config = rasterTestData.getConnectionPool().getConfig();
         sderasterurlbase = "sde://" + config.getUserName() + ":" + config.getUserPassword() + "@"
@@ -71,14 +71,12 @@ public class OneBitGridCoverageReaderTest {
     @Test
     public void testRead1bitCoverageExact() throws Exception {
 
-        final String oneBitTableName = rasterTestData.getRasterTableName(RasterTableName.ONEBIT);
-
         GridCoverage2D gc;
         Format f = new ArcSDERasterFormatFactory().createFormat();
         AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f)
-                .getReader(sderasterurlbase + oneBitTableName);
+                .getReader(sderasterurlbase + tableName);
 
-        SeRasterAttr ras = rasterTestData.getRasterAttributes(oneBitTableName, new Rectangle(0, 0,
+        SeRasterAttr ras = rasterTestData.getRasterAttributes(tableName, new Rectangle(0, 0,
                 0, 0), 0, new int[] { 1 });
         int totalheight = ras.getImageHeightByLevel(0);
         int totalwidth = ras.getImageWidthByLevel(0);
@@ -107,14 +105,12 @@ public class OneBitGridCoverageReaderTest {
     @Test
     public void testRead1bitCoverageReproject() throws Exception {
 
-        final String oneBitTableName = rasterTestData.getRasterTableName(RasterTableName.ONEBIT);
-
         GridCoverage2D gc;
         Format f = new ArcSDERasterFormatFactory().createFormat();
         AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f)
-                .getReader(sderasterurlbase + oneBitTableName);
+                .getReader(sderasterurlbase + tableName);
 
-        SeRasterAttr ras = rasterTestData.getRasterAttributes(oneBitTableName, new Rectangle(0, 0,
+        SeRasterAttr ras = rasterTestData.getRasterAttributes(tableName, new Rectangle(0, 0,
                 0, 0), 0, new int[] { 1 });
         int totalheight = ras.getImageHeightByLevel(0);
         int totalwidth = ras.getImageWidthByLevel(0);

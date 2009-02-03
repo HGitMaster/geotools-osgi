@@ -17,6 +17,8 @@
  */
 package org.geotools.arcsde.gce.band;
 
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_REAL;
+
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
@@ -35,7 +37,7 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
+import org.geotools.arcsde.gce.imageio.InterleaveType;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
@@ -47,7 +49,6 @@ import org.junit.Test;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
-import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterAttr;
 import com.esri.sde.sdk.client.SeRasterConstraint;
 import com.esri.sde.sdk.client.SeRasterTile;
@@ -77,7 +78,7 @@ public class FloatBandCopierTest {
 
     @Test
     public void testReadAlignedFloatTile() throws Exception {
-        final String tableName = rasterTestData.getRasterTableName(RasterTableName.FLOAT);
+        final String tableName = rasterTestData.getRasterTableName(TYPE_32BIT_REAL, 1);
 
         ArcSDEPooledConnection conn = null;
         try {
@@ -95,7 +96,9 @@ public class FloatBandCopierTest {
             rConstraint.setBands(bands);
             rConstraint.setLevel(0);
             rConstraint.setEnvelope(0, 0, 0, 0);
-            rConstraint.setInterleave(SeRaster.SE_RASTER_INTERLEAVE_BSQ);
+            final int interleave = rAttr.getInterleave();
+            System.out.println(InterleaveType.valueOf(interleave));
+            rConstraint.setInterleave(interleave);
 
             q.queryRasterTile(rConstraint);
 

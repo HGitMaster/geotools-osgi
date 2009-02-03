@@ -17,32 +17,43 @@
  */
 package org.geotools.arcsde.gce.band;
 
-import java.util.logging.Logger;
+import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 
-import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.util.logging.Logging;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.geotools.arcsde.gce.RasterUtils;
+import org.geotools.arcsde.gce.imageio.RasterCellType;
+import org.geotools.data.DataSourceException;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class UnsignedByteRGBABandCopierTest {
+public class UnsignedByteRGBABandCopierTest extends AbstractArcsdeBandCopierOnlineTest {
 
-    static RasterTestData rasterTestData;
+    private static final RasterCellType pixelType = RasterCellType.TYPE_8BIT_U;
 
-    static Logger LOGGER;
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
-        if (rasterTestData == null) {
-            rasterTestData = new RasterTestData();
-            rasterTestData.setUp();
-            rasterTestData.loadRGBRaster();
+    @Override
+    protected BufferedImage getTargetImage(final int width, final int height, final int numBands) {
+        BufferedImage compatibleImage;
+        try {
+            compatibleImage = RasterUtils.createCompatibleBufferedImage(width, height, numBands,
+                    pixelType, null);
+        } catch (DataSourceException e) {
+            throw new RuntimeException(e);
         }
+        return compatibleImage;
     }
 
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-        rasterTestData.tearDown();
+    @Test
+    public void testSingleBand() throws Exception {
+        final int numBands = 1;
+        final IndexColorModel colorModel = null;
+        testArcSDEBandCopier(numBands, pixelType, colorModel);
     }
 
+    @Test
+    @Ignore
+    public void testThreeBands() throws Exception {
+        final int numBands = 3;
+        final IndexColorModel colorModel = null;
+        testArcSDEBandCopier(numBands, pixelType, colorModel);
+    }
 }

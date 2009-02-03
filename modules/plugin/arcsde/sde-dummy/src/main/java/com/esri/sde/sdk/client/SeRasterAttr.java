@@ -7,7 +7,7 @@ public class SeRasterAttr {
 	
 	public SeRasterAttr(boolean b) {}
 
-    public int getPixelType() { return -1; }
+    public int getPixelType() throws SeException{ return -1; }
     public int getTileHeight() { return -1; }
     public int getTileWidth() { return -1; }
     public SeRasterBand[] getBands() throws SeException { return null; }
@@ -57,6 +57,26 @@ public class SeRasterAttr {
 
     public int getInterpolation() {
         return 0;
+    }
+
+    public int getBandWidth() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public int getBandHeight() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public int getInterleave() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void setInterleave(boolean b, int se_raster_interleave_bsq) {
+        // TODO Auto-generated method stub
+        
     }
     
 }

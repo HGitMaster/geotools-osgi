@@ -20,7 +20,6 @@ package org.geotools.arcsde.gce;
 import java.awt.Rectangle;
 import java.io.IOException;
 
-import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -29,7 +28,6 @@ import org.junit.Test;
 import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterAttr;
 import com.esri.sde.sdk.client.SeRasterBand;
-import com.esri.sde.sdk.client.SeRasterBand.SeRasterBandColorMap;
 
 public class ArcSDERasterProducerTest {
 
@@ -48,10 +46,9 @@ public class ArcSDERasterProducerTest {
 
     @Test
     public void testCreateRGBColorMappedRaster() throws Exception {
-        testData.loadRGBColorMappedRaster();
+        final String tableName = testData.loadRGBColorMappedRaster();
 
-        SeRasterAttr attr = testData.getRasterAttributes(testData
-                .getRasterTableName(RasterTableName.RGB_CM), new Rectangle(0, 0, 0, 0), 0,
+        SeRasterAttr attr = testData.getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0,
                 new int[] { 1 });
         SeRasterBand[] bands = attr.getBands();
 
@@ -63,10 +60,9 @@ public class ArcSDERasterProducerTest {
 
     @Test
     public void testCreateGrayscaleByteRaster() throws Exception {
-        testData.loadOneByteGrayScaleRaster();
+        final String tableName = testData.loadOneByteGrayScaleRaster();
 
-        SeRasterAttr attr = testData.getRasterAttributes(testData
-                .getRasterTableName(RasterTableName.GRAYSCALE), new Rectangle(0, 0, 0, 0), 0,
+        SeRasterAttr attr = testData.getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0,
                 new int[] { 1 });
         Assert.assertTrue(attr.getPixelType() == SeRaster.SE_PIXEL_TYPE_8BIT_U);
         Assert.assertTrue(attr.getNumBands() == 1);
@@ -76,10 +72,9 @@ public class ArcSDERasterProducerTest {
 
     @Test
     public void testCreateFloatRaster() throws Exception {
-        testData.loadFloatRaster();
+        final String tableName = testData.loadFloatRaster();
 
-        SeRasterAttr attr = testData.getRasterAttributes(testData
-                .getRasterTableName(RasterTableName.FLOAT), new Rectangle(0, 0, 0, 0), 0,
+        SeRasterAttr attr = testData.getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0,
                 new int[] { 1 });
         Assert.assertTrue(attr.getPixelType() == SeRaster.SE_PIXEL_TYPE_32BIT_REAL);
         Assert.assertTrue(attr.getNumBands() == 1);

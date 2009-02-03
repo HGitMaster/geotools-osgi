@@ -40,10 +40,10 @@ public class SeRasterBand {
     public boolean hasStats() {
         return false;
     }
-    public double getStatsMin() {
+    public double getStatsMin() throws SeException{
         return 0;
     }
-    public double getStatsMax() {
+    public double getStatsMax() throws SeException{
         return 0;
     }
     public String getBandName() {

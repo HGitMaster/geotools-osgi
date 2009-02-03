@@ -26,7 +26,6 @@ import javax.imageio.ImageIO;
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
 import org.geotools.arcsde.gce.ArcSDERasterFormat;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterTestData.RasterTableName;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -42,19 +41,19 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opengis.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class RGBGridCoverageReaderTest {
 
     static RasterTestData rasterTestData;
+    private static String tableName;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
-        rasterTestData.loadRGBRaster();
+        tableName = rasterTestData.loadRGBRaster();
     }
 
     @AfterClass
@@ -69,7 +68,7 @@ public class RGBGridCoverageReaderTest {
         String rgbUrl = "sde://" + config.getUserName() + ":" + config.getUserPassword() + "@"
                 + config.getServerName() + ":" + config.getPortNumber() + "/"
                 + config.getDatabaseName() + "#"
-                + rasterTestData.getRasterTableName(RasterTableName.RGB);
+                + tableName;
 
         GridCoverage2D gc;
          ArcSDERasterFormat f = new ArcSDERasterFormatFactory().createFormat();
