@@ -284,7 +284,7 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         assertTrue(it.hasNext());
         SimpleFeature f = it.next();
         ReferencedEnvelope fe = ReferencedEnvelope.reference(f.getBounds());
-        assertEquals(2, f.getAttribute(aname("intProperty")));
+        assertEquals(2, ((Number) f.getAttribute(aname("intProperty"))).intValue());
         assertFalse(it.hasNext());
         features.close(it);
         assertEquals(fe, features.getBounds());
@@ -305,7 +305,7 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         assertTrue(it.hasNext());
         SimpleFeature f = it.next();
         ReferencedEnvelope fe = ReferencedEnvelope.reference(f.getBounds());
-        assertEquals(1, f.getAttribute(aname("intProperty")));
+        assertEquals(1, ((Number) f.getAttribute(aname("intProperty"))).intValue());
         assertFalse(it.hasNext());
         features.close(it);
         assertEquals(fe, features.getBounds());
