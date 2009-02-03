@@ -18,9 +18,11 @@
 package org.geotools.arcsde.gce;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
+import java.awt.image.BandedSampleModel;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
@@ -49,7 +51,9 @@ import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -82,6 +86,16 @@ public class JaiTest {
     }
 
     @Test
+    public void testJai_1bit_1Band() throws Exception {
+        testJai(RasterCellType.TYPE_1BIT, 1);
+    }
+
+    @Test
+    public void testJai_1bit_7Band() throws Exception {
+        testJai(RasterCellType.TYPE_1BIT, 7);
+    }
+
+    @Test
     public void testJai_8bit_U_1Band() throws Exception {
         testJai(RasterCellType.TYPE_8BIT_U, 1);
     }
@@ -97,18 +111,28 @@ public class JaiTest {
     }
 
     @Test
+    public void testJai_8bit_U_7Bands() throws Exception {
+        testJai(RasterCellType.TYPE_8BIT_U, 7);
+    }
+
+    @Test
     public void testJai_16bit_U_1Band() throws Exception {
         testJai(RasterCellType.TYPE_16BIT_U, 1);
     }
 
     @Test
     public void testJai_16bit_U_3Band() throws Exception {
-        testJai(RasterCellType.TYPE_16BIT_U, 1);
+        testJai(RasterCellType.TYPE_16BIT_U, 3);
     }
 
     @Test
     public void testJai_16bit_U_4Band() throws Exception {
         testJai(RasterCellType.TYPE_16BIT_U, 4);
+    }
+
+    @Test
+    public void testJai_16bit_U_7Band() throws Exception {
+        testJai(RasterCellType.TYPE_16BIT_U, 7);
     }
 
     @Test
@@ -126,23 +150,68 @@ public class JaiTest {
         testJai(RasterCellType.TYPE_32BIT_REAL, 3);
     }
 
+    @Test
+    @Ignore
+    public void testJai_4bit_1Band() throws Exception {
+        testJai(RasterCellType.TYPE_4BIT, 1);
+    }
+
+    @Test
+    public void testJai_16bit_S_1Band() throws Exception {
+        testJai(RasterCellType.TYPE_16BIT_S, 1);
+    }
+
+    @Test
+    public void testJai_16bit_S_2Band() throws Exception {
+        testJai(RasterCellType.TYPE_16BIT_S, 2);
+    }
+
+    @Test
+    public void testJai_16bit_S_3Band() throws Exception {
+        testJai(RasterCellType.TYPE_16BIT_S, 3);
+    }
+
     private void testJai(final RasterCellType pixelType, final int numberOfBands) throws Exception {
         final String tableName = testData.getRasterTableName(pixelType, numberOfBands);
         testData.loadTestRaster(tableName, numberOfBands, pixelType, null);
 
         testJai(0, tableName, numberOfBands, pixelType);
+        testJai(1, tableName, numberOfBands, pixelType);
+        testJai(2, tableName, numberOfBands, pixelType);
+        testJai(3, tableName, numberOfBands, pixelType);
+        testJai(4, tableName, numberOfBands, pixelType);
     }
 
-    private void testJai(final int pyramidLevel, String tableName, int numberOfBands,
-            RasterCellType pixelType) throws Exception {
+    @Test
+    public void testJai_RGBSampleImage() throws Exception {
+        final String tableName = testData.loadRGBRaster();
+        testJai(0, tableName, 3, RasterCellType.TYPE_8BIT_U);
+        //testJai(1, tableName, 3, RasterCellType.TYPE_8BIT_U);
+//        testJai(2, tableName, 3, RasterCellType.TYPE_8BIT_U);
+//        testJai(3, tableName, 3, RasterCellType.TYPE_8BIT_U);
+    }
+
+    @Test
+    public void testJai_RGBSampleImage_1Band() throws Exception {
+        final String tableName = testData.loadRGBRaster();
+        testJai(0, tableName, 1, RasterCellType.TYPE_8BIT_U);
+        testJai(1, tableName, 1, RasterCellType.TYPE_8BIT_U);
+        testJai(2, tableName, 1, RasterCellType.TYPE_8BIT_U);
+        testJai(3, tableName, 1, RasterCellType.TYPE_8BIT_U);
+    }
+
+    private void testJai(final int pyramidLevel, final String tableName, final int numberOfBands,
+            final RasterCellType pixelType) throws Exception {
 
         SeConnection conn = testData.getConnectionPool().getConnection();
-        final SeRasterAttr rAttr;
         final SeRow row;
-        final ArcSDEPyramid pyramidInfo;
-        final ArcSDEPyramidLevel level;
 
+        final int tileW, tileH;
+        final Rectangle imageSize;
         try {
+            final ArcSDEPyramid pyramidInfo;
+            final ArcSDEPyramidLevel level;
+            final SeRasterAttr rAttr;
             SeQuery seQuery = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(
                     tableName));
             seQuery.prepareQuery();
@@ -150,21 +219,34 @@ public class JaiTest {
             row = seQuery.fetch();
             rAttr = row.getRaster(0);
 
-            pyramidInfo = new ArcSDEPyramid(rAttr, CRS.decode("EPSG:4326"));
+            CoordinateReferenceSystem crs = CRS.decode("EPSG:4326");
+            pyramidInfo = new ArcSDEPyramid(rAttr, crs);
             level = pyramidInfo.getPyramidLevel(pyramidLevel);
+            tileW = rAttr.getTileWidth();
+            tileH = rAttr.getTileHeight();
 
             SeRasterConstraint rConstraint = new SeRasterConstraint();
             int[] bandsToQuery = new int[numberOfBands];
             for (int bandN = 1; bandN <= numberOfBands; bandN++) {
                 bandsToQuery[bandN - 1] = bandN;
             }
+            // if(numberOfBands == 3){
+            // bandsToQuery = new int[]{1,2,3};
+            // }else{
+            // bandsToQuery = new int[]{1};
+            // }
+
             rConstraint.setBands(bandsToQuery);
             rConstraint.setLevel(pyramidLevel);
 
-            rConstraint.setEnvelope(0, 0, level.getNumTilesWide() - 1, level.getNumTilesHigh() - 1); // which
+            rConstraint.setEnvelope(0, 0, 5, 5);
+            imageSize = new Rectangle(pyramidInfo.getTileWidth() * 6,
+                    pyramidInfo.getTileHeight() * 6);
+            // rConstraint.setEnvelope(0, 0, level.getNumTilesWide() - 1, level.getNumTilesHigh() -
+            // 1); // which
             // tiles
             // ...
-            int interleaveType = SeRaster.SE_RASTER_INTERLEAVE_BSQ;
+            int interleaveType = SeRaster.SE_RASTER_INTERLEAVE_BIP;
             rConstraint.setInterleave(interleaveType);
             seQuery.queryRasterTile(rConstraint);
 
@@ -176,93 +258,82 @@ public class JaiTest {
         final ImageInputStream in;
 
         try {
-            in = new ArcSDETiledImageInputStream(conn, pixelType, rAttr, row);
+            TileReader reader = TileReader.getInstance(conn, pixelType, row, numberOfBands, tileW,
+                    tileH);
+            in = new ArcSDETiledImageInputStream(reader);
         } catch (IOException e) {
             conn.close();
             throw e;
         }
 
         try {
-            int b;
-            int readByteCount = 0;
-            // ByteArrayOutputStream out = new ByteArrayOutputStream();
-            // while ((b = in.readByte()) != -1) {
-            // readByteCount++;
-            // out.write(b);
-            // }
-            // System.out.println(readByteCount);
-            // int expectedCount = numberOfBands * (pixelType.getBitsPerSample() / 8) * tileWidth
-            // * tileHeight;
-            // Assert.assertEquals(expectedCount, readByteCount);
+            // Prepare temporaray colorModel and sample model, needed to build the final
+            // ArcSDEPyramidLevel level;
 
-            // Prepare temporaray colorModel and sample model, needed to build the
             // RawImageInputStream
-            ColorSpace colorSpace = ColorSpace.getInstance(numberOfBands == 1 ? ColorSpace.CS_GRAY
-                    : ColorSpace.CS_sRGB);
-            ColorModel colorModel = new ComponentColorModel(colorSpace, false, false,
-                    Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
-            // SampleModel sampleModel =
-            // colorModel.createCompatibleSampleModel(level.getSize().width,
-            // level.getSize().height);
-
-            // final ImageTypeSpecifier its = new ImageTypeSpecifier(colorModel, sampleModel);
-
             final ImageTypeSpecifier its;
-            // if (numberOfBands == 1) {
-            // boolean isAlphaPremultiplied = false;
-            // its = ImageTypeSpecifier.createGrayscale(pixelType.getBitsPerSample(), pixelType
-            // .getDataBufferType(), pixelType.isSigned(), isAlphaPremultiplied);
-            // } else {
-            // boolean hasAlpha = false;
-            // boolean isAlphaPremultiplied = false;
-            // int[] bankIndices = new int[numberOfBands];
-            // for (int bankIndex = 0; bankIndex <= numberOfBands; bankIndex++) {
-            // bankIndices[bankIndex] = bankIndex;
-            // }
-            // int[] bandOffsets = null;
-            // its = ImageTypeSpecifier.createBanded(colorSpace, bankIndices, bandOffsets,
-            // pixelType.getDataBufferType(), hasAlpha, isAlphaPremultiplied);
-            // }
-            its = RasterUtils.createImageTypeSpec(pixelType, numberOfBands, level.getSize().width,
-                    level.getSize().height);
-            colorModel = its.getColorModel();
-            SampleModel sampleModel = its.getSampleModel();
-            // {
-            // int dataType = DataBuffer.TYPE_BYTE;
-            // int w = level.getSize().width;
-            // int h = level.getSize().height;
-            // int pixelStride = 1;
-            // int scanlineStride = w;
-            // int[] bandOffsets = {0};
-            // sampleModel = new ComponentSampleModel(dataType, w, h, pixelStride, scanlineStride,
-            // bandOffsets);
-            // }
+
+            its = RasterUtils.createImageTypeSpec(pixelType, numberOfBands, imageSize.width,
+                    imageSize.height, tileW, tileH);
+            ColorModel colorModel = its.getColorModel();
+            SampleModel sampleModel;
+            {
+                SampleModel sm = its.getSampleModel();
+                sampleModel = sm.createCompatibleSampleModel(imageSize.width, imageSize.height);
+
+                int[] bankIndices = new int[numberOfBands];
+                int[] bandOffsets = new int[numberOfBands];
+
+                int bandOffset = (tileW * tileH * pixelType.getBitsPerSample()) / 8;
+
+                for (int i = 0; i < numberOfBands; i++) {
+                    bankIndices[i] = i;
+                    bandOffsets[i] = 0;// (i * bandOffset);
+                }
+                sampleModel = new BandedSampleModel(pixelType.getDataBufferType(), imageSize.width,
+                        imageSize.height, tileW, bankIndices, bandOffsets);
+            }
+
             // Finally, build the image input stream
-            final RawImageInputStream raw = new RawImageInputStream(in, its, new long[] { 0 },
-                    new Dimension[] { level.getSize() });
+            // final RawImageInputStream raw = new RawImageInputStream(in, its, new long[] { 0 },
+            // new Dimension[] { level.getSize() });
+
+            final RawImageInputStream raw = new RawImageInputStream(in, sampleModel,
+                    new long[] { 0 }, new Dimension[] { new Dimension(imageSize.width,
+                            imageSize.height) });
 
             // building the final image layout
-            // final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(imageWidth,
-            // imageHeight));
-            final ImageLayout il = new ImageLayout(0, 0, level.getSize().width,
-                    level.getSize().height, level.getXOffset(), level.getYOffset(), pyramidInfo
-                            .getTileWidth(), pyramidInfo.getTileHeight(), sampleModel, colorModel);
+            final ImageLayout imageLayout;
+            {
+                int minX = 0;
+                int minY = 0;
+                int width = imageSize.width;
+                int height = imageSize.height;
+                // case 1:
+                // its = ImageTypeSpecifier.createGrayscale(pixelType.getBitsPerSample(), pixelType
+                // .getDataBufferType(), pixelType.isSigned());
+                // break;
+                // case 3:
+                // ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+                int tileGridXOffset = 0;//level.getXOffset();
+                int tileGridYOffset = 0;//level.getYOffset();
+
+                if (tileGridXOffset != 0 || tileGridYOffset != 0) {
+                    System.out.println("here");
+                }
+                imageLayout = new ImageLayout(minX, minY, width, height, tileGridXOffset,
+                        tileGridYOffset, tileW, tileH, sampleModel, colorModel);
+            }
 
             // First operator: read the image
-            final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, il);
-
-            // if we don't provide an ImageLayout to the JAI ImageRead
-            // operation, it'll try to read the entire raster layer!
-            // It's only a slight abuse of the semantics of the word "tile"
-            // when we tell JAI that it can tile our image at exactly the
-            // size of the section of the raster layer we're looking to render.
-            // final ImageLayout layout = new ImageLayout();
-            // layout.setTileWidth(tileWidth);
-            // layout.setTileHeight(tileHeight);
+            final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, imageLayout);
 
             ParameterBlock pb = new ParameterBlock();
             pb.add(raw);
-            pb.add(new Integer(0));// pyramidLevel
+            /*
+             * image index, always 0 since we're already fetching the required pyramid level
+             */
+            pb.add(Integer.valueOf(0));
             pb.add(Boolean.FALSE);
             pb.add(Boolean.FALSE);
             pb.add(Boolean.FALSE);
@@ -277,13 +348,20 @@ public class JaiTest {
             RenderedOp image = JAI.create("ImageRead", pb, hints);
             Assert.assertNotNull(image);
 
-            File path = new File("/home/groldan/tmp/img/_jai" + pixelType + "-Level_"
-                    + pyramidLevel + "-" + numberOfBands + "-band.tiff");
+            String file = System.getProperty("user.home");
+            file += File.separator + "arcsde_test" + File.separator + "_jai" + pixelType
+                    + "-Level_" + pyramidLevel + "-" + numberOfBands + "-band.tiff";
+            File path = new File(file);
+            path.getParentFile().mkdirs();
+            System.out.println("\n --- Writing to " + file);
             try {
                 ImageIO.write(image, "TIFF", path);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            // Assert.assertEquals(-1, in.read());
+
         } finally {
             in.close();
         }

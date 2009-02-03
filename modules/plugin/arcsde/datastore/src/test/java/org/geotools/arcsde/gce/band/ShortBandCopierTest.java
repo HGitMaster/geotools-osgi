@@ -30,7 +30,9 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 
+import org.geotools.arcsde.gce.RasterUtils;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
+import org.geotools.data.DataSourceException;
 import org.junit.Test;
 
 /**
@@ -38,27 +40,19 @@ import org.junit.Test;
  * @author Gabriel Roldan (OpenGeo)
  */
 public class ShortBandCopierTest extends AbstractArcsdeBandCopierOnlineTest {
+    
+    private static final RasterCellType pixelType = RasterCellType.TYPE_16BIT_S;
 
     @Override
     protected BufferedImage getTargetImage(final int width, final int height, final int numBands) {
-        final BufferedImage fromSdeImage;
-        if (numBands != 1) {
-            throw new IllegalArgumentException("onle single-band images supported");
+        BufferedImage compatibleImage;
+        try {
+            compatibleImage = RasterUtils.createCompatibleBufferedImage(width, height, numBands,
+                    pixelType, null);
+        } catch (DataSourceException e) {
+            throw new RuntimeException(e);
         }
-
-        final int pixelStride = 1;
-        final int scanLineStride = width;
-        final int[] bandOffsets = new int[] { 0 };
-        SampleModel sampleModel = new ComponentSampleModel(DataBuffer.TYPE_SHORT, width, height,
-                pixelStride, scanLineStride, bandOffsets);
-        DataBuffer db = new DataBufferUShort(width * height);
-        WritableRaster wr = Raster.createWritableRaster(sampleModel, db, null);
-        ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-        ColorModel cm = new ComponentColorModel(cs, false, true, Transparency.OPAQUE,
-                DataBuffer.TYPE_SHORT);
-        fromSdeImage = new BufferedImage(cm, wr, false, null);
-
-        return fromSdeImage;
+        return compatibleImage;
     }
 
     @Test

@@ -374,7 +374,7 @@ public class RasterTestData {
             attr.setPixelType(sePixelType);
             attr.setCompressionType(SeRaster.SE_COMPRESSION_NONE);
             // no pyramiding
-            attr.setPyramidInfo(3, false, SeRaster.SE_INTERPOLATION_NEAREST);
+            attr.setPyramidInfo(3, false, SeRaster.SE_INTERPOLATION_BICUBIC);
             attr.setMaskMode(false);
             attr.setImportMode(false);
 
@@ -540,7 +540,7 @@ public class RasterTestData {
             final RasterCellType pixelType, final IndexColorModel colorModel) throws Exception {
         final boolean pyramiding = true;
         final boolean skipLevelOne = false;
-        final int interpolationType = SeRaster.SE_INTERPOLATION_NEAREST;
+        final int interpolationType = SeRaster.SE_INTERPOLATION_BILINEAR;
         loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding, skipLevelOne,
                 interpolationType);
     }
@@ -640,7 +640,7 @@ public class RasterTestData {
                 final int numOfLevels = skipLevelOne ? 3 : 4;
                 attr.setPyramidInfo(numOfLevels, skipLevelOne, interpolationType);
             }
-            attr.setInterleave(true, SeRaster.SE_RASTER_INTERLEAVE_BSQ);
+            attr.setInterleave(true, SeRaster.SE_RASTER_INTERLEAVE_BIP);
             attr.setMaskMode(false);
             attr.setImportMode(false);
 

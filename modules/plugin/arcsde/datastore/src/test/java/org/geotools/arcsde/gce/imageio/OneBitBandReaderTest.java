@@ -20,6 +20,7 @@ package org.geotools.arcsde.gce.imageio;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.gce.RasterTestData;
+import org.geotools.arcsde.gce.RasterUtils;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -86,6 +88,8 @@ public class OneBitBandReaderTest {
             readerProps.put(ArcSDERasterReaderSpi.PYRAMID, pyramid);
             readerProps.put(ArcSDERasterReaderSpi.RASTER_TABLE, tableName);
             readerProps.put(ArcSDERasterReaderSpi.RASTER_COLUMN, "RASTER");
+            BufferedImage sampleImage = RasterUtils.createCompatibleBufferedImage(1, 1, 1, RasterCellType.TYPE_1BIT, null);
+            readerProps.put(ArcSDERasterReaderSpi.SAMPLE_IMAGE, sampleImage);
         } catch (SeException se) {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
             throw se;
@@ -136,8 +140,7 @@ public class OneBitBandReaderTest {
 
             reader.read(0, rParam);
 
-            // ImageIO.write(image, "PNG", new File("/tmp/" +
-            // Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+             ImageIO.write(image, "TIFF", new File("/tmp/testRead1bitImageTileAligned.tiff"));
             final String rasFileName = rasterTestData
                     .getRasterTestDataProperty("sampledata.onebitraster");
 

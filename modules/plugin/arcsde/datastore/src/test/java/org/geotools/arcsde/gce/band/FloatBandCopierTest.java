@@ -61,13 +61,15 @@ public class FloatBandCopierTest {
 
     static Logger LOGGER;
 
+    private static String tableName;
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
         if (rasterTestData == null) {
             rasterTestData = new RasterTestData();
             rasterTestData.setUp();
-            rasterTestData.loadFloatRaster();
+            tableName = rasterTestData.loadFloatRaster();
         }
     }
 
@@ -78,7 +80,6 @@ public class FloatBandCopierTest {
 
     @Test
     public void testReadAlignedFloatTile() throws Exception {
-        final String tableName = rasterTestData.getRasterTableName(TYPE_32BIT_REAL, 1);
 
         ArcSDEPooledConnection conn = null;
         try {

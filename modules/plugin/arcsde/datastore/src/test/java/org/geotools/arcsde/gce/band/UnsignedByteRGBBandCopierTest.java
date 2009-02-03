@@ -57,7 +57,7 @@ public class UnsignedByteRGBBandCopierTest {
         if (rasterTestData == null) {
             rasterTestData = new RasterTestData();
             rasterTestData.setUp();
-            tableName = rasterTestData.load1bitRaster();
+            tableName = rasterTestData.loadRGBRaster();
         }
     }
 
@@ -68,8 +68,6 @@ public class UnsignedByteRGBBandCopierTest {
 
     @Test
     public void testLiveRGBRasterTile() throws Exception {
-
-        rasterTestData.loadRGBRaster();
 
         ArcSDEPooledConnection conn = null;
         try {

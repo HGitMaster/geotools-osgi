@@ -27,6 +27,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
+import java.awt.image.BandedSampleModel;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
@@ -48,6 +49,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageTypeSpecifier;
 import javax.media.jai.ImageLayout;
+import javax.swing.plaf.multi.MultiButtonUI;
 
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterImageReadParam;
@@ -59,6 +61,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
@@ -73,6 +76,7 @@ import com.esri.sde.sdk.pe.PeFactory;
 import com.esri.sde.sdk.pe.PeGeographicCS;
 import com.esri.sde.sdk.pe.PeProjectedCS;
 import com.esri.sde.sdk.pe.PeProjectionException;
+import com.sun.imageio.plugins.common.BogusColorSpace;
 
 /**
  * 
@@ -490,6 +494,38 @@ public class RasterUtils {
         return ret;
     }
 
+    public static ImageTypeSpecifier createImageTypeSpec(final RasterCellType pixelType,
+            final int numberOfBands, final int width, final int height, final int tileW,
+            final int tileH) {
+
+        ImageTypeSpecifier its;
+
+        ColorSpace colorSpace;
+        // if(pixelType == TYPE_1BIT ){
+        // int visibleBand = 0;
+        // int[] ARGB = {0x000000, 0xFFFFFF};
+        // ColorModel cm = ColorUtilities.getIndexColorModel(ARGB, numberOfBands, visibleBand);
+        // colorSpace = cm.getColorSpace();
+        // }else{
+        colorSpace = new BogusColorSpace(numberOfBands);
+        // }
+        int[] bankIndices = new int[numberOfBands];
+        int[] bandOffsets = new int[numberOfBands];
+
+        int bandOffset = (tileW * tileH * pixelType.getBitsPerSample()) / 8;
+
+        for (int i = 0; i < numberOfBands; i++) {
+            bankIndices[i] = i;
+            bandOffsets[i] = (i * bandOffset);
+        }
+        boolean hasAlpha = false;
+        boolean isAlphaPremultiplied = false;
+        its = ImageTypeSpecifier.createBanded(colorSpace, bankIndices, bandOffsets, pixelType
+                .getDataBufferType(), hasAlpha, isAlphaPremultiplied);
+
+        return its;
+    }
+
     /**
      * 
      * @param pixelType
@@ -498,7 +534,7 @@ public class RasterUtils {
      *            visible
      * @return
      */
-    public static ImageTypeSpecifier createImageTypeSpec(final RasterCellType pixelType,
+    public static ImageTypeSpecifier _createImageTypeSpec(final RasterCellType pixelType,
             final int numberOfBands, final int width, final int height) {
 
         final ImageTypeSpecifier its;
@@ -506,41 +542,59 @@ public class RasterUtils {
         ColorModel colorModel;
         SampleModel sampleModel;
 
-        final int[] bandOffsets;
+        int[] bandOffsets;
         final int transferType = pixelType.getDataBufferType();
         {
-            final ColorSpace colorSpace;
-            final boolean isAlphaPremultiplied = false;
-            // final SampleModel sampleModel = colorModel.createCompatibleSampleModel(width,
-            // height);
-            switch (numberOfBands) {
-            case 3:
-                colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-                bandOffsets = new int[] { 0, 1, 2 };
+            switch (pixelType) {
+            case TYPE_1BIT:
+                its = ImageTypeSpecifier
+                        .createFromBufferedImageType(BufferedImage.TYPE_BYTE_BINARY);
+                break;
+            case TYPE_4BIT:
+                its = ImageTypeSpecifier.createGrayscale(4, pixelType.getDataBufferType(),
+                        pixelType.isSigned());
                 break;
             default:
-                colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-                bandOffsets = new int[]{0};
-                break;
-            }
+                final ColorSpace colorSpace;
+                final boolean isAlphaPremultiplied = false;
+                // final SampleModel sampleModel = colorModel.createCompatibleSampleModel(width,
+                // height);
+                switch (numberOfBands) {
+                case 3:
+                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+                    bandOffsets = new int[] { 0, 1, 2 };
+                    break;
+                default:
+                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+                    bandOffsets = new int[] { 0 };
+                    break;
+                }
+                final boolean hasAlpha = false;
+                final int transparencyKey = Transparency.OPAQUE;
+                // if (numBands > 3) {
+                // transparencyKey = TraStridensparency.TRANSLUCENT;
+                // hasAlpha = true;
+                // }
+                colorModel = new ComponentColorModelJAI(colorSpace, hasAlpha, isAlphaPremultiplied,
+                        transparencyKey, transferType);
+                final int pixelStride = 1;
+                final int scanLineStride = width;
 
-            final boolean hasAlpha = false;
-            final int transparencyKey = Transparency.OPAQUE;
-            // if (numBands > 3) {
-            // transparencyKey = Transparency.TRANSLUCENT;
-            // hasAlpha = true;
-            // }
-            colorModel = new ComponentColorModelJAI(colorSpace, hasAlpha, isAlphaPremultiplied,
-                    transparencyKey, transferType);
+                bandOffsets = new int[numberOfBands];
+                for (int i = 0; i < numberOfBands; i++)
+                    bandOffsets[i] = i;
+
+                // colorSpace = new BogusColorSpace(numberOfBands);
+                its = ImageTypeSpecifier.createBanded(colorSpace, bandOffsets, bandOffsets,
+                        transferType, hasAlpha, isAlphaPremultiplied);
+                // sampleModel = new BandedSampleModel(transferType, width, height, numberOfBands);
+                // sampleModel = new ComponentSampleModel(transferType, width, height, pixelStride,
+                // scanLineStride, bandOffsets);
+
+                // its = new ImageTypeSpecifier(colorModel, sampleModel);
+            }
         }
 
-        final int pixelStride = 1;
-        final int scanLineStride = width;
-
-        sampleModel = new ComponentSampleModel(transferType, width, height, pixelStride,
-                scanLineStride, bandOffsets);
-
-        its = new ImageTypeSpecifier(colorModel, sampleModel);
         return its;
     }
 
