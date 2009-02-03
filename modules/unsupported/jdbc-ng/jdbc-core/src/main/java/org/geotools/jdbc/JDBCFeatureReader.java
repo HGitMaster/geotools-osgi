@@ -117,6 +117,10 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
      * feature builder
      */
     protected SimpleFeatureBuilder builder;
+    /**
+     * The primary key    
+     */
+    protected PrimaryKey pkey;
     
     /**
      * statement,result set that is being worked from.
@@ -186,6 +190,14 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         if(ff == null)
             ff = featureSource.getDataStore().getFeatureFactory();
         builder = new SimpleFeatureBuilder(featureType, ff);
+        
+        // find the primary key
+        try {
+            pkey = dataStore.getPrimaryKey(featureType);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
     
     public JDBCFeatureReader( JDBCFeatureReader other ) {
@@ -244,15 +256,6 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                 throw (IOException) new IOException().initCause(e);
             }
             
-            // find the primary key
-            PrimaryKey pkey;
-    
-            try {
-                pkey = dataStore.getPrimaryKey(featureType);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-    
             // figure out the fid
             String fid;
     
@@ -278,7 +281,11 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
     
             // round up attributes
             // List attributes = new ArrayList();
-            for (AttributeDescriptor type : featureType.getAttributeDescriptors()) {
+            final int pkeyCols = pkey.getColumns().size();
+            final int attributeCount = featureType.getAttributeCount();
+            for(int i = 0; i < attributeCount; i++) {
+                AttributeDescriptor type = featureType.getDescriptor(i);
+                
                 //figure out if any referenced attributes should be resolved
                 boolean resolve = depth.intValue() > 0;
     
@@ -299,7 +306,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                         //read the geometry
                         try {
                             value = dataStore.getSQLDialect()
-                                             .decodeGeometryValue(gatt, rs, type.getLocalName(),
+                                             .decodeGeometryValue(gatt, rs, i + pkeyCols + 1,
                                     geometryFactory, cx);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -504,9 +511,8 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                                 }
                             }
                         }
-                    }
-                    else {
-                        value = rs.getObject(type.getLocalName());
+                    } else {
+                        value = rs.getObject(i + pkeyCols + 1);
                     }
     
                     // is this an association?

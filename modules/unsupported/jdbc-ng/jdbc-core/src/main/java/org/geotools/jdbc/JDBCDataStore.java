@@ -1162,11 +1162,15 @@ public final class JDBCDataStore extends ContentDataStore
         if(pkey.getColumns().isEmpty()) {
             return SimpleFeatureBuilder.createDefaultFeatureId();
         } 
+        
+        // just one, no need to build support structures
+        if(pkey.getColumns().size() == 1)
+            return rs.getString(1);
 
-        // at least one
-        List<Object> keyValues = new ArrayList();
-        for( PrimaryKeyColumn col : pkey.getColumns() ) {
-            Object o = rs.getObject( col.getName() );
+        // more than one
+        List<Object> keyValues = new ArrayList<Object>();
+        for(int i = 0; i < pkey.getColumns().size(); i++) {
+            String o = rs.getString(i+1);
             keyValues.add( o );
         }
         return encodeFID( keyValues );
