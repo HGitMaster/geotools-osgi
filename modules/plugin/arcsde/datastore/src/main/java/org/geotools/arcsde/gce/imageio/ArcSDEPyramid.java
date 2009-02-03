@@ -247,4 +247,16 @@ public class ArcSDEPyramid {
         public ReferencedEnvelope envelope;
 
     }
+
+    @Override
+    public String toString() {
+        StringBuilder b = new StringBuilder("ArcSDEPyramid[");
+        b.append("Nº levels: ").append(getNumLevels()).append(", tile size: ").append(
+                getTileWidth()).append("x").append(getTileHeight()).append("\n\tLevels:");
+        for (int l = 0; l < getNumLevels(); l++) {
+            b.append("\n\t").append(getPyramidLevel(l));
+        }
+        b.append("\n]");
+        return b.toString();
+    }
 }

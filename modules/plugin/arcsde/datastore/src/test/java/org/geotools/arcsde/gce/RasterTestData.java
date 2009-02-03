@@ -370,11 +370,14 @@ public class RasterTestData {
 
             SeRasterAttr attr = new SeRasterAttr(true);
             attr.setImageSize(imageWidth, imageHeight, sampleImage.getSampleModel().getNumBands());
-            attr.setTileSize(128, 128);
+            int tileWidth = imageWidth >> 3;// 128;
+            int tileHeight = imageHeight >> 3;// 128;
+            attr.setTileSize(tileWidth, tileHeight);
             attr.setPixelType(sePixelType);
             attr.setCompressionType(SeRaster.SE_COMPRESSION_NONE);
-            // no pyramiding
-            attr.setPyramidInfo(3, false, SeRaster.SE_INTERPOLATION_BICUBIC);
+
+            int maxLevels = imageWidth / tileWidth;
+            attr.setPyramidInfo(maxLevels, false, SeRaster.SE_INTERPOLATION_BILINEAR);
             attr.setMaskMode(false);
             attr.setImportMode(false);
 

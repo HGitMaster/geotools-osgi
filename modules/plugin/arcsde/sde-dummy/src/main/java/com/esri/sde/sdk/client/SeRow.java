@@ -11,6 +11,7 @@ public class SeRow {
 	public static /* GEOT-947 final*/ int SE_IS_ALREADY_FETCHED = 2;
 	public static /* GEOT-947 final*/ int SE_IS_NOT_NULL_VALUE = 3;
 	
+	public void reset() throws SeException{};
 	public SeColumnDefinition[] getColumns() { return null; }
 	public Object getObject(int i) throws SeException { return null; }
 	public SeColumnDefinition getColumnDef(int i) throws SeException{ return null; }
