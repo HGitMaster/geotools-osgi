@@ -1158,6 +1158,12 @@ public final class JDBCDataStore extends ContentDataStore
      * Encodes a feature id from a primary key and result set values. 
      */
     protected String encodeFID( PrimaryKey pkey, ResultSet rs ) throws SQLException, IOException {
+        // no pk columns
+        if(pkey.getColumns().isEmpty()) {
+            return SimpleFeatureBuilder.createDefaultFeatureId();
+        } 
+
+        // at least one
         List<Object> keyValues = new ArrayList();
         for( PrimaryKeyColumn col : pkey.getColumns() ) {
             Object o = rs.getObject( col.getName() );
