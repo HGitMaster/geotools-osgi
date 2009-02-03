@@ -2158,6 +2158,14 @@ public final class JDBCDataStore extends ContentDataStore
         } finally {
             closeSafe(types);
         }
+        
+        // apply the overrides specified by the dialect
+        Map<Integer, String> overrides = getSqlTypeToSqlTypeNameOverrides();
+        for (int i = 0; i < sqlTypes.length; i++) {
+            String override = overrides.get(sqlTypes[i]);
+            if(override != null)
+                sqlTypeNames[i] = override;
+        }
 
         return sqlTypeNames;
     }
