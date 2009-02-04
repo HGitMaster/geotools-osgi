@@ -36,6 +36,7 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -1841,6 +1842,20 @@ public class SLDParser {
                 // add the element node as an expression
                 ret = manageMixed(ret, org.geotools.filter.ExpressionDOMParser
                         .parseExpression(child));
+            }else if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
+                String value = child.getNodeValue();
+                if (value != null && value.length() != 0) {
+                    // we build a literal straight, to preserve even cdata sections
+                    // that have only spaces (as opposed to try and parse it as a literal
+                    // using the expression dom parser)
+                    Literal literal = ff.literal(value);
+
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("Built new literal " + literal);
+                    }
+                    // add the text node as a literal
+                    ret = manageMixed(ret, literal);
+                }
             } else
                 continue;
 
