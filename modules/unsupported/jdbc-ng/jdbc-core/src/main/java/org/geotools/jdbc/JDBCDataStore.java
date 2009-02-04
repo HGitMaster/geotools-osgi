@@ -2433,8 +2433,15 @@ public final class JDBCDataStore extends ContentDataStore
     protected String selectBoundsSQL(SimpleFeatureType featureType, Query query) {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT ");
-        buildEnvelopeAggregates(featureType, sql);
+        boolean offsetLimit = checkLimitOffset(query);
+        if(offsetLimit) {
+            // envelopes are aggregates, just like count, so we must first isolate
+            // the rows against which the aggregate will work in a subquery
+            sql.append(" SELECT *");
+        } else {
+            sql.append("SELECT ");
+            buildEnvelopeAggregates(featureType, sql);
+        }
 
         sql.append(" FROM ");
         encodeTableName(featureType.getTypeName(), sql);
@@ -2451,7 +2458,18 @@ public final class JDBCDataStore extends ContentDataStore
         }
         
         // finally encode limit/offset, if necessary
-        applyLimitOffset(sql, query);
+        if(offsetLimit) {
+            applyLimitOffset(sql, query);
+            // build the prologue
+            StringBuffer sb = new StringBuffer();
+            sb.append("SELECT ");
+            buildEnvelopeAggregates(featureType, sb);
+            sb.append("FROM (");
+            // wrap the existing query
+            sql.insert(0, sb.toString());
+            sql.append(")");
+            dialect.encodeTableAlias("GT2_BOUNDS_", sql);
+        }
 
         return sql.toString();
     }
