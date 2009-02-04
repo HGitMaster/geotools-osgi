@@ -165,5 +165,14 @@ public class MySQLDialectPrepared extends PreparedStatementSQLDialect {
         
     }
 
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
+    }
    
 }

@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.data.Query;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -400,6 +401,18 @@ public abstract class SQLDialect {
         sql.append(" as ");
         encodeColumnName(raw, sql);
     }
+    
+    /**
+     * Encodes the alias of a table in an sql query.
+     * <p>
+     * This default implementation uses the syntax: <pre>as "alias"</pre>.
+     * Subclasses should override to provide a different syntax.
+     * </p>
+     */
+    public void encodeTableAlias(String raw, StringBuffer sql) {
+        sql.append(" as ");
+        encodeColumnName(raw, sql);
+    }
 
     /**
      * Encodes the name of a table in an SQL statement.
@@ -738,5 +751,25 @@ public abstract class SQLDialect {
     public Object getNextSequenceValue(String schemaName, String sequenceName, Connection cx ) 
         throws SQLException {
         return null;
+    }
+    
+    /**
+     * Returns true if this dialect can encode both {@linkplain Query#getStartIndex()}
+     * and {@linkplain Query#getMaxFeatures()} into native SQL. 
+     * @return
+     */
+    public boolean isLimitOffsetSupported() {
+        return false;
+    }
+    
+    /**
+     * Alters the query provided so that limit and offset are natively dealt with. This might mean
+     * simply appending some extra directive to the query, or wrapping it into a bigger one.
+     * @param sql
+     * @param limit
+     * @param offset
+     */
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        throw new UnsupportedOperationException("Ovveride this method when isLimitOffsetSupported returns true");
     }
 }

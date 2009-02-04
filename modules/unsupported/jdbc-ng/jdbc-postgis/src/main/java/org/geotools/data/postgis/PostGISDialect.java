@@ -547,5 +547,22 @@ public class PostGISDialect extends BasicSQLDialect {
         sql.setLooseBBOXEnabled(looseBBOXEnabled);
         return sql;
     }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return true;
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        if(limit > 0 && limit < Integer.MAX_VALUE) {
+            sql.append(" LIMIT " + limit);
+            if(offset > 0) {
+                sql.append(" OFFSET " + offset);
+            }
+        } else if(offset > 0) {
+            sql.append(" OFFSET " + offset);
+        }
+    }
 
 }

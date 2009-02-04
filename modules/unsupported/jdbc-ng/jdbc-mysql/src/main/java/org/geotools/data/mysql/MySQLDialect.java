@@ -263,5 +263,23 @@ public class MySQLDialect extends SQLDialect {
             dataStore.closeSafe(st);
         }
     }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return true;
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        if(limit > 0 && limit < Integer.MAX_VALUE) {
+            if(offset > 0)
+                sql.append(" LIMIT " + offset + ", " + limit);
+            else 
+                sql.append(" LIMIT " + limit);
+        } else if(offset > 0) {
+            // MySql pretends to have limit specified along with offset
+            sql.append(" LIMIT " + offset + ", " + Long.MAX_VALUE);
+        }
+    }
 
 }

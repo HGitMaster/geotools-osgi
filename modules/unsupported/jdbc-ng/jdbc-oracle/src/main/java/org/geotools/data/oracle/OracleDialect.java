@@ -611,4 +611,40 @@ public class OracleDialect extends PreparedStatementSQLDialect {
         
         return geodetic;
     }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return true;
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        // see http://progcookbook.blogspot.com/2006/02/using-rownum-properly-for-pagination.html
+        // and http://www.oracle.com/technology/oramag/oracle/07-jan/o17asktom.html
+        // to understand why we are going thru such hoops in order to get it working
+        // The same techinique is used in Hibernate to support pagination
+        
+        if(offset == 0) {
+            // top-n query: select * from (your_query) where rownum <= n;
+            sql.insert(0, "SELECT * FROM (");
+            sql.append(") WHERE ROWNUM <= " + limit);
+        } else {
+            // find results between N and M
+            // select * from 
+            // ( select rownum rnum, a.*
+            //    from (your_query) a
+            //   where rownum <= :M )
+            // where rnum >= :N;
+            long max = (limit == Integer.MAX_VALUE ? Long.MAX_VALUE : limit + offset);
+            sql.insert(0, "SELECT * FROM (SELECT A.*, ROWNUM RNUM FROM ( ");
+            sql.append(") A WHERE ROWNUM <= " + max + ")");
+            sql.append("WHERE RNUM > " + offset);
+        }
+    }
+    
+    @Override
+    public void encodeTableAlias(String raw, StringBuffer sql) {
+        sql.append(" ");
+        encodeTableName(raw, sql);
+    }
 }

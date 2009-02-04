@@ -159,5 +159,15 @@ public class PostGISPSDialect extends PreparedStatementSQLDialect {
         fts.setLooseBBOXEnabled(delegate.isLooseBBOXEnabled());
         return fts;
     }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
+    }
 
 }

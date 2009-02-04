@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.FilteringFeatureWriter;
@@ -44,6 +45,8 @@ import org.opengis.filter.Filter;
  * @author Justin Deoliveira, The Open Planning Project
  */
 public final class JDBCFeatureStore extends ContentFeatureStore {
+    
+    private static final Query QUERY_NONE = new DefaultQuery(null, Filter.EXCLUDE); 
     
     /**
      * jdbc feature source to delegate to, we do this b/c we can't inherit from
@@ -152,6 +155,16 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
     }
     
     @Override
+    protected boolean canLimit() {
+        return delegate.canLimit();
+    }
+    
+    @Override
+    protected boolean canOffset() {
+        return delegate.canOffset();
+    }
+    
+    @Override
     protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(
             Query query) throws IOException {
         return delegate.getReaderInternal(query);
@@ -192,14 +205,16 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         try {
             //check for insert only
             if ( (flags | WRITER_ADD) == WRITER_ADD ) {
+                DefaultQuery queryNone = new DefaultQuery(query);
+                queryNone.setFilter(Filter.EXCLUDE);
                 if ( getDataStore().getSQLDialect() instanceof PreparedStatementSQLDialect ) {
-                    PreparedStatement ps = getDataStore().selectSQLPS(getSchema(), Filter.EXCLUDE, query.getSortBy(), cx);
+                    PreparedStatement ps = getDataStore().selectSQLPS(getSchema(), queryNone, cx);
                     return new JDBCInsertFeatureWriter( ps, cx, delegate, query.getHints() );
                 }
                 else {
                     //build up a statement for the content, inserting only so we dont want
                     // the query to return any data ==> Filter.EXCLUDE
-                    String sql = getDataStore().selectSQL(getSchema(), Filter.EXCLUDE, query.getSortBy());
+                    String sql = getDataStore().selectSQL(getSchema(), queryNone);
                     getDataStore().getLogger().fine(sql);
     
                     return new JDBCInsertFeatureWriter( sql, cx, delegate, query.getHints() );
@@ -212,8 +227,10 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
             postFilter = split[1];
             
             // build up a statement for the content
+            DefaultQuery preQuery = new DefaultQuery(query);
+            preQuery.setFilter(preFilter);
             if(getDataStore().getSQLDialect() instanceof PreparedStatementSQLDialect) {
-                PreparedStatement ps = getDataStore().selectSQLPS(getSchema(), preFilter, query.getSortBy(), cx);
+                PreparedStatement ps = getDataStore().selectSQLPS(getSchema(), preQuery, cx);
                 if ( (flags | WRITER_UPDATE) == WRITER_UPDATE ) {
                     writer = new JDBCUpdateFeatureWriter(ps, cx, delegate, query.getHints() );
                 } else {
@@ -221,7 +238,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                     writer = new JDBCUpdateInsertFeatureWriter(ps, cx, delegate, query.getPropertyNames(), query.getHints() );
                 }
             } else {
-                String sql = getDataStore().selectSQL(getSchema(), preFilter, query.getSortBy());
+                String sql = getDataStore().selectSQL(getSchema(), preQuery);
                 getDataStore().getLogger().fine(sql);
                 
                 if ( (flags | WRITER_UPDATE) == WRITER_UPDATE ) {

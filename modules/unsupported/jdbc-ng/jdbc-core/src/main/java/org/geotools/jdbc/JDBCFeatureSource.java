@@ -358,15 +358,20 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                 // either way we can use the datastore optimization
                 Connection cx = dataStore.getConnection(getState());
                 try {
-                    int count = dataStore.getCount(getSchema(), preFilter, cx);
-                    if(query.getStartIndex() != null && query.getStartIndex() > 0) {
-                        if(query.getStartIndex() > count)
-                            count = 0;
-                        else
-                            count -= query.getStartIndex();
+                    DefaultQuery q = new DefaultQuery(query);
+                    q.setFilter(preFilter);
+                    int count = dataStore.getCount(getSchema(), q, cx);
+                    // if native support for limit and offset is not implemented, we have to ajust the result
+                    if(!dataStore.getSQLDialect().isLimitOffsetSupported()) {
+                        if(query.getStartIndex() != null && query.getStartIndex() > 0) {
+                            if(query.getStartIndex() > count)
+                                count = 0;
+                            else
+                                count -= query.getStartIndex();
+                        }
+                        if(query.getMaxFeatures() > 0 && count > query.getMaxFeatures())
+                            count = query.getMaxFeatures();
                     }
-                    if(query.getMaxFeatures() > 0 && count > query.getMaxFeatures())
-                        count = query.getMaxFeatures();
                     return count;
                 }
                 finally {
@@ -422,7 +427,9 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                 // use datastore optimization
                 Connection cx = dataStore.getConnection(getState());
                 try {
-                    return dataStore.getBounds(getSchema(), preFilter, cx);
+                    DefaultQuery q = new DefaultQuery(query);
+                    q.setFilter(preFilter);
+                    return dataStore.getBounds(getSchema(), q, cx);
                 }
                 finally {
                     getDataStore().releaseConnection( cx, getState() );
@@ -445,11 +452,25 @@ public class JDBCFeatureSource extends ContentFeatureSource {
         return true;
     }
     
+    @Override
+    protected boolean canLimit() {
+        return getDataStore().getSQLDialect().isLimitOffsetSupported();
+    }
+    
+    @Override
+    protected boolean canOffset() {
+        return getDataStore().getSQLDialect().isLimitOffsetSupported();
+    }
+    
     protected  FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
         // split the filter
         Filter[] split = splitFilter(query.getFilter());
         Filter preFilter = split[0];
         Filter postFilter = split[1];
+        
+        // rebuild a new query with the same params, but just the pre-filter
+        DefaultQuery preQuery = new DefaultQuery(query);
+        preQuery.setFilter(preFilter);
         
         // Build the feature type returned by this query. Also build an eventual extra feature type
         // containing the attributes we might need in order to evaluate the post filter
@@ -489,11 +510,11 @@ public class JDBCFeatureSource extends ContentFeatureSource {
             
             SQLDialect dialect = getDataStore().getSQLDialect();
             if ( dialect instanceof PreparedStatementSQLDialect ) {
-                PreparedStatement ps = getDataStore().selectSQLPS(querySchema, preFilter, query.getSortBy(), cx);
+                PreparedStatement ps = getDataStore().selectSQLPS(querySchema, preQuery, cx);
                 reader = new JDBCFeatureReader( ps, cx, this, querySchema, query.getHints() );
             } else {
                 //build up a statement for the content
-                String sql = getDataStore().selectSQL(querySchema, preFilter, query.getSortBy());
+                String sql = getDataStore().selectSQL(querySchema, preQuery);
                 getDataStore().getLogger().fine(sql);
     
                 reader = new JDBCFeatureReader( sql, cx, this, querySchema, query.getHints() );

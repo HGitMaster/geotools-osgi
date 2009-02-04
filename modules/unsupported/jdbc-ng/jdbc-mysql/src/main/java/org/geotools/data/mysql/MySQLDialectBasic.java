@@ -162,5 +162,15 @@ public class MySQLDialectBasic extends BasicSQLDialect {
             throw (IOException) new IOException(msg).initCause(e);
         }
     }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
+    }
 
 }

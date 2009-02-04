@@ -398,4 +398,23 @@ public class H2Dialect extends SQLDialect {
             dataStore.closeSafe(st);
         }
     }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return true;
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        if(limit > 0 && limit < Integer.MAX_VALUE) {
+            sql.append(" LIMIT " + limit);
+            if(offset > 0) {
+                sql.append(" OFFSET " + offset);
+            }
+        } else if(offset > 0) {
+            // H2 pretends to have limit specified along with offset
+            sql.append(" LIMIT " + Integer.MAX_VALUE);
+            sql.append(" OFFSET " + offset);
+        }
+    }
 }

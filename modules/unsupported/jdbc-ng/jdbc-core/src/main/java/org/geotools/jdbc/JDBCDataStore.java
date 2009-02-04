@@ -45,6 +45,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
+import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.store.ContentDataStore;
@@ -814,10 +815,10 @@ public final class JDBCDataStore extends ContentDataStore
      * Returns the bounds of the features for a particular feature type / table.
      * 
      * @param featureType The feature type / table.
-     //* @param types The columns to include in the bounds calculation, may be <code>null<code>.
-     * @param filter Filter specifying rows to include in bounds calculation.
+     * @param query Specifies rows to include in bounds calculation, as well as how many 
+     *              features and the offset if needed
      */
-    protected ReferencedEnvelope getBounds(SimpleFeatureType featureType, /*Set types,*/ Filter filter,
+    protected ReferencedEnvelope getBounds(SimpleFeatureType featureType, Query query,
         Connection cx) throws IOException {
         
         // handle geometryless case by returning an emtpy envelope
@@ -828,11 +829,11 @@ public final class JDBCDataStore extends ContentDataStore
         ResultSet rs = null;
         try {
             if ( dialect instanceof PreparedStatementSQLDialect ) {
-                st = selectBoundsSQLPS(featureType, filter, cx);
+                st = selectBoundsSQLPS(featureType, query, cx);
                 rs = ((PreparedStatement)st).executeQuery();
             }
             else {
-                String sql = selectBoundsSQL(featureType,/* types,*/ filter);
+                String sql = selectBoundsSQL(featureType, query);
                 LOGGER.log(Level.FINE, "Retriving bounding box: {0}", sql);
         
                 st = cx.createStatement();
@@ -890,18 +891,18 @@ public final class JDBCDataStore extends ContentDataStore
     /**
      * Returns the count of the features for a particular feature type / table.
      */
-    protected int getCount(SimpleFeatureType featureType, Filter filter, Connection cx)
+    protected int getCount(SimpleFeatureType featureType, Query query, Connection cx)
         throws IOException {
         
         Statement st = null;
         ResultSet rs = null;
         try {
             if ( dialect instanceof PreparedStatementSQLDialect ) {
-                st = selectCountSQLPS(featureType, filter, cx);
+                st = selectCountSQLPS(featureType, query, cx);
                 rs = ((PreparedStatement)st).executeQuery();
             }
             else {
-                String sql = selectCountSQL(featureType, filter);
+                String sql = selectCountSQL(featureType, query);
                 LOGGER.log(Level.FINE, "Counting features: {0}", sql);
                 
                 st = cx.createStatement();
@@ -2179,13 +2180,13 @@ public final class JDBCDataStore extends ContentDataStore
      * @param attributes
      *            the properties queried, or {@link Query#ALL_NAMES} to gather
      *            all of them
-     * @param filter
-     *            an encodable filter (filter splitting should already have
-     *            occurred)
+     * @param query
+     *            the query to be run. The type name and property will be ignored, as they are
+     *            supposed to have been already embedded into the provided feature type
      * @param sort
      *            sort conditions
      */
-    protected String selectSQL(SimpleFeatureType featureType, Filter filter, SortBy[] sort) throws IOException {
+    protected String selectSQL(SimpleFeatureType featureType, Query query) throws IOException {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
 
@@ -2226,6 +2227,7 @@ public final class JDBCDataStore extends ContentDataStore
         encodeTableName(featureType.getTypeName(), sql);
 
         //filtering
+        Filter filter = query.getFilter();
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2240,7 +2242,10 @@ public final class JDBCDataStore extends ContentDataStore
         }
 
         //sorting
-        sort(featureType, sort, key, sql);
+        sort(featureType, query.getSortBy(), key, sql);
+        
+        // finally encode limit/offset, if necessary
+        applyLimitOffset(sql, query);
 
         return sql.toString();
     }
@@ -2296,16 +2301,14 @@ public final class JDBCDataStore extends ContentDataStore
      * @param attributes
      *            the properties queried, or {@link Query#ALL_NAMES} to gather
      *            all of them
-     * @param filter
-     *            an encodable filter (filter splitting should already have
-     *            occurred)
-     * @param sort
-     *            sort conditions
+     * @param query
+     *            the query to be run. The type name and property will be ignored, as they are
+     *            supposed to have been already embedded into the provided feature type
      * @param cx
      *            The database connection to be used to create the prepared
      *            statement
      */
-    protected PreparedStatement selectSQLPS( SimpleFeatureType featureType, Filter filter, SortBy[] sort, Connection cx )
+    protected PreparedStatement selectSQLPS( SimpleFeatureType featureType, Query query, Connection cx )
         throws SQLException, IOException {
         
         StringBuffer sql = new StringBuffer();
@@ -2347,6 +2350,7 @@ public final class JDBCDataStore extends ContentDataStore
 
         //filtering
         PreparedFilterToSQL toSQL = null;
+        Filter filter = query.getFilter();
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2361,7 +2365,10 @@ public final class JDBCDataStore extends ContentDataStore
         }
 
         //sorting
-        sort(featureType, sort, key, sql);
+        sort(featureType, query.getSortBy(), key, sql);
+        
+        // finally encode limit/offset, if necessary
+        applyLimitOffset(sql, query);
 
         LOGGER.fine( sql.toString() );
         PreparedStatement ps = cx.prepareStatement(sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -2420,31 +2427,19 @@ public final class JDBCDataStore extends ContentDataStore
      * Generates a 'SELECT' sql statement which selects bounds.
      * 
      * @param featureType The feature type / table.
-     * @param filter Filter specifying rows to include in bounds calculation.
+     * @param query Specifies which features are to be used for the bounds computation
+     *              (and in particular uses filter, start index and max features)
      */
-    protected String selectBoundsSQL(SimpleFeatureType featureType, /*Set types,*/ Filter filter) {
+    protected String selectBoundsSQL(SimpleFeatureType featureType, Query query) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT ");
-
-        //walk through all geometry attributes and build the query
-        for (Iterator a = featureType.getAttributeDescriptors().iterator(); a.hasNext();) {
-            AttributeDescriptor attribute = (AttributeDescriptor) a.next();
-            //if (types != null && !types.contains( attribute.getLocalName() ) ) {
-            //    continue;
-            //}
-            if (attribute instanceof GeometryDescriptor) {
-                String geometryColumn = featureType.getGeometryDescriptor().getLocalName();
-                dialect.encodeGeometryEnvelope(featureType.getTypeName(), geometryColumn, sql);
-                sql.append(",");
-            }
-        }
-
-        sql.setLength(sql.length() - 1);
+        buildEnvelopeAggregates(featureType, sql);
 
         sql.append(" FROM ");
         encodeTableName(featureType.getTypeName(), sql);
 
+        Filter filter = query.getFilter();
         if (filter != null  && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2454,6 +2449,9 @@ public final class JDBCDataStore extends ContentDataStore
                 throw new RuntimeException(e);
             }
         }
+        
+        // finally encode limit/offset, if necessary
+        applyLimitOffset(sql, query);
 
         return sql.toString();
     }
@@ -2462,35 +2460,31 @@ public final class JDBCDataStore extends ContentDataStore
      * Generates a 'SELECT' prepared statement which selects bounds.
      * 
      * @param featureType The feature type / table.
-     * @param filter Filter specifying rows to include in bounds calculation.
+     * @param query Specifies which features are to be used for the bounds computation
+     *              (and in particular uses filter, start index and max features)
      * @param cx A database connection.
      */
-    protected PreparedStatement selectBoundsSQLPS(SimpleFeatureType featureType, Filter filter, Connection cx)
+    protected PreparedStatement selectBoundsSQLPS(SimpleFeatureType featureType, Query query, Connection cx)
         throws SQLException {
         
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT ");
-
-        //walk through all geometry attributes and build the query
-        for (Iterator a = featureType.getAttributeDescriptors().iterator(); a.hasNext();) {
-            AttributeDescriptor attribute = (AttributeDescriptor) a.next();
-            //if (types != null && !types.contains( attribute.getLocalName() ) ) {
-            //    continue;
-            //}
-            if (attribute instanceof GeometryDescriptor) {
-                String geometryColumn = featureType.getGeometryDescriptor().getLocalName();
-                dialect.encodeGeometryEnvelope(featureType.getTypeName(), geometryColumn, sql);
-                sql.append(",");
-            }
+        boolean offsetLimit = checkLimitOffset(query);
+        if(offsetLimit) {
+            // envelopes are aggregates, just like count, so we must first isolate
+            // the rows against which the aggregate will work in a subquery
+            sql.append(" SELECT *");
+        } else {
+            sql.append("SELECT ");
+            buildEnvelopeAggregates(featureType, sql);
         }
-
-        sql.setLength(sql.length() - 1);
 
         sql.append(" FROM ");
         encodeTableName(featureType.getTypeName(), sql);
 
+        // encode the filter
         PreparedFilterToSQL toSQL = null;
+        Filter filter = query.getFilter();
         if (filter != null  && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2500,6 +2494,21 @@ public final class JDBCDataStore extends ContentDataStore
                 throw new RuntimeException(e);
             }
         }
+        
+        // finally encode limit/offset, if necessary
+        if(offsetLimit) {
+            applyLimitOffset(sql, query);
+            // build the prologue
+            StringBuffer sb = new StringBuffer();
+            sb.append("SELECT ");
+            buildEnvelopeAggregates(featureType, sb);
+            sb.append("FROM (");
+            // wrap the existing query
+            sql.insert(0, sb.toString());
+            sql.append(")");
+            dialect.encodeTableAlias("GT2_BOUNDS_", sql);
+        }
+        
 
         LOGGER.fine( sql.toString() );
         PreparedStatement ps = cx.prepareStatement(sql.toString());
@@ -2510,16 +2519,44 @@ public final class JDBCDataStore extends ContentDataStore
         
         return ps;
     }
+
+    /**
+     * Builds a list of the aggregate function calls necesary to compute each geometry
+     * column bounds
+     * @param featureType
+     * @param sql
+     */
+    void buildEnvelopeAggregates(SimpleFeatureType featureType, StringBuffer sql) {
+        //walk through all geometry attributes and build the query
+        for (Iterator a = featureType.getAttributeDescriptors().iterator(); a.hasNext();) {
+            AttributeDescriptor attribute = (AttributeDescriptor) a.next();
+            if (attribute instanceof GeometryDescriptor) {
+                String geometryColumn = featureType.getGeometryDescriptor().getLocalName();
+                dialect.encodeGeometryEnvelope(featureType.getTypeName(), geometryColumn, sql);
+                sql.append(",");
+            }
+        }
+        sql.setLength(sql.length() - 1);
+    }
     
     /**
-     * Generates a 'SELECT count(*) FROM' sql statement.
+     * Generates a 'SELECT count(*) FROM' sql statement. In case limit/offset is 
+     * used, we'll need to apply them on a <code>select *<code>
+     * as limit/offset usually alters the number of returned rows 
+     * (and a count returns just one), and then count on the result of that first select
      */
-    protected String selectCountSQL(SimpleFeatureType featureType, Filter filter) {
+    protected String selectCountSQL(SimpleFeatureType featureType, Query query) {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT count(*) FROM ");
+        boolean limitOffset = checkLimitOffset(query);
+        if(limitOffset) {
+            sql.append("SELECT * FROM ");
+        } else {
+            sql.append("SELECT count(*) FROM ");
+        }
         encodeTableName(featureType.getTypeName(), sql);
 
+        Filter filter = query.getFilter();
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2529,6 +2566,13 @@ public final class JDBCDataStore extends ContentDataStore
                 throw new RuntimeException(e);
             }
         }
+        
+        if(limitOffset) {
+            applyLimitOffset(sql, query);
+            sql.insert(0, "SELECT COUNT(*) FROM (");
+            sql.append(") AS GT_COUNT_ ");
+            
+        }
 
         return sql.toString();
     }
@@ -2536,14 +2580,20 @@ public final class JDBCDataStore extends ContentDataStore
     /**
      * Generates a 'SELECT count(*) FROM' prepared statement.
      */
-    protected PreparedStatement selectCountSQLPS(SimpleFeatureType featureType, Filter filter, Connection cx ) 
+    protected PreparedStatement selectCountSQLPS(SimpleFeatureType featureType, Query query, Connection cx ) 
         throws SQLException {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT count(*) FROM ");
+        boolean limitOffset = checkLimitOffset(query);
+        if(limitOffset) {
+            sql.append("SELECT * FROM ");
+        } else {
+            sql.append("SELECT count(*) FROM ");
+        }
         encodeTableName(featureType.getTypeName(), sql);
 
         PreparedFilterToSQL toSQL = null;
+        Filter filter = query.getFilter();
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2552,6 +2602,13 @@ public final class JDBCDataStore extends ContentDataStore
             } catch (FilterToSQLException e) {
                 throw new RuntimeException(e);
             }
+        }
+        
+        if(limitOffset) {
+            applyLimitOffset(sql, query);
+            sql.insert(0, "SELECT COUNT(*) FROM (");
+            sql.append(")");
+            dialect.encodeTableAlias("GT_COUNT_", sql);
         }
 
         LOGGER.fine( sql.toString() );
@@ -3137,11 +3194,11 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected void encodeTableName(String tableName, StringBuffer sql) {
         if (databaseSchema != null) {
-            dialect.encodeTableName(databaseSchema, sql);
+            dialect.encodeSchemaName(databaseSchema, sql);
             sql.append(".");
         }
 
-        dialect.encodeSchemaName(tableName, sql);
+        dialect.encodeTableName(tableName, sql);
     }
 
     /**
@@ -3175,6 +3232,36 @@ public final class JDBCDataStore extends ContentDataStore
         }
 
         g.setUserData(userData);
+    }
+    
+    /**
+     * Applies the limit/offset elements to the query if they are specified
+     * and if the dialect supports them
+     * @param sql The sql to be modified
+     * @param the query that holds the limit and offset parameters
+     */
+    void applyLimitOffset(StringBuffer sql, Query query) {
+        if(checkLimitOffset(query)) {
+            final Integer offset = query.getStartIndex();
+            final int limit = query.getMaxFeatures();
+            dialect.applyLimitOffset(sql, limit, offset != null ? offset : 0);
+        }
+    }
+    
+    /**
+     * Checks if the query needs limit/offset treatment
+     * @param query
+     * @return true if the query needs limit/offset treatment and if the sql dialect can do that natively
+     */
+    boolean checkLimitOffset(Query query) {
+        // if we cannot, don't bother checking the query
+        if(!dialect.isLimitOffsetSupported())
+            return false;
+        
+        // the check the query has at least a non default value for limit/offset
+        final Integer offset = query.getStartIndex();
+        final int limit = query.getMaxFeatures();
+        return limit != Integer.MAX_VALUE || (offset != null && offset > 0);
     }
     
     /**

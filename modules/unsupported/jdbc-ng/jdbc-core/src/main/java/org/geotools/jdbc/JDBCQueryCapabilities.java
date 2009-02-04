@@ -13,7 +13,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Gabriel Roldan (TOPP)
  * @author Andrea Aime (OpenGeo)
- * @version $Id: JDBCQueryCapabilities.java 32391 2009-02-03 10:12:01Z aaime $
+ * @version $Id: JDBCQueryCapabilities.java 32408 2009-02-04 15:39:50Z aaime $
  * @since 2.5.4
  */
 class JDBCQueryCapabilities extends QueryCapabilities {
@@ -78,5 +78,8 @@ class JDBCQueryCapabilities extends QueryCapabilities {
         return !(source.getPrimaryKey() instanceof NullPrimaryKey);
     }
     
-    
+    @Override
+    public boolean isOffsetSupported() {
+        return source.getDataStore().getSQLDialect().isLimitOffsetSupported();
+    }
 }
