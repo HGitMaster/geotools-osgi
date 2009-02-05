@@ -36,6 +36,7 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
@@ -48,6 +49,7 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.util.logging.Logging;
@@ -58,6 +60,7 @@ import org.opengis.geometry.BoundingBox;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -139,9 +142,9 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         // super.raster2Model = getRasterToModel();
     }
 
-    private MathTransform getRasterToModel() {
+    private MathTransform getRasterToModel(GeneralGridRange originalDim, GeneralEnvelope originalEnv) {
         final GridToEnvelopeMapper geMapper;
-        geMapper = new GridToEnvelopeMapper(originalGridRange, originalEnvelope);
+        geMapper = new GridToEnvelopeMapper(originalDim, originalEnv);
         geMapper.setPixelAnchor(PixelInCell.CELL_CENTER);
         final MathTransform rasterToModel = geMapper.createTransform();
         return rasterToModel;
@@ -167,76 +170,118 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         return serviceInfo;
     }
 
-    public GridCoverage read(GeneralParameterValue[] params) throws IOException {
-        GeneralEnvelope requestedEnvelope = null;
+    private static class ReadParameters {
+        GeneralEnvelope requestedEnvelope;
+
+        Rectangle dim;
+
+        OverviewPolicy overviewPolicy;
+    }
+
+    private ReadParameters parseReadParams(GeneralParameterValue[] params)
+            throws DataSourceException {
+        if (params == null) {
+            throw new DataSourceException("No GeneralParameterValue given to read operation");
+        }
+
+        GeneralEnvelope reqEnvelope = null;
         Rectangle dim = null;
         OverviewPolicy overviewPolicy = null;
-        if (params != null) {
-            // /////////////////////////////////////////////////////////////////////
-            //
-            // Checking params
-            //
-            // /////////////////////////////////////////////////////////////////////
-            if (params != null) {
-                for (int i = 0; i < params.length; i++) {
-                    final ParameterValue param = (ParameterValue) params[i];
-                    final String name = param.getDescriptor().getName().getCode();
-                    if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())) {
-                        final GridGeometry2D gg = (GridGeometry2D) param.getValue();
-                        requestedEnvelope = new GeneralEnvelope((Envelope) gg.getEnvelope2D());
 
-                        ReferencedEnvelope nativeCrsEnv;
-                        nativeCrsEnv = RasterUtils.toNativeCrs(requestedEnvelope, crs);
-                        requestedEnvelope = new GeneralEnvelope(nativeCrsEnv);
-                        dim = gg.getGridRange2D().getBounds();
-                        continue;
-                    }
-                    if (name.equals(AbstractGridFormat.OVERVIEW_POLICY.getName().toString())) {
-                        overviewPolicy = (OverviewPolicy) param.getValue();
-                        continue;
-                    }
+        // /////////////////////////////////////////////////////////////////////
+        //
+        // Checking params
+        //
+        // /////////////////////////////////////////////////////////////////////
+        for (int i = 0; i < params.length; i++) {
+            final ParameterValue<?> param = (ParameterValue<?>) params[i];
+            final String name = param.getDescriptor().getName().getCode();
+            if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())) {
+                final GridGeometry2D gg = (GridGeometry2D) param.getValue();
+                reqEnvelope = new GeneralEnvelope((Envelope) gg.getEnvelope2D());
+
+                CoordinateReferenceSystem nativeCrs = rasterInfo.getCoverageCrs();
+                CoordinateReferenceSystem requestCrs = reqEnvelope.getCoordinateReferenceSystem();
+                if (!CRS.equalsIgnoreMetadata(nativeCrs, requestCrs)) {
+                    LOGGER.info("Request CRS and native CRS differ, "
+                            + "reprojecting request envelope to native CRS");
+                    ReferencedEnvelope nativeCrsEnv;
+                    nativeCrsEnv = RasterUtils.toNativeCrs(reqEnvelope, nativeCrs);
+                    reqEnvelope = new GeneralEnvelope(nativeCrsEnv);
                 }
+
+                dim = gg.getGridRange2D().getBounds();
+                continue;
+            }
+            if (name.equals(AbstractGridFormat.OVERVIEW_POLICY.getName().toString())) {
+                overviewPolicy = (OverviewPolicy) param.getValue();
+                continue;
             }
         }
-        LOGGER.info("Reading raster for " + dim.getWidth() + "x" + dim.getHeight()
-                + " requested dim and " + requestedEnvelope.getMinimum(0) + ","
-                + requestedEnvelope.getMaximum(0) + " - " + requestedEnvelope.getMinimum(1)
-                + requestedEnvelope.getMaximum(1) + " requested extent");
 
+        if (overviewPolicy == null) {
+            LOGGER.finer("No overview policy requested, defaulting to QUALITY");
+            overviewPolicy = OverviewPolicy.QUALITY;
+        }
+        LOGGER.fine("Overview policy is " + overviewPolicy);
+
+        LOGGER.info("Reading raster for " + dim.getWidth() + "x" + dim.getHeight()
+                + " requested dim and " + reqEnvelope.getMinimum(0) + ","
+                + reqEnvelope.getMaximum(0) + " - " + reqEnvelope.getMinimum(1)
+                + reqEnvelope.getMaximum(1) + " requested extent");
+
+        ReadParameters parsedParams = new ReadParameters();
+        parsedParams.requestedEnvelope = reqEnvelope;
+        parsedParams.dim = dim;
+        parsedParams.overviewPolicy = overviewPolicy;
+        return parsedParams;
+    }
+
+    /**
+     * @see GridCoverageReader#read(GeneralParameterValue[])
+     */
+    public GridCoverage read(GeneralParameterValue[] params) throws IOException {
+
+        final GeneralEnvelope requestedEnvelope;
+        final Rectangle requestedDim;
+        final OverviewPolicy overviewPolicy;
+        {
+            final ReadParameters opParams = parseReadParams(params);
+            overviewPolicy = opParams.overviewPolicy;
+            requestedEnvelope = opParams.requestedEnvelope;
+            requestedDim = opParams.dim;
+        }
         final ArcSDEPyramid pyramidInfo = rasterInfo.getPyramidInfo();
 
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // set params
-        //
-        // /////////////////////////////////////////////////////////////////////
+        /*
+         * set params
+         */
+
         // This is to choose the pyramid level as if it were the image index in a file with
         // overviews
         int pyramidLevelChoice = 0;
         final ImageReadParam readP = new ImageReadParam();
         try {
-            pyramidLevelChoice = setReadParams(overviewPolicy, readP, requestedEnvelope, dim);
+            pyramidLevelChoice = setReadParams(overviewPolicy, readP, requestedEnvelope,
+                    requestedDim);
             LOGGER.info("Pyramid level chosen: " + pyramidInfo.getPyramidLevel(pyramidLevelChoice));
         } catch (TransformException e) {
             new DataSourceException(e);
         }
 
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // IMAGE READ OPERATION
-        //
-        // /////////////////////////////////////////////////////////////////////
+        /*
+         * IMAGE READ OPERATION
+         */
 
         final RasterQueryInfo queryInfo = pyramidInfo.fitExtentToRasterPixelGrid(
                 new ReferencedEnvelope(requestedEnvelope), pyramidLevelChoice);
 
         final RenderedOp coverageRaster = createRaster(pyramidLevelChoice, queryInfo);
 
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // BUILDING COVERAGE
-        //
-        // /////////////////////////////////////////////////////////////////////
+        /*
+         * BUILDING COVERAGE
+         */
+
         // I need to calculate a new transformation (raster2Model)
         // between the cropped image and the required
         // adjustedRequestEnvelope
@@ -246,28 +291,33 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
             LOGGER.log(Level.FINE, "Coverage read: width = " + ssWidth + " height = " + ssHeight);
         }
 
-        // //
-        //
-        // setting new coefficients to define a new affineTransformation
-        // to be applied to the grid to world transformation
-        // -----------------------------------------------------------------------------------
-        //
-        // With respect to the original envelope, the obtained planarImage
-        // needs to be rescaled. The scaling factors are computed as the
-        // ratio between the cropped source region sizes and the read
-        // image sizes.
-        //
-        // //
-        final double scaleX = originalGridRange.getLength(0) / (1.0 * ssWidth);
-        final double scaleY = originalGridRange.getLength(1) / (1.0 * ssHeight);
+        /*
+         * setting new coefficients to define a new affineTransformation to be applied to the grid
+         * to world transformation
+         * -----------------------------------------------------------------------------------
+         * 
+         * With respect to the original envelope, the obtained planarImage needs to be rescaled. The
+         * scaling factors are computed as the ratio between the cropped source region sizes and the
+         * read image sizes.
+         */
 
+        final double scaleX = requestedDim.width / (1.0 * ssWidth);
+        final double scaleY = requestedDim.height / (1.0 * ssHeight);
+
+        final GridSampleDimension[] bands = rasterInfo.getGridSampleDimensions();
+        GeneralEnvelope finalEnvelope = new GeneralEnvelope(queryInfo.actualEnvelope);
+        
+        return coverageFactory.create(coverageName, coverageRaster, finalEnvelope, bands, null,
+                null);
+        
+        // MathTransform rasterToModel = getRasterToModel();
         // final AffineTransform tempRaster2Model = new AffineTransform((AffineTransform)
-        // raster2Model);
+        // rasterToModel);
         // tempRaster2Model.concatenate(new AffineTransform(scaleX, 0, 0, scaleY, 0, 0));
-        //        
+        //
         // return createImageCoverage(coverageRaster, ProjectiveTransform
         // .create((AffineTransform) tempRaster2Model));
-        return createImageCoverage(coverageRaster);
+        // return createImageCoverage(coverageRaster);
     }
 
     private RenderedOp createRaster(final int pyramidLevel, final RasterQueryInfo queryInfo)
@@ -320,7 +370,7 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
             {
                 final int numTilesWide = optimalLevel.getNumTilesWide();
                 final int numTilesHigh = optimalLevel.getNumTilesHigh();
-                final Rectangle pixels = queryInfo.image;
+                final Rectangle pixels = queryInfo.requestedPixels;
                 final int imageMinX = pixels.x;
                 final int imageMinY = pixels.y;
                 final int imageMaxX = imageMinX + pixels.width;
@@ -359,7 +409,14 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
             final int actualImageWidth = tileWidth * (1 + maxTileX - minTileX);
             final int actualImageHeight = tileHeight * (1 + maxTileY - minTileY);
             actualImageSize = new Rectangle(actualX, actualY, actualImageWidth, actualImageHeight);
-
+            
+            queryInfo.actualPixels = actualImageSize;
+            queryInfo.actualEnvelope = new ReferencedEnvelope(queryInfo.requestedEnvelope.getCoordinateReferenceSystem());
+            ReferencedEnvelope minTileExtent = pyramidInfo.getTileExtent(pyramidLevel, minTileX, minTileY);
+            ReferencedEnvelope maxTileExtent = pyramidInfo.getTileExtent(pyramidLevel, maxTileX, maxTileY);
+            queryInfo.actualEnvelope.expandToInclude(minTileExtent);
+            queryInfo.actualEnvelope.expandToInclude(maxTileExtent);
+            
             final int interleaveType = SeRaster.SE_RASTER_INTERLEAVE_BIP;
             rConstraint.setInterleave(interleaveType);
             seQuery.queryRasterTile(rConstraint);

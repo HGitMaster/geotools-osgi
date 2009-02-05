@@ -213,36 +213,36 @@ public class ArcSDEPyramid {
         final double widthGeo = resX * widthPixel;
         final double heightGeo = resY * heightPixel;
 
-        ret.envelope = new ReferencedEnvelope(xMinGeo, xMinGeo + widthGeo, yMinGeo, yMinGeo
-                + heightGeo, reqEnv.getCoordinateReferenceSystem());
-        ret.image = new Rectangle(xMinPixel, yMinPixel, widthPixel, heightPixel);
+        ret.requestedEnvelope = new ReferencedEnvelope(xMinGeo, xMinGeo + widthGeo, yMinGeo,
+                yMinGeo + heightGeo, reqEnv.getCoordinateReferenceSystem());
+        ret.requestedPixels = new Rectangle(xMinPixel, yMinPixel, widthPixel, heightPixel);
 
-//        /*
-//         * figure out which tiles to query, in tile space
-//         */
-//        final int minTileX = sourceRegion.x / tileWidth;
-//        final int minTileY = sourceRegion.y / tileHeight;
-//        if (LOGGER.isLoggable(Level.FINER))
-//            LOGGER
-//                    .finer("figured minTiles: " + minTileX + "," + minTileY + ".  Image is "
-//                            + curLevel.getNumTilesWide() + "x" + curLevel.getNumTilesHigh()
-//                            + " tiles wxh.");
-//        int maxTileX = (sourceRegion.x + sourceRegion.width + tileWidth - 1) / tileWidth - 1;
-//        int maxTileY = (sourceRegion.y + sourceRegion.height + tileHeight - 1) / tileHeight - 1;
-//        if (maxTileX >= curLevel.getNumTilesWide())
-//            maxTileX = curLevel.getNumTilesWide() - 1;
-//        if (maxTileY >= curLevel.getNumTilesHigh())
-//            maxTileY = curLevel.getNumTilesHigh() - 1;
-//
-//        // figure out what our offset into the tile grid is
-//        final int tilegridOffsetX = sourceRegion.x % tileWidth;
-//        final int tilegridOffsetY = sourceRegion.y % tileHeight;
-//
-//        if (LOGGER.isLoggable(Level.INFO)) {
-//            LOGGER.info("Reading " + param.getSourceRegion() + " offset by "
-//                    + param.getDestinationOffset() + " (tiles " + minTileX + "," + minTileY
-//                    + " to " + maxTileX + "," + maxTileY + " in level " + imageIndex + ")");
-//        }
+        // /*
+        // * figure out which tiles to query, in tile space
+        // */
+        // final int minTileX = sourceRegion.x / tileWidth;
+        // final int minTileY = sourceRegion.y / tileHeight;
+        // if (LOGGER.isLoggable(Level.FINER))
+        // LOGGER
+        // .finer("figured minTiles: " + minTileX + "," + minTileY + ".  Image is "
+        // + curLevel.getNumTilesWide() + "x" + curLevel.getNumTilesHigh()
+        // + " tiles wxh.");
+        // int maxTileX = (sourceRegion.x + sourceRegion.width + tileWidth - 1) / tileWidth - 1;
+        // int maxTileY = (sourceRegion.y + sourceRegion.height + tileHeight - 1) / tileHeight - 1;
+        // if (maxTileX >= curLevel.getNumTilesWide())
+        // maxTileX = curLevel.getNumTilesWide() - 1;
+        // if (maxTileY >= curLevel.getNumTilesHigh())
+        // maxTileY = curLevel.getNumTilesHigh() - 1;
+        //
+        // // figure out what our offset into the tile grid is
+        // final int tilegridOffsetX = sourceRegion.x % tileWidth;
+        // final int tilegridOffsetY = sourceRegion.y % tileHeight;
+        //
+        // if (LOGGER.isLoggable(Level.INFO)) {
+        // LOGGER.info("Reading " + param.getSourceRegion() + " offset by "
+        // + param.getDestinationOffset() + " (tiles " + minTileX + "," + minTileY
+        // + " to " + maxTileX + "," + maxTileY + " in level " + imageIndex + ")");
+        // }
         return ret;
     }
 
@@ -278,10 +278,13 @@ public class ArcSDEPyramid {
 
     public static class RasterQueryInfo {
 
-        public Rectangle image;
+        public Rectangle requestedPixels;
 
-        public ReferencedEnvelope envelope;
+        public ReferencedEnvelope requestedEnvelope;
 
+        public Rectangle actualPixels;
+
+        public ReferencedEnvelope actualEnvelope;
     }
 
     @Override
@@ -294,5 +297,27 @@ public class ArcSDEPyramid {
         }
         b.append("\n]");
         return b.toString();
+    }
+
+    public ReferencedEnvelope getTileExtent(int pyramidLevel, int tileX, int tileY) {
+        final ArcSDEPyramidLevel level = getPyramidLevel(pyramidLevel);
+        final ReferencedEnvelope levelExtent = level.getEnvelope();
+        ReferencedEnvelope tileExtent = new ReferencedEnvelope(levelExtent
+                .getCoordinateReferenceSystem());
+        double xres = level.getXRes();
+        double yres = level.getYRes();
+
+        double tileWidth = getTileWidth();
+        double tileHeight = getTileHeight();
+
+        double tileSpanXGeo = xres * tileWidth;
+        double tileSpanYGeo = yres * tileHeight;
+
+        double minx = levelExtent.getMinX() + (tileX * tileSpanXGeo);
+        double miny = levelExtent.getMinY() + (tileY * tileSpanYGeo);
+
+        tileExtent.expandToInclude(minx, miny);
+        tileExtent.expandToInclude(minx + tileSpanXGeo, miny + tileSpanYGeo);
+        return tileExtent;
     }
 }

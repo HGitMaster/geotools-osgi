@@ -17,16 +17,23 @@
  */
 package org.geotools.arcsde.gce;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
+import org.geotools.arcsde.gce.imageio.RasterCellType;
+import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.metadata.iso.content.BandImpl;
+import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.geotools.util.NumberRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -116,7 +123,56 @@ public class RasterInfo {
     }
 
     public GridSampleDimension[] getGridSampleDimensions() {
-        return gridSampleDimensions.toArray(new GridSampleDimension[gridSampleDimensions.size()]);
+        if (gridSampleDimensions == null) {
+            synchronized (this) {
+                if (gridSampleDimensions == null) {
+                    gridSampleDimensions = buildSampleDimensions();
+                }
+            }
+        }
+        return gridSampleDimensions.toArray(new GridSampleDimension[getNumBands()]);
+    }
+
+    private List<GridSampleDimension> buildSampleDimensions() {
+        final int numBands = getNumBands();
+        List<GridSampleDimension> dimensions = new ArrayList<GridSampleDimension>(numBands);
+
+        final Color[] RGB = { Color.RED, Color.GREEN, Color.BLUE };
+        final String[] RGBCatNames = { "red", "green", "blue" };
+
+        for (RasterBandInfo band : bands) {
+            int bandNumber = band.getBandNumber();
+            RasterCellType cellType = band.getCellType();
+
+            final NumberRange<?> sampleValueRange;
+            double minimum = cellType.getMinimum();
+            double maximum = cellType.getMaximum();
+            String bandName = band.getBandName();
+
+            sampleValueRange = NumberRange.create(minimum, true, maximum, true);
+
+            final Color minColor = Color.BLACK;
+            String catName;
+            final Color maxColor;
+            switch (numBands) {
+            case 3:
+                maxColor = RGB[bandNumber - 1];
+                catName = RGBCatNames[bandNumber - 1];
+                break;
+            default:
+                maxColor = Color.WHITE;
+                catName = bandName;
+            }
+            final Color[] colorRange = { minColor, maxColor };
+            Category bandCat = new Category(catName, colorRange, sampleValueRange,
+                    LinearTransform1D.IDENTITY);
+
+            GridSampleDimension sampleDim = new GridSampleDimension(bandName,
+                    new Category[] { bandCat }, null).geophysics(true);
+
+            dimensions.add(sampleDim);
+        }
+        return dimensions;
     }
 
     public int getNumBands() {
@@ -139,9 +195,10 @@ public class RasterInfo {
         return imageHeight;
     }
 
-    public void setGridSampleDimensions(List<GridSampleDimension> gridSampleDimensions) {
-        this.gridSampleDimensions = gridSampleDimensions;
-    }
+    /*
+     * public void setGridSampleDimensions(List<GridSampleDimension> gridSampleDimensions) {
+     * this.gridSampleDimensions = gridSampleDimensions; }
+     */
 
     /**
      * @param sampleImage

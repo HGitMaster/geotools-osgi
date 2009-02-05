@@ -73,7 +73,7 @@ public abstract class AbstractArcsdeBandCopierOnlineTest {
         if (colorModel == null) {
             tableName = rasterTestData.getRasterTableName(pixelType, numBands);
         } else {
-            tableName = rasterTestData.getRasterTableName(pixelType, true);
+            tableName = rasterTestData.getRasterTableName(pixelType, numBands, true);
         }
         rasterTestData.loadTestRaster(tableName, numBands, pixelType, colorModel);
 

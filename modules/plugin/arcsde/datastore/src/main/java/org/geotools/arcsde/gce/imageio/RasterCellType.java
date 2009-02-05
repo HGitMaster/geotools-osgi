@@ -12,16 +12,16 @@ import com.esri.sde.sdk.client.SeRaster;
  * @author Gabriel Roldan
  */
 public enum RasterCellType {
-    TYPE_16BIT_S(16, DataBuffer.TYPE_SHORT, true), //
-    TYPE_16BIT_U(16, DataBuffer.TYPE_USHORT, false), //
-    TYPE_1BIT(1, DataBuffer.TYPE_BYTE, false), //
-    TYPE_32BIT_REAL(32, DataBuffer.TYPE_FLOAT, true), //
-    TYPE_32BIT_S(32, DataBuffer.TYPE_INT, true), //
-    TYPE_32BIT_U(32, DataBuffer.TYPE_INT, false), //
-    TYPE_4BIT(4, DataBuffer.TYPE_BYTE, false), //
-    TYPE_64BIT_REAL(64, DataBuffer.TYPE_DOUBLE, true), //
-    TYPE_8BIT_S(8, DataBuffer.TYPE_BYTE, true), //
-    TYPE_8BIT_U(8, DataBuffer.TYPE_BYTE, false);
+    TYPE_16BIT_S(16, DataBuffer.TYPE_SHORT, true, Short.MIN_VALUE, Short.MAX_VALUE), //
+    TYPE_16BIT_U(16, DataBuffer.TYPE_USHORT, false, 0, 65535), //
+    TYPE_1BIT(1, DataBuffer.TYPE_BYTE, false, 0, 1), //
+    TYPE_32BIT_REAL(32, DataBuffer.TYPE_FLOAT, true, Float.MIN_VALUE, Float.MAX_VALUE), //
+    TYPE_32BIT_S(32, DataBuffer.TYPE_INT, true, Integer.MIN_VALUE, Integer.MAX_VALUE), //
+    TYPE_32BIT_U(32, DataBuffer.TYPE_INT, false, 0L, ((2 ^ 32) - 1)), //
+    TYPE_4BIT(4, DataBuffer.TYPE_BYTE, false, 0, ((2 ^ 4) - 1)), //
+    TYPE_64BIT_REAL(64, DataBuffer.TYPE_DOUBLE, true, Double.MIN_VALUE, Double.MAX_VALUE), //
+    TYPE_8BIT_S(8, DataBuffer.TYPE_BYTE, true, Byte.MIN_VALUE, Byte.MAX_VALUE), //
+    TYPE_8BIT_U(8, DataBuffer.TYPE_BYTE, false, 0, 255);
     static {
         TYPE_16BIT_S.setSdeTypeId(SeRaster.SE_PIXEL_TYPE_16BIT_S);
         TYPE_16BIT_U.setSdeTypeId(SeRaster.SE_PIXEL_TYPE_16BIT_U);
@@ -38,15 +38,20 @@ public enum RasterCellType {
     private int typeId;
 
     private final int bitsPerSample;
-    
+
     private final int dataBufferType;
 
     private final boolean signed;
-    
-    private RasterCellType(final int bitsPerSample, final int dataBufferType, final boolean signed) {
+
+    private final Number minimum, maximum;
+
+    private RasterCellType(final int bitsPerSample, final int dataBufferType, final boolean signed,
+            Number minimum, Number maximum) {
         this.bitsPerSample = bitsPerSample;
         this.dataBufferType = dataBufferType;
         this.signed = signed;
+        this.minimum = minimum;
+        this.maximum = maximum;
     }
 
     private void setSdeTypeId(int typeId) {
@@ -77,6 +82,14 @@ public enum RasterCellType {
         }
         throw new NoSuchElementException("Raster pixel type " + seRasterPixelType
                 + " does not exist");
+    }
+
+    public double getMinimum() {
+        return minimum.doubleValue();
+    }
+
+    public double getMaximum() {
+        return maximum.doubleValue();
     }
 
 }

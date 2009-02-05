@@ -3,16 +3,20 @@
  */
 package org.geotools.arcsde.gce;
 
+import static org.geotools.arcsde.gce.imageio.RasterCellType.*;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
+import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -25,13 +29,12 @@ import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
-import org.geotools.referencing.CRS;
-import org.geotools.test.TestData;
+import org.geotools.util.logging.Logging;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
@@ -44,6 +47,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 @SuppressWarnings( { "deprecation", "nls" })
 public class ArcSDEGridCoverage2DReaderJAITest {
 
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
+
     static RasterTestData rasterTestData;
 
     private static String tableName;
@@ -52,7 +57,7 @@ public class ArcSDEGridCoverage2DReaderJAITest {
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
-        tableName = rasterTestData.loadRGBRaster();
+        rasterTestData.setOverrideExistingTestTables(false);
     }
 
     @AfterClass
@@ -78,17 +83,88 @@ public class ArcSDEGridCoverage2DReaderJAITest {
      * Test method for {@link org.geotools.arcsde.gce.ArcSDEGridCoverage2DReaderJAI#getInfo()}.
      */
     @Test
+    @Ignore
     public void testGetInfo() {
         fail("Not yet implemented");
     }
 
-    /**
-     * Test method for
-     * {@link org.geotools.arcsde.gce.ArcSDEGridCoverage2DReaderJAI#read(org.opengis.parameter.GeneralParameterValue[])}
-     * .
-     */
     @Test
-    public void tesReadFullLevel0() throws Exception {
+    public void testRead_1bit_1Band() throws Exception {
+        testReadFullLevel0(TYPE_1BIT, 1);
+    }
+
+    @Test
+    public void testRead_1bit_7Band() throws Exception {
+        testReadFullLevel0(TYPE_1BIT, 7);
+    }
+
+    @Test
+    public void testRead_8bit_U_1Band() throws Exception {
+        testReadFullLevel0(TYPE_8BIT_U, 1);
+    }
+
+    @Test
+    public void testRead_8bit_U_7Band() throws Exception {
+        testReadFullLevel0(TYPE_8BIT_U, 7);
+    }
+
+    @Test
+    @Ignore
+    public void testRead_8bit_S_1Band() throws Exception {
+        testReadFullLevel0(TYPE_8BIT_S, 1);
+    }
+
+    @Test
+    @Ignore
+    public void testRead_8bit_S_7Band() throws Exception {
+        testReadFullLevel0(TYPE_8BIT_S, 7);
+    }
+
+    @Test
+    public void testRead_16bit_S_1Band() throws Exception {
+        testReadFullLevel0(TYPE_16BIT_S, 1);
+    }
+
+    @Test
+    public void testRead_16bit_S_7Band() throws Exception {
+        testReadFullLevel0(TYPE_16BIT_S, 7);
+    }
+
+    @Test
+    public void testRead_16bit_U_1Band() throws Exception {
+        testReadFullLevel0(TYPE_16BIT_U, 1);
+    }
+
+    @Test
+    public void testRead_16bit_U_7Band() throws Exception {
+        testReadFullLevel0(TYPE_16BIT_U, 7);
+    }
+
+    @Test
+    public void testRead_32bit_REAL_1Band() throws Exception {
+        testReadFullLevel0(TYPE_32BIT_REAL, 1);
+    }
+
+    @Test
+    public void testRead_32bit_REAL_7Band() throws Exception {
+        testReadFullLevel0(TYPE_32BIT_REAL, 7);
+    }
+
+    @Test
+    public void testReadSampleRGB() throws Exception {
+        tableName = rasterTestData.loadRGBRaster();
+        testReadFullLevel0("sampleRGB");
+    }
+
+    private void testReadFullLevel0(final RasterCellType cellType, final int numBands)
+            throws Exception {
+
+        tableName = rasterTestData.getRasterTableName(cellType, numBands, false);
+        rasterTestData.loadTestRaster(tableName, numBands, cellType, null);
+        testReadFullLevel0(tableName + "_" + numBands + "-Band");
+    }
+
+    private void testReadFullLevel0(final String fileNamePostFix) throws Exception {
 
         final AbstractGridCoverage2DReader reader = getReader();
         assertNotNull(reader);
@@ -102,13 +178,12 @@ public class ArcSDEGridCoverage2DReaderJAITest {
                 originalEnvelope);
         assertNotNull(coverage);
 
-        String fileName = "tesReadFullLevel0";
+        String fileName = "tesReadFullLevel0_" + fileNamePostFix;
 
         final RenderedImage image = writeToDisk(coverage, fileName);
 
         System.out.println(image);
 
-        writeToDisk(coverage, fileName + "_2");
         // BufferedImage expected = ImageIO.read(TestData.file(null, rasterTestData
         // .getRasterTestDataProperty("sampledata.rgbraster")));
         // expected = expected.getSubimage(0, expected.getHeight() - 128, 256, 128);
@@ -136,50 +211,65 @@ public class ArcSDEGridCoverage2DReaderJAITest {
         final GeneralEnvelope requestedEnvelope;
         final GridCoverage2D coverage;
         {
-            double minx = originalEnvelope.getMinimum(0);
+            final double minx = originalEnvelope.getMinimum(0);
+            final double miny = originalEnvelope.getMinimum(1);
 
             double shiftX = originalEnvelope.getSpan(0) / 2;
-            double miny = originalEnvelope.getMinimum(1);
             double shiftY = originalEnvelope.getSpan(1) / 2;
 
             double x1 = minx - shiftX;
             double x2 = minx + shiftX;
-            double y1 = miny + shiftY;
-            double y2 = miny + 2 * shiftY;
+            double y1 = miny - shiftY;
+            double y2 = miny + shiftY;
 
             requestedEnvelope = new GeneralEnvelope(new ReferencedEnvelope(x1, x2, y1, y2,
                     originalCrs));
             coverage = readCoverage(reader, requestedWidth, requestedHeight, requestedEnvelope);
         }
         assertNotNull(coverage);
+        assertNotNull(coverage.getRenderedImage());
 
         final String fileName = "tesReadDisplaced_Level0";
 
         final RenderedImage image = writeToDisk(coverage, fileName);
 
-        System.out.println(image);
-
         assertSame(originalCrs, coverage.getCoordinateReferenceSystem());
 
-        Envelope envelope = coverage.getEnvelope();
+        final Envelope returnedEnvelope = coverage.getEnvelope();
 
-        System.out.println("Requested width : " + requestedWidth + 
-                         "\nReturned width  :" + coverage.getRenderedImage().getWidth() + 
-                         "\nRequested height:" + requestedHeight + 
-                         "\nReturned height :" + coverage.getRenderedImage().getHeight());
-        
-        System.out.println("Original envelope  : " + originalEnvelope + "\n requested envelope :"
-                + requestedEnvelope + "\n returned envelope  :" + envelope);
+        // these ones should equal to the tile dimension in the arcsde raster
+        int tileWidth = image.getTileWidth();
+        int tileHeight = image.getTileHeight();
+        assertTrue(tileWidth > 0);
+        assertTrue(tileHeight > 0);
 
-        // BufferedImage expected = ImageIO.read(TestData.file(null, rasterTestData
-        // .getRasterTestDataProperty("sampledata.rgbraster")));
-        // expected = expected.getSubimage(0, expected.getHeight() - 128, 256, 128);
-        //
-        // ImageIO.write(expected, "TIFF", new File(file + "-original.tiff"));
-        //
-        // Assert.assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
-        // coverage.view(ViewType.PHOTOGRAPHIC).getRenderedImage(), expected));
-        //
+        int fullWidth = originalGridRange.getSpan(0);
+        int fullHeight = originalGridRange.getSpan(1);
+        // we asked for an extend that overlaps with half the width and half the height of the
+        // original image, so lets figure out how many actual tiles should have been fetched
+        final int expectedWidth = tileWidth
+                * (int) Math.ceil((fullWidth / (double) 2 / (double) tileWidth));
+        final int expectedHeight = tileHeight
+                * (int) Math.ceil(((fullHeight / (double) 2) / (double) tileHeight));
+
+        GeneralEnvelope expectedEnvelope = new GeneralEnvelope(originalCrs);
+        expectedEnvelope.setRange(0, originalEnvelope.getMinimum(0), originalEnvelope.getMinimum(0)
+                + (originalEnvelope.getSpan(0) / 2));
+
+        expectedEnvelope.setRange(1, originalEnvelope.getMinimum(1), originalEnvelope.getMinimum(1)
+                + (originalEnvelope.getSpan(1) / 2));
+
+        LOGGER.info("\nRequested width : " + requestedWidth + "\nReturned width  :"
+                + image.getWidth() + "\nRequested height:" + requestedHeight
+                + "\nReturned height :" + image.getHeight());
+
+        LOGGER.info("\nOriginal envelope  : " + originalEnvelope + "\n requested envelope :"
+                + requestedEnvelope + "\n expected envelope  :" + expectedEnvelope
+                + "\n returned envelope  :" + returnedEnvelope);
+
+        assertEquals(expectedWidth, image.getWidth());
+        assertEquals(expectedHeight, image.getHeight());
+        assertEquals(expectedEnvelope, returnedEnvelope);
     }
 
     private RenderedImage writeToDisk(final GridCoverage2D coverage, String fileName) {

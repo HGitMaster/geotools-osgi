@@ -59,7 +59,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
- * @version $Id: ArcSDEPyramidTest.java 32417 2009-02-05 16:51:43Z groldan $
+ * @version $Id: ArcSDEPyramidTest.java 32418 2009-02-05 20:52:41Z groldan $
  */
 public class ArcSDEPyramidTest {
 
@@ -134,7 +134,7 @@ public class ArcSDEPyramidTest {
 
         RasterTestData testData = new RasterTestData();
         testData.setUp();
-        String tableName = testData.getRasterTableName(RasterCellType.TYPE_8BIT_U, false);
+        String tableName = testData.getRasterTableName(RasterCellType.TYPE_8BIT_U, 1, false);
         testData.loadTestRaster(tableName, 1, 1013, 1021, RasterCellType.TYPE_8BIT_U, null, true,
                 false, SeRaster.SE_INTERPOLATION_NEAREST, 9);
 

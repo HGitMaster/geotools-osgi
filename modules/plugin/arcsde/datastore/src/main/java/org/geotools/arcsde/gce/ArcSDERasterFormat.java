@@ -490,16 +490,16 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
         bands = setUpBandInfo(scon, rasterTable, rasterAttributes);
 
-        sampleImage = RasterUtils.createCompatibleBufferedImage(1, 1, bands.size(), cellType, bands
-                .get(0).getColorMap());
+//        sampleImage = RasterUtils.createCompatibleBufferedImage(1, 1, bands.size(), cellType, bands
+//                .get(0).getColorMap());
 
-        gridSampleDimensions = buildGridSampleDimensions(scon, rasterTable, rasterAttributes);
+        //gridSampleDimensions = buildGridSampleDimensions(scon, rasterTable, rasterAttributes);
 
         originalEnvelope = calculateOriginalEnvelope(rasterAttributes, coverageCrs);
 
         GeneralGridRange originalGridRange = calculateOriginalGridRange(pyramidInfo);
 
-        imageIOReader = createImageIOReader(rasterTable, rasterColumns, pyramidInfo, sampleImage);
+        //imageIOReader = createImageIOReader(rasterTable, rasterColumns, pyramidInfo, sampleImage);
 
         RasterInfo rasterInfo = new RasterInfo();
         try {
@@ -510,15 +510,15 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         }
         rasterInfo.setRasterTable(rasterTable);
         rasterInfo.setRasterColumns(rasterColumns);
-        rasterInfo.setGridSampleDimensions(gridSampleDimensions);
+        //rasterInfo.setGridSampleDimensions(gridSampleDimensions);
         rasterInfo.setLevelZeroPRP(levelZeroPRP);
         rasterInfo.setBands(bands);
         rasterInfo.setPyramidInfo(pyramidInfo);
-        rasterInfo.setSampleImage(sampleImage);
+        //rasterInfo.setSampleImage(sampleImage);
         rasterInfo.setCoverageCrs(coverageCrs);
         rasterInfo.setOriginalEnvelope(originalEnvelope);
         rasterInfo.setOriginalGridRange(originalGridRange);
-        rasterInfo.setImageIOReader(imageIOReader);
+        //rasterInfo.setImageIOReader(imageIOReader);
 
         return rasterInfo;
     }
@@ -603,7 +603,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         return rasterColumns;
     }
 
-    private List<GridSampleDimension> buildGridSampleDimensions(ArcSDEPooledConnection conn,
+    
+    private List<GridSampleDimension> buildGridSampleDimensions_Old(ArcSDEPooledConnection conn,
             String coverageName, SeRasterAttr rasterAttributes) throws IOException {
 
         List<GridSampleDimension> gridBands;
@@ -672,7 +673,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                         final NumberRange<Float> sampleValueRange;
                         sampleValueRange = NumberRange.create(minimum, maximum);
                         final Color minColor = Color.BLACK;
-                        final Color maxColor = Color.RED;
+                        final Color maxColor = Color.WHITE;
                         final Color[] colorRange = { minColor, maxColor };
                         final MathTransform1D sampleToGeophysics = identity;
                         floatBandCategory = new Category(bandName, colorRange, sampleValueRange,
@@ -755,8 +756,11 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                         null));
                 gridBands.add(new GridSampleDimension("Blue band", new Category[] { greenBandCat },
                         null));
-//                gridBands.add(new GridSampleDimension("NODATA Mask Band", new Category[] { nan,
-//                        white }, null));
+                if(numBands == 4){
+                    //temporary workaround
+                    gridBands.add(new GridSampleDimension("NODATA Mask Band", new Category[] { nan,
+                        white }, null));
+                }
 
             } else {
                 throw new DataSourceException("The coverage contains " + numBands

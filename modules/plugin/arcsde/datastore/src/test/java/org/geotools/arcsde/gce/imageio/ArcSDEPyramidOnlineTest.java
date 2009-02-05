@@ -55,7 +55,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
- * @version $Id: ArcSDEPyramidOnlineTest.java 32417 2009-02-05 16:51:43Z groldan $
+ * @version $Id: ArcSDEPyramidOnlineTest.java 32418 2009-02-05 20:52:41Z groldan $
  */
 public class ArcSDEPyramidOnlineTest {
 
@@ -117,8 +117,8 @@ public class ArcSDEPyramidOnlineTest {
         assertEquals(6, imgLevel);
         // LOGGER.info(ret.image + "");
         // LOGGER.info(ret.envelope + "");
-        assertTrue(ret.image.equals(new Rectangle(-1, 5581, 470, 295)));
-        assertTrue(ret.envelope.contains((BoundingBox) env));
+        assertTrue(ret.requestedPixels.equals(new Rectangle(-1, 5581, 470, 295)));
+        assertTrue(ret.requestedEnvelope.contains((BoundingBox) env));
 
         env = new ReferencedEnvelope(40000.0, 41001.0, 800000.0, 801001.0, crs);
         imageSize = new Rectangle(1000, 1000);
@@ -127,8 +127,8 @@ public class ArcSDEPyramidOnlineTest {
         assertTrue(imgLevel == 1);
         // LOGGER.info(ret.image + "");
         // LOGGER.info(ret.envelope + "");
-        assertTrue(ret.image.equals(new Rectangle(6999, 160999, 1002, 1002)));
-        assertTrue(ret.envelope.contains((BoundingBox) env));
+        assertTrue(ret.requestedPixels.equals(new Rectangle(6999, 160999, 1002, 1002)));
+        assertTrue(ret.requestedEnvelope.contains((BoundingBox) env));
 
     }
 
@@ -169,8 +169,8 @@ public class ArcSDEPyramidOnlineTest {
         assertEquals(1, imgLevel);
         // LOGGER.info(ret.image + "");
         // LOGGER.info(ret.envelope + "");
-        assertEquals(new Rectangle(0, 0, 258, 129), ret.image);
-        assertTrue(ret.envelope.contains((BoundingBox) env));
+        assertEquals(new Rectangle(0, 0, 258, 129), ret.requestedPixels);
+        assertTrue(ret.requestedEnvelope.contains((BoundingBox) env));
 
         // TODO
         // env = new ReferencedEnvelope(40000, 40000, 800000, 801000, crs);

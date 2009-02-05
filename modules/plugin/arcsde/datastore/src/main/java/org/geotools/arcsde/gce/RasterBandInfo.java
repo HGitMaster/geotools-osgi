@@ -17,6 +17,7 @@
  */
 package org.geotools.arcsde.gce;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.awt.image.IndexColorModel;
@@ -29,6 +30,10 @@ import org.geotools.arcsde.gce.imageio.CompressionType;
 import org.geotools.arcsde.gce.imageio.InterleaveType;
 import org.geotools.arcsde.gce.imageio.InterpolationType;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
+import org.geotools.coverage.Category;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.geotools.util.NumberRange;
 
 import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeException;
@@ -148,6 +153,7 @@ public class RasterBandInfo {
         tileOrigin = new Point2D.Double(tOrigin.getX(), tOrigin.getY());
 
         rasterBandCopier = ArcSDERasterBandCopier.getInstance(cellType, tileWidth, tileHeight);
+
     }
 
     public ArcSDERasterBandCopier getRasterBandCopier() {

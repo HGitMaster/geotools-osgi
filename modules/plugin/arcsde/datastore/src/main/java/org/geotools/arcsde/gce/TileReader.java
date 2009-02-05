@@ -1,12 +1,12 @@
 package org.geotools.arcsde.gce;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
-import org.geotools.data.DataSourceException;
 import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeConnection;
@@ -19,9 +19,7 @@ public abstract class TileReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
-    protected final SeConnection conn;
-
-    protected final SeRow row;
+    private TileIterator tileIterator;
 
     private SeRasterTile lastFetchedTile;
 
@@ -38,6 +36,61 @@ public abstract class TileReader {
     private int tileHeight;
 
     private int bitsPerSample;
+
+    private static class TileIterator {
+        private final SeRow row;
+
+        private SeConnection conn;
+
+        private SeRasterTile nextTile;
+
+        private boolean started;
+
+        public TileIterator(SeConnection conn, SeRow row) {
+            this.conn = conn;
+            this.row = row;
+            started = false;
+        }
+
+        public boolean hasNext() throws IOException {
+            if (!started) {
+                try {
+                    nextTile = row.getRasterTile();
+                    started = true;
+                } catch (SeException e) {
+                    throw new ArcSdeException(e);
+                }
+            }
+            return nextTile != null;
+        }
+
+        public SeRasterTile next() throws IOException {
+            if (nextTile == null) {
+                throw new EOFException("No more tiles to read");
+            }
+            SeRasterTile curr = nextTile;
+            try {
+                nextTile = row.getRasterTile();
+                if (nextTile == null) {
+                    LOGGER.info("Releasing the connection since there're no mor tiles to fetch");
+                    close();
+                }
+            } catch (SeException e) {
+                throw new ArcSdeException(e);
+            }
+            return curr;
+        }
+
+        public void close() throws IOException {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SeException e) {
+                    throw new ArcSdeException(e);
+                }
+            }
+        }
+    }
 
     public static TileReader getInstance(final SeConnection conn, final RasterCellType cellType,
             final SeRow row, final int numberOfBands, int tileW, int tileH) {
@@ -58,8 +111,7 @@ public abstract class TileReader {
 
     private TileReader(final SeConnection conn, final SeRow row, final int numberOfBands,
             int tileW, int tileH, int bitsPerSample) {
-        this.conn = conn;
-        this.row = row;
+        this.tileIterator = new TileIterator(conn, row);
         this.numberOfBands = numberOfBands;
         this.tileWidth = tileW;
         this.tileHeight = tileH;
@@ -67,12 +119,8 @@ public abstract class TileReader {
     }
 
     public final void close() throws IOException {
-        try {
-            row.reset();
-            conn.close();
-        } catch (SeException e) {
-            throw new ArcSdeException(e);
-        }
+        LOGGER.fine("Close explicitly called, releasing connection if still in use");
+        tileIterator.close();
     }
 
     protected final void markRead(int actualByteReadCount) throws IOException {
@@ -80,17 +128,10 @@ public abstract class TileReader {
     }
 
     private byte[] fetchTile() throws IOException {
-        try {
-            lastFetchedTile = row.getRasterTile();
-        } catch (SeException e) {
-            throw new ArcSdeException(e);
+        if (tileIterator.hasNext()) {
+            lastFetchedTile = tileIterator.next();
         }
 
-        if (lastFetchedTile == null) {
-            // no more tiles to fetch (aka, EOF)
-            return null;
-        }
-        
         final int tileDataLength = (tileWidth * tileHeight * bitsPerSample) / 8;
         final byte[] tileData = new byte[tileDataLength];
         Arrays.fill(tileData, (byte) 0x00);

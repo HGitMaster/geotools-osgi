@@ -157,14 +157,14 @@ public class RasterUtils {
         rasterGridInfo = pyramidInfo.fitExtentToRasterPixelGrid(reqEnv, pyramidLevel);
 
         final BufferedImage actualOutputImage = createInitialBufferedImage(sampleImage,
-                rasterGridInfo.image.width, rasterGridInfo.image.height);
+                rasterGridInfo.requestedPixels.width, rasterGridInfo.requestedPixels.height);
 
         final Rectangle sourceRegion = calculateSourceRegion(pyramidLevel, pyramidInfo,
                 levelZeroPRP, rasterGridInfo);
 
         final BufferedImage outputImage = getDrawingImage(rasterGridInfo, actualOutputImage);
 
-        final GeneralEnvelope outputImageEnvelope = new GeneralEnvelope(rasterGridInfo.envelope);
+        final GeneralEnvelope outputImageEnvelope = new GeneralEnvelope(rasterGridInfo.requestedEnvelope);
 
         // not quite sure how, but I figure one could request a subset
         // of all available bands...
@@ -225,13 +225,13 @@ public class RasterUtils {
     private static BufferedImage getDrawingImage(final RasterQueryInfo rasterGridInfo,
             final BufferedImage actualOutputImage) {
         final BufferedImage outputImage;
-        if (rasterGridInfo.image.x < 0 || rasterGridInfo.image.y < 0) {
+        if (rasterGridInfo.requestedPixels.x < 0 || rasterGridInfo.requestedPixels.y < 0) {
             Point destOffset = new Point(0, 0);
-            if (rasterGridInfo.image.x < 0) {
-                destOffset.x = rasterGridInfo.image.x * -1;
+            if (rasterGridInfo.requestedPixels.x < 0) {
+                destOffset.x = rasterGridInfo.requestedPixels.x * -1;
             }
-            if (rasterGridInfo.image.y < 0) {
-                destOffset.y = rasterGridInfo.image.y * -1;
+            if (rasterGridInfo.requestedPixels.y < 0) {
+                destOffset.y = rasterGridInfo.requestedPixels.y * -1;
             }
             outputImage = actualOutputImage.getSubimage(destOffset.x, destOffset.y,
                     actualOutputImage.getWidth() - destOffset.x, actualOutputImage.getHeight()
@@ -251,11 +251,11 @@ public class RasterUtils {
     public static Rectangle calculateSourceRegion(final int pyramidLevel,
             final ArcSDEPyramid pyramidInfo, final Point levelZeroPRP,
             final RasterQueryInfo rasterGridInfo) throws NegativelyIndexedTileException {
-        final int minImageX = Math.max(rasterGridInfo.image.x, 0);
-        final int maxImageX = Math.min(rasterGridInfo.image.x + rasterGridInfo.image.width,
+        final int minImageX = Math.max(rasterGridInfo.requestedPixels.x, 0);
+        final int maxImageX = Math.min(rasterGridInfo.requestedPixels.x + rasterGridInfo.requestedPixels.width,
                 pyramidInfo.getPyramidLevel(pyramidLevel).size.width);
-        int minImageY = Math.max(rasterGridInfo.image.y, 0);
-        int maxImageY = Math.min(rasterGridInfo.image.y + rasterGridInfo.image.height, pyramidInfo
+        int minImageY = Math.max(rasterGridInfo.requestedPixels.y, 0);
+        int maxImageY = Math.min(rasterGridInfo.requestedPixels.y + rasterGridInfo.requestedPixels.height, pyramidInfo
                 .getPyramidLevel(pyramidLevel).size.height);
 
         Rectangle sourceRegion = new Rectangle(minImageX, minImageY, maxImageX - minImageX,
@@ -280,7 +280,7 @@ public class RasterUtils {
         if (LOGGER.isLoggable(Level.FINE))
             LOGGER.fine("Expanded request to cover source region [" + sourceRegion + "] in level "
                     + pyramidLevel + ".  Spatial extent of this source region is "
-                    + rasterGridInfo.envelope);
+                    + rasterGridInfo.requestedEnvelope);
         return sourceRegion;
     }
 

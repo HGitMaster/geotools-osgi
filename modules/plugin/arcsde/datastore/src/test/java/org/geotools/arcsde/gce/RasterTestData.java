@@ -104,10 +104,15 @@ public class RasterTestData {
 
     private ArcSDEConnectionPool _pool;
 
+    private Object overr;
+
+    private boolean overrideExistingTables;
+
     public void setUp() throws IOException {
         // load a raster dataset into SDE
         testData = new TestData();
         testData.setUp();
+        overrideExistingTables = true;
     }
 
     public void tearDown() throws Exception {
@@ -127,9 +132,9 @@ public class RasterTestData {
         return this._pool;
     }
 
-    public String getRasterTableName(final RasterCellType cellType, final boolean colorMapped)
-            throws IOException {
-        String testTableName = testData.getTempTableName() + "_" + cellType;
+    public String getRasterTableName(final RasterCellType cellType, final int numBands,
+            final boolean colorMapped) throws IOException {
+        String testTableName = getRasterTableName(cellType, numBands);
         if (colorMapped) {
             testTableName += "_CM";
         }
@@ -149,9 +154,9 @@ public class RasterTestData {
         return createCoverageUrl(rasterTableName);
     }
 
-    public String createCoverageUrl(final RasterCellType cellType, final boolean colorMapped)
+    public String createCoverageUrl(final RasterCellType cellType, final int numBands, final boolean colorMapped)
             throws IOException {
-        final String rasterTableName = getRasterTableName(cellType, colorMapped);
+        final String rasterTableName = getRasterTableName(cellType, numBands, colorMapped);
         return createCoverageUrl(rasterTableName);
     }
 
@@ -234,7 +239,7 @@ public class RasterTestData {
     }
 
     public String loadRGBColorMappedRaster() throws Exception {
-        final String tableName = getRasterTableName(TYPE_8BIT_U, true);
+        final String tableName = getRasterTableName(TYPE_8BIT_U, 1, true);
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
@@ -1282,6 +1287,15 @@ public class RasterTestData {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * TODO: avoiding the deletion of an existing table not yet implemented
+     * 
+     * @param override
+     */
+    public void setOverrideExistingTestTables(boolean override) {
+        this.overrideExistingTables = override;
     }
 
 }
