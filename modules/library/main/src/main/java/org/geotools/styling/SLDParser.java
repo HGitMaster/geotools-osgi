@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
@@ -85,6 +86,10 @@ public class SLDParser {
     private static final String colorMapQuantityString = "quantity";
 
     private static final String colorMapLabelString = "label";
+    
+    private static final Pattern WHITESPACES = Pattern.compile("\\s+", Pattern.MULTILINE);
+    private static final Pattern LEADING_WHITESPACES = Pattern.compile("^\\s+");
+    private static final Pattern TRAILING_WHITESPACES = Pattern.compile("\\s+$");
 
     private FilterFactory ff;
 
@@ -946,7 +951,7 @@ public class SLDParser {
             } else if (childName.equalsIgnoreCase("Label")) {
                 if (LOGGER.isLoggable(Level.FINEST))
                     LOGGER.finest("parsing label " + child.getNodeValue());
-                // the label parser should preserve whitespaces, so
+                // the label parser should collapse whitespaces to one, so
                 // we call parseCssParameter with trimWhiteSpace=false
                 symbol.setLabel(parseCssParameter(child, false));
                 if (symbol.getLabel() == null) {
@@ -1798,18 +1803,17 @@ public class SLDParser {
      * @param root
      *            node to parse
      * @param trimWhiteSpace
-     *            true to trim whitespace from text nodes
+     *            true to trim whitespace from text nodes. If false, whitespaces will be collapsed into one
      * @return
      */
     private Expression parseCssParameter(Node root, boolean trimWhiteSpace) {
-        Expression ret = null;
-
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("parsingCssParam " + root);
         }
 
         NodeList children = root.getChildNodes();
         final int length = children.getLength();
+        List<Expression> expressions = new ArrayList();
         for (int i = 0; i < length; i++) {
             Node child = children.item(i);
 
@@ -1819,20 +1823,31 @@ public class SLDParser {
                 continue;
             } else if (child.getNodeType() == Node.TEXT_NODE) {
                 String value = child.getNodeValue();
-                // trim whitespace if asked to do so
-                value = (value != null && trimWhiteSpace) ? value.trim() : value;
+                if(value == null)
+                    continue;
+                
+                if(trimWhiteSpace) {
+                    value = value.trim();
+                } else {
+                    // by spec the inner spaces should collapsed into one, leading and trailing 
+                    // space should be eliminated too
+                    // http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/ (4.3.6 whiteSpace)
+                    
+                    // remove inside spaces
+                    value = WHITESPACES.matcher(value).replaceAll(" ");
+                    // we can't deal with leading and trailing whitespaces now
+                    // as the parser will return each line of whitespace as a separate element
+                    // we have to do that as post processing
+                }
+                
                 if (value != null && value.length() != 0) {
-                    Element literal = dom.createElement("literal");
-                    Node text = dom.createTextNode(value);
-
-                    literal.appendChild(text);
+                    Literal literal = ff.literal(value);
 
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.finest("Built new literal " + literal);
                     }
                     // add the text node as a literal
-                    ret = manageMixed(ret, org.geotools.filter.ExpressionDOMParser
-                            .parseExpression(literal));
+                    expressions.add(literal);
                 }
             } else if (child.getNodeType() == Node.ELEMENT_NODE) {
 
@@ -1840,9 +1855,9 @@ public class SLDParser {
                     LOGGER.finest("about to parse " + child.getLocalName());
                 }
                 // add the element node as an expression
-                ret = manageMixed(ret, org.geotools.filter.ExpressionDOMParser
+                expressions.add(org.geotools.filter.ExpressionDOMParser
                         .parseExpression(child));
-            }else if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
+            } else if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
                 String value = child.getNodeValue();
                 if (value != null && value.length() != 0) {
                     // we build a literal straight, to preserve even cdata sections
@@ -1854,15 +1869,79 @@ public class SLDParser {
                         LOGGER.finest("Built new literal " + literal);
                     }
                     // add the text node as a literal
-                    ret = manageMixed(ret, literal);
+                    expressions.add(literal);
                 }
             } else
                 continue;
 
         }
 
-        if (ret == null && LOGGER.isLoggable(Level.FINEST)) {
+        if (expressions.size() == 0 && LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("no children in CssParam");
+        } 
+        
+        if(!trimWhiteSpace) {
+            // remove all leading white spaces, which means, find all
+            // string literals, remove the white space ones, eventually
+            // remove the leading white space form the first non white space one
+            while(expressions.size() > 0) {
+                Expression ex = expressions.get(0);
+                
+                // if it's not a string literal we're done
+                if(!(ex instanceof Literal))
+                    break;
+                Literal literal = (Literal) ex;
+                if(!(literal.getValue() instanceof String))
+                    break;
+                
+                // ok, string literal.  
+                String s = (String) literal.getValue();
+                if("".equals(s.trim())) {
+                    // If it's whitespace, we have to remove it and continue
+                    expressions.remove(0);
+                } else {
+                    // if it's not only whitespace, remove anyways the eventual whitespace 
+                    // at its beginning, and then exit, leading whitespace removal is done
+                    if(s.startsWith(" ")) {
+                        s = LEADING_WHITESPACES.matcher(s).replaceAll("");
+                        expressions.set(0, ff.literal(s));
+                    }
+                    break;
+                } 
+            }
+            
+            // remove also all trailing white spaces the same way
+            while(expressions.size() > 0) {
+                Expression ex = expressions.get(expressions.size() - 1);
+                
+                // if it's not a string literal we're done
+                if(!(ex instanceof Literal))
+                    break;
+                Literal literal = (Literal) ex;
+                if(!(literal.getValue() instanceof String))
+                    break;
+                
+                // ok, string literal.  
+                String s = (String) literal.getValue();
+                if("".equals(s.trim())) {
+                 // If it's whitespace, we have to remove it and continue
+                    expressions.remove(expressions.size() - 1);
+                } else {
+                    // if it's not only whitespace, remove anyways the eventual whitespace 
+                    // at its end, and then exit, trailing whitespace removal is done
+                    if(s.endsWith(" ")) {
+                        s = TRAILING_WHITESPACES.matcher(s).replaceAll("");
+                        expressions.set(expressions.size() - 1, ff.literal(s));
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // now combine all expressions into one
+        Expression ret = null;
+        for (Expression expression : expressions) {
+            ret = manageMixed(ret, expression);
         }
 
         return ret;

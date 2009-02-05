@@ -11,16 +11,14 @@
       <FeatureTypeStyle>
         <Rule>
           <Name>Polygon fill mixed</Name>
-          <PolygonSymbolizer>
-            <Fill>
-              <CssParameter name="fill"><ogc:Literal>#96</ogc:Literal>C3F5</CssParameter>
-            </Fill>
-          </PolygonSymbolizer>
           <TextSymbolizer>
-            <Label>   
-            this is a prefix; <ogc:Literal>this is an expression</ogc:Literal>; this is a postfix
+            <Label>
+            <!-- this is a label consisting of the concatenation of two expressions with a 
+                 CDATA section in between to assert we can avoid whitespaces, newlines, etc from being trimmed -->
+            <ogc:Literal>literal_1</ogc:Literal><![CDATA[
+]]><ogc:Literal>literal_2</ogc:Literal>
             </Label>
-          </TextSymbolizer>
+        </TextSymbolizer>
         </Rule>
       </FeatureTypeStyle>
     </UserStyle>

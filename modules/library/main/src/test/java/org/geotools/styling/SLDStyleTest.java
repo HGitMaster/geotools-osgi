@@ -186,6 +186,23 @@ public class SLDStyleTest extends TestCase {
 
          assertEquals("literal_1\n cdata literal_2", labelValue);
     }
+    
+    public void testSLDParserWithhMixedContentCDATASpaces() throws Exception {
+        java.net.URL surl = TestData.getResource(this, "mixedContentWithCDATASpaces.xml");
+         SLDParser stylereader = new SLDParser(sf, surl);
+         StyledLayerDescriptor sld = stylereader.parseSLD();
+         
+         Symbolizer[] symbolizers = ((NamedLayer) sld.getStyledLayers()[0]).getStyles()[0]
+                .getFeatureTypeStyles()[0].getRules()[0].getSymbolizers();
+
+         TextSymbolizer text = (TextSymbolizer) symbolizers[0];
+         
+         Expression label = text.getLabel();
+         
+         String labelValue = (String) label.evaluate(null, String.class);
+
+         assertEquals("literal_1\nliteral_2", labelValue);
+    }
 
     /**
 	 * SLD --> XML --> SLD
