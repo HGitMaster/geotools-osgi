@@ -16,7 +16,9 @@
  */
 package org.geotools.renderer.shape;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.GRX;
+import static org.geotools.data.shapefile.ShpFileType.QIX;
+import static org.geotools.data.shapefile.ShpFileType.SHX;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -78,6 +80,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
+import org.geotools.renderer.label.LabelCacheImpl;
 import org.geotools.renderer.lite.LabelCache;
 import org.geotools.renderer.lite.LabelCacheDefault;
 import org.geotools.renderer.lite.ListenerList;
@@ -191,7 +194,7 @@ public class ShapefileRenderer implements GTRenderer {
     private boolean renderingStopRequested;
     private boolean concatTransforms;
     private MapContext context;
-    LabelCache labelCache = new LabelCacheDefault();
+    LabelCache labelCache = new LabelCacheImpl();
     private ListenerList renderListeners = new ListenerList();
     /** If we are caching styles; by default this is false */
     boolean caching = false;
