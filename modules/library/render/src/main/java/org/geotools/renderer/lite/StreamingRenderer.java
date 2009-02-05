@@ -139,7 +139,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32383 2009-02-01 18:17:21Z aaime $
+ * @version $Id: StreamingRenderer.java 32414 2009-02-05 13:59:48Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -633,9 +633,9 @@ public final class StreamingRenderer implements GTRenderer {
 		// ////////////////////////////////////////////////////////////////////
 		final MapLayer[] layers = context.getLayers();
 		labelCache.start();
-		if(labelCache instanceof LabelCacheDefault) {
+		if(labelCache instanceof LabelCacheImpl) {
 		    boolean outlineEnabled = TEXT_RENDERING_OUTLINE.equals(getTextRenderingMethod());
-            ((LabelCacheDefault) labelCache).setOutlineRenderingEnabled(outlineEnabled);
+            ((LabelCacheImpl) labelCache).setOutlineRenderingEnabled(outlineEnabled);
 		}
 		final int layersNumber = layers.length;
 		MapLayer currLayer;
