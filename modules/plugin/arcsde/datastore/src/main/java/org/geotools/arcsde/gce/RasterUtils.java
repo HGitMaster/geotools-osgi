@@ -248,7 +248,7 @@ public class RasterUtils {
         return outputImage;
     }
 
-    private static Rectangle calculateSourceRegion(final int pyramidLevel,
+    public static Rectangle calculateSourceRegion(final int pyramidLevel,
             final ArcSDEPyramid pyramidInfo, final Point levelZeroPRP,
             final RasterQueryInfo rasterGridInfo) throws NegativelyIndexedTileException {
         final int minImageX = Math.max(rasterGridInfo.image.x, 0);

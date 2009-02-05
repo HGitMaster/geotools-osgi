@@ -41,19 +41,31 @@ public class ArcSDEPyramidLevel {
 
     public Dimension size;
 
-    public ArcSDEPyramidLevel(int level, SeExtent extent, CoordinateReferenceSystem crs,
-            SDEPoint offset, int xTiles, int yTiles, Dimension size) {
+    /**
+     * 
+     * @param level
+     *            the level index
+     * @param extent
+     *            the geographical extent the level covers
+     * @param xOffset
+     *            the offset of the image at this level on the x axis, >= 0
+     * @param yOffset
+     *            the offset of the image at this level on the y axis, >= 0
+     * @param numTilesWide
+     * @param numTilesHigh
+     * @param size
+     *            the dimensions of the level
+     */
+    ArcSDEPyramidLevel(int level, ReferencedEnvelope extent, int xOffset, int yOffset,
+            int numTilesWide, int numTilesHigh, Dimension size) {
         this.pyramidLevel = level;
         this.xRes = (extent.getMaxX() - extent.getMinX()) / size.width;
         this.yRes = (extent.getMaxY() - extent.getMinY()) / size.height;
-        this.envelope = new ReferencedEnvelope(extent.getMinX(), extent.getMaxX(),
-                extent.getMinY(), extent.getMaxY(), crs);
-        if (offset != null) {
-            this.xOffset = (int) offset.getX();
-            this.yOffset = (int) offset.getY();
-        }
-        this.xTiles = xTiles;
-        this.yTiles = yTiles;
+        this.envelope = extent;
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
+        this.xTiles = numTilesWide;
+        this.yTiles = numTilesHigh;
         this.size = size;
     }
 
@@ -122,8 +134,9 @@ public class ArcSDEPyramidLevel {
 
     @Override
     public String toString() {
-        return "[level: " + pyramidLevel + "  xRes: " + xRes + "  yRes: " + yRes + "  xOffset: "
-                + xOffset + "  yOffset: " + yOffset + "  extent: " + envelope + "  tilesWide: "
-                + xTiles + "  tilesHigh: " + yTiles + "]";
+        return "[level: " + pyramidLevel + " size: " + size.width + "x" + size.height + "  xRes: "
+                + xRes + "  yRes: " + yRes + "  xOffset: " + xOffset + "  yOffset: " + yOffset
+                + "  extent: " + envelope + "  tilesWide: " + xTiles + "  tilesHigh: " + yTiles
+                + "]";
     }
 }

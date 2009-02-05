@@ -21,6 +21,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.logging.Level;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -39,6 +40,15 @@ import com.esri.sde.sdk.client.SeRasterAttr;
  * 
  */
 public class ArcSDEPyramid {
+
+    /**
+     * Orders pyramid levels by their level index
+     */
+    private static final Comparator<ArcSDEPyramidLevel> levelComparator = new Comparator<ArcSDEPyramidLevel>() {
+        public int compare(ArcSDEPyramidLevel p0, ArcSDEPyramidLevel p1) {
+            return (p0.getLevel() - p1.getLevel());
+        }
+    };
 
     ArrayList<ArcSDEPyramidLevel> pyramidList;
 
@@ -64,41 +74,58 @@ public class ArcSDEPyramid {
      * @param crs
      * @throws DataSourceException
      */
-    public ArcSDEPyramid(SeRasterAttr rasterAttributes, CoordinateReferenceSystem crs)
+    public ArcSDEPyramid(final SeRasterAttr rasterAttributes, final CoordinateReferenceSystem crs)
             throws DataSourceException {
         try {
+            // levels goes from 0 to N, maxLevel is the zero-based max index of levels
             final int numLevels = rasterAttributes.getMaxLevel() + 1;
             pyramidList = new ArrayList<ArcSDEPyramidLevel>(numLevels);
 
             tileWidth = rasterAttributes.getTileWidth();
             tileHeight = rasterAttributes.getTileHeight();
 
-            // TODO: revisit, I guess level 0 may not exist if the pyramid was created with the omit
-            // level 0 flag, leading to an exception in getExtentByLevel(0)
-            for (int i = 0; i < numLevels; i++) {
-                if (i == 1 && rasterAttributes.skipLevelOne()) {
+            for (int level = 0; level < numLevels; level++) {
+                if (level == 1 && rasterAttributes.skipLevelOne()) {
                     continue;
                 }
 
                 ReferencedEnvelope levelExtent = new ReferencedEnvelope(crs);
-                SeExtent slExtent = rasterAttributes.getExtentByLevel(i);
+                SeExtent slExtent = rasterAttributes.getExtentByLevel(level);
                 levelExtent.expandToInclude(slExtent.getMinX(), slExtent.getMinY());
                 levelExtent.expandToInclude(slExtent.getMaxX(), slExtent.getMaxY());
 
-                final int imageWidth = rasterAttributes.getImageWidthByLevel(i);
-                final int imageHeight = rasterAttributes.getImageHeightByLevel(i);
+                final int levelWidth = rasterAttributes.getImageWidthByLevel(level);
+                final int levelHeight = rasterAttributes.getImageHeightByLevel(level);
 
-                Dimension size = new Dimension(imageWidth, imageHeight);
+                Dimension size = new Dimension(levelWidth, levelHeight);
 
-                addPyramidLevel(i, rasterAttributes.getExtentByLevel(i), crs, rasterAttributes
-                        .getImageOffsetByLevel(i), rasterAttributes.getTilesPerRowByLevel(i),
-                        rasterAttributes.getTilesPerColByLevel(i), size);
+                SDEPoint imageOffset = rasterAttributes.getImageOffsetByLevel(level);
+                int xOffset = (int) (imageOffset == null ? 0 : imageOffset.getX());
+                int yOffset = (int) (imageOffset == null ? 0 : imageOffset.getY());
+
+                int tilesPerRow = rasterAttributes.getTilesPerRowByLevel(level);
+                int tilesPerCol = rasterAttributes.getTilesPerColByLevel(level);
+                addPyramidLevel(level, levelExtent, xOffset, yOffset, tilesPerRow, tilesPerCol,
+                        size);
             }
 
         } catch (SeException se) {
             throw new DataSourceException(se);
         }
+    }
 
+    /**
+     * Don't use this constructor. It only exists for unit testing purposes.
+     * 
+     * @param tileWidth
+     *            DON'T USE
+     * @param tileHeight
+     *            DON'T USE
+     */
+    public ArcSDEPyramid(int tileWidth, int tileHeight) {
+        this.tileWidth = tileWidth;
+        this.tileHeight = tileHeight;
+        pyramidList = new ArrayList<ArcSDEPyramidLevel>(4);
     }
 
     public Dimension getTileDimension() {
@@ -123,8 +150,8 @@ public class ArcSDEPyramid {
      *            The request pixel size of the image
      * @return the integer number of the raster level most appropriate for this request.
      */
-    public int pickOptimalRasterLevel(ReferencedEnvelope requestEnvelope, Rectangle pixelDimensions)
-            throws DataSourceException {
+    public int pickOptimalRasterLevel(final ReferencedEnvelope requestEnvelope,
+            final Rectangle pixelDimensions) throws DataSourceException {
 
         double reqXRes = requestEnvelope.getWidth() / pixelDimensions.width;
         double reqYRes = requestEnvelope.getHeight() / pixelDimensions.height;
@@ -158,34 +185,64 @@ public class ArcSDEPyramid {
         final RasterQueryInfo ret = new RasterQueryInfo();
         final ArcSDEPyramidLevel pLevel = getPyramidLevel(rasterLvl);
 
-        double delta = reqEnv.getMinX() - pLevel.getEnvelope().getMinX();
-        final int xMinPixel = (int) Math.floor(delta / pLevel.getXRes());
+        final ReferencedEnvelope levelEnvelope = pLevel.getEnvelope();
+        double delta = reqEnv.getMinX() - levelEnvelope.getMinX();
 
-        delta = reqEnv.getMaxX() - pLevel.getEnvelope().getMinX();
-        final int xMaxPixel = (int) Math.ceil(delta / pLevel.getXRes());
+        final double resX = pLevel.getXRes();
+        final double resY = pLevel.getYRes();
 
-        delta = pLevel.getEnvelope().getMaxY() - reqEnv.getMaxY();
+        final int xMinPixel = (int) Math.floor(delta / resX);
+
+        delta = reqEnv.getMaxX() - levelEnvelope.getMinX();
+        final int xMaxPixel = (int) Math.ceil(delta / resX);
+
+        delta = levelEnvelope.getMaxY() - reqEnv.getMaxY();
         // Distance in pixels from the top of the whole pyramid image to the top
         // of our AOI.
         // If we're off the top, this number will be negative.
-        final int yMinPixel = (int) Math.floor(delta / pLevel.getYRes());
+        final int yMinPixel = (int) Math.floor(delta / resY);
 
-        delta = pLevel.getEnvelope().getMaxY() - reqEnv.getMinY();
-        final int yMaxPixel = (int) Math.ceil(delta / pLevel.getYRes());
+        delta = levelEnvelope.getMaxY() - reqEnv.getMinY();
+        final int yMaxPixel = (int) Math.ceil(delta / resY);
 
         final int widthPixel = xMaxPixel - xMinPixel;
         final int heightPixel = yMaxPixel - yMinPixel;
 
-        final double xMinGeo = pLevel.getEnvelope().getMinX() + pLevel.getXRes() * xMinPixel;
-        final double yMinGeo = pLevel.getEnvelope().getMaxY() - pLevel.getYRes()
-                * (yMinPixel + heightPixel);
-        final double widthGeo = pLevel.getXRes() * widthPixel;
-        final double heightGeo = pLevel.getYRes() * heightPixel;
+        final double xMinGeo = levelEnvelope.getMinX() + resX * xMinPixel;
+        final double yMinGeo = levelEnvelope.getMaxY() - resY * (yMinPixel + heightPixel);
+        final double widthGeo = resX * widthPixel;
+        final double heightGeo = resY * heightPixel;
 
         ret.envelope = new ReferencedEnvelope(xMinGeo, xMinGeo + widthGeo, yMinGeo, yMinGeo
                 + heightGeo, reqEnv.getCoordinateReferenceSystem());
         ret.image = new Rectangle(xMinPixel, yMinPixel, widthPixel, heightPixel);
 
+//        /*
+//         * figure out which tiles to query, in tile space
+//         */
+//        final int minTileX = sourceRegion.x / tileWidth;
+//        final int minTileY = sourceRegion.y / tileHeight;
+//        if (LOGGER.isLoggable(Level.FINER))
+//            LOGGER
+//                    .finer("figured minTiles: " + minTileX + "," + minTileY + ".  Image is "
+//                            + curLevel.getNumTilesWide() + "x" + curLevel.getNumTilesHigh()
+//                            + " tiles wxh.");
+//        int maxTileX = (sourceRegion.x + sourceRegion.width + tileWidth - 1) / tileWidth - 1;
+//        int maxTileY = (sourceRegion.y + sourceRegion.height + tileHeight - 1) / tileHeight - 1;
+//        if (maxTileX >= curLevel.getNumTilesWide())
+//            maxTileX = curLevel.getNumTilesWide() - 1;
+//        if (maxTileY >= curLevel.getNumTilesHigh())
+//            maxTileY = curLevel.getNumTilesHigh() - 1;
+//
+//        // figure out what our offset into the tile grid is
+//        final int tilegridOffsetX = sourceRegion.x % tileWidth;
+//        final int tilegridOffsetY = sourceRegion.y % tileHeight;
+//
+//        if (LOGGER.isLoggable(Level.INFO)) {
+//            LOGGER.info("Reading " + param.getSourceRegion() + " offset by "
+//                    + param.getDestinationOffset() + " (tiles " + minTileX + "," + minTileY
+//                    + " to " + maxTileX + "," + maxTileY + " in level " + imageIndex + ")");
+//        }
         return ret;
     }
 
@@ -193,51 +250,30 @@ public class ArcSDEPyramid {
      * Don't use this method. It's only public for unit testing purposes.
      * 
      * @param level
-     *            DON'T USE
+     *            the zero-based level index for the new level
      * @param extent
-     *            DON'T USE
+     *            the geographical extent the level covers
      * @param crs
      *            DON'T USE
      * @param offset
      *            DON'T USE
-     * @param xTiles
+     * @param numTilesWide
      *            DON'T USE
-     * @param yTiles
+     * @param numTilesHigh
      *            DON'T USE
      * @param imageSize
      *            DON'T USE
      */
-    public void addPyramidLevel(int level, SeExtent extent, CoordinateReferenceSystem crs,
-            SDEPoint offset, int xTiles, int yTiles, Dimension imageSize) {
+    public void addPyramidLevel(int level, ReferencedEnvelope extent, int xOffset, int yOffset,
+            int numTilesWide, int numTilesHigh, Dimension imageSize) {
 
-        pyramidList.add(level, new ArcSDEPyramidLevel(level, extent, crs, offset, xTiles, yTiles,
-                imageSize));
+        ArcSDEPyramidLevel pyramidLevel;
+        pyramidLevel = new ArcSDEPyramidLevel(level, extent, xOffset, yOffset, numTilesWide,
+                numTilesHigh, imageSize);
 
-        Collections.sort(pyramidList, new Comparator() {
-            public int compare(Object arg0, Object arg1) {
-                ArcSDEPyramidLevel p0, p1;
-                p0 = (ArcSDEPyramidLevel) arg0;
-                p1 = (ArcSDEPyramidLevel) arg1;
-                return (p0.getLevel() - p1.getLevel());
+        pyramidList.add(pyramidLevel);
 
-            }
-        });
-    }
-
-    /**
-     * Don't use this constructor. It only exists for unit testing purposes.
-     * 
-     * @param tileWidth
-     *            DON'T USE
-     * @param tileHeight
-     *            DON'T USE
-     * @param numLayers
-     *            DON'T USE
-     */
-    public ArcSDEPyramid(int tileWidth, int tileHeight, int numLayers) {
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
-        pyramidList = new ArrayList(numLayers);
+        Collections.sort(pyramidList, levelComparator);
     }
 
     public static class RasterQueryInfo {

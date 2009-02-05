@@ -50,6 +50,7 @@ import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
@@ -136,7 +137,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @see AbstractGridFormat#getReader(Object source)
      */
     @Override
-    public ArcSDERasterGridCoverage2DReader getReader(Object source) {
+    public AbstractGridCoverage2DReader getReader(Object source) {
         return getReader(source, null);
     }
 
@@ -146,7 +147,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @see AbstractGridFormat#getReader(Object, Hints)
      */
     @Override
-    public ArcSDERasterGridCoverage2DReader getReader(final Object source, final Hints hints) {
+    public AbstractGridCoverage2DReader getReader(final Object source, final Hints hints) {
         try {
             if (source == null) {
                 throw new DataSourceException("No source set to read this coverage.");
@@ -161,7 +162,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
             RasterInfo rasterInfo = getRasterInfo(coverageUrl, connectionPool);
 
-            return new ArcSDERasterGridCoverage2DReader(connectionPool, rasterInfo, hints);
+            // return new ArcSDERasterGridCoverage2DReader(connectionPool, rasterInfo, hints);
+            return new ArcSDEGridCoverage2DReaderJAI(this, connectionPool, rasterInfo, hints);
         } catch (IOException dse) {
             LOGGER
                     .log(Level.SEVERE, "Unable to creata ArcSDERasterReader for " + source + ".",
@@ -544,8 +546,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     }
 
     private GeneralGridRange calculateOriginalGridRange(ArcSDEPyramid pyramidInfo) {
-        final int numLevels = pyramidInfo.getNumLevels();
-        final ArcSDEPyramidLevel highestRes = pyramidInfo.getPyramidLevel(numLevels - 1);
+        //final int numLevels = pyramidInfo.getNumLevels();
+        final ArcSDEPyramidLevel highestRes = pyramidInfo.getPyramidLevel(0);
 
         final int tileWidth = pyramidInfo.getTileWidth();
         final int tileHeight = pyramidInfo.getTileHeight();
@@ -753,8 +755,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                         null));
                 gridBands.add(new GridSampleDimension("Blue band", new Category[] { greenBandCat },
                         null));
-                gridBands.add(new GridSampleDimension("NODATA Mask Band", new Category[] { nan,
-                        white }, null));
+//                gridBands.add(new GridSampleDimension("NODATA Mask Band", new Category[] { nan,
+//                        white }, null));
 
             } else {
                 throw new DataSourceException("The coverage contains " + numBands

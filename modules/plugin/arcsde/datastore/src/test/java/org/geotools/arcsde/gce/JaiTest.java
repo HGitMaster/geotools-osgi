@@ -205,11 +205,11 @@ public class JaiTest {
         final int numLevels = pyramidInfo.getNumLevels();
 
         for (int level = 0; level < numLevels; level++) {
-            testJai(level, tableName);
+            testReadPyramidLevelJAI(level, tableName);
         }
     }
 
-    private void testJai(final int pyramidLevel, final String tableName) throws Exception {
+    private void testReadPyramidLevelJAI(final int pyramidLevel, final String tableName) throws Exception {
 
         SeConnection conn = testData.getConnectionPool().getConnection();
         final SeRow row;

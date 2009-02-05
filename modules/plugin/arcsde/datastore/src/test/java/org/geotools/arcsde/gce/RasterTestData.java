@@ -443,16 +443,18 @@ public class RasterTestData {
         final boolean skipLevelOne = false;
         final int interpolationType = SeRaster.SE_INTERPOLATION_NEAREST;
         final IndexColorModel colorModel = null;
+        final int imageWidth = 256;
+        final int imageHeight = 256;
 
         try {
-            loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding,
-                    skipLevelOne, interpolationType);
+            loadTestRaster(tableName, numberOfBands, imageWidth, imageHeight, pixelType,
+                    colorModel, pyramiding, skipLevelOne, interpolationType, null);
         } catch (SeException e) {
             throw new ArcSdeException(e);
         }
     }
 
-    public void loadShortRaster() throws Exception {
+    public String loadShortRaster() throws Exception {
         final int numberOfBands = 1;
         final RasterCellType pixelType = TYPE_16BIT_S;
         final String tableName = getRasterTableName(pixelType, numberOfBands);
@@ -460,13 +462,16 @@ public class RasterTestData {
         final boolean skipLevelOne = false;
         final int interpolationType = SeRaster.SE_INTERPOLATION_NEAREST;
         final IndexColorModel colorModel = null;
+        final int imageWidth = 256;
+        final int imageHeight = 256;
 
         try {
-            loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding,
-                    skipLevelOne, interpolationType);
+            loadTestRaster(tableName, numberOfBands, imageWidth, imageHeight, pixelType,
+                    colorModel, pyramiding, skipLevelOne, interpolationType, null);
         } catch (SeException e) {
             throw new ArcSdeException(e);
         }
+        return tableName;
     }
 
     /**
@@ -484,8 +489,10 @@ public class RasterTestData {
         final boolean skipLevelOne = false;
         final int interpolationType = SeRaster.SE_INTERPOLATION_NEAREST;
         final IndexColorModel colorModel = null;
-        loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding, skipLevelOne,
-                interpolationType);
+        final int imageWidth = 256;
+        final int imageHeight = 256;
+        loadTestRaster(tableName, numberOfBands, imageWidth, imageHeight, pixelType, colorModel,
+                pyramiding, skipLevelOne, interpolationType, null);
         return tableName;
     }
 
@@ -503,9 +510,11 @@ public class RasterTestData {
         byte[] cmG = { 0x00 };
         byte[] cmB = { (byte) 0xFF };
         final IndexColorModel colorModel = new IndexColorModel(cmBits, cmSize, cmR, cmG, cmB);
+        final int imageWidth = 256;
+        final int imageHeight = 256;
 
-        loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding, skipLevelOne,
-                interpolationType);
+        loadTestRaster(tableName, numberOfBands, imageWidth, imageHeight, pixelType, colorModel,
+                pyramiding, skipLevelOne, interpolationType, null);
 
         return tableName;
     }
@@ -544,8 +553,11 @@ public class RasterTestData {
         final boolean pyramiding = true;
         final boolean skipLevelOne = false;
         final int interpolationType = SeRaster.SE_INTERPOLATION_BILINEAR;
-        loadTestRaster(tableName, numberOfBands, pixelType, colorModel, pyramiding, skipLevelOne,
-                interpolationType);
+        final int imageWidth = 256;
+        final int imageHeight = 256;
+
+        loadTestRaster(tableName, numberOfBands, imageWidth, imageHeight, pixelType, colorModel,
+                pyramiding, skipLevelOne, interpolationType, null);
     }
 
     /**
@@ -593,9 +605,9 @@ public class RasterTestData {
      * @throws Exception
      */
     public void loadTestRaster(final String tableName, final int numberOfBands,
-            final RasterCellType pixelType, final IndexColorModel colorModel,
-            final boolean pyramiding, final boolean skipLevelOne, final int interpolationType)
-            throws Exception {
+            final int imageWidth, final int imageHeight, final RasterCellType pixelType,
+            final IndexColorModel colorModel, final boolean pyramiding, final boolean skipLevelOne,
+            final int interpolationType, final Integer forceNumLevels) throws Exception {
 
         if (colorModel != null && numberOfBands > 1) {
             throw new IllegalArgumentException(
@@ -629,19 +641,23 @@ public class RasterTestData {
 
             rasCol.create();
 
-            // now start loading the actual raster data
-            final int imageWidth = 256;
-            final int imageHeight = 256;
-
             SeRasterAttr attr = new SeRasterAttr(true);
             attr.setImageSize(imageWidth, imageHeight, numberOfBands);
-            attr.setTileSize(64, 64); // this is lower than the recommended minimum of 128,128 but
+            int tileWidth = imageWidth >> 4;
+            int tileHeight = imageHeight >> 4;
+            attr.setTileSize(tileWidth, tileHeight); // this is lower than the recommended minimum
+            // of 128,128 but
             // it's ok for our testing purposes
             attr.setPixelType(pixelType.getSeRasterPixelType());
             attr.setCompressionType(SeRaster.SE_COMPRESSION_NONE);
             if (pyramiding) {
-                final int numOfLevels = skipLevelOne ? 3 : 4;
-                attr.setPyramidInfo(numOfLevels, skipLevelOne, interpolationType);
+                int maxLevels;
+                if (forceNumLevels == null) {
+                    maxLevels = (imageWidth / (4 * tileWidth)) - 1;
+                } else {
+                    maxLevels = forceNumLevels;
+                }
+                attr.setPyramidInfo(maxLevels, skipLevelOne, interpolationType);
             }
             attr.setInterleave(true, SeRaster.SE_RASTER_INTERLEAVE_BIP);
             attr.setMaskMode(false);
