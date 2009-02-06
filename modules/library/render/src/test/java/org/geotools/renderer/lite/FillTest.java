@@ -118,7 +118,7 @@ public class FillTest extends TestCase {
     }
     
     public void testFontFill() throws Exception {
-        Style style = RendererBaseTest.loadStyle(this, "fillTTFDEcorative.sld");
+        Style style = RendererBaseTest.loadStyle(this, "fillTTFDecorative.sld");
         
         DefaultMapContext mc = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         mc.addLayer(fs, style);
