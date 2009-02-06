@@ -108,7 +108,11 @@ public class TTFMarkFactory implements MarkFactory {
         Rectangle2D bounds = s.getBounds2D();
         AffineTransform tx = new AffineTransform();
         double max = Math.max(bounds.getWidth(), bounds.getHeight());
-        tx.scale(1 / max, 1 / max);
+        // all shapes are defined looking "upwards" (see ShapeMarkFactory or WellKnownMarkFactory)
+        // but the fonts ones are flipped to compensate for the fact the y coords grow from top
+        // to bottom on the screen. We have to flip the symbol so that it conforms to the
+        // other marks convention
+        tx.scale(1 / max, -1 / max);
         tx.translate(-bounds.getCenterX(), -bounds.getCenterY());
         return tx.createTransformedShape(s);
     }

@@ -1123,8 +1123,6 @@ public class SLDStyleFactory {
         if (mark.getFill() != null) {
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         }
-
-        return;
     }
 
     /**

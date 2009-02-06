@@ -55,6 +55,21 @@ public class MarkTest extends TestCase {
         RendererBaseTest.showRender("Decorative marks", renderer, TIME, bounds);
     }
     
+    public void testTriangle() throws Exception {
+        Style pStyle = RendererBaseTest.loadStyle(this, "markTriangle.sld");
+        Style lStyle = RendererBaseTest.loadStyle(this, "lineGray.sld");
+        
+        DefaultMapContext mc = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        mc.addLayer(lineFS, lStyle);
+        mc.addLayer(pointFS, pStyle);
+        
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(mc);
+        renderer.setJava2DHints(new RenderingHints(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON));
+        
+        RendererBaseTest.showRender("Decorative marks", renderer, TIME, bounds);
+    }
+    
     public void testDecorative() throws Exception {
         Style pStyle = RendererBaseTest.loadStyle(this, "markDecorative.sld");
         Style lStyle = RendererBaseTest.loadStyle(this, "lineGray.sld");

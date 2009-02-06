@@ -1,5 +1,6 @@
 package org.geotools.renderer.lite;
 
+import java.awt.Font;
 import java.awt.RenderingHints;
 import java.io.File;
 
@@ -10,6 +11,7 @@ import org.geotools.data.property.PropertyDataStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.renderer.style.FontCache;
 import org.geotools.styling.Style;
 import org.geotools.test.TestData;
 import org.opengis.feature.simple.SimpleFeature;
@@ -30,6 +32,10 @@ public class FillTest extends TestCase {
         bfs = ds.getFeatureSource("bigsquare");
         bounds = fs.getBounds();
         bounds.expandBy(0.2, 0.2);
+        
+        // load font
+        Font f = Font.createFont(Font.TRUETYPE_FONT, TestData.getResource(this, "recreate.ttf").openStream());
+        FontCache.getDefaultInstance().registerFont(f);
         
 //        System.setProperty("org.geotools.test.interactive", "true");
         
@@ -58,6 +64,19 @@ public class FillTest extends TestCase {
         renderer.setJava2DHints(new RenderingHints(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON));
         
         RendererBaseTest.showRender("CrossFill", renderer, TIME, bounds);
+    }
+    
+    public void testTriangleFill() throws Exception {
+        Style style = RendererBaseTest.loadStyle(this, "fillTriangle.sld");
+        
+        DefaultMapContext mc = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        mc.addLayer(fs, style);
+        
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(mc);
+        renderer.setJava2DHints(new RenderingHints(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON));
+        
+        RendererBaseTest.showRender("TriangleFill", renderer, TIME, bounds);
     }
     
     public void testCircleFill() throws Exception {
@@ -97,6 +116,21 @@ public class FillTest extends TestCase {
         
         RendererBaseTest.showRender("ImageFill", renderer, TIME, bounds);
     }
+    
+    public void testFontFill() throws Exception {
+        Style style = RendererBaseTest.loadStyle(this, "fillTTFDEcorative.sld");
+        
+        DefaultMapContext mc = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        mc.addLayer(fs, style);
+        
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(mc);
+        renderer.setJava2DHints(new RenderingHints(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON));
+        
+        RendererBaseTest.showRender("TTF decorative", renderer, TIME, bounds);
+    }
+    
+    
     
     public void testFTSComposition() throws Exception {
     	

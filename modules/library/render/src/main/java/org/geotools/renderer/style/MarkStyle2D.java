@@ -29,7 +29,7 @@ import org.geotools.resources.Utilities;
  *
  * @author Andrea Aime
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/MarkStyle2D.java $
- * @version $Id: MarkStyle2D.java 32162 2009-01-07 13:48:06Z aaime $
+ * @version $Id: MarkStyle2D.java 32420 2009-02-06 11:28:10Z aaime $
  */
 public class MarkStyle2D extends PolygonStyle2D {
     Shape shape;
@@ -70,7 +70,9 @@ public class MarkStyle2D extends PolygonStyle2D {
             ts.shape = shape;
             ts.translate(x, y);
             ts.rotate(rotation);
-            ts.scale(scale, scale);
+            // flip the symbol to take into account the screen orientation
+            // where the y grows from top to bottom
+            ts.scale(scale, -scale);
 
             return ts;
         } else {
