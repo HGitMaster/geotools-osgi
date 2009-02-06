@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32419 2009-02-06 01:29:03Z bencaradocdavies $              
+        Version: $Id: pom.xml 32426 2009-02-06 17:57:24Z groldan $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                                http://maven.apache.org/maven-v4_0_0.xsd">
@@ -146,7 +146,7 @@
     <dependency>
       <groupId>javax.media</groupId>
       <artifactId>jai_imageio</artifactId>
-      <version>1.1</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
