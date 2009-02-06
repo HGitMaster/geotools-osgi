@@ -165,10 +165,18 @@ public class RasterInfo {
             }
             final Color[] colorRange = { minColor, maxColor };
             Category bandCat = new Category(catName, colorRange, sampleValueRange,
-                    LinearTransform1D.IDENTITY);
-
-            GridSampleDimension sampleDim = new GridSampleDimension(bandName,
-                    new Category[] { bandCat }, null).geophysics(true);
+                    LinearTransform1D.IDENTITY).geophysics(true);
+            Category[] categories = { bandCat };
+            // if (band.isHasStats()) {
+            // Category catMin = new Category("Min", null, band.getStatsMin()).geophysics(true);
+            // Category catMax = new Category("Max", null, band.getStatsMin()).geophysics(true);
+            // Category catMean = new Category("Mean", null, band.getStatsMin()).geophysics(true);
+            // Category catStdDev = new Category("StdDev", null, band.getStatsMin())
+            // .geophysics(true);
+            // categories = new Category[] { bandCat, catMin, catMax, catMean, catStdDev };
+            // }
+            GridSampleDimension sampleDim = new GridSampleDimension(bandName, categories, null)
+                    .geophysics(true);
 
             dimensions.add(sampleDim);
         }

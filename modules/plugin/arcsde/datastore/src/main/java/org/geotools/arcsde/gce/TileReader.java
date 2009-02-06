@@ -3,6 +3,7 @@ package org.geotools.arcsde.gce;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
@@ -19,7 +20,13 @@ public abstract class TileReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
-    private TileIterator tileIterator;
+    private final int tileWidth;
+
+    private final int tileHeight;
+
+    private final int bitsPerSample;
+
+    private final TileIterator tileIterator;
 
     private SeRasterTile lastFetchedTile;
 
@@ -28,14 +35,6 @@ public abstract class TileReader {
     private byte[] currTileData;
 
     protected int currTileDataIndex;
-
-    private final int numberOfBands;
-
-    private int tileWidth;
-
-    private int tileHeight;
-
-    private int bitsPerSample;
 
     private static class TileIterator {
         private final SeRow row;
@@ -57,6 +56,10 @@ public abstract class TileReader {
                 try {
                     nextTile = row.getRasterTile();
                     started = true;
+                    if (nextTile == null) {
+                        LOGGER.fine("No tiles to fetch at all, releasing connection");
+                        close();
+                    }
                 } catch (SeException e) {
                     throw new ArcSdeException(e);
                 }
@@ -72,7 +75,7 @@ public abstract class TileReader {
             try {
                 nextTile = row.getRasterTile();
                 if (nextTile == null) {
-                    LOGGER.info("Releasing the connection since there're no mor tiles to fetch");
+                    LOGGER.finer("Releasing the connection since there're no mor tiles to fetch");
                     close();
                 }
             } catch (SeException e) {
@@ -85,6 +88,7 @@ public abstract class TileReader {
             if (conn != null) {
                 try {
                     conn.close();
+                    conn = null;
                 } catch (SeException e) {
                     throw new ArcSdeException(e);
                 }
@@ -93,15 +97,15 @@ public abstract class TileReader {
     }
 
     public static TileReader getInstance(final SeConnection conn, final RasterCellType cellType,
-            final SeRow row, final int numberOfBands, int tileW, int tileH) {
+            final SeRow row, int tileW, int tileH) {
         final int bitsPerSample = cellType.getBitsPerSample();
         switch (cellType) {
         case TYPE_1BIT:
-            return new OneBitTileReader(conn, row, numberOfBands, tileW, tileH, bitsPerSample);
+            return new OneBitTileReader(conn, row, tileW, tileH, bitsPerSample);
         case TYPE_4BIT:
             // return new FourBitTileReader(conn, row);
         default:
-            return new DefaultTileReader(conn, row, numberOfBands, tileW, tileH, bitsPerSample);
+            return new DefaultTileReader(conn, row, tileW, tileH, bitsPerSample);
         }
     }
 
@@ -109,17 +113,16 @@ public abstract class TileReader {
 
     public abstract int read() throws IOException;
 
-    private TileReader(final SeConnection conn, final SeRow row, final int numberOfBands,
-            int tileW, int tileH, int bitsPerSample) {
+    private TileReader(final SeConnection conn, final SeRow row, int tileW, int tileH,
+            int bitsPerSample) {
         this.tileIterator = new TileIterator(conn, row);
-        this.numberOfBands = numberOfBands;
         this.tileWidth = tileW;
         this.tileHeight = tileH;
         this.bitsPerSample = bitsPerSample;
     }
 
     public final void close() throws IOException {
-        LOGGER.fine("Close explicitly called, releasing connection if still in use");
+        LOGGER.finer("Close explicitly called, releasing connection if still in use");
         tileIterator.close();
     }
 
@@ -132,23 +135,27 @@ public abstract class TileReader {
             lastFetchedTile = tileIterator.next();
         }
 
-        final int tileDataLength = (tileWidth * tileHeight * bitsPerSample) / 8;
+        tileDataLength = (tileWidth * tileHeight * bitsPerSample) / 8;
         final byte[] tileData = new byte[tileDataLength];
-        Arrays.fill(tileData, (byte) 0x00);
-        System.out.println("Fetching " + lastFetchedTile + " - bitmask: "
-                + lastFetchedTile.getBitMaskData().length);
+        final byte NO_DATA_BYTE = (byte) 0x00;
+
+        if (LOGGER.isLoggable(Level.FINER)) {
+            LOGGER.finer(" >> Fetching " + lastFetchedTile + " - bitmask: "
+                    + lastFetchedTile.getBitMaskData().length);
+        }
         final int numPixels = lastFetchedTile.getNumPixels();
         if (numPixels == 0) {
-            LOGGER.fine("ignoring tile since it contains no pixel data: " + lastFetchedTile);
+            LOGGER.finer("tile contains no pixel data: " + lastFetchedTile);
+            Arrays.fill(tileData, NO_DATA_BYTE);
             return tileData;
         }
 
         // get pixel data AND bitmask data appended, if exist. Pixel data packed into
         // byte[] according to pixel type. This is the only generic way of getting at
         // the pixel data regardless of its data type
-        byte[] rawTileData = lastFetchedTile.getPixelData();
-        final byte[] bitMaskData = lastFetchedTile.getBitMaskData();
-        final int bitMaskDataLength = bitMaskData.length;
+        final byte[] rawTileData = lastFetchedTile.getPixelData();
+        final byte[] bitmaskData = lastFetchedTile.getBitMaskData();
+        final int bitMaskDataLength = bitmaskData.length;
         final int dataAndBitMaskLength = rawTileData.length;
         final int pureDataLength = dataAndBitMaskLength - bitMaskDataLength;
         if (pureDataLength != tileDataLength) {
@@ -157,60 +164,31 @@ public abstract class TileReader {
         }
         System.arraycopy(rawTileData, 0, tileData, 0, tileDataLength);
 
-        this.tileDataLength = tileDataLength;
+        // now set the nodata pixels to no-data
+        if (bitMaskDataLength > 0) {
+            LOGGER.finer("Applying no-data bitmask to tile pixels, bits per sample: "
+                    + bitsPerSample);
+            final int bytesPerSample = bitsPerSample / 8;
+            for (int pixelN = 0; pixelN < numPixels; pixelN++) {
+                if (((bitmaskData[pixelN / 8] >> (7 - (pixelN % 8))) & 0x01) == 0x00) {
+                    // it's a no-data pixel. For now works for bitsPerSample >= 8
+                    if (bitsPerSample >= 8) {
+                        for (int pixByteN = 0; pixByteN < bytesPerSample; pixByteN++) {
+                            tileData[(pixelN * bytesPerSample) + pixByteN] = NO_DATA_BYTE;
+                        }
+                    } else if (bitsPerSample == 1) {
+                        // TODO
+                    } else if (bitsPerSample == 4) {
+                        // TODO
+                    } else {
+                        throw new IllegalStateException("bitsPerSample " + bitsPerSample);
+                    }
+                }
+            }
+        }
+
         return tileData;
     }
-
-    // private byte[] fetchTile() throws IOException {
-    // byte[] pixelInterleavedData = null;
-    // SeRasterTile[] bandsTiles = new SeRasterTile[numberOfBands];
-    // try {
-    // for (int band = 0; band < numberOfBands; band++) {
-    // bandsTiles[band] = row.getRasterTile();
-    // }
-    // lastFetchedTile = bandsTiles[numberOfBands - 1];
-    //
-    // } catch (SeException e) {
-    // throw new ArcSdeException(e);
-    // }
-    // if (lastFetchedTile != null) {
-    // // wasn't it the last tile in the stream?
-    // // get pixel data AND bitmask data appended, if exist. Pixel data packed into
-    // // byte[] according to pixel type. This is the only generic way of getting at
-    // // the pixel data regardless of its data type
-    // final RasterCellType cellType = RasterCellType.valueOf(lastFetchedTile.getPixelType());
-    // final int bitsPerSample = cellType.getBitsPerSample();
-    // final int bandSize = (bitsPerSample * tileWidth * tileHeight) / 8;
-    // tileDataLength = numberOfBands * bandSize;
-    // pixelInterleavedData = new byte[tileDataLength];
-    //
-    // for (int band = 0; band < numberOfBands; band++) {
-    // SeRasterTile currTile = bandsTiles[band];
-    // System.err.println("Reading from tile " + currTile + ". Bitmask: "
-    // + currTile.getBitMaskData().length);
-    // byte[] thisTileData = currTile.getPixelData();
-    // final int bitMaskDataLength = currTile.getBitMaskData().length;
-    // final int dataAndBitMaskLength = thisTileData.length;
-    // // cut off the bitmask data from the pixel data length
-    // final int thisTileDataLength = dataAndBitMaskLength - bitMaskDataLength;
-    //
-    // if (bandSize != thisTileDataLength) {
-    // throw new IllegalStateException("tile data expected to be " + bandSize
-    // + " but is " + thisTileDataLength + ": " + lastFetchedTile);
-    // }
-    // final int bytesPerSample = bitsPerSample / 8;
-    // final int shift = bytesPerSample * numberOfBands;
-    //
-    // for (int tilePixel = 0, interleaved = 0; tilePixel < bandSize; tilePixel++, interleaved +=
-    // shift) {
-    // for (int i = 0; i < bytesPerSample; i++) {
-    // pixelInterleavedData[interleaved + i] = thisTileData[tilePixel];
-    // }
-    // }
-    // }
-    // }
-    // return pixelInterleavedData;
-    // }
 
     protected final byte[] getTileData() throws IOException {
         if (currTileData == null) {
@@ -237,9 +215,9 @@ public abstract class TileReader {
      */
     private static class DefaultTileReader extends TileReader {
 
-        public DefaultTileReader(final SeConnection conn, final SeRow row, final int numberOfBands,
-                int tileW, int tileH, int bitsPerSample) {
-            super(conn, row, numberOfBands, tileW, tileH, bitsPerSample);
+        public DefaultTileReader(final SeConnection conn, final SeRow row, int tileW, int tileH,
+                int bitsPerSample) {
+            super(conn, row, tileW, tileH, bitsPerSample);
         }
 
         @Override
@@ -248,7 +226,7 @@ public abstract class TileReader {
             if (data == null) {
                 return -1;
             }
-            int currByte = data[currTileDataIndex] & 0xFF;
+            byte currByte = data[currTileDataIndex];
             markRead(1);
             return currByte;
         }
@@ -286,16 +264,16 @@ public abstract class TileReader {
         /**
          * Current byte actually read holding up to 8 samples
          */
-        private int currByte;
+        private byte currByte;
 
         /**
          * how many bits of the current byte have been alread read
          */
         private int currByteReadCount;
 
-        public OneBitTileReader(final SeConnection conn, final SeRow row, final int numberOfBands,
-                int tileW, int tileH, int bitsPerSample) {
-            super(conn, row, numberOfBands, tileW, tileH, bitsPerSample);
+        public OneBitTileReader(final SeConnection conn, final SeRow row, int tileW, int tileH,
+                int bitsPerSample) {
+            super(conn, row, tileW, tileH, bitsPerSample);
             currByteReadCount = 8;// need to fetch more
         }
 
@@ -330,7 +308,7 @@ public abstract class TileReader {
                 if (data == null) {
                     return -1;
                 }
-                currByte = data[currTileDataIndex] & 0xFF;
+                currByte = data[currTileDataIndex];
                 currByteReadCount = 0;
                 markRead(1);
             }

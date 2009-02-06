@@ -92,7 +92,27 @@ public class RasterBandInfo {
 
     private final double statsMin;
 
+    public double getStatsMin() {
+        return statsMin;
+    }
+
+    public double getStatsMax() {
+        return statsMax;
+    }
+
+    public double getStatsMean() {
+        return statsMean;
+    }
+
+    public double getStatsStdDev() {
+        return statsStdDev;
+    }
+
     private final double statsMax;
+
+    private final double statsMean;
+
+    private final double statsStdDev;
 
     public RasterBandInfo(SeRasterBand band) throws IOException {
 
@@ -135,12 +155,16 @@ public class RasterBandInfo {
             try {
                 statsMin = band.getStatsMin();
                 statsMax = band.getStatsMax();
+                statsMean = band.getStatsMean();
+                statsStdDev = band.getStatsStdDev();
             } catch (SeException e) {
                 throw new ArcSdeException(e);
             }
         } else {
             statsMin = java.lang.Double.NaN;
             statsMax = java.lang.Double.NaN;
+            statsMean = java.lang.Double.NaN;
+            statsStdDev = java.lang.Double.NaN;
         }
         tileWidth = band.getTileWidth();
         tileHeight = band.getTileHeight();

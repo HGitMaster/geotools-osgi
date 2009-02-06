@@ -174,7 +174,8 @@ public class JaiTest {
         testAllPyramidLevels(tableName);
     }
 
-    private void testRasterTestTable(final RasterCellType pixelType, final int numberOfBands) throws Exception {
+    private void testRasterTestTable(final RasterCellType pixelType, final int numberOfBands)
+            throws Exception {
         final String tableName = testData.getRasterTableName(pixelType, numberOfBands);
         testData.loadTestRaster(tableName, numberOfBands, pixelType, null);
 
@@ -209,7 +210,8 @@ public class JaiTest {
         }
     }
 
-    private void testReadPyramidLevelJAI(final int pyramidLevel, final String tableName) throws Exception {
+    private void testReadPyramidLevelJAI(final int pyramidLevel, final String tableName)
+            throws Exception {
 
         SeConnection conn = testData.getConnectionPool().getConnection();
         final SeRow row;
@@ -275,8 +277,7 @@ public class JaiTest {
         final ImageInputStream in;
 
         try {
-            TileReader reader = TileReader.getInstance(conn, pixelType, row, numberOfBands, tileW,
-                    tileH);
+            TileReader reader = TileReader.getInstance(conn, pixelType, row, tileW, tileH);
             in = new ArcSDETiledImageInputStream(reader);
         } catch (IOException e) {
             conn.close();

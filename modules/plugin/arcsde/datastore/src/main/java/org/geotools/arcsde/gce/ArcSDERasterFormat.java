@@ -190,7 +190,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                         rasterInfo = gatherCoverageMetadata(scon, coverageUrl);
                         rasterInfos.put(coverageUrl, rasterInfo);
                     } finally {
-                        scon.close();
+                        if (!scon.isPassivated())
+                            scon.close();
                     }
                 }
             }
@@ -490,16 +491,18 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
         bands = setUpBandInfo(scon, rasterTable, rasterAttributes);
 
-//        sampleImage = RasterUtils.createCompatibleBufferedImage(1, 1, bands.size(), cellType, bands
-//                .get(0).getColorMap());
+        // sampleImage = RasterUtils.createCompatibleBufferedImage(1, 1, bands.size(), cellType,
+        // bands
+        // .get(0).getColorMap());
 
-        //gridSampleDimensions = buildGridSampleDimensions(scon, rasterTable, rasterAttributes);
+        // gridSampleDimensions = buildGridSampleDimensions(scon, rasterTable, rasterAttributes);
 
         originalEnvelope = calculateOriginalEnvelope(rasterAttributes, coverageCrs);
 
         GeneralGridRange originalGridRange = calculateOriginalGridRange(pyramidInfo);
 
-        //imageIOReader = createImageIOReader(rasterTable, rasterColumns, pyramidInfo, sampleImage);
+        // imageIOReader = createImageIOReader(rasterTable, rasterColumns, pyramidInfo,
+        // sampleImage);
 
         RasterInfo rasterInfo = new RasterInfo();
         try {
@@ -510,15 +513,15 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         }
         rasterInfo.setRasterTable(rasterTable);
         rasterInfo.setRasterColumns(rasterColumns);
-        //rasterInfo.setGridSampleDimensions(gridSampleDimensions);
+        // rasterInfo.setGridSampleDimensions(gridSampleDimensions);
         rasterInfo.setLevelZeroPRP(levelZeroPRP);
         rasterInfo.setBands(bands);
         rasterInfo.setPyramidInfo(pyramidInfo);
-        //rasterInfo.setSampleImage(sampleImage);
+        // rasterInfo.setSampleImage(sampleImage);
         rasterInfo.setCoverageCrs(coverageCrs);
         rasterInfo.setOriginalEnvelope(originalEnvelope);
         rasterInfo.setOriginalGridRange(originalGridRange);
-        //rasterInfo.setImageIOReader(imageIOReader);
+        // rasterInfo.setImageIOReader(imageIOReader);
 
         return rasterInfo;
     }
@@ -546,7 +549,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     }
 
     private GeneralGridRange calculateOriginalGridRange(ArcSDEPyramid pyramidInfo) {
-        //final int numLevels = pyramidInfo.getNumLevels();
+        // final int numLevels = pyramidInfo.getNumLevels();
         final ArcSDEPyramidLevel highestRes = pyramidInfo.getPyramidLevel(0);
 
         final int tileWidth = pyramidInfo.getTileWidth();
@@ -603,7 +606,6 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         return rasterColumns;
     }
 
-    
     private List<GridSampleDimension> buildGridSampleDimensions_Old(ArcSDEPooledConnection conn,
             String coverageName, SeRasterAttr rasterAttributes) throws IOException {
 
@@ -756,10 +758,10 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                         null));
                 gridBands.add(new GridSampleDimension("Blue band", new Category[] { greenBandCat },
                         null));
-                if(numBands == 4){
-                    //temporary workaround
+                if (numBands == 4) {
+                    // temporary workaround
                     gridBands.add(new GridSampleDimension("NODATA Mask Band", new Category[] { nan,
-                        white }, null));
+                            white }, null));
                 }
 
             } else {
