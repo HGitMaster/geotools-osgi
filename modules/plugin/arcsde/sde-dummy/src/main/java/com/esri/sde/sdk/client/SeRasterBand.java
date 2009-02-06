@@ -106,5 +106,13 @@ public class SeRasterBand {
         // TODO Auto-generated method stub
         return null;
     }
+    public double getStatsMean() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+    public double getStatsStdDev() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
 }
