@@ -65,7 +65,6 @@ import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
@@ -106,7 +105,7 @@ public class RasterUtils {
     }
 
     public static ReferencedEnvelope toNativeCrs(final GeneralEnvelope requestedEnvelope,
-            final CoordinateReferenceSystem nativeCRS) throws DataSourceException {
+            final CoordinateReferenceSystem nativeCRS) throws IllegalArgumentException {
 
         ReferencedEnvelope reqEnv = toReferencedEnvelope(requestedEnvelope);
 
@@ -118,10 +117,10 @@ public class RasterUtils {
                 reqEnv = reqEnv.transform(nativeCRS, true);
             } catch (FactoryException fe) {
                 // unable to reproject?
-                throw new DataSourceException("Unable to find a reprojection from requested "
+                throw new IllegalArgumentException("Unable to find a reprojection from requested "
                         + "coordsys to native coordsys for this request", fe);
             } catch (TransformException te) {
-                throw new DataSourceException("Unable to perform reprojection from requested "
+                throw new IllegalArgumentException("Unable to perform reprojection from requested "
                         + "coordsys to native coordsys for this request", te);
             }
         }

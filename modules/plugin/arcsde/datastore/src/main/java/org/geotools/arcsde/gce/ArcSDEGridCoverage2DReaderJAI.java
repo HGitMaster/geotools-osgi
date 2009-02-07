@@ -8,12 +8,12 @@ import java.awt.color.ColorSpace;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BandedSampleModel;
 import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageReadParam;
@@ -28,12 +28,10 @@ import org.geotools.arcsde.gce.RasterUtils.QueryInfo;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramid.RasterQueryInfo;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
@@ -45,7 +43,6 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
@@ -55,8 +52,6 @@ import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.datum.PixelInCell;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.esri.sde.sdk.client.SeException;
@@ -132,16 +127,6 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         } else {
             overViewResolutions = null;
         }
-
-        // super.raster2Model = getRasterToModel();
-    }
-
-    private MathTransform getRasterToModel(GeneralGridRange originalDim, GeneralEnvelope originalEnv) {
-        final GridToEnvelopeMapper geMapper;
-        geMapper = new GridToEnvelopeMapper(originalDim, originalEnv);
-        geMapper.setPixelAnchor(PixelInCell.CELL_CENTER);
-        final MathTransform rasterToModel = geMapper.createTransform();
-        return rasterToModel;
     }
 
     /**
@@ -164,6 +149,115 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         return serviceInfo;
     }
 
+    /**
+     * @see GridCoverageReader#read(GeneralParameterValue[])
+     */
+    public GridCoverage read(GeneralParameterValue[] params) throws IOException {
+
+        final GeneralEnvelope requestedEnvelope;
+        final Rectangle requestedDim;
+        final OverviewPolicy overviewPolicy;
+        {
+            final ReadParameters opParams = parseReadParams(params);
+            overviewPolicy = opParams.overviewPolicy;
+            requestedEnvelope = opParams.requestedEnvelope;
+            requestedDim = opParams.dim;
+        }
+        final ArcSDEPyramid pyramidInfo = rasterInfo.getPyramidInfo();
+
+        /*
+         * set params
+         */
+
+        // This is to choose the pyramid level as if it were the image index in a file with
+        // overviews
+        int pyramidLevelChoice = 0;
+        final ImageReadParam readP = new ImageReadParam();
+        try {
+            pyramidLevelChoice = setReadParams(overviewPolicy, readP, requestedEnvelope,
+                    requestedDim);
+            LOGGER.info("Pyramid level chosen: " + pyramidInfo.getPyramidLevel(pyramidLevelChoice));
+        } catch (TransformException e) {
+            new IllegalArgumentException(e);
+        }
+
+        /*
+         * Obtain the tiles, pixel range, and resulting envelope
+         */
+        final QueryInfo rasterQueryInfo = RasterUtils.fitRequestToRaster(new ReferencedEnvelope(
+                requestedEnvelope), requestedDim, pyramidInfo, pyramidLevelChoice);
+
+        LOGGER.info(rasterQueryInfo.toString());
+
+        /*
+         * Create the prepared query (not executed) stream to fetch the tiles from
+         */
+        final Rectangle matchingTiles = rasterQueryInfo.getMatchingTiles();
+        final ArcSDEPooledConnection conn = connectionPool.getConnection();
+        final SeQuery preparedQuery;
+        try {
+            preparedQuery = createSeQuery(conn);
+        } catch (IOException e) {
+            conn.close();
+            throw e;
+        }
+
+        final RenderedImage coverageRaster;
+        try {
+            // covers an area of full tiles
+            final RenderedImage fullTilesRaster;
+            /*
+             * Create the tiled raster covering the full area of the matching tiles
+             */
+            fullTilesRaster = createTiledRaster(preparedQuery, matchingTiles, pyramidLevelChoice);
+
+            /*
+             * now crop it to the desired dimensions
+             */
+            final Rectangle resultDimension = rasterQueryInfo.getResultDimension();
+            coverageRaster = cropToRequiredDimension(fullTilesRaster, resultDimension);
+            /*
+             * REVISIT: This is odd, we need to force the data to be loaded so we're free to release
+             * the stream, which gives away the streamed, tiled nature of this rasters, but I don't
+             * see the GCE api having a very clear usage workflow that ensures close() is always
+             * being called to the underlying ImageInputStream so we could let it close the SeQuery
+             * when done.
+             */
+            coverageRaster.getData();
+        } finally {
+            try {
+                preparedQuery.close();
+            } catch (SeException e) {
+                throw new ArcSdeException(e);
+            } finally {
+                conn.close();
+            }
+        }
+        /*
+         * BUILDING COVERAGE
+         */
+        final GridSampleDimension[] bands = rasterInfo.getGridSampleDimensions();
+        final GeneralEnvelope finalEnvelope = rasterQueryInfo.getResultEnvelope();
+
+        return coverageFactory.create(coverageName, coverageRaster, finalEnvelope, bands, null,
+                null);
+    }
+
+    private RenderedOp cropToRequiredDimension(final RenderedImage fullTilesRaster,
+            final Rectangle resultDimension) {
+        ParameterBlock cropParams = new ParameterBlock();
+
+        cropParams.addSource(fullTilesRaster);// Source
+        cropParams.add(Float.valueOf(resultDimension.x)); // x origin for each band
+        cropParams.add(Float.valueOf(resultDimension.y)); // y origin for each band
+        cropParams.add(Float.valueOf(resultDimension.width));// width for each band
+        cropParams.add(Float.valueOf(resultDimension.height));// height for each band
+
+        final RenderingHints hints = null;
+        RenderedOp image = JAI.create("Crop", cropParams, hints);
+        return image;
+    }
+
     private static class ReadParameters {
         GeneralEnvelope requestedEnvelope;
 
@@ -173,9 +267,9 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
     }
 
     private ReadParameters parseReadParams(GeneralParameterValue[] params)
-            throws DataSourceException {
+            throws IllegalArgumentException {
         if (params == null) {
-            throw new DataSourceException("No GeneralParameterValue given to read operation");
+            throw new IllegalArgumentException("No GeneralParameterValue given to read operation");
         }
 
         GeneralEnvelope reqEnvelope = null;
@@ -231,144 +325,96 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         return parsedParams;
     }
 
-    /**
-     * @see GridCoverageReader#read(GeneralParameterValue[])
-     */
-    public GridCoverage read(GeneralParameterValue[] params) throws IOException {
-
-        final GeneralEnvelope requestedEnvelope;
-        final Rectangle requestedDim;
-        final OverviewPolicy overviewPolicy;
-        {
-            final ReadParameters opParams = parseReadParams(params);
-            overviewPolicy = opParams.overviewPolicy;
-            requestedEnvelope = opParams.requestedEnvelope;
-            requestedDim = opParams.dim;
-        }
-        final ArcSDEPyramid pyramidInfo = rasterInfo.getPyramidInfo();
-
-        /*
-         * set params
-         */
-
-        // This is to choose the pyramid level as if it were the image index in a file with
-        // overviews
-        int pyramidLevelChoice = 0;
-        final ImageReadParam readP = new ImageReadParam();
+    private SeQuery createSeQuery(final ArcSDEPooledConnection conn) throws IOException {
+        final SeQuery seQuery;
+        final String[] rasterColumns = rasterInfo.getRasterColumns();
+        final String tableName = rasterInfo.getRasterTable();
         try {
-            pyramidLevelChoice = setReadParams(overviewPolicy, readP, requestedEnvelope,
-                    requestedDim);
-            LOGGER.info("Pyramid level chosen: " + pyramidInfo.getPyramidLevel(pyramidLevelChoice));
-        } catch (TransformException e) {
-            new DataSourceException(e);
+            seQuery = new SeQuery(conn, rasterColumns, new SeSqlConstruct(tableName));
+            seQuery.prepareQuery();
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
         }
-
-        /*
-         * Obtain the tiles, pixel range, and resulting envelope
-         */
-        final QueryInfo rasterQueryInfo = RasterUtils.fitRequestToRaster(new ReferencedEnvelope(
-                requestedEnvelope), requestedDim, pyramidInfo, pyramidLevelChoice);
-
-        LOGGER.info(rasterQueryInfo.toString());
-        
-        /*
-         * IMAGE READ OPERATION
-         */
-        final RenderedOp coverageRaster = createRaster(rasterQueryInfo);
-        // force reading the input stream so it gets closed, or the client code may never do that
-        // and make us leak connections
-        coverageRaster.getData();
-
-        /*
-         * BUILDING COVERAGE
-         */
-        final GridSampleDimension[] bands = rasterInfo.getGridSampleDimensions();
-        final GeneralEnvelope finalEnvelope = rasterQueryInfo.getResultEnvelope();
-
-        return coverageFactory.create(coverageName, coverageRaster, finalEnvelope, bands, null,
-                null);
+        return seQuery;
     }
 
-    private RenderedOp createRaster(final QueryInfo rasterQueryInfo) throws IOException {
-
-        final ArcSDEPooledConnection conn = connectionPool.getConnection();
+    private RenderedOp createTiledRaster(final SeQuery preparedQuery,
+            final Rectangle matchingTiles, final int pyramidLevel) throws IOException {
         final SeRow row;
 
-        final int tileWidth, tileHeight;
+        final int tileWidth;
+        final int tileHeight;
         final int numberOfBands;
         final RasterCellType pixelType;
         try {
             final SeRasterAttr rAttr;
-            final String rasterColumnName = rasterInfo.getRasterColumns()[0];
-            final String tableName = rasterInfo.getRasterTable();
-            SeQuery seQuery = new SeQuery(conn, new String[] { rasterColumnName },
-                    new SeSqlConstruct(tableName));
-            seQuery.prepareQuery();
-            seQuery.execute();
-            row = seQuery.fetch();
+            preparedQuery.execute();
+            row = preparedQuery.fetch();
             rAttr = row.getRaster(0);
 
             numberOfBands = rAttr.getNumBands();
             pixelType = RasterCellType.valueOf(rAttr.getPixelType());
-
             tileWidth = rAttr.getTileWidth();
             tileHeight = rAttr.getTileHeight();
 
-            SeRasterConstraint rConstraint = new SeRasterConstraint();
             int[] bandsToQuery = new int[numberOfBands];
             for (int bandN = 1; bandN <= numberOfBands; bandN++) {
                 bandsToQuery[bandN - 1] = bandN;
             }
 
-            rConstraint.setBands(bandsToQuery);
-            rConstraint.setLevel(rasterQueryInfo.getPyramidLevel());
-
-            final ArcSDEPyramid pyramidInfo = rasterInfo.getPyramidInfo();
-            final ArcSDEPyramidLevel optimalLevel = pyramidInfo.getPyramidLevel(rasterQueryInfo
-                    .getPyramidLevel());
-
-            int minTileX = rasterQueryInfo.getMatchingTiles().x;
-            int minTileY = rasterQueryInfo.getMatchingTiles().y;
-            int maxTileX = minTileX + rasterQueryInfo.getMatchingTiles().width;
-            int maxTileY = minTileY + rasterQueryInfo.getMatchingTiles().height;
+            int minTileX = matchingTiles.x;
+            int minTileY = matchingTiles.y;
+            int maxTileX = minTileX + matchingTiles.width;
+            int maxTileY = minTileY + matchingTiles.height;
             LOGGER.fine("Requesting tiles [" + minTileX + "," + minTileY + ":" + maxTileX + ","
                     + maxTileY + "]");
 
-            rConstraint.setEnvelope(minTileX, minTileY, maxTileX, maxTileY);
-
             final int interleaveType = SeRaster.SE_RASTER_INTERLEAVE_BIP;
+
+            SeRasterConstraint rConstraint = new SeRasterConstraint();
+            rConstraint.setBands(bandsToQuery);
+            rConstraint.setLevel(pyramidLevel);
+            rConstraint.setEnvelope(minTileX, minTileY, maxTileX, maxTileY);
             rConstraint.setInterleave(interleaveType);
-            seQuery.queryRasterTile(rConstraint);
+
+            preparedQuery.queryRasterTile(rConstraint);
 
         } catch (SeException se) {
-            conn.close();
             throw new ArcSdeException(se);
         }
+
+        // Finally, build the image input stream
+        final ImageInputStream tiledImageInputStream;
+
+        final TileReader tileReader = TileReader.getInstance(row, pixelType.getBitsPerSample(),
+                numberOfBands, matchingTiles, new Dimension(tileWidth, tileHeight));
+        tiledImageInputStream = new ArcSDETiledImageInputStream(tileReader);
+
+        final int tiledImageWidth = tileReader.getTilesWide() * tileReader.getTileWidth();
+        final int tiledImageHeight = tileReader.getTilesHigh() * tileReader.getTileHeight();
 
         // Prepare temporaray colorModel and sample model, needed to build the final
         // ArcSDEPyramidLevel level;
         final ColorModel colorModel;
         final SampleModel sampleModel;
-        final Rectangle actualImageSize = rasterQueryInfo.getResultDimension();
         {
             int[] bankIndices = new int[numberOfBands];
             int[] bandOffsets = new int[numberOfBands];
 
-            int bandOffset = (tileWidth * tileHeight * pixelType.getBitsPerSample()) / 8;
+            // int bandOffset = (tileWidth * tileHeight * pixelType.getBitsPerSample()) / 8;
 
             for (int i = 0; i < numberOfBands; i++) {
                 bankIndices[i] = i;
                 bandOffsets[i] = 0;// (i * bandOffset);
             }
 
-            sampleModel = new BandedSampleModel(pixelType.getDataBufferType(),
-                    actualImageSize.width, actualImageSize.height, actualImageSize.width,
-                    bankIndices, bandOffsets);
+            sampleModel = new BandedSampleModel(pixelType.getDataBufferType(), tiledImageWidth,
+                    tiledImageHeight, tiledImageWidth, bankIndices, bandOffsets);
 
             int[] numBits = new int[numberOfBands];
-            int bits = pixelType.getBitsPerSample();// DataBuffer.getDataTypeSize(dataType);
+            final int bitsPerSample = pixelType.getBitsPerSample();
             for (int i = 0; i < numberOfBands; i++) {
-                numBits[i] = bits;
+                numBits[i] = bitsPerSample;
             }
 
             final int dataType = pixelType.getDataBufferType();
@@ -387,36 +433,30 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
                     Transparency.OPAQUE, dataType);
         }
 
-        // Finally, build the image input stream
-        final ImageInputStream in;
+        final long[] imageOffsets = new long[] { 0 };
+        // final Dimension[] imageDimensions = new Dimension[] { new
+        // Dimension(actualImageSize.width,
+        // actualImageSize.height) };
 
-        try {
-            TileReader reader = TileReader.getInstance(conn, pixelType, row, actualImageSize,
-                    rasterQueryInfo.getMatchingTiles(), new Dimension(tileWidth, tileHeight));
-            in = new ArcSDETiledImageInputStream(reader);
-        } catch (IOException e) {
-            conn.close();
-            throw e;
-        }
+        final Dimension[] imageDimensions = new Dimension[] { new Dimension(tiledImageWidth,
+                tiledImageHeight) };
 
-        final RawImageInputStream raw = new RawImageInputStream(in, sampleModel, new long[] { 0 },
-                new Dimension[] { new Dimension(actualImageSize.width, actualImageSize.height) });
+        final RawImageInputStream raw = new RawImageInputStream(tiledImageInputStream, sampleModel,
+                imageOffsets, imageDimensions);
 
         // building the final image layout
         final ImageLayout imageLayout;
         {
-            int minX = actualImageSize.x;// queryInfo.image.x;
-            int minY = actualImageSize.y;// queryInfo.image.y;
-            int width = actualImageSize.width;
-            int height = actualImageSize.height;
+            int minX = 0;
+            int minY = 0;
+            int width = tiledImageWidth;
+            int height = tiledImageHeight;
 
-            int tileGridXOffset = 0;// level.getXOffset();
-            int tileGridYOffset = 0;// level.getYOffset();
+            int tileGridXOffset = 0;
+            int tileGridYOffset = 0;
 
-            imageLayout = new ImageLayout(minX, minY, tileWidth, tileHeight, sampleModel, colorModel);
-
-//            imageLayout = new ImageLayout(minX, minY, width, height, tileGridXOffset,
-//                    tileGridYOffset, tileWidth, tileHeight, sampleModel, colorModel);
+            imageLayout = new ImageLayout(minX, minY, width, height, tileGridXOffset,
+                    tileGridYOffset, tileWidth, tileHeight, sampleModel, colorModel);
         }
 
         // First operator: read the image
@@ -428,9 +468,9 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
          * image index, always 0 since we're already fetching the required pyramid level
          */
         pb.add(Integer.valueOf(0)); // Image index
-        pb.add(Boolean.FALSE); // Read metadata
-        pb.add(Boolean.FALSE);// Read thumbnails
-        pb.add(Boolean.FALSE);// Verify input
+        pb.add(Boolean.TRUE); // Read metadata
+        pb.add(Boolean.TRUE);// Read thumbnails
+        pb.add(Boolean.TRUE);// Verify input
         pb.add(null);// Listeners
         pb.add(null);// Locale
         final ImageReadParam rParam = new ImageReadParam();
