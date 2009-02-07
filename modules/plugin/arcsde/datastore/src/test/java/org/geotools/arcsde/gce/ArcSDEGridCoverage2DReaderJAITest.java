@@ -275,7 +275,7 @@ public class ArcSDEGridCoverage2DReaderJAITest {
     @Test
     public void tesReadDisplaced() throws Exception {
         tableName = rasterTestData.getRasterTableName(RasterCellType.TYPE_8BIT_U, 1);
-        rasterTestData.loadTestRaster(tableName, 1, 1000, 1000, TYPE_8BIT_U, null, true, false,
+        rasterTestData.loadTestRaster(tableName, 1, 100, 100, TYPE_8BIT_U, null, true, false,
                 SeRaster.SE_INTERPOLATION_NEAREST, null);
         final AbstractGridCoverage2DReader reader = getReader();
         assertNotNull(reader);
@@ -289,7 +289,7 @@ public class ArcSDEGridCoverage2DReaderJAITest {
         final int requestedHeight = originalGridRange.getLength(1);
 
         final GeneralEnvelope requestedEnvelope;
-        requestedEnvelope = originalEnvelope;// new GeneralEnvelope(new ReferencedEnvelope(0, 200, 0, 200, originalCrs));
+        requestedEnvelope = new GeneralEnvelope(new ReferencedEnvelope(-100, 100, -100, 100, originalCrs));
 
         final GridCoverage2D coverage;
         coverage = readCoverage(reader, requestedWidth, requestedHeight, requestedEnvelope);

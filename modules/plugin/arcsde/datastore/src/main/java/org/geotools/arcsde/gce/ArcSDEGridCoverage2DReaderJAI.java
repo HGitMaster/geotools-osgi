@@ -7,9 +7,12 @@ import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BandedSampleModel;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.util.HashSet;
@@ -184,8 +187,8 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         /*
          * Obtain the tiles, pixel range, and resulting envelope
          */
-        final QueryInfo rasterQueryInfo = RasterUtils.fitRequestToRaster(new ReferencedEnvelope(
-                requestedEnvelope), requestedDim, pyramidInfo, pyramidLevelChoice);
+        final QueryInfo rasterQueryInfo = RasterUtils.fitRequestToRaster(requestedEnvelope,
+                requestedDim, pyramidInfo, pyramidLevelChoice);
 
         LOGGER.info(rasterQueryInfo.toString());
 
@@ -244,14 +247,24 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
     }
 
     private RenderedOp cropToRequiredDimension(final RenderedImage fullTilesRaster,
-            final Rectangle resultDimension) {
+            final Rectangle cropTo) {
+
+        int width = fullTilesRaster.getWidth();
+        int height = fullTilesRaster.getHeight();
+
+        Rectangle origDim = new Rectangle(0, 0, width, height);
+        if (!origDim.contains(cropTo)) {
+            throw new IllegalArgumentException("Original image (" + origDim
+                    + ") does not contain desired dimension (" + cropTo + ")");
+        }
+
         ParameterBlock cropParams = new ParameterBlock();
 
         cropParams.addSource(fullTilesRaster);// Source
-        cropParams.add(Float.valueOf(resultDimension.x)); // x origin for each band
-        cropParams.add(Float.valueOf(resultDimension.y)); // y origin for each band
-        cropParams.add(Float.valueOf(resultDimension.width));// width for each band
-        cropParams.add(Float.valueOf(resultDimension.height));// height for each band
+        cropParams.add(Float.valueOf(cropTo.x)); // x origin for each band
+        cropParams.add(Float.valueOf(cropTo.y)); // y origin for each band
+        cropParams.add(Float.valueOf(cropTo.width));// width for each band
+        cropParams.add(Float.valueOf(cropTo.height));// height for each band
 
         final RenderingHints hints = null;
         RenderedOp image = JAI.create("Crop", cropParams, hints);
