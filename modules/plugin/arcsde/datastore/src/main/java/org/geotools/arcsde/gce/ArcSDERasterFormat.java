@@ -552,16 +552,10 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         // final int numLevels = pyramidInfo.getNumLevels();
         final ArcSDEPyramidLevel highestRes = pyramidInfo.getPyramidLevel(0);
 
-        final int tileWidth = pyramidInfo.getTileWidth();
-        final int tileHeight = pyramidInfo.getTileHeight();
+        final int width = highestRes.size.width;
+        final int height = highestRes.size.height;
 
-        final int numTilesWide = highestRes.getNumTilesWide();
-        final int numTilesHigh = highestRes.getNumTilesHigh();
-
-        final int actualWidth = numTilesWide * tileWidth;
-        final int actualHeight = numTilesHigh * tileHeight;
-
-        Rectangle actualDim = new Rectangle(0, 0, actualWidth, actualHeight);
+        Rectangle actualDim = new Rectangle(0, 0, width, height);
         GeneralGridRange originalGridRange = new GeneralGridRange(actualDim);
         return originalGridRange;
     }

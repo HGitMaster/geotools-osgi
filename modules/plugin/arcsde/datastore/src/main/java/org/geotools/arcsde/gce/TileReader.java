@@ -1,8 +1,13 @@
 package org.geotools.arcsde.gce;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,13 +25,15 @@ public abstract class TileReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
-    private final int tileWidth;
-
-    private final int tileHeight;
-
     private final int bitsPerSample;
 
     private final TileIterator tileIterator;
+
+    private final Rectangle imageDimension;
+
+    private final Rectangle requestedTiles;
+
+    private final Dimension tileSize;
 
     private SeRasterTile lastFetchedTile;
 
@@ -97,15 +104,18 @@ public abstract class TileReader {
     }
 
     public static TileReader getInstance(final SeConnection conn, final RasterCellType cellType,
-            final SeRow row, int tileW, int tileH) {
+            final SeRow row, final Rectangle imageSize, final Rectangle requestedTiles,
+            final Dimension tileSize) {
         final int bitsPerSample = cellType.getBitsPerSample();
         switch (cellType) {
         case TYPE_1BIT:
-            return new OneBitTileReader(conn, row, tileW, tileH, bitsPerSample);
+            return new OneBitTileReader(conn, row, imageSize, bitsPerSample, requestedTiles,
+                    tileSize);
         case TYPE_4BIT:
             // return new FourBitTileReader(conn, row);
         default:
-            return new DefaultTileReader(conn, row, tileW, tileH, bitsPerSample);
+            return new DefaultTileReader(conn, row, imageSize, bitsPerSample, requestedTiles,
+                    tileSize);
         }
     }
 
@@ -113,12 +123,24 @@ public abstract class TileReader {
 
     public abstract int read() throws IOException;
 
-    private TileReader(final SeConnection conn, final SeRow row, int tileW, int tileH,
-            int bitsPerSample) {
+    /**
+     * 
+     * @param conn
+     * @param row
+     * @param imageDimensions
+     *            the image size, x and y are the offsets, width and height the actual width and
+     *            height, used to ignore incomming pixel data as appropriate to fit the image
+     *            dimensions
+     * @param bitsPerSample
+     * @param requestedTiles
+     */
+    private TileReader(final SeConnection conn, final SeRow row, Rectangle imageDimensions,
+            int bitsPerSample, final Rectangle requestedTiles, Dimension tileSize) {
         this.tileIterator = new TileIterator(conn, row);
-        this.tileWidth = tileW;
-        this.tileHeight = tileH;
+        this.imageDimension = imageDimensions;
         this.bitsPerSample = bitsPerSample;
+        this.requestedTiles = requestedTiles;
+        this.tileSize = tileSize;
     }
 
     public final void close() throws IOException {
@@ -130,24 +152,72 @@ public abstract class TileReader {
         currTileDataIndex += actualByteReadCount;
     }
 
+    private static class BoundsCheck {
+        private final int tileWidth;
+
+        private final int tileHeight;
+
+        private final int minImageX;
+
+        private final int maxImageX;
+
+        private final int minImageY;
+
+        private final int maxImageY;
+
+        public BoundsCheck(Rectangle imageSize, Dimension tileSize) {
+            tileWidth = tileSize.width;
+            tileHeight = tileSize.height;
+            minImageX = imageSize.x;
+            maxImageX = minImageX + imageSize.width;
+            minImageY = imageSize.y;
+            maxImageY = minImageY + imageSize.height;
+        }
+
+        public boolean imageContains(final int tileX, final int tileY, final int tileCol,
+                final int tileRow) {
+
+            int x = tileCol * tileWidth + tileX;
+            int y = tileRow * tileHeight + tileY;
+
+            if (x < minImageX) {
+                return false;
+            }
+            if (x > maxImageX) {
+                return false;
+            }
+            if (y < minImageY) {
+                return false;
+            }
+            if (y > maxImageY) {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    private BoundsCheck boundsCheck;
+
     private byte[] fetchTile() throws IOException {
+        if (boundsCheck == null) {
+            boundsCheck = new BoundsCheck(imageDimension, tileSize);
+        }
+
         if (tileIterator.hasNext()) {
             lastFetchedTile = tileIterator.next();
+        } else {
+            return null;
         }
-
-        tileDataLength = (tileWidth * tileHeight * bitsPerSample) / 8;
-        final byte[] tileData = new byte[tileDataLength];
-        final byte NO_DATA_BYTE = (byte) 0x00;
-
         if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer(" >> Fetching " + lastFetchedTile + " - bitmask: "
-                    + lastFetchedTile.getBitMaskData().length);
+            LOGGER.info(" >> Fetching " + lastFetchedTile + " - bitmask: "
+                    + lastFetchedTile.getBitMaskData().length + " has more: " + tileIterator.hasNext());
         }
+
         final int numPixels = lastFetchedTile.getNumPixels();
+
         if (numPixels == 0) {
-            LOGGER.finer("tile contains no pixel data: " + lastFetchedTile);
-            Arrays.fill(tileData, NO_DATA_BYTE);
-            return tileData;
+            LOGGER.finer("tile contains no pixel data, skipping: " + lastFetchedTile);
+            return fetchTile();
         }
 
         // get pixel data AND bitmask data appended, if exist. Pixel data packed into
@@ -156,38 +226,138 @@ public abstract class TileReader {
         final byte[] rawTileData = lastFetchedTile.getPixelData();
         final byte[] bitmaskData = lastFetchedTile.getBitMaskData();
         final int bitMaskDataLength = bitmaskData.length;
-        final int dataAndBitMaskLength = rawTileData.length;
-        final int pureDataLength = dataAndBitMaskLength - bitMaskDataLength;
-        if (pureDataLength != tileDataLength) {
-            throw new IllegalStateException("expected data length of " + tileDataLength + ", got "
-                    + pureDataLength);
-        }
-        System.arraycopy(rawTileData, 0, tileData, 0, tileDataLength);
+        final byte[] tileData;
 
-        // now set the nodata pixels to no-data
-        if (bitMaskDataLength > 0) {
-            LOGGER.finer("Applying no-data bitmask to tile pixels, bits per sample: "
-                    + bitsPerSample);
+        final Point shift = getTilePixelShift(lastFetchedTile);
+
+        if (shift.x == 0 && shift.y == 0 && bitMaskDataLength == 0) {
+            // it's a full tile, go the easy way
+            tileDataLength = rawTileData.length;
+            tileData = new byte[tileDataLength];
+            System.arraycopy(rawTileData, 0, tileData, 0, tileDataLength);
+        } else {
+            // there are no data pixels (ie, ones that merely fill the tile dimension, nothing to do
+            // with the no-data concept). Copy just the non blank ones.
+            final int tileWidth = tileSize.width;
+            final int tileHeight = tileSize.height;
+
+            if (numPixels != tileWidth * tileHeight) {
+                throw new IllegalStateException("numPixels != tileWidth * tileHeight");
+            }
+            ByteArrayOutputStream out = new ByteArrayOutputStream(rawTileData.length
+                    - bitMaskDataLength);
             final int bytesPerSample = bitsPerSample / 8;
-            for (int pixelN = 0; pixelN < numPixels; pixelN++) {
-                if (((bitmaskData[pixelN / 8] >> (7 - (pixelN % 8))) & 0x01) == 0x00) {
-                    // it's a no-data pixel. For now works for bitsPerSample >= 8
-                    if (bitsPerSample >= 8) {
-                        for (int pixByteN = 0; pixByteN < bytesPerSample; pixByteN++) {
-                            tileData[(pixelN * bytesPerSample) + pixByteN] = NO_DATA_BYTE;
+
+            final int columnIndex = lastFetchedTile.getColumnIndex();
+            final int rowIndex = lastFetchedTile.getRowIndex();
+
+            int pixArrayOffset;
+            boolean isNoData;
+            boolean include;
+            int numSkippedPixels = 0;
+            for (int x = 0; x < tileWidth; x++) {
+                for (int y = 0; y < tileHeight; y++) {
+                    pixArrayOffset = y * tileWidth + x;
+                    isNoData = isNoData(bitmaskData, pixArrayOffset);
+                    if (isNoData) {
+                        numSkippedPixels++;
+                        continue;
+                    }
+                    include = boundsCheck.imageContains(x, y, columnIndex, rowIndex);
+                    // discard = isNoData
+                    // || false
+                    // && ((shift.x > 0 && x > shift.x)
+                    // || (shift.x < 0 && x > (tileWidth + shift.x))
+                    // || (shift.y > 0 && y > shift.y) || (shift.y < 0 && y > (tileHeight +
+                    // shift.y)));
+                    if (include) {
+                        for (int byteN = 0; byteN < bytesPerSample; byteN++) {
+                            out.write(rawTileData[pixArrayOffset + byteN]);
                         }
-                    } else if (bitsPerSample == 1) {
-                        // TODO
-                    } else if (bitsPerSample == 4) {
-                        // TODO
                     } else {
-                        throw new IllegalStateException("bitsPerSample " + bitsPerSample);
+                        numSkippedPixels++;
                     }
                 }
+            }
+
+            // for (int pixelN = 0; pixelN < numPixels; pixelN++) {
+            // pixArrayOffset = pixelN * bytesPerSample;
+            // isNoData = isNoData(bitmaskData, pixelN);
+            // discard = isNoData ;
+            // if (isNoData) {
+            // // it's a no-data pixel, ignore it For now works for bitsPerSample >= 8
+            // numSkippedPixels++;
+            // } else {
+            // for (int byteN = 0; byteN < bytesPerSample; byteN++) {
+            // out.write(rawTileData[pixArrayOffset + byteN]);
+            // }
+            // }
+            // }
+
+            tileData = out.toByteArray();
+            tileDataLength = tileData.length;
+            if (LOGGER.isLoggable(Level.FINEST)) {
+                LOGGER.finest("Tile " + lastFetchedTile.getColumnIndex() + ","
+                        + lastFetchedTile.getRowIndex() + " contained " + numSkippedPixels
+                        + " which where ignored. Only " + (numPixels - numSkippedPixels)
+                        + " fetched.");
             }
         }
 
         return tileData;
+    }
+
+    private boolean isNoData(final byte[] bitmaskData, int pixelN) {
+        boolean isNoData;
+        isNoData = bitmaskData.length > 0
+                && ((bitmaskData[pixelN / 8] >> (7 - (pixelN % 8))) & 0x01) == 0x00;
+        return isNoData;
+    }
+
+    /**
+     * Based on the actual image dimensions and the requested tiles, determines whether this tile
+     * contains pixels that should be discarded
+     * 
+     * @param tile
+     * @return the offset x and y of the pixels that shall be discarded
+     */
+    private Point getTilePixelShift(final SeRasterTile tile) {
+
+        final int columnIndex = tile.getColumnIndex();
+        final int rowIndex = tile.getRowIndex();
+
+        /*
+         * The pixel range covered by the tile for the pyramid level
+         */
+        final Rectangle tilePixels = new Rectangle(columnIndex * tileSize.width, rowIndex
+                * tileSize.height, tileSize.width, tileSize.height);
+
+        int xshift = 0;
+        int yshift = 0;
+
+        final int tileMinX = tilePixels.x;
+        final int tileMinY = tilePixels.y;
+        final int tileMaxX = tileMinX + tilePixels.width;
+        final int tileMaxY = tileMinY + tilePixels.height;
+
+        final int imageMinX = imageDimension.x;
+        final int imageMinY = imageDimension.y;
+        final int imageMaxX = imageMinX + imageDimension.width;
+        final int imageMaxY = imageMinY + imageDimension.height;
+
+        if (tileMinX < imageMinX) {
+            xshift = imageMinX - tileMinX;
+        } else if (tileMaxX > imageMaxX) {
+            xshift = -1 * (tileMaxX - imageMaxX);
+        }
+
+        if (tileMinY < imageMinY) {
+            yshift = tileMinY - imageMinY;
+        } else if (tileMaxY > imageMaxY) {
+            yshift = -1 * ((tileMaxY) - imageMaxY);
+        }
+
+        return new Point(xshift, yshift);
     }
 
     protected final byte[] getTileData() throws IOException {
@@ -215,9 +385,10 @@ public abstract class TileReader {
      */
     private static class DefaultTileReader extends TileReader {
 
-        public DefaultTileReader(final SeConnection conn, final SeRow row, int tileW, int tileH,
-                int bitsPerSample) {
-            super(conn, row, tileW, tileH, bitsPerSample);
+        public DefaultTileReader(final SeConnection conn, final SeRow row,
+                final Rectangle imageSize, int bitsPerSample, Rectangle requestedTiles,
+                Dimension tileSize) {
+            super(conn, row, imageSize, bitsPerSample, requestedTiles, tileSize);
         }
 
         @Override
@@ -271,9 +442,10 @@ public abstract class TileReader {
          */
         private int currByteReadCount;
 
-        public OneBitTileReader(final SeConnection conn, final SeRow row, int tileW, int tileH,
-                int bitsPerSample) {
-            super(conn, row, tileW, tileH, bitsPerSample);
+        public OneBitTileReader(final SeConnection conn, final SeRow row,
+                final Rectangle imageSize, int bitsPerSample, final Rectangle requestedTiles,
+                final Dimension tileSize) {
+            super(conn, row, imageSize, bitsPerSample, requestedTiles, tileSize);
             currByteReadCount = 8;// need to fetch more
         }
 

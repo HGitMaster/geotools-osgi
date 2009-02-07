@@ -40,6 +40,8 @@ import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.esri.sde.sdk.client.SeRaster;
+
 /**
  * @author groldan
  * 
@@ -196,8 +198,9 @@ public class ArcSDEGridCoverage2DReaderJAITest {
     }
 
     @Test
-    public void tesReadDisplaced() throws Exception {
-        tableName = rasterTestData.loadRGBRaster();
+    public void tesReadDisplacedRGB() throws Exception {
+        tableName = rasterTestData.getRasterTableName(RasterCellType.TYPE_8BIT_U, 3);
+        //rasterTestData.loadRGBRaster();
         final AbstractGridCoverage2DReader reader = getReader();
         assertNotNull(reader);
 
@@ -220,8 +223,8 @@ public class ArcSDEGridCoverage2DReaderJAITest {
 
             double x1 = minx - shiftX;
             double x2 = minx + shiftX;
-            double y1 = miny - shiftY;
-            double y2 = miny + shiftY;
+            double y1 = miny + shiftY;
+            double y2 = miny + 2*shiftY;
 
             requestedEnvelope = new GeneralEnvelope(new ReferencedEnvelope(x1, x2, y1, y2,
                     originalCrs));
@@ -229,12 +232,14 @@ public class ArcSDEGridCoverage2DReaderJAITest {
         }
         assertNotNull(coverage);
         assertNotNull(coverage.getRenderedImage());
+        CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
+        assertNotNull(crs);
 
         final String fileName = "tesReadDisplaced_Level0";
 
         final RenderedImage image = writeToDisk(coverage, fileName);
 
-        assertSame(originalCrs, coverage.getCoordinateReferenceSystem());
+        assertSame(originalCrs, crs);
 
         final Envelope returnedEnvelope = coverage.getEnvelope();
 
@@ -246,12 +251,6 @@ public class ArcSDEGridCoverage2DReaderJAITest {
 
         int fullWidth = originalGridRange.getSpan(0);
         int fullHeight = originalGridRange.getSpan(1);
-        // we asked for an extend that overlaps with half the width and half the height of the
-        // original image, so lets figure out how many actual tiles should have been fetched
-        final int expectedWidth = tileWidth
-                * (int) Math.ceil((fullWidth / (double) 2 / (double) tileWidth));
-        final int expectedHeight = tileHeight
-                * (int) Math.ceil(((fullHeight / (double) 2) / (double) tileHeight));
 
         GeneralEnvelope expectedEnvelope = new GeneralEnvelope(originalCrs);
         expectedEnvelope.setRange(0, originalEnvelope.getMinimum(0), originalEnvelope.getMinimum(0)
@@ -268,9 +267,66 @@ public class ArcSDEGridCoverage2DReaderJAITest {
                 + requestedEnvelope + "\n expected envelope  :" + expectedEnvelope
                 + "\n returned envelope  :" + returnedEnvelope);
 
-        assertEquals(expectedWidth, image.getWidth());
-        assertEquals(expectedHeight, image.getHeight());
-        //assertEquals(expectedEnvelope, returnedEnvelope);
+        assertEquals(501, image.getWidth());
+        assertEquals(501, image.getHeight());
+        // assertEquals(expectedEnvelope, returnedEnvelope);
+    }
+
+    @Test
+    public void tesReadDisplaced() throws Exception {
+        tableName = rasterTestData.getRasterTableName(RasterCellType.TYPE_8BIT_U, 1);
+        rasterTestData.loadTestRaster(tableName, 1, 1000, 1000, TYPE_8BIT_U, null, true, false,
+                SeRaster.SE_INTERPOLATION_NEAREST, null);
+        final AbstractGridCoverage2DReader reader = getReader();
+        assertNotNull(reader);
+
+        final GeneralEnvelope originalEnvelope = reader.getOriginalEnvelope();
+
+        final CoordinateReferenceSystem originalCrs = originalEnvelope
+                .getCoordinateReferenceSystem();
+        final GeneralGridRange originalGridRange = reader.getOriginalGridRange();
+        final int requestedWidth = originalGridRange.getLength(0);
+        final int requestedHeight = originalGridRange.getLength(1);
+
+        final GeneralEnvelope requestedEnvelope;
+        requestedEnvelope = originalEnvelope;// new GeneralEnvelope(new ReferencedEnvelope(0, 200, 0, 200, originalCrs));
+
+        final GridCoverage2D coverage;
+        coverage = readCoverage(reader, requestedWidth, requestedHeight, requestedEnvelope);
+
+        assertNotNull(coverage);
+        assertNotNull(coverage.getRenderedImage());
+
+        final String fileName = "tesReadDisplaced_Level0_8BitU_1-Band";
+
+        final RenderedImage image = writeToDisk(coverage, fileName);
+
+        final Envelope returnedEnvelope = coverage.getEnvelope();
+
+        // these ones should equal to the tile dimension in the arcsde raster
+        int tileWidth = image.getTileWidth();
+        int tileHeight = image.getTileHeight();
+        assertTrue(tileWidth > 0);
+        assertTrue(tileHeight > 0);
+
+        int fullWidth = originalGridRange.getSpan(0);
+        int fullHeight = originalGridRange.getSpan(1);
+
+        GeneralEnvelope expectedEnvelope = new GeneralEnvelope(originalCrs);
+        expectedEnvelope.setRange(0, 0, 100);
+        expectedEnvelope.setRange(1, 0, 100);
+
+        LOGGER.info("\nRequested width : " + requestedWidth + "\nReturned width  :"
+                + image.getWidth() + "\nRequested height:" + requestedHeight
+                + "\nReturned height :" + image.getHeight());
+
+        LOGGER.info("\nOriginal envelope  : " + originalEnvelope + "\n requested envelope :"
+                + requestedEnvelope + "\n expected envelope  :" + expectedEnvelope
+                + "\n returned envelope  :" + returnedEnvelope);
+
+        assertEquals(50, image.getWidth());
+        assertEquals(50, image.getHeight());
+        // assertEquals(expectedEnvelope, returnedEnvelope);
     }
 
     private RenderedImage writeToDisk(final GridCoverage2D coverage, String fileName) {

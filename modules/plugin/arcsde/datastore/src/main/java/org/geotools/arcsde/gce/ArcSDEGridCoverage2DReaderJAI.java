@@ -24,6 +24,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 
 import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.gce.RasterUtils.QueryInfo;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
@@ -263,13 +264,17 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         }
 
         /*
+         * Obtain the tiles, pixel range, and resulting envelope
+         */
+        final QueryInfo rasterQueryInfo = RasterUtils.fitRequestToRaster(new ReferencedEnvelope(
+                requestedEnvelope), requestedDim, pyramidInfo, pyramidLevelChoice);
+
+        LOGGER.info(rasterQueryInfo.toString());
+        
+        /*
          * IMAGE READ OPERATION
          */
-
-        final RasterQueryInfo queryInfo = pyramidInfo.fitExtentToRasterPixelGrid(
-                new ReferencedEnvelope(requestedEnvelope), pyramidLevelChoice);
-
-        final RenderedOp coverageRaster = createRaster(pyramidLevelChoice, queryInfo);
+        final RenderedOp coverageRaster = createRaster(rasterQueryInfo);
         // force reading the input stream so it gets closed, or the client code may never do that
         // and make us leak connections
         coverageRaster.getData();
@@ -277,57 +282,19 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         /*
          * BUILDING COVERAGE
          */
-
-        // I need to calculate a new transformation (raster2Model)
-        // between the cropped image and the required
-        // adjustedRequestEnvelope
-        final int ssWidth = coverageRaster.getWidth();
-        final int ssHeight = coverageRaster.getHeight();
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.log(Level.FINE, "Coverage read: width = " + ssWidth + " height = " + ssHeight);
-        }
-
-        /*
-         * setting new coefficients to define a new affineTransformation to be applied to the grid
-         * to world transformation
-         * -----------------------------------------------------------------------------------
-         * 
-         * With respect to the original envelope, the obtained planarImage needs to be rescaled. The
-         * scaling factors are computed as the ratio between the cropped source region sizes and the
-         * read image sizes.
-         */
-
-        final double scaleX = requestedDim.width / (1.0 * ssWidth);
-        final double scaleY = requestedDim.height / (1.0 * ssHeight);
-
         final GridSampleDimension[] bands = rasterInfo.getGridSampleDimensions();
-        GeneralEnvelope finalEnvelope = new GeneralEnvelope(queryInfo.actualEnvelope);
+        final GeneralEnvelope finalEnvelope = rasterQueryInfo.getResultEnvelope();
 
         return coverageFactory.create(coverageName, coverageRaster, finalEnvelope, bands, null,
                 null);
-
-        // MathTransform rasterToModel = getRasterToModel();
-        // final AffineTransform tempRaster2Model = new AffineTransform((AffineTransform)
-        // rasterToModel);
-        // tempRaster2Model.concatenate(new AffineTransform(scaleX, 0, 0, scaleY, 0, 0));
-        //
-        // return createImageCoverage(coverageRaster, ProjectiveTransform
-        // .create((AffineTransform) tempRaster2Model));
-        // return createImageCoverage(coverageRaster);
     }
 
-    private RenderedOp createRaster(final int pyramidLevel, final RasterQueryInfo queryInfo)
-            throws IOException {
+    private RenderedOp createRaster(final QueryInfo rasterQueryInfo) throws IOException {
 
         final ArcSDEPooledConnection conn = connectionPool.getConnection();
         final SeRow row;
 
         final int tileWidth, tileHeight;
-        /*
-         * The image size resulting of fetching all the required tiles to comply with the requested
-         * image subset
-         */
-        final Rectangle actualImageSize;
         final int numberOfBands;
         final RasterCellType pixelType;
         try {
@@ -354,67 +321,20 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
             }
 
             rConstraint.setBands(bandsToQuery);
-            rConstraint.setLevel(pyramidLevel);
+            rConstraint.setLevel(rasterQueryInfo.getPyramidLevel());
 
             final ArcSDEPyramid pyramidInfo = rasterInfo.getPyramidInfo();
-            final ArcSDEPyramidLevel optimalLevel = pyramidInfo.getPyramidLevel(pyramidLevel);
+            final ArcSDEPyramidLevel optimalLevel = pyramidInfo.getPyramidLevel(rasterQueryInfo
+                    .getPyramidLevel());
 
-            int minTileX = -1;
-            int minTileY = -1;
-            int maxTileX = -1;
-            int maxTileY = -1;
-            {
-                final int numTilesWide = optimalLevel.getNumTilesWide();
-                final int numTilesHigh = optimalLevel.getNumTilesHigh();
-                final Rectangle pixels = queryInfo.requestedPixels;
-                final int imageMinX = pixels.x;
-                final int imageMinY = pixels.y;
-                final int imageMaxX = imageMinX + pixels.width;
-                final int imageMaxY = imageMinY + pixels.height;
+            int minTileX = rasterQueryInfo.getMatchingTiles().x;
+            int minTileY = rasterQueryInfo.getMatchingTiles().y;
+            int maxTileX = minTileX + rasterQueryInfo.getMatchingTiles().width;
+            int maxTileY = minTileY + rasterQueryInfo.getMatchingTiles().height;
+            LOGGER.fine("Requesting tiles [" + minTileX + "," + minTileY + ":" + maxTileX + ","
+                    + maxTileY + "]");
 
-                for (int tileX = 0; tileX < numTilesWide; tileX++) {
-                    final int tileMinx = tileX * tileWidth;
-                    final int tileMaxx = tileMinx + tileWidth - 1;
-
-                    if (minTileX == -1 && imageMinX <= tileMaxx) {
-                        minTileX = tileX;
-                    }
-
-                    if (imageMaxX >= tileMinx) {
-                        maxTileX = tileX;
-                    }
-                }
-                for (int tileY = 0; tileY < numTilesHigh; tileY++) {
-                    final int tileMiny = tileY * tileHeight;
-                    final int tileMaxy = tileMiny + tileHeight - 1;
-                    if (minTileY == -1 && imageMinY <= tileMaxy) {
-                        minTileY = tileY;
-                    }
-
-                    if (imageMaxY >= tileMiny) {
-                        maxTileY = tileY;
-                    }
-                }
-                LOGGER.info("Requesting tiles " + minTileX + ":" + maxTileX + "," + minTileY + ":"
-                        + maxTileY);
-            }
             rConstraint.setEnvelope(minTileX, minTileY, maxTileX, maxTileY);
-
-            final int actualX = tileWidth * minTileX;
-            final int actualY = tileHeight * minTileY;
-            final int actualImageWidth = tileWidth * (1 + maxTileX - minTileX);
-            final int actualImageHeight = tileHeight * (1 + maxTileY - minTileY);
-            actualImageSize = new Rectangle(actualX, actualY, actualImageWidth, actualImageHeight);
-
-            queryInfo.actualPixels = actualImageSize;
-            queryInfo.actualEnvelope = new ReferencedEnvelope(queryInfo.requestedEnvelope
-                    .getCoordinateReferenceSystem());
-            ReferencedEnvelope minTileExtent = pyramidInfo.getTileExtent(pyramidLevel, minTileX,
-                    minTileY);
-            ReferencedEnvelope maxTileExtent = pyramidInfo.getTileExtent(pyramidLevel, maxTileX,
-                    maxTileY);
-            queryInfo.actualEnvelope.expandToInclude(minTileExtent);
-            queryInfo.actualEnvelope.expandToInclude(maxTileExtent);
 
             final int interleaveType = SeRaster.SE_RASTER_INTERLEAVE_BIP;
             rConstraint.setInterleave(interleaveType);
@@ -429,6 +349,7 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         // ArcSDEPyramidLevel level;
         final ColorModel colorModel;
         final SampleModel sampleModel;
+        final Rectangle actualImageSize = rasterQueryInfo.getResultDimension();
         {
             int[] bankIndices = new int[numberOfBands];
             int[] bandOffsets = new int[numberOfBands];
@@ -439,6 +360,7 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
                 bankIndices[i] = i;
                 bandOffsets[i] = 0;// (i * bandOffset);
             }
+
             sampleModel = new BandedSampleModel(pixelType.getDataBufferType(),
                     actualImageSize.width, actualImageSize.height, actualImageSize.width,
                     bankIndices, bandOffsets);
@@ -469,7 +391,8 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         final ImageInputStream in;
 
         try {
-            TileReader reader = TileReader.getInstance(conn, pixelType, row, tileWidth, tileHeight);
+            TileReader reader = TileReader.getInstance(conn, pixelType, row, actualImageSize,
+                    rasterQueryInfo.getMatchingTiles(), new Dimension(tileWidth, tileHeight));
             in = new ArcSDETiledImageInputStream(reader);
         } catch (IOException e) {
             conn.close();
@@ -490,8 +413,10 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
             int tileGridXOffset = 0;// level.getXOffset();
             int tileGridYOffset = 0;// level.getYOffset();
 
-            imageLayout = new ImageLayout(minX, minY, width, height, tileGridXOffset,
-                    tileGridYOffset, tileWidth, tileHeight, sampleModel, colorModel);
+            imageLayout = new ImageLayout(minX, minY, tileWidth, tileHeight, sampleModel, colorModel);
+
+//            imageLayout = new ImageLayout(minX, minY, width, height, tileGridXOffset,
+//                    tileGridYOffset, tileWidth, tileHeight, sampleModel, colorModel);
         }
 
         // First operator: read the image
