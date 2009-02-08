@@ -33,6 +33,7 @@ import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
@@ -262,5 +263,40 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
             writer = new FilteringFeatureWriter( writer, postFilter );
         }
         return writer;
+    }
+    
+    @Override
+    public void modifyFeatures(AttributeDescriptor[] types, Object[] values, Filter filter)
+            throws IOException {
+        Filter[] splitted = delegate.splitFilter(filter);
+        Filter preFilter = splitted[0];
+        Filter postFilter = splitted[1];
+        
+        if(postFilter != null && !Filter.INCLUDE.equals(postFilter)) {
+            // we don't have a fast way to perform this update, let's do it the
+            // feature by feature way then
+            super.modifyFeatures(types, values, filter);
+        } else {
+            // let's grab the connection
+            Connection cx = getDataStore().getConnection(getState());
+            getDataStore().update(getSchema(), types, values, preFilter, cx);
+        }
+    }
+    
+    @Override
+    public void removeFeatures(Filter filter) throws IOException {
+        Filter[] splitted = delegate.splitFilter(filter);
+        Filter preFilter = splitted[0];
+        Filter postFilter = splitted[1];
+        
+        if(postFilter != null && !Filter.INCLUDE.equals(postFilter)) {
+            // we don't have a fast way to perform this delete, let's do it the
+            // feature by feature way then
+            super.removeFeatures(filter);
+        } else {
+            // let's grab the connection
+            Connection cx = getDataStore().getConnection(getState());
+            getDataStore().delete(getSchema(), preFilter, cx);
+        }
     }
 }

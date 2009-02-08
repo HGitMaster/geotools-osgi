@@ -308,7 +308,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * will throw an {@link IllegalArgumentException}.
      * </p>
      */
-    public final void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
         throws IOException {
         if ( filter == null ) {
             String msg = "Must specify a filter, must not be null.";
@@ -355,7 +355,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * will throw an {@link IllegalArgumentException}.
      * </p>
      */
-    public final void removeFeatures(Filter filter) throws IOException {
+    public void removeFeatures(Filter filter) throws IOException {
         if ( filter == null ) {
             String msg = "Must specify a filter, must not be null.";
             throw new IllegalArgumentException( msg );
