@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32439 2009-02-09 10:59:05Z acuster $              
+        Version: $Id: pom.xml 32443 2009-02-09 12:38:20Z acuster $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -96,20 +96,6 @@
       </roles>
     </developer>
   </developers>
-  
-  <!-- ======= Skip Testing since this is broken on Java6 ===========  -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <skipTests>true</skipTests>
-         </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
 
 
   <!-- =========================================================== -->
