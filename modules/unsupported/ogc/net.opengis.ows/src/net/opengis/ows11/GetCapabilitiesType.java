@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GetCapabilitiesType.java 29859 2008-04-09 04:42:44Z jdeolive $
+ * $Id: GetCapabilitiesType.java 32447 2009-02-09 13:34:55Z aaime $
  */
 package net.opengis.ows11;
 
@@ -14,7 +14,7 @@ import org.eclipse.emf.ecore.EObject;
  * <!-- end-user-doc -->
  *
  * <!-- begin-model-doc -->
- * XML encoded GetCapabilities operation request. This operation allows clients to retrieve service metadata about a specific service instance. In this XML encoding, no "request" parameter is included, since the element name specifies the specific operation. This base type shall be extended by each specific OWS to include the additional required "service" attribute, with the correct value for that OWS. 
+ * XML encoded GetCapabilities operation request. This operation allows clients to retrieve service metadata about a specific service instance. In this XML encoding, no "request" parameter is included, since the element name specifies the specific operation. This base type shall be extended by each specific OWS to include the additional required "service" attribute, with the correct value for that OWS.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -25,6 +25,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.opengis.ows11.GetCapabilitiesType#getAcceptFormats <em>Accept Formats</em>}</li>
  *   <li>{@link net.opengis.ows11.GetCapabilitiesType#getUpdateSequence <em>Update Sequence</em>}</li>
  *   <li>{@link net.opengis.ows11.GetCapabilitiesType#getBaseUrl <em>Base Url</em>}</li>
+ *   <li>{@link net.opengis.ows11.GetCapabilitiesType#getNamespace <em>Namespace</em>}</li>
  * </ul>
  * </p>
  *
@@ -38,7 +39,7 @@ public interface GetCapabilitiesType extends EObject {
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * <!-- begin-model-doc -->
-     * When omitted, server shall return latest supported version. 
+     * When omitted, server shall return latest supported version.
      * <!-- end-model-doc -->
      * @return the value of the '<em>Accept Versions</em>' containment reference.
      * @see #setAcceptVersions(AcceptVersionsType)
@@ -64,7 +65,7 @@ public interface GetCapabilitiesType extends EObject {
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * <!-- begin-model-doc -->
-     * When omitted or not supported by server, server shall return complete service metadata (Capabilities) document. 
+     * When omitted or not supported by server, server shall return complete service metadata (Capabilities) document.
      * <!-- end-model-doc -->
      * @return the value of the '<em>Sections</em>' containment reference.
      * @see #setSections(SectionsType)
@@ -90,7 +91,7 @@ public interface GetCapabilitiesType extends EObject {
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * <!-- begin-model-doc -->
-     * When omitted or not supported by server, server shall return service metadata document using the MIME type "text/xml". 
+     * When omitted or not supported by server, server shall return service metadata document using the MIME type "text/xml".
      * <!-- end-model-doc -->
      * @return the value of the '<em>Accept Formats</em>' containment reference.
      * @see #setAcceptFormats(AcceptFormatsType)
@@ -116,7 +117,7 @@ public interface GetCapabilitiesType extends EObject {
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * <!-- begin-model-doc -->
-     * When omitted or not supported by server, server shall return latest complete service metadata document. 
+     * When omitted or not supported by server, server shall return latest complete service metadata document.
      * <!-- end-model-doc -->
      * @return the value of the '<em>Update Sequence</em>' attribute.
      * @see #setUpdateSequence(String)
@@ -162,5 +163,31 @@ public interface GetCapabilitiesType extends EObject {
      * @generated
      */
     void setBaseUrl(String value);
+
+    /**
+     * Returns the value of the '<em><b>Namespace</b></em>' attribute.
+     * <!-- begin-user-doc -->
+     * <p>
+     * If the meaning of the '<em>Namespace</em>' attribute isn't clear,
+     * there really should be more of a description here...
+     * </p>
+     * <!-- end-user-doc -->
+     * @return the value of the '<em>Namespace</em>' attribute.
+     * @see #setNamespace(String)
+     * @see net.opengis.ows11.Ows11Package#getGetCapabilitiesType_Namespace()
+     * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+     * @generated
+     */
+    String getNamespace();
+
+    /**
+     * Sets the value of the '{@link net.opengis.ows11.GetCapabilitiesType#getNamespace <em>Namespace</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @param value the new value of the '<em>Namespace</em>' attribute.
+     * @see #getNamespace()
+     * @generated
+     */
+    void setNamespace(String value);
 
 } // GetCapabilitiesType

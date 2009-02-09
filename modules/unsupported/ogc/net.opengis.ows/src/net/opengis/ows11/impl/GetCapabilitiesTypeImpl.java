@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GetCapabilitiesTypeImpl.java 29859 2008-04-09 04:42:44Z jdeolive $
+ * $Id: GetCapabilitiesTypeImpl.java 32447 2009-02-09 13:34:55Z aaime $
  */
 package net.opengis.ows11.impl;
 
@@ -33,6 +33,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *   <li>{@link net.opengis.ows11.impl.GetCapabilitiesTypeImpl#getAcceptFormats <em>Accept Formats</em>}</li>
  *   <li>{@link net.opengis.ows11.impl.GetCapabilitiesTypeImpl#getUpdateSequence <em>Update Sequence</em>}</li>
  *   <li>{@link net.opengis.ows11.impl.GetCapabilitiesTypeImpl#getBaseUrl <em>Base Url</em>}</li>
+ *   <li>{@link net.opengis.ows11.impl.GetCapabilitiesTypeImpl#getNamespace <em>Namespace</em>}</li>
  * </ul>
  * </p>
  *
@@ -108,6 +109,26 @@ public class GetCapabilitiesTypeImpl extends EObjectImpl implements GetCapabilit
      * @ordered
      */
     protected String baseUrl = BASE_URL_EDEFAULT;
+
+    /**
+     * The default value of the '{@link #getNamespace() <em>Namespace</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see #getNamespace()
+     * @generated
+     * @ordered
+     */
+    protected static final String NAMESPACE_EDEFAULT = null;
+
+    /**
+     * The cached value of the '{@link #getNamespace() <em>Namespace</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see #getNamespace()
+     * @generated
+     * @ordered
+     */
+    protected String namespace = NAMESPACE_EDEFAULT;
 
     /**
      * <!-- begin-user-doc -->
@@ -303,6 +324,27 @@ public class GetCapabilitiesTypeImpl extends EObjectImpl implements GetCapabilit
      * <!-- end-user-doc -->
      * @generated
      */
+    public String getNamespace() {
+        return namespace;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public void setNamespace(String newNamespace) {
+        String oldNamespace = namespace;
+        namespace = newNamespace;
+        if (eNotificationRequired())
+            eNotify(new ENotificationImpl(this, Notification.SET, Ows11Package.GET_CAPABILITIES_TYPE__NAMESPACE, oldNamespace, namespace));
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
     public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
         switch (featureID) {
             case Ows11Package.GET_CAPABILITIES_TYPE__ACCEPT_VERSIONS:
@@ -332,6 +374,8 @@ public class GetCapabilitiesTypeImpl extends EObjectImpl implements GetCapabilit
                 return getUpdateSequence();
             case Ows11Package.GET_CAPABILITIES_TYPE__BASE_URL:
                 return getBaseUrl();
+            case Ows11Package.GET_CAPABILITIES_TYPE__NAMESPACE:
+                return getNamespace();
         }
         return super.eGet(featureID, resolve, coreType);
     }
@@ -357,6 +401,9 @@ public class GetCapabilitiesTypeImpl extends EObjectImpl implements GetCapabilit
                 return;
             case Ows11Package.GET_CAPABILITIES_TYPE__BASE_URL:
                 setBaseUrl((String)newValue);
+                return;
+            case Ows11Package.GET_CAPABILITIES_TYPE__NAMESPACE:
+                setNamespace((String)newValue);
                 return;
         }
         super.eSet(featureID, newValue);
@@ -384,6 +431,9 @@ public class GetCapabilitiesTypeImpl extends EObjectImpl implements GetCapabilit
             case Ows11Package.GET_CAPABILITIES_TYPE__BASE_URL:
                 setBaseUrl(BASE_URL_EDEFAULT);
                 return;
+            case Ows11Package.GET_CAPABILITIES_TYPE__NAMESPACE:
+                setNamespace(NAMESPACE_EDEFAULT);
+                return;
         }
         super.eUnset(featureID);
     }
@@ -405,6 +455,8 @@ public class GetCapabilitiesTypeImpl extends EObjectImpl implements GetCapabilit
                 return UPDATE_SEQUENCE_EDEFAULT == null ? updateSequence != null : !UPDATE_SEQUENCE_EDEFAULT.equals(updateSequence);
             case Ows11Package.GET_CAPABILITIES_TYPE__BASE_URL:
                 return BASE_URL_EDEFAULT == null ? baseUrl != null : !BASE_URL_EDEFAULT.equals(baseUrl);
+            case Ows11Package.GET_CAPABILITIES_TYPE__NAMESPACE:
+                return NAMESPACE_EDEFAULT == null ? namespace != null : !NAMESPACE_EDEFAULT.equals(namespace);
         }
         return super.eIsSet(featureID);
     }
@@ -422,6 +474,8 @@ public class GetCapabilitiesTypeImpl extends EObjectImpl implements GetCapabilit
         result.append(updateSequence);
         result.append(", baseUrl: ");
         result.append(baseUrl);
+        result.append(", namespace: ");
+        result.append(namespace);
         result.append(')');
         return result.toString();
     }
