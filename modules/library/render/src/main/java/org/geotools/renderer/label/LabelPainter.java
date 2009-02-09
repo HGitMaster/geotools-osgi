@@ -40,7 +40,6 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -440,7 +439,7 @@ public class LabelPainter {
         try {
             // first off, check if we are walking the line so that the label is
             // looking up, if not, reverse the line
-            if (!isLabelUpwards(cursor)) {
+            if (!isLabelUpwards(cursor) && labelItem.isForceLeftToRightEnabled()) {
                 LineStringCursor reverse = cursor.reverse();
                 reverse.moveTo(cursor.getLineStringLength() - cursor.getCurrentOrdinate());
                 cursor = reverse;

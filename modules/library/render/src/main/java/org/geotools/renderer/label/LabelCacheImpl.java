@@ -170,6 +170,9 @@ public final class LabelCacheImpl implements LabelCache {
 
     // Auto wrapping long labels default
     static final int DEFAULT_AUTO_WRAP = 0;
+    
+    // Force labels to a readable orientation (so that they don't look "upside down")
+    static final boolean DEFAULT_FORCE_LEFT_TO_RIGHT = true;
 
     /**
      * When true, the text is rendered as its GlyphVector outline (as a
@@ -387,6 +390,7 @@ public final class LabelCacheImpl implements LabelCache {
         double maxAngleDelta = getDoubleOption(symbolizer, "maxAngleDelta", DEFAULT_MAX_ANGLE_DELTA);
         item.setMaxAngleDelta(Math.toRadians(maxAngleDelta));
         item.setAutoWrap(getIntOption(symbolizer, "autoWrap", DEFAULT_AUTO_WRAP));
+        item.setForceLeftToRightEnabled(getBooleanOption(symbolizer, "forceLeftToRight", DEFAULT_FORCE_LEFT_TO_RIGHT));
         return item;
     }
 
@@ -941,7 +945,10 @@ public final class LabelCacheImpl implements LabelCache {
             // use the one the user supplied!
             rotation = textStyle.getRotation();
         } else { // lineplacement
-            rotation = cursor.getLabelOrientation();
+            if(painter.getLabel().isForceLeftToRightEnabled())
+                rotation = cursor.getLabelOrientation();
+            else
+                rotation = cursor.getCurrentAngle();
             // move it off the line
             displacementY -= textStyle.getPerpendicularOffset();
             anchorX = 0.5; // centered

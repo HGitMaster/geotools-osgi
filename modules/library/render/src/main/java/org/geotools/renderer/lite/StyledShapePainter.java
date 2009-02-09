@@ -437,6 +437,7 @@ public final class StyledShapePainter {
 		graphics.setTransform(markAT);
 		graphics.setComposite(AlphaComposite.getInstance(
 				AlphaComposite.SRC_OVER, opacity));
+		
 
 		// we moved the origin to the middle of the image.
 		if(leftMiddle) {

@@ -66,6 +66,8 @@ public class LabelCacheItem implements Comparable<LabelCacheItem> {
     double maxAngleDelta;
 
     int autoWrap = 100;
+    
+    boolean forceLeftToRightEnabled = true;
 
     public String getLabel() {
         return label;
@@ -291,6 +293,20 @@ public class LabelCacheItem implements Comparable<LabelCacheItem> {
      */
     public int compareTo(LabelCacheItem other) {
         return Double.compare(this.getPriority(), other.getPriority());
+    }
+
+    /**
+     * If enabled, text will be forced to follow a left to right alignement
+     * (that makes it readable) no matter what the natural orientation of the 
+     * line is
+     * @return
+     */
+    public boolean isForceLeftToRightEnabled() {
+        return forceLeftToRightEnabled;
+    }
+
+    public void setForceLeftToRightEnabled(boolean forceLeftToRight) {
+        this.forceLeftToRightEnabled = forceLeftToRight;
     }
 
 }
