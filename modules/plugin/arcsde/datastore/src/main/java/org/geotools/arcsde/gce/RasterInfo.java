@@ -141,15 +141,11 @@ public class RasterInfo {
         final String[] RGBCatNames = { "red", "green", "blue" };
 
         for (RasterBandInfo band : bands) {
-            int bandNumber = band.getBandNumber();
-            RasterCellType cellType = band.getCellType();
-
-            final NumberRange<?> sampleValueRange;
-            double minimum = cellType.getMinimum();
-            double maximum = cellType.getMaximum();
+            final int bandNumber = band.getBandNumber();
+            final RasterCellType cellType = band.getCellType();
             String bandName = band.getBandName();
 
-            sampleValueRange = NumberRange.create(minimum, true, maximum, true);
+            final NumberRange<?> sampleValueRange = cellType.getSampleValueRange();
 
             final Color minColor = Color.BLACK;
             String catName;

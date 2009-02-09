@@ -1,5 +1,6 @@
 package org.geotools.arcsde.gce;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -7,12 +8,10 @@ import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BandedSampleModel;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.Raster;
+import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
-import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.util.HashSet;
@@ -21,6 +20,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
@@ -46,6 +46,7 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
@@ -411,50 +412,61 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         final ColorModel colorModel;
         final SampleModel sampleModel;
         {
-            int[] bankIndices = new int[numberOfBands];
-            int[] bandOffsets = new int[numberOfBands];
-
-            // int bandOffset = (tileWidth * tileHeight * pixelType.getBitsPerSample()) / 8;
-
-            for (int i = 0; i < numberOfBands; i++) {
-                bankIndices[i] = i;
-                bandOffsets[i] = 0;// (i * bandOffset);
-            }
-
-            sampleModel = new BandedSampleModel(pixelType.getDataBufferType(), tiledImageWidth,
-                    tiledImageHeight, tiledImageWidth, bankIndices, bandOffsets);
-
-            int[] numBits = new int[numberOfBands];
             final int bitsPerSample = pixelType.getBitsPerSample();
-            for (int i = 0; i < numberOfBands; i++) {
-                numBits[i] = bitsPerSample;
-            }
-
             final int dataType = pixelType.getDataBufferType();
-            ColorSpace colorSpace;
-            switch (numberOfBands) {
-            case 1:
-                colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-                break;
-            case 3:
-                colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-                break;
-            default:
-                colorSpace = new BogusColorSpace(numberOfBands);
+
+            if (bitsPerSample == 1 || bitsPerSample == 4) {
+                if (numberOfBands != 1) {
+                    throw new DataSourceException(bitsPerSample
+                            + "-Bit rasters are only supported for one band");
+                }
+                int[] argb = new int[(int) Math.pow(2, bitsPerSample)];
+                ColorUtilities.expand(new Color[] { Color.WHITE, Color.BLACK }, argb, 0,
+                        argb.length);
+                colorModel = rasterInfo.getGridSampleDimensions()[0].getColorModel(0,
+                        numberOfBands, dataType);
+                sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
+                        tiledImageHeight);
+            } else {
+                int[] numBits = new int[numberOfBands];
+                for (int i = 0; i < numberOfBands; i++) {
+                    numBits[i] = bitsPerSample;
+                }
+
+                final ColorSpace colorSpace;
+                switch (numberOfBands) {
+                case 1:
+                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+                    break;
+                case 3:
+                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+                    break;
+                default:
+                    colorSpace = new BogusColorSpace(numberOfBands);
+                }
+                colorModel = new ComponentColorModelJAI(colorSpace, numBits, false, false,
+                        Transparency.OPAQUE, dataType);
+
+                int[] bankIndices = new int[numberOfBands];
+                int[] bandOffsets = new int[numberOfBands];
+                // int bandOffset = (tileWidth * tileHeight * pixelType.getBitsPerSample()) / 8;
+                for (int i = 0; i < numberOfBands; i++) {
+                    bankIndices[i] = i;
+                    bandOffsets[i] = 0;// (i * bandOffset);
+                }
+                sampleModel = new BandedSampleModel(dataType, tiledImageWidth, tiledImageHeight,
+                        tiledImageWidth, bankIndices, bandOffsets);
             }
-            colorModel = new ComponentColorModelJAI(colorSpace, numBits, false, false,
-                    Transparency.OPAQUE, dataType);
         }
+        System.out.println("ColorModel: " + colorModel);
+        System.out.println("SampleModel: " + sampleModel);
 
         final long[] imageOffsets = new long[] { 0 };
-        // final Dimension[] imageDimensions = new Dimension[] { new
-        // Dimension(actualImageSize.width,
-        // actualImageSize.height) };
-
         final Dimension[] imageDimensions = new Dimension[] { new Dimension(tiledImageWidth,
                 tiledImageHeight) };
 
-        final RawImageInputStream raw = new RawImageInputStream(tiledImageInputStream, sampleModel,
+        final ImageTypeSpecifier its = new ImageTypeSpecifier(colorModel, sampleModel);
+        final RawImageInputStream raw = new RawImageInputStream(tiledImageInputStream, its,
                 imageOffsets, imageDimensions);
 
         // building the final image layout
@@ -495,5 +507,4 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         RenderedOp image = JAI.create("ImageRead", pb, hints);
         return image;
     }
-
 }

@@ -174,7 +174,7 @@ class TileReader {
             }
             System.arraycopy(rawTileData, 0, tileData, 0, tileDataLength);
 
-            if (bitMaskDataLength > 0) {
+            /*if (bitsPerSample >= 8 && bitMaskDataLength > 0) {
                 LOGGER.finer("Tile contains no data pixels, applying no-data mask");
                 int pixArrayOffset;
                 boolean isNoData;
@@ -189,7 +189,7 @@ class TileReader {
                         }
                     }
                 }
-            }
+            }*/
 
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("returning " + numPixels + " pixels data packaged into "

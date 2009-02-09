@@ -47,6 +47,9 @@ public abstract class ArcSDERasterBandCopier {
         case TYPE_16BIT_S:
             ret = new ShortBandCopier();
             break;
+        case TYPE_4BIT:
+            ret = new UnsignedByteBandCopier();
+            break;
         default:
             throw new IllegalArgumentException(
                     "Don't know how to create ArcSDE band reader for pixel type " + pixelType);

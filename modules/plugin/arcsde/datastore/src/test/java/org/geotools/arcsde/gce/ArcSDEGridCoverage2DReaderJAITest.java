@@ -96,8 +96,18 @@ public class ArcSDEGridCoverage2DReaderJAITest {
     }
 
     @Test
+    public void testRead_1bit_2Band() throws Exception {
+        testReadFullLevel0(TYPE_1BIT, 2);
+    }
+
+    @Test
     public void testRead_1bit_7Band() throws Exception {
         testReadFullLevel0(TYPE_1BIT, 7);
+    }
+
+    @Test
+    public void testRead_4bit_1Band() throws Exception {
+        testReadFullLevel0(TYPE_4BIT, 1);
     }
 
     @Test

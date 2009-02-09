@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -154,8 +155,8 @@ public class RasterTestData {
         return createCoverageUrl(rasterTableName);
     }
 
-    public String createCoverageUrl(final RasterCellType cellType, final int numBands, final boolean colorMapped)
-            throws IOException {
+    public String createCoverageUrl(final RasterCellType cellType, final int numBands,
+            final boolean colorMapped) throws IOException {
         final String rasterTableName = getRasterTableName(cellType, numBands, colorMapped);
         return createCoverageUrl(rasterTableName);
     }
@@ -981,8 +982,18 @@ public class RasterTestData {
             @Override
             public byte[] getImgBandData(int imgWidth, int imgHeight, final int bandN,
                     final int numBands) {
-                throw new UnsupportedOperationException(
-                        "sampler for pixel type 4BIT not yet implemented");
+                final int numBytes = (int) Math.ceil(imgWidth * imgHeight / 2D);
+                final byte[] imgBandData = new byte[numBytes];
+                LinkedList<Integer> values = new LinkedList<Integer>();
+                for(int val = 0; val < 16; val++){
+                    values.add(val);
+                }
+                for(int coupleN = 0; coupleN < numBytes; coupleN++){
+                    Integer val = values.poll();
+                    values.add(val);
+                    imgBandData[coupleN] = (byte) (val.intValue() & 15);
+                }
+                return imgBandData;
             }
         }
 
