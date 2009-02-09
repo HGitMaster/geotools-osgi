@@ -47,8 +47,6 @@ import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.Disjoint;
 import org.opengis.filter.spatial.DistanceBufferOperator;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
-
 
 
 /**

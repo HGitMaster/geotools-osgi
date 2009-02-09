@@ -33,7 +33,6 @@ import org.geotools.util.Comparators;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-import com.sun.org.apache.xpath.internal.axes.ReverseAxesWalker;
 
 public class IndexedFidReaderTest extends FIDTestCase {
     public IndexedFidReaderTest(  ) throws IOException {
