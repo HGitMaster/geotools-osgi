@@ -40,8 +40,8 @@ import org.geotools.util.logging.Logging;
  * class infers the destination regions automatically from the set of affine transforms.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/RegionCalculator.java $
- * @version $Id: RegionCalculator.java 31648 2008-10-12 16:24:14Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/RegionCalculator.java $
+ * @version $Id: RegionCalculator.java 32440 2009-02-09 11:14:54Z acuster $
  * @author Martin Desruisseaux
  */
 final class RegionCalculator {
@@ -138,24 +138,43 @@ final class RegionCalculator {
              */
             AffineTransform reference = null;
             double xMin  = Double.POSITIVE_INFINITY;
+            double xLead = Double.POSITIVE_INFINITY; // Minimum on the first row only.
             double yMin  = Double.POSITIVE_INFINITY;
             double scale = Double.POSITIVE_INFINITY;
             for (final AffineTransform tr : tilesAT.keySet()) {
                 final double s = XAffineTransform.getScale(tr);
                 double y = tr.getTranslateY(); if (tr.getScaleY() < 0 || tr.getShearY() < 0) y = -y;
                 double x = tr.getTranslateX(); if (tr.getScaleX() < 0 || tr.getShearX() < 0) x = -x;
-                if (s != scale) {
+                if (!(Math.abs(s - scale) <= EPS)) {
                     if (!(s < scale)) continue;  // '!' is for catching NaN.
-                    scale = s;
+                    scale = s; // Found a smaller scale.
                     yMin = y;
-                } else if (y != yMin) {
-                    if (!(y < yMin)) continue;
-                    yMin = y;
-                } else if (x != xMin) {
-                    if (!(x < xMin)) continue;
+                    xMin = x;
+                } else { // Found a transform with the same scale.
+                    if (x < xMin) xMin = x;
+                    if (!(Math.abs(y - yMin) <= EPS)) {
+                        if (!(y < yMin)) continue;
+                        yMin = y; // Found a smaller y.
+                    } else if (!(x < xLead)) continue;
                 }
-                xMin = x;
+                xLead = x;
                 reference = tr;
+            }
+            /*
+             * If there is missing tiles at the begining of the first row, then the x location
+             * of the first tile is greater than the "true" minimum. We will need to adjust.
+             */
+            if (reference == null) {
+                continue;
+            }
+            xLead -= xMin;
+            if (xLead > EPS) {
+                final double[] matrix = new double[6];
+                reference.getMatrix(matrix);
+                matrix[4] -= xLead;
+                reference = new AffineTransform(matrix);
+            } else {
+                reference = new AffineTransform(reference); // Protects from upcomming changes.
             }
             /*
              * Transforms the image bounding box from its own space to the reference space. If
@@ -165,10 +184,6 @@ final class RegionCalculator {
              * round (we do not clip as in the default Rectangle implementation) because we
              * really expect integer results.
              */
-            if (reference == null) {
-                continue;
-            }
-            reference = new AffineTransform(reference); // Protects from upcomming changes.
             final AffineTransform toGrid;
             try {
                 toGrid = reference.createInverse();

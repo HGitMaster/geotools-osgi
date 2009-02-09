@@ -22,7 +22,7 @@ import javax.media.jai.operator.AffineDescriptor;  // For javadoc
 
 import org.opengis.geometry.Envelope;
 import org.opengis.coverage.Coverage;
-import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterDescriptor;
@@ -121,8 +121,8 @@ import org.geotools.resources.coverage.CoverageUtilities;
  * </table>
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Resample.java $
- * @version $Id: Resample.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Resample.java $
+ * @version $Id: Resample.java 32440 2009-02-09 11:14:54Z acuster $
  * @author Martin Desruisseaux (IRD)
  *
  * @see org.geotools.coverage.processing.Operations#resample
@@ -264,7 +264,7 @@ public class Resample extends Operation2D {
              * target image should have the same size). Then create again a new grid geometry,
              * this time with the target envelope.
              */
-            GridRange gridRange;
+            GridEnvelope gridRange;
             try {
                 final GeneralEnvelope transformed;
                 transformed = CRS.transform(CRS.getCoordinateOperationFactory(true)

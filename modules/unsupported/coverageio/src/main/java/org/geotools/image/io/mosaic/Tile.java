@@ -115,8 +115,8 @@ import static java.lang.Math.max;
  * serializable, but its class must be known to {@link IIORegistry} at deserialization time.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/Tile.java $
- * @version $Id: Tile.java 31037 2008-07-21 11:31:27Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/Tile.java $
+ * @version $Id: Tile.java 32440 2009-02-09 11:14:54Z acuster $
  * @author Martin Desruisseaux
  */
 public class Tile implements Comparable<Tile>, Serializable {
@@ -953,6 +953,18 @@ public class Tile implements Comparable<Tile>, Serializable {
     final boolean isFinerThan(final Dimension subsampling) {
         return (xSubsampling & MASK) < subsampling.width ||
                (ySubsampling & MASK) < subsampling.height;
+    }
+
+    /**
+     * Returns {@code true} if the subsampling of this tile is equals to the subsampling of
+     * the given tile, but this tile cover a greater area than the given tile.
+     *
+     * @param other The other tile to compare with.
+     * @return {@code true} if both tiles have the same subsampling and this tile is larger.
+     */
+    final boolean isLargerThan(final Tile other) {
+        return xSubsampling == other.xSubsampling && ySubsampling == other.ySubsampling &&
+                (width & MASK) * (height & MASK) > (other.width & MASK) * (other.height & MASK);
     }
 
     /**
