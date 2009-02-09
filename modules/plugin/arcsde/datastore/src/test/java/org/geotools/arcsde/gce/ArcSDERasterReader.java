@@ -35,7 +35,6 @@ import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 
-import org.geotools.arcsde.gce.RasterUtils;
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
@@ -265,7 +264,7 @@ public class ArcSDERasterReader extends ImageReader {
             if (destination == null) {
                 final int imageWidth = intoDestinationImageOffset.x + sourceRegion.width;
                 final int imageHeight = intoDestinationImageOffset.y + sourceRegion.height;
-                destination = RasterUtils.createInitialBufferedImage(sampleImage, imageWidth,
+                destination = RasterTestData.createInitialBufferedImage(sampleImage, imageWidth,
                         imageHeight);
             } else if (!(intoDestinationImageOffset.x == 0 && intoDestinationImageOffset.y == 0)) {
                 int destWidth = sourceRegion.width, destHeight = sourceRegion.height;

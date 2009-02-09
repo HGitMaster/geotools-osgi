@@ -83,9 +83,9 @@ public class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements
             if (tileReader.hasNext()) {
                 byte[] tileData = tileReader.next();
                 // if (tileReader.getBitsPerSample() == 1) {
-                //currTileData = expandOneBitData(tileData);
+                // currTileData = expandOneBitData(tileData);
                 // } else {
-                 currTileData = tileData;
+                currTileData = tileData;
                 // }
                 currTileDataIndex = 0;
             } else {
@@ -95,23 +95,23 @@ public class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements
         return currTileData;
     }
 
-    private byte[] expandOneBitData(final byte[] tileData) {
-        byte[] byteData = new byte[8 * tileData.length];
-        for (int i = 0; i < tileData.length; i++) {
-            byte packed = tileData[i];
-            int base = 8 * i;
-            byteData[base] = (byte) ((packed >>> 1) & 0x1);
-            byteData[base + 1] = (byte) ((packed >>> 2) & 0x1);
-            byteData[base + 2] = (byte) ((packed >>> 3) & 0x1);
-            byteData[base + 3] = (byte) ((packed >>> 4) & 0x1);
-            byteData[base + 4] = (byte) ((packed >>> 5) & 0x1);
-            byteData[base + 5] = (byte) ((packed >>> 6) & 0x1);
-            byteData[base + 6] = (byte) ((packed >>> 7) & 0x1);
-            byteData[base + 7] = (byte) ((packed >>> 8) & 0x1);
-        }
-        return byteData;
-    }
-
+    // private byte[] expandOneBitData(final byte[] tileData) {
+    // byte[] byteData = new byte[8 * tileData.length];
+    // for (int i = 0; i < tileData.length; i++) {
+    // byte packed = tileData[i];
+    // int base = 8 * i;
+    // byteData[base] = (byte) ((packed >>> 1) & 0x1);
+    // byteData[base + 1] = (byte) ((packed >>> 2) & 0x1);
+    // byteData[base + 2] = (byte) ((packed >>> 3) & 0x1);
+    // byteData[base + 3] = (byte) ((packed >>> 4) & 0x1);
+    // byteData[base + 4] = (byte) ((packed >>> 5) & 0x1);
+    // byteData[base + 5] = (byte) ((packed >>> 6) & 0x1);
+    // byteData[base + 6] = (byte) ((packed >>> 7) & 0x1);
+    // byteData[base + 7] = (byte) ((packed >>> 8) & 0x1);
+    // }
+    // return byteData;
+    // }
+    //
     @Override
     public void close() throws IOException {
         super.close();

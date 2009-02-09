@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;

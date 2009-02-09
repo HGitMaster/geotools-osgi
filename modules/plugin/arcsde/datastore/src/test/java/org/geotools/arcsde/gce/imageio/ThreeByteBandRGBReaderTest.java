@@ -30,7 +30,6 @@ import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.ArcSDERasterReader;
 import org.geotools.arcsde.gce.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterUtils;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -76,7 +75,7 @@ public class ThreeByteBandRGBReaderTest {
             readerProps.put(ArcSDERasterReaderSpi.PYRAMID, pyramid);
             readerProps.put(ArcSDERasterReaderSpi.RASTER_TABLE, tableName);
             readerProps.put(ArcSDERasterReaderSpi.RASTER_COLUMN, "RASTER");
-            BufferedImage sampleImage = RasterUtils.createCompatibleBufferedImage(1, 1, 3, RasterCellType.TYPE_8BIT_U, null);
+            BufferedImage sampleImage = RasterTestData.createCompatibleBufferedImage(1, 1, 3, RasterCellType.TYPE_8BIT_U, null);
             readerProps.put(ArcSDERasterReaderSpi.SAMPLE_IMAGE, sampleImage);
         } catch (ArcSdeException se) {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);

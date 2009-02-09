@@ -30,7 +30,6 @@ import javax.imageio.ImageIO;
 import org.geotools.arcsde.gce.ArcSDERasterReader;
 import org.geotools.arcsde.gce.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.RasterUtils;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -90,7 +89,7 @@ public class OneBitBandReaderTest {
             readerProps.put(ArcSDERasterReaderSpi.PYRAMID, pyramid);
             readerProps.put(ArcSDERasterReaderSpi.RASTER_TABLE, tableName);
             readerProps.put(ArcSDERasterReaderSpi.RASTER_COLUMN, "RASTER");
-            BufferedImage sampleImage = RasterUtils.createCompatibleBufferedImage(1, 1, 1, RasterCellType.TYPE_1BIT, null);
+            BufferedImage sampleImage = RasterTestData.createCompatibleBufferedImage(1, 1, 1, RasterCellType.TYPE_1BIT, null);
             readerProps.put(ArcSDERasterReaderSpi.SAMPLE_IMAGE, sampleImage);
         } catch (SeException se) {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);

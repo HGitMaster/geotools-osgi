@@ -17,33 +17,15 @@
  */
 package org.geotools.arcsde.gce;
 
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_16BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_16BIT_U;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_1BIT;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
 
 import java.awt.Rectangle;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.ComponentSampleModel;
 import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferFloat;
-import java.awt.image.DataBufferShort;
-import java.awt.image.DataBufferUShort;
 import java.awt.image.IndexColorModel;
-import java.awt.image.Raster;
-import java.awt.image.SampleModel;
-import java.awt.image.WritableRaster;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
@@ -114,28 +96,6 @@ public class RasterUtils {
         return reqEnv;
     }
 
-    public static BufferedImage createInitialBufferedImage(final BufferedImage prototype,
-            final int width, final int height) throws DataSourceException {
-
-        final WritableRaster rasterPrototype = prototype.getRaster();
-        final WritableRaster newras = rasterPrototype.createCompatibleWritableRaster(width, height);
-        final BufferedImage ret = new BufferedImage(prototype.getColorModel(), newras, prototype
-                .isAlphaPremultiplied(), null);
-        // By default BufferedImages are created with all banks set to zero.
-        // That's an all-black, transparent image.
-        // Transparency is handled in the ArcSDERasterBandCopier. Blackness
-        // isn't. Let's fix that and set
-        // the image to white.
-        final int transparentWhite = 0x00ffffff;
-        int[] pixels = new int[width * height];
-        for (int i = 0; i < width * height; i++) {
-            pixels[i] = transparentWhite;
-        }
-        ret.setRGB(0, 0, width, height, pixels, 0, 1);
-
-        return ret;
-    }
-
     /**
      * Gets the coordinate system that will be associated to the {@link GridCoverage}.
      * 
@@ -190,152 +150,6 @@ public class RasterUtils {
         } catch (PeProjectionException e) {
             ArcSDERasterFormat.LOGGER.log(Level.SEVERE, "", e);
             throw new DataSourceException(e);
-        }
-    }
-
-    /**
-     * Create a one-band {@link BufferedImage} compatible with the {@code cellType} and
-     * IndexColorModel, if any.
-     * 
-     * @param width
-     * @param height
-     * @param cellType
-     * @param colorMap
-     *            if non-null, the color model for the buffered image
-     * @return
-     * @throws DataSourceException
-     */
-    public static BufferedImage createSingleBandCompatibleImage(final int width, final int height,
-            final RasterCellType cellType, IndexColorModel colorMap) throws DataSourceException {
-
-        final BufferedImage compatibleImage;
-        final boolean hasColorMap = colorMap != null;
-        LOGGER.fine("creating compatible image with single-band " + cellType + " image with "
-                + (hasColorMap ? "" : "NO") + " Color Map");
-
-        if (hasColorMap) {
-            compatibleImage = createColorMappedImage(width, height, cellType, colorMap);
-        } else if (cellType == TYPE_1BIT) {
-            compatibleImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
-        } else if (cellType == TYPE_8BIT_U) {
-            compatibleImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-        } else {
-            compatibleImage = createSingleBandImageWithCustomColorModel(width, height, cellType);
-        }
-        return compatibleImage;
-    }
-
-    private static BufferedImage createColorMappedImage(final int width, final int height,
-            final RasterCellType cellType, final IndexColorModel colorMap) {
-        final boolean is8Bit = cellType == TYPE_8BIT_U || cellType == TYPE_8BIT_S;
-        final boolean is16Bit = cellType == TYPE_16BIT_S || cellType == TYPE_16BIT_U;
-        final BufferedImage compatibleImage;
-        if (is8Bit) {
-            // Hold on adding 8-bit colormapped support until we figure out the
-            // deadlock inside SeRasterBand.getColorMap()
-            if (true) {
-                throw new IllegalArgumentException(
-                        "8-bit colormapped raster layers are not supported");
-            }
-            LOGGER.fine("Discovered 8-bit single-band raster with colormap. "
-                    + " Using return image type: TYPE_BYTE_INDEX");
-            // cache the colormodel
-            compatibleImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED,
-                    colorMap);
-
-        } else if (is16Bit) {
-            throw new IllegalArgumentException(
-                    "One-band 16-bit rasters with color map are not yet supported");
-        } else {
-            throw new IllegalArgumentException("Color mapped images with pixel type " + cellType
-                    + " are not supported (nor allowed by ArcSDE!!)");
-        }
-        return compatibleImage;
-    }
-
-    private static BufferedImage createSingleBandImageWithCustomColorModel(final int width,
-            final int height, final RasterCellType cellType) {
-        final int dataType;
-        final DataBuffer dataBuffer;
-        switch (cellType) {
-        case TYPE_16BIT_U:
-            dataType = DataBuffer.TYPE_USHORT;
-            dataBuffer = new DataBufferUShort(width * height);
-            break;
-        case TYPE_16BIT_S:
-            dataType = DataBuffer.TYPE_SHORT;
-            dataBuffer = new DataBufferShort(width * height);
-            break;
-        case TYPE_32BIT_REAL:
-            dataType = DataBuffer.TYPE_FLOAT;
-            dataBuffer = new DataBufferFloat(width * height);
-            break;
-        default:
-            throw new IllegalArgumentException(
-                    "Don't know how to create a single-band image for pixel type " + cellType);
-        }
-        final WritableRaster raster;
-        final ColorModel colorModel;
-        {
-            final int pixelStride = 1;
-            final int scanLineStride = width;
-            final int[] bandOffsets = new int[] { 0 };
-            final SampleModel sampleModel = new ComponentSampleModel(dataType, width, height,
-                    pixelStride, scanLineStride, bandOffsets);
-            raster = Raster.createWritableRaster(sampleModel, dataBuffer, null);
-        }
-        {
-            final ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-            final boolean hasAlpha = false;
-            final boolean isAlphaPremultiplied = true;
-            colorModel = new ComponentColorModel(colorSpace, hasAlpha, isAlphaPremultiplied,
-                    Transparency.OPAQUE, dataType);
-        }
-
-        final boolean isRasterPremultiplied = false;
-        BufferedImage compatibleImage = new BufferedImage(colorModel, raster,
-                isRasterPremultiplied, null);
-        return compatibleImage;
-    }
-
-    private static void initalize(BufferedImage img) {
-        WritableRaster raster = img.getRaster();
-        SampleModel sampleModel = raster.getSampleModel();
-    }
-
-    /**
-     * @param width
-     * @param height
-     * @param numBands
-     * @param cellType
-     * @param colorMap
-     * @return
-     * @throws DataSourceException
-     */
-    public static BufferedImage createCompatibleBufferedImage(final int width, final int height,
-            final int numBands, final RasterCellType cellType, final IndexColorModel colorMap)
-            throws DataSourceException {
-        if (numBands == 1) {
-            return createSingleBandCompatibleImage(width, height, cellType, colorMap);
-        }
-
-        if (numBands == 3 || numBands == 4) {
-            if (cellType != TYPE_8BIT_U) {
-                throw new IllegalArgumentException("3 or 4 band rasters are only supported"
-                        + " if they have pixel type 8-bit unsigned pixels.");
-            }
-            LOGGER.fine("Three or four banded non-colormapped raster detected.  Assuming "
-                    + "bands 1,2 and 3 constitue a 3-band RGB image.  Using return "
-                    + "image type: TYPE_INT_ARGB (alpha will be used to support "
-                    + "no-data pixels)");
-            return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        } else {
-            StringBuffer errmsg = new StringBuffer();
-            errmsg.append("ArcSDERasterReader doesn't support ");
-            errmsg.append(numBands);
-            errmsg.append("-banded images of type ");
-            errmsg.append(cellType);
-            throw new IllegalArgumentException(errmsg.toString());
         }
     }
 

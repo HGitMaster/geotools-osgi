@@ -20,7 +20,7 @@ package org.geotools.arcsde.gce.band;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 
-import org.geotools.arcsde.gce.RasterUtils;
+import org.geotools.arcsde.gce.RasterTestData;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.data.DataSourceException;
 import org.junit.Ignore;
@@ -34,7 +34,7 @@ public class UnsignedByteRGBABandCopierTest extends AbstractArcsdeBandCopierOnli
     protected BufferedImage getTargetImage(final int width, final int height, final int numBands) {
         BufferedImage compatibleImage;
         try {
-            compatibleImage = RasterUtils.createCompatibleBufferedImage(width, height, numBands,
+            compatibleImage = RasterTestData.createCompatibleBufferedImage(width, height, numBands,
                     pixelType, null);
         } catch (DataSourceException e) {
             throw new RuntimeException(e);

@@ -19,10 +19,6 @@ package org.geotools.arcsde.gce.imageio;
 import java.awt.Dimension;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.esri.sde.sdk.client.SDEPoint;
-import com.esri.sde.sdk.client.SeExtent;
 
 /**
  * Represents one level in an ArcSDE pyramid. Holds information about a given pyramid level, like

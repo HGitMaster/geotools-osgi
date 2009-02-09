@@ -17,6 +17,7 @@
  */
 package org.geotools.arcsde.gce;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
@@ -72,7 +73,7 @@ public class RasterBandInfo {
 
     int tileHeight;
 
-    Double tileOrigin;
+    Point2D.Double tileOrigin;
 
     double statsMin;
 

@@ -3,9 +3,17 @@
  */
 package org.geotools.arcsde.gce;
 
-import static org.geotools.arcsde.gce.imageio.RasterCellType.*;
-import static org.junit.Assert.*;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_16BIT_S;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_16BIT_U;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_1BIT;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_REAL;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_4BIT;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_S;
+import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.awt.Rectangle;

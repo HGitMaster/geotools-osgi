@@ -30,7 +30,7 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 
-import org.geotools.arcsde.gce.RasterUtils;
+import org.geotools.arcsde.gce.RasterTestData;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.data.DataSourceException;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class ShortBandCopierTest extends AbstractArcsdeBandCopierOnlineTest {
     protected BufferedImage getTargetImage(final int width, final int height, final int numBands) {
         BufferedImage compatibleImage;
         try {
-            compatibleImage = RasterUtils.createCompatibleBufferedImage(width, height, numBands,
+            compatibleImage = RasterTestData.createCompatibleBufferedImage(width, height, numBands,
                     pixelType, null);
         } catch (DataSourceException e) {
             throw new RuntimeException(e);

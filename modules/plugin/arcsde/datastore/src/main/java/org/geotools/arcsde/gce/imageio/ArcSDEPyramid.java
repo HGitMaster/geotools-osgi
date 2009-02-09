@@ -21,7 +21,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.logging.Level;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -149,6 +148,7 @@ public class ArcSDEPyramid {
      * @param pixelDimensions
      *            The request pixel size of the image
      * @return the integer number of the raster level most appropriate for this request.
+     * @deprecated
      */
     public int pickOptimalRasterLevel(final ReferencedEnvelope requestEnvelope,
             final Rectangle pixelDimensions) throws DataSourceException {
@@ -299,25 +299,25 @@ public class ArcSDEPyramid {
         return b.toString();
     }
 
-    public ReferencedEnvelope getTileExtent(int pyramidLevel, int tileX, int tileY) {
-        final ArcSDEPyramidLevel level = getPyramidLevel(pyramidLevel);
-        final ReferencedEnvelope levelExtent = level.getEnvelope();
-        ReferencedEnvelope tileExtent = new ReferencedEnvelope(levelExtent
-                .getCoordinateReferenceSystem());
-        double xres = level.getXRes();
-        double yres = level.getYRes();
-
-        double tileWidth = getTileWidth();
-        double tileHeight = getTileHeight();
-
-        double tileSpanXGeo = xres * tileWidth;
-        double tileSpanYGeo = yres * tileHeight;
-
-        double minx = levelExtent.getMinX() + (tileX * tileSpanXGeo);
-        double miny = levelExtent.getMinY() + (tileY * tileSpanYGeo);
-
-        tileExtent.expandToInclude(minx, miny);
-        tileExtent.expandToInclude(minx + tileSpanXGeo, miny + tileSpanYGeo);
-        return tileExtent;
-    }
+    // public ReferencedEnvelope getTileExtent(int pyramidLevel, int tileX, int tileY) {
+    // final ArcSDEPyramidLevel level = getPyramidLevel(pyramidLevel);
+    // final ReferencedEnvelope levelExtent = level.getEnvelope();
+    // ReferencedEnvelope tileExtent = new ReferencedEnvelope(levelExtent
+    // .getCoordinateReferenceSystem());
+    // double xres = level.getXRes();
+    // double yres = level.getYRes();
+    //
+    // double tileWidth = getTileWidth();
+    // double tileHeight = getTileHeight();
+    //
+    // double tileSpanXGeo = xres * tileWidth;
+    // double tileSpanYGeo = yres * tileHeight;
+    //
+    // double minx = levelExtent.getMinX() + (tileX * tileSpanXGeo);
+    // double miny = levelExtent.getMinY() + (tileY * tileSpanYGeo);
+    //
+    // tileExtent.expandToInclude(minx, miny);
+    // tileExtent.expandToInclude(minx + tileSpanXGeo, miny + tileSpanYGeo);
+    // return tileExtent;
+    // }
 }
