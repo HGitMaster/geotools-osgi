@@ -17,29 +17,15 @@
  */
 package org.geotools.arcsde.gce;
 
-import java.awt.Color;
-import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
-import java.util.logging.Logger;
 
-import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
 import org.geotools.arcsde.gce.imageio.CompressionType;
 import org.geotools.arcsde.gce.imageio.InterleaveType;
 import org.geotools.arcsde.gce.imageio.InterpolationType;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
-import org.geotools.coverage.Category;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.util.NumberRange;
 
-import com.esri.sde.sdk.client.SDEPoint;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeExtent;
-import com.esri.sde.sdk.client.SeRasterBand;
-import com.esri.sde.sdk.client.SeRasterBand.SeRasterBandColorMap;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -199,6 +185,7 @@ public class RasterBandInfo {
         return statsStdDev;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -206,11 +193,18 @@ public class RasterBandInfo {
         sb.append(": ").append(getBandWidth()).append("x").append(getBandHeight()).append(" ");
         sb.append(getCellType()).append(".");
         sb.append(" Tiles: ").append(getTileWidth()).append("x").append(getTileHeight());
+        sb.append(", Tile origin: ").append((int) getTileOrigin().x).append(",").append(
+                (int) getTileOrigin().y);
         sb.append(", ").append(getCompressionType());
         sb.append(", ").append(getInterpolationType());
         sb.append(", Color Map: ").append(isColorMapped() ? "YES" : "NO");
         sb.append(", Max pyramid level: " + getMaxPyramidLevel()).append(
                 isSkipPyramidLevelOne() ? " (Skips level one)" : "");
+        if (hasStats) {
+            sb.append(", Statistics: min=").append(getStatsMin()).append(" max=").append(
+                    getStatsMax()).append(" mean=").append(getStatsMean()).append(" stddev=")
+                    .append(getStatsStdDev());
+        }
         return sb.toString();
     }
 
