@@ -186,7 +186,7 @@ public class ShpFiles {
     private URL findExistingFile(ShpFileType shpFileType, URL value) {
         final File file = DataUtilities.urlToFile(value);
         File directory = file.getParentFile();
-        if( directory==null ){
+        if( directory==null || !directory.exists() ) {
             // doesn't exist
             return null;
         }
