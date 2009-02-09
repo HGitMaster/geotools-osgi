@@ -581,6 +581,9 @@ public class Encoder {
                 String prefix = (String) e.nextElement();
                 String uri = namespaces.getURI( prefix );
                 
+                if ( "xml".equals( prefix ) ) {
+                    continue;
+                }
                 serializer.startPrefixMapping( prefix , uri );
             }
             for (Iterator itr = schema.getQNamePrefixToNamespaceMap().entrySet().iterator();
