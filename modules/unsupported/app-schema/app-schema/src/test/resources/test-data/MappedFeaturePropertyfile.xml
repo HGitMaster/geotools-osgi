@@ -33,7 +33,7 @@
 	<targetTypes>
 		<FeatureType>
 			<schemaUri>
-                commonSchemas_new/geosciml/geosciml.xsd
+                commonSchemas_new/GeoSciML/geosciml.xsd
             </schemaUri>
 		</FeatureType>
 	</targetTypes>

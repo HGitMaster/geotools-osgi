@@ -66,7 +66,7 @@
 				may be absolute URL's. Imports and includes at the schemas will be
 				followed as long as they're relative paths.
 			-->
-			<schemaUri>commonSchemas_new/geosciml/geosciml.xsd</schemaUri>
+			<schemaUri>commonSchemas_new/GeoSciML/geosciml.xsd</schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>
