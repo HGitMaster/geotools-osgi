@@ -8,7 +8,7 @@ import java.io.IOException;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageInputStreamImpl;
 
-public class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageInputStream {
+class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageInputStream {
 
     private final TileReader tileReader;
 

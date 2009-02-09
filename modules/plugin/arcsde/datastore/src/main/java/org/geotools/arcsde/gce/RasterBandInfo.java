@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Gabriel Roldan
  */
-public class RasterBandInfo {
+class RasterBandInfo {
 
     long bandId;
 

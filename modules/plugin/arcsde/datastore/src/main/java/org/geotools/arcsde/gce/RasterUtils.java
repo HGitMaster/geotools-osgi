@@ -54,7 +54,7 @@ import com.esri.sde.sdk.pe.PeProjectionException;
  * @author Gabriel Roldan
  */
 @SuppressWarnings( { "nls", "deprecation" })
-public class RasterUtils {
+class RasterUtils {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 

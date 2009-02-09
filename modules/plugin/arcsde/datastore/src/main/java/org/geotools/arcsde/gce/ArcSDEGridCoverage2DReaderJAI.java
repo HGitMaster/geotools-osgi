@@ -70,7 +70,7 @@ import com.sun.media.imageio.stream.RawImageInputStream;
 import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
 
 @SuppressWarnings( { "deprecation", "nls" })
-public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
+class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
     private final static Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 

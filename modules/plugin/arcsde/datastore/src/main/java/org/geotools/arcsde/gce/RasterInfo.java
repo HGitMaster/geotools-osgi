@@ -37,7 +37,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Gabriel Roldan
  */
 @SuppressWarnings( { "nls", "deprecation" })
-public class RasterInfo {
+class RasterInfo {
     /** The name of the raster table we're pulling images from in this reader * */
     private String rasterTable = null;
 
