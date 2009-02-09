@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.arcsde.gce.imageio;
+package org.geotools.arcsde.gce;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -24,12 +24,15 @@ import java.util.Map;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 
+import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
+
 /**
  * An ImageIO Service Provider Interface for creating ArcSDERasterReaders.
  * 
  * @author sfarber
- * 
+ * @deprecated leaving in test code by now until making sure we're not loosing test coverage
  */
+@Deprecated
 public class ArcSDERasterReaderSpi extends ImageReaderSpi {
 
     final public static String PYRAMID = "org.geotools.arcsde.gce.imageio.PYRAMID";

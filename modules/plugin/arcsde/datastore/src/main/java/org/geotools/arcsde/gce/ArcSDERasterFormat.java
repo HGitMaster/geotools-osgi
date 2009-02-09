@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferShort;
@@ -46,8 +45,6 @@ import javax.measure.unit.Unit;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
-import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
-import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.gce.imageio.CompressionType;
 import org.geotools.arcsde.gce.imageio.InterleaveType;
 import org.geotools.arcsde.gce.imageio.InterpolationType;
@@ -473,18 +470,9 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         final CoordinateReferenceSystem coverageCrs;
         final GeneralEnvelope originalEnvelope;
         final ArcSDEPyramid pyramidInfo;
-        final BufferedImage sampleImage;
-        final List<GridSampleDimension> gridSampleDimensions;
-        final ArcSDERasterReader imageIOReader;
 
         rasterColumns = getRasterColumns(scon, rasterTable);
         final SeRasterAttr rasterAttributes = getSeRasterAttr(scon, rasterTable, rasterColumns);
-        final RasterCellType cellType;
-        try {
-            cellType = RasterCellType.valueOf(rasterAttributes.getPixelType());
-        } catch (SeException e) {
-            throw new ArcSdeException(e);
-        }
         {
             SeRasterColumn rCol;
             try {
@@ -527,39 +515,13 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         }
         rasterInfo.setRasterTable(rasterTable);
         rasterInfo.setRasterColumns(rasterColumns);
-        // rasterInfo.setGridSampleDimensions(gridSampleDimensions);
-        rasterInfo.setLevelZeroPRP(levelZeroPRP);
         rasterInfo.setBands(bands);
         rasterInfo.setPyramidInfo(pyramidInfo);
-        // rasterInfo.setSampleImage(sampleImage);
         rasterInfo.setCoverageCrs(coverageCrs);
         rasterInfo.setOriginalEnvelope(originalEnvelope);
         rasterInfo.setOriginalGridRange(originalGridRange);
-        // rasterInfo.setImageIOReader(imageIOReader);
 
         return rasterInfo;
-    }
-
-    private ArcSDERasterReader createImageIOReader(final String rasterTable,
-            final String[] rasterColumns, final ArcSDEPyramid pyramidInfo,
-            final BufferedImage sampleImage) throws IOException {
-
-        Map<String, Object> readerMap = new HashMap<String, Object>();
-        readerMap.put(ArcSDERasterReaderSpi.PYRAMID, pyramidInfo);
-        readerMap.put(ArcSDERasterReaderSpi.RASTER_TABLE, rasterTable);
-        readerMap.put(ArcSDERasterReaderSpi.RASTER_COLUMN, rasterColumns[0]);
-        readerMap.put(ArcSDERasterReaderSpi.SAMPLE_IMAGE, sampleImage);
-
-        ArcSDERasterReader imageIOReader;
-        try {
-            ArcSDERasterReaderSpi arcSDERasterReaderSpi = new ArcSDERasterReaderSpi();
-            imageIOReader = arcSDERasterReaderSpi.createReaderInstance(readerMap);
-        } catch (IOException ioe) {
-            LOGGER.log(Level.SEVERE,
-                    "Error creating ImageIOReader in ArcSDERasterGridCoverage2DReader", ioe);
-            throw ioe;
-        }
-        return imageIOReader;
     }
 
     private GeneralGridRange calculateOriginalGridRange(ArcSDEPyramid pyramidInfo) {

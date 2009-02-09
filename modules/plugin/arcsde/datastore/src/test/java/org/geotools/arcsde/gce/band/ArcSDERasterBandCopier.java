@@ -16,7 +16,6 @@
  */
 package org.geotools.arcsde.gce.band;
 
-import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 
 import org.geotools.arcsde.gce.imageio.RasterCellType;
@@ -24,6 +23,10 @@ import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeRasterTile;
 
+/**
+ * @deprecated leaving in test code by now until making sure we're not loosing test coverage
+ */
+@Deprecated
 public abstract class ArcSDERasterBandCopier {
 
     protected int tileWidth, tileHeight;

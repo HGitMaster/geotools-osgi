@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.arcsde.gce.imageio;
+package org.geotools.arcsde.gce;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -37,6 +37,10 @@ import javax.imageio.metadata.IIOMetadata;
 
 import org.geotools.arcsde.gce.RasterUtils;
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
+import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
+import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
+import org.geotools.arcsde.gce.imageio.ArcSDERasterImageReadParam;
+import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
 import org.geotools.util.logging.Logging;
@@ -74,7 +78,9 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * 
  * @author Saul Farber
  * @author Gabriel Roldan
+ * @deprecated leaving in test code by now until making sure we're not loosing test coverage
  */
+@Deprecated
 public class ArcSDERasterReader extends ImageReader {
 
     private static final boolean DEBUG = false;

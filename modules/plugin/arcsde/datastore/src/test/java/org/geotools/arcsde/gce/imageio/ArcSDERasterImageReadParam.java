@@ -64,7 +64,9 @@ import com.esri.sde.sdk.client.SeRasterBand;
  * </ul>
  * 
  * @author sfarber
+ * @deprecated leaving in test code by now until making sure we're not loosing test coverage
  */
+@Deprecated
 public class ArcSDERasterImageReadParam extends ImageReadParam {
 
     private ArcSDEPooledConnection connection;

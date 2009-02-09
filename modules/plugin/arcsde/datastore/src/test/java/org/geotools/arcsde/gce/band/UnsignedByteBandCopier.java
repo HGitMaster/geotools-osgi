@@ -1,5 +1,22 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.arcsde.gce.band;
 
+import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,14 +26,17 @@ import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeRasterTile;
 
-public class FloatBandCopier extends ArcSDERasterBandCopier {
+/**
+ * @deprecated leaving in test code by now until making sure we're not loosing test coverage
+ */
+@Deprecated
+class UnsignedByteBandCopier extends ArcSDERasterBandCopier {
 
     Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
     @Override
     public void copyPixelData(SeRasterTile tile, WritableRaster raster, int copyOffX, int copyOffY,
             int targetBand) throws DataSourceException {
-
         if (LOGGER.isLoggable(Level.FINER))
             LOGGER.finer("copying raster data band " + tile.getBandId().longValue()
                     + " into image band " + targetBand);
@@ -29,7 +49,7 @@ public class FloatBandCopier extends ArcSDERasterBandCopier {
                         + tile.getRowIndex());
             return;
         }
-        float[] pixelData = new float[numPixels];
+        byte[] pixelData = new byte[numPixels];
         byte[] bitmaskData;
         try {
             pixelData = tile.getPixels(pixelData);
@@ -46,11 +66,6 @@ public class FloatBandCopier extends ArcSDERasterBandCopier {
             throw new DataSourceException(e);
         }
         int x, y;
-        final boolean haveBMData;
-        if (bitmaskData.length > 0)
-            haveBMData = true;
-        else
-            haveBMData = false;
 
         final int imgWidth = raster.getWidth() + copyOffX > tileWidth ? tileWidth - copyOffX
                 : raster.getWidth();
@@ -58,20 +73,41 @@ public class FloatBandCopier extends ArcSDERasterBandCopier {
                 : raster.getHeight();
 
         for (x = 0; x < imgWidth; x++) {
-            // final float[] imageDataRow = new float[imgHeight];
             for (y = 0; y < imgHeight; y++) {
                 final int pixArrayOffset = (y + copyOffY) * tileWidth + (x + copyOffX);
-                if (haveBMData) {
+                if (bitmaskData.length > 0) {
                     if (((bitmaskData[pixArrayOffset / 8] >> (7 - (pixArrayOffset % 8))) & 0x01) == 0x00) {
-                        // it's a no-data pixel. Make it transparent/no-data
-                        // TODO: support nodata values here
-                        raster.setSample(x, y, targetBand, 0.0f);
+                        // it's a no-data pixel. Make it transparent if there's
+                        // a 4th band, and also make it white.
+                        if (raster.getNumBands() == 4)
+                            raster.setSample(x, y, 3, 0);
+
+                        raster.setSample(x, y, targetBand, 255);
                         continue;
                     }
                 }
                 try {
-                    final float sdePixelData = pixelData[pixArrayOffset];
-                    raster.setSample(x, y, targetBand, sdePixelData);
+                    // verify that we have an opaque pixel
+                    if (raster.getNumBands() == 4)
+                        raster.setSample(x, y, 3, 255);
+                    final int transferType = raster.getTransferType();
+                    if (transferType == DataBuffer.TYPE_BYTE || transferType == DataBuffer.TYPE_INT) {
+                        final byte sdePixelData = pixelData[pixArrayOffset];
+                        // final int bandSample = (raster.getSample(x, y,
+                        // targetBand) | sdePixelData) & 0x000000ff;
+                        final int bandSample = sdePixelData & 0x000000ff;
+                        /*
+                         * if (bandSample != 0 && Math.random() > .99995) { LOGGER.info("pixel " + x
+                         * + "," + y + ", band:" + targetBand + " has value " + bandSample); }
+                         */
+                        raster.setSample(x, y, targetBand, bandSample);
+                    } else {
+                        // this can't happen, it'd have been caught earlier when
+                        // we created the transfer object.
+                        throw new IllegalArgumentException(
+                                "Can't copy ArcSDE Raster data from an SE_PIXEL_TYPE_8BIT_U raster to a java.awt.Raster with a transferType of "
+                                        + transferType);
+                    }
                 } catch (RuntimeException e) {
                     LOGGER.severe("at data " + (x + copyOffX) + "," + (y + copyOffY)
                             + "(img pixel " + x + "," + y + ")");

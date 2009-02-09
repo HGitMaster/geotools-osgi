@@ -23,7 +23,6 @@ import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_1BIT;
 import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_S;
 import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -39,23 +38,12 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
-import java.awt.image.renderable.ParameterBlock;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageTypeSpecifier;
-import javax.media.jai.ImageLayout;
-
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
-import org.geotools.arcsde.gce.imageio.ArcSDERasterImageReadParam;
-import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramid.RasterQueryInfo;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
@@ -63,7 +51,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ColorUtilities;
-import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.FactoryException;
@@ -74,13 +61,11 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 
 import com.esri.sde.sdk.client.SeCoordinateReference;
-import com.esri.sde.sdk.client.SeRasterBand.SeRasterBandColorMap;
 import com.esri.sde.sdk.pe.PeCoordinateSystem;
 import com.esri.sde.sdk.pe.PeFactory;
 import com.esri.sde.sdk.pe.PeGeographicCS;
 import com.esri.sde.sdk.pe.PeProjectedCS;
 import com.esri.sde.sdk.pe.PeProjectionException;
-import com.sun.imageio.plugins.common.BogusColorSpace;
 
 /**
  * 
@@ -149,147 +134,6 @@ public class RasterUtils {
         ret.setRGB(0, 0, width, height, pixels, 0, 1);
 
         return ret;
-    }
-
-    public static ArcSDERasterImageReadParam createImageReadParam(final int pyramidLevel,
-            final ArcSDEPyramid pyramidInfo, final ReferencedEnvelope reqEnv,
-            final ArcSDEPooledConnection scon, final List<RasterBandInfo> seBands,
-            final Point levelZeroPRP, final ArcSDERasterReader imageIOReader,
-            BufferedImage sampleImage) throws NegativelyIndexedTileException, DataSourceException {
-
-        // ok, there's actually something to render. Render it.
-        final RasterQueryInfo rasterGridInfo;
-        rasterGridInfo = pyramidInfo.fitExtentToRasterPixelGrid(reqEnv, pyramidLevel);
-
-        final BufferedImage actualOutputImage = createInitialBufferedImage(sampleImage,
-                rasterGridInfo.requestedPixels.width, rasterGridInfo.requestedPixels.height);
-
-        final Rectangle sourceRegion = calculateSourceRegion(pyramidLevel, pyramidInfo,
-                levelZeroPRP, rasterGridInfo);
-
-        final BufferedImage outputImage = getDrawingImage(rasterGridInfo, actualOutputImage);
-
-        final GeneralEnvelope outputImageEnvelope = new GeneralEnvelope(
-                rasterGridInfo.requestedEnvelope);
-
-        // not quite sure how, but I figure one could request a subset
-        // of all available bands...
-        // for now we'll just grab the first three, and assume they're
-        // RGB in order.
-        int[] bands = new int[Math.min(3, seBands.size())];
-        Map<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
-        for (int bandIndex = 0; bandIndex < bands.length; bandIndex++) {
-            bands[bandIndex] = bandIndex + 1;
-            bandMapper.put(new Integer((int) seBands.get(bandIndex).getBandId()), new Integer(
-                    bandIndex));
-        }
-
-        ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
-        rParam.setConnection(scon);
-        rParam.setActualDestination(actualOutputImage);
-        rParam.setSourceRegion(sourceRegion);
-        rParam.setDestination(outputImage);
-        rParam.setOutputImageEnvelope(outputImageEnvelope);
-        rParam.setSourceBands(bands);
-        rParam.setBandMapper(bandMapper);
-
-        // if we don't provide an ImageLayout to the JAI ImageRead
-        // operation, it'll try to read the entire raster layer!
-        // It's only a slight abuse of the semantics of the word "tile"
-        // when we tell JAI that it can tile our image at exactly the
-        // size of the section of the raster layer we're looking to render.
-        final ImageLayout layout = new ImageLayout();
-        layout.setTileWidth(sourceRegion.width);
-        layout.setTileHeight(sourceRegion.height);
-
-        ParameterBlock pb = new ParameterBlock();
-        pb.add(new Object());
-        pb.add(new Integer(pyramidLevel));
-        pb.add(Boolean.FALSE);
-        pb.add(Boolean.FALSE);
-        pb.add(Boolean.FALSE);
-        pb.add(null);
-        pb.add(null);
-        pb.add(rParam);
-        pb.add(imageIOReader);
-        return rParam;
-    }
-
-    /**
-     * Returns the image where to actually perform the painting.
-     * <p>
-     * May or may not match the {@code actualOutputImage}. If not a subImage sharing the internal
-     * buffer is returned.
-     * </p>
-     * 
-     * @param rasterGridInfo
-     * @param actualOutputImage
-     *            the full sized image
-     * @return possibly a subimage of actualOutputImage if needs to be shifted to accomodate to the
-     *         raster grid info
-     */
-    private static BufferedImage getDrawingImage(final RasterQueryInfo rasterGridInfo,
-            final BufferedImage actualOutputImage) {
-        final BufferedImage outputImage;
-        if (rasterGridInfo.requestedPixels.x < 0 || rasterGridInfo.requestedPixels.y < 0) {
-            Point destOffset = new Point(0, 0);
-            if (rasterGridInfo.requestedPixels.x < 0) {
-                destOffset.x = rasterGridInfo.requestedPixels.x * -1;
-            }
-            if (rasterGridInfo.requestedPixels.y < 0) {
-                destOffset.y = rasterGridInfo.requestedPixels.y * -1;
-            }
-            outputImage = actualOutputImage.getSubimage(destOffset.x, destOffset.y,
-                    actualOutputImage.getWidth() - destOffset.x, actualOutputImage.getHeight()
-                            - destOffset.y);
-
-            if (LOGGER.isLoggable(Level.FINER)) {
-                LOGGER.finer("source region is offset by " + destOffset + " into the "
-                        + actualOutputImage.getWidth() + "x" + actualOutputImage.getHeight()
-                        + " output image.");
-            }
-        } else {
-            outputImage = actualOutputImage;
-        }
-        return outputImage;
-    }
-
-    public static Rectangle calculateSourceRegion(final int pyramidLevel,
-            final ArcSDEPyramid pyramidInfo, final Point levelZeroPRP,
-            final RasterQueryInfo rasterGridInfo) throws NegativelyIndexedTileException {
-        final int minImageX = Math.max(rasterGridInfo.requestedPixels.x, 0);
-        final int maxImageX = Math.min(rasterGridInfo.requestedPixels.x
-                + rasterGridInfo.requestedPixels.width,
-                pyramidInfo.getPyramidLevel(pyramidLevel).size.width);
-        int minImageY = Math.max(rasterGridInfo.requestedPixels.y, 0);
-        int maxImageY = Math.min(rasterGridInfo.requestedPixels.y
-                + rasterGridInfo.requestedPixels.height,
-                pyramidInfo.getPyramidLevel(pyramidLevel).size.height);
-
-        Rectangle sourceRegion = new Rectangle(minImageX, minImageY, maxImageX - minImageX,
-                maxImageY - minImageY);
-        // check for inaccessible negative-indexed level-zero tiles.
-        // Shift to level 1 if necessary.
-        if (pyramidLevel == 0 && levelZeroPRP != null) {
-            if ((maxImageY > levelZeroPRP.y && minImageY < levelZeroPRP.y)
-                    || (maxImageX > levelZeroPRP.x && minImageX < levelZeroPRP.x)) {
-                throw new NegativelyIndexedTileException("");
-            } else if (maxImageY > levelZeroPRP.y && maxImageX > levelZeroPRP.x) {
-                // we're on the south side of the PRP...need to shift
-                // everything up
-                sourceRegion.translate(levelZeroPRP.x * -1, levelZeroPRP.y * -1);
-            } else {
-                // all the data we want is negatively indexed on one axis or another. Since
-                // we can't get at it, we'll have to shift up to level 1;
-                throw new NegativelyIndexedTileException("");
-            }
-        }
-
-        if (LOGGER.isLoggable(Level.FINE))
-            LOGGER.fine("Expanded request to cover source region [" + sourceRegion + "] in level "
-                    + pyramidLevel + ".  Spatial extent of this source region is "
-                    + rasterGridInfo.requestedEnvelope);
-        return sourceRegion;
     }
 
     /**
@@ -493,117 +337,6 @@ public class RasterUtils {
             errmsg.append(cellType);
             throw new IllegalArgumentException(errmsg.toString());
         }
-    }
-
-    public static IndexColorModel sdeColorMapToJavaColorModel(SeRasterBandColorMap sdeColorMap) {
-        // TODO implement sdeColorMapToJavaColorModel
-        IndexColorModel ret = new IndexColorModel(8, 3, new byte[] { 0x0 }, new byte[] { 0x0 },
-                new byte[] { 0x0 });
-        return ret;
-    }
-
-    public static ImageTypeSpecifier createImageTypeSpec(final RasterCellType pixelType,
-            final int numberOfBands, final int width, final int height, final int tileW,
-            final int tileH) {
-
-        ImageTypeSpecifier its;
-
-        ColorSpace colorSpace;
-        // if(pixelType == TYPE_1BIT ){
-        // int visibleBand = 0;
-        // int[] ARGB = {0x000000, 0xFFFFFF};
-        // ColorModel cm = ColorUtilities.getIndexColorModel(ARGB, numberOfBands, visibleBand);
-        // colorSpace = cm.getColorSpace();
-        // }else{
-        colorSpace = new BogusColorSpace(numberOfBands);
-        // }
-        int[] bankIndices = new int[numberOfBands];
-        int[] bandOffsets = new int[numberOfBands];
-
-        int bandOffset = (tileW * tileH * pixelType.getBitsPerSample()) / 8;
-
-        for (int i = 0; i < numberOfBands; i++) {
-            bankIndices[i] = i;
-            bandOffsets[i] = (i * bandOffset);
-        }
-        boolean hasAlpha = false;
-        boolean isAlphaPremultiplied = false;
-        its = ImageTypeSpecifier.createBanded(colorSpace, bankIndices, bandOffsets, pixelType
-                .getDataBufferType(), hasAlpha, isAlphaPremultiplied);
-
-        return its;
-    }
-
-    /**
-     * 
-     * @param pixelType
-     * @param numberOfBands
-     *            the total number of bands in the raster, regardless of which one(s) to make
-     *            visible
-     * @return
-     */
-    public static ImageTypeSpecifier _createImageTypeSpec(final RasterCellType pixelType,
-            final int numberOfBands, final int width, final int height) {
-
-        final ImageTypeSpecifier its;
-
-        ColorModel colorModel;
-        SampleModel sampleModel;
-
-        int[] bandOffsets;
-        final int transferType = pixelType.getDataBufferType();
-        {
-            switch (pixelType) {
-            case TYPE_1BIT:
-                its = ImageTypeSpecifier
-                        .createFromBufferedImageType(BufferedImage.TYPE_BYTE_BINARY);
-                break;
-            case TYPE_4BIT:
-                its = ImageTypeSpecifier.createGrayscale(4, pixelType.getDataBufferType(),
-                        pixelType.isSigned());
-                break;
-            default:
-                final ColorSpace colorSpace;
-                final boolean isAlphaPremultiplied = false;
-                // final SampleModel sampleModel = colorModel.createCompatibleSampleModel(width,
-                // height);
-                switch (numberOfBands) {
-                case 3:
-                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-                    bandOffsets = new int[] { 0, 1, 2 };
-                    break;
-                default:
-                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-                    bandOffsets = new int[] { 0 };
-                    break;
-                }
-                final boolean hasAlpha = false;
-                final int transparencyKey = Transparency.OPAQUE;
-                // if (numBands > 3) {
-                // transparencyKey = TraStridensparency.TRANSLUCENT;
-                // hasAlpha = true;
-                // }
-                colorModel = new ComponentColorModelJAI(colorSpace, hasAlpha, isAlphaPremultiplied,
-                        transparencyKey, transferType);
-                final int pixelStride = 1;
-                final int scanLineStride = width;
-
-                bandOffsets = new int[numberOfBands];
-                for (int i = 0; i < numberOfBands; i++)
-                    bandOffsets[i] = i;
-
-                // colorSpace = new BogusColorSpace(numberOfBands);
-                its = ImageTypeSpecifier.createBanded(colorSpace, bandOffsets, bandOffsets,
-                        transferType, hasAlpha, isAlphaPremultiplied);
-                // sampleModel = new BandedSampleModel(transferType, width, height, numberOfBands);
-                // sampleModel = new ComponentSampleModel(transferType, width, height, pixelStride,
-                // scanLineStride, bandOffsets);
-
-                // its = new ImageTypeSpecifier(colorModel, sampleModel);
-            }
-        }
-
-        return its;
     }
 
     public static class QueryInfo {

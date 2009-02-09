@@ -18,20 +18,16 @@
 package org.geotools.arcsde.gce;
 
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
-import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.metadata.iso.content.BandImpl;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -40,6 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Gabriel Roldan
  */
+@SuppressWarnings( { "nls", "deprecation" })
 public class RasterInfo {
     /** The name of the raster table we're pulling images from in this reader * */
     private String rasterTable = null;
@@ -52,10 +49,6 @@ public class RasterInfo {
 
     /** Array holding information on each level of the pyramid in this raster. * */
     private ArcSDEPyramid pyramidInfo;
-
-    private BufferedImage sampleImage;
-
-    private Point levelZeroPRP;
 
     private List<RasterBandInfo> bands;
 
@@ -70,12 +63,6 @@ public class RasterInfo {
     private int imageWidth;
 
     private int imageHeight;
-
-    /**
-     * Local copy of the javax.imageio.ImageReader subclass for reading from this ArcSDE Raster
-     * Source.
-     */
-    private ArcSDERasterReader imageIOReader;
 
     /**
      * @param rasterTable
@@ -199,41 +186,6 @@ public class RasterInfo {
         return imageHeight;
     }
 
-    /*
-     * public void setGridSampleDimensions(List<GridSampleDimension> gridSampleDimensions) {
-     * this.gridSampleDimensions = gridSampleDimensions; }
-     */
-
-    /**
-     * @param sampleImage
-     *            the sampleImage to set
-     */
-    void setSampleImage(BufferedImage sampleImage) {
-        this.sampleImage = sampleImage;
-    }
-
-    /**
-     * @return the sampleImage
-     */
-    public BufferedImage getSampleImage() {
-        return sampleImage;
-    }
-
-    /**
-     * @param levelZeroPRP
-     *            the levelZeroPRP to set
-     */
-    void setLevelZeroPRP(Point levelZeroPRP) {
-        this.levelZeroPRP = levelZeroPRP;
-    }
-
-    /**
-     * @return the levelZeroPRP
-     */
-    public Point getLevelZeroPRP() {
-        return levelZeroPRP;
-    }
-
     /**
      * @param bands
      *            the bands to set
@@ -292,14 +244,6 @@ public class RasterInfo {
      */
     public GeneralEnvelope getOriginalEnvelope() {
         return originalEnvelope;
-    }
-
-    public ArcSDERasterReader getImageIOReader() {
-        return this.imageIOReader;
-    }
-
-    public void setImageIOReader(ArcSDERasterReader imageIOReader) {
-        this.imageIOReader = imageIOReader;
     }
 
     @Override

@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import org.geotools.arcsde.gce.ArcSDERasterReader;
+import org.geotools.arcsde.gce.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.gce.RasterTestData;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;

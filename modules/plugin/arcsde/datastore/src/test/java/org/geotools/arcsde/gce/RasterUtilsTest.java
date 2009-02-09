@@ -19,14 +19,7 @@ package org.geotools.arcsde.gce;
 
 import static org.junit.Assert.assertSame;
 
-import java.awt.image.ColorModel;
-import java.awt.image.SampleModel;
-
-import javax.imageio.ImageTypeSpecifier;
-
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.referencing.CRS;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -58,31 +51,5 @@ public class RasterUtilsTest {
         assertSame(expectedCRS, compatibleCRS);
     }
 
-    @Test
-    public void testCreateImageTypeSpecifier_NoColorMap() throws Exception {
-//        for (RasterCellType pixelType : RasterCellType.values()) {
-//            testCreateImageTypeSpecifier(pixelType);
-//        }
 
-            testCreateImageTypeSpecifier(RasterCellType.TYPE_1BIT);
-    }
-
-    @Test
-    @Ignore
-    public void testCreateImageTypeSpecifier_ColorMapped() throws Exception {
-        //TODO
-    }
-
-    private void testCreateImageTypeSpecifier(RasterCellType cellType) throws Exception {
-        final int minBands = 1;
-        final int maxBands = 7;
-        ImageTypeSpecifier its;
-        for (int numBands = minBands; numBands <= maxBands; numBands++) {
-            System.out.println(cellType + " - " + numBands + "-Band");
-            its = RasterUtils.createImageTypeSpec(cellType, numBands, 10, 10, 5, 5);
-            SampleModel sampleModel = its.getSampleModel(256, 128);
-            ColorModel colorModel = its.getColorModel();
-        }
-
-    }
 }

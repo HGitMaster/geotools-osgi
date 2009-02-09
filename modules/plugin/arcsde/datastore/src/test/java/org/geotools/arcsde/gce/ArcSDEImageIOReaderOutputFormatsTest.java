@@ -29,8 +29,6 @@ import junit.framework.TestCase;
 
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterImageReadParam;
-import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
-import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
@@ -53,7 +51,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEImageIOReaderOutputFormatsTest.java $
- * @version $Id: ArcSDEImageIOReaderOutputFormatsTest.java 32322 2009-01-24 20:11:52Z groldan $
+ * @version $Id: ArcSDEImageIOReaderOutputFormatsTest.java 32456 2009-02-09 22:06:34Z groldan $
  */
 public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 

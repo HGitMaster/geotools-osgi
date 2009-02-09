@@ -15,7 +15,7 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeRasterTile;
 import com.esri.sde.sdk.client.SeRow;
 
-@SuppressWarnings( { "nls", "deprecation" })
+@SuppressWarnings( { "nls" })
 class TileReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");

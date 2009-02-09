@@ -30,7 +30,9 @@ import com.esri.sde.sdk.client.SeRasterTile;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * 
+ * @deprecated leaving in test code by now until making sure we're not loosing test coverage
  */
+@Deprecated
 class UnsignedShortBandCopier extends ArcSDERasterBandCopier {
 
     Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
