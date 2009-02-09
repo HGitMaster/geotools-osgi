@@ -1,5 +1,6 @@
 package com.esri.sde.sdk.client;
 
+import java.io.ByteArrayInputStream;
 import java.util.Calendar;
 
 import com.esri.sde.sdk.geom.GeometryFactory;
@@ -32,6 +33,10 @@ public class SeRow {
     public SeShape getShape(int i) {return null;}
     public void setNString(int index, String convertedValue) {}
     public Object getGeometry(GeometryFactory seGeomFac, int i)throws SeException {
+        return null;
+    }
+    public ByteArrayInputStream getBlob(int i) throws SeException{
+        // TODO Auto-generated method stub
         return null;
     }
 	

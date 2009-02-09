@@ -15,6 +15,7 @@ import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -414,8 +415,14 @@ public class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader 
         {
             final int bitsPerSample = pixelType.getBitsPerSample();
             final int dataType = pixelType.getDataBufferType();
-
-            if (bitsPerSample == 1 || bitsPerSample == 4) {
+            final List<RasterBandInfo> bands = rasterInfo.getBands();
+            final boolean hasColorMap = bands.get(0).isColorMapped();
+            if (hasColorMap) {
+                LOGGER.fine("Found single-band colormapped raster, using its index color model");
+                colorModel = bands.get(0).getColorMap();
+                sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
+                        tiledImageHeight);
+            } else if (bitsPerSample == 1 || bitsPerSample == 4) {
                 if (numberOfBands != 1) {
                     throw new DataSourceException(bitsPerSample
                             + "-Bit rasters are only supported for one band");

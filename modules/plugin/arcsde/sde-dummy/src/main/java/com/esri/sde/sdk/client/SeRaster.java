@@ -9,6 +9,7 @@ public class SeRaster {
     public static int SE_RASTER_INTERLEAVE_BIL_91 = 0;
     public static int SE_RASTER_INTERLEAVE_BIL = 0;
     public static int SE_COLORMAP_DATA_BYTE = 0;
+    public static int SE_COLORMAP_DATA_SHORT = 0;
     public static int SE_COLORMAP_RGBA = 0;
     public static int SE_COLORMAP_RGB = 0;
     public static int SE_PIXEL_TYPE_64BIT_REAL = 0;

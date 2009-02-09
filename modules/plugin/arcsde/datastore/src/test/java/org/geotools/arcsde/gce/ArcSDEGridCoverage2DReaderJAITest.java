@@ -91,6 +91,12 @@ public class ArcSDEGridCoverage2DReaderJAITest {
     }
 
     @Test
+    public void testRead_8bitU_ColorMapped() throws Exception {
+        tableName = rasterTestData.loadRGBColorMappedRaster();
+        testReadFullLevel0("testRead_8bitU_RGBColorMappedRaster");
+    }
+
+    @Test
     public void testRead_1bit_1Band() throws Exception {
         testReadFullLevel0(TYPE_1BIT, 1);
     }
@@ -210,7 +216,7 @@ public class ArcSDEGridCoverage2DReaderJAITest {
     @Test
     public void tesReadDisplacedRGB() throws Exception {
         tableName = rasterTestData.getRasterTableName(RasterCellType.TYPE_8BIT_U, 3);
-        //rasterTestData.loadRGBRaster();
+        // rasterTestData.loadRGBRaster();
         final AbstractGridCoverage2DReader reader = getReader();
         assertNotNull(reader);
 
@@ -234,7 +240,7 @@ public class ArcSDEGridCoverage2DReaderJAITest {
             double x1 = minx - shiftX;
             double x2 = minx + shiftX;
             double y1 = miny + shiftY;
-            double y2 = miny + 2*shiftY;
+            double y2 = miny + 2 * shiftY;
 
             requestedEnvelope = new GeneralEnvelope(new ReferencedEnvelope(x1, x2, y1, y2,
                     originalCrs));
@@ -299,7 +305,8 @@ public class ArcSDEGridCoverage2DReaderJAITest {
         final int requestedHeight = originalGridRange.getLength(1);
 
         final GeneralEnvelope requestedEnvelope;
-        requestedEnvelope = new GeneralEnvelope(new ReferencedEnvelope(-100, 100, -100, 100, originalCrs));
+        requestedEnvelope = new GeneralEnvelope(new ReferencedEnvelope(-100, 100, -100, 100,
+                originalCrs));
 
         final GridCoverage2D coverage;
         coverage = readCoverage(reader, requestedWidth, requestedHeight, requestedEnvelope);

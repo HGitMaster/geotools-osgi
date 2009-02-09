@@ -48,140 +48,56 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class RasterBandInfo {
 
-    private final long bandId;
+    long bandId;
 
-    private final int bandHeight;
+    int bandHeight;
 
-    private final int bandWidth;
+    int bandWidth;
 
-    private final String bandName;
+    String bandName;
 
-    private final int bandNumber;
+    int bandNumber;
 
-    private final boolean hasColorMap;
+    boolean hasColorMap;
 
-    private final IndexColorModel colorMap;
+    IndexColorModel colorMap;
 
-    private final CompressionType compressionType;
+    CompressionType compressionType;
 
-    private final Envelope bandExtent;
+    Envelope bandExtent;
 
-    private final RasterCellType cellType;
+    RasterCellType cellType;
 
-    private final long rasterColumnId;
+    long rasterColumnId;
 
-    private final InterleaveType interleaveType;
+    InterleaveType interleaveType;
 
-    private final InterpolationType interpolationType;
+    InterpolationType interpolationType;
 
-    private final int maxPyramidLevel;
+    int maxPyramidLevel;
 
-    private final boolean isSkipPyramidLevelOne;
+    boolean isSkipPyramidLevelOne;
 
-    private final long rasterId;
+    long rasterId;
 
-    private final boolean hasStats;
+    boolean hasStats;
 
-    private final int tileWidth;
+    int tileWidth;
 
-    private final int tileHeight;
+    int tileHeight;
 
-    private final Double tileOrigin;
+    Double tileOrigin;
 
-    private final ArcSDERasterBandCopier rasterBandCopier;
+    double statsMin;
 
-    private final double statsMin;
+    double statsMax;
 
-    public double getStatsMin() {
-        return statsMin;
-    }
+    double statsMean;
 
-    public double getStatsMax() {
-        return statsMax;
-    }
+    double statsStdDev;
 
-    public double getStatsMean() {
-        return statsMean;
-    }
-
-    public double getStatsStdDev() {
-        return statsStdDev;
-    }
-
-    private final double statsMax;
-
-    private final double statsMean;
-
-    private final double statsStdDev;
-
-    public RasterBandInfo(SeRasterBand band) throws IOException {
-
-        bandId = band.getId().longValue();
-        bandNumber = band.getBandNumber();
-        bandName = "Band " + bandNumber;
-
-        rasterId = band.getRasterId().longValue();
-        rasterColumnId = band.getRasterColumnId().longValue();
-
-        bandHeight = band.getBandHeight();
-        bandWidth = band.getBandWidth();
-        hasColorMap = band.hasColorMap();
-        if (hasColorMap) {
-            // TODO: hold on on getting the color map until the blocking issue is resolved
-            Logger.getLogger("org.geotools.arcsde.gce").warning(
-                    "Skipping getting the color map for band " + band);
-            colorMap = null;
-            // SeRasterBandColorMap sdeColorMap;
-            // try {
-            // sdeColorMap = band.getColorMap();
-            // } catch (SeException e) {
-            // throw new ArcSdeException("Getting band's color map", e);
-            // }
-            // colorMap = RasterUtils.sdeColorMapToJavaColorModel(sdeColorMap);
-        } else {
-            colorMap = null;
-        }
-        compressionType = CompressionType.valueOf(band.getCompressionType());
-        SeExtent extent = band.getExtent();
-        bandExtent = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(), extent
-                .getMaxY());
-        cellType = RasterCellType.valueOf(band.getPixelType());
-        interleaveType = InterleaveType.valueOf(band.getInterleave());
-        interpolationType = InterpolationType.valueOf(band.getInterpolation());
-        maxPyramidLevel = band.getMaxLevel();
-        isSkipPyramidLevelOne = band.skipLevelOne();
-        hasStats = band.hasStats();
-        if (hasStats) {
-            try {
-                statsMin = band.getStatsMin();
-                statsMax = band.getStatsMax();
-                statsMean = band.getStatsMean();
-                statsStdDev = band.getStatsStdDev();
-            } catch (SeException e) {
-                throw new ArcSdeException(e);
-            }
-        } else {
-            statsMin = java.lang.Double.NaN;
-            statsMax = java.lang.Double.NaN;
-            statsMean = java.lang.Double.NaN;
-            statsStdDev = java.lang.Double.NaN;
-        }
-        tileWidth = band.getTileWidth();
-        tileHeight = band.getTileHeight();
-        SDEPoint tOrigin;
-        try {
-            tOrigin = band.getTileOrigin();
-        } catch (SeException e) {
-            throw new ArcSdeException(e);
-        }
-        tileOrigin = new Point2D.Double(tOrigin.getX(), tOrigin.getY());
-
-        rasterBandCopier = ArcSDERasterBandCopier.getInstance(cellType, tileWidth, tileHeight);
-
-    }
-
-    public ArcSDERasterBandCopier getRasterBandCopier() {
-        return rasterBandCopier;
+    public RasterBandInfo() throws IOException {
+        // do nothing
     }
 
     /**
@@ -207,7 +123,7 @@ public class RasterBandInfo {
         return bandNumber;
     }
 
-    public boolean isHasColorMap() {
+    public boolean isColorMapped() {
         return hasColorMap;
     }
 
@@ -267,6 +183,22 @@ public class RasterBandInfo {
         return colorMap;
     }
 
+    public double getStatsMin() {
+        return statsMin;
+    }
+
+    public double getStatsMax() {
+        return statsMax;
+    }
+
+    public double getStatsMean() {
+        return statsMean;
+    }
+
+    public double getStatsStdDev() {
+        return statsStdDev;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -276,7 +208,7 @@ public class RasterBandInfo {
         sb.append(" Tiles: ").append(getTileWidth()).append("x").append(getTileHeight());
         sb.append(", ").append(getCompressionType());
         sb.append(", ").append(getInterpolationType());
-        sb.append(", Color Map: ").append(isHasColorMap() ? "YES" : "NO");
+        sb.append(", Color Map: ").append(isColorMapped() ? "YES" : "NO");
         sb.append(", Max pyramid level: " + getMaxPyramidLevel()).append(
                 isSkipPyramidLevelOne() ? " (Skips level one)" : "");
         return sb.toString();

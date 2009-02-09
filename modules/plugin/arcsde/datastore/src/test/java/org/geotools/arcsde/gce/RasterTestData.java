@@ -28,6 +28,7 @@ import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_64BIT_REAL;
 import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_S;
 import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -72,6 +73,7 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
+import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SDEPoint;
@@ -389,26 +391,6 @@ public class RasterTestData {
 
             attr.setExtent(extent);
 
-            // if there's a colormap to insert, let's add that too
-            if (colorModel != null) {
-                final int numEntries = 256;
-                // number of colors, including alpha, if any
-                final int numBanks = colorModel.getNumComponents();
-                final int colorMapType = numBanks == 3 ? SeRaster.SE_COLORMAP_RGB
-                        : SeRaster.SE_COLORMAP_RGBA;
-                final int dataType = SeRaster.SE_COLORMAP_DATA_BYTE;
-                DataBufferByte dataBuffer = new DataBufferByte(numEntries, numBanks);
-                for (int elem = 0; elem < numEntries; elem++) {
-                    dataBuffer.setElem(0, colorModel.getRed(elem));
-                    dataBuffer.setElem(1, colorModel.getGreen(elem));
-                    dataBuffer.setElem(2, colorModel.getBlue(elem));
-                    if (numBanks == 4) {
-                        dataBuffer.setElem(3, colorModel.getAlpha(elem));
-                    }
-                }
-                attr.setColorMap(colorMapType, dataBuffer);
-            }
-
             // attr.setImageOrigin();
 
             prod.setSeRasterAttr(attr);
@@ -433,8 +415,25 @@ public class RasterTestData {
             // if there's a colormap to insert, let's add that too
             if (colorModel != null) {
                 attr = getRasterAttributes(tableName, new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
-                // attr.getBands()[0].setColorMap(SeRaster.SE_COLORMAP_DATA_BYTE, );
-                // NOT IMPLEMENTED FOR NOW!
+                final int numEntries = colorModel.getMapSize();
+                // number of colors, including alpha, if any
+                final int numBanks = colorModel.getNumComponents();
+                final int colorMapType = numBanks == 3 ? SeRaster.SE_COLORMAP_RGB
+                        : SeRaster.SE_COLORMAP_RGBA;
+                DataBufferByte dataBuffer = new DataBufferByte(numEntries, numBanks);
+                for (int elem = 0; elem < numEntries; elem++) {
+                    dataBuffer.setElem(0, elem, colorModel.getRed(elem));
+                    dataBuffer.setElem(1, elem, colorModel.getGreen(elem));
+                    dataBuffer.setElem(2, elem, colorModel.getBlue(elem));
+                    if (numBanks == 4) {
+                        dataBuffer.setElem(3, elem, colorModel.getAlpha(elem));
+                    }
+                }
+                SeRaster raster = attr.getRasterInfo();
+                SeRasterBand[] bands = raster.getBands();
+                SeRasterBand band = bands[0];
+                band.setColorMap(colorMapType, dataBuffer);
+                band.alter();
             }
         } finally {
             conn.close();
@@ -985,10 +984,10 @@ public class RasterTestData {
                 final int numBytes = (int) Math.ceil(imgWidth * imgHeight / 2D);
                 final byte[] imgBandData = new byte[numBytes];
                 LinkedList<Integer> values = new LinkedList<Integer>();
-                for(int val = 0; val < 16; val++){
+                for (int val = 0; val < 16; val++) {
                     values.add(val);
                 }
-                for(int coupleN = 0; coupleN < numBytes; coupleN++){
+                for (int coupleN = 0; coupleN < numBytes; coupleN++) {
                     Integer val = values.poll();
                     values.add(val);
                     imgBandData[coupleN] = (byte) (val.intValue() & 15);

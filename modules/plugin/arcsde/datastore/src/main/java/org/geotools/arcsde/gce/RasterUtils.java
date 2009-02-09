@@ -62,6 +62,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
+import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
@@ -85,6 +86,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan
  */
+@SuppressWarnings( { "nls", "deprecation" })
 public class RasterUtils {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
@@ -788,5 +790,38 @@ public class RasterUtils {
         final Rectangle cropTo = new Rectangle(minCropX, minCropY, cropWidth, cropHeight);
 
         queryInfo.resultDimension = cropTo;
+    }
+
+    public static IndexColorModel sdeColorMapToJavaColorModel(final int bitsPerPixel,
+            final DataBuffer colorMapData) {
+        if (colorMapData == null) {
+            throw new NullPointerException("colorMapData");
+        }
+
+        if (colorMapData.getNumBanks() < 3 || colorMapData.getNumBanks() > 4) {
+            throw new IllegalArgumentException("colorMapData shall have 3 or 4 banks: "
+                    + colorMapData.getNumBanks());
+        }
+
+        final int numBanks = colorMapData.getNumBanks();
+        final int mapSize = colorMapData.getSize();
+
+        int[] ARGB = new int[mapSize];
+        int r;
+        int g;
+        int b;
+        int a;
+        for (int i = 0; i < mapSize; i++) {
+            r = colorMapData.getElem(0, i);
+            g = colorMapData.getElem(1, i);
+            b = colorMapData.getElem(2, i);
+            a = numBanks == 4 ? colorMapData.getElem(3, i) : 255;
+            int rgba = ColorUtilities.getIntFromColor(r, g, b, a);
+            ARGB[i] = rgba;
+        }
+
+        IndexColorModel colorModel = ColorUtilities.getIndexColorModel(ARGB);
+
+        return colorModel;
     }
 }

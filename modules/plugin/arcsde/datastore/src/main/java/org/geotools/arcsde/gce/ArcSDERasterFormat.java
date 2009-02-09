@@ -23,7 +23,14 @@ import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferShort;
+import java.awt.image.IndexColorModel;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,6 +48,9 @@ import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
 import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
+import org.geotools.arcsde.gce.imageio.CompressionType;
+import org.geotools.arcsde.gce.imageio.InterleaveType;
+import org.geotools.arcsde.gce.imageio.InterpolationType;
 import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
@@ -68,12 +78,15 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform1D;
 
+import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
+import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
+import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterAttr;
 import com.esri.sde.sdk.client.SeRasterBand;
 import com.esri.sde.sdk.client.SeRasterColumn;
@@ -81,6 +94,7 @@ import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.esri.sde.sdk.client.SeTable;
 import com.esri.sde.sdk.client.SeTable.SeTableStats;
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * An implementation of the ArcSDE Raster Format. Based on the ArcGrid module.
@@ -92,7 +106,7 @@ import com.esri.sde.sdk.client.SeTable.SeTableStats;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/gce/ArcSDERasterFormat.java $
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings( { "nls", "deprecation" })
 public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
     protected static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
@@ -798,11 +812,13 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
     private List<RasterBandInfo> setUpBandInfo(ArcSDEPooledConnection scon, String rasterTable,
             SeRasterAttr rasterAttributes) throws IOException {
-        int numBands;
-        SeRasterBand[] seBands;
+        final int numBands;
+        final SeRasterBand[] seBands;
+        final RasterCellType cellType;
         try {
             numBands = rasterAttributes.getNumBands();
             seBands = rasterAttributes.getBands();
+            cellType = RasterCellType.valueOf(rasterAttributes.getPixelType());
         } catch (SeException e) {
             throw new ArcSdeException(e);
         }
@@ -813,10 +829,189 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         SeRasterBand band;
         for (int bandN = 0; bandN < numBands; bandN++) {
             band = seBands[bandN];
-            bandInfo = new RasterBandInfo(band);
+            bandInfo = new RasterBandInfo();
+            setBandInfo(bandInfo, band, scon, cellType.getBitsPerSample());
             detachedBandInfo.add(bandInfo);
         }
         return detachedBandInfo;
     }
 
+    /**
+     * 
+     * @param bandInfo
+     * @param band
+     * @param scon
+     * @param bitsPerSample
+     *            only used if the band is colormapped to create the IndexColorModel
+     * @throws IOException
+     */
+    private void setBandInfo(RasterBandInfo bandInfo, final SeRasterBand band,
+            final ArcSDEPooledConnection scon, int bitsPerSample) throws IOException {
+
+        bandInfo.bandId = band.getId().longValue();
+        bandInfo.bandNumber = band.getBandNumber();
+        bandInfo.bandName = "Band " + bandInfo.bandNumber;
+
+        bandInfo.rasterId = band.getRasterId().longValue();
+        bandInfo.rasterColumnId = band.getRasterColumnId().longValue();
+
+        bandInfo.bandHeight = band.getBandHeight();
+        bandInfo.bandWidth = band.getBandWidth();
+        bandInfo.hasColorMap = band.hasColorMap();
+        if (bandInfo.hasColorMap) {
+            IndexColorModel colorMap = getBandColorMap(band, scon, bitsPerSample);
+            LOGGER.fine("Setting band's color map: " + colorMap);
+            bandInfo.colorMap = colorMap;
+        } else {
+            bandInfo.colorMap = null;
+        }
+        bandInfo.compressionType = CompressionType.valueOf(band.getCompressionType());
+        SeExtent extent = band.getExtent();
+        bandInfo.bandExtent = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(),
+                extent.getMaxY());
+        bandInfo.cellType = RasterCellType.valueOf(band.getPixelType());
+        bandInfo.interleaveType = InterleaveType.valueOf(band.getInterleave());
+        bandInfo.interpolationType = InterpolationType.valueOf(band.getInterpolation());
+        bandInfo.maxPyramidLevel = band.getMaxLevel();
+        bandInfo.isSkipPyramidLevelOne = band.skipLevelOne();
+        bandInfo.hasStats = band.hasStats();
+        if (bandInfo.hasStats) {
+            try {
+                bandInfo.statsMin = band.getStatsMin();
+                bandInfo.statsMax = band.getStatsMax();
+                bandInfo.statsMean = band.getStatsMean();
+                bandInfo.statsStdDev = band.getStatsStdDev();
+            } catch (SeException e) {
+                throw new ArcSdeException(e);
+            }
+        } else {
+            bandInfo.statsMin = java.lang.Double.NaN;
+            bandInfo.statsMax = java.lang.Double.NaN;
+            bandInfo.statsMean = java.lang.Double.NaN;
+            bandInfo.statsStdDev = java.lang.Double.NaN;
+        }
+        bandInfo.tileWidth = band.getTileWidth();
+        bandInfo.tileHeight = band.getTileHeight();
+        SDEPoint tOrigin;
+        try {
+            tOrigin = band.getTileOrigin();
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
+        }
+        bandInfo.tileOrigin = new Point2D.Double(tOrigin.getX(), tOrigin.getY());
+    }
+
+    private IndexColorModel getBandColorMap(SeRasterBand band, ArcSDEPooledConnection scon,
+            int bitsPerPixel) throws IOException {
+        final DataBuffer colorMapData = getColormapData(band, scon);
+
+        IndexColorModel colorModel;
+        colorModel = RasterUtils.sdeColorMapToJavaColorModel(bitsPerPixel, colorMapData);
+
+        return colorModel;
+    }
+
+    /**
+     * 
+     * @param band
+     * @param scon
+     * @return
+     * @throws ArcSdeException
+     */
+    @SuppressWarnings("nls")
+    private DataBuffer getColormapData(SeRasterBand band, ArcSDEPooledConnection scon)
+            throws IOException {
+        LOGGER.fine("Reading colormap for raster band " + band);
+
+        final SeObjectId rasterColumnId = band.getRasterColumnId();
+
+        final String auxTableName = "SDE_AUX_" + rasterColumnId.longValue();
+        LOGGER.fine("Quering auxiliary table " + auxTableName + " for color map data");
+
+        DataBuffer colorMap;
+        SeQuery query = null;
+        try {
+            SeTable table = new SeTable(scon, auxTableName);
+
+            SeSqlConstruct sqlConstruct = new SeSqlConstruct();
+            sqlConstruct.setTables(new String[] { auxTableName });
+            sqlConstruct.setWhere("TYPE = 3");
+
+            query = new SeQuery(scon, new String[] { "OBJECT" }, sqlConstruct);
+            query.prepareQuery();
+            query.execute();
+
+            SeRow row = query.fetch();
+
+            ByteArrayInputStream colorMapIS = row.getBlob(0);
+
+            colorMap = readColorMap(colorMapIS);
+
+        } catch (SeException e) {
+            throw new ArcSdeException("Error fetching colormap data for band " + band, e);
+        } finally {
+            if (query != null) {
+                try {
+                    query.close();
+                } catch (SeException e) {
+                    LOGGER.log(Level.INFO, "ignoring exception when closing query to "
+                            + "fetch colormap data", e);
+                }
+            }
+        }
+        return colorMap;
+    }
+
+    private DataBuffer readColorMap(final ByteArrayInputStream colorMapIS) throws IOException {
+        final int COLOR_MODEL_TYPE_INDEX = 4;// either RGB or RGBA
+
+        final DataInputStream dataIn = new DataInputStream(colorMapIS);
+        // discard unneeded data
+        for (int i = 0; i < COLOR_MODEL_TYPE_INDEX; i++) {
+            dataIn.readByte();
+        }
+
+        final int colorSpaceType = dataIn.readInt();
+        final int numBanks;
+        if (colorSpaceType == SeRaster.SE_COLORMAP_RGB) {
+            numBanks = 3;
+        } else if (colorSpaceType == SeRaster.SE_COLORMAP_RGBA) {
+            numBanks = 4;
+        } else {
+            throw new IllegalStateException("Got unknown colormap type: " + colorSpaceType);
+        }
+        LOGGER.info("Colormap has " + numBanks + " color components");
+
+        final int buffType = dataIn.readInt();
+        final int numElems = dataIn.readInt();
+        LOGGER.fine("ColorMap length: " + numElems);
+
+        final DataBuffer buff;
+        if (buffType == SeRaster.SE_COLORMAP_DATA_BYTE) {
+            LOGGER.fine("Creating Byte data buffer for " + numBanks + " banks and " + numElems
+                    + " elements per bank");
+            buff = new DataBufferByte(numElems, numBanks);
+            for (int elem = 0; elem < numElems; elem++) {
+                for (int bank = 0; bank < numBanks; bank++) {
+                    int val = dataIn.readByte();
+                    buff.setElem(bank, elem, val);
+                }
+            }
+        } else if (buffType == SeRaster.SE_COLORMAP_DATA_SHORT) {
+            LOGGER.fine("Creating Short data buffer for " + numBanks + " banks and " + numElems
+                    + " elements per bank");
+            buff = new DataBufferShort(numElems, numBanks);
+            for (int elem = 0; elem < numElems; elem++) {
+                for (int bank = 0; bank < numBanks; bank++) {
+                    int val = dataIn.readShort();
+                    buff.setElem(bank, elem, val);
+                }
+            }
+        } else {
+            throw new IllegalStateException("Unknown databuffer type from colormap header: "
+                    + buffType + " expected one of TYPE_BYTE, TYPE_SHORT");
+        }
+
+        return buff;
+    }
 }
