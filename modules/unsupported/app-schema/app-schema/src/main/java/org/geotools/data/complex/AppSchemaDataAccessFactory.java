@@ -40,10 +40,9 @@ import org.opengis.feature.type.FeatureType;
  * Instead, we're directly using DataAccessFactory
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessFactory.java 32062 2008-12-23 02:30:39Z bencaradocdavies $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/app-schema/app-schema/src/main/java
- *         /org/geotools/data/complex/AppSchemaDataAccessFactory.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: AppSchemaDataAccessFactory.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccessFactory.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessFactory implements DataAccessFactory {
@@ -53,11 +52,16 @@ public class AppSchemaDataAccessFactory implements DataAccessFactory {
     public static final DataAccessFactory.Param DBTYPE = new DataAccessFactory.Param("dbtype",
             String.class, "Fixed value '" + DBTYPE_STRING + "'", true, DBTYPE_STRING);
 
+    /**
+     * Registry for app schema data accesses so they can access each other's mappings
+     */
+    private AppSchemaDataAccessRegistry registry;
+
     public static final DataAccessFactory.Param URL = new DataAccessFactory.Param("url", URL.class,
             "URL to an application schema datastore XML configuration file", true);
 
     public AppSchemaDataAccessFactory() {
-        // no-op
+        this.registry = AppSchemaDataAccessRegistry.newInstance();
     }
 
     public DataAccess<FeatureType, Feature> createDataStore(Map params) throws IOException {
@@ -70,6 +74,8 @@ public class AppSchemaDataAccessFactory implements DataAccessFactory {
         mappings = AppSchemaDataAccessConfigurator.buildMappings(config);
 
         dataStore = new AppSchemaDataAccess(mappings);
+
+        dataStore.register();
 
         return dataStore;
     }

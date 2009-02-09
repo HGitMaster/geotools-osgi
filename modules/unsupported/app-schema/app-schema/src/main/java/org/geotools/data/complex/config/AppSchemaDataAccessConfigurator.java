@@ -47,6 +47,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
+import org.geotools.data.complex.NestedAttributeMapping;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
@@ -61,12 +62,13 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * Utility class to create a set of {@linkPlain org.geotools.data.complex.FeatureTypeMapping}
- * objects from a complex datastore's configuration object ({@link
- * org.geotools.data.complex.config.AppSchemaDataAccessDTO}).
+ * objects from a complex datastore's configuration object (
+ * {@link org.geotools.data.complex.config.AppSchemaDataAccessDTO}).
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessConfigurator.java 31882 2008-11-20 07:20:42Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AppSchemaDataAccessConfigurator.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: AppSchemaDataAccessConfigurator.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AppSchemaDataAccessConfigurator.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessConfigurator {
@@ -93,7 +95,7 @@ public class AppSchemaDataAccessConfigurator {
      * Creates a new ComplexDataStoreConfigurator object.
      * 
      * @param config
-     *                DOCUMENT ME!
+     *            DOCUMENT ME!
      */
     private AppSchemaDataAccessConfigurator(AppSchemaDataAccessDTO config) {
         this.config = config;
@@ -117,13 +119,13 @@ public class AppSchemaDataAccessConfigurator {
      * </p>
      * 
      * @param config
-     *                DOCUMENT ME!
+     *            DOCUMENT ME!
      * 
      * @return a Set of {@link org.geotools.data.complex.FeatureTypeMapping} source to target
      *         FeatureType mapping definitions
      * 
      * @throws IOException
-     *                 if any error occurs while creating the mappings
+     *             if any error occurs while creating the mappings
      */
     public static Set buildMappings(AppSchemaDataAccessDTO config) throws IOException {
         AppSchemaDataAccessConfigurator mappingsBuilder;
@@ -145,7 +147,7 @@ public class AppSchemaDataAccessConfigurator {
      * @return
      * 
      * @throws IOException
-     *                 DOCUMENT ME!
+     *             DOCUMENT ME!
      */
     private Set buildMappings() throws IOException {
         // -parse target xml schemas, let parsed types on <code>registry</code>
@@ -170,7 +172,8 @@ public class AppSchemaDataAccessConfigurator {
 
             FeatureSource featureSource = getFeatureSource(dto);
             AttributeDescriptor target = getTargetDescriptor(dto);
-            List attMappings = getAttributeMappings(target, dto.getAttributeMappings());
+            List attMappings = getAttributeMappings(target, dto.getAttributeMappings(),
+                    featureSource);
 
             FeatureTypeMapping mapping;
 
@@ -202,11 +205,14 @@ public class AppSchemaDataAccessConfigurator {
      * Creates a list of {@link org.geotools.data.complex.AttributeMapping} from the attribute
      * mapping configurations in the provided list of {@link AttributeMapping}
      * 
+     * @param root
      * @param attDtos
+     * @param fSource
+     *            Feature source
      * @return
      */
-    private List getAttributeMappings(final AttributeDescriptor root, final List attDtos)
-            throws IOException {
+    private List getAttributeMappings(final AttributeDescriptor root, final List attDtos,
+            FeatureSource fSource) throws IOException {
         List attMappings = new LinkedList();
 
         for (Iterator it = attDtos.iterator(); it.hasNext();) {
@@ -244,9 +250,22 @@ public class AppSchemaDataAccessConfigurator {
             } else {
                 expectedInstanceOf = null;
             }
+            AttributeMapping attMapping;
+            String sourceElement = attDto.getLinkElement();
+            if (sourceElement != null) {
+                // nested complex attributes
+                String sourceField = attDto.getLinkField();
+                assert sourceField != null; // source field must be specified
 
-            AttributeMapping attMapping = new AttributeMapping(idExpression, sourceExpression,
-                    targetXPathSteps, expectedInstanceOf, isMultiValued, clientProperties);
+                final StepList sourceFieldSteps = XPath.steps(root, sourceField, namespaces);
+                // a nested feature
+                attMapping = new NestedAttributeMapping(idExpression, sourceExpression,
+                        targetXPathSteps, isMultiValued, clientProperties,
+                        degloseTypeName(sourceElement), sourceFieldSteps, fSource);
+            } else {
+                attMapping = new AttributeMapping(idExpression, sourceExpression, targetXPathSteps,
+                        expectedInstanceOf, isMultiValued, clientProperties);
+            }
             attMappings.add(attMapping);
         }
         return attMappings;
@@ -436,7 +455,7 @@ public class AppSchemaDataAccessConfigurator {
      * 
      * @throws IOException
      * @throws DataSourceException
-     *                 DOCUMENT ME!
+     *             DOCUMENT ME!
      */
     private Map/* <String, FeatureAccess> */aquireSourceDatastores() throws IOException {
         AppSchemaDataAccessConfigurator.LOGGER.entering(getClass().getName(),
@@ -515,7 +534,7 @@ public class AppSchemaDataAccessConfigurator {
      * @param prefixedName
      * @return
      * @throws IllegalArgumentException
-     *                 if <code>prefixedName</code> has no prefix.
+     *             if <code>prefixedName</code> has no prefix.
      */
     private Name degloseTypeName(String prefixedName) throws IllegalArgumentException {
         Name name = null;

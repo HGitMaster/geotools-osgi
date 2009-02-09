@@ -37,8 +37,8 @@ import org.opengis.feature.type.Name;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessFactoryTest.java 31882 2008-11-20 07:20:42Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AppSchemaDataAccessFactoryTest.java $
+ * @version $Id: AppSchemaDataAccessFactoryTest.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AppSchemaDataAccessFactoryTest.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessFactoryTest extends TestCase {
@@ -106,6 +106,7 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
         FeatureSource<FeatureType, Feature> mappedSource = ds.getFeatureSource(mappedTypeName);
         assertNotNull(mappedSource);
         assertSame(ds, mappedSource.getDataStore());
+        ds.dispose();
     }
 
     /**
@@ -119,6 +120,8 @@ public class AppSchemaDataAccessFactoryTest extends TestCase {
 
         FeatureSource<FeatureType, Feature> mappedSource = ds.getFeatureSource(mappedTypeName);
         assertNotNull(mappedSource);
+        
+        ds.dispose();
     }
 
     /**

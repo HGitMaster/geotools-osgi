@@ -52,7 +52,6 @@ import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.gml3.GML;
 import org.geotools.xlink.XLINK;
 import org.opengis.feature.Attribute;
-import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -69,9 +68,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: TimeSeriesTest.java 31787 2008-11-06 07:12:25Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
+ * @version $Id: TimeSeriesTest.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
  * @since 2.4
  */
 public class TimeSeriesTest extends TestCase {
@@ -103,7 +101,7 @@ public class TimeSeriesTest extends TestCase {
      * DOCUMENT ME!
      * 
      * @throws Exception
-     *                 DOCUMENT ME!
+     *             DOCUMENT ME!
      */
     protected void setUp() throws Exception {
         super.setUp();
@@ -116,7 +114,7 @@ public class TimeSeriesTest extends TestCase {
      * DOCUMENT ME!
      * 
      * @throws Exception
-     *                 DOCUMENT ME!
+     *             DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -126,10 +124,10 @@ public class TimeSeriesTest extends TestCase {
      * DOCUMENT ME!
      * 
      * @param location
-     *                schema location path discoverable through getClass().getResource()
+     *            schema location path discoverable through getClass().getResource()
      * 
      * @throws IOException
-     *                 DOCUMENT ME!
+     *             DOCUMENT ME!
      */
     private void loadSchema(URL location) throws IOException {
         URL catalogLocation = getClass().getResource(schemaBase + "observations.oasis.xml");
@@ -398,14 +396,16 @@ public class TimeSeriesTest extends TestCase {
         FeatureCollection features;
         // make a getFeatures request with a nested properties filter.
         //
-        // was 6, but now 96 as one per line (no grouping)
-        final int EXPECTED_RESULT_COUNT = 96;
+        // was 96, but now 3 as mapped features are grouped by id
+        final int EXPECTED_MAPPED_FEATURE_COUNT = 3;
+        // 96 data rows from property file
+        final int EXPECTED_SIMPLE_FEATURE_COUNT = 96;
         {
             features = fSource.getFeatures();
 
             int resultCount = getCount(features);
             String msg = "be sure difference in result count is not due to different dataset.";
-            assertEquals(msg, EXPECTED_RESULT_COUNT, resultCount);
+            assertEquals(msg, EXPECTED_MAPPED_FEATURE_COUNT, resultCount);
         }
 
         Feature feature;
@@ -463,55 +463,50 @@ public class TimeSeriesTest extends TestCase {
                 assertNotNull(elementPath, timeCovVal);
                 assertTrue(timeCovVal instanceof Feature);
                 final List elements = (List) ((Feature) timeCovVal).getValue();
-                if (count == 1)
-                    assertEquals(1, elements.size());
-                else if (count == 22) { // 22nd feature, row TS2.22
-                    // no grouping
-                    assertEquals(1, elements.size());
-
-                    Name compactTimeValuePairName = Types.typeName(CVNS, "CompactTimeValuePair");
-                    Name geometryName = Types.typeName(CVNS, "geometry");
-                    Name valueName = Types.typeName(CVNS, "value");
-
-                    ComplexAttribute element = (ComplexAttribute) elements.get(0);
-                    assertNotNull(element);
-
-                    Collection compactTimes = element.getProperties(compactTimeValuePairName);
-                    assertNotNull(compactTimes);
-                    assertEquals(1, compactTimes.size());
-
-                    ComplexAttribute compatTimeValuePair = (ComplexAttribute) compactTimes
-                            .iterator().next();
-                    Collection geometries = compatTimeValuePair.getProperties(geometryName);
-                    Collection values = compatTimeValuePair.getProperties(valueName);
-
-                    assertNotNull(geometries);
-                    assertNotNull(values);
-                    assertEquals(1, geometries.size());
-                    assertEquals(1, values.size());
-
-                    Attribute geom = (Attribute) geometries.iterator().next();
-                    Attribute value = (Attribute) values.iterator().next();
-
-                    assertNotNull(geom.getValue());
-                    assertNotNull(value.getValue());
-
-                    Object valueContent = ((ComplexAttribute) geom).getProperty("simpleContent")
-                            .getValue();
-                    Date sampleTimePosition = (Date) valueContent;
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(sampleTimePosition);
-                    // see row TS2.22
-                    assertEquals(2007, cal.get(Calendar.YEAR));
-                    assertEquals(Calendar.JANUARY, cal.get(Calendar.MONTH));
-                    assertEquals(21, cal.get(Calendar.DAY_OF_MONTH));
-                }
+                assertEquals(1, elements.size());
             }
 
         }
         features.close(it);
 
-        assertEquals(EXPECTED_RESULT_COUNT, count);
+        count = 0;
+        Iterator simpleIterator = ((MappingFeatureIterator) features.iterator()).sourceFeatureIterator;
+        for (; simpleIterator.hasNext();) {
+            feature = (Feature) simpleIterator.next();
+            count++;
+
+            if (count == 22) {
+                String compactTimeValuePairName = "result";
+                String geomName = "sample_time_position";
+
+                Collection compactTimes = feature.getProperties(compactTimeValuePairName);
+                assertNotNull(compactTimes);
+                assertEquals(1, compactTimes.size());
+
+                Attribute value = (Attribute) compactTimes.iterator().next();
+                assertNotNull(value.getValue());
+
+                Collection geomProperties = feature.getProperties(geomName);
+                assertNotNull(geomProperties);
+                assertEquals(1, geomProperties.size());
+
+                Attribute geom = (Attribute) geomProperties.iterator().next();
+                assertNotNull(geom.getValue());
+
+                Object valueContent = geom.getValue();
+                Date sampleTimePosition = (Date) valueContent;
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(sampleTimePosition);
+                // see row TS2.22
+                assertEquals(2007, cal.get(Calendar.YEAR));
+                assertEquals(Calendar.JANUARY, cal.get(Calendar.MONTH));
+                assertEquals(21, cal.get(Calendar.DAY_OF_MONTH));
+            }
+        }
+
+        mappingDataStore.dispose();
+
+        assertEquals(EXPECTED_SIMPLE_FEATURE_COUNT, count);
 
     }
 

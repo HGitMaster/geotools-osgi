@@ -38,17 +38,21 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.ServiceInfo;
+import org.geotools.data.complex.config.EmfAppSchemaReader;
 import org.geotools.data.complex.filter.UnmappingFilterVisitor;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Types;
+import org.geotools.feature.type.NonFeatureTypeProxy;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -63,8 +67,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: AppSchemaDataAccess.java 31882 2008-11-20 07:20:42Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccess.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: AppSchemaDataAccess.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccess.java $
  * @since 2.4
  */
 public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
@@ -88,7 +93,46 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
         for (FeatureTypeMapping mapping : mappings) {
             Name mappedElement = mapping.getTargetFeature().getName();
             this.mappings.put(mappedElement, mapping);
+            // if the type is not a feature, it should be wrapped with
+            // a fake feature type, so attributes can be chained/nested
+            AttributeType type = mapping.getTargetFeature().getType();
+            if (!(type instanceof FeatureType)) {
+                createNonFeatureTypeProxy(type, mapping);
+            }
         }
+    }
+
+    /**
+     * Wrap a non feature type with a fake feature type, so they can be nested/chained.
+     * 
+     * @param type
+     *            Non feature attribute type
+     * @param mapping
+     *            Feature type mapping
+     */
+    private void createNonFeatureTypeProxy(AttributeType type, final FeatureTypeMapping mapping) {
+        assert type instanceof ComplexType;
+
+        EmfAppSchemaReader reader = EmfAppSchemaReader.newInstance();
+        AttributeType fakeFeatureType = new NonFeatureTypeProxy(type);
+
+        int maxOccurs = mapping.getTargetFeature().getMaxOccurs();
+        int minOccurs = mapping.getTargetFeature().getMinOccurs();
+        boolean nillable = mapping.getTargetFeature().isNillable();
+        Object defaultValue = mapping.getTargetFeature().getDefaultValue();
+        Name name = mapping.getTargetFeature().getName();
+
+        // create a new descriptor with the wrapped type and set it to the mapping
+        AttributeDescriptor descriptor = reader.getTypeFactory().createAttributeDescriptor(
+                fakeFeatureType, name, minOccurs, maxOccurs, nillable, defaultValue);
+        mapping.setTargetFeature(descriptor);
+    }
+
+    /**
+     * Registers this data access to the registry so the mappings can be retrieved globally
+     */
+    protected void register() {
+        AppSchemaDataAccessRegistry.register(this);
     }
 
     /**
@@ -133,6 +177,14 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
             throw new DataSourceException(typeName + " not found " + availables);
         }
         return mapping;
+    }
+
+    /**
+     * @param typeName
+     * @return true if this data access contains mapping for provided type name
+     */
+    public boolean hasMapping(Name typeName) {
+        return this.mappings.containsKey(typeName);
     }
 
     /**
@@ -247,7 +299,7 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
             FeatureTypeMapping mapping) {
         List<String> propNames = null;
         final AttributeDescriptor targetDescriptor = mapping.getTargetFeature();
-        final FeatureType mappedType = (FeatureType) targetDescriptor.getType();
+        final AttributeType mappedType = targetDescriptor.getType();
         if (mappingProperties != null && mappingProperties.length > 0) {
             Set<String> requestedSurrogateProperties = new HashSet<String>();
             // add all surrogate attributes involved in mapping of the requested
@@ -304,7 +356,7 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
     }
 
     public void dispose() {
-        // TODO Auto-generated method stub
+        AppSchemaDataAccessRegistry.unregister(this);
     }
 
     /**

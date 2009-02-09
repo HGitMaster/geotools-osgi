@@ -28,9 +28,9 @@ import org.opengis.filter.expression.Expression;
 
 /**
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AttributeMapping.java 31815 2008-11-10 07:53:14Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/AttributeMapping.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: AttributeMapping.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AttributeMapping.java $
  * @since 2.4
  */
 public class AttributeMapping {
@@ -97,6 +97,15 @@ public class AttributeMapping {
         return targetNodeInstance;
     }
 
+    /**
+     * This is overridden by NestedAttributeMapping
+     * 
+     * @return always return false
+     */
+    public boolean isNestedAttribute() {
+        return false;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -143,5 +152,10 @@ public class AttributeMapping {
 
     public void setIdentifierExpression(Expression identifierExpression) {
         this.identifierExpression = identifierExpression;
+    }
+
+    public boolean isNestedFeature() {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

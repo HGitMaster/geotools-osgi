@@ -47,7 +47,7 @@ import org.opengis.feature.type.Name;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: GeoSciMLTest.java 31787 2008-11-06 07:12:25Z bencd $
+ * @version $Id: GeoSciMLTest.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
  * @since 2.4
@@ -225,6 +225,9 @@ public class GeoSciMLTest extends TestCase {
                 count++;
             }
             features.close(it);
+
+            mappingDataStore.dispose();
+            
             assertEquals(EXPECTED_RESULT_COUNT, count);
         } catch (Exception e) {
             e.printStackTrace();

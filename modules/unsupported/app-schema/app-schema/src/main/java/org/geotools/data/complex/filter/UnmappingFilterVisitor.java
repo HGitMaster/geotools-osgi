@@ -17,6 +17,7 @@
 
 package org.geotools.data.complex.filter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -29,12 +30,15 @@ import java.util.logging.Logger;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
+import org.geotools.data.complex.AppSchemaDataAccessRegistry;
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.Types;
 import org.geotools.filter.RegfuncFilterFactoryImpl;
+import org.geotools.filter.NestedAttributeExpression;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.And;
@@ -104,9 +108,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: UnmappingFilterVisitor.java 31760 2008-11-04 06:42:06Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/filter/UnmappingFilterVisitor.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: UnmappingFilterVisitor.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/UnmappingFilterVisitor.java $
  * @since 2.4
  */
 public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor, ExpressionVisitor {
@@ -780,7 +784,64 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
 
         StepList simplifiedSteps = XPath.steps(root, targetXPath, namespaces);
 
-        List /* {Expression} */matchingMappings = findMappingsFor(simplifiedSteps);
+        List /* {Expression} */matchingMappings = findMappingsFor(mappings, simplifiedSteps);
+
+        if (matchingMappings.size() == 0 && simplifiedSteps.size() > 1) {
+            // means the attributes are nested and mapped separately
+            ArrayList nestedMappings = new ArrayList();
+
+            if (simplifiedSteps.size() % 2 == 0) {
+                // there should be at least 3 steps:
+                // - 1st one is the attribute of parent feature
+                // - 2nd one denotes the element type of the nested feature
+                // - 3rd one is the attribute of the nested feature
+                // It's not possible to filter something against a feature (2nd step)
+                // since it has to be a java object that cannot be provided by
+                // the user.
+                throw new UnsupportedOperationException(
+                        "Are you sure the filter property makes sense? "
+                                + "Please check the property path again. "
+                                + "Current invalid path: " + simplifiedSteps.toString());
+            }
+
+            // We need to extract the mappings in specific order: element type, source expression,
+            // etc.
+            Name featureTypeName = root.getName();
+            // Start with the root's element type
+            nestedMappings.add(ff.literal(featureTypeName));
+            for (int i = 0; i < simplifiedSteps.size(); i += 2) {
+                Step step = simplifiedSteps.get(i);
+                try {
+                    FeatureTypeMapping mapping = AppSchemaDataAccessRegistry
+                            .getMapping(featureTypeName);
+
+                    List<AttributeMapping> mappings = findMappingsFor(mapping, XPath.steps(root,
+                            step.toString(), namespaces));
+                    if (mappings.isEmpty()) {
+                        throw new IllegalArgumentException("Don't know how to map " + targetXPath);
+                    }
+
+                    if (mappings.size() > 1) {
+                        throw new UnsupportedOperationException("Unmapping attributes that map "
+                                + "to more than one source expressions is not supported yet");
+                    }
+                    // add source expression
+                    nestedMappings.add(mappings.get(0));
+
+                    if (i < simplifiedSteps.size() - 1) {
+                        // if this is not the last element, get the next element type
+                        step = simplifiedSteps.get(i + 1);
+                        featureTypeName = new NameImpl(step.getName().getNamespaceURI(), step
+                                .getName().getLocalPart());
+                        root = mapping.getTargetFeature();
+                        nestedMappings.add(ff.literal(featureTypeName));
+                    }
+                } catch (IOException e) {
+                    throw new IllegalArgumentException("Don't know how to map " + targetXPath, e);
+                }
+            }
+            matchingMappings.add(new NestedAttributeExpression(targetXPath, nestedMappings));
+        }
 
         if (matchingMappings.size() == 0) {
             throw new IllegalArgumentException("Don't know how to map " + targetXPath);
@@ -798,10 +859,13 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
      * propertyName is just <code>gml:name</code>, all three mappings apply.
      * </p>
      * 
+     * @param mappings
+     *            Feature type mapping to search for
      * @param simplifiedSteps
      * @return
      */
-    private List /* {Expression} */findMappingsFor(final StepList propertyName) {
+    private List /* {Expression} */findMappingsFor(FeatureTypeMapping mappings,
+            final StepList propertyName) {
         // collect all the mappings for the given property
         // regardless of xpath index
         List candidates = mappings.getAttributeMappingsIgnoreIndex(propertyName);

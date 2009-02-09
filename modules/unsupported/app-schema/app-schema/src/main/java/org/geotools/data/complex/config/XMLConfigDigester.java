@@ -34,9 +34,9 @@ import org.xml.sax.SAXException;
  * Digester to consume the app-schema {@link AppSchemaDataAccessFactory} configuration file.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XMLConfigDigester.java 31882 2008-11-20 07:20:42Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/XMLConfigDigester.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: XMLConfigDigester.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/XMLConfigDigester.java $
  * @since 2.4
  */
 public class XMLConfigDigester {
@@ -180,6 +180,14 @@ public class XMLConfigDigester {
 
         digester.addCallMethod(attMap + "/sourceExpression/OCQL", "setSourceExpression", 1);
         digester.addCallParam(attMap + "/sourceExpression/OCQL", 0);
+
+        // for feature chaining: this refers to the nested feature type
+        digester.addCallMethod(attMap + "/sourceExpression/linkElement", "setLinkElement", 1);
+        digester.addCallParam(attMap + "/sourceExpression/linkElement", 0);
+
+        // for feature chaining: this refers to the nested feature attribute
+        digester.addCallMethod(attMap + "/sourceExpression/linkField", "setLinkField", 1);
+        digester.addCallParam(attMap + "/sourceExpression/linkField", 0);
 
         digester.addCallMethod(attMap + "/ClientProperty", "putClientProperty", 2);
         digester.addCallParam(attMap + "/ClientProperty/name", 0);

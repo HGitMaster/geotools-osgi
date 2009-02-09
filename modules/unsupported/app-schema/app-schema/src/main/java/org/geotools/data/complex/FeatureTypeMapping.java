@@ -29,14 +29,14 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.filter.expression.Expression;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
- * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: FeatureTypeMapping.java 31514 2008-09-15 08:36:50Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/FeatureTypeMapping.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: FeatureTypeMapping.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/FeatureTypeMapping.java $
  * @since 2.4
  */
 public class FeatureTypeMapping {
@@ -90,6 +90,28 @@ public class FeatureTypeMapping {
         for (Iterator it = attributeMappings.iterator(); it.hasNext();) {
             attMapping = (AttributeMapping) it.next();
             if (targetPath.equalsIgnoreIndex(attMapping.getTargetXPath())) {
+                if (mappings.size() == 0) {
+                    mappings = new ArrayList(2);
+                }
+                mappings.add(attMapping);
+            }
+        }
+        return mappings;
+    }
+
+    /**
+     * Finds the attribute mappings for the given source expression.
+     * 
+     * @param sourceExpression
+     * @return list of matching attribute mappings
+     */
+    public List/* <AttributeMapping> */getAttributeMappingsByExpression(
+            final Expression sourceExpression) {
+        AttributeMapping attMapping;
+        List mappings = Collections.EMPTY_LIST;
+        for (Iterator it = attributeMappings.iterator(); it.hasNext();) {
+            attMapping = (AttributeMapping) it.next();
+            if (sourceExpression.equals(attMapping.getSourceExpression())) {
                 if (mappings.size() == 0) {
                     mappings = new ArrayList(2);
                 }

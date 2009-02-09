@@ -285,16 +285,32 @@
     ]]>
       </documentation>
     </annotation>
-    <choice>
-      <element name="OCQL" type="string" />
-      <element name="Expression">
-        <complexType>
-          <sequence>
-            <element ref="ogc:expression" />
-          </sequence>
-        </complexType>
+    <sequence>
+      <choice>
+        <element name="OCQL" type="string" />
+        <element name="Expression">
+          <complexType>
+            <sequence>
+              <element ref="ogc:expression" />
+            </sequence>
+          </complexType>
+        </element>
+      </choice>
+      <element name="linkElement" type="string" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            <![CDATA[ XPath expression addressing the target schema element this attribute mapping is nesting ]]>
+          </documentation>
+        </annotation>
       </element>
-    </choice>
+      <element name="linkField" type="string" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            <![CDATA[ XPath expression addressing the target attribute this attribute mapping links to ]]>
+          </documentation>
+        </annotation>
+      </element>
+    </sequence>
   </complexType>
 
   <complexType name="AttributeMappingType">

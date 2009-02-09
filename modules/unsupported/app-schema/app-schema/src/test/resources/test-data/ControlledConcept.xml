@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--  Controlled Concept mapping file -->
+<as:AppSchemaDataAccess xmlns:as="http://www.geotools.org/app-schema"
+	xmlns:ogc="http://www.opengis.net/ogc" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geotools.org/app-schema AppSchemaDataAccess.xsd
+                      http://www.opengis.net/ogc http://schemas.opengis.net/filter/1.1.0/expr.xsd">
+	<namespaces>
+		<!--
+			declare here the namespaces and prefixes used by the parser to
+			resolve <type> elements.
+		-->
+		<Namespace>
+			<prefix>gsml</prefix>
+			<uri>http://www.cgi-iugs.org/xml/GeoSciML/2</uri>
+		</Namespace>
+		<Namespace>
+			<prefix>gml</prefix>
+			<uri>http://www.opengis.net/gml</uri>
+		</Namespace>
+	</namespaces>
+	<sourceDataStores>
+		<DataStore>
+			<id>ControlledConcept</id>
+			<parameters>
+				<Parameter>
+					<name>directory</name>
+					<!-- path can be relative to this file if starts with "file: -->
+					<value>file:./</value>
+				</Parameter>
+			</parameters>
+		</DataStore>
+	</sourceDataStores>
+	<catalog>mappedPolygons.oasis.xml</catalog>
+	<targetTypes>
+		<FeatureType>
+			<!--
+				State the needed xsd schemas to be loaded in order to make the
+				schema-to-FeatureModel parse. Paths are relative to this file, or
+				may be absolute URL's. Imports and includes at the schemas will be
+				followed as long as they're relative paths.
+			-->
+			<schemaUri>commonSchemas_new/GeoSciML/vocabulary.xsd</schemaUri>
+		</FeatureType>
+	</targetTypes>
+	<typeMappings>
+		<FeatureTypeMapping>
+			<sourceDataStore>ControlledConcept</sourceDataStore>
+			<sourceType>ControlledConcept</sourceType>
+			<targetElement>gsml:ControlledConcept</targetElement>
+			<attributeMappings>
+				<AttributeMapping>
+					<targetAttribute>gml:name</targetAttribute>
+					<sourceExpression>
+						<OCQL>NAME</OCQL>
+					</sourceExpression>
+					<isMultiple>true</isMultiple>
+				</AttributeMapping>
+			</attributeMappings>
+		</FeatureTypeMapping>
+	</typeMappings>
+</as:AppSchemaDataAccess>
