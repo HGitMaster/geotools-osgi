@@ -168,9 +168,9 @@
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>commons-pool</groupId>
-      <artifactId>commons-pool</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.pool</artifactId>  
+      <version>1.4.0</version>     
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -195,20 +195,20 @@
   </dependencies>
   
   <build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+      <plugins>
+         <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifestFile>META-INF/MANIFEST.MF</manifestFile>
                   <manifest>
                      <addClasspath>false</addClasspath>
                   </manifest>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+               </archive>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
 
 
 </project>
