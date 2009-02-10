@@ -241,6 +241,12 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         testReadFullLevel0(TYPE_8BIT_U, 3, "sampleRGB");
     }
 
+    @Test
+    public void testReadRasterCatalog() throws Exception {
+        tableName = "SDE.IMG_USGSQUAD_2_TILES";
+        GridCoverage2D coverage = testReadFullLevel0(TYPE_8BIT_U, 1, "RasterCatalog");
+    }
+
     private void testReadFullLevel0(final RasterCellType cellType, final int numBands)
             throws Exception {
 
@@ -249,7 +255,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         testReadFullLevel0(cellType, numBands, tableName + "_" + numBands + "-Band");
     }
 
-    private void testReadFullLevel0(final RasterCellType cellType, final int numBands,
+    private GridCoverage2D testReadFullLevel0(final RasterCellType cellType, final int numBands,
             final String fileNamePostFix) throws Exception {
 
         final AbstractGridCoverage2DReader reader = getReader();
@@ -280,18 +286,20 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         GridGeometry2D gridGeometry = coverage.getGridGeometry();
 
         assertEquals(originalGridRange, gridGeometry.getGridRange());
-        
+
         final RenderedImage image = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
         assertNotNull(image);
 
         assertEquals(cellType.getDataBufferType(), image.getSampleModel().getDataType());
         final int[] sampleSize = image.getSampleModel().getSampleSize();
-        for(int band = 0; band < numBands; band++){
+        for (int band = 0; band < numBands; band++) {
             assertEquals(cellType.getBitsPerSample(), sampleSize[band]);
         }
-        
+
         final String fileName = "tesReadFullLevel0_" + fileNamePostFix;
         writeToDisk(image, fileName);
+
+        return coverage;
     }
 
     @Test

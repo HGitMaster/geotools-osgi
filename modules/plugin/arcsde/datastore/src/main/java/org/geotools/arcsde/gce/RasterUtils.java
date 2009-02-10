@@ -35,7 +35,6 @@ import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
@@ -54,7 +53,7 @@ import com.esri.sde.sdk.pe.PeProjectionException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32461 2009-02-10 21:16:29Z groldan $
+ * @version $Id: RasterUtils.java 32463 2009-02-10 21:44:10Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -400,123 +399,6 @@ class RasterUtils {
     private static boolean relates(Rectangle r1, Rectangle r2) {
         // expand r2 by one so intersects acts as relates (counts adjacent edges)
         return r1.intersects(new Rectangle(r2.x - 1, r2.y - 1, r2.width + 2, r2.height + 2));
-    }
-
-    private static void calculateQueryDimensionAndEnvelope(final QueryInfo queryInfo,
-            final ArcSDEPyramid pyramid) {
-
-        // final Rectangle matchingTiles = queryInfo.matchingTiles;
-        final int pyramidLevel = queryInfo.pyramidLevel;
-        final GeneralEnvelope requestedEnvelope = queryInfo.requestedEnvelope;
-        final ArcSDEPyramidLevel level = pyramid.getPyramidLevel(pyramidLevel);
-        final ReferencedEnvelope levelEnvelope = level.getEnvelope();
-
-        final int offsetX = level.getXOffset();
-        final int offsetY = level.getYOffset();
-
-        // get the range of this pyramid level in pixel space
-        final Rectangle levelRange = new Rectangle(offsetX, offsetY, level.size.width,
-                level.size.height);
-
-        // create a raster to model transform, from this tile pixel space to the tile's geographic
-        // extent
-        GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(new GeneralGridRange(levelRange),
-                new GeneralEnvelope(levelEnvelope));
-        geMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
-
-        final MathTransform rasterToModel = geMapper.createTransform();
-
-        int levelMinPixelX;
-        int levelMaxPixelX;
-        int levelMinPixelY;
-        int levelMaxPixelY;
-        try {
-            // use a model to raster transform to find out which pixel range at the specified level
-            // better match the requested extent
-            MathTransform modelToRaster = rasterToModel.inverse();
-            GeneralEnvelope requestedPixels;
-            requestedPixels = CRS.transform(modelToRaster, requestedEnvelope);
-
-            levelMinPixelX = (int) Math.floor(requestedPixels.getMinimum(0));
-            levelMaxPixelX = (int) Math.ceil(requestedPixels.getMaximum(0));
-
-            levelMinPixelY = (int) Math.floor(requestedPixels.getMinimum(1));
-            levelMaxPixelY = (int) Math.ceil(requestedPixels.getMaximum(1));
-
-        } catch (NoninvertibleTransformException e) {
-            throw new IllegalArgumentException(e);
-        } catch (TransformException e) {
-            throw new IllegalArgumentException(e);
-        }
-
-        // adapt the requested pixel extent to what the tile level can serve
-        levelMinPixelX = Math.max(levelMinPixelX, levelRange.x);
-        levelMinPixelY = Math.max(levelMinPixelY, levelRange.y);
-
-        levelMaxPixelX = Math.min(levelMaxPixelX, levelRange.x + levelRange.width);
-        levelMaxPixelY = Math.min(levelMaxPixelY, levelRange.y + levelRange.height);
-
-        // obtain the resulting geographical extent for the final pixels to query at this pyramid
-        // level
-        GeneralEnvelope resultEnvelope;
-        try {
-            resultEnvelope = CRS.transform(rasterToModel, new ReferencedEnvelope(levelMinPixelX,
-                    levelMaxPixelX, levelMinPixelY, levelMaxPixelY, requestedEnvelope
-                            .getCoordinateReferenceSystem()));
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-        resultEnvelope.setCoordinateReferenceSystem(requestedEnvelope
-                .getCoordinateReferenceSystem());
-
-        queryInfo.resultEnvelope = resultEnvelope;
-
-        // finally, figure out which tile range (in tile space) fit the required pixel range
-        final int tileWidth = pyramid.getTileWidth();
-        final int tileHeight = pyramid.getTileHeight();
-        final int numTilesWide = level.getNumTilesWide();
-        final int numTilesHigh = level.getNumTilesHigh();
-
-        int minTileX = Integer.MIN_VALUE;
-        int minTileY = Integer.MIN_VALUE;
-        int maxTileX = Integer.MAX_VALUE;
-        int maxTileY = Integer.MAX_VALUE;
-        for (int tileX = 0; tileX < numTilesWide; tileX++) {
-            int tileMinX = tileX * tileWidth;
-            int tileMaxX = tileMinX + tileWidth;
-            if (tileMinX <= levelMinPixelX) {
-                minTileX = Math.max(minTileX, tileX);
-            }
-            if (tileMaxX >= levelMaxPixelX) {
-                maxTileX = Math.min(maxTileX, tileX);
-            }
-        }
-        for (int tileY = 0; tileY < numTilesHigh; tileY++) {
-            int tileMinY = tileY * tileHeight;
-            int tileMaxY = tileMinY + tileHeight;
-            if (tileMinY <= levelMinPixelY) {
-                minTileY = Math.max(minTileY, tileY);
-            }
-            if (tileMaxY >= levelMaxPixelY) {
-                maxTileY = Math.min(maxTileY, tileY);
-            }
-        }
-
-        final Rectangle requiredTiles = new Rectangle(minTileX, minTileY, maxTileX - minTileX,
-                maxTileY - minTileY);
-        queryInfo.matchingTiles = requiredTiles;
-
-        /*
-         * the subset of pixels from the resulting image given by the full matching tiles that are
-         * the actual dimensions of the resulting image
-         */
-        int minCropX = levelMinPixelX - (minTileX * tileWidth);
-        int minCropY = levelMinPixelY - (minTileY * tileWidth);
-        int cropWidth = levelMaxPixelX - levelMinPixelX;
-        int cropHeight = levelMaxPixelY - levelMinPixelY;
-        final Rectangle cropTo = new Rectangle(minCropX, minCropY, cropWidth, cropHeight);
-
-        queryInfo.resultDimension = cropTo;
     }
 
     public static IndexColorModel sdeColorMapToJavaColorModel(final int bitsPerPixel,
