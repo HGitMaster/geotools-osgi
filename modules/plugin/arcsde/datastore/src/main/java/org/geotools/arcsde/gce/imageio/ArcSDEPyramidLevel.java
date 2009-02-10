@@ -18,6 +18,7 @@
 package org.geotools.arcsde.gce.imageio;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -127,6 +128,19 @@ public class ArcSDEPyramidLevel {
      */
     public Dimension getSize() {
         return size;
+    }
+    
+    public Rectangle getRange(){
+        final int offsetX = getXOffset();
+        final int offsetY = getYOffset();
+
+        /*
+         * get the range of actual data pixels in this pyramid level in pixel space, offset and
+         * trailing no data pixels to fill up the tile space do not count
+         */
+        final Rectangle levelRange = new Rectangle(offsetX, offsetY, size.width,
+                size.height);
+        return levelRange;
     }
 
     @Override

@@ -17,7 +17,7 @@
  */
 package org.geotools.arcsde.gce;
 
-
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
@@ -35,6 +35,7 @@ import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
@@ -53,7 +54,7 @@ import com.esri.sde.sdk.pe.PeProjectionException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32460 2009-02-10 05:23:31Z groldan $
+ * @version $Id: RasterUtils.java 32461 2009-02-10 21:16:29Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -214,15 +215,191 @@ class RasterUtils {
 
     public static QueryInfo fitRequestToRaster(final GeneralEnvelope requestedEnvelope,
             final Rectangle requestedDim, final ArcSDEPyramid pyramidInfo, final int pyramidLevel) {
+        final ArcSDEPyramidLevel level = pyramidInfo.getPyramidLevel(pyramidLevel);
+
+        final CoordinateReferenceSystem nativeCrs;
+        {
+            nativeCrs = level.getEnvelope().getCoordinateReferenceSystem();
+            CoordinateReferenceSystem requestCrs = requestedEnvelope.getCoordinateReferenceSystem();
+            if (!CRS.equalsIgnoreMetadata(nativeCrs, requestCrs)) {
+                throw new IllegalArgumentException("Request CRS and native CRS shall be equivalent");
+            }
+        }
 
         QueryInfo queryInfo = new QueryInfo();
         queryInfo.requestedEnvelope = requestedEnvelope;
         queryInfo.requestedDim = requestedDim;
         queryInfo.pyramidLevel = pyramidLevel;
 
-        calculateQueryDimensionAndEnvelope(queryInfo, pyramidInfo);
+        final Rectangle levelGridRange = level.getRange();
+
+        final GeneralEnvelope levelEnvelope = new GeneralEnvelope(level.getEnvelope());
+        final MathTransform rasterToModel = createRasterToModel(levelGridRange, levelEnvelope);
+
+        Rectangle pixelSpaceOverlappingArea;
+        pixelSpaceOverlappingArea = calculateMatchingLevelDimension(requestedEnvelope,
+                rasterToModel, levelGridRange);
+        if (pixelSpaceOverlappingArea.width > 0 && pixelSpaceOverlappingArea.height > 0) {
+            // there is at least one pixel to query
+            queryInfo.resultEnvelope = getResultEnvelope(pixelSpaceOverlappingArea, rasterToModel,
+                    nativeCrs);
+
+            Dimension tileSize = pyramidInfo.getTileDimension();
+            queryInfo.matchingTiles = finaMatchingTiles(tileSize, level.getNumTilesWide(), level
+                    .getNumTilesHigh(), pixelSpaceOverlappingArea);
+            queryInfo.resultDimension = getResultDimensionForTileRange(queryInfo.matchingTiles,
+                    tileSize, pixelSpaceOverlappingArea);
+        }
+        // calculateQueryDimensionAndEnvelope(queryInfo, pyramidInfo);
 
         return queryInfo;
+    }
+
+    public static MathTransform createRasterToModel(final Rectangle levelRange,
+            final GeneralEnvelope levelEnvelope) {
+        /*
+         * GeneralGridRange range's is exclusive for the higher coords, so we expand it by one in
+         * both dimensions
+         */
+        Rectangle expandedRange = new Rectangle(levelRange.x, levelRange.y, levelRange.width + 1,
+                levelRange.height + 1);
+        GeneralGridRange gridRange = new GeneralGridRange(expandedRange);
+
+        // create a raster to model transform, from this tile pixel space to the tile's geographic
+        // extent
+        GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(gridRange, levelEnvelope);
+        geMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
+
+        final MathTransform rasterToModel = geMapper.createTransform();
+        return rasterToModel;
+    }
+
+    private static GeneralEnvelope getResultEnvelope(final Rectangle pixelSpaceOverlappingArea,
+            final MathTransform rasterToModel, final CoordinateReferenceSystem crs) {
+
+        GeneralEnvelope envelope = new GeneralEnvelope(crs);
+        envelope.setEnvelope(pixelSpaceOverlappingArea.getMinX(), pixelSpaceOverlappingArea
+                .getMinY(), pixelSpaceOverlappingArea.getMaxX(), pixelSpaceOverlappingArea
+                .getMaxY());
+
+        GeneralEnvelope resultingEnvelope;
+        try {
+            resultingEnvelope = CRS.transform(rasterToModel, envelope);
+        } catch (TransformException e) {
+            throw new RuntimeException("Error transforming pixel range to target CRS");
+        }
+        resultingEnvelope.setCoordinateReferenceSystem(crs);
+        return resultingEnvelope;
+    }
+
+    private static Rectangle getResultDimensionForTileRange(final Rectangle matchingTiles,
+            final Dimension tileSize, final Rectangle pixelRange) {
+
+        int minx = pixelRange.x - (tileSize.width * matchingTiles.x);
+        int miny = pixelRange.y - (tileSize.height * matchingTiles.y);
+        return new Rectangle(minx, miny, pixelRange.width, pixelRange.height);
+    }
+
+    /**
+     * Returns the rectangle specifying the matching tiles for a given pyramid level and rectangle
+     * specifying the overlapping area to request in the level's pixel space.
+     * 
+     * @param pixelRange
+     * @param tilesHigh
+     * @param tilesWide
+     * @param tileSize
+     * @param numTilesHigh
+     * @param numTilesWide
+     * 
+     * @param pixelRange
+     * @param level
+     * 
+     * @return a rectangle holding the coordinates in tile space that fully covers the requested
+     *         pixel range for the given pyramid level, or a negative area rectangle
+     */
+    private static Rectangle finaMatchingTiles(final Dimension tileSize, int numTilesWide,
+            int numTilesHigh, final Rectangle pixelRange) {
+
+        final int minPixelX = pixelRange.x;
+        final int minPixelY = pixelRange.y;
+
+        int minTileX = (int) Math.floor(minPixelX / tileSize.getWidth());
+        int minTileY = (int) Math.floor(minPixelY / tileSize.getHeight());
+
+        int numTilesX = (int) Math.ceil(pixelRange.getWidth() / tileSize.getWidth());
+        int numTilesY = (int) Math.ceil(pixelRange.getHeight() / tileSize.getHeight());
+
+        Rectangle matchingTiles = new Rectangle(minTileX, minTileY, numTilesX - minTileX, numTilesY
+                - minTileY);
+        return matchingTiles;
+    }
+
+    /**
+     * For a given pyramid level and request extent, calculates the minimum pixel range overlapping
+     * the requested geographical area
+     * 
+     * @param level
+     * @param requestedEnvelope
+     * 
+     * @return a rectangle in the pyramid level pixel space covering the overlapping area with the
+     *         requested envelope, or a zero area rectangle if the level does not geographically
+     *         overlaps with the requested envelope.
+     */
+    static Rectangle calculateMatchingLevelDimension(final GeneralEnvelope requestedEnvelope,
+            final MathTransform rasterToModel, final Rectangle levelGridRange) {
+
+        Rectangle levelOverlappingPixels;
+        int levelMinPixelX;
+        int levelMaxPixelX;
+        int levelMinPixelY;
+        int levelMaxPixelY;
+        {
+            // use a model to raster transform to find out which pixel range at the specified level
+            // better match the requested extent
+            GeneralEnvelope requestedPixels;
+            try {
+                MathTransform modelToRaster = rasterToModel.inverse();
+                requestedPixels = CRS.transform(modelToRaster, requestedEnvelope);
+            } catch (NoninvertibleTransformException e) {
+                throw new IllegalArgumentException(e);
+            } catch (TransformException e) {
+                throw new IllegalArgumentException(e);
+            }
+
+            levelMinPixelX = (int) Math.floor(requestedPixels.getMinimum(0));
+            levelMaxPixelX = (int) Math.ceil(requestedPixels.getMaximum(0));
+
+            levelMinPixelY = (int) Math.floor(requestedPixels.getMinimum(1));
+            levelMaxPixelY = (int) Math.ceil(requestedPixels.getMaximum(1));
+
+            final int width = levelMaxPixelX - levelMinPixelX;
+            final int height = levelMaxPixelY - levelMinPixelY;
+            levelOverlappingPixels = new Rectangle(levelMinPixelX, levelMinPixelY, width, height);
+        }
+
+        if (relates(levelGridRange, levelOverlappingPixels)) {
+            // adapt the requested pixel extent to what the tile level can serve
+            levelOverlappingPixels.x = Math.max(levelMinPixelX, levelGridRange.x);
+            levelOverlappingPixels.y = Math.max(levelMinPixelY, levelGridRange.y);
+
+            levelMaxPixelX = Math.min(levelMaxPixelX, levelGridRange.x + levelGridRange.width);
+            levelMaxPixelY = Math.min(levelMaxPixelY, levelGridRange.y + levelGridRange.height);
+
+            levelOverlappingPixels.width = levelMaxPixelX - levelOverlappingPixels.x;
+            levelOverlappingPixels.height = levelMaxPixelY - levelOverlappingPixels.y;
+        } else {
+            // there are no overlapping pixels between the requested extent and the level extent
+            levelOverlappingPixels.x = 0;
+            levelOverlappingPixels.y = 0;
+            levelOverlappingPixels.width = 0;
+            levelOverlappingPixels.height = 0;
+        }
+        return levelOverlappingPixels;
+    }
+
+    private static boolean relates(Rectangle r1, Rectangle r2) {
+        // expand r2 by one so intersects acts as relates (counts adjacent edges)
+        return r1.intersects(new Rectangle(r2.x - 1, r2.y - 1, r2.width + 2, r2.height + 2));
     }
 
     private static void calculateQueryDimensionAndEnvelope(final QueryInfo queryInfo,
@@ -294,7 +471,7 @@ class RasterUtils {
 
         queryInfo.resultEnvelope = resultEnvelope;
 
-        // finally, figure out which tile range (int tile space) fit the required pixel range
+        // finally, figure out which tile range (in tile space) fit the required pixel range
         final int tileWidth = pyramid.getTileWidth();
         final int tileHeight = pyramid.getTileHeight();
         final int numTilesWide = level.getNumTilesWide();

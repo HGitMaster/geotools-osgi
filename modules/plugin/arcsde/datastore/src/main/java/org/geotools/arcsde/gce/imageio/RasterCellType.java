@@ -30,21 +30,28 @@ import com.esri.sde.sdk.client.SeRaster;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterCellType.java 32460 2009-02-10 05:23:31Z groldan $
+ * @version $Id: RasterCellType.java 32461 2009-02-10 21:16:29Z groldan $
  * @source $URL$
  */
 public enum RasterCellType {
-    TYPE_16BIT_S(16, DataBuffer.TYPE_SHORT, true, NumberRange.create(Short.MIN_VALUE, Short.MAX_VALUE)), //
-    TYPE_16BIT_U(16, DataBuffer.TYPE_USHORT, false, NumberRange.create((int)0, (int)65535)), //
-    TYPE_1BIT(1, DataBuffer.TYPE_BYTE, false, NumberRange.create((byte)0, (byte)1)), //
-    TYPE_32BIT_REAL(32, DataBuffer.TYPE_FLOAT, true, NumberRange.create(Float.MIN_VALUE, Float.MAX_VALUE)), //
-    TYPE_32BIT_S(32, DataBuffer.TYPE_INT, true, NumberRange.create(Integer.MIN_VALUE, Integer.MAX_VALUE)), //
-    TYPE_32BIT_U(32, DataBuffer.TYPE_INT, false, NumberRange.create(0L, ((2 ^ 32) - 1))), //
-    TYPE_4BIT(4, DataBuffer.TYPE_BYTE, false, NumberRange.create((byte)0, (byte)((2 ^ 4) - 1))), //
-    TYPE_64BIT_REAL(64, DataBuffer.TYPE_DOUBLE, true, NumberRange.create(Double.MIN_VALUE, Double.MAX_VALUE)), //
+    TYPE_16BIT_S(16, DataBuffer.TYPE_SHORT, true, NumberRange.create(Short.MIN_VALUE,
+            Short.MAX_VALUE)), //
+    TYPE_16BIT_U(16, DataBuffer.TYPE_USHORT, false, NumberRange.create((int) 0, (int) 65535)), //
+    TYPE_1BIT(1, DataBuffer.TYPE_BYTE, false, NumberRange.create((byte) 0, (byte) 1)), //
+    TYPE_32BIT_REAL(32, DataBuffer.TYPE_FLOAT, true, NumberRange.create(Float.MIN_VALUE,
+            Float.MAX_VALUE)), //
+    TYPE_32BIT_S(32, DataBuffer.TYPE_INT, true, NumberRange.create(Integer.MIN_VALUE,
+            Integer.MAX_VALUE)), //
+    TYPE_32BIT_U(32, DataBuffer.TYPE_INT, false, NumberRange.create(0L, (long) Math.pow(2, 32) - 1)), //
+    TYPE_4BIT(4, DataBuffer.TYPE_BYTE, false, NumberRange.create((byte) 0,
+            (byte) Math.pow(2, 4) - 1)), //
+    TYPE_64BIT_REAL(64, DataBuffer.TYPE_DOUBLE, true, NumberRange.create(Double.MIN_VALUE,
+            Double.MAX_VALUE)), //
     TYPE_8BIT_S(8, DataBuffer.TYPE_BYTE, true, NumberRange.create(Byte.MIN_VALUE, Byte.MAX_VALUE)), //
-    TYPE_8BIT_U(8, DataBuffer.TYPE_BYTE, false, NumberRange.create((int)0, (int)255));
+    TYPE_8BIT_U(8, DataBuffer.TYPE_BYTE, false, NumberRange.create((int) 0, (int) 255));
     static {
+        // Setting the se_pixel_type in a static initializer to avoid having them linked to the fake
+        // values in the dummy api
         TYPE_16BIT_S.setSdeTypeId(SeRaster.SE_PIXEL_TYPE_16BIT_S);
         TYPE_16BIT_U.setSdeTypeId(SeRaster.SE_PIXEL_TYPE_16BIT_U);
         TYPE_1BIT.setSdeTypeId(SeRaster.SE_PIXEL_TYPE_1BIT);

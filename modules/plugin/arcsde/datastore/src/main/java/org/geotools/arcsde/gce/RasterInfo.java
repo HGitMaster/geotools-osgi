@@ -36,7 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32460 2009-02-10 05:23:31Z groldan $
+ * @version $Id: RasterInfo.java 32461 2009-02-10 21:16:29Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -201,7 +201,11 @@ class RasterInfo {
      * @return the bands
      */
     public List<RasterBandInfo> getBands() {
-        return bands;
+        return new ArrayList<RasterBandInfo>(bands);
+    }
+
+    public RasterBandInfo getBand(int index) {
+        return bands.get(index);
     }
 
     /**

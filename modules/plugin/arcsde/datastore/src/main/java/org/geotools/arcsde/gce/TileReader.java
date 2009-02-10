@@ -37,7 +37,7 @@ import com.esri.sde.sdk.client.SeRow;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: TileReader.java 32460 2009-02-10 05:23:31Z groldan $
+ * @version $Id: TileReader.java 32461 2009-02-10 21:16:29Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls" })
@@ -192,7 +192,7 @@ class TileReader {
                     + " has more: " + hasNext());
         }
 
-        final byte NO_DATA_BYTE = (byte) 0xFF;
+        final byte NO_DATA_BYTE = (byte) 0x00;
 
         final int numPixels = tile.getNumPixels();
         if (0 == numPixels) {

@@ -31,7 +31,6 @@ import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -90,7 +89,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32460 2009-02-10 05:23:31Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32461 2009-02-10 21:16:29Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -109,6 +108,14 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
     public ArcSDEGridCoverage2DReaderJAI(ArcSDERasterFormat parent,
             ArcSDEConnectionPool connectionPool, RasterInfo rasterInfo, Hints hints)
             throws IOException {
+        // check it's a supported format
+        {
+            final int bitsPerSample = rasterInfo.getBand(0).getCellType().getBitsPerSample();
+            if (rasterInfo.getNumBands() > 1 && (bitsPerSample == 1 || bitsPerSample == 4)) {
+                throw new IllegalArgumentException(bitsPerSample
+                        + "-bit rasters with more than one band are not supported");
+            }
+        }
         this.parent = parent;
         this.connectionPool = connectionPool;
         this.rasterInfo = rasterInfo;
@@ -217,50 +224,64 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
         LOGGER.info(rasterQueryInfo.toString());
 
-        /*
-         * Create the prepared query (not executed) stream to fetch the tiles from
-         */
-        final Rectangle matchingTiles = rasterQueryInfo.getMatchingTiles();
-        final ArcSDEPooledConnection conn = connectionPool.getConnection();
-        final SeQuery preparedQuery;
-        try {
-            preparedQuery = createSeQuery(conn);
-        } catch (IOException e) {
-            conn.close();
-            throw e;
-        }
-
         final RenderedImage coverageRaster;
-        try {
-            // covers an area of full tiles
-            final RenderedImage fullTilesRaster;
-            /*
-             * Create the tiled raster covering the full area of the matching tiles
-             */
-            fullTilesRaster = createTiledRaster(preparedQuery, matchingTiles, pyramidLevelChoice);
 
+        /*
+         * Do the requested and resulting envelopes overlap?
+         */
+        GeneralEnvelope resultEnvelope = rasterQueryInfo.getResultEnvelope();
+        if (requestedEnvelope.intersects(resultEnvelope, true)) {
             /*
-             * now crop it to the desired dimensions
+             * Create the prepared query (not executed) stream to fetch the tiles from
              */
-            final Rectangle resultDimension = rasterQueryInfo.getResultDimension();
-            coverageRaster = cropToRequiredDimension(fullTilesRaster, resultDimension);
-            /*
-             * REVISIT: This is odd, we need to force the data to be loaded so we're free to release
-             * the stream, which gives away the streamed, tiled nature of this rasters, but I don't
-             * see the GCE api having a very clear usage workflow that ensures close() is always
-             * being called to the underlying ImageInputStream so we could let it close the SeQuery
-             * when done.
-             */
-            coverageRaster.getData();
-        } finally {
+            final Rectangle matchingTiles = rasterQueryInfo.getMatchingTiles();
+            final ArcSDEPooledConnection conn = connectionPool.getConnection();
+            final SeQuery preparedQuery;
             try {
-                preparedQuery.close();
-            } catch (SeException e) {
-                throw new ArcSdeException(e);
-            } finally {
+                preparedQuery = createSeQuery(conn);
+            } catch (IOException e) {
                 conn.close();
+                throw e;
             }
+
+            try {
+                // covers an area of full tiles
+                final RenderedImage fullTilesRaster;
+                /*
+                 * Create the tiled raster covering the full area of the matching tiles
+                 */
+                fullTilesRaster = createTiledRaster(preparedQuery, matchingTiles,
+                        pyramidLevelChoice);
+
+                /*
+                 * now crop it to the desired dimensions
+                 */
+                final Rectangle resultDimension = rasterQueryInfo.getResultDimension();
+                coverageRaster = cropToRequiredDimension(fullTilesRaster, resultDimension);
+                /*
+                 * REVISIT: This is odd, we need to force the data to be loaded so we're free to
+                 * release the stream, which gives away the streamed, tiled nature of this rasters,
+                 * but I don't see the GCE api having a very clear usage workflow that ensures
+                 * close() is always being called to the underlying ImageInputStream so we could let
+                 * it close the SeQuery when done.
+                 */
+                coverageRaster.getData();
+            } finally {
+                try {
+                    preparedQuery.close();
+                } catch (SeException e) {
+                    throw new ArcSdeException(e);
+                } finally {
+                    conn.close();
+                }
+            }
+        } else {
+            LOGGER.finer("requested and resulting envelopes do not overlap");
+            coverageRaster = null;
+            resultEnvelope = new GeneralEnvelope(originalEnvelope.getCoordinateReferenceSystem());
+            resultEnvelope.setEnvelope(0, -1, 0, -1);
         }
+
         /*
          * BUILDING COVERAGE
          */
@@ -402,8 +423,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
             int minTileX = matchingTiles.x;
             int minTileY = matchingTiles.y;
-            int maxTileX = minTileX + matchingTiles.width;
-            int maxTileY = minTileY + matchingTiles.height;
+            int maxTileX = minTileX + matchingTiles.width - 1;
+            int maxTileY = minTileY + matchingTiles.height - 1;
             LOGGER.fine("Requesting tiles [" + minTileX + "," + minTileY + ":" + maxTileX + ","
                     + maxTileY + "]");
 
@@ -438,11 +459,11 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         {
             final int bitsPerSample = pixelType.getBitsPerSample();
             final int dataType = pixelType.getDataBufferType();
-            final List<RasterBandInfo> bands = rasterInfo.getBands();
-            final boolean hasColorMap = bands.get(0).isColorMapped();
+            final RasterBandInfo bandOne = rasterInfo.getBand(0);
+            final boolean hasColorMap = bandOne.isColorMapped();
             if (hasColorMap) {
                 LOGGER.fine("Found single-band colormapped raster, using its index color model");
-                colorModel = bands.get(0).getColorMap();
+                colorModel = bandOne.getColorMap();
                 sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
                         tiledImageHeight);
             } else if (bitsPerSample == 1 || bitsPerSample == 4) {
@@ -453,8 +474,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                 int[] argb = new int[(int) Math.pow(2, bitsPerSample)];
                 ColorUtilities.expand(new Color[] { Color.WHITE, Color.BLACK }, argb, 0,
                         argb.length);
-                colorModel = rasterInfo.getGridSampleDimensions()[0].getColorModel(0,
-                        numberOfBands, dataType);
+                GridSampleDimension gridSampleDimension = rasterInfo.getGridSampleDimensions()[0];
+                colorModel = gridSampleDimension.getColorModel(0, numberOfBands, dataType);
                 sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
                         tiledImageHeight);
             } else {

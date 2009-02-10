@@ -99,6 +99,7 @@ import com.esri.sde.sdk.pe.PeFactory;
 import com.esri.sde.sdk.pe.PePCSDefs;
 import com.esri.sde.sdk.pe.PeProjectedCS;
 
+@SuppressWarnings({"nls", "deprecation"})
 public class RasterTestData {
 
     private TestData testData;
@@ -124,6 +125,10 @@ public class RasterTestData {
         // String tableName = getRasterTableName(table);
         // testData.deleteTable(tableName);
         // }
+    }
+
+    public void deleteTable(final String tableName) throws Exception{
+        testData.deleteTable(tableName);
     }
 
     public ArcSDEConnectionPool getConnectionPool() throws DataSourceException {
@@ -1028,8 +1033,19 @@ public class RasterTestData {
             @Override
             public byte[] getImgBandData(int imgWidth, int imgHeight, final int bandN,
                     final int numBands) {
-                throw new UnsupportedOperationException(
-                        "sampler for pixel type 8BIT_S not yet implemented");
+                // luckily the byte-packed data format in MultiPixelPackedSampleModel is identical
+                // to the one-bit-per-pixel format expected by ArcSDE.
+                final byte[] imgBandData = new byte[imgWidth * imgHeight];
+                final byte min = Byte.MIN_VALUE;
+                final byte step = 1;
+                byte val = min;
+                for (int w = 0; w < imgWidth; w++) {
+                    for (int h = 0; h < imgHeight; h++) {
+                        imgBandData[(w * imgHeight) + h] = val;
+                    }
+                    val+=step;
+                }
+                return imgBandData;
             }
         }
 
@@ -1147,8 +1163,27 @@ public class RasterTestData {
             @Override
             public byte[] getImgBandData(int imgWidth, int imgHeight, final int bandN,
                     final int numBands) {
-                throw new UnsupportedOperationException(
-                        "sampler for pixel type 32BIT_U not yet implemented");
+                final int DATA_TYPE_DEPTH = 4;
+                final int dataSize = DATA_TYPE_DEPTH * imgWidth * imgHeight;
+                final ByteArrayOutputStream out = new ByteArrayOutputStream(dataSize);
+                final DataOutputStream writer = new DataOutputStream(out);
+
+                final long MIN = (long) TYPE_32BIT_U.getSampleValueRange().getMinimum();
+                final long MAX = (long) TYPE_32BIT_U.getSampleValueRange().getMaximum();
+                final float step = ((float) MAX - (float) MIN) / (float) imgWidth;
+                long pixelValue = MIN;
+                try {
+                    for (int x = 0; x < imgWidth; x++) {
+                        for (int y = 0; y < imgHeight; y++) {
+                            writer.writeInt((int) pixelValue);
+                        }
+                        pixelValue += step;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                final byte[] imgBandData = out.toByteArray();
+                return imgBandData;
             }
         }
 
@@ -1162,8 +1197,27 @@ public class RasterTestData {
             @Override
             public byte[] getImgBandData(int imgWidth, int imgHeight, final int bandN,
                     final int numBands) {
-                throw new UnsupportedOperationException(
-                        "sampler for pixel type 32BIT_S not yet implemented");
+                final int DATA_TYPE_DEPTH = 4;
+                final int dataSize = DATA_TYPE_DEPTH * imgWidth * imgHeight;
+                final ByteArrayOutputStream out = new ByteArrayOutputStream(dataSize);
+                final DataOutputStream writer = new DataOutputStream(out);
+
+                final int MIN = (int) TYPE_32BIT_S.getSampleValueRange().getMinimum();
+                final int MAX = (int) TYPE_32BIT_S.getSampleValueRange().getMaximum();
+                final float step = ((float) MAX - (float) MIN) / (float) imgWidth;
+                int pixelValue = MIN;
+                try {
+                    for (int x = 0; x < imgWidth; x++) {
+                        for (int y = 0; y < imgHeight; y++) {
+                            writer.writeInt(pixelValue);
+                        }
+                        pixelValue += step;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                final byte[] imgBandData = out.toByteArray();
+                return imgBandData;
             }
         }
 
@@ -1211,8 +1265,27 @@ public class RasterTestData {
             @Override
             public byte[] getImgBandData(int imgWidth, int imgHeight, final int bandN,
                     final int numBands) {
-                throw new UnsupportedOperationException(
-                        "sampler for pixel type 64BIT_REAL not yet implemented");
+                final int DATA_TYPE_DEPTH = 8;
+                final int dataSize = DATA_TYPE_DEPTH * imgWidth * imgHeight;
+                final ByteArrayOutputStream out = new ByteArrayOutputStream(dataSize);
+                final DataOutputStream writer = new DataOutputStream(out);
+
+                final double MIN = Double.MIN_VALUE;
+                final double MAX = Double.MAX_VALUE;
+                final double step = (MAX - MIN) / imgWidth;
+                double pixelValue = MIN;
+                try {
+                    for (int x = 0; x < imgWidth; x++) {
+                        for (int y = 0; y < imgHeight; y++) {
+                            writer.writeDouble(pixelValue);
+                        }
+                        pixelValue += step;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                final byte[] imgBandData = out.toByteArray();
+                return imgBandData;
             }
         }
     }
