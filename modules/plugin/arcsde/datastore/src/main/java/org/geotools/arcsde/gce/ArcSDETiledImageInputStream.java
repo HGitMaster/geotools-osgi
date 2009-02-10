@@ -8,6 +8,14 @@ import java.io.IOException;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageInputStreamImpl;
 
+/**
+ * An {@link ImageInputStream} that reads ArcSDE raster tiles in a band interleaved order.
+ * 
+ * @author Gabriel Roldan (OpenGeo)
+ * @since 2.5.4
+ * @version $Id: ArcSDETiledImageInputStream.java 32459 2009-02-10 05:18:30Z groldan $
+ * @source $URL$
+ */
 class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageInputStream {
 
     private final TileReader tileReader;
@@ -16,10 +24,13 @@ class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageI
 
     private int currTileDataIndex;
 
-    public ArcSDETiledImageInputStream(TileReader tileReader) throws IOException {
+    public ArcSDETiledImageInputStream(final TileReader tileReader) throws IOException {
         super();
         this.tileReader = tileReader;
-        this.currTileData = new byte[0];
+        final int bytesPerTile = tileReader.getBytesPerTile();
+        this.currTileData = new byte[bytesPerTile];
+        // force load at the first read invocation
+        this.currTileDataIndex = bytesPerTile;
     }
 
     /**
@@ -81,11 +92,10 @@ class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageI
     private byte[] getTileData() throws IOException {
         if (currTileDataIndex == currTileData.length) {
             if (tileReader.hasNext()) {
-                byte[] tileData = tileReader.next();
+                currTileData = tileReader.next(currTileData);
                 // if (tileReader.getBitsPerSample() == 1) {
                 // currTileData = expandOneBitData(tileData);
                 // } else {
-                currTileData = tileData;
                 // }
                 currTileDataIndex = 0;
             } else {
@@ -112,6 +122,7 @@ class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageI
     // return byteData;
     // }
     //
+    
     @Override
     public void close() throws IOException {
         super.close();

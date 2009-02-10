@@ -15,6 +15,14 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeRasterTile;
 import com.esri.sde.sdk.client.SeRow;
 
+/**
+ * Offers an iterator like interface to fetch ArcSDE raster tiles.
+ * 
+ * @author Gabriel Roldan (OpenGeo)
+ * @since 2.5.4
+ * @version $Id: TileReader.java 32459 2009-02-10 05:18:30Z groldan $
+ * @source $URL$
+ */
 @SuppressWarnings( { "nls" })
 class TileReader {
 
@@ -108,6 +116,10 @@ class TileReader {
         return 1 + requestedTiles.height;
     }
 
+    /**
+     * @return number of bytes in the raw pixel content of a tile, not taking into account any
+     *         trailing bitmask data.
+     */
     public int getBytesPerTile() {
         return tileDataLength;
     }
@@ -135,10 +147,22 @@ class TileReader {
      * Fetches a tile and returns its raw pixel data packaged as bytes according to the number of
      * bits per sample
      * 
-     * @return contents of the next tile
+     * @param tileData
+     *            a possibly {@code null} array where to store the next tile data. If {@code null} a
+     *            new byte[] of length {@link #getBytesPerTile()} will be allocated and filled up
+     *            with the raw tile pixel data.
+     * @return contents of the next tile, or {@code null} if there are no more tiles to fetch
      * @throws IOException
+     * @throws {@link IllegalArgumentException} if tileData is not null and its size is less than
+     *         {@link #getBytesPerTile()}
      */
-    public byte[] next() throws IOException {
+    public byte[] next(byte[] tileData) throws IOException {
+        if (tileData == null) {
+            tileData = new byte[getBytesPerTile()];
+        } else if (tileData.length < getBytesPerTile()) {
+            throw new IllegalArgumentException("tileData shall have at least " + getBytesPerTile()
+                    + " elements: " + tileData.length);
+        }
         final SeRasterTile tile;
 
         if (hasNext()) {
@@ -152,8 +176,6 @@ class TileReader {
         }
 
         final byte NO_DATA_BYTE = (byte) 0xFF;
-
-        final byte[] tileData = new byte[tileDataLength];
 
         final int numPixels = tile.getNumPixels();
         if (0 == numPixels) {
@@ -174,22 +196,15 @@ class TileReader {
             }
             System.arraycopy(rawTileData, 0, tileData, 0, tileDataLength);
 
-            /*if (bitsPerSample >= 8 && bitMaskDataLength > 0) {
-                LOGGER.finer("Tile contains no data pixels, applying no-data mask");
-                int pixArrayOffset;
-                boolean isNoData;
-                final int bytesPerSample = bitsPerSample / 8;// hey this won't work for bits x
-                // sample < 8
-                for (int pixelN = 0; pixelN < numPixels; pixelN++) {
-                    pixArrayOffset = pixelN * bytesPerSample;
-                    isNoData = (((bitmaskData[pixelN / 8] >> (7 - (pixArrayOffset % 8))) & 0x01) == 0x00);
-                    if (isNoData) {
-                        for (int i = 0; i < bytesPerSample; i++) {
-                            tileData[pixArrayOffset + i] = NO_DATA_BYTE;
-                        }
-                    }
-                }
-            }*/
+            /*
+             * if (bitsPerSample >= 8 && bitMaskDataLength > 0) {
+             * LOGGER.finer("Tile contains no data pixels, applying no-data mask"); int
+             * pixArrayOffset; boolean isNoData; final int bytesPerSample = bitsPerSample / 8;// hey
+             * this won't work for bits x // sample < 8 for (int pixelN = 0; pixelN < numPixels;
+             * pixelN++) { pixArrayOffset = pixelN bytesPerSample; isNoData = (((bitmaskData[pixelN
+             * / 8] >> (7 - (pixArrayOffset % 8))) & 0x01) == 0x00); if (isNoData) { for (int i = 0;
+             * i < bytesPerSample; i++) { tileData[pixArrayOffset + i] = NO_DATA_BYTE; } } } }
+             */
 
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("returning " + numPixels + " pixels data packaged into "
