@@ -1,3 +1,20 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2009, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.arcsde.gce;
 
 import java.awt.Color;
@@ -69,6 +86,13 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
 import com.sun.media.imageio.stream.RawImageInputStream;
 import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
 
+/**
+ * 
+ * @author Gabriel Roldan (OpenGeo)
+ * @since 2.5.4
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32460 2009-02-10 05:23:31Z groldan $
+ * @source $URL$
+ */
 @SuppressWarnings( { "deprecation", "nls" })
 class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
@@ -120,7 +144,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         // get information for the successive images
         //
         // //
-        if (numOverviews >= 1) {
+        if (numOverviews > 0) {
             overViewResolutions = new double[numOverviews][2];
             for (int pyramidLevel = 1; pyramidLevel <= numOverviews; pyramidLevel++) {
                 ArcSDEPyramidLevel level = pyramidInfo.getPyramidLevel(pyramidLevel);
@@ -464,8 +488,6 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                         tiledImageWidth, bankIndices, bandOffsets);
             }
         }
-        System.out.println("ColorModel: " + colorModel);
-        System.out.println("SampleModel: " + sampleModel);
 
         final long[] imageOffsets = new long[] { 0 };
         final Dimension[] imageDimensions = new Dimension[] { new Dimension(tiledImageWidth,

@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002-2009, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
- * @author Gabriel Roldan
+ * @author Gabriel Roldan (OpenGeo)
+ * @since 2.5.4
+ * @version $Id: RasterInfo.java 32460 2009-02-10 05:23:31Z groldan $
+ * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
 class RasterInfo {

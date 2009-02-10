@@ -1,7 +1,8 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
- *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    (C) 2002-2009, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -99,6 +100,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Saul Farber (saul.farber)
  * @author jeichar
  * @author Simone Giannecchini (simboss)
+ * @author Gabriel Roldan (OpenGeo)
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/gce/ArcSDERasterFormat.java $

@@ -1,3 +1,20 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2009, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.arcsde.gce.imageio;
 
 import java.awt.image.DataBuffer;
@@ -11,7 +28,10 @@ import com.esri.sde.sdk.client.SeRaster;
  * An enumeration that mirrors the different possible cell resolutions in Arcsde (ie, {@code
  * SeRaster#SE_PIXEL_TYPE_*})
  * 
- * @author Gabriel Roldan
+ * @author Gabriel Roldan (OpenGeo)
+ * @since 2.5.4
+ * @version $Id: RasterCellType.java 32460 2009-02-10 05:23:31Z groldan $
+ * @source $URL$
  */
 public enum RasterCellType {
     TYPE_16BIT_S(16, DataBuffer.TYPE_SHORT, true, NumberRange.create(Short.MIN_VALUE, Short.MAX_VALUE)), //
