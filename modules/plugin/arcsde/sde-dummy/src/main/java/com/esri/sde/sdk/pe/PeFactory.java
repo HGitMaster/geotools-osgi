@@ -4,7 +4,7 @@ public class PeFactory {
     
     public static int[] projcsCodelist() { return null; }
     public static PeProjectedCS projcs(int i)  throws PeProjectionException { return null; }
-    public static PeCoordinateSystem factory(int i) throws PeProjectionException { return null; }
+    public static PeObject factory(int i) throws PeProjectionException { return null; }
     public static int[] geogcsCodelist() throws PeProjectionException{
         return null;
     }
