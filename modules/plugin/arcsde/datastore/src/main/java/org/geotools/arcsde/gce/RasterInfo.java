@@ -20,15 +20,17 @@ package org.geotools.arcsde.gce;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.imageio.ImageTypeSpecifier;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -37,11 +39,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32472 2009-02-11 17:32:48Z groldan $
+ * @version $Id: RasterInfo.java 32473 2009-02-11 21:28:44Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
 class RasterInfo {
+
     /** The name of the raster table we're pulling images from in this reader * */
     private String rasterTable = null;
 
@@ -63,9 +66,7 @@ class RasterInfo {
 
     private List<GridSampleDimension> gridSampleDimensions;
 
-    private int imageWidth;
-
-    private int imageHeight;
+    private ImageTypeSpecifier renderedImageSpec;
 
     /**
      * @param rasterTable
@@ -168,20 +169,16 @@ class RasterInfo {
         return subRasterInfo.get(0).getNumBands();
     }
 
-    public void setImageWidth(int imageWidth) {
-        this.imageWidth = imageWidth;
-    }
-
-    public void setImageHeight(int imageHeight) {
-        this.imageHeight = imageHeight;
-    }
-
     public int getImageWidth() {
-        return imageWidth;
+        final GeneralGridRange originalGridRange = getOriginalGridRange();
+        final int width = originalGridRange.getSpan(0);
+        return width;
     }
 
     public int getImageHeight() {
-        return imageHeight;
+        final GeneralGridRange originalGridRange = getOriginalGridRange();
+        final int height = originalGridRange.getSpan(1);
+        return height;
     }
 
     /**
@@ -293,4 +290,28 @@ class RasterInfo {
         return rasterInfo;
     }
 
+    public ImageTypeSpecifier getRenderedImageSpec() {
+        if (this.renderedImageSpec == null) {
+            synchronized (this) {
+                if (this.renderedImageSpec == null) {
+                    this.renderedImageSpec = RasterUtils.createFullImageTypeSpecifier(this);
+                }
+            }
+        }
+        return this.renderedImageSpec;
+    }
+
+    public IndexColorModel getColorMap() {
+        final RasterBandInfo bandOne = getBand(0, 0);
+        return bandOne.getColorMap();
+    }
+
+    boolean isColorMapped() {
+        final RasterBandInfo bandOne = getBand(0, 0);
+        return bandOne.isColorMapped();
+    }
+
+    public RasterCellType getCellType() {
+        return getBand(0, 0).getCellType();
+    }
 }

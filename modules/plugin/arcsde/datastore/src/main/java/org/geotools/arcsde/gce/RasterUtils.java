@@ -17,13 +17,22 @@
  */
 package org.geotools.arcsde.gce;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
+import java.awt.image.BandedSampleModel;
+import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
+import java.awt.image.SampleModel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageTypeSpecifier;
+
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
@@ -31,6 +40,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ColorUtilities;
+import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.FactoryException;
@@ -46,12 +56,13 @@ import com.esri.sde.sdk.pe.PeFactory;
 import com.esri.sde.sdk.pe.PeGeographicCS;
 import com.esri.sde.sdk.pe.PeProjectedCS;
 import com.esri.sde.sdk.pe.PeProjectionException;
+import com.sun.imageio.plugins.common.BogusColorSpace;
 
 /**
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32472 2009-02-11 17:32:48Z groldan $
+ * @version $Id: RasterUtils.java 32473 2009-02-11 21:28:44Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -249,8 +260,11 @@ class RasterUtils {
                     pixelSpaceOverlappingArea);
             queryInfo.resultDimension = getResultDimensionForTileRange(queryInfo.matchingTiles,
                     tileSize, pixelSpaceOverlappingArea);
+        } else {
+            queryInfo.resultDimension = new Rectangle(0, 0, -1, -1);
+            queryInfo.matchingTiles = new Rectangle(0, 0, -1, -1);
+            queryInfo.resultEnvelope = new GeneralEnvelope(nativeCrs);
         }
-        // calculateQueryDimensionAndEnvelope(queryInfo, pyramidInfo);
 
         return queryInfo;
     }
@@ -432,5 +446,71 @@ class RasterUtils {
         IndexColorModel colorModel = ColorUtilities.getIndexColorModel(ARGB);
 
         return colorModel;
+    }
+
+    public static ImageTypeSpecifier createFullImageTypeSpecifier(final RasterInfo rasterInfo) {
+        final int numberOfBands = rasterInfo.getNumBands();
+        final RasterCellType pixelType = rasterInfo.getCellType();
+        // Prepare temporary colorModel and sample model, needed to build the final
+        // ArcSDEPyramidLevel level;
+        final ColorModel colorModel;
+        final SampleModel sampleModel;
+        int tiledImageWidth = rasterInfo.getImageWidth();
+        int tiledImageHeight = rasterInfo.getImageHeight();
+        {
+            final int bitsPerSample = pixelType.getBitsPerSample();
+            final int dataType = pixelType.getDataBufferType();
+            final boolean hasColorMap = rasterInfo.isColorMapped();
+            if (hasColorMap) {
+                LOGGER.fine("Found single-band colormapped raster, using its index color model");
+                colorModel = rasterInfo.getColorMap();
+                sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
+                        tiledImageHeight);
+            } else if (bitsPerSample == 1 || bitsPerSample == 4) {
+                if (numberOfBands != 1) {
+                    throw new IllegalArgumentException(bitsPerSample
+                            + "-Bit rasters are only supported for one band");
+                }
+                int[] argb = new int[(int) Math.pow(2, bitsPerSample)];
+                ColorUtilities.expand(new Color[] { Color.WHITE, Color.BLACK }, argb, 0,
+                        argb.length);
+                GridSampleDimension gridSampleDimension = rasterInfo.getGridSampleDimensions()[0];
+                colorModel = gridSampleDimension.getColorModel(0, numberOfBands, dataType);
+                sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
+                        tiledImageHeight);
+            } else {
+                int[] numBits = new int[numberOfBands];
+                for (int i = 0; i < numberOfBands; i++) {
+                    numBits[i] = bitsPerSample;
+                }
+
+                final ColorSpace colorSpace;
+                switch (numberOfBands) {
+                case 1:
+                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+                    break;
+                case 3:
+                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+                    break;
+                default:
+                    colorSpace = new BogusColorSpace(numberOfBands);
+                }
+                colorModel = new ComponentColorModelJAI(colorSpace, numBits, false, false,
+                        Transparency.OPAQUE, dataType);
+
+                int[] bankIndices = new int[numberOfBands];
+                int[] bandOffsets = new int[numberOfBands];
+                // int bandOffset = (tileWidth * tileHeight * pixelType.getBitsPerSample()) / 8;
+                for (int i = 0; i < numberOfBands; i++) {
+                    bankIndices[i] = i;
+                    bandOffsets[i] = 0;// (i * bandOffset);
+                }
+                sampleModel = new BandedSampleModel(dataType, tiledImageWidth, tiledImageHeight,
+                        tiledImageWidth, bankIndices, bandOffsets);
+            }
+        }
+
+        final ImageTypeSpecifier its = new ImageTypeSpecifier(colorModel, sampleModel);
+        return its;
     }
 }

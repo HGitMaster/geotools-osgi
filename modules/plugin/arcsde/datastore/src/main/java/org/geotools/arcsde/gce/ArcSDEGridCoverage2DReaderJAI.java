@@ -17,14 +17,10 @@
  */
 package org.geotools.arcsde.gce;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BandedSampleModel;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
@@ -54,15 +50,12 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.OverviewPolicy;
-import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.ServiceInfo;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
-import org.geotools.resources.image.ColorUtilities;
-import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -80,7 +73,6 @@ import com.esri.sde.sdk.client.SeRasterAttr;
 import com.esri.sde.sdk.client.SeRasterConstraint;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
-import com.sun.imageio.plugins.common.BogusColorSpace;
 import com.sun.media.imageio.stream.RawImageInputStream;
 import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
 
@@ -88,7 +80,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32472 2009-02-11 17:32:48Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32473 2009-02-11 21:28:44Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -230,8 +222,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         /*
          * Do the requested and resulting envelopes overlap?
          */
-        GeneralEnvelope resultEnvelope = rasterQueryInfo.getResultEnvelope();
-        if (requestedEnvelope.intersects(resultEnvelope, true)) {
+        final GeneralEnvelope resultEnvelope = rasterQueryInfo.getResultEnvelope();
+        if (resultEnvelope.getSpan(0) > 0 && resultEnvelope.getSpan(1) > 0) {
             /*
              * Create the prepared query (not executed) stream to fetch the tiles from
              */
@@ -279,8 +271,6 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         } else {
             LOGGER.finer("requested and resulting envelopes do not overlap");
             coverageRaster = null;
-            resultEnvelope = new GeneralEnvelope(originalEnvelope.getCoordinateReferenceSystem());
-            resultEnvelope.setEnvelope(0, -1, 0, -1);
         }
 
         /*
@@ -458,57 +448,9 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         final ColorModel colorModel;
         final SampleModel sampleModel;
         {
-            final int bitsPerSample = pixelType.getBitsPerSample();
-            final int dataType = pixelType.getDataBufferType();
-            final RasterBandInfo bandOne = rasterInfo.getBand(0, 0);
-            final boolean hasColorMap = bandOne.isColorMapped();
-            if (hasColorMap) {
-                LOGGER.fine("Found single-band colormapped raster, using its index color model");
-                colorModel = bandOne.getColorMap();
-                sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
-                        tiledImageHeight);
-            } else if (bitsPerSample == 1 || bitsPerSample == 4) {
-                if (numberOfBands != 1) {
-                    throw new DataSourceException(bitsPerSample
-                            + "-Bit rasters are only supported for one band");
-                }
-                int[] argb = new int[(int) Math.pow(2, bitsPerSample)];
-                ColorUtilities.expand(new Color[] { Color.WHITE, Color.BLACK }, argb, 0,
-                        argb.length);
-                GridSampleDimension gridSampleDimension = rasterInfo.getGridSampleDimensions()[0];
-                colorModel = gridSampleDimension.getColorModel(0, numberOfBands, dataType);
-                sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
-                        tiledImageHeight);
-            } else {
-                int[] numBits = new int[numberOfBands];
-                for (int i = 0; i < numberOfBands; i++) {
-                    numBits[i] = bitsPerSample;
-                }
-
-                final ColorSpace colorSpace;
-                switch (numberOfBands) {
-                case 1:
-                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-                    break;
-                case 3:
-                    colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-                    break;
-                default:
-                    colorSpace = new BogusColorSpace(numberOfBands);
-                }
-                colorModel = new ComponentColorModelJAI(colorSpace, numBits, false, false,
-                        Transparency.OPAQUE, dataType);
-
-                int[] bankIndices = new int[numberOfBands];
-                int[] bandOffsets = new int[numberOfBands];
-                // int bandOffset = (tileWidth * tileHeight * pixelType.getBitsPerSample()) / 8;
-                for (int i = 0; i < numberOfBands; i++) {
-                    bankIndices[i] = i;
-                    bandOffsets[i] = 0;// (i * bandOffset);
-                }
-                sampleModel = new BandedSampleModel(dataType, tiledImageWidth, tiledImageHeight,
-                        tiledImageWidth, bankIndices, bandOffsets);
-            }
+            final ImageTypeSpecifier fullImageSpec = rasterInfo.getRenderedImageSpec();
+            colorModel = fullImageSpec.getColorModel();
+            sampleModel = fullImageSpec.getSampleModel(tiledImageWidth, tiledImageHeight);
         }
 
         final long[] imageOffsets = new long[] { 0 };
