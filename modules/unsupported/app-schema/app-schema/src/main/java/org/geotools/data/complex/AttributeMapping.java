@@ -29,7 +29,7 @@ import org.opengis.filter.expression.Expression;
 /**
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AttributeMapping.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @version $Id: AttributeMapping.java 32469 2009-02-11 07:53:06Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AttributeMapping.java $
  * @since 2.4
  */
@@ -154,8 +154,4 @@ public class AttributeMapping {
         this.identifierExpression = identifierExpression;
     }
 
-    public boolean isNestedFeature() {
-        // TODO Auto-generated method stub
-        return false;
-    }
 }

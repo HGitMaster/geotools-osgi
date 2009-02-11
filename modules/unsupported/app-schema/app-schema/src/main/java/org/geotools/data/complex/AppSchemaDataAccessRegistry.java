@@ -63,7 +63,7 @@ public final class AppSchemaDataAccessRegistry {
      * @param dataAccess
      *            Data access to be registered
      */
-    public static void register(AppSchemaDataAccess dataAccess) {
+    public static synchronized void register(AppSchemaDataAccess dataAccess) {
         if (registry == null) {
             throw new NullPointerException(
                     "App schema data access registry needs to be instantiated before usage!");
@@ -77,7 +77,7 @@ public final class AppSchemaDataAccessRegistry {
      * @param dataAccess
      *            Data access to be unregistered
      */
-    public static void unregister(DataAccess<FeatureType, Feature> dataAccess) {
+    public static synchronized void unregister(DataAccess<FeatureType, Feature> dataAccess) {
         if (registry == null) {
             throw new NullPointerException(
                     "App schema data access registry needs to be instantiated before usage!");

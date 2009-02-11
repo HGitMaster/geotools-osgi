@@ -274,6 +274,7 @@ public class FeatureChainingTest extends TestCase {
         }
         mfFeatures.close(mfIterator);
         guFeatures.close(guIterator);
+        cpFeatures.close(cpIterator);
 
         disposeDataAccesses();
     }
@@ -328,6 +329,8 @@ public class FeatureChainingTest extends TestCase {
             assertEquals(realValues.containsAll(Arrays.asList(values)), true);
         }
         this.disposeDataAccesses();
+        
+        guFeatures.close(guIterator);
     }
 
     /**

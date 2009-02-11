@@ -29,9 +29,9 @@ import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 
 /**
- * This class represents the fake feature type needed for feature chaining. When a non feature is
- * mapped separately in app schema data access, it is regarded as a feature since it would have a
- * feature source.
+ * This class represents the fake feature type needed for feature chaining for properties that are
+ * not features. When a non feature is mapped separately in app schema data access, it is regarded
+ * as a feature since it would have a feature source.
  * 
  * @author Rini Angreani, Curtin University of Technology
  */
