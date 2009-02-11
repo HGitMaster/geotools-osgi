@@ -24,7 +24,6 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTWriter;
 
 
-import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.filter.DefaultExpression;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.jdbc.JDBCDataStore;
@@ -38,7 +37,6 @@ import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Literal;
-import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.BinarySpatialOperator;
@@ -54,11 +52,8 @@ import org.opengis.filter.spatial.Within;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.sql.Types;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 

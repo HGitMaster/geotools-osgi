@@ -39,6 +39,7 @@ import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.spatial.BBOX;
 
 
+
 public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
     ContentFeatureSource featureSource;
 
@@ -265,7 +266,8 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         assertEquals(2, count);
         features.close(it);
         
-        assertEquals(env, features.getBounds());
+        //assertEquals(env, features.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(env, features.getBounds()));
     }
     
     public void testGetFeaturesWithOffset() throws Exception {
@@ -285,7 +287,8 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         assertEquals(2, ((Number) f.getAttribute(aname("intProperty"))).intValue());
         assertFalse(it.hasNext());
         features.close(it);
-        assertEquals(fe, features.getBounds());
+        //assertEquals(fe, features.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(fe, features.getBounds()));
     }
     
     public void testGetFeaturesWithOffsetLimit() throws Exception {
@@ -306,7 +309,8 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         assertEquals(1, ((Number) f.getAttribute(aname("intProperty"))).intValue());
         assertFalse(it.hasNext());
         features.close(it);
-        assertEquals(fe, features.getBounds());
+        //assertEquals(fe, features.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(fe, features.getBounds()));
     }
     
     /**

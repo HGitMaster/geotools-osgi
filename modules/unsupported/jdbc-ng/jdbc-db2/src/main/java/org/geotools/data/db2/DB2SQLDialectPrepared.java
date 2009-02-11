@@ -176,5 +176,13 @@ public class DB2SQLDialectPrepared extends PreparedStatementSQLDialect {
 	public void prepareGeometryValue(Geometry geom, int srid, Class binding, StringBuffer sql) {
 		DB2Util.prepareGeometryValue(geom, srid, binding, sql);
 	}
+	
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
+    }
+
 
 }

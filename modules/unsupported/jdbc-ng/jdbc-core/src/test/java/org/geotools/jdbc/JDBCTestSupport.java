@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 import org.geotools.feature.NameImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -219,5 +220,20 @@ public abstract class JDBCTestSupport extends TestCase {
     		
     	return crs1.equals(crs2); 
    	}
+
+	protected boolean areReferencedEnvelopesEuqal(ReferencedEnvelope e1, ReferencedEnvelope e2) {
+		
+		if (e1==null && e2 ==null) return true;
+		if (e1==null || e2 == null) return false;
+		
+		boolean equal = 
+			Math.round(e1.getMinX())==Math.round(e2.getMinX()) &&
+			Math.round(e1.getMinY())==Math.round(e2.getMinY()) &&
+			Math.round(e1.getMaxX())==Math.round(e2.getMaxX()) &&
+			Math.round(e1.getMaxY())==Math.round(e2.getMaxY());
+		
+		if (!equal) return false;
+		return areCRSEqual(e1.getCoordinateReferenceSystem(), e2.getCoordinateReferenceSystem());
+	}
 
 }

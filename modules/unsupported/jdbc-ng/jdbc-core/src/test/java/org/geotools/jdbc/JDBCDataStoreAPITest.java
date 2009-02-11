@@ -1651,19 +1651,4 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
         return true;
     }
-    
-    protected boolean areReferencedEnvelopesEuqal(ReferencedEnvelope e1, ReferencedEnvelope e2) {
-    	
-    	if (e1==null && e2 ==null) return true;
-    	if (e1==null || e2 == null) return false;
-    	
-    	boolean equal = 
-    		e1.getMinX()==e2.getMinX() &&
-    		e1.getMinY()==e2.getMinY() &&
-    		e1.getMaxX()==e2.getMaxX() &&
-    		e1.getMaxY()==e2.getMaxY();
-    	
-    	if (!equal) return false;
-    	return areCRSEqual(e1.getCoordinateReferenceSystem(), e2.getCoordinateReferenceSystem());
-    }
 }

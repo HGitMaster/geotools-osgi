@@ -93,6 +93,16 @@ public class DB2SQLDialect extends SQLDialect  {
     private static String SELECT_INCLUDE_WITH_SCHEMA ="select table_schema,table_name  from db2gse.st_geometry_columns where table_schema = ? and table_name=?";
     private static String SELECT_INCLUDE="select table_schema,table_name  from db2gse.st_geometry_columns where table_schema = current schema  and table_name=?";
     
+    //private static String SELECT_ROWNUMBER="select rownumber() over () as rownum,ibmreqd from sysibm.sysdummy1";
+    private static String SELECT_ROWNUMBER="select * from sysibm.sysdummy1 where rownum = 1";
+    private  Boolean isRowNumberSupported=null;
+    private  static String ROWNUMBER_MESSAGE=
+    	"DB2 handles paged select statements inefficiently\n"+
+    	"Since Version 9.5 you can do the following\n"+
+    	"dbstop\n"+
+    	"db2set DB2_COMPATIBILITY_VECTOR=01\n"+
+    	"db2start\n";
+    
     public DB2SQLDialect(JDBCDataStore dataStore) {
         super(dataStore);
     }
@@ -111,6 +121,7 @@ public class DB2SQLDialect extends SQLDialect  {
      */
     @Override
     public CoordinateReferenceSystem createCRS(int srid, Connection cx) throws SQLException {
+    	    	
     	PreparedStatement ps = cx.prepareStatement(SELECT_CRS_WKT);
     	ps.setInt(1, srid);
     	ResultSet rs = ps.executeQuery();
@@ -422,7 +433,7 @@ public class DB2SQLDialect extends SQLDialect  {
 	
 				
 		PreparedStatement ps = null;
-		if (schemaName!=null || schemaName.trim().length()>0) { 
+		if (schemaName!=null && schemaName.trim().length()>0) { 
 			ps = cx.prepareStatement(SELECT_INCLUDE_WITH_SCHEMA); 
 			ps.setString(1,schemaName);
 			ps.setString(2,tableName);
@@ -438,7 +449,46 @@ public class DB2SQLDialect extends SQLDialect  {
 		return isGeomTable;
 	}
 
+    @Override   
+    public boolean isLimitOffsetSupported() {
+    	if (isRowNumberSupported==null)
+    		setIsRowNumberSupported();
+        return isRowNumberSupported;
+    }
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+    	// Using the same code as in the OracleDialict. This method is only invoked if
+    	// DB2 is configured to be compatible to Oracle with 
+    	// "db2set DB2_COMPATIBILITY_VECTOR=01"
+    	// enabling the rownum pseudo column
+    	
+        if(offset == 0) {
+            sql.insert(0, "SELECT * FROM (");
+            sql.append(") WHERE ROWNUM <= " + limit);
+        } else {
+            long max = (limit == Integer.MAX_VALUE ? Long.MAX_VALUE : limit + offset);
+            sql.insert(0, "SELECT * FROM (SELECT A.*, ROWNUM RNUM FROM ( ");
+            sql.append(") A WHERE ROWNUM <= " + max + ")");
+            sql.append("WHERE RNUM > " + offset);
+        }
+    }
 
 
-
+    private void setIsRowNumberSupported() {
+    	
+    	try {
+    		Connection con = dataStore.getDataSource().getConnection();
+    		PreparedStatement ps = con.prepareStatement(SELECT_ROWNUMBER); 
+    		ResultSet rs = ps.executeQuery();
+    		if (rs.next()) isRowNumberSupported=Boolean.TRUE;    		
+    		rs.close();
+    		ps.close();
+    		con.close();
+    	}
+    	catch (SQLException ex) {
+    		LOGGER.warning(ROWNUMBER_MESSAGE);
+    		isRowNumberSupported=Boolean.FALSE;
+    	}
+    }
+    
 }

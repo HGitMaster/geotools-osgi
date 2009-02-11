@@ -17,6 +17,7 @@
 package org.geotools.data.db2;
 
 import java.io.IOException;
+import java.sql.Driver;
 import java.util.Map;
 
 import org.geotools.jdbc.JDBCDataStore;

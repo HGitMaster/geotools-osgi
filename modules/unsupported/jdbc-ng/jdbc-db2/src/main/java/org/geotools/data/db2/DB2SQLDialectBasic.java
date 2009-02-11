@@ -151,4 +151,12 @@ public class DB2SQLDialectBasic extends BasicSQLDialect {
         
     }
 
+    
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
+    }
+
 }
