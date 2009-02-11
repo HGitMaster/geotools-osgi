@@ -21,9 +21,13 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.util.HashSet;
@@ -62,6 +66,7 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -80,7 +85,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32473 2009-02-11 21:28:44Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32474 2009-02-11 22:39:25Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -270,7 +275,12 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             }
         } else {
             LOGGER.finer("requested and resulting envelopes do not overlap");
-            coverageRaster = null;
+            ImageTypeSpecifier imageSpec = rasterInfo.getRenderedImageSpec();
+            SampleModel sampleModel = imageSpec.getSampleModel(0, 0);
+            DataBuffer db = sampleModel.createDataBuffer();
+            WritableRaster raster = Raster.createWritableRaster(sampleModel, null);
+            ColorModel colorModel = imageSpec.getColorModel();
+            coverageRaster = new BufferedImage(colorModel, raster, false, null);
         }
 
         /*
@@ -355,6 +365,23 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                 overviewPolicy = (OverviewPolicy) param.getValue();
                 continue;
             }
+        }
+
+        if (dim == null && reqEnvelope == null) {
+            throw new ParameterNotFoundException("Parameter is mandatory and shall provide "
+                    + "the extent and dimension to request", AbstractGridFormat.READ_GRIDGEOMETRY2D
+                    .getName().toString());
+        }
+
+        if (!reqEnvelope.intersects(getOriginalEnvelope(), true)) {
+            throw new IllegalArgumentException(
+                    "The requested extend does not overlap the coverage extent: "
+                            + getOriginalEnvelope());
+        }
+
+        if (dim.width <= 0 || dim.height <= 0) {
+            throw new IllegalArgumentException("The requested coverage dimension can't be null: "
+                    + dim);
         }
 
         if (overviewPolicy == null) {

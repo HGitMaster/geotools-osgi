@@ -460,43 +460,12 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
                 originalCrs));
 
         final GridCoverage2D coverage;
-        coverage = readCoverage(reader, requestedWidth, requestedHeight, nonOverlappingEnvelope);
-
-        assertNotNull(coverage);
-        assertNotNull(coverage.getRenderedImage());
-
-        final String fileName = "tesReadOverlaps_Level0_8BitU_1-Band";
-
-        final RenderedImage image = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
-        assertNotNull(image);
-        writeToDisk(image, fileName);
-
-        final Envelope returnedEnvelope = coverage.getEnvelope();
-
-        // these ones should equal to the tile dimension in the arcsde raster
-        int tileWidth = image.getTileWidth();
-        int tileHeight = image.getTileHeight();
-        assertTrue(tileWidth > 0);
-        assertTrue(tileHeight > 0);
-
-        int fullWidth = originalGridRange.getSpan(0);
-        int fullHeight = originalGridRange.getSpan(1);
-
-        GeneralEnvelope expectedEnvelope = new GeneralEnvelope(originalCrs);
-        expectedEnvelope.setRange(0, 0, 100);
-        expectedEnvelope.setRange(1, 0, 100);
-
-        LOGGER.info("\nRequested width : " + requestedWidth + "\nReturned width  :"
-                + image.getWidth() + "\nRequested height:" + requestedHeight
-                + "\nReturned height :" + image.getHeight());
-
-        LOGGER.info("\nOriginal envelope  : " + originalEnvelope + "\n requested envelope :"
-                + nonOverlappingEnvelope + "\n expected envelope  :" + expectedEnvelope
-                + "\n returned envelope  :" + returnedEnvelope);
-
-        assertEquals(50, image.getWidth());
-        assertEquals(50, image.getHeight());
-        // assertEquals(expectedEnvelope, returnedEnvelope);
+        try {
+            coverage = readCoverage(reader, requestedWidth, requestedHeight, nonOverlappingEnvelope);
+            fail("Expected IAE, envelopes does not overlap");
+        } catch (IllegalArgumentException e) {
+            assertTrue(true);
+        }
     }
 
     private void writeToDisk(final RenderedImage image, String fileName) {
