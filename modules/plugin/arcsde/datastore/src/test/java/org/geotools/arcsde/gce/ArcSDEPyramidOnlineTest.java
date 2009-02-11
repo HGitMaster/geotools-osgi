@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.arcsde.gce.imageio;
+package org.geotools.arcsde.gce;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -24,8 +24,8 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramid.RasterQueryInfo;
+import org.geotools.arcsde.gce.ArcSDEPyramid;
+import org.geotools.arcsde.gce.ArcSDEPyramid.RasterQueryInfo;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -55,7 +55,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
- * @version $Id: ArcSDEPyramidOnlineTest.java 32418 2009-02-05 20:52:41Z groldan $
+ * @version $Id: ArcSDEPyramidOnlineTest.java 32465 2009-02-11 00:12:14Z groldan $
  */
 public class ArcSDEPyramidOnlineTest {
 

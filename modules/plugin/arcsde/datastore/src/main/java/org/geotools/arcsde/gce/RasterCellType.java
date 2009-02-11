@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.arcsde.gce.imageio;
+package org.geotools.arcsde.gce;
 
 import java.awt.image.DataBuffer;
 import java.util.NoSuchElementException;
@@ -30,10 +30,10 @@ import com.esri.sde.sdk.client.SeRaster;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterCellType.java 32461 2009-02-10 21:16:29Z groldan $
+ * @version $Id: RasterCellType.java 32465 2009-02-11 00:12:14Z groldan $
  * @source $URL$
  */
-public enum RasterCellType {
+enum RasterCellType {
     TYPE_16BIT_S(16, DataBuffer.TYPE_SHORT, true, NumberRange.create(Short.MIN_VALUE,
             Short.MAX_VALUE)), //
     TYPE_16BIT_U(16, DataBuffer.TYPE_USHORT, false, NumberRange.create((int) 0, (int) 65535)), //

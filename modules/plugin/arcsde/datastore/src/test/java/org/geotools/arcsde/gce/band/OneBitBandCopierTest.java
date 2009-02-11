@@ -24,8 +24,8 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.gce.RasterCellType;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.util.logging.Logging;

@@ -20,8 +20,8 @@ package org.geotools.arcsde.gce.band;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 
+import org.geotools.arcsde.gce.RasterCellType;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.data.DataSourceException;
 import org.junit.Ignore;
 import org.junit.Test;

@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -36,7 +34,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32461 2009-02-10 21:16:29Z groldan $
+ * @version $Id: RasterInfo.java 32465 2009-02-11 00:12:14Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })

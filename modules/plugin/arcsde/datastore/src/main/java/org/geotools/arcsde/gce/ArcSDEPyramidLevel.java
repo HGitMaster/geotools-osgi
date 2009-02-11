@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.arcsde.gce.imageio;
+package org.geotools.arcsde.gce;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -30,7 +30,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @author sfarber
  * 
  */
-public class ArcSDEPyramidLevel {
+class ArcSDEPyramidLevel {
     private int pyramidLevel, xOffset, yOffset, xTiles, yTiles;
 
     private double xRes, yRes;

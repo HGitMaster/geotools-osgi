@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.arcsde.gce.imageio;
+package org.geotools.arcsde.gce;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -39,7 +39,7 @@ import com.esri.sde.sdk.client.SeRasterAttr;
  * @author Saul Farber
  * 
  */
-public class ArcSDEPyramid {
+class ArcSDEPyramid {
 
     /**
      * Orders pyramid levels by their level index

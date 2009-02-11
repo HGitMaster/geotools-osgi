@@ -17,16 +17,16 @@
  */
 package org.geotools.arcsde.gce;
 
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_16BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_16BIT_U;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_1BIT;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_REAL;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_U;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_4BIT;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_64BIT_REAL;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_16BIT_S;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_16BIT_U;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_1BIT;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_32BIT_REAL;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_32BIT_S;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_32BIT_U;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_4BIT;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_64BIT_REAL;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_S;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_U;
 
 import java.awt.Rectangle;
 import java.awt.Transparency;
@@ -61,9 +61,6 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.data.TestData;
-import org.geotools.arcsde.gce.imageio.CompressionType;
-import org.geotools.arcsde.gce.imageio.InterpolationType;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.gce.producer.ArcSDERasterFloatProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterOneBitPerBandProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterOneBytePerBandProducerImpl;

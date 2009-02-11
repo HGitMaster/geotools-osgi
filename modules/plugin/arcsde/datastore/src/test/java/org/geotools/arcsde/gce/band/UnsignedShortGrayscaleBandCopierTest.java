@@ -30,7 +30,7 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 
-import org.geotools.arcsde.gce.imageio.RasterCellType;
+import org.geotools.arcsde.gce.RasterCellType;
 import org.junit.Test;
 
 /**

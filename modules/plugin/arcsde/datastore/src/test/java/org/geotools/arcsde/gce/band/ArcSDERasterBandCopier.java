@@ -18,7 +18,7 @@ package org.geotools.arcsde.gce.band;
 
 import java.awt.image.WritableRaster;
 
-import org.geotools.arcsde.gce.imageio.RasterCellType;
+import org.geotools.arcsde.gce.RasterCellType;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeRasterTile;

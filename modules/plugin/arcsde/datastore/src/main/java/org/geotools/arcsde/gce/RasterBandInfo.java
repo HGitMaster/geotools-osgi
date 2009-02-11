@@ -22,10 +22,6 @@ import java.awt.geom.Point2D.Double;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
 
-import org.geotools.arcsde.gce.imageio.CompressionType;
-import org.geotools.arcsde.gce.imageio.InterleaveType;
-import org.geotools.arcsde.gce.imageio.InterpolationType;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -33,7 +29,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterBandInfo.java 32460 2009-02-10 05:23:31Z groldan $
+ * @version $Id: RasterBandInfo.java 32465 2009-02-11 00:12:14Z groldan $
  * @source $URL$
  */
 class RasterBandInfo {

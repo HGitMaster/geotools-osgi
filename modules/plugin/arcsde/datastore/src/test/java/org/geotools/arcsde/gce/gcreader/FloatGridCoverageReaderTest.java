@@ -26,8 +26,8 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
 import org.geotools.arcsde.gce.ArcSDERasterFormat;
+import org.geotools.arcsde.gce.RasterCellType;
 import org.geotools.arcsde.gce.RasterTestData;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;

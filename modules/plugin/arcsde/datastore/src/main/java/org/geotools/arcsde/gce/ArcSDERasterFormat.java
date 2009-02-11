@@ -17,9 +17,9 @@
  */
 package org.geotools.arcsde.gce;
 
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_1BIT;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_1BIT;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_S;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_U;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -44,12 +44,6 @@ import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
-import org.geotools.arcsde.gce.imageio.CompressionType;
-import org.geotools.arcsde.gce.imageio.InterleaveType;
-import org.geotools.arcsde.gce.imageio.InterpolationType;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;

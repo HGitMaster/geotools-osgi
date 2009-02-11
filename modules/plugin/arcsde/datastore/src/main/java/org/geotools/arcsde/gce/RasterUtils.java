@@ -24,8 +24,6 @@ import java.awt.image.IndexColorModel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
@@ -53,7 +51,7 @@ import com.esri.sde.sdk.pe.PeProjectionException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32463 2009-02-10 21:44:10Z groldan $
+ * @version $Id: RasterUtils.java 32465 2009-02-11 00:12:14Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })

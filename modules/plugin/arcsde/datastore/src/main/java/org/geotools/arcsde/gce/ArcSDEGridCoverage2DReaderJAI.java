@@ -44,9 +44,6 @@ import javax.media.jai.RenderedOp;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterUtils.QueryInfo;
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramid;
-import org.geotools.arcsde.gce.imageio.ArcSDEPyramidLevel;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.coverage.CoverageFactoryFinder;
@@ -89,7 +86,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32461 2009-02-10 21:16:29Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32465 2009-02-11 00:12:14Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })

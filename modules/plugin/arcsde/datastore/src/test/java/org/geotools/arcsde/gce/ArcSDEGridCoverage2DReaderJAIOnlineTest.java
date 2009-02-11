@@ -3,16 +3,16 @@
  */
 package org.geotools.arcsde.gce;
 
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_16BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_16BIT_U;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_1BIT;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_REAL;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_32BIT_U;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_4BIT;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_64BIT_REAL;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_S;
-import static org.geotools.arcsde.gce.imageio.RasterCellType.TYPE_8BIT_U;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_16BIT_S;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_16BIT_U;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_1BIT;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_32BIT_REAL;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_32BIT_S;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_32BIT_U;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_4BIT;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_64BIT_REAL;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_S;
+import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_U;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
-import org.geotools.arcsde.gce.imageio.RasterCellType;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
