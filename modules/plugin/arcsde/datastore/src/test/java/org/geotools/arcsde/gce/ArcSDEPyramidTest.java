@@ -17,33 +17,22 @@
  */
 package org.geotools.arcsde.gce;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.gce.PyramidInfo;
-import org.geotools.arcsde.gce.RasterCellType;
-import org.geotools.arcsde.gce.PyramidInfo.RasterQueryInfo;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.EngineeringCRS;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRaster;
@@ -60,7 +49,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
- * @version $Id: ArcSDEPyramidTest.java 32466 2009-02-11 00:19:18Z groldan $
+ * @version $Id: ArcSDEPyramidTest.java 32472 2009-02-11 17:32:48Z groldan $
  */
 public class ArcSDEPyramidTest {
 

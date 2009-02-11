@@ -69,9 +69,10 @@ import com.esri.sde.sdk.client.SeRelease;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ArcSDEConnectionPool.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEConnectionPool.java 32472 2009-02-11 17:32:48Z groldan $
  * @deprecated still here waiting for gce to switch to {@link SessionPool}
  */
+@SuppressWarnings("unchecked")
 public class ArcSDEConnectionPool {
     /** package's logger */
     private static final Logger LOGGER = org.geotools.util.logging.Logging
@@ -318,7 +319,7 @@ public class ArcSDEConnectionPool {
      * provides ArcSDE's SeConnections.
      * 
      * @author Gabriel Roldan, Axios Engineering
-     * @version $Id: ArcSDEConnectionPool.java 32195 2009-01-09 19:00:35Z groldan $
+     * @version $Id: ArcSDEConnectionPool.java 32472 2009-02-11 17:32:48Z groldan $
      */
     class SeConnectionFactory extends BasePoolableObjectFactory {
         /** DOCUMENT ME! */

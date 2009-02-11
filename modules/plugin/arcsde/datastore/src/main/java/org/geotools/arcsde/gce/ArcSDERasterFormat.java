@@ -23,7 +23,6 @@ import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_U;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -51,7 +50,6 @@ import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
@@ -114,11 +112,16 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
     private static final Map<String, ArcSDEConnectionConfig> connectionConfigs = new WeakHashMap<String, ArcSDEConnectionConfig>();
 
+    private static final ArcSDERasterFormat instance = new ArcSDERasterFormat();
     /**
      * Creates an instance and sets the metadata.
      */
-    public ArcSDERasterFormat() {
+    private ArcSDERasterFormat() {
         setInfo();
+    }
+    
+    public static ArcSDERasterFormat getInstance(){
+        return instance;
     }
 
     /**
@@ -135,7 +138,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         mInfo = info;
 
         readParameters = new ParameterGroup(new DefaultParameterDescriptorGroup(mInfo,
-                new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
+                new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D, OVERVIEW_POLICY }));
     }
 
     /**
@@ -433,6 +436,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
     private RasterInfo gatherCoverageMetadata(final ArcSDEPooledConnection scon,
             final String coverageUrl) throws IOException {
+        LOGGER.fine("Gathering raster dataset metadata for " + coverageUrl);
         String rasterTable;
         Point levelZeroPRP = null;
         {
@@ -461,75 +465,46 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             }
         }
 
-        final String[] rasterColumns;
-        final List<RasterBandInfo> bands;
-        final CoordinateReferenceSystem coverageCrs;
-        final GeneralEnvelope originalEnvelope;
-        final PyramidInfo pyramidInfo;
-
-        rasterColumns = getRasterColumns(scon, rasterTable);
-        final SeRasterAttr rasterAttributes = getSeRasterAttr(scon, rasterTable, rasterColumns);
+        final String[] rasterColumns = getRasterColumns(scon, rasterTable);
+        final List<PyramidInfo> rastersLayoutInfo = new ArrayList<PyramidInfo>();
         {
-            SeRasterColumn rCol;
+            final PyramidInfo pyramidInfo;
+            final List<RasterBandInfo> bands;
+
+            final SeRasterAttr rasterAttributes = getSeRasterAttr(scon, rasterTable, rasterColumns);
+
+            final CoordinateReferenceSystem coverageCrs;
+            SeRasterColumn rasterColumn;
             try {
-                rCol = new SeRasterColumn(scon, rasterAttributes.getRasterColumnId());
+                rasterColumn = new SeRasterColumn(scon, rasterAttributes.getRasterColumnId());
             } catch (SeException e) {
                 throw new ArcSdeException(e);
             }
-            SeCoordinateReference seCoordRef = rCol.getCoordRef();
+            SeCoordinateReference seCoordRef = rasterColumn.getCoordRef();
             coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
+            pyramidInfo = new PyramidInfo(rasterAttributes, coverageCrs);
+
+            rastersLayoutInfo.add(pyramidInfo);
+            // REVISIT: I'm still not completely sure what levelZeroPRP was for, ask Saul
+            if (levelZeroPRP != null) {
+                int tileWidth = pyramidInfo.getTileWidth();
+                int tileHeight = pyramidInfo.getTileHeight();
+                levelZeroPRP = new Point(levelZeroPRP.x * tileWidth, levelZeroPRP.y * tileHeight);
+            }
+            bands = setUpBandInfo(scon, rasterTable, rasterAttributes);
+
+            final GeneralEnvelope originalEnvelope;
+            originalEnvelope = calculateOriginalEnvelope(rasterAttributes, coverageCrs);
+            pyramidInfo.setOriginalEnvelope(originalEnvelope);
+            pyramidInfo.setBands(bands);
         }
-        pyramidInfo = new PyramidInfo(rasterAttributes, coverageCrs);
-
-        if (levelZeroPRP != null) {
-            int tileWidth = pyramidInfo.getTileWidth();
-            int tileHeight = pyramidInfo.getTileHeight();
-            levelZeroPRP = new Point(levelZeroPRP.x * tileWidth, levelZeroPRP.y * tileHeight);
-        }
-
-        bands = setUpBandInfo(scon, rasterTable, rasterAttributes);
-
-        // sampleImage = RasterUtils.createCompatibleBufferedImage(1, 1, bands.size(), cellType,
-        // bands
-        // .get(0).getColorMap());
-
-        // gridSampleDimensions = buildGridSampleDimensions(scon, rasterTable, rasterAttributes);
-
-        originalEnvelope = calculateOriginalEnvelope(rasterAttributes, coverageCrs);
-
-        GeneralGridRange originalGridRange = calculateOriginalGridRange(pyramidInfo);
-
-        // imageIOReader = createImageIOReader(rasterTable, rasterColumns, pyramidInfo,
-        // sampleImage);
 
         RasterInfo rasterInfo = new RasterInfo();
-        try {
-            rasterInfo.setImageWidth(rasterAttributes.getImageWidth());
-            rasterInfo.setImageHeight(rasterAttributes.getImageHeight());
-        } catch (SeException e) {
-            throw new ArcSdeException(e);
-        }
         rasterInfo.setRasterTable(rasterTable);
         rasterInfo.setRasterColumns(rasterColumns);
-        rasterInfo.setBands(bands);
-        rasterInfo.setPyramidInfo(pyramidInfo);
-        rasterInfo.setCoverageCrs(coverageCrs);
-        rasterInfo.setOriginalEnvelope(originalEnvelope);
-        rasterInfo.setOriginalGridRange(originalGridRange);
+        rasterInfo.setPyramidInfo(rastersLayoutInfo);
 
         return rasterInfo;
-    }
-
-    private GeneralGridRange calculateOriginalGridRange(PyramidInfo pyramidInfo) {
-        // final int numLevels = pyramidInfo.getNumLevels();
-        final PyramidLevelInfo highestRes = pyramidInfo.getPyramidLevel(0);
-
-        final int width = highestRes.size.width;
-        final int height = highestRes.size.height;
-
-        Rectangle actualDim = new Rectangle(0, 0, width, height);
-        GeneralGridRange originalGridRange = new GeneralGridRange(actualDim);
-        return originalGridRange;
     }
 
     private GeneralEnvelope calculateOriginalEnvelope(final SeRasterAttr rasterAttributes,
@@ -876,7 +851,6 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @return
      * @throws ArcSdeException
      */
-    @SuppressWarnings("nls")
     private DataBuffer getColormapData(SeRasterBand band, ArcSDEPooledConnection scon)
             throws IOException {
         LOGGER.fine("Reading colormap for raster band " + band);

@@ -18,6 +18,8 @@
 package org.geotools.arcsde.gce;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +28,7 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -34,7 +37,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32466 2009-02-11 00:19:18Z groldan $
+ * @version $Id: RasterInfo.java 32472 2009-02-11 17:32:48Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -49,12 +52,11 @@ class RasterInfo {
     private String[] rasterColumns;
 
     /** Array holding information on each level of the pyramid in this raster. * */
-    private PyramidInfo pyramidInfo;
+    private List<PyramidInfo> subRasterInfo;
 
-    private List<RasterBandInfo> bands;
-
-    private CoordinateReferenceSystem coverageCrs;
-
+    /**
+     * The original (ie, pyramid level zero) envelope for the whole raster dataset
+     */
     private GeneralEnvelope originalEnvelope;
 
     private GeneralGridRange originalGridRange;
@@ -99,15 +101,8 @@ class RasterInfo {
      * @param pyramidInfo
      *            the pyramidInfo to set
      */
-    void setPyramidInfo(PyramidInfo pyramidInfo) {
-        this.pyramidInfo = pyramidInfo;
-    }
-
-    /**
-     * @return the pyramidInfo
-     */
-    public PyramidInfo getPyramidInfo() {
-        return pyramidInfo;
+    void setPyramidInfo(List<PyramidInfo> pyramidInfo) {
+        this.subRasterInfo = pyramidInfo;
     }
 
     public GridSampleDimension[] getGridSampleDimensions() {
@@ -127,6 +122,8 @@ class RasterInfo {
 
         final Color[] RGB = { Color.RED, Color.GREEN, Color.BLUE };
         final String[] RGBCatNames = { "red", "green", "blue" };
+
+        List<RasterBandInfo> bands = subRasterInfo.get(0).getBands();
 
         for (RasterBandInfo band : bands) {
             final int bandNumber = band.getBandNumber();
@@ -168,7 +165,7 @@ class RasterInfo {
     }
 
     public int getNumBands() {
-        return getBands().size();
+        return subRasterInfo.get(0).getNumBands();
     }
 
     public void setImageWidth(int imageWidth) {
@@ -188,66 +185,47 @@ class RasterInfo {
     }
 
     /**
-     * @param bands
-     *            the bands to set
-     */
-    void setBands(List<RasterBandInfo> bands) {
-        this.bands = bands;
-    }
-
-    /**
-     * @return the bands
-     */
-    public List<RasterBandInfo> getBands() {
-        return new ArrayList<RasterBandInfo>(bands);
-    }
-
-    public RasterBandInfo getBand(int index) {
-        return bands.get(index);
-    }
-
-    /**
-     * @param coverageCrs
-     *            the coverageCrs to set
-     */
-    public void setCoverageCrs(CoordinateReferenceSystem coverageCrs) {
-        this.coverageCrs = coverageCrs;
-    }
-
-    /**
      * @return the coverageCrs
      */
     public CoordinateReferenceSystem getCoverageCrs() {
-        return coverageCrs;
+        return subRasterInfo.get(0).getCoordinateReferenceSystem();
     }
 
     /**
-     * @param originalGridRange
-     *            the originalGridRange to set
-     */
-    public void setOriginalGridRange(GeneralGridRange originalGridRange) {
-        this.originalGridRange = originalGridRange;
-    }
-
-    /**
-     * @return the originalGridRange
+     * @return the originalGridRange for the whole raster dataset
      */
     public GeneralGridRange getOriginalGridRange() {
+        if (originalGridRange == null) {
+            Rectangle range = null;
+            for (PyramidInfo pyramid : subRasterInfo) {
+                Rectangle levelZeroRange = pyramid.getPyramidLevel(0).getImageRange();
+                if (range == null) {
+                    range = levelZeroRange;
+                } else {
+                    range.add(levelZeroRange);
+                }
+            }
+            originalGridRange = new GeneralGridRange(range);
+        }
         return originalGridRange;
-    }
-
-    /**
-     * @param originalEnvelope
-     *            the originalEnvelope to set
-     */
-    public void setOriginalEnvelope(GeneralEnvelope originalEnvelope) {
-        this.originalEnvelope = originalEnvelope;
     }
 
     /**
      * @return the originalEnvelope
      */
     public GeneralEnvelope getOriginalEnvelope() {
+        if (originalEnvelope == null) {
+            GeneralEnvelope env = null;
+            for (PyramidInfo raster : subRasterInfo) {
+                GeneralEnvelope rasterEnvelope = raster.getOriginalEnvelope();
+                if (env == null) {
+                    env = new GeneralEnvelope(rasterEnvelope);
+                } else {
+                    env.add(rasterEnvelope);
+                }
+            }
+            originalEnvelope = env;
+        }
         return originalEnvelope;
     }
 
@@ -258,10 +236,61 @@ class RasterInfo {
         sb.append(", raster columns: ").append(Arrays.asList(getRasterColumns()));
         sb.append(", Num bands: ").append(getNumBands());
         sb.append(", Dimension: ").append(getImageWidth()).append("x").append(getImageHeight());
-        for (RasterBandInfo band : getBands()) {
-            sb.append("\n\t").append(band.toString());
+        for (PyramidInfo pyramid : subRasterInfo) {
+            sb.append("\n\t").append(pyramid.toString());
         }
         return sb.toString();
+    }
+
+    public int getRasterCount() {
+        return subRasterInfo.size();
+    }
+
+    public RasterBandInfo getBand(final int rasterIndex, final int bandIndex) {
+        PyramidInfo rasterInfo = getRasterInfo(rasterIndex);
+        return rasterInfo.getBand(bandIndex);
+    }
+
+    public int getNumPyramidLevels(final int rasterIndex) {
+        PyramidInfo rasterInfo = getRasterInfo(rasterIndex);
+        return rasterInfo.getNumLevels();
+    }
+
+    public GeneralEnvelope getEnvelope(final int rasterIndex, final int pyramidLevel) {
+        PyramidLevelInfo level = getLevel(rasterIndex, pyramidLevel);
+        return new GeneralEnvelope(level.getEnvelope());
+    }
+
+    public Rectangle getGridRange(final int rasterIndex, final int pyramidLevel) {
+        PyramidLevelInfo level = getLevel(rasterIndex, pyramidLevel);
+        Rectangle levelRange = level.getImageRange();
+        return levelRange;
+    }
+
+    public int getNumTilesWide(int rasterIndex, int pyramidLevel) {
+        PyramidLevelInfo level = getLevel(rasterIndex, pyramidLevel);
+        return level.getNumTilesWide();
+    }
+
+    public int getNumTilesHigh(int rasterIndex, int pyramidLevel) {
+        PyramidLevelInfo level = getLevel(rasterIndex, pyramidLevel);
+        return level.getNumTilesHigh();
+    }
+
+    public Dimension getTileDimension(int rasterIndex) {
+        PyramidInfo rasterInfo = getRasterInfo(rasterIndex);
+        return rasterInfo.getTileDimension();
+    }
+
+    private PyramidLevelInfo getLevel(int rasterIndex, int pyramidLevel) {
+        PyramidInfo rasterInfo = getRasterInfo(rasterIndex);
+        PyramidLevelInfo level = rasterInfo.getPyramidLevel(pyramidLevel);
+        return level;
+    }
+
+    private PyramidInfo getRasterInfo(int rasterIndex) {
+        PyramidInfo rasterInfo = subRasterInfo.get(rasterIndex);
+        return rasterInfo;
     }
 
 }

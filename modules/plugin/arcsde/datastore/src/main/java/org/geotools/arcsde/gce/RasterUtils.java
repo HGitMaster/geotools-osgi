@@ -51,7 +51,7 @@ import com.esri.sde.sdk.pe.PeProjectionException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32466 2009-02-11 00:19:18Z groldan $
+ * @version $Id: RasterUtils.java 32472 2009-02-11 17:32:48Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -211,12 +211,13 @@ class RasterUtils {
     }
 
     public static QueryInfo fitRequestToRaster(final GeneralEnvelope requestedEnvelope,
-            final Rectangle requestedDim, final PyramidInfo pyramidInfo, final int pyramidLevel) {
-        final PyramidLevelInfo level = pyramidInfo.getPyramidLevel(pyramidLevel);
+            final Rectangle requestedDim, final RasterInfo rasterInfo, final int rasterIndex,
+            final int pyramidLevel) {
 
         final CoordinateReferenceSystem nativeCrs;
         {
-            nativeCrs = level.getEnvelope().getCoordinateReferenceSystem();
+            GeneralEnvelope envelope = rasterInfo.getEnvelope(rasterIndex, pyramidLevel);
+            nativeCrs = envelope.getCoordinateReferenceSystem();
             CoordinateReferenceSystem requestCrs = requestedEnvelope.getCoordinateReferenceSystem();
             if (!CRS.equalsIgnoreMetadata(nativeCrs, requestCrs)) {
                 throw new IllegalArgumentException("Request CRS and native CRS shall be equivalent");
@@ -228,9 +229,9 @@ class RasterUtils {
         queryInfo.requestedDim = requestedDim;
         queryInfo.pyramidLevel = pyramidLevel;
 
-        final Rectangle levelGridRange = level.getRange();
+        final Rectangle levelGridRange = rasterInfo.getGridRange(rasterIndex, pyramidLevel);
 
-        final GeneralEnvelope levelEnvelope = new GeneralEnvelope(level.getEnvelope());
+        final GeneralEnvelope levelEnvelope = rasterInfo.getEnvelope(rasterIndex, pyramidLevel);
         final MathTransform rasterToModel = createRasterToModel(levelGridRange, levelEnvelope);
 
         Rectangle pixelSpaceOverlappingArea;
@@ -241,9 +242,11 @@ class RasterUtils {
             queryInfo.resultEnvelope = getResultEnvelope(pixelSpaceOverlappingArea, rasterToModel,
                     nativeCrs);
 
-            Dimension tileSize = pyramidInfo.getTileDimension();
-            queryInfo.matchingTiles = finaMatchingTiles(tileSize, level.getNumTilesWide(), level
-                    .getNumTilesHigh(), pixelSpaceOverlappingArea);
+            Dimension tileSize = rasterInfo.getTileDimension(rasterIndex);
+            int numTilesWide = rasterInfo.getNumTilesWide(rasterIndex, pyramidLevel);
+            int numTilesHigh = rasterInfo.getNumTilesHigh(rasterIndex, pyramidLevel);
+            queryInfo.matchingTiles = finaMatchingTiles(tileSize, numTilesWide, numTilesHigh,
+                    pixelSpaceOverlappingArea);
             queryInfo.resultDimension = getResultDimensionForTileRange(queryInfo.matchingTiles,
                     tileSize, pixelSpaceOverlappingArea);
         }
@@ -326,8 +329,7 @@ class RasterUtils {
         int numTilesX = (int) Math.ceil(pixelRange.getWidth() / tileSize.getWidth());
         int numTilesY = (int) Math.ceil(pixelRange.getHeight() / tileSize.getHeight());
 
-        Rectangle matchingTiles = new Rectangle(minTileX, minTileY, numTilesX - minTileX, numTilesY
-                - minTileY);
+        Rectangle matchingTiles = new Rectangle(minTileX, minTileY, numTilesX, numTilesY);
         return matchingTiles;
     }
 

@@ -48,6 +48,8 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
@@ -86,7 +88,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32466 2009-02-11 00:19:18Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32472 2009-02-11 17:32:48Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -102,12 +104,12 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
     private DefaultServiceInfo serviceInfo;
 
-    public ArcSDEGridCoverage2DReaderJAI(ArcSDERasterFormat parent,
-            ArcSDEConnectionPool connectionPool, RasterInfo rasterInfo, Hints hints)
-            throws IOException {
+    public ArcSDEGridCoverage2DReaderJAI(final ArcSDERasterFormat parent,
+            final ArcSDEConnectionPool connectionPool, final RasterInfo rasterInfo,
+            final Hints hints) throws IOException {
         // check it's a supported format
         {
-            final int bitsPerSample = rasterInfo.getBand(0).getCellType().getBitsPerSample();
+            final int bitsPerSample = rasterInfo.getBand(0, 0).getCellType().getBitsPerSample();
             if (rasterInfo.getNumBands() > 1 && (bitsPerSample == 1 || bitsPerSample == 4)) {
                 throw new IllegalArgumentException(bitsPerSample
                         + "-bit rasters with more than one band are not supported");
@@ -117,15 +119,16 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         this.connectionPool = connectionPool;
         this.rasterInfo = rasterInfo;
 
-        final PyramidInfo pyramidInfo = rasterInfo.getPyramidInfo();
-
         super.hints = hints;
         super.coverageFactory = CoverageFactoryFinder.getGridCoverageFactory(this.hints);
         super.crs = rasterInfo.getCoverageCrs();
         super.originalEnvelope = rasterInfo.getOriginalEnvelope();
-        super.originalGridRange = rasterInfo.getOriginalGridRange();
+
+        GeneralGridEnvelope gridRange = rasterInfo.getOriginalGridRange();
+        super.originalGridRange = new GeneralGridRange(gridRange.toRectangle());
+
         super.coverageName = rasterInfo.getRasterTable();
-        final int numLevels = pyramidInfo.getNumLevels();
+        final int numLevels = rasterInfo.getNumPyramidLevels(0);
 
         // level 0 is not an overview, but the raster itself
         super.numOverviews = numLevels - 1;
@@ -138,23 +141,24 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         // highestRes = new double[2];
         // highestRes[0] = pyramidInfo.getPyramidLevel(0).getXRes();
         // highestRes[1] = pyramidInfo.getPyramidLevel(0).getYRes();
-        PyramidLevelInfo levelZero = pyramidInfo.getPyramidLevel(0);
-        highestRes = super
-                .getResolution(new GeneralEnvelope(levelZero.getEnvelope()),
-                        new Rectangle2D.Double(0, 0, levelZero.getSize().width,
-                                levelZero.getSize().height), crs);
+        GeneralEnvelope levelZeroEnvelope = rasterInfo.getEnvelope(0, 0);
+        highestRes = super.getResolution(new GeneralEnvelope(levelZeroEnvelope),
+                new Rectangle2D.Double(0, 0, originalGridRange.getSpan(0), originalGridRange
+                        .getSpan(1)), crs);
         // //
         //
         // get information for the successive images
         //
         // //
+        // REVISIT may the different rasters in the raster dataset have different pyramid levels? I
+        // guess so
         if (numOverviews > 0) {
             overViewResolutions = new double[numOverviews][2];
             for (int pyramidLevel = 1; pyramidLevel <= numOverviews; pyramidLevel++) {
-                PyramidLevelInfo level = pyramidInfo.getPyramidLevel(pyramidLevel);
-                overViewResolutions[pyramidLevel - 1] = super.getResolution(new GeneralEnvelope(
-                        level.getEnvelope()), new Rectangle2D.Double(0, 0, level.getSize().width,
-                        level.getSize().height), crs);
+                Rectangle levelGridRange = rasterInfo.getGridRange(0, pyramidLevel);
+                GeneralEnvelope levelEnvelope = rasterInfo.getEnvelope(0, pyramidLevel);
+                overViewResolutions[pyramidLevel - 1] = super.getResolution(levelEnvelope,
+                        levelGridRange, crs);
             }
         } else {
             overViewResolutions = null;
@@ -195,7 +199,6 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             requestedEnvelope = opParams.requestedEnvelope;
             requestedDim = opParams.dim;
         }
-        final PyramidInfo pyramidInfo = rasterInfo.getPyramidInfo();
 
         /*
          * set params
@@ -208,7 +211,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         try {
             pyramidLevelChoice = setReadParams(overviewPolicy, readP, requestedEnvelope,
                     requestedDim);
-            LOGGER.info("Pyramid level chosen: " + pyramidInfo.getPyramidLevel(pyramidLevelChoice));
+            LOGGER.info("Pyramid level chosen: " + pyramidLevelChoice);
         } catch (TransformException e) {
             new IllegalArgumentException(e);
         }
@@ -216,8 +219,9 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         /*
          * Obtain the tiles, pixel range, and resulting envelope
          */
+
         final QueryInfo rasterQueryInfo = RasterUtils.fitRequestToRaster(requestedEnvelope,
-                requestedDim, pyramidInfo, pyramidLevelChoice);
+                requestedDim, rasterInfo, 0, pyramidLevelChoice);
 
         LOGGER.info(rasterQueryInfo.toString());
 
@@ -449,14 +453,14 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         final int tiledImageWidth = tileReader.getTilesWide() * tileReader.getTileWidth();
         final int tiledImageHeight = tileReader.getTilesHigh() * tileReader.getTileHeight();
 
-        // Prepare temporaray colorModel and sample model, needed to build the final
+        // Prepare temporary colorModel and sample model, needed to build the final
         // ArcSDEPyramidLevel level;
         final ColorModel colorModel;
         final SampleModel sampleModel;
         {
             final int bitsPerSample = pixelType.getBitsPerSample();
             final int dataType = pixelType.getDataBufferType();
-            final RasterBandInfo bandOne = rasterInfo.getBand(0);
+            final RasterBandInfo bandOne = rasterInfo.getBand(0, 0);
             final boolean hasColorMap = bandOne.isColorMapped();
             if (hasColorMap) {
                 LOGGER.fine("Found single-band colormapped raster, using its index color model");

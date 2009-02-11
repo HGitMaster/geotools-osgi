@@ -129,8 +129,7 @@ public class RasterUtilsTest {
         levelEnvelope.setEnvelope(levelExtent.getMinX(), levelExtent.getMinY(), levelExtent
                 .getMaxX(), levelExtent.getMaxY());
 
-        MathTransform rasterToModel = RasterUtils
-                .createRasterToModel(levelGridRange, levelEnvelope);
+        MathTransform rasterToModel = RasterUtils.createRasterToModel(levelGridRange, levelEnvelope);
 
         Rectangle matchingDimension = RasterUtils.calculateMatchingLevelDimension(
                 requestedEnvelope, rasterToModel, levelGridRange);

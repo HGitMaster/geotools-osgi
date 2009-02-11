@@ -20,6 +20,7 @@ package org.geotools.arcsde.gce;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
+import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 /**
@@ -51,20 +52,20 @@ class PyramidLevelInfo {
      *            the offset of the image at this level on the y axis, >= 0
      * @param numTilesWide
      * @param numTilesHigh
-     * @param size
-     *            the dimensions of the level
+     * @param levelSize
+     *            the size of the actual image inside the tiled pixel range
      */
     PyramidLevelInfo(int level, ReferencedEnvelope extent, int xOffset, int yOffset,
-            int numTilesWide, int numTilesHigh, Dimension size) {
+            int numTilesWide, int numTilesHigh, Dimension levelSize) {
         this.pyramidLevel = level;
-        this.xRes = (extent.getMaxX() - extent.getMinX()) / size.width;
-        this.yRes = (extent.getMaxY() - extent.getMinY()) / size.height;
+        this.xRes = (extent.getMaxX() - extent.getMinX()) / levelSize.width;
+        this.yRes = (extent.getMaxY() - extent.getMinY()) / levelSize.height;
         this.envelope = extent;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
         this.xTiles = numTilesWide;
         this.yTiles = numTilesHigh;
-        this.size = size;
+        this.size = levelSize;
     }
 
     /**
@@ -124,13 +125,18 @@ class PyramidLevelInfo {
     }
 
     /**
-     * @return The total number of pixels in the image at this level
+     * @return The total number of pixels in the image at this level as whole tiles
      */
     public Dimension getSize() {
         return size;
     }
-    
-    public Rectangle getRange(){
+
+    /**
+     * The rectangle covering the actual raster data inside the tiled space
+     * 
+     * @return
+     */
+    public Rectangle getImageRange() {
         final int offsetX = getXOffset();
         final int offsetY = getYOffset();
 
@@ -138,8 +144,7 @@ class PyramidLevelInfo {
          * get the range of actual data pixels in this pyramid level in pixel space, offset and
          * trailing no data pixels to fill up the tile space do not count
          */
-        final Rectangle levelRange = new Rectangle(offsetX, offsetY, size.width,
-                size.height);
+        final Rectangle levelRange = new Rectangle(offsetX, offsetY, size.width, size.height);
         return levelRange;
     }
 

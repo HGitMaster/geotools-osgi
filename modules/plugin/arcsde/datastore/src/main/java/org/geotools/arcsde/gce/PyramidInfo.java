@@ -18,12 +18,13 @@
 package org.geotools.arcsde.gce;
 
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -54,15 +55,13 @@ class PyramidInfo {
 
     private int tileWidth;
 
-    public int getTileWidth() {
-        return tileWidth;
-    }
-
-    public int getTileHeight() {
-        return tileHeight;
-    }
-
     private int tileHeight;
+
+    private GeneralEnvelope originalEnvelope;
+
+    private ArrayList<RasterBandInfo> bands;
+
+    private CoordinateReferenceSystem crs;
 
     /**
      * Creates an in-memory representation of an ArcSDE Raster Pyramid. Basically it wraps the
@@ -76,6 +75,7 @@ class PyramidInfo {
      */
     public PyramidInfo(final SeRasterAttr rasterAttributes, final CoordinateReferenceSystem crs)
             throws DataSourceException {
+        this.crs = crs;
         try {
             // levels goes from 0 to N, maxLevel is the zero-based max index of levels
             final int numLevels = rasterAttributes.getMaxLevel() + 1;
@@ -97,7 +97,7 @@ class PyramidInfo {
                 final int levelWidth = rasterAttributes.getImageWidthByLevel(level);
                 final int levelHeight = rasterAttributes.getImageHeightByLevel(level);
 
-                Dimension size = new Dimension(levelWidth, levelHeight);
+                Dimension levelImageSize = new Dimension(levelWidth, levelHeight);
 
                 SDEPoint imageOffset = rasterAttributes.getImageOffsetByLevel(level);
                 int xOffset = (int) (imageOffset == null ? 0 : imageOffset.getX());
@@ -106,12 +106,20 @@ class PyramidInfo {
                 int tilesPerRow = rasterAttributes.getTilesPerRowByLevel(level);
                 int tilesPerCol = rasterAttributes.getTilesPerColByLevel(level);
                 addPyramidLevel(level, levelExtent, xOffset, yOffset, tilesPerRow, tilesPerCol,
-                        size);
+                        levelImageSize);
             }
 
         } catch (SeException se) {
             throw new DataSourceException(se);
         }
+    }
+
+    public int getTileWidth() {
+        return tileWidth;
+    }
+
+    public int getTileHeight() {
+        return tileHeight;
     }
 
     /**
@@ -147,16 +155,16 @@ class PyramidInfo {
      *            the zero-based level index for the new level
      * @param extent
      *            the geographical extent the level covers
-     * @param crs
-     *            DON'T USE
-     * @param offset
-     *            DON'T USE
+     * @param xOffset
+     *            the offset on the X axis of the actual image inside the tile space for this level
+     * @param yOffset
+     *            the offset on the Y axis of the actual image inside the tile space for this level
      * @param numTilesWide
-     *            DON'T USE
+     *            the number of tiles that make up the level on the X axis
      * @param numTilesHigh
-     *            DON'T USE
+     *            the number of tiles that make up the level on the Y axis
      * @param imageSize
-     *            DON'T USE
+     *            the size of the actual image in pixels
      */
     void addPyramidLevel(int level, ReferencedEnvelope extent, int xOffset, int yOffset,
             int numTilesWide, int numTilesHigh, Dimension imageSize) {
@@ -168,17 +176,6 @@ class PyramidInfo {
         pyramidList.add(pyramidLevel);
 
         Collections.sort(pyramidList, levelComparator);
-    }
-
-    public static class RasterQueryInfo {
-
-        public Rectangle requestedPixels;
-
-        public ReferencedEnvelope requestedEnvelope;
-
-        public Rectangle actualPixels;
-
-        public ReferencedEnvelope actualEnvelope;
     }
 
     @Override
@@ -193,25 +190,31 @@ class PyramidInfo {
         return b.toString();
     }
 
-    // public ReferencedEnvelope getTileExtent(int pyramidLevel, int tileX, int tileY) {
-    // final ArcSDEPyramidLevel level = getPyramidLevel(pyramidLevel);
-    // final ReferencedEnvelope levelExtent = level.getEnvelope();
-    // ReferencedEnvelope tileExtent = new ReferencedEnvelope(levelExtent
-    // .getCoordinateReferenceSystem());
-    // double xres = level.getXRes();
-    // double yres = level.getYRes();
-    //
-    // double tileWidth = getTileWidth();
-    // double tileHeight = getTileHeight();
-    //
-    // double tileSpanXGeo = xres * tileWidth;
-    // double tileSpanYGeo = yres * tileHeight;
-    //
-    // double minx = levelExtent.getMinX() + (tileX * tileSpanXGeo);
-    // double miny = levelExtent.getMinY() + (tileY * tileSpanYGeo);
-    //
-    // tileExtent.expandToInclude(minx, miny);
-    // tileExtent.expandToInclude(minx + tileSpanXGeo, miny + tileSpanYGeo);
-    // return tileExtent;
-    // }
+    void setOriginalEnvelope(GeneralEnvelope originalEnvelope) {
+        this.originalEnvelope = originalEnvelope;
+    }
+
+    public GeneralEnvelope getOriginalEnvelope() {
+        return originalEnvelope;
+    }
+
+    void setBands(List<RasterBandInfo> bands) {
+        this.bands = new ArrayList<RasterBandInfo>(bands);
+    }
+
+    public List<RasterBandInfo> getBands() {
+        return new ArrayList<RasterBandInfo>(bands);
+    }
+
+    public int getNumBands() {
+        return bands.size();
+    }
+
+    public RasterBandInfo getBand(final int index) {
+        return bands.get(0);
+    }
+
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return crs;
+    }
 }

@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import org.geotools.arcsde.gce.ArcSDERasterFormat;
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 import org.geotools.util.logging.Logging;
-import org.opengis.coverage.grid.Format;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.pe.PeCoordinateSystem;
@@ -47,13 +46,9 @@ public class ArcSDERasterFormatFactory implements GridFormatFactorySpi {
     protected static final Logger LOGGER = Logging.getLogger(ArcSDERasterFormatFactory.class
             .getName());
 
-    /** friendly factory description */
-    // private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 9.x Raster Support via
-    // GridCoverageExchange Interface";
+
     /**
-     * DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
+     * @see GridFormatFactorySpi#isAvailable()
      */
     public boolean isAvailable() {
         LOGGER.fine("Checking availability of ArcSDE Jars.");
@@ -74,13 +69,13 @@ public class ArcSDERasterFormatFactory implements GridFormatFactorySpi {
      * @see GridFormatFactorySpi#createFormat()
      */
     public ArcSDERasterFormat createFormat() {
-        return new ArcSDERasterFormat();
+        return ArcSDERasterFormat.getInstance();
     }
 
     /**
      * Returns the implementation hints. The default implementation returns en empty map.
      * 
-     * @return DOCUMENT ME!
+     * @return the empty map, this factory make no use of any implementation hint so far
      */
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;
