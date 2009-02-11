@@ -465,7 +465,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         final List<RasterBandInfo> bands;
         final CoordinateReferenceSystem coverageCrs;
         final GeneralEnvelope originalEnvelope;
-        final ArcSDEPyramid pyramidInfo;
+        final PyramidInfo pyramidInfo;
 
         rasterColumns = getRasterColumns(scon, rasterTable);
         final SeRasterAttr rasterAttributes = getSeRasterAttr(scon, rasterTable, rasterColumns);
@@ -479,7 +479,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             SeCoordinateReference seCoordRef = rCol.getCoordRef();
             coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
         }
-        pyramidInfo = new ArcSDEPyramid(rasterAttributes, coverageCrs);
+        pyramidInfo = new PyramidInfo(rasterAttributes, coverageCrs);
 
         if (levelZeroPRP != null) {
             int tileWidth = pyramidInfo.getTileWidth();
@@ -520,9 +520,9 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         return rasterInfo;
     }
 
-    private GeneralGridRange calculateOriginalGridRange(ArcSDEPyramid pyramidInfo) {
+    private GeneralGridRange calculateOriginalGridRange(PyramidInfo pyramidInfo) {
         // final int numLevels = pyramidInfo.getNumLevels();
-        final ArcSDEPyramidLevel highestRes = pyramidInfo.getPyramidLevel(0);
+        final PyramidLevelInfo highestRes = pyramidInfo.getPyramidLevel(0);
 
         final int width = highestRes.size.width;
         final int height = highestRes.size.height;

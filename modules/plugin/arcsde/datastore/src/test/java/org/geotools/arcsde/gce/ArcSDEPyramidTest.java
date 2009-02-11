@@ -24,9 +24,9 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.gce.ArcSDEPyramid;
+import org.geotools.arcsde.gce.PyramidInfo;
 import org.geotools.arcsde.gce.RasterCellType;
-import org.geotools.arcsde.gce.ArcSDEPyramid.RasterQueryInfo;
+import org.geotools.arcsde.gce.PyramidInfo.RasterQueryInfo;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -60,7 +60,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
- * @version $Id: ArcSDEPyramidTest.java 32465 2009-02-11 00:12:14Z groldan $
+ * @version $Id: ArcSDEPyramidTest.java 32466 2009-02-11 00:19:18Z groldan $
  */
 public class ArcSDEPyramidTest {
 
@@ -75,7 +75,7 @@ public class ArcSDEPyramidTest {
     }
 
     /**
-     * test case for {@link ArcSDEPyramid#pickOptimalRasterLevel(ReferencedEnvelope, Rectangle)}
+     * test case for {@link PyramidInfo#pickOptimalRasterLevel(ReferencedEnvelope, Rectangle)}
      */
     @Test
     public void testPickOptimalPyramidLevel() {
@@ -100,9 +100,9 @@ public class ArcSDEPyramidTest {
      * 
      * @return
      */
-    private ArcSDEPyramid createPyramid() {
+    private PyramidInfo createPyramid() {
 
-        ArcSDEPyramid pyramid = new ArcSDEPyramid(1013, 1021);
+        PyramidInfo pyramid = new PyramidInfo(1013, 1021);
 
         final CoordinateReferenceSystem crs = DefaultEngineeringCRS.CARTESIAN_2D;
 
@@ -130,7 +130,7 @@ public class ArcSDEPyramidTest {
 
     @Test
     public void testArcSDEPyramidHypothetical() throws Exception {
-        ArcSDEPyramid pyramid = createPyramid();
+        PyramidInfo pyramid = createPyramid();
         System.out.println(pyramid);
 
         RasterTestData testData = new RasterTestData();
@@ -160,7 +160,7 @@ public class ArcSDEPyramidTest {
         CoordinateReferenceSystem crs = CRS.parseWKT(coordRefWKT); // CRS.decode(testData.
         // getRasterTestDataProperty
         // ("tableCRS"));
-        pyramid = new ArcSDEPyramid(rAttr, crs);
+        pyramid = new PyramidInfo(rAttr, crs);
         conn.close();
 
         System.out.println(pyramid);

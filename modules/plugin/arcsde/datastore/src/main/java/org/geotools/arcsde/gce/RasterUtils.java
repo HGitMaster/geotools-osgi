@@ -51,7 +51,7 @@ import com.esri.sde.sdk.pe.PeProjectionException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32465 2009-02-11 00:12:14Z groldan $
+ * @version $Id: RasterUtils.java 32466 2009-02-11 00:19:18Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -211,8 +211,8 @@ class RasterUtils {
     }
 
     public static QueryInfo fitRequestToRaster(final GeneralEnvelope requestedEnvelope,
-            final Rectangle requestedDim, final ArcSDEPyramid pyramidInfo, final int pyramidLevel) {
-        final ArcSDEPyramidLevel level = pyramidInfo.getPyramidLevel(pyramidLevel);
+            final Rectangle requestedDim, final PyramidInfo pyramidInfo, final int pyramidLevel) {
+        final PyramidLevelInfo level = pyramidInfo.getPyramidLevel(pyramidLevel);
 
         final CoordinateReferenceSystem nativeCrs;
         {

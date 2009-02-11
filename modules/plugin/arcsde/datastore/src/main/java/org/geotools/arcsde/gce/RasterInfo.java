@@ -34,7 +34,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32465 2009-02-11 00:12:14Z groldan $
+ * @version $Id: RasterInfo.java 32466 2009-02-11 00:19:18Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -49,7 +49,7 @@ class RasterInfo {
     private String[] rasterColumns;
 
     /** Array holding information on each level of the pyramid in this raster. * */
-    private ArcSDEPyramid pyramidInfo;
+    private PyramidInfo pyramidInfo;
 
     private List<RasterBandInfo> bands;
 
@@ -99,14 +99,14 @@ class RasterInfo {
      * @param pyramidInfo
      *            the pyramidInfo to set
      */
-    void setPyramidInfo(ArcSDEPyramid pyramidInfo) {
+    void setPyramidInfo(PyramidInfo pyramidInfo) {
         this.pyramidInfo = pyramidInfo;
     }
 
     /**
      * @return the pyramidInfo
      */
-    public ArcSDEPyramid getPyramidInfo() {
+    public PyramidInfo getPyramidInfo() {
         return pyramidInfo;
     }
 

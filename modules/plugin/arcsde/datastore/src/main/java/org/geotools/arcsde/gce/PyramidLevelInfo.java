@@ -30,7 +30,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @author sfarber
  * 
  */
-class ArcSDEPyramidLevel {
+class PyramidLevelInfo {
     private int pyramidLevel, xOffset, yOffset, xTiles, yTiles;
 
     private double xRes, yRes;
@@ -54,7 +54,7 @@ class ArcSDEPyramidLevel {
      * @param size
      *            the dimensions of the level
      */
-    ArcSDEPyramidLevel(int level, ReferencedEnvelope extent, int xOffset, int yOffset,
+    PyramidLevelInfo(int level, ReferencedEnvelope extent, int xOffset, int yOffset,
             int numTilesWide, int numTilesHigh, Dimension size) {
         this.pyramidLevel = level;
         this.xRes = (extent.getMaxX() - extent.getMinX()) / size.width;

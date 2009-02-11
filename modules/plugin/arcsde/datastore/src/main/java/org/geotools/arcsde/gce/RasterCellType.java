@@ -30,10 +30,10 @@ import com.esri.sde.sdk.client.SeRaster;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterCellType.java 32465 2009-02-11 00:12:14Z groldan $
+ * @version $Id: RasterCellType.java 32466 2009-02-11 00:19:18Z groldan $
  * @source $URL$
  */
-enum RasterCellType {
+public enum RasterCellType {
     TYPE_16BIT_S(16, DataBuffer.TYPE_SHORT, true, NumberRange.create(Short.MIN_VALUE,
             Short.MAX_VALUE)), //
     TYPE_16BIT_U(16, DataBuffer.TYPE_USHORT, false, NumberRange.create((int) 0, (int) 65535)), //

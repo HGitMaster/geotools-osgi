@@ -17,8 +17,6 @@
  */
 package org.geotools.arcsde.gce.band;
 
-import static org.geotools.arcsde.gce.RasterCellType.TYPE_32BIT_REAL;
-
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
@@ -36,7 +34,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.gce.InterleaveType;
 import org.geotools.arcsde.gce.RasterCellType;
 import org.geotools.arcsde.gce.RasterTestData;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
@@ -98,7 +95,6 @@ public class FloatBandCopierTest {
             rConstraint.setLevel(0);
             rConstraint.setEnvelope(0, 0, 0, 0);
             final int interleave = rAttr.getInterleave();
-            System.out.println(InterleaveType.valueOf(interleave));
             rConstraint.setInterleave(interleave);
 
             q.queryRasterTile(rConstraint);
