@@ -46,7 +46,7 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32478 2009-02-12 16:07:10Z groldan $
+ * @version $Id: RasterInfo.java 32479 2009-02-12 18:41:58Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -213,7 +213,7 @@ class RasterInfo {
             int maxx = Integer.MIN_VALUE;
             int maxy = Integer.MIN_VALUE;
 
-            final int rasterCount = getRasterCount();
+            final int rasterCount = getNumRasters();
             for (int rasterN = 0; rasterN < rasterCount; rasterN++) {
                 final GeneralEnvelope rasterEnvelope = getEnvelope(rasterN, 0);
                 final Rectangle rasterGridRange = getGridRange(rasterN, 0);
@@ -305,7 +305,7 @@ class RasterInfo {
         return sb.toString();
     }
 
-    public int getRasterCount() {
+    public int getNumRasters() {
         return subRasterInfo.size();
     }
 
@@ -379,5 +379,10 @@ class RasterInfo {
 
     public RasterCellType getCellType() {
         return getBand(0, 0).getCellType();
+    }
+
+    public long getRasterId(final int rasterIndex) {
+        final PyramidInfo rasterInfo = getRasterInfo(rasterIndex);
+        return rasterInfo.getRasterId();
     }
 }

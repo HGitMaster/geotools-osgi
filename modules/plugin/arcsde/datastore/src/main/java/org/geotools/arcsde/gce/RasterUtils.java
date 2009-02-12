@@ -34,6 +34,9 @@ import javax.imageio.ImageTypeSpecifier;
 
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -43,6 +46,10 @@ import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.geometry.Envelope;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
@@ -62,7 +69,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32473 2009-02-11 21:28:44Z groldan $
+ * @version $Id: RasterUtils.java 32479 2009-02-12 18:41:58Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -183,6 +190,8 @@ class RasterUtils {
 
         private Rectangle resultDimension;
 
+        private long rasterId;
+
         @Override
         public String toString() {
             StringBuilder s = new StringBuilder("[Raster query info:");
@@ -194,6 +203,14 @@ class RasterUtils {
             s.append("\n\tresult dimension     : ").append(resultDimension);
             s.append("\n]");
             return s.toString();
+        }
+
+        /**
+         * @return the rasterId (as in SeRaster.getId()) for the raster in the raster dataset this
+         *         query works upon
+         */
+        public long getRasterId() {
+            return rasterId;
         }
 
         public GeneralEnvelope getRequestedEnvelope() {
@@ -236,9 +253,10 @@ class RasterUtils {
         }
 
         QueryInfo queryInfo = new QueryInfo();
+        queryInfo.rasterId = rasterInfo.getRasterId(rasterIndex);
+        queryInfo.pyramidLevel = pyramidLevel;
         queryInfo.requestedEnvelope = requestedEnvelope;
         queryInfo.requestedDim = requestedDim;
-        queryInfo.pyramidLevel = pyramidLevel;
 
         final Rectangle levelGridRange = rasterInfo.getGridRange(rasterIndex, pyramidLevel);
 
@@ -512,5 +530,83 @@ class RasterUtils {
 
         final ImageTypeSpecifier its = new ImageTypeSpecifier(colorModel, sampleModel);
         return its;
+    }
+
+    public static ArcSDEGridCoverage2DReaderJAI.ReadParameters parseReadParams(
+            final GeneralEnvelope coverageEnvelope, final GeneralParameterValue[] params)
+            throws IllegalArgumentException {
+        if (params == null) {
+            throw new IllegalArgumentException("No GeneralParameterValue given to read operation");
+        }
+
+        GeneralEnvelope reqEnvelope = null;
+        Rectangle dim = null;
+        OverviewPolicy overviewPolicy = null;
+
+        // /////////////////////////////////////////////////////////////////////
+        //
+        // Checking params
+        //
+        // /////////////////////////////////////////////////////////////////////
+        for (int i = 0; i < params.length; i++) {
+            final ParameterValue<?> param = (ParameterValue<?>) params[i];
+            final String name = param.getDescriptor().getName().getCode();
+            if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())) {
+                final GridGeometry2D gg = (GridGeometry2D) param.getValue();
+                reqEnvelope = new GeneralEnvelope((Envelope) gg.getEnvelope2D());
+
+                CoordinateReferenceSystem nativeCrs = coverageEnvelope
+                        .getCoordinateReferenceSystem();
+                CoordinateReferenceSystem requestCrs = reqEnvelope.getCoordinateReferenceSystem();
+                if (!CRS.equalsIgnoreMetadata(nativeCrs, requestCrs)) {
+                    LOGGER.info("Request CRS and native CRS differ, "
+                            + "reprojecting request envelope to native CRS");
+                    ReferencedEnvelope nativeCrsEnv;
+                    nativeCrsEnv = toNativeCrs(reqEnvelope, nativeCrs);
+                    reqEnvelope = new GeneralEnvelope(nativeCrsEnv);
+                }
+
+                dim = gg.getGridRange2D().getBounds();
+                continue;
+            }
+            if (name.equals(AbstractGridFormat.OVERVIEW_POLICY.getName().toString())) {
+                overviewPolicy = (OverviewPolicy) param.getValue();
+                continue;
+            }
+        }
+
+        if (dim == null && reqEnvelope == null) {
+            throw new ParameterNotFoundException("Parameter is mandatory and shall provide "
+                    + "the extent and dimension to request", AbstractGridFormat.READ_GRIDGEOMETRY2D
+                    .getName().toString());
+        }
+
+        if (!reqEnvelope.intersects(coverageEnvelope, true)) {
+            throw new IllegalArgumentException(
+                    "The requested extend does not overlap the coverage extent: "
+                            + coverageEnvelope);
+        }
+
+        if (dim.width <= 0 || dim.height <= 0) {
+            throw new IllegalArgumentException("The requested coverage dimension can't be null: "
+                    + dim);
+        }
+
+        if (overviewPolicy == null) {
+            LOGGER.finer("No overview policy requested, defaulting to QUALITY");
+            overviewPolicy = OverviewPolicy.QUALITY;
+        }
+        LOGGER.fine("Overview policy is " + overviewPolicy);
+
+        LOGGER.info("Reading raster for " + dim.getWidth() + "x" + dim.getHeight()
+                + " requested dim and " + reqEnvelope.getMinimum(0) + ","
+                + reqEnvelope.getMaximum(0) + " - " + reqEnvelope.getMinimum(1)
+                + reqEnvelope.getMaximum(1) + " requested extent");
+
+        ArcSDEGridCoverage2DReaderJAI.ReadParameters parsedParams = new ArcSDEGridCoverage2DReaderJAI.ReadParameters();
+        parsedParams.requestedEnvelope = reqEnvelope;
+        parsedParams.dim = dim;
+        parsedParams.overviewPolicy = overviewPolicy;
+        return parsedParams;
     }
 }

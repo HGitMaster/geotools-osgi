@@ -96,7 +96,7 @@ import com.esri.sde.sdk.pe.PeFactory;
 import com.esri.sde.sdk.pe.PePCSDefs;
 import com.esri.sde.sdk.pe.PeProjectedCS;
 
-@SuppressWarnings({"nls", "deprecation"})
+@SuppressWarnings( { "nls", "deprecation" })
 public class RasterTestData {
 
     private TestData testData;
@@ -124,7 +124,7 @@ public class RasterTestData {
         // }
     }
 
-    public void deleteTable(final String tableName) throws Exception{
+    public void deleteTable(final String tableName) throws Exception {
         testData.deleteTable(tableName, false);
     }
 
@@ -148,6 +148,8 @@ public class RasterTestData {
 
     public String getRasterTableName(final RasterCellType cellType, final int numBands)
             throws IOException {
+        String typeString = cellType.toString();
+        typeString = typeString.substring("TYPE_".length());
         String testTableName = testData.getTempTableName() + "_" + cellType + "_" + numBands
                 + "_BAND";
         return testTableName;
@@ -356,16 +358,7 @@ public class RasterTestData {
 
         final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
         try {
-            // much of this code is from
-            // http://edndoc.esri.com/arcsde/9.2/concepts/rasters/dataloading/dataloading.htm
-            SeRasterColumn rasCol = new SeRasterColumn(conn);
-            rasCol.setTableName(tableName);
-            rasCol.setDescription("Sample geotools ArcSDE raster test-suite data.");
-            rasCol.setRasterColumnName("RASTER");
-            rasCol.setCoordRef(crs);
-            rasCol.setConfigurationKeyword(testData.getConfigKeyword());
-
-            rasCol.create();
+            createRasterColumn(tableName, crs, conn);
 
             // now start loading the actual raster data
             BufferedImage sampleImage = ImageIO.read(org.geotools.test.TestData.getResource(null,
@@ -568,6 +561,100 @@ public class RasterTestData {
     }
 
     /**
+     * Creates a simple raster catalog, extent and grid range coincide for easier assertions.
+     * <p>
+     * The catalog rasters are not inserted in left-right, top-bottom direction though, as it may
+     * happen in real life.
+     * </p>
+     * <p>
+     * The grid extent layout is as follows (invert Y for pixel layout):
+     * 
+     * <pre>
+     *   0,512       256,512       512,512
+     *       _____________________
+     *      |          |          |
+     *      |          |          |
+     *      |     3    |    1     |
+     *      |          |          |
+     *      |__________|__________| 512,256
+     *  0,256          |256,256   |
+     *                 |          |
+     *                 |    2     |
+     *                 |          |
+     *                 |__________|
+     *    0,0       256,0          512,0
+     * </pre>
+     * 
+     * </p>
+     * 
+     * @return
+     * @throws Exception
+     */
+    public String loadRasterCatalog() throws Exception {
+        final int numberOfBands = 1;
+        final RasterCellType pixelType = TYPE_8BIT_U;
+        final String tableName = getRasterTableName(pixelType, numberOfBands) + "_CAT";
+
+        {
+            // clean out the table if it's currently in-place
+            testData.deleteTable(tableName);
+            // build the base business table. We'll add the raster data to it in a bit
+            // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
+            ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+            try {
+                createRasterBusinessTempTable(tableName, conn);
+            } finally {
+                conn.close();
+            }
+        }
+
+        final SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
+
+        final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+        try {
+            createRasterColumn(tableName, crs, conn);
+
+            int imageWidth = 256;
+            int imageHeight = 256;
+            SeExtent extent;
+            int maxLevels;
+
+            maxLevels = 3;
+            extent = new SeExtent(256, 256, 512, 512);
+            addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
+                    pixelType, maxLevels, extent);
+
+            maxLevels = 3;
+            extent = new SeExtent(256, 0, 512, 256);
+            addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
+                    pixelType, maxLevels, extent);
+
+            maxLevels = 3;
+            extent = new SeExtent(0, 256, 256, 512);
+            addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
+                    pixelType, maxLevels, extent);
+        } finally {
+            conn.close();
+        }
+
+        return tableName;
+    }
+
+    private void addRasterToCatalog(ArcSDEPooledConnection conn, String tableName,
+            SeCoordinateReference crs, int numberOfBands, int imageWidth, int imageHeight,
+            RasterCellType pixelType, int maxLevels, SeExtent extent) throws ArcSdeException,
+            SeException, CloneNotSupportedException {
+
+        IndexColorModel colorModel = null;
+        boolean skipLevelOne = false;
+        int interpolationType = SeRaster.SE_INTERPOLATION_NEAREST;
+
+        addRasterAttribute(tableName, numberOfBands, imageWidth, imageHeight, pixelType,
+                colorModel, maxLevels, skipLevelOne, interpolationType, extent, conn);
+
+    }
+
+    /**
      * Creates a a raster in the database with some default settings and the provided parameters.
      * <p>
      * Default settings
@@ -633,148 +720,168 @@ public class RasterTestData {
             }
         }
 
+        final SeExtent extent = new SeExtent(0, 0, 2 * imageWidth, 2 * imageHeight);
         final SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
 
         final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
         try {
-            // much of this code is from
-            // http://edndoc.esri.com/arcsde/9.2/concepts/rasters/dataloading/dataloading.htm
-            SeRasterColumn rasCol = new SeRasterColumn(conn);
-            rasCol.setTableName(tableName);
-            rasCol.setDescription("Sample geotools ArcSDE raster test-suite data.");
-            rasCol.setRasterColumnName("RASTER");
-            rasCol.setCoordRef(crs);
-            rasCol.setConfigurationKeyword(testData.getConfigKeyword());
+            createRasterColumn(tableName, crs, conn);
 
-            rasCol.create();
-
-            SeRasterAttr attr = new SeRasterAttr(true);
-            attr.setImageSize(imageWidth, imageHeight, numberOfBands);
-            int tileWidth = imageWidth >> 4;
-            int tileHeight = imageHeight >> 4;
-            attr.setTileSize(tileWidth, tileHeight); // this is lower than the recommended minimum
-            // of 128,128 but
-            // it's ok for our testing purposes
-            attr.setPixelType(pixelType.getSeRasterPixelType());
-            attr.setCompressionType(SeRaster.SE_COMPRESSION_NONE);
+            int maxLevels;
             if (pyramiding) {
-                int maxLevels;
+                int tileWidth = imageWidth >> 4;
                 if (forceNumLevels == null) {
                     maxLevels = (imageWidth / (4 * tileWidth)) - 1;
                 } else {
                     maxLevels = forceNumLevels;
                 }
-                attr.setPyramidInfo(maxLevels, skipLevelOne, interpolationType);
+            } else {
+                maxLevels = 0;
             }
-            attr.setInterleave(true, SeRaster.SE_RASTER_INTERLEAVE_BIP);
-            attr.setMaskMode(false);
-            attr.setImportMode(false);
-
-            SeExtent extent = new SeExtent(0, 0, 2 * imageWidth, 2 * imageHeight);
-            attr.setExtent(extent);
-
-            // attr.setImageOrigin();
-
-            SeRasterProducer prod = new SeRasterProducer() {
-                public void addConsumer(SeRasterConsumer consumer) {
-                }
-
-                public boolean isConsumer(SeRasterConsumer consumer) {
-                    return false;
-                }
-
-                public void removeConsumer(SeRasterConsumer consumer) {
-                }
-
-                /**
-                 * Note that due to some synchronization problems inherent in the SDE api code, the
-                 * startProduction() method MUST return before consumer.setScanLines() or
-                 * consumer.setRasterTiles() is called. Hence the thread implementation.
-                 */
-                public void startProduction(final SeRasterConsumer consumer) {
-                    if (!(consumer instanceof SeRasterRenderedImage)) {
-                        throw new IllegalArgumentException(
-                                "You must set SeRasterAttr.setImportMode(false) to "
-                                        + "load data using this SeProducer implementation.");
-                    }
-
-                    Thread runme = new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                PixelSampler sampler = PixelSampler.getSampler(pixelType);
-                                // for each band...
-                                for (int bandN = 0; bandN < numberOfBands; bandN++) {
-                                    final byte[] imgBandData;
-                                    imgBandData = sampler.getImgBandData(imageWidth, imageHeight,
-                                            bandN, numberOfBands);
-                                    consumer.setScanLines(imageHeight, imgBandData, null);
-                                    consumer.rasterComplete(SeRasterConsumer.SINGLEFRAMEDONE);
-                                }
-                                consumer.rasterComplete(SeRasterConsumer.STATICIMAGEDONE);
-                            } catch (Exception se) {
-                                se.printStackTrace();
-                                consumer.rasterComplete(SeRasterConsumer.IMAGEERROR);
-                            }
-                        }
-                    };
-                    runme.start();
-                }
-            };
-            attr.setRasterProducer(prod);
-
-            try {
-                SeInsert insert = new SeInsert(conn);
-                insert.intoTable(tableName, new String[] { "RASTER" });
-                // no buffered writes on raster loads
-                insert.setWriteMode(false);
-                SeRow row = insert.getRowToSet();
-                row.setRaster(0, attr);
-                // import the data
-                insert.execute();
-                insert.close();
-            } catch (SeException se) {
-                new ArcSdeException(se).printStackTrace();
-                throw se;
-            }
-
-            // if there's a colormap to insert, let's add that too
-            if (colorModel != null) {
-                try {
-                    SeQuery query = new SeQuery(conn, new String[] { "RASTER" },
-                            new SeSqlConstruct(tableName));
-                    query.prepareQuery();
-                    query.execute();
-                    SeRow row = query.fetch();
-                    attr = row.getRaster(0);
-                    SeRaster raster = attr.getRasterInfo();
-                    SeRasterBand band1 = raster.getBands()[0];
-                    final int numEntries = 256;
-                    // number of colors, including alpha, if any
-                    final int numBanks = colorModel.getNumComponents();
-                    final int colorMapType = numBanks == 3 ? SeRaster.SE_COLORMAP_RGB
-                            : SeRaster.SE_COLORMAP_RGBA;
-                    final int dataType = SeRaster.SE_COLORMAP_DATA_BYTE;
-                    DataBufferByte dataBuffer = new DataBufferByte(numEntries, numBanks);
-                    for (int elem = 0; elem < numEntries; elem++) {
-                        dataBuffer.setElem(0, colorModel.getRed(elem));
-                        dataBuffer.setElem(1, colorModel.getGreen(elem));
-                        dataBuffer.setElem(2, colorModel.getBlue(elem));
-                        if (numBanks == 4) {
-                            dataBuffer.setElem(3, colorModel.getAlpha(elem));
-                        }
-                    }
-                    band1.setColorMap(colorMapType, dataBuffer);
-                    band1.alter();
-                } catch (SeException e) {
-                    e.printStackTrace();
-                    throw new ArcSdeException(e);
-                }
-            }
+            addRasterAttribute(tableName, numberOfBands, imageWidth, imageHeight, pixelType,
+                    colorModel, maxLevels, skipLevelOne, interpolationType, extent, conn);
 
         } finally {
             conn.close();
         }
+    }
+
+    private void addRasterAttribute(final String tableName, final int numberOfBands,
+            final int imageWidth, final int imageHeight, final RasterCellType pixelType,
+            final IndexColorModel colorModel, final int maxPyramidLevel,
+            final boolean skipLevelOne, final int interpolationType, final SeExtent extent,
+            final ArcSDEPooledConnection conn) throws SeException, CloneNotSupportedException,
+            ArcSdeException {
+        SeRasterAttr attr = new SeRasterAttr(true);
+        attr.setImageSize(imageWidth, imageHeight, numberOfBands);
+        int tileWidth = imageWidth >> 4;
+        int tileHeight = imageHeight >> 4;
+        attr.setTileSize(tileWidth, tileHeight); // this is lower than the recommended minimum
+        // of 128,128 but
+        // it's ok for our testing purposes
+        attr.setPixelType(pixelType.getSeRasterPixelType());
+        attr.setCompressionType(SeRaster.SE_COMPRESSION_NONE);
+
+        attr.setPyramidInfo(maxPyramidLevel, skipLevelOne, interpolationType);
+
+        attr.setInterleave(true, SeRaster.SE_RASTER_INTERLEAVE_BIP);
+        attr.setMaskMode(false);
+        attr.setImportMode(false);
+
+        attr.setExtent(extent);
+
+        // attr.setImageOrigin();
+
+        SeRasterProducer prod = new SeRasterProducer() {
+            public void addConsumer(SeRasterConsumer consumer) {
+            }
+
+            public boolean isConsumer(SeRasterConsumer consumer) {
+                return false;
+            }
+
+            public void removeConsumer(SeRasterConsumer consumer) {
+            }
+
+            /**
+             * Note that due to some synchronization problems inherent in the SDE api code, the
+             * startProduction() method MUST return before consumer.setScanLines() or
+             * consumer.setRasterTiles() is called. Hence the thread implementation.
+             */
+            public void startProduction(final SeRasterConsumer consumer) {
+                if (!(consumer instanceof SeRasterRenderedImage)) {
+                    throw new IllegalArgumentException(
+                            "You must set SeRasterAttr.setImportMode(false) to "
+                                    + "load data using this SeProducer implementation.");
+                }
+
+                Thread runme = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            PixelSampler sampler = PixelSampler.getSampler(pixelType);
+                            // for each band...
+                            for (int bandN = 0; bandN < numberOfBands; bandN++) {
+                                final byte[] imgBandData;
+                                imgBandData = sampler.getImgBandData(imageWidth, imageHeight,
+                                        bandN, numberOfBands);
+                                consumer.setScanLines(imageHeight, imgBandData, null);
+                                consumer.rasterComplete(SeRasterConsumer.SINGLEFRAMEDONE);
+                            }
+                            consumer.rasterComplete(SeRasterConsumer.STATICIMAGEDONE);
+                        } catch (Exception se) {
+                            se.printStackTrace();
+                            consumer.rasterComplete(SeRasterConsumer.IMAGEERROR);
+                        }
+                    }
+                };
+                runme.start();
+            }
+        };
+        attr.setRasterProducer(prod);
+
+        try {
+            SeInsert insert = new SeInsert(conn);
+            insert.intoTable(tableName, new String[] { "RASTER" });
+            // no buffered writes on raster loads
+            insert.setWriteMode(false);
+            SeRow row = insert.getRowToSet();
+            row.setRaster(0, attr);
+            // import the data
+            insert.execute();
+            insert.close();
+        } catch (SeException se) {
+            new ArcSdeException(se).printStackTrace();
+            throw se;
+        }
+
+        // if there's a colormap to insert, let's add that too
+        if (colorModel != null) {
+            try {
+                SeQuery query = new SeQuery(conn, new String[] { "RASTER" }, new SeSqlConstruct(
+                        tableName));
+                query.prepareQuery();
+                query.execute();
+                SeRow row = query.fetch();
+                attr = row.getRaster(0);
+                SeRaster raster = attr.getRasterInfo();
+                SeRasterBand band1 = raster.getBands()[0];
+                final int numEntries = 256;
+                // number of colors, including alpha, if any
+                final int numBanks = colorModel.getNumComponents();
+                final int colorMapType = numBanks == 3 ? SeRaster.SE_COLORMAP_RGB
+                        : SeRaster.SE_COLORMAP_RGBA;
+                final int dataType = SeRaster.SE_COLORMAP_DATA_BYTE;
+                DataBufferByte dataBuffer = new DataBufferByte(numEntries, numBanks);
+                for (int elem = 0; elem < numEntries; elem++) {
+                    dataBuffer.setElem(0, colorModel.getRed(elem));
+                    dataBuffer.setElem(1, colorModel.getGreen(elem));
+                    dataBuffer.setElem(2, colorModel.getBlue(elem));
+                    if (numBanks == 4) {
+                        dataBuffer.setElem(3, colorModel.getAlpha(elem));
+                    }
+                }
+                band1.setColorMap(colorMapType, dataBuffer);
+                band1.alter();
+            } catch (SeException e) {
+                e.printStackTrace();
+                throw new ArcSdeException(e);
+            }
+        }
+    }
+
+    private void createRasterColumn(final String tableName, final SeCoordinateReference crs,
+            final ArcSDEPooledConnection conn) throws SeException {
+        // much of this code is from
+        // http://edndoc.esri.com/arcsde/9.2/concepts/rasters/dataloading/dataloading.htm
+        SeRasterColumn rasCol = new SeRasterColumn(conn);
+        rasCol.setTableName(tableName);
+        rasCol.setDescription("Sample geotools ArcSDE raster test-suite data.");
+        rasCol.setRasterColumnName("RASTER");
+        rasCol.setCoordRef(crs);
+        rasCol.setConfigurationKeyword(testData.getConfigKeyword());
+
+        rasCol.create();
     }
 
     /**
@@ -1040,7 +1147,7 @@ public class RasterTestData {
                     for (int h = 0; h < imgHeight; h++) {
                         imgBandData[(w * imgHeight) + h] = val;
                     }
-                    val+=step;
+                    val += step;
                 }
                 return imgBandData;
             }

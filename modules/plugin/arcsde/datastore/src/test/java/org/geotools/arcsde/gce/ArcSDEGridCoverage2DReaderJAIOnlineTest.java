@@ -33,11 +33,13 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.GridRange2D;
 import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.data.DataSourceException;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
@@ -243,9 +245,27 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
 
     @Test
     @Ignore
-    public void testReadRasterCatalog() throws Exception {
+    public void testReadRasterCatalogOnline() throws Exception {
         tableName = "SDE.IMG_USGSQUAD_2_TILES";
         GridCoverage2D coverage = testReadFullLevel0(TYPE_8BIT_U, 1, "RasterCatalog");
+    }
+
+    @Test
+    public void testReadRasterCatalog() throws Exception {
+        tableName = rasterTestData.loadRasterCatalog();
+        GridCoverage2D coverage = testReadFullLevel0(TYPE_8BIT_U, 1, "RasterCatalog");
+
+        GridGeometry2D gridGeometry = coverage.getGridGeometry();
+        Envelope2D envelope2D = gridGeometry.getEnvelope2D();
+        GridRange2D gridRange2D = gridGeometry.getGridRange2D();
+
+        assertEquals(-256, envelope2D.getMinX(), 1.0E-5);
+        assertEquals(-256, envelope2D.getMinY(), 1.0E-5);
+        assertEquals(256, envelope2D.getMaxX(), 1.0E-5);
+        assertEquals(256, envelope2D.getMaxY(), 1.0E-5);
+
+        assertEquals(512, gridRange2D.getWidth());
+        assertEquals(512, gridRange2D.getHeight());
     }
 
     private void testReadFullLevel0(final RasterCellType cellType, final int numBands)
@@ -469,7 +489,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         }
     }
 
-    private void writeToDisk(final RenderedImage image, String fileName) {
+    private void writeToDisk(final RenderedImage image, String fileName) throws Exception {
         if (!DEBUG) {
             LOGGER.fine("DEBUG == false, not writing image to disk");
             return;
@@ -486,6 +506,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
             System.out.println(" - wrote in " + t + "ms" + file);
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
 
