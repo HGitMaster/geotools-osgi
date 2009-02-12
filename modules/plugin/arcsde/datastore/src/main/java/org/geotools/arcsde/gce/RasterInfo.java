@@ -29,17 +29,24 @@ import javax.imageio.ImageTypeSpecifier;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.datum.PixelInCell;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32473 2009-02-11 21:28:44Z groldan $
+ * @version $Id: RasterInfo.java 32478 2009-02-12 16:07:10Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -193,18 +200,77 @@ class RasterInfo {
      */
     public GeneralGridRange getOriginalGridRange() {
         if (originalGridRange == null) {
-            Rectangle range = null;
-            for (PyramidInfo pyramid : subRasterInfo) {
-                Rectangle levelZeroRange = pyramid.getPyramidLevel(0).getImageRange();
-                if (range == null) {
-                    range = levelZeroRange;
-                } else {
-                    range.add(levelZeroRange);
-                }
+            final MathTransform modelToRaster;
+            try {
+                final MathTransform rasterToModel = getRasterToModel();
+                modelToRaster = rasterToModel.inverse();
+            } catch (NoninvertibleTransformException e) {
+                throw new IllegalStateException("Can't create transform from model to raster");
             }
+
+            int minx = Integer.MAX_VALUE;
+            int miny = Integer.MAX_VALUE;
+            int maxx = Integer.MIN_VALUE;
+            int maxy = Integer.MIN_VALUE;
+
+            final int rasterCount = getRasterCount();
+            for (int rasterN = 0; rasterN < rasterCount; rasterN++) {
+                final GeneralEnvelope rasterEnvelope = getEnvelope(rasterN, 0);
+                final Rectangle rasterGridRange = getGridRange(rasterN, 0);
+                GeneralEnvelope rasterGridRangeInDataSet;
+                try {
+                    rasterGridRangeInDataSet = CRS.transform(modelToRaster, rasterEnvelope);
+                } catch (NoninvertibleTransformException e) {
+                    throw new IllegalArgumentException(e);
+                } catch (TransformException e) {
+                    throw new IllegalArgumentException(e);
+                }
+
+                minx = Math.min(minx, (int) Math.floor(rasterGridRangeInDataSet.getMinimum(0)));
+                miny = Math.min(miny, (int) Math.floor(rasterGridRangeInDataSet.getMinimum(1)));
+                maxx = Math.max(maxx, (int) Math.ceil(rasterGridRangeInDataSet.getMaximum(0)));
+                maxy = Math.max(maxy, (int) Math.ceil(rasterGridRangeInDataSet.getMaximum(1)));
+
+                System.out.println("Original raster grid range   : " + rasterGridRange);
+                System.out.println("Raster grid range in dataset : "
+                        + rasterGridRangeInDataSet.toRectangle2D());
+
+            }
+            Rectangle range = new Rectangle(minx, miny, maxx - minx, maxy - miny);
+            System.out.println("Dataset grid range   : " + range);
             originalGridRange = new GeneralGridRange(range);
         }
         return originalGridRange;
+        // if (originalGridRange == null) {
+        // Rectangle range = null;
+        // for (PyramidInfo pyramid : subRasterInfo) {
+        // Rectangle levelZeroRange = pyramid.getPyramidLevel(0).getImageRange();
+        // if (range == null) {
+        // range = levelZeroRange;
+        // } else {
+        // range.add(levelZeroRange);
+        // }
+        // }
+        // originalGridRange = new GeneralGridRange(range);
+        // }
+        // return originalGridRange;
+    }
+
+    public MathTransform getRasterToModel() {
+
+        GeneralEnvelope firstRasterEnvelope = getEnvelope(0, 0);
+        Rectangle firstRasterGridRange = getGridRange(0, 0);
+        // GridToEnvelopeMapper works upon GridEnvelope. GeneralGridEnvelope includes the border
+        // edges in computations, GeneralGridRange doesn't, so use a GeneralEnvelope instead
+        GeneralGridEnvelope gridRange = new GeneralGridEnvelope(firstRasterGridRange, 2);
+
+        // create a raster to model transform, from this tile pixel space to the tile's geographic
+        // extent
+        GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(gridRange, firstRasterEnvelope);
+        geMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
+
+        final MathTransform rasterToModel = geMapper.createTransform();
+        return rasterToModel;
     }
 
     /**

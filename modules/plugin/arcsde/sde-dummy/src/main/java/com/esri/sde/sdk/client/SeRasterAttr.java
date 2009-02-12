@@ -78,5 +78,10 @@ public class SeRasterAttr {
         // TODO Auto-generated method stub
         
     }
+
+    public SeObjectId getRasterId() throws SeException{
+        // TODO Auto-generated method stub
+        return null;
+    }
     
 }

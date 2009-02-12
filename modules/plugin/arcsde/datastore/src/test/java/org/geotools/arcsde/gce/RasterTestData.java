@@ -125,7 +125,7 @@ public class RasterTestData {
     }
 
     public void deleteTable(final String tableName) throws Exception{
-        testData.deleteTable(tableName);
+        testData.deleteTable(tableName, false);
     }
 
     public ArcSDEConnectionPool getConnectionPool() throws DataSourceException {

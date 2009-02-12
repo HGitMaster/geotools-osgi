@@ -63,6 +63,8 @@ class PyramidInfo {
 
     private CoordinateReferenceSystem crs;
 
+    private long rasterId;
+
     /**
      * Creates an in-memory representation of an ArcSDE Raster Pyramid. Basically it wraps the
      * supplide SeRasterAttr object and implements some convenience logic for extracting
@@ -77,6 +79,7 @@ class PyramidInfo {
             throws DataSourceException {
         this.crs = crs;
         try {
+            this.rasterId = rasterAttributes.getRasterId().longValue();
             // levels goes from 0 to N, maxLevel is the zero-based max index of levels
             final int numLevels = rasterAttributes.getMaxLevel() + 1;
             pyramidList = new ArrayList<PyramidLevelInfo>(numLevels);
@@ -112,6 +115,10 @@ class PyramidInfo {
         } catch (SeException se) {
             throw new DataSourceException(se);
         }
+    }
+
+    public long getRasterId() {
+        return rasterId;
     }
 
     public int getTileWidth() {

@@ -22,7 +22,6 @@ import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_S;
 import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_U;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -113,14 +112,15 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     private static final Map<String, ArcSDEConnectionConfig> connectionConfigs = new WeakHashMap<String, ArcSDEConnectionConfig>();
 
     private static final ArcSDERasterFormat instance = new ArcSDERasterFormat();
+
     /**
      * Creates an instance and sets the metadata.
      */
     private ArcSDERasterFormat() {
         setInfo();
     }
-    
-    public static ArcSDERasterFormat getInstance(){
+
+    public static ArcSDERasterFormat getInstance() {
         return instance;
     }
 
@@ -178,7 +178,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             LOGGER
                     .log(Level.SEVERE, "Unable to creata ArcSDERasterReader for " + source + ".",
                             dse);
-            return null;
+            throw new RuntimeException(dse);
         }
     }
 
@@ -438,26 +438,12 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             final String coverageUrl) throws IOException {
         LOGGER.fine("Gathering raster dataset metadata for " + coverageUrl);
         String rasterTable;
-        Point levelZeroPRP = null;
         {
             String sdeUrl = coverageUrl;
             if (sdeUrl.indexOf(";") != -1) {
                 final String extraParams = sdeUrl.substring(sdeUrl.indexOf(";") + 1, sdeUrl
                         .length());
                 sdeUrl = sdeUrl.substring(0, sdeUrl.indexOf(";"));
-
-                // Right now we only support one kind of extra parameter, so we'll
-                // pull it out here.
-                if (extraParams.indexOf("LZERO_ORIGIN_TILE=") != -1) {
-                    String offsetTile = extraParams.substring(extraParams
-                            .indexOf("LZERO_ORIGIN_TILE=") + 18);
-                    int xOffsetTile = Integer.parseInt(offsetTile.substring(0, offsetTile
-                            .indexOf(",")));
-                    int yOffsetTile = Integer.parseInt(offsetTile
-                            .substring(offsetTile.indexOf(",") + 1));
-                    levelZeroPRP = new Point(xOffsetTile, yOffsetTile);
-                }
-
             }
             rasterTable = sdeUrl.substring(sdeUrl.indexOf("#") + 1);
             if (LOGGER.isLoggable(Level.FINE)) {
@@ -468,35 +454,44 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         final String[] rasterColumns = getRasterColumns(scon, rasterTable);
         final List<PyramidInfo> rastersLayoutInfo = new ArrayList<PyramidInfo>();
         {
-            final PyramidInfo pyramidInfo;
             final List<RasterBandInfo> bands;
 
-            final SeRasterAttr rasterAttributes = getSeRasterAttr(scon, rasterTable, rasterColumns);
+            final List<SeRasterAttr> rasterAttributes = getSeRasterAttr(scon, rasterTable,
+                    rasterColumns);
+
+            if (rasterAttributes.size() == 0) {
+                throw new IllegalArgumentException("Table " + rasterTable
+                        + " contains no raster datasets");
+            }
 
             final CoordinateReferenceSystem coverageCrs;
-            SeRasterColumn rasterColumn;
+            {
+                SeRasterColumn rasterColumn;
+                try {
+                    SeRasterAttr ratt = rasterAttributes.get(0);
+                    rasterColumn = new SeRasterColumn(scon, ratt.getRasterColumnId());
+                    bands = setUpBandInfo(scon, rasterTable, ratt);
+                } catch (SeException e) {
+                    throw new ArcSdeException(e);
+                }
+                final SeCoordinateReference seCoordRef = rasterColumn.getCoordRef();
+                coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
+            }
             try {
-                rasterColumn = new SeRasterColumn(scon, rasterAttributes.getRasterColumnId());
+                for (SeRasterAttr rAtt : rasterAttributes) {
+                    LOGGER.fine("Gathering raster metadata for " + rasterTable + " raster "
+                            + rAtt.getRasterId().longValue());
+                    PyramidInfo pyramidInfo = new PyramidInfo(rAtt, coverageCrs);
+                    rastersLayoutInfo.add(pyramidInfo);
+
+                    final GeneralEnvelope originalEnvelope;
+                    originalEnvelope = calculateOriginalEnvelope(rAtt, coverageCrs);
+                    pyramidInfo.setOriginalEnvelope(originalEnvelope);
+                    pyramidInfo.setBands(bands);
+                }
             } catch (SeException e) {
-                throw new ArcSdeException(e);
+                throw new ArcSdeException("Gathering raster dataset information", e);
             }
-            SeCoordinateReference seCoordRef = rasterColumn.getCoordRef();
-            coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
-            pyramidInfo = new PyramidInfo(rasterAttributes, coverageCrs);
-
-            rastersLayoutInfo.add(pyramidInfo);
-            // REVISIT: I'm still not completely sure what levelZeroPRP was for, ask Saul
-            if (levelZeroPRP != null) {
-                int tileWidth = pyramidInfo.getTileWidth();
-                int tileHeight = pyramidInfo.getTileHeight();
-                levelZeroPRP = new Point(levelZeroPRP.x * tileWidth, levelZeroPRP.y * tileHeight);
-            }
-            bands = setUpBandInfo(scon, rasterTable, rasterAttributes);
-
-            final GeneralEnvelope originalEnvelope;
-            originalEnvelope = calculateOriginalEnvelope(rasterAttributes, coverageCrs);
-            pyramidInfo.setOriginalEnvelope(originalEnvelope);
-            pyramidInfo.setBands(bands);
         }
 
         RasterInfo rasterInfo = new RasterInfo();
@@ -716,19 +711,24 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         return gridBands;
     }
 
-    private SeRasterAttr getSeRasterAttr(ArcSDEPooledConnection scon, String rasterTable,
+    private List<SeRasterAttr> getSeRasterAttr(ArcSDEPooledConnection scon, String rasterTable,
             String[] rasterColumns) throws IOException {
 
+        LOGGER.fine("Gathering raster attributes for " + rasterTable);
         SeRasterAttr rasterAttributes;
+        List<SeRasterAttr> rasterAttList = new ArrayList<SeRasterAttr>();
         SeQuery query = null;
         try {
-
             query = new SeQuery(scon, rasterColumns, new SeSqlConstruct(rasterTable));
             query.prepareQuery();
             query.execute();
 
-            SeRow r = query.fetch();
-            rasterAttributes = r.getRaster(0);
+            SeRow row = query.fetch();
+            while (row != null) {
+                rasterAttributes = row.getRaster(0);
+                rasterAttList.add(rasterAttributes);
+                row = query.fetch();
+            }
         } catch (SeException se) {
             throw new ArcSdeException("Error fetching raster attributes for " + rasterTable, se);
         } finally {
@@ -740,7 +740,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 }
             }
         }
-        return rasterAttributes;
+        LOGGER.fine("Found " + rasterAttList.size() + " raster attributes for " + rasterTable);
+        return rasterAttList;
     }
 
     private List<RasterBandInfo> setUpBandInfo(ArcSDEPooledConnection scon, String rasterTable,

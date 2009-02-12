@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.Command;
 import org.geotools.arcsde.pool.ISession;
@@ -73,7 +74,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/TestData.java $
- * @version $Id: TestData.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: TestData.java 32478 2009-02-12 16:07:10Z groldan $
  */
 @SuppressWarnings( { "nls", "unchecked" })
 public class TestData {
@@ -259,8 +260,13 @@ public class TestData {
 
     public void deleteTable(final String typeName) throws IOException,
             UnavailableArcSDEConnectionException {
+        deleteTable(typeName, true);
+    }
+
+    public void deleteTable(final String typeName, final boolean ignoreFailure) throws IOException,
+            UnavailableArcSDEConnectionException {
         SessionPool connectionPool = getConnectionPool();
-        deleteTable(connectionPool, typeName);
+        deleteTable(connectionPool, typeName, ignoreFailure);
     }
 
     /**
@@ -269,16 +275,12 @@ public class TestData {
      * @param connPool
      *            to get the connection to use in deleting {@link #getTempTableName()}
      */
-    public void deleteTempTable(SessionPool connPool) {
-        try {
-            deleteTable(connPool, getTempTableName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void deleteTempTable(SessionPool connPool) throws IOException {
+        deleteTable(connPool, getTempTableName(), false);
     }
 
-    private static void deleteTable(final SessionPool connPool, final String tableName)
-            throws IOException, UnavailableArcSDEConnectionException {
+    private static void deleteTable(final SessionPool connPool, final String tableName,
+            final boolean ignoreFailure) throws IOException, UnavailableArcSDEConnectionException {
 
         final ISession session = connPool.getSession();
 
@@ -302,7 +304,10 @@ public class TestData {
                 try {
                     table.delete();
                 } catch (SeException ignorable) {
-                    // table did not already exist
+                    // table did not already exist? or was locked...
+                    if (!ignoreFailure) {
+                        throw new ArcSdeException(ignorable);
+                    }
                 }
                 return null;
             }

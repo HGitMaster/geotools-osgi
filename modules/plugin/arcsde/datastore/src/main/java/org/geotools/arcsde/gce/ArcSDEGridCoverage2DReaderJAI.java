@@ -85,7 +85,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32474 2009-02-11 22:39:25Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32478 2009-02-12 16:07:10Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -135,13 +135,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         // setting the higher resolution avalaible for this coverage
         //
         // ///
-        // highestRes = new double[2];
-        // highestRes[0] = pyramidInfo.getPyramidLevel(0).getXRes();
-        // highestRes[1] = pyramidInfo.getPyramidLevel(0).getYRes();
-        GeneralEnvelope levelZeroEnvelope = rasterInfo.getEnvelope(0, 0);
-        highestRes = super.getResolution(new GeneralEnvelope(levelZeroEnvelope),
-                new Rectangle2D.Double(0, 0, originalGridRange.getSpan(0), originalGridRange
-                        .getSpan(1)), crs);
+        highestRes = super.getResolution(originalEnvelope,
+                originalGridRange.toRectangle(), crs);
         // //
         //
         // get information for the successive images
