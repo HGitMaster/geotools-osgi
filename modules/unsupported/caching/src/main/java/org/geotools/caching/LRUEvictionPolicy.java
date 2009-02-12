@@ -29,21 +29,30 @@ import org.geotools.caching.spatialindex.NodeIdentifier;
  * </p>
  */
 public class LRUEvictionPolicy implements EvictionPolicy {
-    Map<NodeIdentifier, Object> queue;
-    EvictableTree tree;
+    private Map<NodeIdentifier, Object> queue;
+    private EvictableTree tree;
 
     public LRUEvictionPolicy(EvictableTree tree) {
         this.queue = new LinkedHashMap<NodeIdentifier, Object>(100, .75f, true);
         this.tree = tree;
     }
 
-    public void evict() {
+    public boolean evict() {
         Iterator<NodeIdentifier> it = queue.keySet().iterator();
-        if (it.hasNext()) {
+        while(it.hasNext()){
             NodeIdentifier node = it.next();
-            tree.evict(node);
-            queue.remove(node);
+            if (!node.isLocked()){
+                node.writeLock();
+                try{
+                    tree.evict(node);
+                    queue.remove(node);    
+                }finally{
+                    node.writeUnLock();
+                }
+                return true;
+            }
         }
+        return false;
     }
 
     public void access(NodeIdentifier node) {
@@ -53,4 +62,8 @@ public class LRUEvictionPolicy implements EvictionPolicy {
             queue.put(node, null);
         }
     }
+    
+//    public boolean canEvict(){
+//    	return queue.size() > 0;
+//    }
 }

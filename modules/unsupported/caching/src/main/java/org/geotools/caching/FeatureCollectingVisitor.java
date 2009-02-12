@@ -30,7 +30,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  */
 public class FeatureCollectingVisitor implements Visitor {
-    FeatureCollection fc;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> fc;
     int visited_nodes = 0;
 
     public FeatureCollectingVisitor(SimpleFeatureType type) {
@@ -40,7 +40,7 @@ public class FeatureCollectingVisitor implements Visitor {
     /**
      * @param d Must be a SimpleFeature 
      */
-    public void visitData(Data d) {
+    public void visitData(Data<?> d) {
         fc.add((SimpleFeature) d.getData());
     }
 
@@ -51,7 +51,7 @@ public class FeatureCollectingVisitor implements Visitor {
     /**
      * @return the collection of features visited
      */
-    public FeatureCollection getCollection() {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getCollection() {
         return fc;
     }
 

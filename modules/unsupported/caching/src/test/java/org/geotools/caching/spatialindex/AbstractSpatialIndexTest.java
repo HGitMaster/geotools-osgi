@@ -19,6 +19,7 @@ package org.geotools.caching.spatialindex;
 import junit.framework.TestCase;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
@@ -49,9 +50,15 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
     protected void setUp() {
         index = createIndex();
         regions = new ArrayList<Region>(setSize);
-        
         double width = universe.getHigh(0) - universe.getLow(0);
         double height = universe.getHigh(1) - universe.getLow(1);
+        
+        //validate all nodes as data is only inserted into validated nodes
+        for (int i = 0; i < index.rootNode.getChildrenCount(); i ++){
+        	NodeIdentifier child = index.rootNode.getChildIdentifier(i);
+        	child.setValid(true);
+        }
+        
         
         for (int i = 0; i < setSize; i++) {
             double centerx = (meansize) + (generator.nextDouble() * (width - (2 * meansize)));
@@ -63,6 +70,7 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
             regions.add(reg);
             index.insertData(DATA_PREFIX + i, reg);
         }
+        
     }
 
     public void testInsertion() {
@@ -72,23 +80,12 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
         assertTrue(stats.getNumberOfData() >= setSize);
     }
 
-    public void testDeletion() {
-        int dels = setSize;
-        long beforesize = index.getStatistics().getNumberOfData();
-        
-        for (int i = 0; i < dels; i++) {
-        	assertTrue(index.deleteData(DATA_PREFIX + i, (Region)regions.get(i)));
-        }
-
-        assertEquals(beforesize - dels, index.getStatistics().getNumberOfData());
-    }
-
     public void testIntersectionQuery() {
         HarvestingVisitor v = new HarvestingVisitor();
         Region query = new Region(new double[] { 0, 0 }, new double[] { 1, 1 });
         index.intersectionQuery(query, v);
-        assertEquals(setSize, v.harvest.size());
         assertEquals(index.getStatistics().getNumberOfNodes(), v.visited_nodes);
+        assertEquals(setSize, v.harvest.size());
 
         Set<String> comp_result = noIndexQuery(regions, query, AbstractSpatialIndex.IntersectionQuery);
         assertEquals(comp_result, v.harvest);
@@ -156,9 +153,9 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
 
     protected abstract AbstractSpatialIndex createIndex();
 
-    class HarvestingVisitor implements Visitor {
-        HashSet<Object> harvest = new HashSet<Object>(20);
-        int visited_nodes = 0;
+    public class HarvestingVisitor implements Visitor {
+        public HashSet<Object> harvest = new HashSet<Object>(20);
+        public int visited_nodes = 0;
 
         public void visitData(Data d) {
             harvest.add(d.getData());

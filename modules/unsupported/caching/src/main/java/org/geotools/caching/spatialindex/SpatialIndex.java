@@ -61,15 +61,7 @@ public interface SpatialIndex {
      * @param a n-dims shape
      */
     public void insertData(final Object data, final Shape shape);
-
-    /** Delete data both identified by its shape 
-     *
-     * @param data to find and delete
-     * @param shape
-     * @return <code>true</code> if data has been found and deleted
-     */
-    public boolean deleteData(final Object data, final Shape shape);
-
+    
     /** Traverse index to match data such as :
      *  <code>query.contains(Data.getShape())</code>
      *
@@ -110,37 +102,11 @@ public interface SpatialIndex {
      */
     public void nearestNeighborQuery(int k, final Shape query, final Visitor v);
 
-    /** Provides an alternative way to query the index,
-     * and to run customized and optimized query of the index.
-     * For example, this is useful for traversing a tree by level,
-     * or to get specific information such as the MBR of root node.
-     *
-     * @param qs
-     */
-    public void queryStrategy(final QueryStrategy qs);
 
     /**
      * @return
      */
     public Properties getIndexProperties();
-
-    /** Add a command to be executed before nodes are written.
-     *
-     * @param nc
-     */
-    public void addWriteNodeCommand(NodeCommand nc);
-
-    /** Add a command to be executed before nodes are read.
-     *
-     * @param nc
-     */
-    public void addReadNodeCommand(NodeCommand nc);
-
-    /** Add a command to be executed before nodes are deleted.
-     *
-     * @param nc
-     */
-    public void addDeleteNodeCommand(NodeCommand nc);
 
     /** Implementations may always return true.
      *
@@ -161,5 +127,13 @@ public interface SpatialIndex {
      */
     public void flush();
     
+    /**
+     * Initializes the spatial index from 
+     * a storage instance.
+     * <p>This allows caches to be saved to storage
+     * and reused.</p>
+     * 
+     * @param storage
+     */
     public void initializeFromStorage(Storage storage);
 }

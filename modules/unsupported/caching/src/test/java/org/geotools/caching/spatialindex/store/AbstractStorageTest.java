@@ -17,22 +17,24 @@
 package org.geotools.caching.spatialindex.store;
 
 import junit.framework.TestCase;
+
+import org.geotools.caching.grid.spatialindex.GridSpatialIndex;
+import org.geotools.caching.grid.spatialindex.store.MemoryStorage;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.RegionNodeIdentifier;
 import org.geotools.caching.spatialindex.Storage;
-import org.geotools.caching.spatialindex.grid.Grid;
 
 
 public abstract class AbstractStorageTest extends TestCase {
     Storage store;
     TestNode n;
     RegionNodeIdentifier id;
-    Grid grid;
+    GridSpatialIndex grid;
 
     protected void setUp() {
-        grid = new Grid(new Region(new double[] { 0, 0 }, new double[] { 1, 1 }), 10,
-                MemoryStorage.createInstance());
+        grid = new GridSpatialIndex(new Region(new double[] { 0, 0 }, new double[] { 1, 1 }), 10,
+                MemoryStorage.createInstance(), 200);
         n = new TestNode(grid, new Region(new double[] { 0, 0 }, new double[] { 1, 1 }));
         id = new RegionNodeIdentifier(n);
         store = createStorage();

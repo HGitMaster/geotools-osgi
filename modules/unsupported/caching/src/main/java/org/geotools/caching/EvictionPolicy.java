@@ -25,7 +25,21 @@ import org.geotools.caching.spatialindex.NodeIdentifier;
  */
 public interface EvictionPolicy {
    
-    public void evict();
+	/**
+	 * Removes the node from next node in the policy from the cache.
+	 * @return false if nothing to evict; otherwise returns true
+	 */
+    public boolean evict();
 
+    /**
+     * Called when a node is accessed.
+     * @param node	node accessed
+     */
     public void access(NodeIdentifier node);
+    
+//    /**
+//     * 
+//     * @return false if nothing to evict; otherwise returns true
+//     */
+//    public boolean canEvict();
 }

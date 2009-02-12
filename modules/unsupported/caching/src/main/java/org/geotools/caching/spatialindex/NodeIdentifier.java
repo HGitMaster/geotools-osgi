@@ -16,7 +16,14 @@
  */
 package org.geotools.caching.spatialindex;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.ref.SoftReference;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /** Instances of this class provide unique identifiers for nodes,
@@ -32,23 +39,98 @@ import java.io.Serializable;
  *
  */
 public abstract class NodeIdentifier implements Serializable {
-    //    transient boolean visited = false;
-    boolean valid = false;
+	private static final long serialVersionUID = 1L;
+
+	private boolean valid = false;
+   
+    transient ReentrantReadWriteLock lock;
+    transient SoftReference<Node> node;
+    
+    NodeIdentifier(){
+        lock = new ReentrantReadWriteLock();
+    }
 
     public abstract Shape getShape();
-
-    //    public void setVisited(boolean visited) {
-    //        this.visited = visited;
-    //    }
-    //
-    //    public boolean isVisited() {
-    //        return visited;
-    //    }
+    
+    /**
+     * 
+     * @return if the nodes data is valid
+     */
     public boolean isValid() {
         return valid;
     }
 
+    /**
+     * Sets the validity of the node; true means the data
+     * in the node is ready for reading.
+     * 
+     * @param valid
+     */
     public void setValid(boolean valid) {
         this.valid = valid;
+    }
+    
+    /**
+     * Acquire a write lock on the node
+     */
+    public void writeLock(){
+        lock.writeLock().lock();
+    }
+    /**
+     * Unlock the write lock
+     */
+    public void writeUnLock(){
+        lock.writeLock().unlock();
+    }
+    /**
+     * Acquire a read lock on the node
+     */
+    public void readLock(){
+        lock.readLock().lock();
+    }
+    /**
+     * Unlock read lock
+     */
+    public void readUnLock(){
+        lock.readLock().unlock();
+    }
+    
+    /**
+     *  Only want to write to nodes that aren't being read.
+     */
+    public boolean isWritable(){
+        return lock.getReadLockCount() == 0;
+    }
+    public boolean isLocked(){
+        return lock.getReadLockCount() >0 || lock.isWriteLocked();
+    }
+    
+    /**
+     * Sets the node associated with the nodeid; this node
+     * is stored as a soft reference so getNode() may 
+     * return null.
+     * 
+     * @param n
+     */
+    public void setNode(Node n){
+        this.node = new SoftReference<Node>(n);
+    }
+    /**
+     * May return null; node is held onto with a soft reference
+     *
+     * @return
+     */
+    public Node getNode(){
+        if (this.node == null) return null;
+        return this.node.get();
+    }
+    
+    private void writeObject(ObjectOutputStream stream) throws IOException{
+        stream.writeBoolean(valid);
+    }
+    
+    private  void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException{
+        this.valid = stream.readBoolean();
+        this.lock = new ReentrantReadWriteLock();
     }
 }

@@ -57,8 +57,6 @@ public interface Storage {
      */
     public void clear();
 
-    public void setParent(SpatialIndex index);
-
     /**
      * Get properties about the given storage.  The actual
      * properties returned depend on the type of storage.

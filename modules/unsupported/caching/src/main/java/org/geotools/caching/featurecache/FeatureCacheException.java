@@ -14,30 +14,25 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching;
-
-import org.geotools.caching.featurecache.FeatureCacheException;
+package org.geotools.caching.featurecache;
 
 /**
- * An Exception that is thrown when the
- * size of the features being added to the cache exceeds the
- * size of the cache.
+ * Exception thrown by the FeatureCache when unexpected error occurs.
  */
-public class CacheOversizedException extends FeatureCacheException {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 3498526657089279151L;
+public class FeatureCacheException extends Exception {
 
-    public CacheOversizedException() {
+    private static final long serialVersionUID = 5016587341837058296L;
+
+    public FeatureCacheException() {
         super();
     }
 
-    public CacheOversizedException(Throwable t) {
-        super(t);
+    public FeatureCacheException(Throwable t) {
+        super();
+        initCause(t);
     }
 
-    public CacheOversizedException(String message) {
-        super(message);
+    public FeatureCacheException(String comment) {
+        super(comment);
     }
 }

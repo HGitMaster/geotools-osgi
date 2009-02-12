@@ -16,16 +16,14 @@
  */
 package org.geotools.caching.util;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Stack;
 
-import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.factory.CommonFactoryFinder;
 import org.opengis.filter.And;
-import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
@@ -72,7 +70,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  */
 public class BBoxFilterSplitter implements FilterVisitor {
-    
+    private static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory2(null);
     private static final Envelope UNIVERSE_ENVELOPE = new Envelope(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
     private static final Envelope EMPTY_ENVELOPE = new Envelope();
     
@@ -107,7 +105,7 @@ public class BBoxFilterSplitter implements FilterVisitor {
         //deal with envelope
         if (envelopes.size() > 0){
             //universe - envelope = universe 
-            Envelope e = envelopes.pop();
+            envelopes.pop();
             envelopes.push(new Envelope(UNIVERSE_ENVELOPE));
         }
         otherRestrictions.push(f);
@@ -145,21 +143,11 @@ public class BBoxFilterSplitter implements FilterVisitor {
             envelopes.push(e);
         }
 
-//        if (otherRestrictions.size() >= (othSize + 2)) {
-//            List<Filter> pops = new ArrayList<Filter>();
-//            for (int i = otherRestrictions.size(); i > othSize; i--) {
-//                pops.add((Filter) otherRestrictions.pop());
-//            }
-//            otherRestrictions.push(new FilterFactoryImpl().and(pops));
-//        }
-        // in all case, we'll need original filter as computed SpatialRestriction is a rough approximation
-        int size = otherRestrictions.size();
+        // in all case, we'll need original filter as computed SpatialRestriction is a rough approximation       
         multiplePop(otherRestrictions, othSize);
         Envelope top = envelopes.peek();
         if (!(top.equals(EMPTY_ENVELOPE))){
-        //if (size > othSize){
-            otherRestrictions.push(f);
-        //}
+        	otherRestrictions.push(f);
         }
 
         return null;
@@ -399,7 +387,7 @@ public class BBoxFilterSplitter implements FilterVisitor {
         } else if (e.equals(UNIVERSE_ENVELOPE)){
             return Filter.INCLUDE;
         } else {
-            Filter myfilter = new FilterFactoryImpl().bbox(geom, e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY(), srs);
+            Filter myfilter = filterFactory.bbox(geom, e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY(), srs);
             return myfilter;
         }
     }
@@ -417,12 +405,12 @@ public class BBoxFilterSplitter implements FilterVisitor {
         } else if (otherRestrictions.size() == 1) {
             return (Filter) otherRestrictions.peek();
         } else {
-            return new FilterFactoryImpl().and(otherRestrictions.subList(0,
+            return filterFactory.and(otherRestrictions.subList(0,
                     otherRestrictions.size() - 1));
         }
     }
 
-    private void multiplePop(Stack s, int downsize) {
+    private void multiplePop(Stack<Filter> s, int downsize) {
         for (int i = s.size(); i > downsize; i--) {
             s.pop();
         }
