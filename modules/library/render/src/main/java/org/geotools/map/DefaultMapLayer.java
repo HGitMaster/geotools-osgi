@@ -33,12 +33,15 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerEvent;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.coverage.FeatureUtilities;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -47,7 +50,7 @@ import org.opengis.referencing.operation.TransformException;
  * Default implementation of the MapLayer implementation
  * 
  * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/map/DefaultMapLayer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/map/DefaultMapLayer.java $
  */
 public class DefaultMapLayer implements MapLayer {
     
@@ -399,21 +402,34 @@ public class DefaultMapLayer implements MapLayer {
 				MapLayerEvent.FILTER_CHANGED));
 	}
 	public ReferencedEnvelope getBounds() {
-		
-		CoordinateReferenceSystem sourceCrs = featureSource.getSchema().getCoordinateReferenceSystem();
-		ReferencedEnvelope env;
-		try {
-			env = new ReferencedEnvelope(featureSource.getBounds(), sourceCrs);
-			return env;
-		} catch (MismatchedDimensionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+            // CRS could also be null, depends on FeatureType
+            CoordinateReferenceSystem sourceCrs = featureSource.getSchema()
+                    .getCoordinateReferenceSystem();
+    
+            try {
+                ReferencedEnvelope bounds = featureSource.getBounds();
+                if (null != bounds) {
+                    // returns the bounds based on features
+                    return bounds;
+                }
+    
+                if (sourceCrs != null) {
+                    // returns the envelope based on the CoordinateReferenceSystem
+                    Envelope envelope = CRS.getEnvelope(sourceCrs);
+                    if (envelope != null) {
+                        return new ReferencedEnvelope(envelope); // nice!
+                    }
+                }
+    
+            } catch (MismatchedDimensionException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // return a default ReferencedEnvelope
+            return new ReferencedEnvelope(sourceCrs);
+        }
+	
 	// ------------------------------------------------------------------------
 	// EVENT HANDLING CODE
 	// ------------------------------------------------------------------------

@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32393 2009-02-03 11:03:18Z aaime $
+        Version: $Id: pom.xml 32475 2009-02-12 00:56:57Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -160,7 +160,6 @@
          <property><name>all</name></property>
        </activation>
        <modules>
-         <module>directory</module>
          <module>epsg-oracle</module>
          <module>gml</module>    
          <module>gpx</module>
@@ -180,6 +179,7 @@
     <module>ogc</module>
     <module>repository</module>
     <module>mappane</module>
+    <module>directory</module>
   </modules>
 
 </project>
