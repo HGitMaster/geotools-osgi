@@ -248,6 +248,8 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     public void testReadRasterCatalogOnline() throws Exception {
         tableName = "SDE.IMG_USGSQUAD_2_TILES";
         GridCoverage2D coverage = testReadFullLevel0(TYPE_8BIT_U, 1, "RasterCatalog");
+        RenderedImage image = coverage.getRenderedImage();
+        writeToDisk(image, "testReadRasterCatalogOnline");
     }
 
     @Test
@@ -259,13 +261,16 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         Envelope2D envelope2D = gridGeometry.getEnvelope2D();
         GridRange2D gridRange2D = gridGeometry.getGridRange2D();
 
-        assertEquals(-256, envelope2D.getMinX(), 1.0E-5);
-        assertEquals(-256, envelope2D.getMinY(), 1.0E-5);
-        assertEquals(256, envelope2D.getMaxX(), 1.0E-5);
-        assertEquals(256, envelope2D.getMaxY(), 1.0E-5);
+        assertEquals(0, envelope2D.getMinX(), 1);
+        assertEquals(0, envelope2D.getMinY(), 1);
+        assertEquals(512, envelope2D.getMaxX(), 1);
+        assertEquals(512, envelope2D.getMaxY(), 1);
 
-        assertEquals(512, gridRange2D.getWidth());
-        assertEquals(512, gridRange2D.getHeight());
+        assertEquals(512, gridRange2D.width);
+        assertEquals(512, gridRange2D.height);
+
+        RenderedImage image = coverage.getRenderedImage();
+        writeToDisk(image, "testReadRasterCatalog");
     }
 
     private void testReadFullLevel0(final RasterCellType cellType, final int numBands)
@@ -306,7 +311,8 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
 
         GridGeometry2D gridGeometry = coverage.getGridGeometry();
 
-        // assertEquals(originalGridRange, gridGeometry.getGridRange());
+        /////////////////////////////////////////////////////////////assertEquals(originalGridRange,
+        // gridGeometry.getGridRange());
 
         final RenderedImage image = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
         assertNotNull(image);

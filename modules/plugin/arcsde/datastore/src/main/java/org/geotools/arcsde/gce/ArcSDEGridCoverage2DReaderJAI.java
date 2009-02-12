@@ -18,6 +18,7 @@
 package org.geotools.arcsde.gce;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
@@ -40,7 +41,9 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.MosaicDescriptor;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.gce.RasterUtils.QueryInfo;
@@ -77,7 +80,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32479 2009-02-12 18:41:58Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32480 2009-02-12 21:05:00Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -212,6 +215,15 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         final GeneralEnvelope resultEnvelope = getResultEnvelope(byRasterdIdQueries.values());
 
         /*
+         * Once we collected the matching rasters and their image subsets, find out where in the
+         * overall resulting mosaic they fit. This will be used to set the ImageLayout for each
+         * raster's RenderedImage
+         */
+        final Rectangle mosaicDimension;
+        mosaicDimension = RasterUtils.setMosaicLocations(rasterInfo, resultEnvelope,
+                byRasterdIdQueries.values());
+
+        /*
          * Gather the rendered images for each of the rasters that match the requested envelope
          */
         final List<RenderedImage> mosaicTiles;
@@ -257,7 +269,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
          */
         final GridSampleDimension[] bands = rasterInfo.getGridSampleDimensions();
 
-        final RenderedImage coverageRaster = mosaic(mosaicTiles);
+        final RenderedImage coverageRaster = createMosaic(mosaicDimension, mosaicTiles);
 
         return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
                 null);
@@ -299,8 +311,35 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         return finalEnvelope;
     }
 
-    private RenderedImage mosaic(List<RenderedImage> rasters) {
-        return rasters.get(0);
+    /**
+     * Creates the mosaiced image that results from querying all the rasters in the raster dataset
+     * for the requested envelope
+     * 
+     * @param mosaicDimension
+     *            the dimensions of the resulting image
+     * @param rasters
+     *            the images to mosaic together
+     * @return the mosaiced image
+     */
+    private RenderedImage createMosaic(final Rectangle mosaicDimension,
+            final List<RenderedImage> rasters) {
+        if (rasters.size() == 1) {
+            // no need to mosaic at all
+            return rasters.get(0);
+        }
+
+        ParameterBlock mosaicParams = new ParameterBlock();
+        for (RenderedImage tile : rasters) {
+            mosaicParams.addSource(tile);
+        }
+        mosaicParams.add(MosaicDescriptor.MOSAIC_TYPE_OVERLAY); // mosaic type
+        mosaicParams.add(null); // alpha mask
+        mosaicParams.add(null); // source ROI mask
+        mosaicParams.add(null); // source threshold
+        mosaicParams.add(null); // destination background value
+
+        RenderedOp mosaic = JAI.create("Mosaic", mosaicParams, null);
+        return mosaic;
     }
 
     private RenderedImage getRaster(int pyramidLevelChoice, final SeQuery preparedQuery, SeRow row,
@@ -313,18 +352,22 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
         // covers an area of full tiles
         final RenderedImage fullTilesRaster;
+
         /*
          * Create the tiled raster covering the full area of the matching tiles
          */
+
+        // where the resulting raster fits into the overal mosaic being built for the raster dataset
+        final Rectangle imageLayout = rasterQueryInfo.getMosaicLocation();
         fullTilesRaster = createTiledRaster(preparedQuery, row, rAttr, matchingTiles,
-                pyramidLevelChoice);
+                pyramidLevelChoice, imageLayout.getLocation());
 
         /*
          * now crop it to the desired dimensions
          */
-        final Rectangle resultDimension = rasterQueryInfo.getResultDimension();
-        rasterImage = cropToRequiredDimension(fullTilesRaster, resultDimension);
-       
+        // final Rectangle resultDimension = rasterQueryInfo.getResultDimension();
+        rasterImage = cropToRequiredDimension(fullTilesRaster, imageLayout);
+
         /*
          * REVISIT: This is odd, we need to force the data to be loaded so we're free to release the
          * stream, which gives away the streamed, tiled nature of this rasters, but I don't see the
@@ -339,10 +382,12 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
     private RenderedOp cropToRequiredDimension(final RenderedImage fullTilesRaster,
             final Rectangle cropTo) {
 
+        int minX = fullTilesRaster.getMinX();
+        int minY = fullTilesRaster.getMinY();
         int width = fullTilesRaster.getWidth();
         int height = fullTilesRaster.getHeight();
 
-        Rectangle origDim = new Rectangle(0, 0, width, height);
+        Rectangle origDim = new Rectangle(minX, minY, width, height);
         if (!origDim.contains(cropTo)) {
             throw new IllegalArgumentException("Original image (" + origDim
                     + ") does not contain desired dimension (" + cropTo + ")");
@@ -387,8 +432,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
     }
 
     private RenderedOp createTiledRaster(final SeQuery preparedQuery, final SeRow row,
-            final SeRasterAttr rAttr, final Rectangle matchingTiles, final int pyramidLevel)
-            throws IOException {
+            final SeRasterAttr rAttr, final Rectangle matchingTiles, final int pyramidLevel,
+            final Point mosaicLocation) throws IOException {
 
         final int tileWidth;
         final int tileHeight;
@@ -457,8 +502,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         // building the final image layout
         final ImageLayout imageLayout;
         {
-            int minX = 0;
-            int minY = 0;
+            int minX = mosaicLocation.x;
+            int minY = mosaicLocation.y;
             int width = tiledImageWidth;
             int height = tiledImageHeight;
 

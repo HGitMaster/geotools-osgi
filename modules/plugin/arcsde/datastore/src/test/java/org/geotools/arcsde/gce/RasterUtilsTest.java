@@ -131,7 +131,7 @@ public class RasterUtilsTest {
 
         MathTransform rasterToModel = RasterUtils.createRasterToModel(levelGridRange, levelEnvelope);
 
-        Rectangle matchingDimension = RasterUtils.calculateMatchingLevelDimension(
+        Rectangle matchingDimension = RasterUtils.calculateMatchingDimension(
                 requestedEnvelope, rasterToModel, levelGridRange);
 
         assertEquals(expectedGridRange.x, matchingDimension.x);
