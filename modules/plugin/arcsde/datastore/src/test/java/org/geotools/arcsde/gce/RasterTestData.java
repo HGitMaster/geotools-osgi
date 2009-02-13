@@ -620,17 +620,27 @@ public class RasterTestData {
             int maxLevels;
 
             maxLevels = 3;
+            extent = new SeExtent(0, 0, 256, 256);
+            addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
+                    pixelType, maxLevels, extent);
+
+            maxLevels = 3;
+            extent = new SeExtent(512, 512, 768, 768);
+            addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
+                    pixelType, maxLevels, extent);
+
+            maxLevels = 3;
+            extent = new SeExtent(512, 0, 768, 256);
+            addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
+                    pixelType, maxLevels, extent);
+            
+            maxLevels = 3;
+            extent = new SeExtent(0, 512, 256, 768);
+            addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
+                    pixelType, maxLevels, extent);
+
+            maxLevels = 3;
             extent = new SeExtent(256, 256, 512, 512);
-            addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
-                    pixelType, maxLevels, extent);
-
-            maxLevels = 3;
-            extent = new SeExtent(256, 0, 512, 256);
-            addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
-                    pixelType, maxLevels, extent);
-
-            maxLevels = 3;
-            extent = new SeExtent(0, 256, 256, 512);
             addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
                     pixelType, maxLevels, extent);
         } finally {
@@ -647,7 +657,7 @@ public class RasterTestData {
 
         IndexColorModel colorModel = null;
         boolean skipLevelOne = false;
-        int interpolationType = SeRaster.SE_INTERPOLATION_NEAREST;
+        int interpolationType = SeRaster.SE_INTERPOLATION_BICUBIC;
 
         addRasterAttribute(tableName, numberOfBands, imageWidth, imageHeight, pixelType,
                 colorModel, maxLevels, skipLevelOne, interpolationType, extent, conn);

@@ -22,12 +22,14 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BandedSampleModel;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
-import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,7 +72,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32480 2009-02-12 21:05:00Z groldan $
+ * @version $Id: RasterUtils.java 32482 2009-02-13 17:16:21Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -191,19 +193,29 @@ class RasterUtils {
 
         private Rectangle resultDimension;
 
-        private long rasterId;
+        private Long rasterId;
 
         private Rectangle mosaicLocation;
+
+        private RenderedImage resultImage;
+
+        public QueryInfo() {
+            setResultDimension(new Rectangle(0, 0, 0, 0));
+            setMatchingTiles(new Rectangle(0, 0, 0, 0));
+            setResultEnvelope(null);
+        }
 
         @Override
         public String toString() {
             StringBuilder s = new StringBuilder("[Raster query info:");
+            s.append("\n\tRaster ID            : ").append(getRasterId());
             s.append("\n\tpyramid level        : ").append(getPyramidLevel());
             s.append("\n\trequested envelope   : ").append(getRequestedEnvelope());
             s.append("\n\trequested dimension  : ").append(getRequestedDim());
             s.append("\n\tmatching tiles       : ").append(getMatchingTiles());
             s.append("\n\tresult envelope      : ").append(getResultEnvelope());
             s.append("\n\tresult dimension     : ").append(getResultDimension());
+            s.append("\n\tmosaiced dimension   : ").append(getMosaicLocation());
             s.append("\n]");
             return s.toString();
         }
@@ -212,7 +224,7 @@ class RasterUtils {
          * @return the rasterId (as in SeRaster.getId()) for the raster in the raster dataset this
          *         query works upon
          */
-        public long getRasterId() {
+        public Long getRasterId() {
             return rasterId;
         }
 
@@ -240,7 +252,7 @@ class RasterUtils {
             return resultDimension;
         }
 
-        void setRasterId(long rasterId) {
+        void setRasterId(Long rasterId) {
             this.rasterId = rasterId;
         }
 
@@ -275,15 +287,33 @@ class RasterUtils {
         public Rectangle getMosaicLocation() {
             return mosaicLocation;
         }
+
+        public void setResultImage(RenderedImage rasterImage) {
+            this.resultImage = rasterImage;
+            if (rasterImage.getWidth() != resultDimension.width
+                    || rasterImage.getHeight() != resultDimension.height) {
+                LOGGER.warning("Result image and expected dimensions don't match: image="
+                        + resultImage.getWidth() + "x" + resultImage.getHeight() + ", expected="
+                        + resultDimension.width + "x" + resultDimension.height);
+            }
+        }
+
+        public RenderedImage getResultImage() {
+            return resultImage;
+        }
     }
 
     public static QueryInfo fitRequestToRaster(final GeneralEnvelope requestedEnvelope,
             final Rectangle requestedDim, final RasterInfo rasterInfo, final int rasterIndex,
-            final int pyramidLevel) {
+            final OverviewPolicy overviewPolicy) {
+
+        final int pyramidLevel;
+        pyramidLevel = rasterInfo.getOptimalPyramidLevel(rasterIndex, overviewPolicy,
+                requestedEnvelope, requestedDim);
 
         final CoordinateReferenceSystem nativeCrs;
         {
-            GeneralEnvelope envelope = rasterInfo.getEnvelope(rasterIndex, pyramidLevel);
+            GeneralEnvelope envelope = rasterInfo.getGridEnvelope(rasterIndex, pyramidLevel);
             nativeCrs = envelope.getCoordinateReferenceSystem();
             CoordinateReferenceSystem requestCrs = requestedEnvelope.getCoordinateReferenceSystem();
             if (!CRS.equalsIgnoreMetadata(nativeCrs, requestCrs)) {
@@ -298,8 +328,13 @@ class RasterUtils {
         queryInfo.setRequestedDim(requestedDim);
 
         final Rectangle levelGridRange = rasterInfo.getGridRange(rasterIndex, pyramidLevel);
+        final GeneralEnvelope levelEnvelope = rasterInfo.getGridEnvelope(rasterIndex, pyramidLevel);
 
-        final GeneralEnvelope levelEnvelope = rasterInfo.getEnvelope(rasterIndex, pyramidLevel);
+        if (!levelEnvelope.intersects(requestedEnvelope, true)) {
+            // don't bother
+            return queryInfo;
+        }
+
         final MathTransform rasterToModel = createRasterToModel(levelGridRange, levelEnvelope);
 
         Rectangle pixelSpaceOverlappingArea;
@@ -324,13 +359,20 @@ class RasterUtils {
             queryInfo.setResultEnvelope(resultEnvelope);
             queryInfo.setMatchingTiles(matchingTiles);
             queryInfo.setResultDimension(resultDimension);
-        } else {
-            queryInfo.setResultDimension(new Rectangle(0, 0, -1, -1));
-            queryInfo.setMatchingTiles(new Rectangle(0, 0, -1, -1));
-            queryInfo.setResultEnvelope(new GeneralEnvelope(nativeCrs));
         }
 
         return queryInfo;
+    }
+
+    /**
+     * @return the requested resolutions on the x and y axis as the elements at indices 0 and 1
+     *         respectively
+     */
+    private static double[] getResolution(GeneralEnvelope requestedEnvelope, Rectangle requestedDim) {
+        double[] requestedRes = new double[2];
+        requestedRes[0] = requestedEnvelope.getSpan(0) / requestedDim.getWidth();
+        requestedRes[1] = requestedEnvelope.getSpan(1) / requestedDim.getHeight();
+        return requestedRes;
     }
 
     public static MathTransform createRasterToModel(final Rectangle levelRange,
@@ -339,13 +381,14 @@ class RasterUtils {
          * GeneralGridRange range's is exclusive for the higher coords, so we expand it by one in
          * both dimensions
          */
-        Rectangle expandedRange = new Rectangle(levelRange.x, levelRange.y, levelRange.width + 1,
-                levelRange.height + 1);
-        GeneralGridRange gridRange = new GeneralGridRange(expandedRange);
-
+        // Rectangle expandedRange = new Rectangle(levelRange.x, levelRange.y, levelRange.width + 1,
+        // levelRange.height + 1);
+        // GeneralGridRange gridRange = new GeneralGridRange(expandedRange);
         // create a raster to model transform, from this tile pixel space to the tile's geographic
         // extent
-        GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(gridRange, levelEnvelope);
+        // GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(gridRange, levelEnvelope);
+        GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(new GeneralGridRange(levelRange),
+                levelEnvelope);
         geMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
 
         final MathTransform rasterToModel = geMapper.createTransform();
@@ -433,25 +476,16 @@ class RasterUtils {
         {
             // use a model to raster transform to find out which pixel range at the specified level
             // better match the requested extent
-            GeneralEnvelope requestedPixels;
             try {
                 MathTransform modelToRaster = rasterToModel.inverse();
-                requestedPixels = CRS.transform(modelToRaster, requestedEnvelope);
+                levelOverlappingPixels = getTargetGridRange(modelToRaster, requestedEnvelope);
+                levelMinPixelX = levelOverlappingPixels.x;
+                levelMinPixelY = levelOverlappingPixels.y;
+                levelMaxPixelX = (int) levelOverlappingPixels.getMaxX();
+                levelMaxPixelY = (int) levelOverlappingPixels.getMaxY();
             } catch (NoninvertibleTransformException e) {
                 throw new IllegalArgumentException(e);
-            } catch (TransformException e) {
-                throw new IllegalArgumentException(e);
             }
-
-            levelMinPixelX = (int) Math.floor(requestedPixels.getMinimum(0));
-            levelMaxPixelX = (int) Math.ceil(requestedPixels.getMaximum(0));
-
-            levelMinPixelY = (int) Math.floor(requestedPixels.getMinimum(1));
-            levelMaxPixelY = (int) Math.ceil(requestedPixels.getMaximum(1));
-
-            final int width = levelMaxPixelX - levelMinPixelX;
-            final int height = levelMaxPixelY - levelMinPixelY;
-            levelOverlappingPixels = new Rectangle(levelMinPixelX, levelMinPixelY, width, height);
         }
 
         if (relates(levelGridRange, levelOverlappingPixels)) {
@@ -470,6 +504,38 @@ class RasterUtils {
             levelOverlappingPixels.y = 0;
             levelOverlappingPixels.width = 0;
             levelOverlappingPixels.height = 0;
+        }
+        return levelOverlappingPixels;
+    }
+
+    private static Rectangle getTargetGridRange(final MathTransform modelToRaster,
+            final Envelope requestedEnvelope) {
+        Rectangle levelOverlappingPixels;
+        int levelMinPixelX;
+        int levelMaxPixelX;
+        int levelMinPixelY;
+        int levelMaxPixelY;
+        {
+            // use a model to raster transform to find out which pixel range at the specified level
+            // better match the requested extent
+            GeneralEnvelope requestedPixels;
+            try {
+                requestedPixels = CRS.transform(modelToRaster, requestedEnvelope);
+            } catch (NoninvertibleTransformException e) {
+                throw new IllegalArgumentException(e);
+            } catch (TransformException e) {
+                throw new IllegalArgumentException(e);
+            }
+
+            levelMinPixelX = (int) Math.floor(requestedPixels.getMinimum(0));
+            levelMaxPixelX = (int) Math.floor(requestedPixels.getMaximum(0));
+
+            levelMinPixelY = (int) Math.floor(requestedPixels.getMinimum(1));
+            levelMaxPixelY = (int) Math.floor(requestedPixels.getMaximum(1));
+
+            final int width = levelMaxPixelX - levelMinPixelX;
+            final int height = levelMaxPixelY - levelMinPixelY;
+            levelOverlappingPixels = new Rectangle(levelMinPixelX, levelMinPixelY, width, height);
         }
         return levelOverlappingPixels;
     }
@@ -519,8 +585,8 @@ class RasterUtils {
         // ArcSDEPyramidLevel level;
         final ColorModel colorModel;
         final SampleModel sampleModel;
-        int tiledImageWidth = rasterInfo.getImageWidth();
-        int tiledImageHeight = rasterInfo.getImageHeight();
+        int sampleImageWidth = 1;// rasterInfo.getImageWidth();
+        int sampleImageHeight = 1;// rasterInfo.getImageHeight();
         {
             final int bitsPerSample = pixelType.getBitsPerSample();
             final int dataType = pixelType.getDataBufferType();
@@ -528,8 +594,8 @@ class RasterUtils {
             if (hasColorMap) {
                 LOGGER.fine("Found single-band colormapped raster, using its index color model");
                 colorModel = rasterInfo.getColorMap();
-                sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
-                        tiledImageHeight);
+                sampleModel = colorModel.createCompatibleSampleModel(sampleImageWidth,
+                        sampleImageHeight);
             } else if (bitsPerSample == 1 || bitsPerSample == 4) {
                 if (numberOfBands != 1) {
                     throw new IllegalArgumentException(bitsPerSample
@@ -540,8 +606,8 @@ class RasterUtils {
                         argb.length);
                 GridSampleDimension gridSampleDimension = rasterInfo.getGridSampleDimensions()[0];
                 colorModel = gridSampleDimension.getColorModel(0, numberOfBands, dataType);
-                sampleModel = colorModel.createCompatibleSampleModel(tiledImageWidth,
-                        tiledImageHeight);
+                sampleModel = colorModel.createCompatibleSampleModel(sampleImageWidth,
+                        sampleImageHeight);
             } else {
                 int[] numBits = new int[numberOfBands];
                 for (int i = 0; i < numberOfBands; i++) {
@@ -569,8 +635,8 @@ class RasterUtils {
                     bankIndices[i] = i;
                     bandOffsets[i] = 0;// (i * bandOffset);
                 }
-                sampleModel = new BandedSampleModel(dataType, tiledImageWidth, tiledImageHeight,
-                        tiledImageWidth, bankIndices, bandOffsets);
+                sampleModel = new BandedSampleModel(dataType, sampleImageWidth, sampleImageHeight,
+                        sampleImageWidth, bankIndices, bandOffsets);
             }
         }
 
@@ -663,32 +729,70 @@ class RasterUtils {
      * 
      * @param rasterInfo
      * @param resultEnvelope
-     * @param values
+     * @param results
      * @return
      */
     public static Rectangle setMosaicLocations(final RasterInfo rasterInfo,
-            final GeneralEnvelope resultEnvelope, final Collection<QueryInfo> values) {
+            final GeneralEnvelope resultEnvelope, final List<QueryInfo> results) {
 
-        // we need to use the same rasterToModel transform used to calculate each raster's grid
-        // envelope
-        final MathTransform rasterToModel = rasterInfo.getRasterToModel();
-
-        final Rectangle originalGridRange = rasterInfo.getOriginalGridRange().toRectangle();
+//        int w = 0;
+//        Rectangle r = null;
+//        for (QueryInfo q : results) {
+//            Rectangle d = q.getResultDimension();
+//            Rectangle m = new Rectangle(w, d.y, d.width, d.height);
+//            q.setMosaicLocation(m);
+//            if (r == null) {
+//                r = new Rectangle(m);
+//            } else {
+//                r.add(m);
+//            }
+//            w += d.width;
+//        }
+//        if (true)
+//            return r;
 
         final Rectangle mosaicDimension;
-        mosaicDimension = calculateMatchingDimension(resultEnvelope, rasterToModel,
-                originalGridRange);
-
-        System.out.println("mosaicDimension: " + mosaicDimension);
+        final MathTransform modelToRaster;
+        {
+            MathTransform rasterToModel;
+            /*
+             * hum, in the case the rasters did not had the same spatial resolution at the pyramid
+             * level chosen for each of them, we're gonna set the final mosaiced image dimension to
+             * match the resolution of the first raster in the list, so any further one that does
+             * not fit will have to be chained with an affine transform among the mosaic operation
+             */
+            QueryInfo dimensionChoice = results.get(0);
+            Long rasterId = dimensionChoice.getRasterId();
+            int pyramidLevel = dimensionChoice.getPyramidLevel();
+            int rasterIndex = rasterInfo.getRasterIndex(rasterId);
+            Rectangle levelRange = rasterInfo.getGridRange(rasterIndex, pyramidLevel);
+            GeneralEnvelope levelEnvelope = rasterInfo.getGridEnvelope(rasterIndex, pyramidLevel);
+            rasterToModel = createRasterToModel(levelRange, levelEnvelope);
+            try {
+                modelToRaster = rasterToModel.inverse();
+            } catch (NoninvertibleTransformException e) {
+                throw new RuntimeException(e);
+            }
+            mosaicDimension = getTargetGridRange(modelToRaster, resultEnvelope);
+            System.out.println("mosaicDimension: " + mosaicDimension);
+        }
 
         // GeneralEnvelope mosaicDimension = CRS.transform(modelToRaster, resultEnvelope);
 
-        for (QueryInfo rasterResultInfo : values) {
-            GeneralEnvelope rasterResultEnvelope = rasterResultInfo.getResultEnvelope();
-            Rectangle resultDimension = rasterResultInfo.getResultDimension();
+        for (QueryInfo rasterResultInfo : results) {
+            final GeneralEnvelope rasterResultEnvelope = rasterResultInfo.getResultEnvelope();
+            final Rectangle resultDimension = rasterResultInfo.getResultDimension();
 
-            Rectangle rasterMosaicLocation = calculateMatchingDimension(rasterResultEnvelope,
-                    rasterToModel, originalGridRange);
+            final Long rasterId = rasterResultInfo.getRasterId();
+            final int pyramidLevel = rasterResultInfo.getPyramidLevel();
+            final int rasterIndex = rasterInfo.getRasterIndex(rasterId);
+            final Rectangle levelRange = rasterInfo.getGridRange(rasterIndex, pyramidLevel);
+            final GeneralEnvelope levelEnvelope = rasterInfo.getGridEnvelope(rasterIndex,
+                    pyramidLevel);
+
+            // final MathTransform rasterToModel = createRasterToModel(levelRange, levelEnvelope);
+
+            Rectangle rasterMosaicLocation = getTargetGridRange(modelToRaster, rasterResultEnvelope);
 
             rasterResultInfo.setMosaicLocation(rasterMosaicLocation);
             System.out.println("raster result dimension: " + resultDimension
@@ -697,4 +801,5 @@ class RasterUtils {
 
         return mosaicDimension;
     }
+
 }

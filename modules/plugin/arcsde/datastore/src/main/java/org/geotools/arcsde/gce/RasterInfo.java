@@ -31,6 +31,7 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
@@ -46,7 +47,7 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32479 2009-02-12 18:41:58Z groldan $
+ * @version $Id: RasterInfo.java 32482 2009-02-13 17:16:21Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -196,7 +197,8 @@ class RasterInfo {
     }
 
     /**
-     * @return the originalGridRange for the whole raster dataset
+     * @return the originalGridRange for the whole raster dataset, based on the first raster in the
+     *         raster dataset
      */
     public GeneralGridRange getOriginalGridRange() {
         if (originalGridRange == null) {
@@ -215,7 +217,7 @@ class RasterInfo {
 
             final int rasterCount = getNumRasters();
             for (int rasterN = 0; rasterN < rasterCount; rasterN++) {
-                final GeneralEnvelope rasterEnvelope = getEnvelope(rasterN, 0);
+                final GeneralEnvelope rasterEnvelope = getGridEnvelope(rasterN, 0);
                 final Rectangle rasterGridRange = getGridRange(rasterN, 0);
                 GeneralEnvelope rasterGridRangeInDataSet;
                 try {
@@ -230,35 +232,16 @@ class RasterInfo {
                 miny = Math.min(miny, (int) Math.floor(rasterGridRangeInDataSet.getMinimum(1)));
                 maxx = Math.max(maxx, (int) Math.ceil(rasterGridRangeInDataSet.getMaximum(0)));
                 maxy = Math.max(maxy, (int) Math.ceil(rasterGridRangeInDataSet.getMaximum(1)));
-
-                System.out.println("Original raster grid range   : " + rasterGridRange);
-                System.out.println("Raster grid range in dataset : "
-                        + rasterGridRangeInDataSet.toRectangle2D());
-
             }
             Rectangle range = new Rectangle(minx, miny, maxx - minx, maxy - miny);
-            System.out.println("Dataset grid range   : " + range);
             originalGridRange = new GeneralGridRange(range);
         }
         return originalGridRange;
-        // if (originalGridRange == null) {
-        // Rectangle range = null;
-        // for (PyramidInfo pyramid : subRasterInfo) {
-        // Rectangle levelZeroRange = pyramid.getPyramidLevel(0).getImageRange();
-        // if (range == null) {
-        // range = levelZeroRange;
-        // } else {
-        // range.add(levelZeroRange);
-        // }
-        // }
-        // originalGridRange = new GeneralGridRange(range);
-        // }
-        // return originalGridRange;
     }
 
     public MathTransform getRasterToModel() {
 
-        GeneralEnvelope firstRasterEnvelope = getEnvelope(0, 0);
+        GeneralEnvelope firstRasterEnvelope = getGridEnvelope(0, 0);
         Rectangle firstRasterGridRange = getGridRange(0, 0);
         // GridToEnvelopeMapper works upon GridEnvelope. GeneralGridEnvelope includes the border
         // edges in computations, GeneralGridRange doesn't, so use a GeneralEnvelope instead
@@ -319,7 +302,7 @@ class RasterInfo {
         return rasterInfo.getNumLevels();
     }
 
-    public GeneralEnvelope getEnvelope(final int rasterIndex, final int pyramidLevel) {
+    public GeneralEnvelope getGridEnvelope(final int rasterIndex, final int pyramidLevel) {
         PyramidLevelInfo level = getLevel(rasterIndex, pyramidLevel);
         return new GeneralEnvelope(level.getEnvelope());
     }
@@ -381,8 +364,33 @@ class RasterInfo {
         return getBand(0, 0).getCellType();
     }
 
-    public long getRasterId(final int rasterIndex) {
+    public Long getRasterId(final int rasterIndex) {
         final PyramidInfo rasterInfo = getRasterInfo(rasterIndex);
         return rasterInfo.getRasterId();
+    }
+
+    public int getOptimalPyramidLevel(final int rasterIndex, final OverviewPolicy policy,
+            final GeneralEnvelope requestedEnvelope, final Rectangle requestedDim) {
+
+        final PyramidInfo rasterInfo = getRasterInfo(rasterIndex);
+
+        double[] requestedRes = new double[2];
+        double reqSpanX = requestedEnvelope.getSpan(0);
+        double reqSpanY = requestedEnvelope.getSpan(1);
+        requestedRes[0] = reqSpanX / requestedDim.getWidth();
+        requestedRes[1] = reqSpanY / requestedDim.getHeight();
+
+        return rasterInfo.getOptimalPyramidLevel(policy, requestedRes);
+    }
+
+    public int getRasterIndex(Long rasterId) {
+        int index = -1;
+        for (PyramidInfo p : subRasterInfo) {
+            index++;
+            if (rasterId.equals(p.getRasterId())) {
+                return index;
+            }
+        }
+        throw new IllegalArgumentException("rasterId: " + rasterId);
     }
 }

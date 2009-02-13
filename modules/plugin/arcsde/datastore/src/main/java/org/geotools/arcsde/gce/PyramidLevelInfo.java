@@ -58,8 +58,8 @@ class PyramidLevelInfo {
     PyramidLevelInfo(int level, ReferencedEnvelope extent, int xOffset, int yOffset,
             int numTilesWide, int numTilesHigh, Dimension levelSize) {
         this.pyramidLevel = level;
-        this.xRes = (extent.getMaxX() - extent.getMinX()) / levelSize.width;
-        this.yRes = (extent.getMaxY() - extent.getMinY()) / levelSize.height;
+        this.xRes = extent.getWidth() / levelSize.width;
+        this.yRes = extent.getHeight() / levelSize.height;
         this.envelope = extent;
         this.xOffset = xOffset;
         this.yOffset = yOffset;

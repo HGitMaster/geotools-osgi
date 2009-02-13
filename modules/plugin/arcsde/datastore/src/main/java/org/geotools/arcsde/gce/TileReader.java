@@ -37,7 +37,7 @@ import com.esri.sde.sdk.client.SeRow;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: TileReader.java 32461 2009-02-10 21:16:29Z groldan $
+ * @version $Id: TileReader.java 32482 2009-02-13 17:16:21Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls" })
@@ -123,14 +123,14 @@ class TileReader {
      * @return number of tiles being fetched over the X axis
      */
     public int getTilesWide() {
-        return 1 + requestedTiles.width;
+        return requestedTiles.width;
     }
 
     /**
      * @return number of tiles being fetched over the Y axis
      */
     public int getTilesHigh() {
-        return 1 + requestedTiles.height;
+        return requestedTiles.height;
     }
 
     /**

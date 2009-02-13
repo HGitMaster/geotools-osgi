@@ -25,6 +25,8 @@ import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,13 +35,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
+import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
@@ -64,6 +69,8 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 
 import com.esri.sde.sdk.client.SeException;
@@ -80,7 +87,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32480 2009-02-12 21:05:00Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32482 2009-02-13 17:16:21Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -142,7 +149,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             overViewResolutions = new double[numOverviews][2];
             for (int pyramidLevel = 1; pyramidLevel <= numOverviews; pyramidLevel++) {
                 Rectangle levelGridRange = rasterInfo.getGridRange(0, pyramidLevel);
-                GeneralEnvelope levelEnvelope = rasterInfo.getEnvelope(0, pyramidLevel);
+                GeneralEnvelope levelEnvelope = rasterInfo.getGridEnvelope(0, pyramidLevel);
                 overViewResolutions[pyramidLevel - 1] = super.getResolution(levelEnvelope,
                         levelGridRange, crs);
             }
@@ -188,70 +195,75 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         }
 
         /*
-         * set params
-         */
-
-        // This is to choose the pyramid level as if it were the image index in a file with
-        // overviews
-        int pyramidLevelChoice = 0;
-        final ImageReadParam readP = new ImageReadParam();
-        try {
-            pyramidLevelChoice = setReadParams(overviewPolicy, readP, requestedEnvelope,
-                    requestedDim);
-            LOGGER.info("Pyramid level chosen: " + pyramidLevelChoice);
-        } catch (TransformException e) {
-            new IllegalArgumentException(e);
-        }
-
-        /*
          * For each raster in the raster dataset, obtain the tiles, pixel range, and resulting
          * envelope
          */
-        // map keyed by the raster id's that fit the requested extent
-        final Map<Long, QueryInfo> byRasterdIdQueries;
-        byRasterdIdQueries = findMatchingRasters(requestedEnvelope, requestedDim,
-                pyramidLevelChoice);
+        final List<QueryInfo> queries;
+        queries = findMatchingRasters(requestedEnvelope, requestedDim, overviewPolicy);
 
-        final GeneralEnvelope resultEnvelope = getResultEnvelope(byRasterdIdQueries.values());
+        final GeneralEnvelope resultEnvelope = getResultEnvelope(queries);
 
         /*
          * Once we collected the matching rasters and their image subsets, find out where in the
-         * overall resulting mosaic they fit. This will be used to set the ImageLayout for each
-         * raster's RenderedImage
+         * overall resulting mosaic they fit. If the rasters does not share the spatial resolution,
+         * the QueryInfo.resultDimension and QueryInfo.mosaicLocation width or height won't match
          */
         final Rectangle mosaicDimension;
-        mosaicDimension = RasterUtils.setMosaicLocations(rasterInfo, resultEnvelope,
-                byRasterdIdQueries.values());
+        mosaicDimension = RasterUtils.setMosaicLocations(rasterInfo, resultEnvelope, queries);
 
         /*
          * Gather the rendered images for each of the rasters that match the requested envelope
          */
-        final List<RenderedImage> mosaicTiles;
-        mosaicTiles = new ArrayList<RenderedImage>(byRasterdIdQueries.size());
-
         final ArcSDEPooledConnection conn = connectionPool.getConnection();
         final SeQuery preparedQuery = createSeQuery(conn);
         try {
             preparedQuery.execute();
 
+            final Map<Long, QueryInfo> byRasterdIdQueries = new HashMap<Long, QueryInfo>();
+            for (QueryInfo q : queries) {
+                byRasterdIdQueries.put(q.getRasterId(), q);
+            }
+
             SeRow row = preparedQuery.fetch();
+            StringBuilder sbExtent = new StringBuilder("MULTIPOLYGON (");
+            StringBuilder sbMosaic = new StringBuilder("MULTIPOLYGON (");
             while (row != null) {
                 final SeRasterAttr rAttr = row.getRaster(0);
-                final long rasterId = rAttr.getRasterId().longValue();
+                final Long rasterId = Long.valueOf(rAttr.getRasterId().longValue());
                 final RenderedImage rasterImage;
 
                 if (byRasterdIdQueries.containsKey(rasterId)) {
+
                     final QueryInfo rasterQueryInfo = byRasterdIdQueries.get(rasterId);
+                    LOGGER.finer(rasterQueryInfo.toString());
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        GeneralEnvelope env = rasterQueryInfo.getResultEnvelope();
+                        Rectangle mosaicLocation = rasterQueryInfo.getMosaicLocation();
+                        appendLoggingGeometries(sbExtent, sbMosaic, env, mosaicLocation);
+                    }
+                    final int pyramidLevelChoice = rasterQueryInfo.getPyramidLevel();
 
                     rasterImage = getRaster(pyramidLevelChoice, preparedQuery, row, rAttr,
                             rasterQueryInfo);
 
-                    mosaicTiles.add(rasterImage);
+                    rasterQueryInfo.setResultImage(rasterImage);
+
+                    // ImageIO
+                    // .write(rasterImage, "TIFF", new File(
+                    // "/home/groldan/arcsde_test/mosaicTile"
+                    // + rasterQueryInfo.getRasterId()));
                 }
                 // advance to the next raster in the dataset
                 row = preparedQuery.fetch();
             }
-
+            if (LOGGER.isLoggable(Level.FINEST)) {
+                sbExtent.setLength(sbExtent.length() - 1);
+                sbExtent.append("\n)");
+                sbMosaic.setLength(sbMosaic.length() - 1);
+                sbMosaic.append("\n)");
+                LOGGER.finest("Grid geometry:\n" + sbExtent.toString() + "\n Mosaic geometry:\n"
+                        + sbMosaic.toString());
+            }
         } catch (SeException e) {
             throw new ArcSdeException(e);
         } finally {
@@ -269,30 +281,59 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
          */
         final GridSampleDimension[] bands = rasterInfo.getGridSampleDimensions();
 
-        final RenderedImage coverageRaster = createMosaic(mosaicDimension, mosaicTiles);
+        final RenderedImage coverageRaster = createMosaic(mosaicDimension, queries);
 
         return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
                 null);
     }
 
-    private Map<Long, QueryInfo> findMatchingRasters(final GeneralEnvelope requestedEnvelope,
-            final Rectangle requestedDim, int pyramidLevelChoice) {
-        final Map<Long, QueryInfo> byRasterdIdQueries = new HashMap<Long, QueryInfo>();
+    private void appendLoggingGeometries(StringBuilder sbExtent, StringBuilder sbMosaic,
+            GeneralEnvelope env, Rectangle mosaicLocation) {
+        sbExtent.append("\n  ((" + env.getMinimum(0) + " " + env.getMinimum(1) + ", "
+                + env.getMaximum(0) + " " + env.getMinimum(1) + ", " + env.getMaximum(0) + " "
+                + env.getMaximum(1) + ", " + env.getMinimum(0) + " " + env.getMaximum(1) + ", "
+                + env.getMinimum(0) + " " + env.getMinimum(1) + ")),");
+        sbMosaic.append("\n  ((" + mosaicLocation.getMinX() + " " + mosaicLocation.getMinY() + ", "
+                + mosaicLocation.getMaxX() + " " + mosaicLocation.getMinY() + ", "
+                + mosaicLocation.getMaxX() + " " + mosaicLocation.getMaxY() + ", "
+                + mosaicLocation.getMinX() + " " + mosaicLocation.getMaxY() + ", "
+                + mosaicLocation.getMinX() + " " + mosaicLocation.getMinY() + ")),");
+    }
+
+    private List<QueryInfo> findMatchingRasters(final GeneralEnvelope requestedEnvelope,
+            final Rectangle requestedDim, final OverviewPolicy overviewPolicy) {
+
         final int numRasters = rasterInfo.getNumRasters();
+
+        final List<QueryInfo> byRasterdIdQueries = new ArrayList<QueryInfo>(numRasters);
+
+        MathTransform modelToRaster;
+        {
+            int pyramidLevel = rasterInfo.getOptimalPyramidLevel(0, overviewPolicy,
+                    requestedEnvelope, requestedDim);
+            GeneralEnvelope gridEnvelope = rasterInfo.getGridEnvelope(0, pyramidLevel);
+            Rectangle gridRange = rasterInfo.getGridRange(0, pyramidLevel);
+            MathTransform rasterToModel = RasterUtils.createRasterToModel(gridRange, gridEnvelope);
+            try {
+                modelToRaster = rasterToModel.inverse();
+            } catch (NoninvertibleTransformException e) {
+                throw new RuntimeException(e);
+            }
+        }
         for (int rasterN = 0; rasterN < numRasters; rasterN++) {
+
             final QueryInfo rasterQueryInfo = RasterUtils.fitRequestToRaster(requestedEnvelope,
-                    requestedDim, rasterInfo, rasterN, pyramidLevelChoice);
-            LOGGER.info(rasterQueryInfo.toString());
+                    requestedDim, rasterInfo, rasterN, overviewPolicy);
 
             if (rasterQueryInfo.getResultDimension().getWidth() > 0) {
                 // the requested envelope overlaps the raster envelope
-                byRasterdIdQueries.put(rasterQueryInfo.getRasterId(), rasterQueryInfo);
+                byRasterdIdQueries.add(rasterQueryInfo);
             }
         }
         return byRasterdIdQueries;
     }
 
-    private GeneralEnvelope getResultEnvelope(final Collection<QueryInfo> queryInfos) {
+    private GeneralEnvelope getResultEnvelope(final List<QueryInfo> queryInfos) {
 
         GeneralEnvelope finalEnvelope = null;
 
@@ -317,20 +358,36 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
      * 
      * @param mosaicDimension
      *            the dimensions of the resulting image
-     * @param rasters
+     * @param queries
      *            the images to mosaic together
      * @return the mosaiced image
      */
     private RenderedImage createMosaic(final Rectangle mosaicDimension,
-            final List<RenderedImage> rasters) {
-        if (rasters.size() == 1) {
+            final List<QueryInfo> queries) {
+        if (queries.size() == 1) {
             // no need to mosaic at all
-            return rasters.get(0);
+            return queries.get(0).getResultImage();
+        }
+
+        List<RenderedImage> translated = new ArrayList<RenderedImage>(queries.size());
+
+        for (QueryInfo query : queries) {
+            RenderedImage image = query.getResultImage();
+            Rectangle mosaicLocation = query.getMosaicLocation();
+            ParameterBlock pb = new ParameterBlock();
+            pb.addSource(image);
+            pb.add(Float.valueOf((float) mosaicLocation.getX()));
+            pb.add(Float.valueOf((float) mosaicLocation.getY()));
+            pb.add(new InterpolationNearest());
+            RenderedOp trans = JAI.create("translate", pb, null);
+            translated.add(trans);
         }
 
         ParameterBlock mosaicParams = new ParameterBlock();
-        for (RenderedImage tile : rasters) {
-            mosaicParams.addSource(tile);
+        for (RenderedImage img : translated) {
+            System.err.println("--> adding to mosaic: " + img.getMinX() + "," + img.getMinY() + ","
+                    + img.getWidth() + "," + img.getHeight());
+            mosaicParams.addSource(img);
         }
         mosaicParams.add(MosaicDescriptor.MOSAIC_TYPE_OVERLAY); // mosaic type
         mosaicParams.add(null); // alpha mask
@@ -356,17 +413,9 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         /*
          * Create the tiled raster covering the full area of the matching tiles
          */
-
-        // where the resulting raster fits into the overal mosaic being built for the raster dataset
-        final Rectangle imageLayout = rasterQueryInfo.getMosaicLocation();
+        final Rectangle resultDimension = rasterQueryInfo.getResultDimension();
         fullTilesRaster = createTiledRaster(preparedQuery, row, rAttr, matchingTiles,
-                pyramidLevelChoice, imageLayout.getLocation());
-
-        /*
-         * now crop it to the desired dimensions
-         */
-        // final Rectangle resultDimension = rasterQueryInfo.getResultDimension();
-        rasterImage = cropToRequiredDimension(fullTilesRaster, imageLayout);
+                pyramidLevelChoice, resultDimension.getLocation());
 
         /*
          * REVISIT: This is odd, we need to force the data to be loaded so we're free to release the
@@ -374,12 +423,23 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
          * GCE api having a very clear usage workflow that ensures close() is always being called to
          * the underlying ImageInputStream so we could let it close the SeQuery when done.
          */
-        rasterImage.getData();
+        try {
+            fullTilesRaster.getData();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Fetching data for " + rasterQueryInfo.toString(), e);
+        }
+
+        /*
+         * now crop it to the desired dimensions
+         */
+        // where the resulting raster fits into the overal mosaic being built for the raster dataset
+        // final Rectangle imageLayout = rasterQueryInfo.getResultDimension();
+        rasterImage = cropToRequiredDimension(fullTilesRaster, resultDimension);
 
         return rasterImage;
     }
 
-    private RenderedOp cropToRequiredDimension(final RenderedImage fullTilesRaster,
+    private RenderedImage cropToRequiredDimension(final RenderedImage fullTilesRaster,
             final Rectangle cropTo) {
 
         int minX = fullTilesRaster.getMinX();
@@ -391,6 +451,13 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         if (!origDim.contains(cropTo)) {
             throw new IllegalArgumentException("Original image (" + origDim
                     + ") does not contain desired dimension (" + cropTo + ")");
+        } else if (origDim.equals(cropTo)) {
+            if (LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.finer("No need to crop image, full tiled dimension and target one "
+                        + "do match: original: " + width + "x" + height + ", target: "
+                        + cropTo.width + "x" + cropTo.height);
+            }
+            return fullTilesRaster;
         }
 
         ParameterBlock cropParams = new ParameterBlock();
