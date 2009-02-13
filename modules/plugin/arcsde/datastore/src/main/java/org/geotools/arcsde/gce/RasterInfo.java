@@ -47,7 +47,7 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32482 2009-02-13 17:16:21Z groldan $
+ * @version $Id: RasterInfo.java 32483 2009-02-13 21:19:39Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -233,7 +233,9 @@ class RasterInfo {
                 maxx = Math.max(maxx, (int) Math.ceil(rasterGridRangeInDataSet.getMaximum(0)));
                 maxy = Math.max(maxy, (int) Math.ceil(rasterGridRangeInDataSet.getMaximum(1)));
             }
-            Rectangle range = new Rectangle(minx, miny, maxx - minx, maxy - miny);
+            int width = maxx - minx;
+            int height = maxy - miny;
+            Rectangle range = new Rectangle(0, 0, width, height);
             originalGridRange = new GeneralGridRange(range);
         }
         return originalGridRange;

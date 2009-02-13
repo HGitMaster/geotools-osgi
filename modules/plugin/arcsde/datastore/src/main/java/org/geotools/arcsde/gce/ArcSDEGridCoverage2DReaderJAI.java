@@ -21,15 +21,15 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
-import java.io.EOFException;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +38,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
@@ -46,7 +45,6 @@ import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.MosaicDescriptor;
 
@@ -71,7 +69,6 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.operation.TransformException;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
@@ -87,7 +84,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32482 2009-02-13 17:16:21Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32483 2009-02-13 21:19:39Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -200,6 +197,13 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
          */
         final List<QueryInfo> queries;
         queries = findMatchingRasters(requestedEnvelope, requestedDim, overviewPolicy);
+        if (queries.isEmpty()) {
+            /*
+             * none of the rasters match the requested envelope. This may happen by the tiled nature
+             * of the raster dataset
+             */
+            return createFakeCoverage(requestedEnvelope, requestedDim);
+        }
 
         final GeneralEnvelope resultEnvelope = getResultEnvelope(queries);
 
@@ -287,6 +291,26 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                 null);
     }
 
+    /**
+     * Called when the requested envelope do overlap the coverage envelope but none of the rasters
+     * in the dataset do
+     * 
+     * @param requestedEnvelope
+     * @param requestedDim
+     * @return
+     */
+    private GridCoverage createFakeCoverage(GeneralEnvelope requestedEnvelope,
+            Rectangle requestedDim) {
+
+        ImageTypeSpecifier its = rasterInfo.getRenderedImageSpec();
+        SampleModel sampleModel = its.getSampleModel(requestedDim.width, requestedDim.height);
+        ColorModel colorModel = its.getColorModel();
+
+        WritableRaster raster = Raster.createWritableRaster(sampleModel, null);
+        BufferedImage image = new BufferedImage(colorModel, raster, false, null);
+        return coverageFactory.create(coverageName, image, requestedEnvelope);
+    }
+
     private void appendLoggingGeometries(StringBuilder sbExtent, StringBuilder sbMosaic,
             GeneralEnvelope env, Rectangle mosaicLocation) {
         sbExtent.append("\n  ((" + env.getMinimum(0) + " " + env.getMinimum(1) + ", "
@@ -325,7 +349,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             final QueryInfo rasterQueryInfo = RasterUtils.fitRequestToRaster(requestedEnvelope,
                     requestedDim, rasterInfo, rasterN, overviewPolicy);
 
-            if (rasterQueryInfo.getResultDimension().getWidth() > 0) {
+            if (rasterQueryInfo.getResultDimensionInsideTiledImage().getWidth() > 0) {
                 // the requested envelope overlaps the raster envelope
                 byRasterdIdQueries.add(rasterQueryInfo);
             }
@@ -410,12 +434,12 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         // covers an area of full tiles
         final RenderedImage fullTilesRaster;
 
+        final Rectangle tiledSubSet = rasterQueryInfo.getResultDimensionInsideTiledImage();
         /*
          * Create the tiled raster covering the full area of the matching tiles
          */
-        final Rectangle resultDimension = rasterQueryInfo.getResultDimension();
         fullTilesRaster = createTiledRaster(preparedQuery, row, rAttr, matchingTiles,
-                pyramidLevelChoice, resultDimension.getLocation());
+                pyramidLevelChoice, tiledSubSet.getLocation());
 
         /*
          * REVISIT: This is odd, we need to force the data to be loaded so we're free to release the
@@ -432,9 +456,17 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         /*
          * now crop it to the desired dimensions
          */
-        // where the resulting raster fits into the overal mosaic being built for the raster dataset
-        // final Rectangle imageLayout = rasterQueryInfo.getResultDimension();
-        rasterImage = cropToRequiredDimension(fullTilesRaster, resultDimension);
+        {
+            final Rectangle tiledImageSize = rasterQueryInfo.getTiledImageSize();
+            int width = fullTilesRaster.getWidth();
+            int height = fullTilesRaster.getHeight();
+            if (tiledImageSize.width != width || tiledImageSize.height != height) {
+                throw new IllegalStateException("Read image is not of the expected size. Image="
+                        + width + "x" + height + ", expected: " + tiledImageSize.width + "x"
+                        + tiledImageSize.height);
+            }
+        }
+        rasterImage = cropToRequiredDimension(fullTilesRaster, tiledSubSet);
 
         return rasterImage;
     }
@@ -500,7 +532,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
     private RenderedOp createTiledRaster(final SeQuery preparedQuery, final SeRow row,
             final SeRasterAttr rAttr, final Rectangle matchingTiles, final int pyramidLevel,
-            final Point mosaicLocation) throws IOException {
+            final Point offset) throws IOException {
 
         final int tileWidth;
         final int tileHeight;
@@ -523,6 +555,11 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             int maxTileY = minTileY + matchingTiles.height - 1;
             LOGGER.fine("Requesting tiles [" + minTileX + "," + minTileY + ":" + maxTileX + ","
                     + maxTileY + "]");
+
+            Rectangle tiledImageSize = new Rectangle(0, 0, tileWidth * matchingTiles.width,
+                    tileHeight * matchingTiles.height);
+
+            LOGGER.fine("Tiled image size: " + tiledImageSize);
 
             final int interleaveType = SeRaster.SE_RASTER_INTERLEAVE_BIP;
 
@@ -569,13 +606,13 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         // building the final image layout
         final ImageLayout imageLayout;
         {
-            int minX = mosaicLocation.x;
-            int minY = mosaicLocation.y;
+            int minX = offset.x;
+            int minY = offset.y;
             int width = tiledImageWidth;
             int height = tiledImageHeight;
 
-            int tileGridXOffset = 0;
-            int tileGridYOffset = 0;
+            int tileGridXOffset = offset.x;
+            int tileGridYOffset = offset.y;
 
             imageLayout = new ImageLayout(minX, minY, width, height, tileGridXOffset,
                     tileGridYOffset, tileWidth, tileHeight, sampleModel, colorModel);

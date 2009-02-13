@@ -246,7 +246,6 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     }
 
     @Test
-    @Ignore
     public void testReadRasterCatalogOnline() throws Exception {
         tableName = "SDE.IMG_USGSQUAD_SGBASE";
         final AbstractGridCoverage2DReader reader = getReader();
@@ -453,8 +452,8 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
                 + requestedEnvelope + "\n expected envelope  :" + expectedEnvelope
                 + "\n returned envelope  :" + returnedEnvelope);
 
-        assertEquals(500, image.getWidth());
-        assertEquals(500, image.getHeight());
+        assertEquals(501, image.getWidth());
+        assertEquals(501, image.getHeight());
         // assertEquals(expectedEnvelope, returnedEnvelope);
     }
 
@@ -513,7 +512,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
                 + requestedEnvelope + "\n expected envelope  :" + expectedEnvelope
                 + "\n returned envelope  :" + returnedEnvelope);
 
-        assertEquals(50, image.getWidth());
+        assertEquals(51, image.getWidth());
         assertEquals(50, image.getHeight());
         // assertEquals(expectedEnvelope, returnedEnvelope);
     }
