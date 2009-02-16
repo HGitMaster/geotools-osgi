@@ -69,8 +69,8 @@ import org.geotools.resources.image.ImageUtilities;
  * is left in an undetermined state and should not be used anymore.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
- * @version $Id: ImageWorker.java 31735 2008-10-30 01:55:57Z simboss $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
+ * @version $Id: ImageWorker.java 32486 2009-02-16 15:30:17Z simonegiannecchini $
  * @author Simone Giannecchini
  * @author Bryce Nordgren
  * @author Martin Desruisseaux
@@ -1066,9 +1066,8 @@ public class ImageWorker {
             final IndexColorModel icm = (IndexColorModel) cm;
             final boolean gray     = ColorUtilities.isGrayPalette(icm, checkTransparent);
             final boolean alpha    = icm.hasAlpha();
-            final int     numSourceBands = icm.getNumComponents();
             /*
-             * If the image is grayscale, retain only the first band.
+             * If the image is grayscale, retain only the needed bands.
              *
              */            
             final int     numDestinationBands = gray?(alpha?2:1):(alpha?4:3);
@@ -1076,7 +1075,11 @@ public class ImageWorker {
             final byte    data[][] = new byte[numDestinationBands][icm.getMapSize()];
             icm.getReds  (data[0]);
             if(numDestinationBands>=2)
-            	icm.getGreens(data[1]);
+            	// remember to optimize for grayscale images
+            	if(!gray)
+            		icm.getGreens(data[1]);
+            	else
+            		icm.getAlphas(data[1]);
             if(numDestinationBands>=3)
             	icm.getBlues (data[2]);
             if (numDestinationBands == 4) {
