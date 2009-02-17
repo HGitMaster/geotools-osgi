@@ -306,7 +306,7 @@ public class Import {
             if (typ==ImportTyp.CSV)
             	imp = new Import(config, spatialTableName, tileTableName,csvUrl,csvDelim,commitCount,con,typ);
             if (typ==ImportTyp.DIR) {            	
-            	imp = new Import(config, spatialTableName, tileTableName,new File(dir).toURL(),extension,commitCount,con,typ);
+            	imp = new Import(config, spatialTableName, tileTableName,new File(dir).toURI().toURL(),extension,commitCount,con,typ);
             }
             
             imp.fillSpatialTable();
@@ -529,7 +529,7 @@ public class Import {
     	
     	if (typ==ImportTyp.DIR) {
 			try {
-				return imageFiles[currentPos-1].toURL();
+				return imageFiles[currentPos-1].toURI().toURL();
 			} catch (MalformedURLException e1) {
 			}
     	}
@@ -752,13 +752,31 @@ public class Import {
 
     private Geometry getGeomFromWorldFile(File imageFile, int width, int height) throws IOException{
     	StringBuffer buff = new StringBuffer(imageFile.getAbsolutePath());
+    	
+    	// try to  find world file, e.g for *.png *.pgw
     	char charToRemove = buff.charAt(buff.length()-2);
     	buff = buff.deleteCharAt(buff.length()-2);
     	if (Character.isUpperCase(charToRemove))
     		buff.append("W");
     	else 
     		buff.append("w");
-    	BufferedReader in = new BufferedReader(new FileReader(buff.toString()));
+    	
+    	File f = new File(buff.toString());
+    	
+    	if (f.exists()==false) { // check if worldfile has "wld" extension
+    		f=null;
+    		int index = buff.lastIndexOf(".");
+    		if (index != -1) { 
+    			buff.delete(index+1,buff.length());
+    			buff.append("wld");
+    			f = new File(buff.toString());    			
+    		}
+    	}
+    	
+    	if (f.exists()==false)
+    		throw new IOException("Cannot find world file for "+ imageFile.getAbsolutePath());
+    	
+    	BufferedReader in = new BufferedReader(new FileReader(f));
     	Double resx = new Double(in.readLine());
     	in.readLine(); // skip rotate x
     	in.readLine(); // skip rotaty y
