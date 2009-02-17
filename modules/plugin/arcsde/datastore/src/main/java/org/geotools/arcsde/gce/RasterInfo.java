@@ -48,7 +48,7 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32494 2009-02-17 14:51:14Z groldan $
+ * @version $Id: RasterInfo.java 32501 2009-02-17 19:33:59Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -282,11 +282,34 @@ class RasterInfo {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("ArcSDE Raster: " + getRasterTable());
-        sb.append(", raster columns: ").append(Arrays.asList(getRasterColumns()));
+        sb.append(", Raster columns: ").append(Arrays.asList(getRasterColumns()));
         sb.append(", Num bands: ").append(getNumBands());
         sb.append(", Dimension: ").append(getImageWidth()).append("x").append(getImageHeight());
-        for (PyramidInfo pyramid : subRasterInfo) {
-            sb.append("\n\t").append(pyramid.toString());
+        sb.append(", Pixel type: ").append(getCellType());
+        sb.append(", Has Color Map: ").append(isColorMapped());
+        for (int rasterIndex = 0; rasterIndex < getNumRasters(); rasterIndex++) {
+            PyramidInfo pyramid = getRasterInfo(rasterIndex);
+            sb.append("\n\tRaster " + pyramid.getRasterId()).append(": ");
+            sb.append(pyramid.getNumLevels()).append(" levels");
+            Rectangle grid = getGridRange(rasterIndex, 0);
+            sb.append(", Grid range: ").append(grid.width).append("x").append(grid.height);
+            sb.append(", Tile size: ").append(pyramid.getTileWidth()).append("x").append(
+                    pyramid.getTileHeight());
+            GeneralEnvelope env = pyramid.getOriginalEnvelope();
+            sb.append(", Envelope: ").append(env.getMinimum(0)).append(",").append(
+                    env.getMinimum(1)).append(" ").append(env.getMaximum(0)).append(",").append(
+                    env.getMaximum(1));
+            for (RasterBandInfo band : pyramid.getBands()) {
+                sb.append("\n\t\t").append(band.getBandName()).append(": ");
+                if (band.isHasStats()) {
+                    sb.append("Min: ").append(band.getStatsMin());
+                    sb.append(", Max: ").append(band.getStatsMax());
+                    sb.append(", Mean: ").append(band.getStatsMean());
+                    sb.append(", Std. Dev: ").append(band.getStatsStdDev());
+                } else {
+                    sb.append(" NO STATISTICS GENERATED");
+                }
+            }
         }
         return sb.toString();
     }
