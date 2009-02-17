@@ -246,6 +246,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     }
 
     @Test
+    @Ignore
     public void testReadRasterCatalogOnline() throws Exception {
         tableName = "SDE.IMG_USGSQUAD_SGBASE";
         final AbstractGridCoverage2DReader reader = getReader();
@@ -278,6 +279,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     }
 
     @Test
+    @Ignore
     public void testReadRasterCatalogOnline2() throws Exception {
         tableName = "SDE.COLOROQ_TEST";
         final AbstractGridCoverage2DReader reader = getReader();
