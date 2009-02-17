@@ -160,7 +160,7 @@ class PyramidInfo {
      * @param pyramidLevel
      * @return resx, resy, scalefactor
      */
-    private double[] getResolution(final int pyramidLevel) {
+    double[] getResolution(final int pyramidLevel) {
         final double highestRes = getPyramidLevel(0).getXRes();
         PyramidLevelInfo level = getPyramidLevel(pyramidLevel);
         double[] resolution = new double[3];

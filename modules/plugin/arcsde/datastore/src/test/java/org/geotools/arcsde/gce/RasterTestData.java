@@ -591,7 +591,7 @@ public class RasterTestData {
      * @throws Exception
      */
     public String loadRasterCatalog() throws Exception {
-        final int numberOfBands = 1;
+        final int numberOfBands = 3;
         final RasterCellType pixelType = TYPE_8BIT_U;
         final String tableName = getRasterTableName(pixelType, numberOfBands) + "_CAT";
 
@@ -614,33 +614,43 @@ public class RasterTestData {
         try {
             createRasterColumn(tableName, crs, conn);
 
-            int imageWidth = 256;
-            int imageHeight = 256;
+            int imageWidth;
+            int imageHeight;
             SeExtent extent;
             int maxLevels;
 
-            maxLevels = 3;
+            maxLevels = 2;
             extent = new SeExtent(0, 0, 256, 256);
+            imageWidth = 228;
+            imageHeight = 228;
             addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
                     pixelType, maxLevels, extent);
 
             maxLevels = 3;
             extent = new SeExtent(512, 512, 768, 768);
+            imageWidth = 456;
+            imageHeight = 456;
             addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
                     pixelType, maxLevels, extent);
 
             maxLevels = 3;
             extent = new SeExtent(512, 0, 768, 256);
+            imageWidth = 532;
+            imageHeight = 532;
             addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
                     pixelType, maxLevels, extent);
             
             maxLevels = 3;
             extent = new SeExtent(0, 512, 256, 768);
+            imageWidth = 1024;
+            imageHeight = 1024;
             addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
                     pixelType, maxLevels, extent);
 
             maxLevels = 3;
             extent = new SeExtent(256, 256, 512, 512);
+            imageWidth = 99;
+            imageHeight = 99;
             addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
                     pixelType, maxLevels, extent);
         } finally {

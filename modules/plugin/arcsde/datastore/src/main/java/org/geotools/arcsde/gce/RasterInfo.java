@@ -19,6 +19,7 @@ package org.geotools.arcsde.gce;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32483 2009-02-13 21:19:39Z groldan $
+ * @version $Id: RasterInfo.java 32494 2009-02-17 14:51:14Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -394,5 +395,17 @@ class RasterInfo {
             }
         }
         throw new IllegalArgumentException("rasterId: " + rasterId);
+    }
+
+    public double[] getResolution(int rasterN, int pyramidLevel) {
+        PyramidInfo rasterInfo = getRasterInfo(rasterN);
+        double[] resolution = rasterInfo.getResolution(pyramidLevel);
+        return resolution;
+    }
+
+    public Point getTileOffset(final int rasterIndex, final int pyramidLevel) {
+        PyramidInfo rasterInfo = getRasterInfo(rasterIndex);
+        PyramidLevelInfo level = rasterInfo.getPyramidLevel(pyramidLevel);
+        return new Point(level.getXOffset(), level.getYOffset());
     }
 }

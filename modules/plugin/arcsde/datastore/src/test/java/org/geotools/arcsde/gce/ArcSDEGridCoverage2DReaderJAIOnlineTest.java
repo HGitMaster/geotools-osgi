@@ -254,15 +254,18 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         final GeneralEnvelope originalEnvelope = reader.getOriginalEnvelope();
         final GeneralGridRange originalGridRange = reader.getOriginalGridRange();
 
-        final int reqWidth = originalGridRange.getLength(0) / 100;
-        final int reqHeight = originalGridRange.getLength(1) / 100;
+        final int reqWidth = originalGridRange.getLength(0) / 50;
+        final int reqHeight = originalGridRange.getLength(1) / 50;
 
         GeneralEnvelope reqEnvelope = new GeneralEnvelope(originalEnvelope
                 .getCoordinateReferenceSystem());
-        double minx = originalEnvelope.getMinimum(0) + 1000;
-        double miny = originalEnvelope.getMinimum(1) + 1000;
-        double maxx = minx + originalEnvelope.getSpan(0) - 1000;
-        double maxy = miny + originalEnvelope.getSpan(1) - 1000;
+        double deltaX = originalEnvelope.getSpan(0) / 1;
+        double deltaY = originalEnvelope.getSpan(1) / 1;
+
+        double minx = originalEnvelope.getMedian(0) - deltaX;
+        double miny = originalEnvelope.getMedian(1) - deltaY;
+        double maxx = minx + 2 * deltaX;
+        double maxy = miny + 2 * deltaY;
         reqEnvelope.setEnvelope(minx, miny, maxx, maxy);
 
         assertTrue(originalEnvelope.intersects(reqEnvelope, true));
@@ -275,9 +278,9 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     }
 
     @Test
-    public void testReadRasterCatalog() throws Exception {
+    public void testReadRasterCatalogFull() throws Exception {
         tableName = rasterTestData.loadRasterCatalog();
-        GridCoverage2D coverage = testReadFullLevel0(TYPE_8BIT_U, 1, "RasterCatalog");
+        GridCoverage2D coverage = testReadFullLevel0(TYPE_8BIT_U, 3, "RasterCatalog");
 
         GridGeometry2D gridGeometry = coverage.getGridGeometry();
         Envelope2D envelope2D = gridGeometry.getEnvelope2D();
@@ -290,9 +293,38 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         //
         // assertEquals(512, gridRange2D.width);
         // assertEquals(512, gridRange2D.height);
+    }
+
+    @Test
+    public void testReadRasterCatalogSubset() throws Exception {
+        tableName = rasterTestData.loadRasterCatalog();
+        final AbstractGridCoverage2DReader reader = getReader();
+        assertNotNull("Couldn't obtain a reader for " + tableName, reader);
+
+        final GeneralEnvelope originalEnvelope = reader.getOriginalEnvelope();
+        final GeneralGridRange originalGridRange = reader.getOriginalGridRange();
+
+        final int reqWidth = originalGridRange.getLength(0) / 2;
+        final int reqHeight = originalGridRange.getLength(1) / 2;
+
+        GeneralEnvelope reqEnvelope = new GeneralEnvelope(originalEnvelope
+                .getCoordinateReferenceSystem());
+        double deltaX = originalEnvelope.getSpan(0) / 6;
+        double deltaY = originalEnvelope.getSpan(1) / 6;
+
+        double minx = originalEnvelope.getMinimum(0) + deltaX;
+        double miny = originalEnvelope.getMinimum(1) + deltaY;
+        double maxx = originalEnvelope.getMaximum(0) - deltaX;
+        double maxy = originalEnvelope.getMaximum(1) - deltaY;
+        reqEnvelope.setEnvelope(minx, miny, maxx, maxy);
+
+        assertTrue(originalEnvelope.intersects(reqEnvelope, true));
+
+        final GridCoverage2D coverage = readCoverage(reader, reqWidth, reqHeight, reqEnvelope);
+        assertNotNull("read coverage returned null", coverage);
 
         RenderedImage image = coverage.getRenderedImage();
-        writeToDisk(image, "testReadRasterCatalog");
+        writeToDisk(image, "testReadRasterCatalogSubset");
     }
 
     @Test
@@ -374,7 +406,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
             assertEquals(cellType.getBitsPerSample(), sampleSize[band]);
         }
 
-        final String fileName = "tesReadFullLevel0_" + fileNamePostFix;
+        final String fileName = "testReadFullLevel0_" + fileNamePostFix;
         writeToDisk(image, fileName);
 
         return coverage;
