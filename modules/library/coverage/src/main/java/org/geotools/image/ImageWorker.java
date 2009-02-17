@@ -70,7 +70,7 @@ import org.geotools.resources.image.ImageUtilities;
  *
  * @since 2.3
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
- * @version $Id: ImageWorker.java 32489 2009-02-17 00:33:43Z simonegiannecchini $
+ * @version $Id: ImageWorker.java 32491 2009-02-17 00:39:21Z simonegiannecchini $
  * @author Simone Giannecchini
  * @author Bryce Nordgren
  * @author Martin Desruisseaux
@@ -1096,7 +1096,7 @@ public class ImageWorker {
 				}
 				break;
 				
-			case DataBuffer.TYPE_USHORT:case DataBuffer.TYPE_SHORT:
+			case DataBuffer.TYPE_USHORT:
 			{
 				final int mapSize=icm.getMapSize();
 				final short    data[][] = new short[numDestinationBands][mapSize];
