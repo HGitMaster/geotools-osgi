@@ -75,7 +75,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32494 2009-02-17 14:51:14Z groldan $
+ * @version $Id: RasterUtils.java 32495 2009-02-17 15:50:05Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -349,140 +349,23 @@ class RasterUtils {
         }
     }
 
-    public static QueryInfo fitRequestToRaster(final GeneralEnvelope requestedEnvelope,
-            final Rectangle requestedDim, final RasterInfo rasterInfo, final int rasterIndex,
-            final OverviewPolicy overviewPolicy) {
-
-        final int pyramidLevel;
-        pyramidLevel = rasterInfo.getOptimalPyramidLevel(rasterIndex, overviewPolicy,
-                requestedEnvelope, requestedDim);
-
-        final CoordinateReferenceSystem nativeCrs;
-        {
-            GeneralEnvelope envelope = rasterInfo.getGridEnvelope(rasterIndex, pyramidLevel);
-            nativeCrs = envelope.getCoordinateReferenceSystem();
-            CoordinateReferenceSystem requestCrs = requestedEnvelope.getCoordinateReferenceSystem();
-            if (!CRS.equalsIgnoreMetadata(nativeCrs, requestCrs)) {
-                throw new IllegalArgumentException("Request CRS and native CRS shall be equivalent");
-            }
-        }
-
-        QueryInfo queryInfo = new QueryInfo();
-        queryInfo.setRasterId(rasterInfo.getRasterId(rasterIndex));
-        queryInfo.setPyramidLevel(pyramidLevel);
-        queryInfo.setRequestedEnvelope(requestedEnvelope);
-        queryInfo.setRequestedDim(requestedDim);
-
-        final Rectangle levelGridRange = rasterInfo.getGridRange(rasterIndex, pyramidLevel);
-        final GeneralEnvelope levelEnvelope = rasterInfo.getGridEnvelope(rasterIndex, pyramidLevel);
-
-        if (!levelEnvelope.intersects(requestedEnvelope, true)) {
-            // don't bother
-            return queryInfo;
-        }
-
-        final MathTransform rasterToModel = createRasterToModel(levelGridRange, levelEnvelope);
-
-        /*
-         * Which pixel grid range overlaps the level grid range for the requested envelope
-         */
-        final Rectangle pixelSpaceOverlappingArea;
-        pixelSpaceOverlappingArea = calculateMatchingDimension(requestedEnvelope, rasterToModel,
-                levelGridRange);
-
-        if (pixelSpaceOverlappingArea.width > 0 && pixelSpaceOverlappingArea.height > 0) {
-            // there is at least one pixel to query
-            final GeneralEnvelope resultEnvelope;
-            final Rectangle matchingTiles;
-            final Rectangle tiledImageGridRange;
-            final Rectangle resultDimensionInsideTiledImage;
-
-            final Dimension tileSize = rasterInfo.getTileDimension(rasterIndex);
-            final int numTilesWide = rasterInfo.getNumTilesWide(rasterIndex, pyramidLevel);
-            final int numTilesHigh = rasterInfo.getNumTilesHigh(rasterIndex, pyramidLevel);
-            /*
-             * Which tile range fully covers the pixel grid range that matches the requested
-             * envelope
-             */
-            matchingTiles = findMatchingTiles(tileSize, numTilesWide, numTilesHigh,
-                    pixelSpaceOverlappingArea);
-
-            int tiledImageMinX = matchingTiles.x * tileSize.width;
-            int tiledImageMinY = matchingTiles.y * tileSize.height;
-            tiledImageGridRange = new Rectangle(tiledImageMinX, tiledImageMinY, matchingTiles.width
-                    * tileSize.width, matchingTiles.height * tileSize.height);
-
-            /*
-             * What is the grid range inside the whole level grid range that fits into the matching
-             * tiles
-             */
-            resultDimensionInsideTiledImage = getResultDimensionForTileRange(tiledImageGridRange,
-                    pixelSpaceOverlappingArea);
-
-            // resultEnvelope = getResultEnvelope(pixelSpaceOverlappingArea, rasterToModel,
-            // nativeCrs);
-            /*
-             * What is the envelope for the pixel grid range?
-             */
-            resultEnvelope = getResultEnvelope(resultDimensionInsideTiledImage, rasterToModel,
-                    nativeCrs);
-
-            queryInfo.setResultEnvelope(resultEnvelope);
-            queryInfo.setMatchingTiles(matchingTiles);
-            queryInfo.setTiledImageSize(tiledImageGridRange);
-            queryInfo.setResultDimensionInsideTiledImage(resultDimensionInsideTiledImage);
-        }
-
-        return queryInfo;
-    }
-
-    /**
-     * @return the requested resolutions on the x and y axis as the elements at indices 0 and 1
-     *         respectively
-     */
-    private static double[] getResolution(GeneralEnvelope requestedEnvelope, Rectangle requestedDim) {
-        double[] requestedRes = new double[2];
-        requestedRes[0] = requestedEnvelope.getSpan(0) / requestedDim.getWidth();
-        requestedRes[1] = requestedEnvelope.getSpan(1) / requestedDim.getHeight();
-        return requestedRes;
-    }
-
     public static MathTransform createRasterToModel(final Rectangle levelGridRange,
             final GeneralEnvelope levelEnvelope) {
         /*
          * GeneralGridRange range's is exclusive for the higher coords, so we expand it by one in
          * both dimensions
          */
-        // Rectangle expandedRange = new Rectangle(levelRange.x, levelRange.y, levelRange.width + 1,
-        // levelRange.height + 1);
-        // GeneralGridRange gridRange = new GeneralGridRange(expandedRange);
+        Rectangle expandedRange = new Rectangle(levelGridRange.x, levelGridRange.y,
+                levelGridRange.width + 1, levelGridRange.height + 1);
+        GeneralGridRange gridRange = new GeneralGridRange(expandedRange);
         // create a raster to model transform, from this tile pixel space to the tile's geographic
         // extent
-        // GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(gridRange, levelEnvelope);
         GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(new GeneralGridRange(
                 levelGridRange), levelEnvelope);
         geMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
 
         final MathTransform rasterToModel = geMapper.createTransform();
         return rasterToModel;
-    }
-
-    private static GeneralEnvelope getResultEnvelope(final Rectangle pixelSpaceOverlappingArea,
-            final MathTransform rasterToModel, final CoordinateReferenceSystem crs) {
-
-        GeneralEnvelope envelope = new GeneralEnvelope(crs);
-        envelope.setEnvelope(pixelSpaceOverlappingArea.getMinX(), pixelSpaceOverlappingArea
-                .getMinY(), pixelSpaceOverlappingArea.getMaxX(), pixelSpaceOverlappingArea
-                .getMaxY());
-
-        GeneralEnvelope resultingEnvelope;
-        try {
-            resultingEnvelope = CRS.transform(rasterToModel, envelope);
-        } catch (TransformException e) {
-            throw new RuntimeException("Error transforming pixel range to target CRS");
-        }
-        resultingEnvelope.setCoordinateReferenceSystem(crs);
-        return resultingEnvelope;
     }
 
     private static Rectangle getResultDimensionForTileRange(final Rectangle tiledImageGridRange,
@@ -515,9 +398,6 @@ class RasterUtils {
      */
     private static Rectangle findMatchingTiles(final Dimension tileSize, int numTilesWide,
             int numTilesHigh, final Rectangle pixelRange) {
-
-        final Rectangle tiledGridRange = new Rectangle(0, 0, tileSize.width * numTilesWide,
-                tileSize.height * numTilesHigh);
 
         final int minPixelX = pixelRange.x;
         final int minPixelY = pixelRange.y;
@@ -619,11 +499,11 @@ class RasterUtils {
                 throw new IllegalArgumentException(e);
             }
 
-            levelMinPixelX = (int) Math.round(requestedPixels.getMinimum(0));
-            levelMaxPixelX = (int) Math.round(requestedPixels.getMaximum(0));
+            levelMinPixelX = (int) Math.floor(requestedPixels.getMinimum(0));
+            levelMaxPixelX = (int) Math.floor(requestedPixels.getMaximum(0));
 
-            levelMinPixelY = (int) Math.round(requestedPixels.getMinimum(1));
-            levelMaxPixelY = (int) Math.round(requestedPixels.getMaximum(1));
+            levelMinPixelY = (int) Math.ceil(requestedPixels.getMinimum(1));
+            levelMaxPixelY = (int) Math.ceil(requestedPixels.getMaximum(1));
 
             final int width = levelMaxPixelX - levelMinPixelX;
             final int height = levelMaxPixelY - levelMinPixelY;
@@ -831,13 +711,7 @@ class RasterUtils {
         final MathTransform rasterToModel;
         final double[] baseResolution;
         {
-            /*
-             * hum, in the case the rasters did not had the same spatial resolution at the pyramid
-             * level chosen for each of them, we're gonna set the final mosaiced image dimension to
-             * match the resolution of the first raster in the list, so any further one that does
-             * not fit will have to be chained with an affine transform among the mosaic operation
-             */
-            QueryInfo dimensionChoice = results.get(0);
+            QueryInfo dimensionChoice = findLowestResolution(results);
             baseResolution = dimensionChoice.getResolution();
             Long rasterId = dimensionChoice.getRasterId();
             int pyramidLevel = dimensionChoice.getPyramidLevel();
@@ -910,6 +784,21 @@ class RasterUtils {
         return mosaicDimension;
     }
 
+    private static QueryInfo findLowestResolution(List<QueryInfo> results) {
+        double[] prev = { Double.MIN_VALUE, Double.MIN_VALUE };
+        QueryInfo lowestResQuery = null;
+
+        double[] curr;
+        for (QueryInfo query : results) {
+            curr = query.getResolution();
+            if (curr[0] > prev[0]) {
+                prev = curr;
+                lowestResQuery = query;
+            }
+        }
+        return lowestResQuery;
+    }
+
     /**
      * Find out the raster ids and their pyramid levels in the raster dataset for the rasters whose
      * envelope overlaps the requested one
@@ -946,7 +835,7 @@ class RasterUtils {
     }
 
     public static void fitRequestToRaster(final GeneralEnvelope requestedEnvelope,
-            final Rectangle requestedDim, final RasterInfo rasterInfo, final QueryInfo query) {
+            final RasterInfo rasterInfo, final QueryInfo query) {
 
         final int rasterIndex = query.getRasterIndex();
         final int pyramidLevel = query.getPyramidLevel();
@@ -963,15 +852,31 @@ class RasterUtils {
         final Rectangle resultGridRange;
         final GeneralEnvelope resultEnvelope;
         try {
-            GeneralEnvelope requestedGridRange = CRS.transform(modelToRaster, requestedEnvelope);
-            int minx = (int) Math.max(rasterGridRange.getMinX(), Math.round(requestedGridRange
-                    .getMinimum(0)));
-            int miny = (int) Math.max(rasterGridRange.getMinY(), Math.round(requestedGridRange
-                    .getMinimum(1)));
-            int maxx = (int) Math.min(rasterGridRange.getMaxX(), Math.round(requestedGridRange
-                    .getMaximum(0)));
-            int maxy = (int) Math.min(rasterGridRange.getMaxY(), Math.round(requestedGridRange
-                    .getMaximum(1)));
+            int minx;
+            int miny;
+            int maxx;
+            int maxy;
+            {
+                GeneralEnvelope requestedGridRange = CRS
+                        .transform(modelToRaster, requestedEnvelope);
+                minx = (int) Math.floor(requestedGridRange.getMinimum(0));
+                miny = (int) Math.floor(requestedGridRange.getMinimum(1));
+                maxx = (int) Math.ceil(requestedGridRange.getMaximum(0));
+                maxy = (int) Math.ceil(requestedGridRange.getMaximum(1));
+                /*
+                 * expand requested grid range by two pixels to the four directions to give the
+                 * mosaic more chances to overlap
+                 */
+                minx -= 2;
+                miny -= 2;
+                maxx += 2;
+                maxy += 2;
+            }
+
+            minx = (int) Math.max(Math.floor(rasterGridRange.getMinX()), minx);
+            miny = (int) Math.max(Math.floor(rasterGridRange.getMinY()), miny);
+            maxx = (int) Math.min(Math.ceil(rasterGridRange.getMaxX()), maxx);
+            maxy = (int) Math.min(Math.ceil(rasterGridRange.getMaxY()), maxy);
 
             resultGridRange = new Rectangle(minx, miny, maxx - minx, maxy - miny);
             resultEnvelope = CRS.transform(rasterToModel, new GeneralEnvelope(resultGridRange));
@@ -1012,7 +917,8 @@ class RasterUtils {
             int height = (int) Math.min(tiledImageGridRange.getMaxY() - resultGridRange.y,
                     resultGridRange.height);
 
-            resultDimensionInsideTiledImage = getResultDimensionForTileRange(tiledImageGridRange, resultGridRange);
+            resultDimensionInsideTiledImage = getResultDimensionForTileRange(tiledImageGridRange,
+                    resultGridRange);
         }
 
         query.setResultEnvelope(resultEnvelope);

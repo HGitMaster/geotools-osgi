@@ -86,7 +86,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32494 2009-02-17 14:51:14Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32495 2009-02-17 15:50:05Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -341,7 +341,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         }
 
         for (QueryInfo match : matchingQueries) {
-            RasterUtils.fitRequestToRaster(requestedEnvelope, requestedDim, rasterInfo, match);
+            RasterUtils.fitRequestToRaster(requestedEnvelope, rasterInfo, match);
         }
         return matchingQueries;
     }
