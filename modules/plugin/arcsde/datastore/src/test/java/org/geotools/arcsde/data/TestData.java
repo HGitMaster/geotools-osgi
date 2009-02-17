@@ -74,7 +74,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/TestData.java $
- * @version $Id: TestData.java 32478 2009-02-12 16:07:10Z groldan $
+ * @version $Id: TestData.java 32500 2009-02-17 18:31:11Z groldan $
  */
 @SuppressWarnings( { "nls", "unchecked" })
 public class TestData {
@@ -276,7 +276,7 @@ public class TestData {
      *            to get the connection to use in deleting {@link #getTempTableName()}
      */
     public void deleteTempTable(SessionPool connPool) throws IOException {
-        deleteTable(connPool, getTempTableName(), false);
+        deleteTable(connPool, getTempTableName(), true);
     }
 
     private static void deleteTable(final SessionPool connPool, final String tableName,

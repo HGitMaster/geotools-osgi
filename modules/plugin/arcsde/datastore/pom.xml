@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32426 2009-02-06 17:57:24Z groldan $              
+        Version: $Id: pom.xml 32500 2009-02-17 18:31:11Z groldan $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                                http://maven.apache.org/maven-v4_0_0.xsd">
@@ -101,15 +101,6 @@
       <artifactId>gt-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--
-    This dependency was being used by FilterTest, which anyway
-    is not being executed as it relies in non available data.
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-jts-wrapper</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-     -->
     <dependency>
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
@@ -228,11 +219,6 @@
               <includes>
                 <include>**/*Test.java</include>
               </includes>
-              <excludes>
-                <!-- this ones contains no test cases yet but the surefire plugin tries to run it anyway leading to an initializationError -->
-                <exclude>**/OneByteBandNoColormapReaderTest.java</exclude>
-                <exclude>**/UnsignedByteRGBABandCopierTest.java</exclude>
-              </excludes>
             </configuration>
           </plugin>
         </plugins>
