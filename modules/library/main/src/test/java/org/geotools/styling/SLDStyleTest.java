@@ -30,12 +30,14 @@ import junit.framework.TestSuite;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
+import org.geotools.filter.IsEqualsToImpl;
 import org.geotools.test.TestData;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 import org.opengis.filter.Not;
+import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
@@ -333,6 +335,22 @@ public class SLDStyleTest extends TestCase {
             assertTrue(layer.getStyles()[0] instanceof NamedStyle);
             assertEquals(namedStyleNames[i], layer.getStyles()[0].getName());
         }
+        
+        // find the rivers layers and test the LayerFeatureConstraints
+        for (int i = 0; i < expectedLayerCount; i++) {
+        	NamedLayer layer = (NamedLayer) layers[i];
+        	if (layer.getName().equals("Rivers")) {
+        		FeatureTypeConstraint[] featureTypeConstraints = layer.getLayerFeatureConstraints();
+    	        final int featureTypeConstraintCount = 1;
+    	        assertEquals(featureTypeConstraintCount, featureTypeConstraints.length);
+    	        Filter filter = featureTypeConstraints[0].getFilter();
+    	        assertTrue(filter instanceof PropertyIsEqualTo);
+    	        PropertyIsEqualTo equal = (PropertyIsEqualTo) filter;
+    	        assertTrue(equal.getExpression1() instanceof PropertyName);
+    	        assertTrue(equal.getExpression2() instanceof Literal);
+        	}
+        }
+        
     }
 
     /**

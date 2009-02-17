@@ -576,8 +576,7 @@ public class SLDParser {
                 Style user = parseStyle(child);
                 layer.addStyle(user);
             } else if (childName.equalsIgnoreCase("LayerFeatureConstraints")) {
-                throw new UnsupportedOperationException(
-                        "LayerFeatureConstraints pending of implementation");
+            	layer.setLayerFeatureConstraints(parseLayerFeatureConstraints(child));
             }
         }
 
