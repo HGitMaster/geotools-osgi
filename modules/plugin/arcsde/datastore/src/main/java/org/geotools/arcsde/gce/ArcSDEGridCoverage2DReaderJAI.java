@@ -86,7 +86,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32495 2009-02-17 15:50:05Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32498 2009-02-17 17:20:15Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -253,8 +253,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
                     final int pyramidLevelChoice = rasterQueryInfo.getPyramidLevel();
 
-                    rasterImage = getRaster(pyramidLevelChoice, preparedQuery, row, rAttr,
-                            rasterQueryInfo);
+                    rasterImage = getRasterMatchingTileRange(pyramidLevelChoice, preparedQuery,
+                            row, rAttr, rasterQueryInfo);
 
                     {
                         final Rectangle tiledImageSize = rasterQueryInfo.getTiledImageSize();
@@ -530,8 +530,9 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         return mosaic;
     }
 
-    private RenderedImage getRaster(int pyramidLevelChoice, final SeQuery preparedQuery, SeRow row,
-            final SeRasterAttr rAttr, final QueryInfo rasterQueryInfo) throws IOException {
+    private RenderedImage getRasterMatchingTileRange(int pyramidLevelChoice,
+            final SeQuery preparedQuery, SeRow row, final SeRasterAttr rAttr,
+            final QueryInfo rasterQueryInfo) throws IOException {
 
         /*
          * Create the prepared query (not executed) stream to fetch the tiles from

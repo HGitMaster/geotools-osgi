@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageTypeSpecifier;
 
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
@@ -75,7 +76,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32495 2009-02-17 15:50:05Z groldan $
+ * @version $Id: RasterUtils.java 32498 2009-02-17 17:20:15Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -304,11 +305,11 @@ class RasterUtils {
 
         public void setResultImage(RenderedImage rasterImage) {
             this.resultImage = rasterImage;
-            if (rasterImage.getWidth() != resultDimension.width
-                    || rasterImage.getHeight() != resultDimension.height) {
+            if (rasterImage.getWidth() != tiledImageSize.width
+                    || rasterImage.getHeight() != tiledImageSize.height) {
                 LOGGER.warning("Result image and expected dimensions don't match: image="
                         + resultImage.getWidth() + "x" + resultImage.getHeight() + ", expected="
-                        + resultDimension.width + "x" + resultDimension.height);
+                        + tiledImageSize.width + "x" + tiledImageSize.height);
             }
         }
 
@@ -352,16 +353,16 @@ class RasterUtils {
     public static MathTransform createRasterToModel(final Rectangle levelGridRange,
             final GeneralEnvelope levelEnvelope) {
         /*
-         * GeneralGridRange range's is exclusive for the higher coords, so we expand it by one in
-         * both dimensions
+         * GeneralGridRange range's is exclusive for the higher coords, so we contract it by one in
+         * both dimensions for the transform to produce matching mosaics
          */
-        Rectangle expandedRange = new Rectangle(levelGridRange.x, levelGridRange.y,
-                levelGridRange.width + 1, levelGridRange.height + 1);
-        GeneralGridRange gridRange = new GeneralGridRange(expandedRange);
+        Rectangle reducedRange = new Rectangle(levelGridRange.x, levelGridRange.y,
+                levelGridRange.width - 1, levelGridRange.height - 1);
+
         // create a raster to model transform, from this tile pixel space to the tile's geographic
         // extent
-        GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(new GeneralGridRange(
-                levelGridRange), levelEnvelope);
+        GeneralGridRange gridRange = new GeneralGridRange(reducedRange, 2);
+        GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(gridRange, levelEnvelope);
         geMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
 
         final MathTransform rasterToModel = geMapper.createTransform();
@@ -725,7 +726,6 @@ class RasterUtils {
                 throw new RuntimeException(e);
             }
             mosaicDimension = getTargetGridRange(modelToRaster, resultEnvelope);
-            System.out.println("mosaicDimension: " + mosaicDimension);
         }
 
         for (QueryInfo rasterResultInfo : results) {
@@ -908,18 +908,8 @@ class RasterUtils {
          * tiles
          */
         Rectangle resultDimensionInsideTiledImage;
-        {
-            final Point tileOffset = rasterInfo.getTileOffset(rasterIndex, pyramidLevel);
-            int minx = tileOffset.x + resultGridRange.x - tiledImageGridRange.x;
-            int miny = tileOffset.y + resultGridRange.y - tiledImageGridRange.y;
-            int width = (int) Math.min(tiledImageGridRange.getMaxX() - resultGridRange.x,
-                    resultGridRange.width);
-            int height = (int) Math.min(tiledImageGridRange.getMaxY() - resultGridRange.y,
-                    resultGridRange.height);
-
-            resultDimensionInsideTiledImage = getResultDimensionForTileRange(tiledImageGridRange,
-                    resultGridRange);
-        }
+        resultDimensionInsideTiledImage = getResultDimensionForTileRange(tiledImageGridRange,
+                resultGridRange);
 
         query.setResultEnvelope(resultEnvelope);
         query.setResultDimensionInsideTiledImage(resultDimensionInsideTiledImage);

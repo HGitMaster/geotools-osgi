@@ -278,6 +278,38 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     }
 
     @Test
+    public void testReadRasterCatalogOnline2() throws Exception {
+        tableName = "SDE.COLOROQ_TEST";
+        final AbstractGridCoverage2DReader reader = getReader();
+        assertNotNull("Couldn't obtain a reader for " + tableName, reader);
+
+        final GeneralEnvelope originalEnvelope = reader.getOriginalEnvelope();
+        final GeneralGridRange originalGridRange = reader.getOriginalGridRange();
+
+        final int reqWidth = originalGridRange.getLength(0) / 20;
+        final int reqHeight = originalGridRange.getLength(1) / 20;
+
+        GeneralEnvelope reqEnvelope = new GeneralEnvelope(originalEnvelope
+                .getCoordinateReferenceSystem());
+        double deltaX = originalEnvelope.getSpan(0) / 1;
+        double deltaY = originalEnvelope.getSpan(1) / 1;
+
+        double minx = originalEnvelope.getMedian(0) - deltaX;
+        double miny = originalEnvelope.getMedian(1) - deltaY;
+        double maxx = minx + 2 * deltaX;
+        double maxy = miny + 2 * deltaY;
+        reqEnvelope.setEnvelope(minx, miny, maxx, maxy);
+
+        assertTrue(originalEnvelope.intersects(reqEnvelope, true));
+
+        final GridCoverage2D coverage = readCoverage(reader, reqWidth, reqHeight, reqEnvelope);
+        assertNotNull("read coverage returned null", coverage);
+
+        RenderedImage image = coverage.getRenderedImage();
+        writeToDisk(image, "testReadRasterCatalogOnline2");
+    }
+
+    @Test
     public void testReadRasterCatalogFull() throws Exception {
         tableName = rasterTestData.loadRasterCatalog();
         GridCoverage2D coverage = testReadFullLevel0(TYPE_8BIT_U, 3, "RasterCatalog");
