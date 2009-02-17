@@ -454,8 +454,6 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         final String[] rasterColumns = getRasterColumns(scon, rasterTable);
         final List<PyramidInfo> rastersLayoutInfo = new ArrayList<PyramidInfo>();
         {
-            final List<RasterBandInfo> bands;
-
             final List<SeRasterAttr> rasterAttributes = getSeRasterAttr(scon, rasterTable,
                     rasterColumns);
 
@@ -470,7 +468,6 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 try {
                     SeRasterAttr ratt = rasterAttributes.get(0);
                     rasterColumn = new SeRasterColumn(scon, ratt.getRasterColumnId());
-                    bands = setUpBandInfo(scon, rasterTable, ratt);
                 } catch (SeException e) {
                     throw new ArcSdeException(e);
                 }
@@ -487,6 +484,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                     final GeneralEnvelope originalEnvelope;
                     originalEnvelope = calculateOriginalEnvelope(rAtt, coverageCrs);
                     pyramidInfo.setOriginalEnvelope(originalEnvelope);
+                    final List<RasterBandInfo> bands = setUpBandInfo(scon, rasterTable, rAtt);
                     pyramidInfo.setBands(bands);
                 }
             } catch (SeException e) {
@@ -865,10 +863,11 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         SeQuery query = null;
         try {
             SeTable table = new SeTable(scon, auxTableName);
-
+            SeColumnDefinition[] describe = table.describe();
             SeSqlConstruct sqlConstruct = new SeSqlConstruct();
             sqlConstruct.setTables(new String[] { auxTableName });
-            sqlConstruct.setWhere("TYPE = 3");
+            String whereClause = "TYPE = 3 AND RASTERBAND_ID=" + band.getId().longValue();
+            sqlConstruct.setWhere(whereClause);
 
             query = new SeQuery(scon, new String[] { "OBJECT" }, sqlConstruct);
             query.prepareQuery();
@@ -878,6 +877,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
             ByteArrayInputStream colorMapIS = row.getBlob(0);
 
+            row = query.fetch();
+            
             colorMap = readColorMap(colorMapIS);
 
         } catch (SeException e) {

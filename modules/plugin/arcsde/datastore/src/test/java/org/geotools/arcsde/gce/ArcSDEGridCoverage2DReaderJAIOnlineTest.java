@@ -246,7 +246,6 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     }
 
     @Test
-    @Ignore
     public void testReadRasterCatalogOnline() throws Exception {
         tableName = "SDE.IMG_USGSQUAD_SGBASE";
         final AbstractGridCoverage2DReader reader = getReader();
@@ -279,9 +278,8 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     }
 
     @Test
-    @Ignore
     public void testReadRasterCatalogOnline2() throws Exception {
-        tableName = "SDE.COLOROQ_TEST";
+        tableName = "SDE.IMG_USGSQUAD_SGBASE";
         final AbstractGridCoverage2DReader reader = getReader();
         assertNotNull("Couldn't obtain a reader for " + tableName, reader);
 
@@ -293,8 +291,8 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
 
         GeneralEnvelope reqEnvelope = new GeneralEnvelope(originalEnvelope
                 .getCoordinateReferenceSystem());
-        double deltaX = originalEnvelope.getSpan(0) / 1;
-        double deltaY = originalEnvelope.getSpan(1) / 1;
+        double deltaX = originalEnvelope.getSpan(0) / 20;
+        double deltaY = originalEnvelope.getSpan(1) / 20;
 
         double minx = originalEnvelope.getMedian(0) - deltaX;
         double miny = originalEnvelope.getMedian(1) - deltaY;

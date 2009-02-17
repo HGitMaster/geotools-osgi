@@ -17,14 +17,10 @@
  */
 package org.geotools.arcsde.gce;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -32,6 +28,7 @@ import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,13 +39,14 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
-import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
+import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.MosaicDescriptor;
 
@@ -66,6 +64,7 @@ import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.ServiceInfo;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -86,13 +85,23 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32498 2009-02-17 17:20:15Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32504 2009-02-17 21:58:34Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
 class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
+
+    private static final boolean DEBUG = false;
+
+    private static final File debugDir = new File(System.getProperty("user.home") + File.separator
+            + "arcsde_test");
+    static {
+        if (DEBUG) {
+            debugDir.mkdir();
+        }
+    }
 
     private final ArcSDERasterFormat parent;
 
@@ -219,7 +228,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
          * overall resulting mosaic they fit. If the rasters does not share the spatial resolution,
          * the QueryInfo.resultDimension and QueryInfo.mosaicLocation width or height won't match
          */
-        RasterUtils.setMosaicLocations(rasterInfo, resultEnvelope, queries);
+        final Rectangle mosaicDimension;
+        mosaicDimension = RasterUtils.setMosaicLocations(rasterInfo, resultEnvelope, queries);
 
         /*
          * Gather the rendered images for each of the rasters that match the requested envelope
@@ -297,7 +307,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
          */
         final GridSampleDimension[] bands = rasterInfo.getGridSampleDimensions();
 
-        final RenderedImage coverageRaster = createMosaic(queries);
+        final RenderedImage coverageRaster = createMosaic(queries, mosaicDimension);
 
         geomLog.log(LoggingHelper.REQ_ENV);
         geomLog.log(LoggingHelper.RES_ENV);
@@ -320,7 +330,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
     private GridCoverage createFakeCoverage(GeneralEnvelope requestedEnvelope,
             Rectangle requestedDim) {
 
-        ImageTypeSpecifier its = rasterInfo.getRenderedImageSpec();
+        ImageTypeSpecifier its = rasterInfo.getRenderedImageSpec(0);
         SampleModel sampleModel = its.getSampleModel(requestedDim.width, requestedDim.height);
         ColorModel colorModel = its.getColorModel();
 
@@ -370,8 +380,10 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
      * 
      * @param queries
      * @return
+     * @throws IOException 
      */
-    private RenderedImage createMosaic(final List<QueryInfo> queries) {
+    private RenderedImage createMosaic(final List<QueryInfo> queries,
+            final Rectangle mosaicDimension) throws IOException {
         // if (queries.size() == 1) {
         // // no need to mosaic at all
         // return queries.get(0).getResultImage();
@@ -382,6 +394,10 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         for (QueryInfo query : queries) {
             RenderedImage image = query.getResultImage();
             image = cropToRequiredDimension(image, query.getResultDimensionInsideTiledImage());
+            if (DEBUG) {
+                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                        + "_02_crop.tiff"));
+            }
 
             final Rectangle mosaicLocation = query.getMosaicLocation();
             // scale
@@ -396,9 +412,16 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(scaleY);
             pb.add(translateX);
             pb.add(translateY);
-            pb.add(new InterpolationNearest());
+            pb.add(null);
 
-            image = JAI.create("scale", pb);
+            final RenderingHints hints = (RenderingHints) ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL
+                    .clone();
+            image = JAI.create("scale", pb, hints);
+
+            if (DEBUG) {
+                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                        + "_03_scale.tiff"));
+            }
 
             int minx = image.getMinX();
             int miny = image.getMinY();
@@ -413,9 +436,13 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.addSource(image);
             pb.add(Float.valueOf(mosaicLocation.x - minx));
             pb.add(Float.valueOf(mosaicLocation.y - miny));
-            pb.add(new InterpolationNearest());
+            pb.add(null);
 
-            image = JAI.create("translate", pb);
+            image = JAI.create("translate", pb, hints);
+            if (DEBUG) {
+                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                        + "_04_translate.tiff"));
+            }
 
             assert image.getMinX() == mosaicLocation.x : image.getMinX() + " != "
                     + mosaicLocation.x;
@@ -429,6 +456,9 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             transformed.add(image);
         }
 
+        final ParameterBlockJAI pbjMosaic = new ParameterBlockJAI("Mosaic");
+        pbjMosaic.setParameter("mosaicType", MosaicDescriptor.MOSAIC_TYPE_OVERLAY);
+
         ParameterBlock mosaicParams = new ParameterBlock();
 
         for (RenderedImage img : transformed) {
@@ -436,96 +466,39 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             geomLog.appendLoggingGeometries(LoggingHelper.MOSAIC_RESULT, img);
         }
 
-        mosaicParams.add(MosaicDescriptor.MOSAIC_TYPE_BLEND); // mosaic type
-        mosaicParams.add(null); // alpha mask
-        mosaicParams.add(null); // source ROI mask
-        mosaicParams.add(null); // source threshold
-        mosaicParams.add(null); // destination background value
-
-        RenderedImage mosaic = JAI.create("Mosaic", mosaicParams, null);
-        //
-        // {
-        // BufferedImage img = new BufferedImage(mosaic.getColorModel(), Raster
-        // .createWritableRaster(mosaic.getSampleModel().createCompatibleSampleModel(
-        // mosaic.getWidth(), mosaic.getHeight()), null), false, null);
-        // Graphics2D graphics = img.createGraphics();
-        // graphics.drawRenderedImage(mosaic, at);
-        // graphics.setColor(Color.CYAN);
-        // graphics.setStroke(new BasicStroke(2));
-        // for (QueryInfo query : queries) {
-        // Rectangle m = query.getMosaicLocation();
-        // graphics
-        // .drawRect(m.x - mosaic.getMinX(), m.y - mosaic.getMinY(), m.width, m.height);
-        // }
-        // mosaic = img;
-        // }
-
-        return mosaic;
-    }
-
-    /**
-     * Creates the mosaiced image that results from querying all the rasters in the raster dataset
-     * for the requested envelope
-     * 
-     * @param mosaicDimension
-     *            the dimensions of the resulting image
-     * @param queries
-     *            the images to mosaic together
-     * @return the mosaiced image
-     */
-    private RenderedImage _createMosaic(final Rectangle mosaicDimension,
-            final List<QueryInfo> queries) {
-        if (queries.size() == 1) {
-            // no need to mosaic at all
-            return queries.get(0).getResultImage();
-        }
-
-        List<RenderedImage> translated = new ArrayList<RenderedImage>(queries.size());
-
-        for (QueryInfo query : queries) {
-            RenderedImage image = query.getResultImage();
-            Rectangle mosaicLocation = query.getMosaicLocation();
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add(Float.valueOf((float) mosaicLocation.getX()));
-            pb.add(Float.valueOf((float) mosaicLocation.getY()));
-            pb.add(new InterpolationNearest());
-            RenderedImage trans = JAI.create("translate", pb, null);
-
-            translated.add(trans);
-        }
-
-        ParameterBlock mosaicParams = new ParameterBlock();
-        for (RenderedImage img : translated) {
-            System.err.println("--> adding to mosaic: " + img.getMinX() + "," + img.getMinY() + ","
-                    + img.getWidth() + "," + img.getHeight());
-            mosaicParams.addSource(img);
-        }
         mosaicParams.add(MosaicDescriptor.MOSAIC_TYPE_OVERLAY); // mosaic type
         mosaicParams.add(null); // alpha mask
         mosaicParams.add(null); // source ROI mask
         mosaicParams.add(null); // source threshold
         mosaicParams.add(null); // destination background value
 
-        RenderedImage mosaic = JAI.create("Mosaic", mosaicParams, null);
-
+        // building the final image layout
+        final ImageLayout imageLayout;
         {
-            BufferedImage img = new BufferedImage(mosaic.getColorModel(), Raster
-                    .createWritableRaster(mosaic.getSampleModel().createCompatibleSampleModel(
-                            mosaic.getWidth(), mosaic.getHeight()), null), false, null);
-            Graphics2D graphics = img.createGraphics();
-            AffineTransform at = new AffineTransform();
-            at.translate(-(int) mosaic.getMinX(), -(int) mosaic.getMinY());
-            graphics.drawRenderedImage(mosaic, at);
-            graphics.setColor(Color.CYAN);
-            graphics.setStroke(new BasicStroke(2));
-            for (QueryInfo query : queries) {
-                Rectangle m = query.getMosaicLocation();
-                graphics
-                        .drawRect(m.x - mosaic.getMinX(), m.y - mosaic.getMinY(), m.width, m.height);
-            }
-            mosaic = img;
+            int minX = mosaicDimension.x;
+            int minY = mosaicDimension.y;
+            int width = mosaicDimension.width;
+            int height = mosaicDimension.height;
+
+            int tileGridXOffset = mosaicDimension.x;
+            int tileGridYOffset = mosaicDimension.y;
+
+            ImageTypeSpecifier imageSpec = rasterInfo.getRenderedImageSpec(0);
+            SampleModel sampleModel = imageSpec.getSampleModel(width, height);
+            ColorModel colorModel = imageSpec.getColorModel();
+
+            imageLayout = new ImageLayout(minX, minY, width, height, tileGridXOffset,
+                    tileGridYOffset, JAI.getDefaultTileSize().width,
+                    JAI.getDefaultTileSize().height, sampleModel, colorModel);
         }
+
+//        final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, imageLayout);
+        final RenderingHints hints = (RenderingHints) ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL
+        .clone();
+
+        RenderedImage mosaic = JAI.create("Mosaic", mosaicParams, hints);
+
+        mosaic.getData();
 
         return mosaic;
     }
@@ -546,7 +519,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
          * Create the tiled raster covering the full area of the matching tiles
          */
         fullTilesRaster = createTiledRaster(preparedQuery, row, rAttr, matchingTiles,
-                pyramidLevelChoice, rasterQueryInfo.getTiledImageSize().getLocation());
+                pyramidLevelChoice, rasterQueryInfo.getTiledImageSize().getLocation(), rasterQueryInfo.getRasterIndex());
 
         /*
          * REVISIT: This is odd, we need to force the data to be loaded so we're free to release the
@@ -560,6 +533,10 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             LOGGER.log(Level.SEVERE, "Fetching data for " + rasterQueryInfo.toString(), e);
         }
 
+        if (DEBUG) {
+            ImageIO.write(fullTilesRaster, "TIFF", new File(debugDir, rasterQueryInfo.getRasterId()
+                    + "_01_original.tiff"));
+        }
         return fullTilesRaster;
     }
 
@@ -629,7 +606,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
     private RenderedOp createTiledRaster(final SeQuery preparedQuery, final SeRow row,
             final SeRasterAttr rAttr, final Rectangle matchingTiles, final int pyramidLevel,
-            final Point imageLocation) throws IOException {
+            final Point imageLocation, final int rasterIndex) throws IOException {
 
         final int tileWidth;
         final int tileHeight;
@@ -687,7 +664,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         final ColorModel colorModel;
         final SampleModel sampleModel;
         {
-            final ImageTypeSpecifier fullImageSpec = rasterInfo.getRenderedImageSpec();
+            final ImageTypeSpecifier fullImageSpec = rasterInfo.getRenderedImageSpec(rasterIndex);
             colorModel = fullImageSpec.getColorModel();
             sampleModel = fullImageSpec.getSampleModel(tiledImageWidth, tiledImageHeight);
         }

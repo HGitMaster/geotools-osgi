@@ -24,7 +24,9 @@ import java.awt.Rectangle;
 import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageTypeSpecifier;
 
@@ -48,7 +50,7 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterInfo.java 32501 2009-02-17 19:33:59Z groldan $
+ * @version $Id: RasterInfo.java 32504 2009-02-17 21:58:34Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -75,7 +77,7 @@ class RasterInfo {
 
     private List<GridSampleDimension> gridSampleDimensions;
 
-    private ImageTypeSpecifier renderedImageSpec;
+    private final Map<Integer, ImageTypeSpecifier> renderedImageSpec = new HashMap<Integer, ImageTypeSpecifier>();
 
     /**
      * @param rasterTable
@@ -365,19 +367,22 @@ class RasterInfo {
         return rasterInfo;
     }
 
-    public ImageTypeSpecifier getRenderedImageSpec() {
-        if (this.renderedImageSpec == null) {
+    public ImageTypeSpecifier getRenderedImageSpec(final int rasterIndex) {
+        if (!this.renderedImageSpec.containsKey(Integer.valueOf(rasterIndex))) {
             synchronized (this) {
-                if (this.renderedImageSpec == null) {
-                    this.renderedImageSpec = RasterUtils.createFullImageTypeSpecifier(this);
+                if (!this.renderedImageSpec.containsKey(Integer.valueOf(rasterIndex))) {
+                    ImageTypeSpecifier imageTypeSpecifier;
+                    imageTypeSpecifier = RasterUtils
+                            .createFullImageTypeSpecifier(this, rasterIndex);
+                    renderedImageSpec.put(Integer.valueOf(rasterIndex), imageTypeSpecifier);
                 }
             }
         }
-        return this.renderedImageSpec;
+        return this.renderedImageSpec.get(Integer.valueOf(rasterIndex));
     }
 
-    public IndexColorModel getColorMap() {
-        final RasterBandInfo bandOne = getBand(0, 0);
+    public IndexColorModel getColorMap(final int rasterIndex) {
+        final RasterBandInfo bandOne = getBand(rasterIndex, 0);
         return bandOne.getColorMap();
     }
 
@@ -431,4 +436,5 @@ class RasterInfo {
         PyramidLevelInfo level = rasterInfo.getPyramidLevel(pyramidLevel);
         return new Point(level.getXOffset(), level.getYOffset());
     }
+
 }
