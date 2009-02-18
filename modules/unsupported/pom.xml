@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32475 2009-02-12 00:56:57Z jive $
+        Version: $Id: pom.xml 32513 2009-02-18 13:02:08Z simonegiannecchini $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -50,16 +50,6 @@
      </profile>
 
      <!-- ================================================== -->
-     <!--     Modules requiring GDAL DLLs be in your JDK     -->
-     <!-- ================================================== -->
-     <profile>
-       <id>gdal</id>
-       <modules>
-         <module>imageio-ext-gdal</module>
-       </modules>
-     </profile>
-
-     <!-- ================================================== -->
      <!--     Modules not yet included in the build          -->
      <!-- ================================================== -->
      <profile>
@@ -97,7 +87,7 @@
      <!-- ================================================== -->
      <!--     Unsupported Modules                            -->
      <!-- ================================================== -->
-     <!-- The following profiles can all be turned on by     -->
+     <!-- The following profiles can all be turned on by     -->BufferedImage
      <!-- providing -Dall on the command line.               -->
      <!--                                                    -->
      <!-- These modules are included in the build and deploy -->
@@ -112,7 +102,6 @@
          <module>coverageio</module>
          <module>coverageio-netcdf</module>
          <module>coveragetools</module>
-         <module>imageio-ext-gdal</module>
        </modules>
      </profile>
      <profile>
