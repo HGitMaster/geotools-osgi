@@ -19,6 +19,7 @@ package org.geotools.data.complex.filter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -65,7 +66,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: XPath.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @version $Id: XPath.java 32505 2009-02-18 01:55:54Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/XPath.java $
  * @since 2.4
  */
@@ -634,7 +635,7 @@ public class XPath {
                     assert previousValue instanceof Collection;
                     ((Collection) convertedValue).addAll((Collection) previousValue);
                 } else {
-                    List temp = new ArrayList();
+                    HashSet temp = new HashSet();
                     ((Collection) temp).add(convertedValue);
                     if (previousValue instanceof Collection) {
                         ((Collection) temp).addAll((Collection) previousValue);
@@ -667,7 +668,7 @@ public class XPath {
                 return list;
             } else {
                 if (value instanceof Feature) {
-                    ArrayList<Feature> list = new ArrayList<Feature>();
+                    HashSet<Feature> list = new HashSet<Feature>();
                     list.add((Feature) value);
                     return list;
                 }

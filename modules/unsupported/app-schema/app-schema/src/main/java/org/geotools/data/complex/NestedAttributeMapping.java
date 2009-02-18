@@ -143,7 +143,7 @@ public class NestedAttributeMapping extends AttributeMapping {
      * @return simple feature iterator
      * @throws IOException
      */
-    private Iterator<SimpleFeature> simpleIterator() throws IOException {
+    private synchronized Iterator<SimpleFeature> simpleIterator() throws IOException {
         if (simpleFeatures == null) {
             // We can't initiate this in the constructor because the feature type mapping
             // might not be built yet.
@@ -187,7 +187,7 @@ public class NestedAttributeMapping extends AttributeMapping {
      * @return built features iterator
      * @throws IOException
      */
-    private Iterator<Feature> iterator() throws IOException {
+    private synchronized Iterator<Feature> iterator() throws IOException {
         if (features == null) {
             features = new ArrayList<Feature>();
 
