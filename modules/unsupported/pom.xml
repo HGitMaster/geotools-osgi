@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32513 2009-02-18 13:02:08Z simonegiannecchini $
+        Version: $Id: pom.xml 32514 2009-02-18 13:04:03Z simonegiannecchini $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -87,7 +87,7 @@
      <!-- ================================================== -->
      <!--     Unsupported Modules                            -->
      <!-- ================================================== -->
-     <!-- The following profiles can all be turned on by     -->BufferedImage
+     <!-- The following profiles can all be turned on by     -->
      <!-- providing -Dall on the command line.               -->
      <!--                                                    -->
      <!-- These modules are included in the build and deploy -->
