@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31558 2008-09-21 13:14:27Z christian.mueller $              
+        Version: $Id: pom.xml 32511 2009-02-18 11:07:25Z simonegiannecchini $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -88,6 +88,7 @@
     <module>gtopo30</module>
     <module>image</module>
     <module>imagemosaic</module>
+    <module>imageio-ext-gdal</module>
     <module>imagepyramid</module>
     <module>imagemosaic-jdbc</module>
     <module>postgis</module>
