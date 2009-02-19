@@ -106,11 +106,11 @@ public class Import {
 	
     private final static int DefaultCommitCount = 100;
     private final static String UsageInfo = "Importing from a shapefile or csv file\n" +
-        "-configUrl url -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -shapeUrl shapeUrl -shapeKeyField shapeKeyField\n" +
+        "-config URLOrFile -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -shape shapeURLOrFile -shapeKeyField shapeKeyField\n" +
         "Importing from a csv file\n" +
-        "-configUrl url -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -csvUrl csvUrl -csvDelim csvDelim\n" +
+        "-config URLOrFile -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -csv csvURLOrFile -csvDelim csvDelim\n" +
         "Importing using world wfiles\n" +
-        "-configUrl url -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -dir directory -ext extension" +
+        "-config URLOrFile -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -dir directory -ext extension" +
         "\n" + "The default for commitCount is 100\n";
     private Config config;
     private ImportTyp typ;
@@ -203,9 +203,9 @@ public class Import {
         String dir = null, extension=null;;
 
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-configUrl")) {
+            if (args[i].equals("-config")) {
                 try {
-                    config = Config.readFrom(new URL(args[i + 1]));
+                    config = Config.readFrom(Toolbox.getURLFromString(args[i + 1]));
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);
@@ -221,23 +221,19 @@ public class Import {
             } else if (args[i].equals("-commitCount")) {
                 commitCount = new Integer(args[i + 1]);
                 i++;
-            } else if (args[i].equals("-shapeUrl")) {
-                try {
-                    shapeUrl = new URL(args[i + 1]);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                    System.exit(1);
+            } else if (args[i].equals("-shape")) {
+                shapeUrl = Toolbox.getURLFromString(args[i + 1]);
+                if (shapeUrl==null) {
+                	System.out.println("Cannot open " + args[i+1]);
+                	System.exit(1);
                 }
-
                 i++;
-            } else if (args[i].equals("-csvUrl")) {
-                try {
-                    csvUrl = new URL(args[i + 1]);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                    System.exit(1);
+            } else if (args[i].equals("-csv")) {
+                csvUrl = Toolbox.getURLFromString(args[i + 1]);
+                if (csvUrl==null) {
+                	System.out.println("Cannot open " + args[i+1]);
+                	System.exit(1);
                 }
-
                 i++;
             } else if (args[i].equals("-csvDelim")) {
                 csvDelim = args[i + 1];

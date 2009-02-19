@@ -59,7 +59,7 @@ class DDLGenerator {
     private final static String FN_DROPTABLES = "droptables.sql";
     private final static String FN_DROPINIDEXES = "dropindexes.sql";
     private final static String UsageInfo = "Generating DDL scripts\n" +
-        "-configUrl url -spatialTNPrefix spatialTNPrefix [-tileTNPrefix tileTNPrefix]\n" +
+        "-config URLOrFile -spatialTNPrefix spatialTNPrefix [-tileTNPrefix tileTNPrefix]\n" +
         "  [-pyramids pyramids] -statementDelim statementDelim [-srs srs ] -targetDir directory";
     private Config config;
     private String spatialTNPrefix;
@@ -113,9 +113,9 @@ class DDLGenerator {
         int pyramids = DefaultPyramids;
 
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-configUrl")) {
+            if (args[i].equals("-config")) {
                 try {
-                    config = Config.readFrom(new URL(args[i + 1]));
+                    config = Config.readFrom(Toolbox.getURLFromString(args[i + 1]));
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);
