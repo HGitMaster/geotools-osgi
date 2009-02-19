@@ -233,7 +233,7 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 			// resolutions levels
 			final String levels = properties.getProperty("Levels");
 			pairs = levels.split(" ");
-			double[][] overViewResolutions = numOverviews > 1 ? new double[numOverviews][2]
+			double[][] overViewResolutions = numOverviews >= 1 ? new double[numOverviews][2]
 					: null;
 			pair = pairs[0].split(",");
 			double[] highestRes = new double[2];
