@@ -46,7 +46,6 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.MosaicDescriptor;
 
@@ -64,7 +63,7 @@ import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.ServiceInfo;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.image.ImageUtilities;
+import org.geotools.image.ImageWorker;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -85,7 +84,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32504 2009-02-17 21:58:34Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32522 2009-02-19 21:54:01Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -110,8 +109,6 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
     private final RasterInfo rasterInfo;
 
     private DefaultServiceInfo serviceInfo;
-
-    private LoggingHelper geomLog = new LoggingHelper();
 
     public ArcSDEGridCoverage2DReaderJAI(final ArcSDERasterFormat parent,
             final ArcSDEConnectionPool connectionPool, final RasterInfo rasterInfo,
@@ -220,6 +217,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
         final GeneralEnvelope resultEnvelope = getResultEnvelope(queries);
 
+        final LoggingHelper geomLog = new LoggingHelper();
         geomLog.appendLoggingGeometries(LoggingHelper.REQ_ENV, requestedEnvelope);
         geomLog.appendLoggingGeometries(LoggingHelper.RES_ENV, resultEnvelope);
 
@@ -307,13 +305,12 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
          */
         final GridSampleDimension[] bands = rasterInfo.getGridSampleDimensions();
 
-        final RenderedImage coverageRaster = createMosaic(queries, mosaicDimension);
-
         geomLog.log(LoggingHelper.REQ_ENV);
         geomLog.log(LoggingHelper.RES_ENV);
         geomLog.log(LoggingHelper.MOSAIC_ENV);
         geomLog.log(LoggingHelper.MOSAIC_EXPECTED);
-        geomLog.log(LoggingHelper.MOSAIC_RESULT);
+
+        final RenderedImage coverageRaster = createMosaic(queries);
 
         return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
                 null);
@@ -380,10 +377,9 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
      * 
      * @param queries
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
-    private RenderedImage createMosaic(final List<QueryInfo> queries,
-            final Rectangle mosaicDimension) throws IOException {
+    private RenderedImage createMosaic(final List<QueryInfo> queries) throws IOException {
         // if (queries.size() == 1) {
         // // no need to mosaic at all
         // return queries.get(0).getResultImage();
@@ -391,8 +387,36 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
         List<RenderedImage> transformed = new ArrayList<RenderedImage>(queries.size());
 
+        /*
+         * Do we need to expand to RGB color space and then create a new colormapped image with the
+         * whole mosaic?
+         */
+        boolean expandThenContractCM = queries.size() > 1 && rasterInfo.isColorMapped();
+        if (expandThenContractCM) {
+            LOGGER.info("Creating mosaic out of " + queries.size()
+                    + " colormapped rasters. The mosaic tiles will be expanded to "
+                    + "\nRGB space and the resulting mosaic reduced to a new IndexColorModel");
+        }
         for (QueryInfo query : queries) {
             RenderedImage image = query.getResultImage();
+            if (DEBUG) {
+                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                        + "_01_original.tiff"));
+            }
+            if (expandThenContractCM) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    LOGGER.finer("Creating color expanded version of tile for raster #"
+                            + query.getRasterId());
+                }
+                ImageWorker imageWorker = new ImageWorker(image);
+                imageWorker.forceComponentColorModel();
+                image = imageWorker.getRenderedImage();
+                if (DEBUG) {
+                    ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                            + "_01.1_colorExpanded.tiff"));
+                }
+            }
+
             image = cropToRequiredDimension(image, query.getResultDimensionInsideTiledImage());
             if (DEBUG) {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
@@ -414,9 +438,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(translateY);
             pb.add(null);
 
-            final RenderingHints hints = (RenderingHints) ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL
-                    .clone();
-            image = JAI.create("scale", pb, hints);
+            image = JAI.create("scale", pb);
 
             if (DEBUG) {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
@@ -438,7 +460,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(Float.valueOf(mosaicLocation.y - miny));
             pb.add(null);
 
-            image = JAI.create("translate", pb, hints);
+            image = JAI.create("translate", pb);
             if (DEBUG) {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
                         + "_04_translate.tiff"));
@@ -456,15 +478,14 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             transformed.add(image);
         }
 
-        final ParameterBlockJAI pbjMosaic = new ParameterBlockJAI("Mosaic");
-        pbjMosaic.setParameter("mosaicType", MosaicDescriptor.MOSAIC_TYPE_OVERLAY);
-
         ParameterBlock mosaicParams = new ParameterBlock();
 
+        final LoggingHelper geomLog = new LoggingHelper();
         for (RenderedImage img : transformed) {
             mosaicParams.addSource(img);
             geomLog.appendLoggingGeometries(LoggingHelper.MOSAIC_RESULT, img);
         }
+        geomLog.log(LoggingHelper.MOSAIC_RESULT);
 
         mosaicParams.add(MosaicDescriptor.MOSAIC_TYPE_OVERLAY); // mosaic type
         mosaicParams.add(null); // alpha mask
@@ -472,34 +493,27 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         mosaicParams.add(null); // source threshold
         mosaicParams.add(null); // destination background value
 
-        // building the final image layout
-        final ImageLayout imageLayout;
-        {
-            int minX = mosaicDimension.x;
-            int minY = mosaicDimension.y;
-            int width = mosaicDimension.width;
-            int height = mosaicDimension.height;
+        LOGGER.fine("Creating mosaic out of " + queries.size() + " raster tiles");
+        RenderedImage mosaic = JAI.create("Mosaic", mosaicParams);
 
-            int tileGridXOffset = mosaicDimension.x;
-            int tileGridYOffset = mosaicDimension.y;
-
-            ImageTypeSpecifier imageSpec = rasterInfo.getRenderedImageSpec(0);
-            SampleModel sampleModel = imageSpec.getSampleModel(width, height);
-            ColorModel colorModel = imageSpec.getColorModel();
-
-            imageLayout = new ImageLayout(minX, minY, width, height, tileGridXOffset,
-                    tileGridYOffset, JAI.getDefaultTileSize().width,
-                    JAI.getDefaultTileSize().height, sampleModel, colorModel);
+        if (DEBUG) {
+            ImageIO.write(mosaic, "TIFF",
+                    new File(debugDir, coverageName + "_05_mosaicResult.tiff"));
         }
 
-//        final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, imageLayout);
-        final RenderingHints hints = (RenderingHints) ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL
-        .clone();
-
-        RenderedImage mosaic = JAI.create("Mosaic", mosaicParams, hints);
-
-        mosaic.getData();
-
+        if (expandThenContractCM) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("The original rasters are colormapped, "
+                        + "reducing the mosaic color space to an indexed one");
+            }
+            ImageWorker imageWorker = new ImageWorker(mosaic);
+            imageWorker.forceIndexColorModel(true);
+            mosaic = imageWorker.getRenderedImage();
+            if (DEBUG) {
+                ImageIO.write(mosaic, "TIFF", new File(debugDir, coverageName
+                        + "_05.1_colorReduced.tiff"));
+            }
+        }
         return mosaic;
     }
 
@@ -519,7 +533,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
          * Create the tiled raster covering the full area of the matching tiles
          */
         fullTilesRaster = createTiledRaster(preparedQuery, row, rAttr, matchingTiles,
-                pyramidLevelChoice, rasterQueryInfo.getTiledImageSize().getLocation(), rasterQueryInfo.getRasterIndex());
+                pyramidLevelChoice, rasterQueryInfo.getTiledImageSize().getLocation(),
+                rasterQueryInfo.getRasterIndex());
 
         /*
          * REVISIT: This is odd, we need to force the data to be loaded so we're free to release the
@@ -531,11 +546,6 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             fullTilesRaster.getData();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Fetching data for " + rasterQueryInfo.toString(), e);
-        }
-
-        if (DEBUG) {
-            ImageIO.write(fullTilesRaster, "TIFF", new File(debugDir, rasterQueryInfo.getRasterId()
-                    + "_01_original.tiff"));
         }
         return fullTilesRaster;
     }
