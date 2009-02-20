@@ -462,6 +462,7 @@ public class Import {
     }
 
     private void insertMasterRecord() throws Exception {
+    	deleteExistingMasterRecord();
         String statmentString = "INSERT INTO " + config.getMasterTable() + "(" +
             config.getCoverageNameAttribute() + "," +
             config.getTileTableNameAtribute() + "," +
@@ -474,6 +475,36 @@ public class Import {
         ps.close();
     }
 
+    private void deleteExistingMasterRecord() throws Exception {
+    	int count=0;
+    	String statmentString = "SELECT count(*) from "+config.getMasterTable() +
+    		" where " + config.getCoverageNameAttribute()+ " = ? "+
+    		" and " + config.getTileTableNameAtribute()+ " = ? "+
+    		" and " + config.getSpatialTableNameAtribute()+ " = ? ";
+        PreparedStatement ps = con.prepareStatement(statmentString);
+        ps.setString(1, config.getCoverageName());
+        ps.setString(2, tileTableName);
+        ps.setString(3, spatialTableName);
+        ResultSet rs  = ps.executeQuery();
+        if (rs.next()) 
+        	count=rs.getInt(1);
+        rs.close();
+        ps.close();
+
+        if (count==0) return; // no existing master Record
+        
+    	statmentString = "DELETE FROM "+config.getMasterTable() +
+			" where " + config.getCoverageNameAttribute()+ " = ? "+
+			" and " + config.getTileTableNameAtribute()+ " = ? "+
+			" and " + config.getSpatialTableNameAtribute()+ " = ? ";
+    	ps = con.prepareStatement(statmentString);
+    	ps.setString(1, config.getCoverageName());
+    	ps.setString(2, tileTableName);
+    	ps.setString(3, spatialTableName);
+        ps.execute();
+        ps.close();        
+    }
+    
     private byte[] getImageBytes(URL url) throws IOException {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
