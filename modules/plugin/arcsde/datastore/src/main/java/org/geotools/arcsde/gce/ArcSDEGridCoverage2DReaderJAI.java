@@ -46,6 +46,7 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.MosaicDescriptor;
 
@@ -69,6 +70,7 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.operation.MathTransform;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
@@ -84,7 +86,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32530 2009-02-20 19:33:29Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32531 2009-02-20 21:10:32Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -312,8 +314,12 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
         final RenderedImage coverageRaster = createMosaic(queries);
 
-        return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
-                null);
+        MathTransform rasterToModel = RasterUtils.createRasterToModel(mosaicDimension,
+                resultEnvelope);
+        return super.createImageCoverage(PlanarImage.wrapRenderedImage(coverageRaster),
+                rasterToModel);
+        // return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
+        // null);
     }
 
     /**
@@ -415,8 +421,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             // scale
             Float scaleX = Float.valueOf((float) (mosaicLocation.getWidth() / image.getWidth()));
             Float scaleY = Float.valueOf((float) (mosaicLocation.getHeight() / image.getHeight()));
-            Float translateX = Float.valueOf(-image.getMinX());
-            Float translateY = Float.valueOf(-image.getMinY());
+            Float translateX = null;
+            Float translateY = null;
 
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(image);
@@ -434,21 +440,17 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                         + "_03_scale.tiff"));
             }
 
-            int minx = image.getMinX();
-            int miny = image.getMinY();
             int width = image.getWidth();
             int height = image.getHeight();
 
-            assert image.getMinX() == 0;
-            assert image.getMinY() == 0;
             assert mosaicLocation.width == width;
             assert mosaicLocation.height == height;
 
             // translate
             pb = new ParameterBlock();
             pb.addSource(image);
-            pb.add(Float.valueOf(mosaicLocation.x - minx));
-            pb.add(Float.valueOf(mosaicLocation.y - miny));
+            pb.add(Float.valueOf(mosaicLocation.x - image.getMinX()));
+            pb.add(Float.valueOf(mosaicLocation.y - image.getMinY()));
             pb.add(null);
 
             image = JAI.create("translate", pb);
@@ -458,14 +460,10 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                         + "_04_translate.tiff"));
             }
 
-            assert image.getMinX() == mosaicLocation.x : image.getMinX() + " != "
-                    + mosaicLocation.x;
-            assert image.getMinY() == mosaicLocation.y : image.getMinY() + " != "
-                    + mosaicLocation.y;
-            assert image.getWidth() == mosaicLocation.width : image.getWidth() + " != "
-                    + mosaicLocation.width;
-            assert image.getHeight() == mosaicLocation.height : image.getHeight() + " != "
-                    + mosaicLocation.height;
+            assert image.getMinX() == mosaicLocation.x : image.getMinX() + " != " + mosaicLocation.x;
+            assert image.getMinY() == mosaicLocation.y : image.getMinY() + " != " + mosaicLocation.y;
+            assert image.getWidth() == mosaicLocation.width : image.getWidth() + " != " + mosaicLocation.width;
+            assert image.getHeight() == mosaicLocation.height : image.getHeight() + " != " + mosaicLocation.height;
 
             if (expandThenContractCM) {
                 if (LOGGER.isLoggable(Level.FINER)) {
@@ -507,19 +505,19 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                     new File(debugDir, coverageName + "_05_mosaicResult.tiff"));
         }
 
-        if (expandThenContractCM) {
-            if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.fine("The original rasters are colormapped, "
-                        + "reducing the mosaic color space to an indexed one");
-            }
-            ImageWorker imageWorker = new ImageWorker(mosaic);
-            imageWorker.forceIndexColorModel(true);
-            mosaic = imageWorker.getRenderedImage();
-            if (DEBUG) {
-                ImageIO.write(mosaic, "TIFF", new File(debugDir, coverageName
-                        + "_05.1_colorReduced.tiff"));
-            }
-        }
+        // if (expandThenContractCM) {
+        // if (LOGGER.isLoggable(Level.FINE)) {
+        // LOGGER.fine("The original rasters are colormapped, "
+        // + "reducing the mosaic color space to an indexed one");
+        // }
+        // ImageWorker imageWorker = new ImageWorker(mosaic);
+        // imageWorker.forceIndexColorModel(true);
+        // mosaic = imageWorker.getRenderedImage();
+        // if (DEBUG) {
+        // ImageIO.write(mosaic, "TIFF", new File(debugDir, coverageName
+        // + "_05.1_colorReduced.tiff"));
+        // }
+        // }
         return mosaic;
     }
 
