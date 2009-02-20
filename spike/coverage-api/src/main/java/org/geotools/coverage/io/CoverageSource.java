@@ -276,7 +276,7 @@ public interface CoverageSource {
 //	 * @return
 //	 * @throws IOException
 //	 */
-//	public Object getStaticsManager(final ProgressListener listener)throws IOException;
+//	public Object getStatisticsManager(final ProgressListener listener)throws IOException;
 //	
 //	
 //	
@@ -286,7 +286,7 @@ public interface CoverageSource {
 //	 * @return
 //	 * @throws IOException
 //	 */
-//	public Object getOverviesManager(final ProgressListener listener)throws IOException;
+//	public Object getOverviewsManager(final ProgressListener listener)throws IOException;
 	
 
 }
