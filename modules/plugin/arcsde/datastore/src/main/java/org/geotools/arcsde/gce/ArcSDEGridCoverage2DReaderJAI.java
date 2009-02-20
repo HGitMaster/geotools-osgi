@@ -84,7 +84,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32522 2009-02-19 21:54:01Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32530 2009-02-20 19:33:29Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -403,21 +403,9 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
                         + "_01_original.tiff"));
             }
-            if (expandThenContractCM) {
-                if (LOGGER.isLoggable(Level.FINER)) {
-                    LOGGER.finer("Creating color expanded version of tile for raster #"
-                            + query.getRasterId());
-                }
-                ImageWorker imageWorker = new ImageWorker(image);
-                imageWorker.forceComponentColorModel();
-                image = imageWorker.getRenderedImage();
-                if (DEBUG) {
-                    ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
-                            + "_01.1_colorExpanded.tiff"));
-                }
-            }
 
             image = cropToRequiredDimension(image, query.getResultDimensionInsideTiledImage());
+            image.getData();
             if (DEBUG) {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
                         + "_02_crop.tiff"));
@@ -439,6 +427,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(null);
 
             image = JAI.create("scale", pb);
+            image.getData();
 
             if (DEBUG) {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
@@ -450,6 +439,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             int width = image.getWidth();
             int height = image.getHeight();
 
+            assert image.getMinX() == 0;
+            assert image.getMinY() == 0;
             assert mosaicLocation.width == width;
             assert mosaicLocation.height == height;
 
@@ -461,6 +452,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(null);
 
             image = JAI.create("translate", pb);
+            image.getData();
             if (DEBUG) {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
                         + "_04_translate.tiff"));
@@ -474,6 +466,20 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                     + mosaicLocation.width;
             assert image.getHeight() == mosaicLocation.height : image.getHeight() + " != "
                     + mosaicLocation.height;
+
+            if (expandThenContractCM) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    LOGGER.finer("Creating color expanded version of tile for raster #"
+                            + query.getRasterId());
+                }
+                ImageWorker imageWorker = new ImageWorker(image);
+                imageWorker.forceComponentColorModel();
+                image = imageWorker.getRenderedImage();
+                if (DEBUG) {
+                    ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                            + "_04_1_colorExpanded.tiff"));
+                }
+            }
 
             transformed.add(image);
         }
