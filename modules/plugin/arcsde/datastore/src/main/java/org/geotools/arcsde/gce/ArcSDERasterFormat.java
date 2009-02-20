@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -441,8 +442,10 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         {
             String sdeUrl = coverageUrl;
             if (sdeUrl.indexOf(";") != -1) {
-                final String extraParams = sdeUrl.substring(sdeUrl.indexOf(";") + 1, sdeUrl
-                        .length());
+                /*
+                 * We're not using any extra param anymore. Yet, be cautious cause a client may
+                 * still be using urls with some old extra param, so jus strip it
+                 */
                 sdeUrl = sdeUrl.substring(0, sdeUrl.indexOf(";"));
             }
             rasterTable = sdeUrl.substring(sdeUrl.indexOf("#") + 1);
@@ -714,7 +717,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
         LOGGER.fine("Gathering raster attributes for " + rasterTable);
         SeRasterAttr rasterAttributes;
-        List<SeRasterAttr> rasterAttList = new ArrayList<SeRasterAttr>();
+        LinkedList<SeRasterAttr> rasterAttList = new LinkedList<SeRasterAttr>();
         SeQuery query = null;
         try {
             query = new SeQuery(scon, rasterColumns, new SeSqlConstruct(rasterTable));
@@ -724,7 +727,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             SeRow row = query.fetch();
             while (row != null) {
                 rasterAttributes = row.getRaster(0);
-                rasterAttList.add(rasterAttributes);
+                rasterAttList.addFirst(rasterAttributes);
                 row = query.fetch();
             }
         } catch (SeException se) {
@@ -878,7 +881,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             ByteArrayInputStream colorMapIS = row.getBlob(0);
 
             row = query.fetch();
-            
+
             colorMap = readColorMap(colorMapIS);
 
         } catch (SeException e) {
