@@ -114,5 +114,9 @@ public class SeRasterBand {
         // TODO Auto-generated method stub
         return 0;
     }
+    public void setColorMap(int colorMapType, DataBuffer dataBuffer) {
+        // TODO Auto-generated method stub
+        
+    }
 
 }
