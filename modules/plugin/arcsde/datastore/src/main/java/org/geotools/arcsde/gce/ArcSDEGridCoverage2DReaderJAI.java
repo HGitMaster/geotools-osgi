@@ -87,7 +87,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32532 2009-02-22 16:13:54Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32536 2009-02-22 19:10:28Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -95,7 +95,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final File debugDir = new File(System.getProperty("user.home") + File.separator
             + "arcsde_test");
