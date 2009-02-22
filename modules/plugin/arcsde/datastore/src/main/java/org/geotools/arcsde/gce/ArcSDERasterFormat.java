@@ -17,11 +17,6 @@
  */
 package org.geotools.arcsde.gce;
 
-import static org.geotools.arcsde.gce.RasterCellType.TYPE_1BIT;
-import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_S;
-import static org.geotools.arcsde.gce.RasterCellType.TYPE_8BIT_U;
-
-import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -41,16 +36,12 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.measure.unit.Unit;
-
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
-import org.geotools.coverage.Category;
-import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
@@ -60,14 +51,11 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform1D;
 
 import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;
@@ -75,7 +63,6 @@ import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeQuery;
-import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterAttr;
 import com.esri.sde.sdk.client.SeRasterBand;
@@ -83,7 +70,6 @@ import com.esri.sde.sdk.client.SeRasterColumn;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.esri.sde.sdk.client.SeTable;
-import com.esri.sde.sdk.client.SeTable.SeTableStats;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -476,11 +462,13 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 final SeRasterColumn rasterColumn;
                 final SeRasterBand sampleBand;
                 final long rasterColumnId;
+                final int bitsPerSample;
                 try {
                     SeRasterAttr ratt = rasterAttributes.get(0);
                     rasterColumn = new SeRasterColumn(scon, ratt.getRasterColumnId());
                     rasterColumnId = rasterColumn.getID().longValue();
                     sampleBand = ratt.getBands()[0];
+                    bitsPerSample = RasterCellType.valueOf(ratt.getPixelType()).getBitsPerSample();
                 } catch (SeException e) {
                     throw new ArcSdeException(e);
                 }
@@ -489,7 +477,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
 
                 if (sampleBand.hasColorMap()) {
-                    rastersColorMaps = loadColorMaps(rasterColumnId, scon);
+                    rastersColorMaps = loadColorMaps(rasterColumnId, bitsPerSample, scon);
                 } else {
                     rastersColorMaps = Collections.emptyMap();
                 }
@@ -506,7 +494,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                     originalEnvelope = calculateOriginalEnvelope(rAtt, coverageCrs);
                     pyramidInfo.setOriginalEnvelope(originalEnvelope);
                     final List<RasterBandInfo> bands;
-                    bands = setUpBandInfo(scon, rasterTable, rAtt, rastersColorMaps);
+                    bands = setUpBandInfo(scon, rAtt, rastersColorMaps);
                     pyramidInfo.setBands(bands);
                 }
             } catch (SeException e) {
@@ -558,177 +546,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                     + rasterTable);
         }
 
-        rasterColumns = (String[]) fetchColumns.toArray(new String[fetchColumns.size()]);
+        rasterColumns = fetchColumns.toArray(new String[fetchColumns.size()]);
         return rasterColumns;
-    }
-
-    private List<GridSampleDimension> buildGridSampleDimensions_Old(ArcSDEPooledConnection conn,
-            String coverageName, SeRasterAttr rasterAttributes) throws IOException {
-
-        List<GridSampleDimension> gridBands;
-
-        try {
-            final int numBands = rasterAttributes.getNumBands();
-            gridBands = new ArrayList<GridSampleDimension>(numBands);
-
-            final SeRasterBand[] sdeBands = rasterAttributes.getBands();
-            final RasterCellType pixelType = RasterCellType
-                    .valueOf(rasterAttributes.getPixelType());
-
-            final LinearTransform1D identity = LinearTransform1D.IDENTITY;
-            if (numBands == 1) {
-                final SeRasterBand singleBand = sdeBands[0];
-                if (pixelType == TYPE_1BIT) {
-                    final NumberRange<Integer> sampleValueRange = NumberRange.create(0, 1);
-                    final String bandName = coverageName + ": Band One (1-bit)";
-                    final Color minColor = Color.BLACK;
-                    final Color maxColor = Color.WHITE;
-                    final Color[] colorRange = { minColor, maxColor };
-                    Category bitBandCat = new Category(bandName, colorRange, sampleValueRange,
-                            identity);
-                    gridBands.add(new GridSampleDimension(bitBandCat.getName(),
-                            new Category[] { bitBandCat }, null).geophysics(true));
-
-                } else if (pixelType == RasterCellType.TYPE_32BIT_REAL) {
-                    float minimum;
-                    float maximum;
-                    if (singleBand.hasStats()) {
-                        minimum = (float) singleBand.getStatsMin();
-                        maximum = (float) singleBand.getStatsMax();
-                    } else {
-                        // throw new IllegalStateException("Raster " + this.coverageName
-                        // + " of type 32-bit float contains no statistics."
-                        // + " Coverage sample range can't be requested.");
-                        LOGGER.info(coverageName
-                                + " has no statistics. Calulating min and max values...");
-                        SeRasterColumn col = new SeRasterColumn(conn, rasterAttributes
-                                .getRasterColumnId());
-                        String tableName = col.getQualifiedTableName();
-                        String rasterColName = col.getName();
-                        SeQuery query = new SeQuery(conn);
-                        try {
-                            // let the server limit the number of values (from the giomgr.defs
-                            // config file)
-                            final int maxDistinctValues = 0;
-                            // which stats to calculate
-                            final int mask = SeTableStats.SE_ALL_STATS;// SeTableStats.SE_MIN_STATS
-                            // |
-                            // SeTableStats.SE_MAX_STATS;
-                            SeQueryInfo queryInfo = new SeQueryInfo();
-                            queryInfo.setConstruct(new SeSqlConstruct(tableName));
-                            // queryInfo.setColumns(new String[] { rasterColName });
-                            SeTableStats stats = query.calculateTableStatistics(rasterColName,
-                                    mask, queryInfo, maxDistinctValues);
-                            minimum = (float) stats.getMin();
-                            maximum = (float) stats.getMax();
-                        } finally {
-                            query.close();
-                        }
-                    }
-                    final String bandName = coverageName + ": Band One (32-bit floating point)";
-                    Category floatBandCategory;
-                    {
-                        final NumberRange<Float> sampleValueRange;
-                        sampleValueRange = NumberRange.create(minimum, maximum);
-                        final Color minColor = Color.BLACK;
-                        final Color maxColor = Color.WHITE;
-                        final Color[] colorRange = { minColor, maxColor };
-                        final MathTransform1D sampleToGeophysics = identity;
-                        floatBandCategory = new Category(bandName, colorRange, sampleValueRange,
-                                sampleToGeophysics);
-                    }
-                    final Unit<?> units = null;
-                    Category[] categories = { floatBandCategory };
-                    GridSampleDimension floatSampleDimension = new GridSampleDimension(bandName,
-                            categories, units);
-                    // The range of sample values in all categories maps directly the "real world"
-                    // values without the need for any transformation
-                    final boolean isGeophysicsView = true;
-                    GridSampleDimension geophysics = floatSampleDimension
-                            .geophysics(isGeophysicsView);
-                    gridBands.add(geophysics);
-                } else {
-                    if (singleBand.hasColorMap()) {
-                        // we support 1-band with colormap now
-                        Category cmCat = null;// buildCategory(rasterAttributes.getBands()[0].
-                        // getColorMap
-                        // ());
-                        gridBands.add(new GridSampleDimension(cmCat.getName(),
-                                new Category[] { cmCat }, null).geophysics(true));
-
-                    } else if (pixelType == TYPE_8BIT_S || pixelType == TYPE_8BIT_U) {
-                        LOGGER.fine("Discovered 8-bit single-band raster.  "
-                                + "Using return image type: TYPE_BYTE_GRAY");
-                        // TODO: I guess if its TYPE_8BIT_S the range shouldn't be 0-255
-                        NumberRange<Integer> sampleValueRange = NumberRange.create(0, 255);
-                        Category greyscaleBandCat = new Category(coverageName
-                                + ": Band One (grayscale)",
-                                new Color[] { Color.BLACK, Color.WHITE }, sampleValueRange,
-                                identity);
-                        gridBands.add(new GridSampleDimension(greyscaleBandCat.getName(),
-                                new Category[] { greyscaleBandCat }, null).geophysics(true));
-                    } else if (pixelType == RasterCellType.TYPE_16BIT_U) {
-                        final int minimum = 0;
-                        final int maximum = 65535;
-                        NumberRange<Integer> sampleValueRange = NumberRange
-                                .create(minimum, maximum);
-                        Category greyscaleBandCat = new Category("Band 1", new Color[] {
-                                Color.BLACK, Color.WHITE }, sampleValueRange, identity);
-                        gridBands.add(new GridSampleDimension(greyscaleBandCat.getName(),
-                                new Category[] { greyscaleBandCat }, null).geophysics(true));
-                    } else if (pixelType == RasterCellType.TYPE_16BIT_S) {
-                        final short minimum = Short.MIN_VALUE;
-                        final short maximum = Short.MAX_VALUE;
-                        NumberRange<Short> sampleValueRange = NumberRange.create(minimum, maximum);
-                        Category greyscaleBandCat = new Category("Band 1", new Color[] {
-                                Color.BLACK, Color.WHITE }, sampleValueRange, identity);
-                        gridBands.add(new GridSampleDimension(greyscaleBandCat.getName(),
-                                new Category[] { greyscaleBandCat }, null).geophysics(true));
-                    } else {
-                        throw new IllegalArgumentException(
-                                "One-band, non-colormapped raster layers with type " + pixelType
-                                        + " are not supported.");
-                    }
-                }
-
-            } else if (numBands == 3 || numBands == 4) {
-                if (pixelType != TYPE_8BIT_U) {
-                    throw new IllegalArgumentException(
-                            "3 or 4 band rasters are only supported if they have pixel type 8-bit unsigned pixels.");
-                }
-                NumberRange<Integer> sampleValueRange = NumberRange.create(0, 255);
-                Category nan = new Category("no-data", new Color[] { new Color(0x00000000) },
-                        NumberRange.create(0, 0), identity);
-                Category white = new Category("valid-data", new Color[] { new Color(0xff000000) },
-                        NumberRange.create(255, 255), identity);
-                Category redBandCat = new Category("red", new Color[] { Color.BLACK, Color.RED },
-                        sampleValueRange, identity);
-                Category blueBandCat = new Category("blue",
-                        new Color[] { Color.BLACK, Color.BLUE }, sampleValueRange, identity);
-                Category greenBandCat = new Category("green", new Color[] { Color.BLACK,
-                        Color.GREEN }, sampleValueRange, identity);
-
-                gridBands.add(new GridSampleDimension("Red band", new Category[] { redBandCat },
-                        null));
-                gridBands.add(new GridSampleDimension("Green band", new Category[] { blueBandCat },
-                        null));
-                gridBands.add(new GridSampleDimension("Blue band", new Category[] { greenBandCat },
-                        null));
-                if (numBands == 4) {
-                    // temporary workaround
-                    gridBands.add(new GridSampleDimension("NODATA Mask Band", new Category[] { nan,
-                            white }, null));
-                }
-
-            } else {
-                throw new DataSourceException("The coverage contains " + numBands
-                        + " bands. We only support 1, 3 or 4 bands");
-            }
-        } catch (SeException e) {
-            throw new ArcSdeException("Error creating the coverage's sample dimensions", e);
-        }
-
-        return gridBands;
     }
 
     private List<SeRasterAttr> getSeRasterAttr(ArcSDEPooledConnection scon, String rasterTable,
@@ -765,7 +584,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         return rasterAttList;
     }
 
-    private List<RasterBandInfo> setUpBandInfo(ArcSDEPooledConnection scon, String rasterTable,
+    private List<RasterBandInfo> setUpBandInfo(ArcSDEPooledConnection scon,
             SeRasterAttr rasterAttributes, Map<Long, IndexColorModel> rastersColorMaps)
             throws IOException {
         final int numBands;
@@ -842,6 +661,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             } catch (SeException e) {
                 throw new ArcSdeException(e);
             }
+            // double noDataValue = 0;
+            // bandInfo.noDataValue = noDataValue;
         } else {
             bandInfo.statsMin = java.lang.Double.NaN;
             bandInfo.statsMax = java.lang.Double.NaN;
@@ -867,7 +688,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @throws ArcSdeException
      */
     private Map<Long, IndexColorModel> loadColorMaps(final long rasterColumnId,
-            ArcSDEPooledConnection scon) throws IOException {
+            final int bitsPerSample, ArcSDEPooledConnection scon) throws IOException {
         LOGGER.fine("Reading colormap for raster column " + rasterColumnId);
 
         final String auxTableName = "SDE_AUX_" + rasterColumnId;
@@ -876,7 +697,6 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         Map<Long, IndexColorModel> colorMaps = new HashMap<Long, IndexColorModel>();
         SeQuery query = null;
         try {
-            SeTable table = new SeTable(scon, auxTableName);
             SeSqlConstruct sqlConstruct = new SeSqlConstruct();
             sqlConstruct.setTables(new String[] { auxTableName });
             String whereClause = "TYPE = 3";
@@ -897,7 +717,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 colorMapIS = row.getBlob(1);
 
                 colorMapData = readColorMap(colorMapIS);
-                colorModel = RasterUtils.sdeColorMapToJavaColorModel(colorMapData);
+                colorModel = RasterUtils.sdeColorMapToJavaColorModel(colorMapData, bitsPerSample);
 
                 colorMaps.put(Long.valueOf(bandId), colorModel);
 

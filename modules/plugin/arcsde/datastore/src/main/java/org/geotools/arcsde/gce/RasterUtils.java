@@ -73,7 +73,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32532 2009-02-22 16:13:54Z groldan $
+ * @version $Id: RasterUtils.java 32533 2009-02-22 18:35:14Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -446,7 +446,27 @@ class RasterUtils {
         return levelOverlappingPixels;
     }
 
-    public static IndexColorModel sdeColorMapToJavaColorModel(final DataBuffer colorMapData) {
+    /**
+     * Creates an IndexColorModel out of a DataBuffer obtained from an ArcSDE's raster color map.
+     * <p>
+     * The resulting IndexColorModel has always four components, whether the original color map has
+     * alpha channel or not. In case the original color map has no alpha channel, the fourth
+     * component will be all opaque.
+     * </p>
+     * <p>
+     * The no-data value to be used for this color model will always be the last element in the
+     * resulting map. If needed, the map's gonna be extended in capacity to make room for the
+     * no-data value, as well as the color model's transfer type may be promoted to the next higher
+     * one (ie, from 8bit to 16bit). Further processing may take into account this possible
+     * difference between the actual data pixel depth and the colormap's one to perform the
+     * necessary conversion.
+     * </p>
+     * 
+     * @param colorMapData
+     * @return
+     */
+    public static IndexColorModel sdeColorMapToJavaColorModel(final DataBuffer colorMapData,
+            final int bitsPerSample) {
         if (colorMapData == null) {
             throw new NullPointerException("colorMapData");
         }
@@ -456,24 +476,69 @@ class RasterUtils {
                     + colorMapData.getNumBanks());
         }
 
+        int[] ARGB = null;
         final int numBanks = colorMapData.getNumBanks();
-        final int mapSize = colorMapData.getSize();
-
-        int[] ARGB = new int[mapSize];
-        int r;
-        int g;
-        int b;
-        int a;
-        for (int i = 0; i < mapSize; i++) {
-            r = colorMapData.getElem(0, i);
-            g = colorMapData.getElem(1, i);
-            b = colorMapData.getElem(2, i);
-            a = numBanks == 4 ? colorMapData.getElem(3, i) : 255;
-            int rgba = ColorUtilities.getIntFromColor(r, g, b, a);
-            ARGB[i] = rgba;
+        {
+            final int mapSize = colorMapData.getSize();
+            ARGB = new int[mapSize];
+            int r;
+            int g;
+            int b;
+            int a;
+            for (int i = 0; i < mapSize; i++) {
+                r = colorMapData.getElem(0, i);
+                g = colorMapData.getElem(1, i);
+                b = colorMapData.getElem(2, i);
+                a = numBanks == 4 ? colorMapData.getElem(3, i) : 255;
+                int rgba = ColorUtilities.getIntFromColor(r, g, b, a);
+                ARGB[i] = rgba;
+            }
+        }
+        /*
+         * Now check if the map need to be expanded and/or the transfer type promoted to the next
+         * higher level in order to make room for the no-data value
+         */
+        int transferType = colorMapData.getDataType();
+        int finalBitsPerSample = bitsPerSample;
+        {
+//            int mapSize = ARGB.length;
+//            switch (bitsPerSample) {
+//            case 8:
+//                if (mapSize >= 256) {
+//                    LOGGER.finer("Promoting transfer type from 8 to 16 bits per sample");
+//                    transferType = DataBuffer.TYPE_USHORT;
+//                    finalBitsPerSample = 0;
+//                } else {
+//                    finalBitsPerSample = 8;
+//                }
+//                break;
+//            case 16:
+//                if (mapSize >= 65536) {
+//                    LOGGER.finer("Promoting transfer type from 16 to 32 bits per sample");
+//                    transferType = DataBuffer.TYPE_INT;
+//                    finalBitsPerSample = 32;
+//                } else {
+//                    finalBitsPerSample = 16;
+//                }
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Unknown pixel depth to compute color map: "
+//                        + bitsPerSample);
+//            }
+//            int[] tmp = new int[ARGB.length + 1];
+//            System.arraycopy(ARGB, 0, tmp, 0, ARGB.length);
+//            ARGB = tmp;
+            int nodataValue = ColorUtilities.getIntFromColor(0, 0, 0, 0);
+            ARGB[ARGB.length - 1] = nodataValue;
         }
 
-        IndexColorModel colorModel = ColorUtilities.getIndexColorModel(ARGB);
+        final boolean hasAlpha = true;
+        final int transparency = Transparency.TRANSLUCENT;
+
+        IndexColorModel colorModel = new IndexColorModel(finalBitsPerSample, ARGB.length, ARGB, 0,
+                hasAlpha, transparency, transferType);
+
+        // IndexColorModel colorModel = ColorUtilities.getIndexColorModel(ARGB);
 
         return colorModel;
     }
