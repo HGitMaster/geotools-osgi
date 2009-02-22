@@ -19,7 +19,7 @@ public class SeRasterColumn {
     public String getTableName() {
         return null;
     }
-    public Integer getID() throws SeException{
+    public SeObjectId getID() throws SeException{
         // TODO Auto-generated method stub
         return null;
     }
