@@ -37,7 +37,7 @@ import com.esri.sde.sdk.client.SeRow;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: TileReader.java 32482 2009-02-13 17:16:21Z groldan $
+ * @version $Id: TileReader.java 32532 2009-02-22 16:13:54Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls" })
@@ -192,7 +192,7 @@ class TileReader {
                     + " has more: " + hasNext());
         }
 
-        final byte NO_DATA_BYTE = (byte) 0x00;
+        final byte NO_DATA_BYTE = (byte) 0xFF;
 
         final int numPixels = tile.getNumPixels();
         if (0 == numPixels) {
@@ -213,15 +213,22 @@ class TileReader {
             }
             System.arraycopy(rawTileData, 0, tileData, 0, tileDataLength);
 
-            /*
-             * if (bitsPerSample >= 8 && bitMaskDataLength > 0) {
-             * LOGGER.finer("Tile contains no data pixels, applying no-data mask"); int
-             * pixArrayOffset; boolean isNoData; final int bytesPerSample = bitsPerSample / 8;// hey
-             * this won't work for bits x // sample < 8 for (int pixelN = 0; pixelN < numPixels;
-             * pixelN++) { pixArrayOffset = pixelN bytesPerSample; isNoData = (((bitmaskData[pixelN
-             * / 8] >> (7 - (pixArrayOffset % 8))) & 0x01) == 0x00); if (isNoData) { for (int i = 0;
-             * i < bytesPerSample; i++) { tileData[pixArrayOffset + i] = NO_DATA_BYTE; } } } }
-             */
+            if (bitsPerSample >= 8 && bitMaskDataLength > 0) {
+                LOGGER.finer("Tile contains no data pixels, applying no-data mask");
+                int pixArrayOffset;
+                boolean isNoData;
+                final int bytesPerSample = bitsPerSample / 8;// hey this won't work for bits x
+                                                             // sample < 8
+                for (int pixelN = 0; pixelN < numPixels; pixelN++) {
+                    pixArrayOffset = pixelN * bytesPerSample;
+                    isNoData = (((bitmaskData[pixelN / 8] >> (7 - (pixArrayOffset % 8))) & 0x01) == 0x00);
+                    if (isNoData) {
+                        for (int i = 0; i < bytesPerSample; i++) {
+                            tileData[pixArrayOffset + i] = NO_DATA_BYTE;
+                        }
+                    }
+                }
+            }
 
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("returning " + numPixels + " pixels data packaged into "

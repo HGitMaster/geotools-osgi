@@ -639,7 +639,7 @@ public class RasterTestData {
             imageHeight = 532;
             addRasterToCatalog(conn, tableName, crs, numberOfBands, imageWidth, imageHeight,
                     pixelType, maxLevels, extent);
-            
+
             maxLevels = 3;
             extent = new SeExtent(0, 512, 256, 768);
             imageWidth = 1024;
@@ -866,13 +866,20 @@ public class RasterTestData {
                 attr = row.getRaster(0);
                 SeRaster raster = attr.getRasterInfo();
                 SeRasterBand band1 = raster.getBands()[0];
-                final int numEntries = 256;
+                final int numEntries = colorModel.getMapSize();
                 // number of colors, including alpha, if any
                 final int numBanks = colorModel.getNumComponents();
                 final int colorMapType = numBanks == 3 ? SeRaster.SE_COLORMAP_RGB
                         : SeRaster.SE_COLORMAP_RGBA;
-                final int dataType = SeRaster.SE_COLORMAP_DATA_BYTE;
-                DataBufferByte dataBuffer = new DataBufferByte(numEntries, numBanks);
+                final int dataType = pixelType.getDataBufferType();
+                DataBuffer dataBuffer;
+                if (DataBuffer.TYPE_BYTE == dataType) {
+                    dataBuffer = new DataBufferByte(numEntries, numBanks);
+                } else if (DataBuffer.TYPE_SHORT == dataType) {
+                    dataBuffer = new DataBufferShort(numEntries, numBanks);
+                } else {
+                    throw new IllegalArgumentException("data type: " + pixelType);
+                }
                 for (int elem = 0; elem < numEntries; elem++) {
                     dataBuffer.setElem(0, colorModel.getRed(elem));
                     dataBuffer.setElem(1, colorModel.getGreen(elem));
@@ -1429,6 +1436,9 @@ public class RasterTestData {
                 query.prepareQuery();
                 query.execute();
                 SeRow row = query.fetch();
+                if (row == null) {
+                    continue;
+                }
                 SeRasterAttr attr = row.getRaster(0);
                 int pixelType = attr.getPixelType();
                 final RasterCellType cellType = RasterCellType.valueOf(pixelType);

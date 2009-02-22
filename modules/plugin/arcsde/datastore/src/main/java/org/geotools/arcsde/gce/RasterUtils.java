@@ -73,7 +73,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32529 2009-02-20 19:31:48Z groldan $
+ * @version $Id: RasterUtils.java 32532 2009-02-22 16:13:54Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -446,8 +446,7 @@ class RasterUtils {
         return levelOverlappingPixels;
     }
 
-    public static IndexColorModel sdeColorMapToJavaColorModel(final int bitsPerPixel,
-            final DataBuffer colorMapData) {
+    public static IndexColorModel sdeColorMapToJavaColorModel(final DataBuffer colorMapData) {
         if (colorMapData == null) {
             throw new NullPointerException("colorMapData");
         }

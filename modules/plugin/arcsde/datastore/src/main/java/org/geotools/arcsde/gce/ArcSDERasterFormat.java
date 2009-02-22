@@ -32,6 +32,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,7 +74,6 @@ import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
-import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeRaster;
@@ -457,8 +457,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         final String[] rasterColumns = getRasterColumns(scon, rasterTable);
         final List<PyramidInfo> rastersLayoutInfo = new ArrayList<PyramidInfo>();
         {
-            final List<SeRasterAttr> rasterAttributes = getSeRasterAttr(scon, rasterTable,
-                    rasterColumns);
+            final List<SeRasterAttr> rasterAttributes;
+            rasterAttributes = getSeRasterAttr(scon, rasterTable, rasterColumns);
 
             if (rasterAttributes.size() == 0) {
                 throw new IllegalArgumentException("Table " + rasterTable
@@ -466,16 +466,34 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             }
 
             final CoordinateReferenceSystem coverageCrs;
+
+            /*
+             * by bandId map of colormaps. The dataset may be composed of more than one raster so we
+             * gather all the colormaps once and held them here by rasterband id
+             */
+            final Map<Long, IndexColorModel> rastersColorMaps;
             {
-                SeRasterColumn rasterColumn;
+                final SeRasterColumn rasterColumn;
+                final SeRasterBand sampleBand;
+                final long rasterColumnId;
                 try {
                     SeRasterAttr ratt = rasterAttributes.get(0);
                     rasterColumn = new SeRasterColumn(scon, ratt.getRasterColumnId());
+                    rasterColumnId = rasterColumn.getID().longValue();
+                    sampleBand = ratt.getBands()[0];
                 } catch (SeException e) {
                     throw new ArcSdeException(e);
                 }
                 final SeCoordinateReference seCoordRef = rasterColumn.getCoordRef();
+                LOGGER.finer("Looing CRS for raster column " + rasterTable);
                 coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
+
+                if (sampleBand.hasColorMap()) {
+                    rastersColorMaps = loadColorMaps(rasterColumnId, scon);
+                } else {
+                    rastersColorMaps = Collections.emptyMap();
+                }
+
             }
             try {
                 for (SeRasterAttr rAtt : rasterAttributes) {
@@ -487,7 +505,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                     final GeneralEnvelope originalEnvelope;
                     originalEnvelope = calculateOriginalEnvelope(rAtt, coverageCrs);
                     pyramidInfo.setOriginalEnvelope(originalEnvelope);
-                    final List<RasterBandInfo> bands = setUpBandInfo(scon, rasterTable, rAtt);
+                    final List<RasterBandInfo> bands;
+                    bands = setUpBandInfo(scon, rasterTable, rAtt, rastersColorMaps);
                     pyramidInfo.setBands(bands);
                 }
             } catch (SeException e) {
@@ -727,6 +746,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             SeRow row = query.fetch();
             while (row != null) {
                 rasterAttributes = row.getRaster(0);
+                // if (rasterAttributes.getRasterId().longValue() == 28)
                 rasterAttList.addFirst(rasterAttributes);
                 row = query.fetch();
             }
@@ -746,7 +766,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     }
 
     private List<RasterBandInfo> setUpBandInfo(ArcSDEPooledConnection scon, String rasterTable,
-            SeRasterAttr rasterAttributes) throws IOException {
+            SeRasterAttr rasterAttributes, Map<Long, IndexColorModel> rastersColorMaps)
+            throws IOException {
         final int numBands;
         final SeRasterBand[] seBands;
         final RasterCellType cellType;
@@ -765,7 +786,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         for (int bandN = 0; bandN < numBands; bandN++) {
             band = seBands[bandN];
             bandInfo = new RasterBandInfo();
-            setBandInfo(bandInfo, band, scon, cellType.getBitsPerSample());
+            final int bitsPerSample = cellType.getBitsPerSample();
+            setBandInfo(bandInfo, band, scon, bitsPerSample, rastersColorMaps);
             detachedBandInfo.add(bandInfo);
         }
         return detachedBandInfo;
@@ -781,7 +803,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @throws IOException
      */
     private void setBandInfo(RasterBandInfo bandInfo, final SeRasterBand band,
-            final ArcSDEPooledConnection scon, int bitsPerSample) throws IOException {
+            final ArcSDEPooledConnection scon, int bitsPerSample,
+            final Map<Long, IndexColorModel> colorMaps) throws IOException {
 
         bandInfo.bandId = band.getId().longValue();
         bandInfo.bandNumber = band.getBandNumber();
@@ -794,8 +817,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         bandInfo.bandWidth = band.getBandWidth();
         bandInfo.hasColorMap = band.hasColorMap();
         if (bandInfo.hasColorMap) {
-            IndexColorModel colorMap = getBandColorMap(band, scon, bitsPerSample);
-            LOGGER.fine("Setting band's color map: " + colorMap);
+            IndexColorModel colorMap = colorMaps.get(Long.valueOf(bandInfo.bandId));
+            LOGGER.finest("Setting band's color map: " + colorMap);
             bandInfo.colorMap = colorMap;
         } else {
             bandInfo.colorMap = null;
@@ -836,16 +859,6 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         bandInfo.tileOrigin = new Point2D.Double(tOrigin.getX(), tOrigin.getY());
     }
 
-    private IndexColorModel getBandColorMap(SeRasterBand band, ArcSDEPooledConnection scon,
-            int bitsPerPixel) throws IOException {
-        final DataBuffer colorMapData = getColormapData(band, scon);
-
-        IndexColorModel colorModel;
-        colorModel = RasterUtils.sdeColorMapToJavaColorModel(bitsPerPixel, colorMapData);
-
-        return colorModel;
-    }
-
     /**
      * 
      * @param band
@@ -853,39 +866,46 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @return
      * @throws ArcSdeException
      */
-    private DataBuffer getColormapData(SeRasterBand band, ArcSDEPooledConnection scon)
-            throws IOException {
-        LOGGER.fine("Reading colormap for raster band " + band);
+    private Map<Long, IndexColorModel> loadColorMaps(final long rasterColumnId,
+            ArcSDEPooledConnection scon) throws IOException {
+        LOGGER.fine("Reading colormap for raster column " + rasterColumnId);
 
-        final SeObjectId rasterColumnId = band.getRasterColumnId();
-
-        final String auxTableName = "SDE_AUX_" + rasterColumnId.longValue();
+        final String auxTableName = "SDE_AUX_" + rasterColumnId;
         LOGGER.fine("Quering auxiliary table " + auxTableName + " for color map data");
 
-        DataBuffer colorMap;
+        Map<Long, IndexColorModel> colorMaps = new HashMap<Long, IndexColorModel>();
         SeQuery query = null;
         try {
             SeTable table = new SeTable(scon, auxTableName);
-            SeColumnDefinition[] describe = table.describe();
             SeSqlConstruct sqlConstruct = new SeSqlConstruct();
             sqlConstruct.setTables(new String[] { auxTableName });
-            String whereClause = "TYPE = 3 AND RASTERBAND_ID=" + band.getId().longValue();
+            String whereClause = "TYPE = 3";
             sqlConstruct.setWhere(whereClause);
 
-            query = new SeQuery(scon, new String[] { "OBJECT" }, sqlConstruct);
+            query = new SeQuery(scon, new String[] { "RASTERBAND_ID, OBJECT" }, sqlConstruct);
             query.prepareQuery();
             query.execute();
 
+            long bandId;
+            ByteArrayInputStream colorMapIS;
+            DataBuffer colorMapData;
+            IndexColorModel colorModel;
+
             SeRow row = query.fetch();
+            while (row != null) {
+                bandId = ((Number) row.getObject(0)).longValue();
+                colorMapIS = row.getBlob(1);
 
-            ByteArrayInputStream colorMapIS = row.getBlob(0);
+                colorMapData = readColorMap(colorMapIS);
+                colorModel = RasterUtils.sdeColorMapToJavaColorModel(colorMapData);
 
-            row = query.fetch();
+                colorMaps.put(Long.valueOf(bandId), colorModel);
 
-            colorMap = readColorMap(colorMapIS);
-
+                row = query.fetch();
+            }
         } catch (SeException e) {
-            throw new ArcSdeException("Error fetching colormap data for band " + band, e);
+            throw new ArcSdeException("Error fetching colormap data for column " + rasterColumnId,
+                    e);
         } finally {
             if (query != null) {
                 try {
@@ -896,17 +916,15 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 }
             }
         }
-        return colorMap;
+        LOGGER.fine("Read color map data for " + colorMaps.size() + " rasters");
+        return colorMaps;
     }
 
     private DataBuffer readColorMap(final ByteArrayInputStream colorMapIS) throws IOException {
-        final int COLOR_MODEL_TYPE_INDEX = 4;// either RGB or RGBA
 
         final DataInputStream dataIn = new DataInputStream(colorMapIS);
         // discard unneeded data
-        for (int i = 0; i < COLOR_MODEL_TYPE_INDEX; i++) {
-            dataIn.readByte();
-        }
+        int discardedData = dataIn.readInt();
 
         final int colorSpaceType = dataIn.readInt();
         final int numBanks;
@@ -917,25 +935,25 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         } else {
             throw new IllegalStateException("Got unknown colormap type: " + colorSpaceType);
         }
-        LOGGER.info("Colormap has " + numBanks + " color components");
+        LOGGER.finest("Colormap has " + numBanks + " color components");
 
         final int buffType = dataIn.readInt();
         final int numElems = dataIn.readInt();
-        LOGGER.fine("ColorMap length: " + numElems);
+        LOGGER.finest("ColorMap length: " + numElems);
 
         final DataBuffer buff;
         if (buffType == SeRaster.SE_COLORMAP_DATA_BYTE) {
-            LOGGER.fine("Creating Byte data buffer for " + numBanks + " banks and " + numElems
+            LOGGER.finest("Creating Byte data buffer for " + numBanks + " banks and " + numElems
                     + " elements per bank");
             buff = new DataBufferByte(numElems, numBanks);
             for (int elem = 0; elem < numElems; elem++) {
                 for (int bank = 0; bank < numBanks; bank++) {
-                    int val = dataIn.readByte();
+                    int val = dataIn.readUnsignedByte();
                     buff.setElem(bank, elem, val);
                 }
             }
         } else if (buffType == SeRaster.SE_COLORMAP_DATA_SHORT) {
-            LOGGER.fine("Creating Short data buffer for " + numBanks + " banks and " + numElems
+            LOGGER.finest("Creating Short data buffer for " + numBanks + " banks and " + numElems
                     + " elements per bank");
             buff = new DataBufferShort(numElems, numBanks);
             for (int elem = 0; elem < numElems; elem++) {
@@ -949,6 +967,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                     + buffType + " expected one of TYPE_BYTE, TYPE_SHORT");
         }
 
+        assert dataIn.read() == -1 : "color map data should have been exausted";
         return buff;
     }
 }

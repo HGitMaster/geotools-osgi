@@ -45,6 +45,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
+import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
@@ -86,7 +87,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32531 2009-02-20 21:10:32Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32532 2009-02-22 16:13:54Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -94,7 +95,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final File debugDir = new File(System.getProperty("user.home") + File.separator
             + "arcsde_test");
@@ -314,12 +315,12 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
         final RenderedImage coverageRaster = createMosaic(queries);
 
-        MathTransform rasterToModel = RasterUtils.createRasterToModel(mosaicDimension,
-                resultEnvelope);
-        return super.createImageCoverage(PlanarImage.wrapRenderedImage(coverageRaster),
-                rasterToModel);
-        // return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
-        // null);
+//        return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
+//                null);
+         MathTransform rasterToModel = RasterUtils.createRasterToModel(mosaicDimension,
+         resultEnvelope);
+         return super.createImageCoverage(PlanarImage.wrapRenderedImage(coverageRaster),
+         rasterToModel);
     }
 
     /**
@@ -430,7 +431,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(scaleY);
             pb.add(translateX);
             pb.add(translateY);
-            pb.add(null);
+            pb.add(new InterpolationNearest());
 
             image = JAI.create("scale", pb);
             image.getData();
@@ -460,10 +461,14 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                         + "_04_translate.tiff"));
             }
 
-            assert image.getMinX() == mosaicLocation.x : image.getMinX() + " != " + mosaicLocation.x;
-            assert image.getMinY() == mosaicLocation.y : image.getMinY() + " != " + mosaicLocation.y;
-            assert image.getWidth() == mosaicLocation.width : image.getWidth() + " != " + mosaicLocation.width;
-            assert image.getHeight() == mosaicLocation.height : image.getHeight() + " != " + mosaicLocation.height;
+            assert image.getMinX() == mosaicLocation.x : image.getMinX() + " != "
+                    + mosaicLocation.x;
+            assert image.getMinY() == mosaicLocation.y : image.getMinY() + " != "
+                    + mosaicLocation.y;
+            assert image.getWidth() == mosaicLocation.width : image.getWidth() + " != "
+                    + mosaicLocation.width;
+            assert image.getHeight() == mosaicLocation.height : image.getHeight() + " != "
+                    + mosaicLocation.height;
 
             if (expandThenContractCM) {
                 if (LOGGER.isLoggable(Level.FINER)) {
