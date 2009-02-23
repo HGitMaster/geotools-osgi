@@ -19,6 +19,8 @@ package org.geotools.data.complex;
 
 import java.awt.RenderingHints;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -54,9 +56,8 @@ import org.opengis.filter.Filter;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: MappingFeatureSource.java 31815 2008-11-10 07:53:14Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/MappingFeatureSource.java $
+ * @version $Id: MappingFeatureSource.java 32538 2009-02-23 04:14:22Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureSource.java $
  * @since 2.4
  */
 class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
@@ -80,6 +81,13 @@ class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
 
     private DefaultQuery namedQuery(Filter filter, int countLimit) {
         DefaultQuery query = new DefaultQuery();
+        if (getName().getNamespaceURI() != null) {
+            try {
+                query.setNamespace(new URI(getName().getNamespaceURI()));
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
         query.setTypeName(getName().getLocalPart());
         query.setFilter(filter);
         query.setMaxFeatures(countLimit);
