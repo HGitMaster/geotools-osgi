@@ -473,7 +473,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                     throw new ArcSdeException(e);
                 }
                 final SeCoordinateReference seCoordRef = rasterColumn.getCoordRef();
-                LOGGER.finer("Looing CRS for raster column " + rasterTable);
+                LOGGER.finer("Looking CRS for raster column " + rasterTable);
                 coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
 
                 if (sampleBand.hasColorMap()) {
@@ -565,7 +565,6 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             SeRow row = query.fetch();
             while (row != null) {
                 rasterAttributes = row.getRaster(0);
-                // if (rasterAttributes.getRasterId().longValue() == 28)
                 rasterAttList.addFirst(rasterAttributes);
                 row = query.fetch();
             }

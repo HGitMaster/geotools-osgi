@@ -23,6 +23,8 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
@@ -49,6 +51,7 @@ import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.FormatDescriptor;
 import javax.media.jai.operator.MosaicDescriptor;
 
 import org.geotools.arcsde.ArcSdeException;
@@ -65,7 +68,6 @@ import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.ServiceInfo;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.image.ImageWorker;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -87,11 +89,11 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32536 2009-02-22 19:10:28Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32540 2009-02-23 06:36:00Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
-class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
+final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
@@ -315,12 +317,12 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
         final RenderedImage coverageRaster = createMosaic(queries);
 
-//        return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
-//                null);
-         MathTransform rasterToModel = RasterUtils.createRasterToModel(mosaicDimension,
-         resultEnvelope);
-         return super.createImageCoverage(PlanarImage.wrapRenderedImage(coverageRaster),
-         rasterToModel);
+        // return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
+        // null);
+        MathTransform rasterToModel = RasterUtils.createRasterToModel(mosaicDimension,
+                resultEnvelope);
+        return super.createImageCoverage(PlanarImage.wrapRenderedImage(coverageRaster),
+                rasterToModel);
     }
 
     /**
@@ -412,7 +414,6 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             }
 
             image = cropToRequiredDimension(image, query.getResultDimensionInsideTiledImage());
-            image.getData();
             if (DEBUG) {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
                         + "_02_crop.tiff"));
@@ -434,7 +435,6 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(new InterpolationNearest());
 
             image = JAI.create("scale", pb);
-            image.getData();
 
             if (DEBUG) {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
@@ -455,7 +455,6 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(null);
 
             image = JAI.create("translate", pb);
-            image.getData();
             if (DEBUG) {
                 ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
                         + "_04_translate.tiff"));
@@ -475,9 +474,12 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                     LOGGER.finer("Creating color expanded version of tile for raster #"
                             + query.getRasterId());
                 }
-                ImageWorker imageWorker = new ImageWorker(image);
-                imageWorker.forceComponentColorModel();
-                image = imageWorker.getRenderedImage();
+
+                /*
+                 * reformat the image as a 4 band rgba backed by byte data
+                 */
+                image = FormatDescriptor.create(image, Integer.valueOf(DataBuffer.TYPE_BYTE), null);
+
                 if (DEBUG) {
                     ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
                             + "_04_1_colorExpanded.tiff"));
@@ -668,12 +670,8 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             throw new ArcSdeException(se);
         }
 
-        // Finally, build the image input stream
-        final ImageInputStream tiledImageInputStream;
-
         final TileReader tileReader = TileReader.getInstance(row, pixelType.getBitsPerSample(),
                 numberOfBands, matchingTiles, new Dimension(tileWidth, tileHeight));
-        tiledImageInputStream = new ArcSDETiledImageInputStream(tileReader);
 
         final int tiledImageWidth = tileReader.getTilesWide() * tileReader.getTileWidth();
         final int tiledImageHeight = tileReader.getTilesHigh() * tileReader.getTileHeight();
@@ -693,8 +691,18 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                 tiledImageHeight) };
 
         final ImageTypeSpecifier its = new ImageTypeSpecifier(colorModel, sampleModel);
-        final RawImageInputStream raw = new RawImageInputStream(tiledImageInputStream, its,
-                imageOffsets, imageDimensions);
+
+        // Finally, build the image input stream
+        final RawImageInputStream raw;
+        {
+            final ImageInputStream tiledImageInputStream;
+            final boolean promoted = (colorModel instanceof IndexColorModel)
+                    && ((IndexColorModel) colorModel).getPixelSize() == 16
+                    && pixelType.getBitsPerSample() == 8;
+            tiledImageInputStream = new ArcSDETiledImageInputStream(tileReader, promoted);
+
+            raw = new RawImageInputStream(tiledImageInputStream, its, imageOffsets, imageDimensions);
+        }
 
         // building the final image layout
         final ImageLayout imageLayout;
@@ -732,6 +740,7 @@ class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         pb.add(readerInstance);// Reader
 
         RenderedOp image = JAI.create("ImageRead", pb, hints);
+        image.getData();
         return image;
     }
 

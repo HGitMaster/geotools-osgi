@@ -73,7 +73,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32533 2009-02-22 18:35:14Z groldan $
+ * @version $Id: RasterUtils.java 32540 2009-02-23 06:36:00Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -501,33 +501,28 @@ class RasterUtils {
         int transferType = colorMapData.getDataType();
         int finalBitsPerSample = bitsPerSample;
         {
-//            int mapSize = ARGB.length;
-//            switch (bitsPerSample) {
-//            case 8:
-//                if (mapSize >= 256) {
-//                    LOGGER.finer("Promoting transfer type from 8 to 16 bits per sample");
-//                    transferType = DataBuffer.TYPE_USHORT;
-//                    finalBitsPerSample = 0;
-//                } else {
-//                    finalBitsPerSample = 8;
-//                }
-//                break;
-//            case 16:
-//                if (mapSize >= 65536) {
-//                    LOGGER.finer("Promoting transfer type from 16 to 32 bits per sample");
-//                    transferType = DataBuffer.TYPE_INT;
-//                    finalBitsPerSample = 32;
-//                } else {
-//                    finalBitsPerSample = 16;
-//                }
-//                break;
-//            default:
-//                throw new IllegalArgumentException("Unknown pixel depth to compute color map: "
-//                        + bitsPerSample);
-//            }
-//            int[] tmp = new int[ARGB.length + 1];
-//            System.arraycopy(ARGB, 0, tmp, 0, ARGB.length);
-//            ARGB = tmp;
+            int mapSize = ARGB.length;
+            switch (bitsPerSample) {
+            case 8:
+                if (mapSize >= 256) {
+                    LOGGER.finer("Promoting transfer type from 8 to 16 bits per sample");
+                    transferType = DataBuffer.TYPE_USHORT;
+                    finalBitsPerSample = 16;
+                    int[] tmp = new int[65536];
+                    System.arraycopy(ARGB, 0, tmp, 0, ARGB.length);
+                    ARGB = tmp;
+                } else {
+                    finalBitsPerSample = 8;
+                }
+                break;
+            case 16:
+                transferType = DataBuffer.TYPE_USHORT;
+                finalBitsPerSample = 16;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown pixel depth to compute color map: "
+                        + bitsPerSample);
+            }
             int nodataValue = ColorUtilities.getIntFromColor(0, 0, 0, 0);
             ARGB[ARGB.length - 1] = nodataValue;
         }

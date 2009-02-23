@@ -37,13 +37,17 @@ import com.esri.sde.sdk.client.SeRow;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: TileReader.java 32532 2009-02-22 16:13:54Z groldan $
+ * @version $Id: TileReader.java 32540 2009-02-23 06:36:00Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls" })
-class TileReader {
+final class TileReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
+
+    private static final byte NO_DATA_MASK = 0x00;
+
+    private static final byte DATA_MASK = (byte) 0xFF;
 
     private final int bitsPerSample;
 
@@ -173,13 +177,14 @@ class TileReader {
      * @throws {@link IllegalArgumentException} if tileData is not null and its size is less than
      *         {@link #getBytesPerTile()}
      */
-    public byte[] next(byte[] tileData) throws IOException {
+    public byte[] next(byte[] tileData, byte[] bitmaskData) throws IOException {
         if (tileData == null) {
-            tileData = new byte[getBytesPerTile()];
-        } else if (tileData.length < getBytesPerTile()) {
-            throw new IllegalArgumentException("tileData shall have at least " + getBytesPerTile()
-                    + " elements: " + tileData.length);
+            throw new IllegalArgumentException("tileData is null");
         }
+        if (bitmaskData == null) {
+            throw new IllegalArgumentException("bitmaskData is null");
+        }
+
         final SeRasterTile tile;
 
         if (hasNext()) {
@@ -192,42 +197,20 @@ class TileReader {
                     + " has more: " + hasNext());
         }
 
-        final byte NO_DATA_BYTE = (byte) 0xFF;
-
         final int numPixels = tile.getNumPixels();
+
         if (0 == numPixels) {
-            Arrays.fill(tileData, NO_DATA_BYTE);
+            Arrays.fill(bitmaskData, NO_DATA_MASK);
             LOGGER.finer("tile contains no pixel data, skipping: " + tile);
         } else if (pixelsPerTile == numPixels) {
-            // get pixel data AND bitmask data appended, if exist. Pixel data packed into
-            // byte[] according to pixel type. This is the only generic way of getting at
-            // the pixel data regardless of its data type
             final byte[] rawTileData = tile.getPixelData();
-            final byte[] bitmaskData = tile.getBitMaskData();
-            final int bitMaskDataLength = bitmaskData.length;
-            final int tileDataLength = rawTileData.length - bitMaskDataLength;
+            final int bitMaskDataLength = rawTileData.length - this.tileDataLength;
 
-            if (this.tileDataLength != tileDataLength) {
-                throw new IllegalStateException("Expected data lengh of " + this.tileDataLength
-                        + " but got " + tileDataLength);
-            }
             System.arraycopy(rawTileData, 0, tileData, 0, tileDataLength);
-
-            if (bitsPerSample >= 8 && bitMaskDataLength > 0) {
-                LOGGER.finer("Tile contains no data pixels, applying no-data mask");
-                int pixArrayOffset;
-                boolean isNoData;
-                final int bytesPerSample = bitsPerSample / 8;// hey this won't work for bits x
-                                                             // sample < 8
-                for (int pixelN = 0; pixelN < numPixels; pixelN++) {
-                    pixArrayOffset = pixelN * bytesPerSample;
-                    isNoData = (((bitmaskData[pixelN / 8] >> (7 - (pixArrayOffset % 8))) & 0x01) == 0x00);
-                    if (isNoData) {
-                        for (int i = 0; i < bytesPerSample; i++) {
-                            tileData[pixArrayOffset + i] = NO_DATA_BYTE;
-                        }
-                    }
-                }
+            if (bitMaskDataLength == 0) {
+                Arrays.fill(bitmaskData, DATA_MASK);
+            } else {
+                System.arraycopy(rawTileData, tileDataLength, bitmaskData, 0, bitMaskDataLength);
             }
 
             if (LOGGER.isLoggable(Level.FINEST)) {

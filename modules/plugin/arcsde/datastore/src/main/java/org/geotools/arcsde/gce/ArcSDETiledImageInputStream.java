@@ -17,6 +17,8 @@
  */
 package org.geotools.arcsde.gce;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import javax.imageio.stream.ImageInputStream;
@@ -27,24 +29,37 @@ import javax.imageio.stream.ImageInputStreamImpl;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDETiledImageInputStream.java 32460 2009-02-10 05:23:31Z groldan $
+ * @version $Id: ArcSDETiledImageInputStream.java 32540 2009-02-23 06:36:00Z groldan $
  * @source $URL$
  */
-class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageInputStream {
+final class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageInputStream {
 
     private final TileReader tileReader;
 
-    private byte[] currTileData;
+    private final int tileDataLength;
+
+    private final byte[] currTileData;
+
+    private byte[] actualTileData;
 
     private int currTileDataIndex;
 
-    public ArcSDETiledImageInputStream(final TileReader tileReader) throws IOException {
+    private final byte[] currBitmaskData;
+
+    private final boolean promote;
+
+    public ArcSDETiledImageInputStream(final TileReader tileReader, final boolean promoteByteToUshort) {
         super();
         this.tileReader = tileReader;
+        this.promote = promoteByteToUshort;
         final int bytesPerTile = tileReader.getBytesPerTile();
+        final int bitmaskDataLength = (int) Math.ceil(bytesPerTile / 8D);
+        this.tileDataLength = (promoteByteToUshort ? 2 : 1) * bytesPerTile;
         this.currTileData = new byte[bytesPerTile];
+        this.actualTileData = new byte[tileDataLength];
+        this.currBitmaskData = new byte[bitmaskDataLength];
         // force load at the first read invocation
-        this.currTileDataIndex = bytesPerTile;
+        this.currTileDataIndex = tileDataLength;
     }
 
     /**
@@ -57,36 +72,35 @@ class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageI
         final int tilesWide = tileReader.getTilesWide();
         final int tilesHigh = tileReader.getTilesHigh();
         final int numberOfBands = tileReader.getNumberOfBands();
-        final int bitsPerSample = tileReader.getBitsPerSample();
+        // final int bitsPerSample = tileReader.getBitsPerSample();
 
         int length = bytesPerTile * tilesWide * tilesHigh * numberOfBands;
-        // if (1 == bitsPerSample) {
-        // length *= 8;
-        // }
-
+        if (promote) {
+            length = 2 * length;
+        }
         return length;
     }
 
     @Override
     public int read() throws IOException {
-        final byte[] data = getTileData();
+        final byte[][] data = getTileData();
         if (data == null) {
             return -1;
         }
-        byte b = data[currTileDataIndex];
+        byte b = data[0][currTileDataIndex];
         currTileDataIndex++;
         return b;
     }
 
     @Override
     public int read(byte[] buff, int off, int len) throws IOException {
-        final byte[] data = getTileData();
+        final byte[][] data = getTileData();
         if (data == null) {
             return -1;
         }
-        final int available = data.length - currTileDataIndex;
+        final int available = data[0].length - currTileDataIndex;
         final int count = Math.min(available, len);
-        System.arraycopy(data, currTileDataIndex, buff, off, count);
+        System.arraycopy(data[0], currTileDataIndex, buff, off, count);
         currTileDataIndex += count;
         return count;
     }
@@ -103,10 +117,10 @@ class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageI
      * @return {@code null} if there's no more tiles to fetch, the current tile data otherwise
      * @throws IOException
      */
-    private byte[] getTileData() throws IOException {
-        if (currTileDataIndex == currTileData.length) {
+    private byte[][] getTileData() throws IOException {
+        if (currTileDataIndex == tileDataLength) {
             if (tileReader.hasNext()) {
-                currTileData = tileReader.next(currTileData);
+                tileReader.next(currTileData, currBitmaskData);
                 // if (tileReader.getBitsPerSample() == 1) {
                 // currTileData = expandOneBitData(tileData);
                 // } else {
@@ -115,28 +129,33 @@ class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageI
             } else {
                 return null;
             }
+            if (promote) {
+                final int numSamples = currTileData.length;
+
+                int pixArrayOffset;
+                boolean isNoData;
+                ByteArrayOutputStream dataOut = new ByteArrayOutputStream();
+                DataOutputStream out = new DataOutputStream(dataOut);
+
+                for (int sampleN = 0; sampleN < numSamples; sampleN++) {
+                    pixArrayOffset = sampleN;
+                    isNoData = (((currBitmaskData[sampleN / 8] >> (7 - (pixArrayOffset % 8))) & 0x01) == 0x00);
+                    if (isNoData) {
+                        /*
+                         * The promoted index color model has the last entry set as transparent, so
+                         * set the sample value to match the entry
+                         */
+                        out.writeShort(65535);
+                    } else {
+                        out.writeShort(currTileData[sampleN] & 0xFF);
+                    }
+                    actualTileData = dataOut.toByteArray();
+                }
+            }
         }
-        return currTileData;
+        return new byte[][] { actualTileData, currBitmaskData };
     }
 
-    // private byte[] expandOneBitData(final byte[] tileData) {
-    // byte[] byteData = new byte[8 * tileData.length];
-    // for (int i = 0; i < tileData.length; i++) {
-    // byte packed = tileData[i];
-    // int base = 8 * i;
-    // byteData[base] = (byte) ((packed >>> 1) & 0x1);
-    // byteData[base + 1] = (byte) ((packed >>> 2) & 0x1);
-    // byteData[base + 2] = (byte) ((packed >>> 3) & 0x1);
-    // byteData[base + 3] = (byte) ((packed >>> 4) & 0x1);
-    // byteData[base + 4] = (byte) ((packed >>> 5) & 0x1);
-    // byteData[base + 5] = (byte) ((packed >>> 6) & 0x1);
-    // byteData[base + 6] = (byte) ((packed >>> 7) & 0x1);
-    // byteData[base + 7] = (byte) ((packed >>> 8) & 0x1);
-    // }
-    // return byteData;
-    // }
-    //
-    
     @Override
     public void close() throws IOException {
         super.close();
