@@ -29,7 +29,7 @@ import javax.imageio.stream.ImageInputStreamImpl;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDETiledImageInputStream.java 32540 2009-02-23 06:36:00Z groldan $
+ * @version $Id: ArcSDETiledImageInputStream.java 32541 2009-02-23 06:55:54Z groldan $
  * @source $URL$
  */
 final class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageInputStream {
@@ -121,10 +121,7 @@ final class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements 
         if (currTileDataIndex == tileDataLength) {
             if (tileReader.hasNext()) {
                 tileReader.next(currTileData, currBitmaskData);
-                // if (tileReader.getBitsPerSample() == 1) {
-                // currTileData = expandOneBitData(tileData);
-                // } else {
-                // }
+                actualTileData = currTileData;
                 currTileDataIndex = 0;
             } else {
                 return null;
