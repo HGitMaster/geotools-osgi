@@ -1,12 +1,15 @@
 package org.geotools.caching.grid.featurecache;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.logging.Level;
 
 import org.geotools.caching.CacheOversizedException;
 import org.geotools.caching.featurecache.FeatureCacheException;
 import org.geotools.caching.grid.featurecache.readers.GridCachingFeatureCollection;
 import org.geotools.caching.grid.spatialindex.NodeLockInvalidatingVisitor;
+import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.util.BBoxFilterSplitter;
 import org.geotools.caching.util.CacheUtil;
@@ -212,4 +215,52 @@ public class StreamingGridFeatureCache extends GridFeatureCache {
 		}
 		this.tracker.flush();
 	}
+	
+	 /**
+     * Registers a collection of nodes as valid.
+     * This function assumes that the necessary nodes are locked
+     * so that synchronization problems don't occur.
+     * @param nodes
+     */
+    public void register( Collection<NodeIdentifier> nodes ) {
+        // we don't want to track access while we register; this will ensure that just because a
+        // node touches another node it
+        // isn't considered an access; it might be better to improve the way containment query is
+        // done.
+        boolean recordaccess = this.tracker.getDoRecordAccess();
+        try {
+            this.tracker.setDoRecordAccess(false);
+            for( Iterator<NodeIdentifier> iterator = nodes.iterator(); iterator.hasNext(); ) {
+                NodeIdentifier nodeIdentifier = (NodeIdentifier) iterator.next();
+                nodeIdentifier.setValid(true);
+            }
+        } finally {
+            this.tracker.setDoRecordAccess(recordaccess);
+        }
+    }
+    
+    /**
+     * Un-registers a collection of nodes.
+     * This function assumes that the necessary nodes are locked
+     * so that synchronization problems don't occur.
+     * 
+     * @param nodes
+     */
+    @Override
+    public void unregister( Collection<NodeIdentifier> nodes ) {
+        // we don't want to track access while we register; this will ensure that just because a
+        // node touches another node it
+        // isn't considered an access; it might be better to improve the way containment query is
+        // done.
+        boolean recordaccess = this.tracker.getDoRecordAccess();
+        try {
+            this.tracker.setDoRecordAccess(false);
+            for( Iterator<NodeIdentifier> iterator = nodes.iterator(); iterator.hasNext(); ) {
+                NodeIdentifier nodeIdentifier = (NodeIdentifier) iterator.next();
+                nodeIdentifier.setValid(false);
+            }
+        } finally {
+            this.tracker.setDoRecordAccess(recordaccess);
+        }
+    }
 }

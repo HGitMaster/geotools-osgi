@@ -64,11 +64,10 @@ public class BufferedDiskStorage implements Storage {
             int buffer_size = Integer.parseInt(pset.getProperty(BUFFER_SIZE_PROPERTY));
             BufferedDiskStorage instance = new BufferedDiskStorage(buffer_size);
             instance.storage = (DiskStorage) DiskStorage.createInstance(pset);
-
+            
             return instance;
         } catch (NullPointerException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("BufferedDiskStorage : invalid property set.");
+            throw new IllegalArgumentException("BufferedDiskStorage : invalid property set.", e);
         }
     }
 

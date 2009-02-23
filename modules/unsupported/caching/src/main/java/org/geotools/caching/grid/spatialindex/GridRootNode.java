@@ -108,7 +108,8 @@ public class GridRootNode extends GridNode {
 
 		do {
 			Region reg = new Region(pos, nextpos);
-			RegionNodeIdentifier id = (RegionNodeIdentifier) index.findUniqueInstance(new RegionNodeIdentifier(reg));
+			RegionNodeIdentifier id = (RegionNodeIdentifier) index
+					.findUniqueInstance(new RegionNodeIdentifier(reg));
 			GridNode child = createNode(id);
 			index.writeNode(child);
 			this.children.add(child.getIdentifier());

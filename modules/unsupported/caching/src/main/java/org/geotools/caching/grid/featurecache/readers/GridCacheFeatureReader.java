@@ -12,12 +12,9 @@ import org.geotools.caching.grid.spatialindex.GridNode;
 import org.geotools.caching.grid.spatialindex.GridRootNode;
 import org.geotools.caching.grid.spatialindex.GridSpatialIndex;
 import org.geotools.caching.spatialindex.NodeIdentifier;
-import org.geotools.caching.util.CacheUtil;
 import org.geotools.data.FeatureReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Feature Reader that reads features from a cache.
@@ -36,26 +33,6 @@ public class GridCacheFeatureReader implements FeatureReader<SimpleFeatureType, 
 
 	private SimpleFeature next;    //next feature in the collection
 	private HashSet<String> collectedFeatureIds;	//need this for now because the "grid" may store the same feature multiple times per node; we only want to get each feature once
-	
-	/**
-	 * Creates a feature reader that reads features within a given envelope.
-	 * 
-	 * @param env
-	 * @param g
-	 */
-	public GridCacheFeatureReader(Envelope env, GridSpatialIndex g){
-		this((Collection<NodeIdentifier>)null, g);
-		
-		//sets up all the nodes to visit
-		for (Iterator<Integer> iterator = g.getRootNode().getChildren(CacheUtil.convert(env)).iterator(); iterator.hasNext();) {
-			Integer cid = (Integer) iterator.next();
-			NodeIdentifier id = g.getRootNode().getChildIdentifier(cid);
-			if (id.isValid()){
-				tovisit.add(id);
-			}
-		}
-		init();
-	}
 	
 	/**
 	 * Creates a feature reader which reads features from a collection

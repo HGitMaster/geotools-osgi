@@ -66,7 +66,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
     /**
      * @param FeatureStore from which to cache features
      * @param indexcapacity = number of tiles in index
-     * @param capacity = max number of features to cache
+     * @param capacity = max number of features to cache; Integer.MAX_VALUE will cache all features
      * @throws FeatureCacheException
      * @throws IOException 
      */
@@ -82,7 +82,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
      * @param fs            FeatureStore from which to cache features
      * @param env           The size of the feature cache; once defined features outside this bounds cannot be added to the featurestore/cache
      * @param gridsize  	number of tiles in the index
-     * @param capacity       maximum number of features to cache; Integer.MAX_VALUE will cache all features
+     * @param capacity       maximum number of features to cache
      * @param store         the cache storage
      */
     public GridFeatureCache(FeatureSource fs, ReferencedEnvelope env, int gridsize, int capacity, Storage store){
@@ -291,7 +291,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
     }
 
     protected void isOversized(FeatureCollection fc) throws CacheOversizedException {
-        if (this.capacity != Integer.MAX_VALUE  && fc.size() > this.capacity) {
+        if (this.capacity != Integer.MAX_VALUE && fc.size() > this.capacity) {
             throw new CacheOversizedException("Cannot cache collection of size " + fc.size()
                 + " (capacity = " + capacity + " )");
         }

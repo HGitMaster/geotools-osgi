@@ -42,12 +42,17 @@ public class LRUEvictionPolicy implements EvictionPolicy {
         while(it.hasNext()){
             NodeIdentifier node = it.next();
             if (!node.isLocked()){
-                node.writeLock();
                 try{
-                    tree.evict(node);
-                    queue.remove(node);    
-                }finally{
-                    node.writeUnLock();
+                    node.writeLock();
+                    try{
+                        tree.evict(node);
+                        queue.remove(node);    
+                    }finally{
+                        node.writeUnLock();
+                    }
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    return false;
                 }
                 return true;
             }

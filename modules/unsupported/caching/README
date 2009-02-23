@@ -1,9 +1,8 @@
 Update: January 2009
 Emily Gouge (egouge@refractions.net)
 
-I'm starting to revive this code a little.  I'm updated it to match the 
-latest feature model, updated the test cases, and added further test cases. 
-I've been Working on some testing against a wfs server in uDig
+I've updated this code significantly.  More information can be found on the wiki:
+http://docs.codehaus.org/display/GEOTOOLS/Caching+Module
 
 ----------------------------------------------------------------------------------------
 

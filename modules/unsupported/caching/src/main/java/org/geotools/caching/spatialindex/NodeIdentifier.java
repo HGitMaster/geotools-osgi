@@ -21,9 +21,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.ref.SoftReference;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 /** Instances of this class provide unique identifiers for nodes,
@@ -40,6 +39,10 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public abstract class NodeIdentifier implements Serializable {
 	private static final long serialVersionUID = 1L;
+	
+	//wait a maximum of 5 minutes for lock; this should never be necessary it's just a safe guard against unexpected behaviour
+	private static final long LOCK_TIMEOUT = 5 * 60; //5min timeout
+	private static final TimeUnit LOCK_TIMEOUT_UNITS = TimeUnit.SECONDS;
 
 	private boolean valid = false;
    
@@ -73,8 +76,11 @@ public abstract class NodeIdentifier implements Serializable {
     /**
      * Acquire a write lock on the node
      */
-    public void writeLock(){
-        lock.writeLock().lock();
+    public void writeLock() throws Exception {
+        if (!lock.writeLock().tryLock(LOCK_TIMEOUT, LOCK_TIMEOUT_UNITS)){
+            throw new Exception("Timed out waiting for write lock on node."); 
+        }
+        //lock.writeLock().lock();
     }
     /**
      * Unlock the write lock
@@ -85,8 +91,11 @@ public abstract class NodeIdentifier implements Serializable {
     /**
      * Acquire a read lock on the node
      */
-    public void readLock(){
-        lock.readLock().lock();
+    public void readLock() throws Exception {
+        if (!lock.readLock().tryLock(LOCK_TIMEOUT, LOCK_TIMEOUT_UNITS)){
+            throw new Exception("Timed out waiting for read lock on node.");
+        }
+        //lock.readLock().lock();
     }
     /**
      * Unlock read lock

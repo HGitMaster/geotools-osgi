@@ -61,7 +61,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class GridCachingFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature>{
 	private static final int MAX_FILTER_SIZE = 4; //the maximum number of "and" statements allowed in filter  
 	
-	private static Logger log = org.geotools.util.logging.Logging.getLogger("org.geotools.caching");
+	private static Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.caching");
 	private static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory2(null);
 	
 	private BBOX preFilter;			//cache feature filter 
@@ -173,7 +173,7 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 	            }
 	        }
 	    }catch (SchemaException ex){
-	    	log.log(Level.SEVERE, "Error converting feature type to match query request.", ex);
+	        logger.log(Level.SEVERE, "Error converting feature type to match query request.", ex);
 	    }
 	    return null;
 	}
@@ -236,7 +236,7 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 		try{
 			closeIterator(close);
 		}catch (Throwable e){
-			e.printStackTrace();
+		    logger.log(Level.WARNING, "Failed to close iterator", e);
 		}finally{
 			iterators.remove(close);
 		}		
@@ -305,7 +305,6 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 			    this.grid.getIndex().flush();
 			}
 		}finally{
-		    iter.releaseLocks();	
 		}
 		iter.close();
 	}
@@ -319,77 +318,92 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 		List<NodeIdentifier> missing = null;
 		List<NodeIdentifier> found = null;
 		
-		Envelope env = new Envelope(preFilter.getMinX(), preFilter.getMaxX(), preFilter.getMinY(), preFilter.getMaxY());
+		FeatureReader<SimpleFeatureType, SimpleFeature> cacheFeatureReader = null;
+        FeatureReader<SimpleFeatureType, SimpleFeature> sourceFeatureReader = null;
+        
+        Envelope env = new Envelope(preFilter.getMinX(), preFilter.getMaxX(), preFilter.getMinY(), preFilter.getMaxY());
+        
 		this.grid.readLock();
 		try{
-			//here we need to get a write lock
-			//get features from the cache
-			//and the source
+			//get features from the cache and the source
 		    List<NodeIdentifier>[] notcached = grid.matchNodeIds(env);
 			missing = notcached[0];
 			found = notcached[1];
-			FeatureReader<SimpleFeatureType, SimpleFeature> cacheFeatureReader = null;
-			FeatureReader<SimpleFeatureType, SimpleFeature> sourceFeatureReader = null;
-			
-			for( Iterator<NodeIdentifier> iterator = found.iterator(); iterator.hasNext(); ) {
-                NodeIdentifier nodeid = (NodeIdentifier) iterator.next();
-                nodeid.readLock();
-                if(!nodeid.isValid()){
-                    //this node is no longer valid
-                    nodeid.readUnLock();
-                    missing.add(nodeid);
-                    iterator.remove();
-                }
-            }
-
+			try{
+			    for( Iterator<NodeIdentifier> iterator = found.iterator(); iterator.hasNext(); ) {
+			        NodeIdentifier nodeid = (NodeIdentifier) iterator.next();
+			        nodeid.readLock();
+			        if(!nodeid.isValid()){
+			            //this node is no longer valid add to missing list
+			            nodeid.readUnLock();
+			            missing.add(nodeid);
+			            iterator.remove();
+			        }
+			    }
+			}catch(Exception ex){
+			    found.clear();
+			    logger.log(Level.SEVERE, "Could not acquire necessary read locks.", ex);
+			}
+			this.grid.readUnLock();
 			if (missing.size() == 0){
 			    cacheFeatureReader = new GridCacheFeatureReader(found, (GridSpatialIndex)grid.getIndex());
-			    this.grid.readUnLock();
+			    for( Iterator iterator = found.iterator(); iterator.hasNext(); ) {
+                    NodeIdentifier id = (NodeIdentifier) iterator.next();
+                }
 			}else{
-			    //we are missing something 
-			    this.grid.readUnLock();
-                this.grid.writeLock();
-                try {
-                    if (missing.size() > 0 && fs != null) {
+			    // we are missing something
+                if (missing.size() > 0 && fs != null) {
+                    this.grid.writeLock();
+                    try {
                         // lock the individual nodes for writing
                         for( Iterator<NodeIdentifier> iterator = missing.iterator(); iterator.hasNext(); ) {
                             NodeIdentifier nodeid = (NodeIdentifier) iterator.next();
                             nodeid.writeLock();
-                            if (nodeid.isValid()){
-                                //might have been validated by previous thread; so lets make
-                                //sure we have the correct queue
+                            if (nodeid.isValid()) {
+                                // might have been validated by previous thread; so lets make sure we have the correct queue
                                 nodeid.readLock();
                                 found.add(nodeid);
                                 nodeid.writeUnLock();
                                 iterator.remove();
                             }
                         }
+                   
                         if (missing.size() > 0) {
                             // register the area you are working with
                             this.grid.register(missing);
-                            // note that for performance reasons this query might actually return
-                            // features from an area larger than we are interested in caching
-                            DefaultQuery dq = new DefaultQuery(featureType.getName().getLocalPart(), this.createFilter(missing));
-                            dq.setCoordinateSystem(featureType.getCoordinateReferenceSystem());
-                            if (query != null) {
-                                dq.setHints(query.getHints());
-                                dq.setHandle(query.getHandle());
-                            } else {
-                                dq.setHints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY,new LiteCoordinateSequenceFactory()));
-                            }
-                            sourceFeatureReader = ((DataStore) fs.getDataStore()).getFeatureReader(dq, Transaction.AUTO_COMMIT);
                         }
-                    }else{
-                    	missing.clear();	//we didn't get anything so we don't want to register these as write locks
+                    }catch (Exception ex){
+                        //some error happened
+                        //lets assume we are missing nothing
+                        logger.log(Level.SEVERE, "Could not acquire necessary write locks.", ex);
+                        missing.clear();
+                    } finally {
+                        this.grid.writeUnLock();
                     }
-                    
-                    if (found.size() > 0) {
-                      cacheFeatureReader = new GridCacheFeatureReader(found,(GridSpatialIndex) grid.getIndex());
-                  }
-                } finally {
-                    // release write lock
-                    this.grid.writeUnLock();
-                }   
+                    if (missing.size() > 0 && fs != null){
+                        // note that for performance reasons this query might actually return
+                        // features from an area larger than we are interested in caching
+                        DefaultQuery dq = new DefaultQuery(featureType.getName().getLocalPart(), this.createFilter(missing));
+                        dq.setCoordinateSystem(featureType.getCoordinateReferenceSystem());
+                        if (query != null) {
+                            dq.setHints(query.getHints());
+                            dq.setHandle(query.getHandle());
+                        } else {
+                            dq.setHints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY,
+                                    new LiteCoordinateSequenceFactory()));
+                        }
+                        sourceFeatureReader = ((DataStore) fs.getDataStore()).getFeatureReader(dq,Transaction.AUTO_COMMIT);
+                    }
+                } else {
+                    missing.clear(); // we didn't get anything so we don't want to register these as write locks
+                }
+
+                if (found.size() > 0) {
+                    cacheFeatureReader = new GridCacheFeatureReader(found, (GridSpatialIndex) grid.getIndex());
+                    for( Iterator iterator = found.iterator(); iterator.hasNext(); ) {
+                        NodeIdentifier id = (NodeIdentifier) iterator.next();
+                    }
+                }
 			}
 			
 			boolean localcache = cacheFeatures;
@@ -408,7 +422,7 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 			it = new FeatureReaderFeatureIterator(wrapFeatureReader(fr), missing, found);
 
 		} catch (Exception ex) {
-		    ex.printStackTrace();
+		    logger.log(Level.SEVERE, "Failed to create feature collection iterator.", ex);
 	        if (missing != null){
 	            for( Iterator<NodeIdentifier> iterator = missing.iterator(); iterator.hasNext(); ) {
 	                NodeIdentifier nodeid = (NodeIdentifier) iterator.next();
@@ -652,25 +666,40 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 		}
 		
 		
-		public void releaseLocks(){
+		private void releaseLocks(){
 			try {
 				for (Iterator<NodeIdentifier> iterator = writelocks.iterator(); iterator.hasNext();) {
 					NodeIdentifier type = (NodeIdentifier) iterator.next();
-					type.writeUnLock();
+					try{
+					    type.writeUnLock();
+					}catch (Exception ex){
+					//    logger.log(Level.SEVERE, "Could not release write lock.", ex);
+					}
 				}
 			} catch (Exception ex) {
-				ex.printStackTrace();
+			    logger.log(Level.SEVERE, "Could not release write locks.", ex);
 			}
 			try {
 				for (Iterator<NodeIdentifier> iterator = readlocks.iterator(); iterator.hasNext();) {
 					NodeIdentifier type = (NodeIdentifier) iterator.next();
-					type.readUnLock();
+					try{
+					    type.readUnLock();
+					}catch (Exception ex){
+					//    logger.log(Level.SEVERE, "Could not release read lock.", ex);
+					}
 				}
 			} catch (Exception ex) {
-				ex.printStackTrace();
+			    logger.log(Level.SEVERE, "Could not release read locks.", ex);;
 			}
 		}
 		
+		/**
+		 * Returns the nodes that have been write locked.  These
+		 * are the nodes that are currently being written
+		 * to.
+		 *
+		 * @return
+		 */
 		public Collection<NodeIdentifier> getMissingNodes(){
 		    return this.writelocks;
 		}
@@ -682,13 +711,10 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 			    if (reader.hasNext()){
 			        return true;
 			    }else{
-			        //auto close because we don't trust the 
-			        //client code to close
-			        close();
 			        return false;
 			    }
 			} catch (IOException ex) {
-			    ex.printStackTrace();
+			    logger.log(Level.SEVERE, "No more items.", ex);
 			    close();
 			    return false;
 			}
@@ -712,11 +738,13 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 		}
 		
 		public void close(){
+		    releaseLocks();
+		    
 		    if (reader == null) return;
 			try{
 				reader.close();
 			}catch(IOException ex){
-			    //do something with this error?
+			    logger.log(Level.SEVERE, "Error closing reader.", ex);
 			}
 			reader = null;
 		}

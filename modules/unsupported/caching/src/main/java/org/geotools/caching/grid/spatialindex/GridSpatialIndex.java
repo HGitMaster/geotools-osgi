@@ -88,11 +88,13 @@ public class GridSpatialIndex extends AbstractSpatialIndex implements EvictableT
         this.featureCapacity = capacity;
         
         this.root = null;
+        
         try{
             initializeFromStorage(this.store);
         }catch (Exception ex){
-            ex.printStackTrace();
+            //ignore any errors and move on
         }
+        
         if (this.root == null){
             this.dimension = mbr.getDimension();
             //nothing read from storage so we need to create new ones
@@ -354,39 +356,31 @@ public class GridSpatialIndex extends AbstractSpatialIndex implements EvictableT
         return this.policy;
     }
     
+    
     /**
-     * must deal with syncronization outside this method.
+     * must deal with synchronization outside this method.
      * 
      * This will blindly evict the node.
      */
     public void evict(NodeIdentifier node) {
         int ret = 0;
         int evictcnt = 1;
-        
-        //we need to write lock the entire cache here to prevent
-//        node.writeLock();
-//        try {
-            GridNode nodeToEvict = (GridNode) readNode(node); // FIXME: avoid to read node before eviction
-            ret = nodeToEvict.getDataCount();
-            // lets first evict all the children
-            for( int i = 0; i < nodeToEvict.getChildrenCount(); i++ ) {
-                Node n = readNode(nodeToEvict.getChildIdentifier(i));
-//                try{
-//                    n.getIdentifier().writeLock();
-                    ret += n.getDataCount();
-                    n.clear();
-                    writeNode(n);
-                    evictcnt++;
-//                }finally{
-//                    n.getIdentifier().writeUnLock();
-//                }
-            }
-            // now evict the main node
-            nodeToEvict.clear();
-            writeNode(nodeToEvict);
-//        }finally{
-//            node.writeUnLock();
-//        }
+
+        // we need to write lock the entire cache here to prevent
+        GridNode nodeToEvict = (GridNode) readNode(node); // FIXME: avoid to read node before
+                                                          // eviction
+        ret = nodeToEvict.getDataCount();
+        // lets first evict all the children
+        for( int i = 0; i < nodeToEvict.getChildrenCount(); i++ ) {
+            Node n = readNode(nodeToEvict.getChildIdentifier(i));
+            ret += n.getDataCount();
+            n.clear();
+            writeNode(n);
+            evictcnt++;
+        }
+        // now evict the main node
+        nodeToEvict.clear();
+        writeNode(nodeToEvict);
         getStatistics().addToDataCounter(-ret);
         getStatistics().addToEvictionCounter(evictcnt);
     }

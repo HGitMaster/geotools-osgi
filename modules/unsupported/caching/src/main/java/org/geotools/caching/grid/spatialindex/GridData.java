@@ -61,7 +61,6 @@ public class GridData implements Data<Object>, Externalizable {
     
     public int hashCode() {
         if (hashCode == 0){
-            
             //int hash = 17;
             //  hash = (37 * hash) + shape.hashCode();
             int hash = 629 + shape.hashCode();	//629 = 17 * 37
@@ -91,7 +90,6 @@ public class GridData implements Data<Object>, Externalizable {
     	try {
     		this.shape = (Shape) in.readObject();
     	} catch (IOException e) {
-    		e.printStackTrace();
     		throw e;
     	}
 
@@ -99,19 +97,16 @@ public class GridData implements Data<Object>, Externalizable {
             try {
                 this.data = getFeatureMarshaller().unmarshall(in);
             } catch ( IllegalAttributeException e) {
-            	e.printStackTrace();
                 throw (IOException) new IOException().initCause(e);
             } catch (IOException e) {
-            	e.printStackTrace();
             	throw e;
             }catch (Exception e){
-                e.printStackTrace();
+                throw (IOException) new IOException().initCause(e);
             }
         } else {
         	try {
         		this.data = in.readObject();
         	} catch (IOException e) {
-        		e.printStackTrace();
         		throw e;
         	}
         }
@@ -125,7 +120,7 @@ public class GridData implements Data<Object>, Externalizable {
             try{
                 getFeatureMarshaller().marshall((SimpleFeature) data, out);
             }catch (Exception ex){
-                ex.printStackTrace();
+                throw (IOException)new IOException().initCause(ex);
             }
         } else {
             out.writeBoolean(false);

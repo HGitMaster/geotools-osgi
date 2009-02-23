@@ -45,14 +45,18 @@ public class NodeLockInvalidatingVisitor implements Visitor {
 			//note this will not clear children; in this case
 			//we assume the validation will visit these children
 			//and clear them separately
-            n.getIdentifier().writeLock();
-            try {
-                dataCount += n.getDataCount();
-                n.clear();
-                index.writeNode(n);
-            } finally {
-                n.getIdentifier().writeUnLock();
-            }
+		    try{
+		        n.getIdentifier().writeLock();
+		        try {
+		            dataCount += n.getDataCount();
+		            n.clear();
+		            index.writeNode(n);
+		        } finally {
+		            n.getIdentifier().writeUnLock();
+		        }
+		    }catch(Exception ex){
+		        ex.printStackTrace();
+		    }
 		}
 	}
     

@@ -22,7 +22,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;

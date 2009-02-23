@@ -93,25 +93,29 @@ public class DiskStorage implements Storage {
     }
     
     private DiskStorage(File f, int page_size, File index_file) throws IOException {
-        dataFile = f;
-        data_file = new RandomAccessFile(f, "rw");
-        data_channel = data_file.getChannel();
-        
         this.indexFile = index_file;
         this.page_size = page_size;
-        
-        emptyPages = new TreeSet<Integer>();
-        pageIndex = new HashMap<NodeIdentifier, Entry>();
-        
+        this.dataFile = f;
+        this.emptyPages = new TreeSet<Integer>();
+        this.pageIndex = new HashMap<NodeIdentifier, Entry>();
         this.featureTypes = new HashSet<FeatureType>();
         
-        //this will overwrite the pageindex size and other variables
         if (index_file.exists()) {
-            initializeFromIndex();
-        } else {
-        	//clear out data file
-            //do nothing; we have nothing to restore so don't worry about it
+            try{
+                initializeFromIndex();
+            }catch (Exception ex){
+                //lets clear out any existing info
+                this.indexFile.createNewFile();
+                this.dataFile.createNewFile();
+                
+                this.emptyPages = new TreeSet<Integer>();
+                this.pageIndex = new HashMap<NodeIdentifier, Entry>();
+                this.featureTypes = new HashSet<FeatureType>();
+            }
         }   
+        
+        data_file = new RandomAccessFile(f, "rw");
+        data_channel = data_file.getChannel();      
     }
 
     /** Factory method : create a new Storage of type DiskStorage.
@@ -147,14 +151,10 @@ public class DiskStorage implements Storage {
                 return new DiskStorage(f, page_size);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            logger.log(Level.WARNING,
-                "DiskStorage : error occured when creating new instance : " + e);
-
+            logger.log(Level.WARNING, "DiskStorage : error occured when creating new instance : "+e.getMessage(),e);
             return null;
         } catch (NullPointerException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("DiskStorage : invalid property set.");
+            throw new IllegalArgumentException("DiskStorage : invalid property set.",e);
         }
     }
 
@@ -210,7 +210,7 @@ public class DiskStorage implements Storage {
         } catch (ClassNotFoundException e1) {
         	throw new IllegalStateException(e1);
         } catch (Exception ex){
-            ex.printStackTrace();
+            logger.log(Level.WARNING, "Error reading node.", ex);
         }
         return node;
     }
@@ -429,8 +429,7 @@ public class DiskStorage implements Storage {
                 os.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            logger.log(Level.WARNING, "Cannot close DiskStorage normally : " + e);
+            logger.log(Level.WARNING, "Cannot close DiskStorage normally : " + e, e);
         }
     }
     
@@ -458,13 +457,11 @@ public class DiskStorage implements Storage {
                 try {
                     FeatureType ft = DataUtilities.createType(name, rep);
                     featureTypes.add(ft);
-                    
                 } catch (SchemaException e) {
-                    e.printStackTrace();
+                    logger.log(Level.WARNING, "Error initializing feature types from store.", e);
                 }
             }
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
             throw (IOException) new IOException().initCause(e);
         } finally {
             ois.close();
@@ -522,9 +519,8 @@ public class DiskStorage implements Storage {
             }finally{
                 fw.close();
             }
-            
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Error writing node.", e);
         }
     }
 
