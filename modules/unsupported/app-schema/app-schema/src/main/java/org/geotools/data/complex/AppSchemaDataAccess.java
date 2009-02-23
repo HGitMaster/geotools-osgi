@@ -68,7 +68,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AppSchemaDataAccess.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @version $Id: AppSchemaDataAccess.java 32539 2009-02-23 04:43:58Z bencaradocdavies $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccess.java $
  * @since 2.4
  */
@@ -85,8 +85,8 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      * Constructor.
      * 
      * @param mappings
-     *                a Set containing a {@linkplain FeatureTypeMapping} for each FeatureType this
-     *                DataAccess is going to produce.
+     *            a Set containing a {@linkplain FeatureTypeMapping} for each FeatureType this
+     *            DataAccess is going to produce.
      */
     public AppSchemaDataAccess(Set<FeatureTypeMapping> mappings) {
         this.mappings = new HashMap<Name, FeatureTypeMapping>();
@@ -147,8 +147,8 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
     }
 
     /**
-     * Finds the target FeatureType named <code>typeName</code> in this ComplexDatastore's
-     * internal list of FeatureType mappings and returns it.
+     * Finds the target FeatureType named <code>typeName</code> in this ComplexDatastore's internal
+     * list of FeatureType mappings and returns it.
      */
     public FeatureType getSchema(Name typeName) throws IOException {
         return (FeatureType) getMapping(typeName).getTargetFeature().getType();
@@ -215,13 +215,13 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      * </p>
      * 
      * @param targetQuery
-     *                Contains the Filter and MaxFeatures to find the bounds for.
+     *            Contains the Filter and MaxFeatures to find the bounds for.
      * @return The number of Features provided by the Query or <code>-1</code> if count is too
      *         expensive to calculate or any errors or occur.
      * @throws IOException
      * 
      * @throws IOException
-     *                 if there are errors getting the count
+     *             if there are errors getting the count
      */
     protected int getCount(final Query targetQuery) throws IOException {
         final FeatureTypeMapping mapping = getMapping(getName(targetQuery));
@@ -238,12 +238,16 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      * @return Name constructed from the query.
      */
     private Name getName(Query query) {
-        return Types.typeName(query.getNamespace().toString(), query.getTypeName());
+        if (query.getNamespace() == null) {
+            return Types.typeName(query.getTypeName());
+        } else {
+            return Types.typeName(query.getNamespace().toString(), query.getTypeName());
+        }
     }
 
     /**
-     * Returns <code>Filter.INCLUDE</code>, as the whole filter is unrolled and passed back to
-     * the underlying DataStore to be treated.
+     * Returns <code>Filter.INCLUDE</code>, as the whole filter is unrolled and passed back to the
+     * underlying DataStore to be treated.
      * 
      * @return <code>Filter.INLCUDE</code>
      */
@@ -252,10 +256,10 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
     }
 
     /**
-     * Creates a <code>org.geotools.data.Query</code> that operates over the surrogate DataStore,
-     * by unrolling the <code>org.geotools.filter.Filter</code> contained in the passed
-     * <code>query</code>, and replacing the list of required attributes by the ones of the
-     * mapped FeatureType.
+     * Creates a <code>org.geotools.data.Query</code> that operates over the surrogate DataStore, by
+     * unrolling the <code>org.geotools.filter.Filter</code> contained in the passed
+     * <code>query</code>, and replacing the list of required attributes by the ones of the mapped
+     * FeatureType.
      * 
      * @param query
      * @param mapping
