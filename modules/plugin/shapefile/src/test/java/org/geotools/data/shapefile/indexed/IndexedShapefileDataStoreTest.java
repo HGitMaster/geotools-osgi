@@ -27,11 +27,14 @@ import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.transaction.TransactionRequiredException;
 
 import org.geotools.TestData;
 import org.geotools.data.DataStore;
@@ -61,7 +64,9 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.geometry.BoundingBox;
@@ -78,7 +83,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/shpLazyLoadingIndex/ext/shape/test/org/geotools/data/shapefile/indexed/ShapefileDataStoreTest.java $
- * @version $Id: IndexedShapefileDataStoreTest.java 31980 2008-12-08 22:35:27Z groldan $
+ * @version $Id: IndexedShapefileDataStoreTest.java 32544 2009-02-25 05:21:59Z aaime $
  * @author Ian Schneider
  */
 public class IndexedShapefileDataStoreTest extends TestCaseSupport {
@@ -795,9 +800,42 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         assertEquals(initialCount - 2, afterCount);
     }
     
+    public void testCountTransaction() throws Exception {
+    	// http://jira.codehaus.org/browse/GEOT-2357
+    	
+    	final IndexedShapefileDataStore ds = createDataStore();
+        FeatureStore<SimpleFeatureType, SimpleFeature> store;
+        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource();
+        Transaction t = new DefaultTransaction();
+        store.setTransaction(t);
+    	
+    	int initialCount = store.getCount(Query.ALL);
+    	
+    	FeatureIterator<SimpleFeature> features = store.getFeatures().features();
+        String fid = features.next().getID();
+        features.close();
+    	
+    	FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+    	String typeName = store.getSchema().getTypeName();
+		Id id = ff.id(Collections.singleton(ff.featureId(fid)));
+		
+		assertEquals(-1, store.getCount(new DefaultQuery(typeName, id)));
+		assertEquals(1, count(ds, typeName, id, t));
+		
+		store.removeFeatures(id);
+		
+		assertEquals(-1, store.getCount(new DefaultQuery(store.getSchema().getTypeName(), id)));
+		assertEquals(initialCount - 1, count(ds, typeName, Filter.INCLUDE, t));
+		assertEquals(0, count(ds, typeName, id, t));
+    }
+    
     private int count(DataStore ds, String typeName, Filter filter) throws Exception {
+        return count(ds, typeName, filter, Transaction.AUTO_COMMIT);
+    }
+    
+    private int count(DataStore ds, String typeName, Filter filter, Transaction t) throws Exception {
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-        reader = ds.getFeatureReader(new DefaultQuery(typeName, filter), Transaction.AUTO_COMMIT);
+        reader = ds.getFeatureReader(new DefaultQuery(typeName, filter), t);
         int count = 0;
         try {
             while (reader.hasNext()) {
