@@ -3,6 +3,7 @@ package org.geotools.caching.grid.featurecache.readers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -329,70 +330,56 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 		    List<NodeIdentifier>[] notcached = grid.matchNodeIds(env);
 			missing = notcached[0];
 			found = notcached[1];
-			try{
-			    for( Iterator<NodeIdentifier> iterator = found.iterator(); iterator.hasNext(); ) {
-			        NodeIdentifier nodeid = (NodeIdentifier) iterator.next();
-			        nodeid.readLock();
-			        if(!nodeid.isValid()){
-			            //this node is no longer valid add to missing list
-			            nodeid.readUnLock();
-			            missing.add(nodeid);
-			            iterator.remove();
-			        }
-			    }
-			}catch(Exception ex){
-			    found.clear();
-			    logger.log(Level.SEVERE, "Could not acquire necessary read locks.", ex);
-			}
-			this.grid.readUnLock();
+			
+			//acquire read locks
+    		acquireReadLocks(missing, found);
+    		
 			if (missing.size() == 0){
+			    //all locks acquired 
+			    this.grid.readUnLock();
 			    cacheFeatureReader = new GridCacheFeatureReader(found, (GridSpatialIndex)grid.getIndex());
-			    for( Iterator iterator = found.iterator(); iterator.hasNext(); ) {
-                    NodeIdentifier id = (NodeIdentifier) iterator.next();
-                }
 			}else{
-			    // we are missing something
-                if (missing.size() > 0 && fs != null) {
-                    this.grid.writeLock();
-                    try {
-                        // lock the individual nodes for writing
-                        for( Iterator<NodeIdentifier> iterator = missing.iterator(); iterator.hasNext(); ) {
-                            NodeIdentifier nodeid = (NodeIdentifier) iterator.next();
-                            nodeid.writeLock();
-                            if (nodeid.isValid()) {
-                                // might have been validated by previous thread; so lets make sure we have the correct queue
-                                nodeid.readLock();
-                                found.add(nodeid);
-                                nodeid.writeUnLock();
-                                iterator.remove();
-                            }
-                        }
-                   
-                        if (missing.size() > 0) {
-                            // register the area you are working with
-                            this.grid.register(missing);
-                        }
-                    }catch (Exception ex){
-                        //some error happened
-                        //lets assume we are missing nothing
-                        logger.log(Level.SEVERE, "Could not acquire necessary write locks.", ex);
-                        missing.clear();
-                    } finally {
-                        this.grid.writeUnLock();
+			    //need a write lock; release all read locks
+			    for( Iterator<NodeIdentifier> iterator = found.iterator(); iterator.hasNext(); ) {
+                    NodeIdentifier nodeid = (NodeIdentifier) iterator.next();
+                    nodeid.readUnLock();
+			    }
+			    this.grid.readUnLock();
+			    this.grid.writeLock();
+			    try{
+			        //re-get read locks
+			        acquireReadLocks(missing, found);
+			    
+			        // acquire write locks
+			        if (missing.size() > 0 && fs != null) {
+                        acquireWriteLocks(missing, found);
+			        }
+			        
+			        // register working area
+			        if (missing.size() > 0 && fs != null) {
+	                     this.grid.register(missing);
+			        }
+			    }finally{
+			        this.grid.writeUnLock();
+			    }
+			    
+                 if (fs != null) {
+                    // note that for performance reasons this query might actually return
+                    // features from an area larger than we are interested in caching
+                    DefaultQuery dq = new DefaultQuery(featureType.getName().getLocalPart(), this.createFilter(missing));
+                    dq.setCoordinateSystem(featureType.getCoordinateReferenceSystem());
+                    if (query != null) {
+                        dq.setHints(query.getHints());
+                        dq.setHandle(query.getHandle());
+                    } else {
+                        dq.setHints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY,new LiteCoordinateSequenceFactory()));
                     }
-                    if (missing.size() > 0 && fs != null){
-                        // note that for performance reasons this query might actually return
-                        // features from an area larger than we are interested in caching
-                        DefaultQuery dq = new DefaultQuery(featureType.getName().getLocalPart(), this.createFilter(missing));
-                        dq.setCoordinateSystem(featureType.getCoordinateReferenceSystem());
-                        if (query != null) {
-                            dq.setHints(query.getHints());
-                            dq.setHandle(query.getHandle());
-                        } else {
-                            dq.setHints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY,
-                                    new LiteCoordinateSequenceFactory()));
-                        }
+                    try{
                         sourceFeatureReader = ((DataStore) fs.getDataStore()).getFeatureReader(dq,Transaction.AUTO_COMMIT);
+                    }catch (Exception ex){
+                        //nothing to get
+                        missing.clear();
+                        sourceFeatureReader = null;
                     }
                 } else {
                     missing.clear(); // we didn't get anything so we don't want to register these as write locks
@@ -400,9 +387,6 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 
                 if (found.size() > 0) {
                     cacheFeatureReader = new GridCacheFeatureReader(found, (GridSpatialIndex) grid.getIndex());
-                    for( Iterator iterator = found.iterator(); iterator.hasNext(); ) {
-                        NodeIdentifier id = (NodeIdentifier) iterator.next();
-                    }
                 }
 			}
 			
@@ -417,6 +401,8 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 			    fr = new CombiningCachingFeatureReader(new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>((SimpleFeatureType)featureType), sourceFeatureReader, false, localcache, grid.getIndex(), this.postFilter);
 			}else if (sourceFeatureReader == null && cacheFeatureReader != null){
 			    fr = new CombiningCachingFeatureReader(cacheFeatureReader, new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>((SimpleFeatureType)featureType), false, false, grid.getIndex(), this.postFilter);
+			}else{
+			    fr = new CombiningCachingFeatureReader(new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>((SimpleFeatureType)featureType), new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>((SimpleFeatureType)featureType), false, false, grid.getIndex(), this.postFilter);
 			}
 			
 			it = new FeatureReaderFeatureIterator(wrapFeatureReader(fr), missing, found);
@@ -448,6 +434,65 @@ public class GridCachingFeatureCollection implements FeatureCollection<SimpleFea
 		
 		return it;
 	}
+
+	/**
+	 * This function acquire write locks for everything in the missing array.
+	 * Once the write lock is acquired if the node is valid it is converted to 
+	 * a read lock.
+	 *
+	 * @param missing
+	 * @param found
+	 * @throws Exception
+	 */
+    private void acquireWriteLocks( List<NodeIdentifier> missing, List<NodeIdentifier> found )
+            throws Exception {
+        for( Iterator<NodeIdentifier> iterator = missing.iterator(); iterator.hasNext(); ) {
+            NodeIdentifier nodeid = (NodeIdentifier) iterator.next();
+            try {
+                nodeid.writeLock();
+            }catch (Exception ex){
+                //error occurred; remove from list
+                iterator.remove();
+                logger.log(Level.SEVERE, "Could not acquire necessary write locks.", ex);
+                continue;
+            }
+            if (nodeid.isValid()) {
+                // might have been validated by previous thread; so lets make sure we have the correct queue
+                nodeid.readLock();
+                found.add(nodeid);
+                nodeid.writeUnLock();
+                iterator.remove();
+            }
+        }
+    }
+
+    /**
+     * This function acquires reads locks for everything in the missing array.
+     * Once the read lock is acquired if the node is not valid it is added 
+     * to the missing array (write locks are not acquired here).
+     *
+     * @param missing
+     * @param found
+     */
+    private void acquireReadLocks( List<NodeIdentifier> missing, List<NodeIdentifier> found ) {
+        for( Iterator<NodeIdentifier> iterator = found.iterator(); iterator.hasNext(); ) {
+            NodeIdentifier nodeid = (NodeIdentifier) iterator.next();
+            try {
+                nodeid.readLock();
+            } catch (Exception ex) {
+                // remove from list
+                logger.log(Level.SEVERE, "Could not acquire necessary read locks.", ex);
+                iterator.remove();
+                continue;
+            }
+            if (!nodeid.isValid()) {
+                // this node is no longer valid add to missing list
+                nodeid.readUnLock();
+                missing.add(nodeid);
+                iterator.remove();
+            }
+        }
+    }
 	
 	/**
 	 * Wraps a feature reader in a reproject and retype feature reader
