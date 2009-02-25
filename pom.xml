@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32196 2009-01-09 19:03:04Z groldan $
+        Version: $Id: pom.xml 32547 2009-02-25 17:23:29Z jdeolive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -142,6 +142,16 @@
           <name>Web site for Maven reports</name>
           <url>scp://www.refractions.net/home/www/lists/htdocs/gt/</url>
         </site>
+      </distributionManagement>
+    </profile>
+    <profile>
+      <id>deploy.opengeo</id>
+      <distributionManagement>
+        <repository>
+          <id>opengeo</id>
+          <name>OpenGeo Maven Repository</name>
+          <url>dav:http://repo.opengeo.org</url>
+        </repository>
       </distributionManagement>
     </profile>
   </profiles>
