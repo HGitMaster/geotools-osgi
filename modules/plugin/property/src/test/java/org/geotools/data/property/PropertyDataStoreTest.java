@@ -33,6 +33,7 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
@@ -50,7 +51,7 @@ import org.opengis.filter.FilterFactory2;
  * Test functioning of PropertyDataStore.
  * 
  * @author Jody Garnett, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
  */
 public class PropertyDataStoreTest extends TestCase {
     PropertyDataStore store;
@@ -261,6 +262,19 @@ public class PropertyDataStoreTest extends TestCase {
         writer.close();
         assertEquals( 5, count( "road" ));    
     }
+    public void testWriterAppendLastNull() throws Exception{
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = (FeatureWriter)
+                    store.getFeatureWriterAppend("road", Transaction.AUTO_COMMIT);
+        SimpleFeature f;
+        assertFalse( writer.hasNext() );
+        f = writer.next();
+        assertNotNull( f );
+        f.setAttribute(0,new Integer(-1));        
+        f.setAttribute(1,null); // this made the datastore break
+        writer.write();
+        writer.close();
+        assertEquals( 5, count( "road" ));    
+    }
     public void testWriterChangeRemoveFirst() throws Exception{
         PropertyFeatureWriter writer = (PropertyFeatureWriter)
                     store.getFeatureWriter("road");
@@ -315,6 +329,7 @@ public class PropertyDataStoreTest extends TestCase {
         writer.close();
         assertEquals( 4, count( "road" ));                    
     }
+    
     public void testGetFeatureSource() throws Exception {
         FeatureSource<SimpleFeatureType, SimpleFeature> road = store.getFeatureSource( "road" );
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = road.getFeatures();
