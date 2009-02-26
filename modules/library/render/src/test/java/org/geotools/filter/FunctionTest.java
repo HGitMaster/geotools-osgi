@@ -45,73 +45,74 @@ public class FunctionTest extends TestCase {
 	public void testCategorization() throws Exception {
 		FilterFactoryImpl ff = (FilterFactoryImpl) CommonFactoryFinder.getFilterFactory2(null);
 		
-//		Literal fallback = ff.literal("NOT_FOUND");
-//		List<Expression> parameters = new ArrayList<Expression>();
-//		parameters.add( ff.property("value") );
-//		parameters.add( ff.literal( 12.0 ));
-//		Function function = ff.function( "categorize", parameters, fallback);
-//		
-//		
-//		Object value = function.evaluate( feature(2) );
-//		assertFalse( "Could not locate 'categorize' function", "NOT_FOUND".equals(value) );
-//		
-//		Integer number = function.evaluate( feature(2), Integer.class );
-//		assertEquals( 12, number.intValue() );	
-//		
-//		parameters = new ArrayList<Expression>();
-//		parameters.add( ff.property("value") );
-//		parameters.add( ff.literal( "low" ));		
-//		parameters.add( ff.literal( 0.0 ));		
-//		parameters.add( ff.literal( "mid" ));		
-//		parameters.add( ff.literal( 50.0 ));
-//		parameters.add( ff.literal( "high" ));				
-//		parameters.add( ff.literal( 100.0 ));
-//		parameters.add( ff.literal( "super" ));
-//		
-//		function = ff.function( "categorize", parameters, fallback);
-//		
-//		// normal
-//		assertEquals( "low", function.evaluate( feature(-1) )); 
-//		assertEquals( "mid", function.evaluate( feature(20) ));
-//		assertEquals( "high", function.evaluate( feature(60) ));
-//		assertEquals( "super", function.evaluate( feature(110) ));
-//		
-//		// boundary
-//		assertEquals( "mid", function.evaluate( feature(0) )); 
-//		assertEquals( "high", function.evaluate( feature(50) ));
-//		assertEquals( "super", function.evaluate( feature(100) ));
-//		
-//		parameters = new ArrayList<Expression>();
-//		parameters.add( ff.property("value") );
-//		parameters.add( ff.literal( "low" ));		
-//		parameters.add( ff.literal( 0.0 ));		
-//		parameters.add( ff.literal( "mid" ));		
-//		parameters.add( ff.literal( 50.0 ));
-//		parameters.add( ff.literal( "high" ));				
-//		parameters.add( ff.literal( 100.0 ));
-//		parameters.add( ff.literal( "super" ));
-//		parameters.add( ff.literal( "preceding"));
-//		
-//		function = ff.function( "categorize", parameters, fallback);
-//		
-//		// normal
-//		assertEquals( "low", function.evaluate( feature(-1) )); 
-//		assertEquals( "mid", function.evaluate( feature(20) ));
-//		assertEquals( "high", function.evaluate( feature(60) ));
-//		assertEquals( "super", function.evaluate( feature(110) ));
-//		
-//		// boundary
-//		assertEquals( "low", function.evaluate( feature(0) )); 
-//		assertEquals( "mid", function.evaluate( feature(50) ));
-//		assertEquals( "high", function.evaluate( feature(100) ));
+		Literal fallback = ff.literal("NOT_FOUND");
+		List<Expression> parameters = new ArrayList<Expression>();
+		parameters.add( ff.property("value") );
+		parameters.add( ff.literal( 12.0 ));
+		Function function = ff.function( "categorize", parameters, fallback);
 		
-//                //test if RasterData Expression works
-//                float pixelBandValue = 255.6f;
-//                Expression rasterData = ff.createLiteralExpression("RasterData");
-//                
-//                float pixafter = rasterData.evaluate(pixelBandValue,float.class);
-//                assertEquals(pixelBandValue, pixafter);
-                
-                
+		
+		Object value = function.evaluate( feature(2) );
+		assertFalse( "Could not locate 'categorize' function", "NOT_FOUND".equals(value) );
+		
+		Integer number = function.evaluate( feature(2), Integer.class );
+		assertEquals( 12, number.intValue() );	
+		
+		parameters = new ArrayList<Expression>();
+		parameters.add( ff.property("value") );
+		parameters.add( ff.literal( "low" ));		
+		parameters.add( ff.literal( 0.0 ));		
+		parameters.add( ff.literal( "mid" ));		
+		parameters.add( ff.literal( 50.0 ));
+		parameters.add( ff.literal( "high" ));				
+		parameters.add( ff.literal( 100.0 ));
+		parameters.add( ff.literal( "super" ));
+		
+		function = ff.function( "categorize", parameters, fallback);
+		
+		// normal
+		assertEquals( "low", function.evaluate( feature(-1) )); 
+		assertEquals( "mid", function.evaluate( feature(20) ));
+		assertEquals( "high", function.evaluate( feature(60) ));
+		assertEquals( "super", function.evaluate( feature(110) ));
+		
+		// boundary
+		assertEquals( "mid", function.evaluate( feature(0) )); 
+		assertEquals( "high", function.evaluate( feature(50) ));
+		assertEquals( "super", function.evaluate( feature(100) ));
+		
+		parameters = new ArrayList<Expression>();
+		parameters.add( ff.property("value") );
+		parameters.add( ff.literal( "low" ));		
+		parameters.add( ff.literal( 0.0 ));		
+		parameters.add( ff.literal( "mid" ));		
+		parameters.add( ff.literal( 50.0 ));
+		parameters.add( ff.literal( "high" ));				
+		parameters.add( ff.literal( 100.0 ));
+		parameters.add( ff.literal( "super" ));
+		parameters.add( ff.literal( "preceding"));
+		
+		function = ff.function( "categorize", parameters, fallback);
+		
+		// normal
+		assertEquals( "low", function.evaluate( feature(-1) )); 
+		assertEquals( "mid", function.evaluate( feature(20) ));
+		assertEquals( "high", function.evaluate( feature(60) ));
+		assertEquals( "super", function.evaluate( feature(110) ));
+		
+		// boundary
+		assertEquals( "low", function.evaluate( feature(0) )); 
+		assertEquals( "mid", function.evaluate( feature(50) ));
+		assertEquals( "high", function.evaluate( feature(100) ));
+	}
+	/** Test if RasterData Expression works */
+	public void XtestRasterData(){
+	    FilterFactoryImpl ff = (FilterFactoryImpl) CommonFactoryFinder.getFilterFactory2(null);
+            
+	    float pixelBandValue = 255.6f;
+            Expression rasterData = ff.createLiteralExpression("RasterData");
+            
+            float pixafter = rasterData.evaluate(pixelBandValue,float.class);
+            assertEquals(pixelBandValue, pixafter);
 	}
 }
