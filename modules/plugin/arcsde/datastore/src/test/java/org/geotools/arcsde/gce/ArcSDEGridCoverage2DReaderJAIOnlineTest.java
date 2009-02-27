@@ -332,13 +332,13 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         Envelope2D envelope2D = gridGeometry.getEnvelope2D();
         GridRange2D gridRange2D = gridGeometry.getGridRange2D();
 
-        // assertEquals(0, envelope2D.getMinX(), 1);
-        // assertEquals(0, envelope2D.getMinY(), 1);
-        // assertEquals(512, envelope2D.getMaxX(), 1);
-        // assertEquals(512, envelope2D.getMaxY(), 1);
-        //
-        // assertEquals(512, gridRange2D.width);
-        // assertEquals(512, gridRange2D.height);
+//         assertEquals(0, envelope2D.getMinX(), 1);
+//         assertEquals(0, envelope2D.getMinY(), 1);
+//         assertEquals(512, envelope2D.getMaxX(), 1);
+//         assertEquals(512, envelope2D.getMaxY(), 1);
+//        
+//         assertEquals(512, gridRange2D.width);
+//         assertEquals(512, gridRange2D.height);
     }
 
     @Test
