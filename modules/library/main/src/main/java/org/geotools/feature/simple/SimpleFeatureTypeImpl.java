@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  * 
- *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002-2009, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,18 +17,21 @@
 package org.geotools.feature.simple;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.feature.type.ComplexTypeImpl;
 import org.geotools.feature.type.FeatureTypeImpl;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.util.InternationalString;
 
@@ -37,6 +40,7 @@ import org.opengis.util.InternationalString;
  * in a list.
  * 
  * @author Justin
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  */
 public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
         SimpleFeatureType {
@@ -44,7 +48,8 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
     // list of types
     List<AttributeType> types = null;
 
-    List<AttributeDescriptor> descriptors;
+    // the property descriptors for this type (never null)
+    final List<AttributeDescriptor> descriptors;
 
     Map<String, Integer> index;
 
@@ -54,12 +59,17 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
             InternationalString description) {
         super(name, (List) schema, defaultGeometry, isAbstract, restrictions,
                 superType, description);
-        descriptors = schema;
+        // ensure immutability by making unmodifiable private copy
+        descriptors = Collections.unmodifiableList(new ArrayList<AttributeDescriptor>(schema));
         index = buildIndex(this);
     }
 
-    public List<AttributeDescriptor> getAttributeDescriptors() {
-        return Collections.unmodifiableList(descriptors);
+    public final List<AttributeDescriptor> getAttributeDescriptors() {
+        /*
+         * This method and getDescriptors() are final to ensure that the returned properties have
+         * consistent iteration order.
+         */
+        return descriptors;
     }
 
     public List<AttributeType> getTypes() {
@@ -161,6 +171,70 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
                     .getLocalName()));
         }
         return index;
+    }
+
+    /**
+     * @see org.geotools.feature.type.ComplexTypeImpl#getDescriptors()
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public final Collection<PropertyDescriptor> getDescriptors() {
+        /*
+         * This method and getAttributeDescriptors() are final to ensure that the returned
+         * properties have consistent iteration order. ComplexTypeImpl.getDescriptors() must not be
+         * used because iteration order is different.
+         * 
+         * In this method, we circumvent the generics type system with a double cast. In general, as
+         * discussed in the Sun Java Tutorials
+         * (http://java.sun.com/docs/books/tutorial/java/generics/subtyping.html),
+         * Collection<PropertyDescriptor> is not the superclass of List<AttributeDescriptor>,
+         * because we could cast an instance of the latter to the former type and add a
+         * PropertyDescriptor that is not an AttributeDescriptor, breaking the contract of the
+         * subclass. This is why casting from List<AttributeDescriptor> to
+         * Collection<PropertyDescriptor> is prohibited by the generics type system. However, if the
+         * collection is immutable (as is the "descriptors" member), the contract-breaking cast/add
+         * cannot occur, List<AttributeDescriptor> is formally substitutable for
+         * Collection<PropertyDescriptor>, and thus can be treated as a subtype without breaking
+         * generics.
+         */
+        return (Collection) descriptors;
+    }
+
+    /**
+     * Hash code based on super and list of properties. Needed because
+     * {@link ComplexTypeImpl#hashCode()} does not observe property order (it uses
+     * {@link Map#equals(Object)} semantics).
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 47;
+        int result = super.hashCode();
+        // need more because super.hashCode() does not respect order
+        result = prime * result + descriptors.hashCode();
+        return result;
+    }
+
+    /**
+     * Equality based on super and list of properties. Needed because
+     * {@link ComplexTypeImpl#equals()} does not observe property order (it uses
+     * {@link Map#equals(Object)} semantics).
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SimpleFeatureTypeImpl other = (SimpleFeatureTypeImpl) obj;
+        if (!descriptors.equals(other.descriptors))
+            return false;
+        return true;
     }
 
 }
