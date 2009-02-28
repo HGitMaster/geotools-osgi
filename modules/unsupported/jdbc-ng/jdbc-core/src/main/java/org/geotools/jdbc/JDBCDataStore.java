@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
@@ -41,6 +42,8 @@ import javax.sql.DataSource;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.GmlObjectStore;
+import org.geotools.data.InProcessLockingManager;
+import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.FilterToSQL;
@@ -1317,6 +1320,53 @@ public final class JDBCDataStore extends ContentDataStore
         return createTableSQL(featureType.getTypeName(), columnNames, sqlTypeNames, nillable, "fid", featureType);
     }
 
+    /**
+     * Ensures that that the specified transaction has access to features specified by a filter.
+     * <p>
+     * If any features matching the filter are locked, and the transaction does not have authorization
+     * with respect to the lock, an exception is thrown.
+     * </p>
+     * @param featureType The feature type / table.
+     * @param filter The filters.
+     * @param tx The transaction.
+     * @param cx The database connection.
+     */
+    protected void ensureAuthorization(SimpleFeatureType featureType, Filter filter, Transaction tx, Connection cx) 
+        throws IOException, SQLException {
+        
+        Query query = new DefaultQuery(featureType.getTypeName(), filter, Query.NO_NAMES);
+
+        Statement st = null;
+        try {
+            ResultSet rs = null;
+            if ( getSQLDialect() instanceof PreparedStatementSQLDialect ) {
+                st = selectSQLPS(featureType, query, cx);
+                rs = ((PreparedStatement)st).executeQuery();
+            }
+            else {
+                String sql = selectSQL(featureType, query);
+                LOGGER.fine( sql );
+                st = cx.createStatement();
+                rs = st.executeQuery( sql );
+            }
+            
+            try {
+                PrimaryKey key = getPrimaryKey( featureType );
+                InProcessLockingManager lm = (InProcessLockingManager) getLockingManager();
+                while( rs.next() ) {
+                    String fid = featureType.getTypeName() + "." + encodeFID( key, rs );
+                    lm.assertAccess(featureType.getTypeName(), fid, tx );
+                }
+            }
+            finally {
+                closeSafe( rs );
+            }
+        }
+        finally {
+            closeSafe( st );
+        }
+    }
+    
     /**
      * Helper method for creating geometry association table if it does not
      * exist.

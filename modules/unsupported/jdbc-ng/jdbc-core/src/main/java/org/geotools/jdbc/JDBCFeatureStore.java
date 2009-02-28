@@ -19,6 +19,7 @@ package org.geotools.jdbc;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -279,6 +280,15 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         } else {
             // let's grab the connection
             Connection cx = getDataStore().getConnection(getState());
+            
+            // we want to support a "batch" update, but we need to be weary of locks
+            SimpleFeatureType featureType = getSchema();
+            try {
+                getDataStore().ensureAuthorization(featureType, preFilter, getTransaction(), cx);
+            } 
+            catch (SQLException e) {
+                throw (IOException) new IOException().initCause( e );
+            }
             getDataStore().update(getSchema(), types, values, preFilter, cx);
         }
     }
@@ -296,7 +306,17 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         } else {
             // let's grab the connection
             Connection cx = getDataStore().getConnection(getState());
-            getDataStore().delete(getSchema(), preFilter, cx);
+            
+            // we want to support a "batch" delete, but we need to be weary of locks
+            SimpleFeatureType featureType = getSchema();
+            try {
+                getDataStore().ensureAuthorization(featureType, preFilter, getTransaction(), cx);
+            } 
+            catch (SQLException e) {
+                throw (IOException) new IOException().initCause( e );
+            }
+            
+            getDataStore().delete(featureType, preFilter, cx);
         }
     }
 }
