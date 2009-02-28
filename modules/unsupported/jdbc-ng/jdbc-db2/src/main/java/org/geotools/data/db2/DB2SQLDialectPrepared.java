@@ -149,7 +149,8 @@ public class DB2SQLDialectPrepared extends PreparedStatementSQLDialect {
 	@Override
 	public void setGeometryValue(Geometry g, int srid, Class binding, PreparedStatement ps, int column) throws SQLException {
 		if (g ==null) {
-			ps.setNull(column, Types.OTHER);
+			//ps.setNull(column, Types.OTHER);
+			ps.setBytes(column, null);
 			return;
 		}
 		WKBWriter w = new WKBWriter();
