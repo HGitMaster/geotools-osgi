@@ -28,7 +28,7 @@ import javax.imageio.stream.ImageInputStreamImpl;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDETiledImageInputStream.java 32555 2009-02-27 19:52:41Z groldan $
+ * @version $Id: ArcSDETiledImageInputStream.java 32557 2009-02-28 02:18:07Z groldan $
  * @source $URL$
  */
 final class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements ImageInputStream {
@@ -39,11 +39,9 @@ final class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements 
 
     private final byte[] currTileData;
 
-    private byte[] actualTileData;
+    private final byte[] actualTileData;
 
     private int currTileDataIndex;
-
-    private final byte[] currBitmaskData;
 
     private final boolean promote;
 
@@ -53,11 +51,9 @@ final class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements 
         this.tileReader = tileReader;
         this.promote = promoteByteToUshort;
         final int bytesPerTile = tileReader.getBytesPerTile();
-        final int bitmaskDataLength = (int) Math.ceil(bytesPerTile / 8D);
         this.tileDataLength = (promoteByteToUshort ? 2 : 1) * bytesPerTile;
         this.currTileData = new byte[bytesPerTile];
         this.actualTileData = new byte[tileDataLength];
-        this.currBitmaskData = new byte[bitmaskDataLength];
         // force load at the first read invocation
         this.currTileDataIndex = tileDataLength;
     }
@@ -83,24 +79,24 @@ final class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements 
 
     @Override
     public int read() throws IOException {
-        final byte[][] data = getTileData();
+        final byte[] data = getTileData();
         if (data == null) {
             return -1;
         }
-        byte b = data[0][currTileDataIndex];
+        byte b = data[currTileDataIndex];
         currTileDataIndex++;
         return b;
     }
 
     @Override
     public int read(byte[] buff, int off, int len) throws IOException {
-        final byte[][] data = getTileData();
+        final byte[] data = getTileData();
         if (data == null) {
             return -1;
         }
-        final int available = data[0].length - currTileDataIndex;
+        final int available = data.length - currTileDataIndex;
         final int count = Math.min(available, len);
-        System.arraycopy(data[0], currTileDataIndex, buff, off, count);
+        System.arraycopy(data, currTileDataIndex, buff, off, count);
         currTileDataIndex += count;
         return count;
     }
@@ -117,22 +113,24 @@ final class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements 
      * @return {@code null} if there's no more tiles to fetch, the current tile data otherwise
      * @throws IOException
      */
-    private byte[][] getTileData() throws IOException {
+    private byte[] getTileData() throws IOException {
         if (currTileDataIndex == tileDataLength) {
             if (!tileReader.hasNext()) {
                 return null;
             }
 
+            final byte[] currBitmaskData;
             currTileDataIndex = 0;
             if (promote) {
-                tileReader.next(currTileData, currBitmaskData);
+                currBitmaskData = tileReader.next(currTileData);
                 final int numSamples = currTileData.length;
                 Arrays.fill(actualTileData, (byte) 0x0);
                 int pixArrayOffset;
                 boolean isNoData;
 
                 for (int sampleN = 0; sampleN < numSamples; sampleN++) {
-                    isNoData = (((currBitmaskData[sampleN / 8] >> (7 - (sampleN % 8))) & 0x01) == 0x00);
+                    isNoData = (currBitmaskData.length > 0)
+                            && (((currBitmaskData[sampleN / 8] >> (7 - (sampleN % 8))) & 0x01) == 0x00);
                     pixArrayOffset = 2 * sampleN;
                     if (isNoData) {
                         /*
@@ -146,10 +144,10 @@ final class ArcSDETiledImageInputStream extends ImageInputStreamImpl implements 
                     }
                 }
             } else {
-                tileReader.next(actualTileData, currBitmaskData);
+                tileReader.next(actualTileData);
             }
         }
-        return new byte[][] { actualTileData, currBitmaskData };
+        return actualTileData;
     }
 
     @Override

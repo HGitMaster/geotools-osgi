@@ -37,17 +37,13 @@ import com.esri.sde.sdk.client.SeRow;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: TileReader.java 32540 2009-02-23 06:36:00Z groldan $
+ * @version $Id: TileReader.java 32557 2009-02-28 02:18:07Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls" })
 final class TileReader {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
-
-    private static final byte NO_DATA_MASK = 0x00;
-
-    private static final byte DATA_MASK = (byte) 0xFF;
 
     private final int bitsPerSample;
 
@@ -165,24 +161,21 @@ final class TileReader {
     }
 
     /**
-     * Fetches a tile and returns its raw pixel data packaged as bytes according to the number of
-     * bits per sample
+     * Fetches a tile and fills {@code tileData} with its raw pixel data packaged as bytes according
+     * to the number of bits per sample
      * 
      * @param tileData
      *            a possibly {@code null} array where to store the next tile data. If {@code null} a
      *            new byte[] of length {@link #getBytesPerTile()} will be allocated and filled up
      *            with the raw tile pixel data.
-     * @return contents of the next tile, or {@code null} if there are no more tiles to fetch
+     * @return the bitmask data, or an empty array if the tile is full
      * @throws IOException
      * @throws {@link IllegalArgumentException} if tileData is not null and its size is less than
      *         {@link #getBytesPerTile()}
      */
-    public byte[] next(byte[] tileData, byte[] bitmaskData) throws IOException {
+    public byte[] next(byte[] tileData) throws IOException {
         if (tileData == null) {
             throw new IllegalArgumentException("tileData is null");
-        }
-        if (bitmaskData == null) {
-            throw new IllegalArgumentException("bitmaskData is null");
         }
 
         final SeRasterTile tile;
@@ -190,28 +183,26 @@ final class TileReader {
         if (hasNext()) {
             tile = nextTile();
         } else {
-            return null;
+            throw new IllegalStateException("There're no more tiles to fetch");
         }
+
+        final byte[] bitMaskData = tile.getBitMaskData();
+
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest(" >> Fetching " + tile + " - bitmask: " + tile.getBitMaskData().length
+            LOGGER.finest(" >> Fetching " + tile + " - bitmask: " + bitMaskData.length
                     + " has more: " + hasNext());
         }
 
         final int numPixels = tile.getNumPixels();
 
         if (0 == numPixels) {
-            Arrays.fill(bitmaskData, NO_DATA_MASK);
             LOGGER.finer("tile contains no pixel data, skipping: " + tile);
+            final byte NO_DATA_MASK = (byte) 0xFF;
+            Arrays.fill(tileData, NO_DATA_MASK);
         } else if (pixelsPerTile == numPixels) {
             final byte[] rawTileData = tile.getPixelData();
-            final int bitMaskDataLength = rawTileData.length - this.tileDataLength;
 
             System.arraycopy(rawTileData, 0, tileData, 0, tileDataLength);
-            if (bitMaskDataLength == 0) {
-                Arrays.fill(bitmaskData, DATA_MASK);
-            } else {
-                System.arraycopy(rawTileData, tileDataLength, bitmaskData, 0, bitMaskDataLength);
-            }
 
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("returning " + numPixels + " pixels data packaged into "
@@ -223,7 +214,7 @@ final class TileReader {
                     + " but got " + numPixels + ": " + tile);
         }
 
-        return tileData;
+        return bitMaskData;
     }
 
     private SeRasterTile nextTile() throws IOException {
