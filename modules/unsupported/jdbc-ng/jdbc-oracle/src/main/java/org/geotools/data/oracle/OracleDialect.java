@@ -92,6 +92,15 @@ public class OracleDialect extends PreparedStatementSQLDialect {
         }
     }
     
+    static final Map<String, Class> TYPES_TO_CLASSES = new HashMap<String, Class>() {
+    	{
+    		put("CHAR", String.class);
+    		put("NCHAR", String.class);
+    		put("NVARCHAR", String.class);
+    		put("NVARCHAR2", String.class);
+    	}
+    };
+    
     /**
      * Whether to use only primary filters for BBOX filters 
      */
@@ -122,47 +131,51 @@ public class OracleDialect extends PreparedStatementSQLDialect {
         final int TABLE_NAME = 3;
         final int COLUMN_NAME = 4;
         final int TYPE_NAME = 6;
-        if (!columnMetaData.getString(TYPE_NAME).equals("SDO_GEOMETRY")) {
-            return null;
-        }
-
-        Connection conn = null;
-        Statement statement = null;
-        ResultSet result = null;
-        try {
-            String tableName = columnMetaData.getString(TABLE_NAME);
-            String columnName = columnMetaData.getString(COLUMN_NAME);
-            
-            // Oracle 9 compatible query
-            String sqlStatement = "SELECT META.SDO_LAYER_GTYPE\n" + 
-            		"FROM ALL_INDEXES INFO\n" + 
-            		"INNER JOIN MDSYS.USER_SDO_INDEX_METADATA META\n" + 
-            		"ON INFO.INDEX_NAME = META.SDO_INDEX_NAME\n" + 
-            		"WHERE INFO.TABLE_NAME = '" + tableName + "'\n" + 
-            		"AND REPLACE(meta.sdo_column_name, '\"') = '" + columnName + "'\n"; 
-            String schema = dataStore.getDatabaseSchema();
-            if(schema != null && !"".equals(schema)) {
-                sqlStatement += " AND INFO.TABLE_OWNER = '" + schema + "'";
-            }
-            
-            LOGGER.log(Level.FINE, "Geometry type check; {0} ", sqlStatement);
-            statement = cx.createStatement();
-            result = statement.executeQuery(sqlStatement);
-
-            if (result.next()) {
-                String gType = result.getString(1);
-                Class geometryClass = (Class) TT.GEOM_CLASSES.get(gType);
-                if(geometryClass == null)
-                    geometryClass = Geometry.class;
-
-                return geometryClass;
-            } else {
-                return Geometry.class;
-            }
-        }  finally {
-            dataStore.closeSafe(result);
-            dataStore.closeSafe(statement);
-        }
+        String typeName = columnMetaData.getString(TYPE_NAME);
+		if (typeName.equals("SDO_GEOMETRY")) {
+	        Connection conn = null;
+	        Statement statement = null;
+	        ResultSet result = null;
+	        try {
+	            String tableName = columnMetaData.getString(TABLE_NAME);
+	            String columnName = columnMetaData.getString(COLUMN_NAME);
+	            
+	            // Oracle 9 compatible query
+	            String sqlStatement = "SELECT META.SDO_LAYER_GTYPE\n" + 
+	            		"FROM ALL_INDEXES INFO\n" + 
+	            		"INNER JOIN MDSYS.USER_SDO_INDEX_METADATA META\n" + 
+	            		"ON INFO.INDEX_NAME = META.SDO_INDEX_NAME\n" + 
+	            		"WHERE INFO.TABLE_NAME = '" + tableName + "'\n" + 
+	            		"AND REPLACE(meta.sdo_column_name, '\"') = '" + columnName + "'\n"; 
+	            String schema = dataStore.getDatabaseSchema();
+	            if(schema != null && !"".equals(schema)) {
+	                sqlStatement += " AND INFO.TABLE_OWNER = '" + schema + "'";
+	            }
+	            
+	            LOGGER.log(Level.FINE, "Geometry type check; {0} ", sqlStatement);
+	            statement = cx.createStatement();
+	            result = statement.executeQuery(sqlStatement);
+	
+	            if (result.next()) {
+	                String gType = result.getString(1);
+	                Class geometryClass = (Class) TT.GEOM_CLASSES.get(gType);
+	                if(geometryClass == null)
+	                    geometryClass = Geometry.class;
+	
+	                return geometryClass;
+	            } else {
+	                return Geometry.class;
+	            }
+	        }  finally {
+	            dataStore.closeSafe(result);
+	            dataStore.closeSafe(statement);
+	        }
+		} else {
+			// if we know, return non null value, otherwise returning
+			// null will force the datatore to figure it out using 
+			// jdbc metadata
+			return TYPES_TO_CLASSES.get(typeName);
+		}
     }
 
     
@@ -646,5 +659,14 @@ public class OracleDialect extends PreparedStatementSQLDialect {
     public void encodeTableAlias(String raw, StringBuffer sql) {
         sql.append(" ");
         encodeTableName(raw, sql);
+    }
+    
+    @Override
+    public void registerSqlTypeToSqlTypeNameOverrides(
+    		Map<Integer, String> overrides) {
+    	super.registerSqlTypeToSqlTypeNameOverrides(overrides);
+    	overrides.put(Types.REAL, "DOUBLE PRECISION");
+    	overrides.put(Types.DOUBLE, "DOUBLE PRECISION");
+    	overrides.put(Types.FLOAT, "FLOAT");
     }
 }
