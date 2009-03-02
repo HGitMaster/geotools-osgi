@@ -33,7 +33,7 @@ import org.geotools.gui.swing.event.JMapPaneMouseEvent;
  * @author Michael Bedward
  * @since 2.6
  */
-public class JMapPanePanTool extends JMapPaneCursorToolAdapter {
+public class JMapPanePanTool extends JMapPaneCursorTool {
     
     public static final String TOOL_NAME = "Pan";
     public static final String TOOL_TIP = "Click and drag to pan";

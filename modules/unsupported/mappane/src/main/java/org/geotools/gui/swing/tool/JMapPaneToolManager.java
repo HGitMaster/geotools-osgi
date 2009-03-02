@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.event.JMapPaneMouseEvent;
+import org.geotools.gui.swing.event.JMapPaneMouseListener;
 
 /**
  * Receives mouse events from a JMapPane instance, converts them to
@@ -37,7 +38,7 @@ import org.geotools.gui.swing.event.JMapPaneMouseEvent;
 public class JMapPaneToolManager implements MouseInputListener, MouseWheelListener {
     
     private JMapPane pane;
-    private Set<JMapPaneTool> tools = new HashSet<JMapPaneTool>();
+    private Set<JMapPaneMouseListener> listeners = new HashSet<JMapPaneMouseListener>();
     private JMapPaneCursorTool cursorTool;
     
     /**
@@ -48,12 +49,12 @@ public class JMapPaneToolManager implements MouseInputListener, MouseWheelListen
     public JMapPaneToolManager(JMapPane pane) {
         this.pane = pane;
     }
-    
+
     /**
      * Unset the current cursor tool
      */
     public void setNoCursorTool() {
-        tools.remove(cursorTool);
+        listeners.remove(cursorTool);
         cursorTool = null;
     }
     
@@ -70,11 +71,11 @@ public class JMapPaneToolManager implements MouseInputListener, MouseWheelListen
         }
         
         if (cursorTool != null) {
-            tools.remove(cursorTool);
+            listeners.remove(cursorTool);
         }
         
         cursorTool = tool;
-        return tools.add(tool);
+        return listeners.add(tool);
     }
 
     /**
@@ -89,7 +90,7 @@ public class JMapPaneToolManager implements MouseInputListener, MouseWheelListen
             throw new IllegalArgumentException("argument must not be null");
         }
         
-        return tools.add(tool);
+        return listeners.add(tool);
     }
     
     /**
@@ -107,64 +108,70 @@ public class JMapPaneToolManager implements MouseInputListener, MouseWheelListen
             throw new IllegalArgumentException("argument must not be null");
         }
         
-        return tools.remove(tool);
+        return listeners.remove(tool);
     }
 
+    /**
+     * Add a listener for JMapPaneMouseEvents
+     */
+    public void addMouseListener(JMapPaneMouseListener listener) {
+    }
+    
     public void mouseClicked(MouseEvent e) {
         JMapPaneMouseEvent pme = convertEvent(e);
         if (pme != null) {
-            for (JMapPaneTool tool : tools) {
-                tool.onMouseClicked(pme);
+            for (JMapPaneMouseListener listener : listeners) {
+                listener.onMouseClicked(pme);
             }
         }
     }
     
     public void mousePressed(MouseEvent e) {
         JMapPaneMouseEvent pme = convertEvent(e);
-        for (JMapPaneTool tool : tools) {
-            tool.onMousePressed(pme);
+        for (JMapPaneMouseListener listener : listeners) {
+            listener.onMousePressed(pme);
         }
     }
 
     public void mouseReleased(MouseEvent e) {
         JMapPaneMouseEvent pme = convertEvent(e);
-        for (JMapPaneTool tool : tools) {
-            tool.onMouseReleased(pme);
+        for (JMapPaneMouseListener listener : listeners) {
+            listener.onMouseReleased(pme);
         }
     }
 
     public void mouseEntered(MouseEvent e) {
         JMapPaneMouseEvent pme = convertEvent(e);
-        for (JMapPaneTool tool : tools) {
-            tool.onMouseEntered(pme);
+        for (JMapPaneMouseListener listener : listeners) {
+            listener.onMouseEntered(pme);
         }
     }
 
     public void mouseExited(MouseEvent e) {
         JMapPaneMouseEvent pme = convertEvent(e);
-        for (JMapPaneTool tool : tools) {
-            tool.onMouseExited(pme);
+        for (JMapPaneMouseListener listener : listeners) {
+            listener.onMouseExited(pme);
         }
     }
 
     public void mouseDragged(MouseEvent e) {
         JMapPaneMouseEvent pme = convertEvent(e);
-        for (JMapPaneTool tool : tools) {
-            tool.onMouseDragged(pme);
+        for (JMapPaneMouseListener listener : listeners) {
+            listener.onMouseDragged(pme);
         }
     }
 
     public void mouseMoved(MouseEvent e) {
         JMapPaneMouseEvent pme = convertEvent(e);
-        for (JMapPaneTool tool : tools) {
-            tool.onMouseMoved(pme);
+        for (JMapPaneMouseListener listener : listeners) {
+            listener.onMouseMoved(pme);
         }
     }
 
     public void mouseWheelMoved(MouseWheelEvent e) {
         JMapPaneMouseEvent pme = convertEvent(e);
-        for (JMapPaneTool tool : tools) {
-            tool.onMouseWheelMoved(pme);
+        for (JMapPaneMouseListener listener : listeners) {
+            listener.onMouseWheelMoved(pme);
         }
     }
 

@@ -36,9 +36,10 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 import org.geotools.geometry.DirectPosition2D;
-import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.gui.swing.event.JMapPaneMouseListener;
 import org.geotools.gui.swing.tool.JMapPaneCursorTool;
+import org.geotools.gui.swing.tool.JMapPaneTool;
 import org.geotools.gui.swing.tool.JMapPaneToolManager;
 import org.geotools.map.MapContext;
 import org.geotools.map.event.MapLayerListEvent;
@@ -189,6 +190,30 @@ public class JMapPane extends JPanel implements MapLayerListListener {
         tool.setMapPane(this);
         this.setCursor(tool.getCursor());
         toolManager.setCursorTool(tool);
+    }
+    
+    /**
+     * Add a general (non-cursor) tool to the map pane's set
+     * of active tools
+     * 
+     * @todo this is an idea that might be going nowhere !
+     * 
+     */
+    public void addTool(JMapPaneTool tool) {
+        if (tool == null) {
+            throw new IllegalArgumentException("tool must not be null");
+        }
+        
+        tool.setMapPane(this);
+        toolManager.addTool(tool);
+    }
+    
+    /**
+     * Add an object that wants to receive JMapPaneMouseEvents
+     * from this pane
+     */
+    public void addMouseListener(JMapPaneMouseListener listener) {
+        toolManager.addMouseListener(listener);
     }
 
     /**

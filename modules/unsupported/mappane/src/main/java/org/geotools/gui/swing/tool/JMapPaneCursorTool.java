@@ -20,17 +20,17 @@ package org.geotools.gui.swing.tool;
 import java.awt.Cursor;
 
 /**
- * The interface for map pane cursor tools. Simply adds a getCursor
- * method to the JMapPaneTool interface
+ * The base class for map pane cursor tools. Simply adds a getCursor
+ * method to the JMapPaneToolAdapter
  * 
  * @author Michael Bedward
  * @since 2.6
  */
-public interface JMapPaneCursorTool extends JMapPaneTool {
+public abstract class JMapPaneCursorTool extends JMapPaneToolAdapter {
 
     /**
      * Get the cursor for this tool
      */
-    public Cursor getCursor();
+    public abstract Cursor getCursor();
     
 }

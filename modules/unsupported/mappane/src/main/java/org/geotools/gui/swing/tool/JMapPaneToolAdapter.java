@@ -30,7 +30,7 @@ import org.geotools.gui.swing.event.JMapPaneMouseEvent;
  * @author Michael Bedward
  * @since 2.6
  */
-public abstract class JMapPaneCursorToolAdapter implements JMapPaneCursorTool {
+public abstract class JMapPaneToolAdapter implements JMapPaneTool {
 
     /**
      * Get the name assigned to this tool (e.g. "Zoom in")
@@ -41,11 +41,6 @@ public abstract class JMapPaneCursorToolAdapter implements JMapPaneCursorTool {
      * Set the JMapPane instance for this tool
      */
     public abstract void setMapPane(JMapPane pane);
-    
-    /**
-     * Get the cursor for this tool
-     */
-    public abstract Cursor getCursor();
     
     /**
      * Get the 32x32 pixel icon for this tool to be used with JButtons

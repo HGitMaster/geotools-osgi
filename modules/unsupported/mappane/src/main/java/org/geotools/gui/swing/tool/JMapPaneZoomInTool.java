@@ -46,7 +46,7 @@ import org.geotools.gui.swing.event.JMapPaneMouseEvent;
 public class JMapPaneZoomInTool extends JMapPaneZoomToolBase {
     
     public static final String TOOL_NAME = "Zoom in";
-    public static final String TOOL_TIP = "Zoom in";
+    public static final String TOOL_TIP = "Click to zoom in or drag to define the zoom area";
     public static final String CURSOR_IMAGE = "/org/geotools/gui/swing/images/zoom_in_cursor_32.gif";
     public static final Point CURSOR_HOTSPOT = new Point(13, 11);
 

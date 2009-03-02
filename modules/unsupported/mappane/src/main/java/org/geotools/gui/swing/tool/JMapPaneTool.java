@@ -19,13 +19,13 @@ package org.geotools.gui.swing.tool;
 
 import javax.swing.Icon;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.event.JMapPaneMouseEvent;
+import org.geotools.gui.swing.event.JMapPaneMouseListener;
 
 /**
  * The interface for tools working with a JMapPane
  *
  */
-public interface JMapPaneTool {
+public interface JMapPaneTool extends JMapPaneMouseListener {
     
     /**
      * Used with tool constructors to specify that the GUI control
@@ -51,11 +51,6 @@ public interface JMapPaneTool {
     public String getName();
 
     /**
-     * Set the JMapPane instance for this tool
-     */
-    public void setMapPane(JMapPane pane);
-
-    /**
      * Get the 32x32 pixel icon for this tool to be used with JButtons
      */
     public Icon getIconLarge();
@@ -65,44 +60,4 @@ public interface JMapPaneTool {
      */
     public Icon getIconSmall();
     
-    /**
-     * Respond to a mouse click event received from the map pane
-     */
-    public void onMouseClicked(JMapPaneMouseEvent pme);
-
-    /**
-     * Respond to a mouse dragged event received from the map pane
-     */
-    public void onMouseDragged(JMapPaneMouseEvent pme);
-
-    /**
-     * Respond to a mouse entered event received from the map pane
-     */
-    public void onMouseEntered(JMapPaneMouseEvent pme);
-
-    /**
-     * Respond to a mouse exited event received from the map pane
-     */
-    public void onMouseExited(JMapPaneMouseEvent pme);
-
-    /**
-     * Respond to a mouse movement event received from the map pane
-     */
-    public void onMouseMoved(JMapPaneMouseEvent pme);
-
-    /**
-     * Respond to a mouse button press event received from the map pane
-     */
-    public void onMousePressed(JMapPaneMouseEvent pme);
-
-    /**
-     * Respond to a mouse button release event received from the map pane
-     */
-    public void onMouseReleased(JMapPaneMouseEvent pme);
-
-    /**
-     * Respond to a mouse wheel scroll event received from the map pane
-     */
-    public void onMouseWheelMoved(JMapPaneMouseEvent pme);
-
 }
