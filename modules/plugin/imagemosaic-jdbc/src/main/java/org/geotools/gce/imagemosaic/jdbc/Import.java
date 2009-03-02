@@ -61,7 +61,9 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -84,7 +86,7 @@ import javax.media.jai.PlanarImage;
  * @author mcr
  *
  */
-public class Import {
+public class Import extends AbstractCmd {
 	class ImageFilter extends Object implements FileFilter {
 		public ImageFilter(String extension) {
 			this.extension=extension;
@@ -106,12 +108,19 @@ public class Import {
 	
     private final static int DefaultCommitCount = 100;
     private final static String UsageInfo = "Importing from a shapefile or csv file\n" +
+    	"\n Importing all levels \n\n"+
+        "-config URLOrFile -spatialTNPrefix spatialTablePrefix -tileTNPrefix tileTablePrefix [-commitCount commitCount] -shape shapeURLOrFile -shapeKeyField shapeKeyField\n" +
+        "Importing from a csv file\n" +
+        "-config URLOrFile -spatialTNPrefix spatialTablePrefix -tileTNPrefix tileTablePrefix [-commitCount commitCount] -csv csvURLOrFile -csvDelim csvDelim\n" +
+        "Importing using world wfiles\n" +
+        "-config URLOrFile -spatialTNPrefix spatialTablePrefix -tileTNPrefix tileTablePrefix [-commitCount commitCount] -dir directory -ext extension" +    	
+    	"\n\n Importing one level \n\n"+
         "-config URLOrFile -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -shape shapeURLOrFile -shapeKeyField shapeKeyField\n" +
         "Importing from a csv file\n" +
         "-config URLOrFile -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -csv csvURLOrFile -csvDelim csvDelim\n" +
         "Importing using world wfiles\n" +
         "-config URLOrFile -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -dir directory -ext extension" +
-        "\n" + "The default for commitCount is 100\n";
+        "\n\n" + "The default for commitCount is 100\n";
     private Config config;
     private ImportTyp typ;
     private String spatialTableName;
@@ -138,25 +147,23 @@ public class Import {
     private File imageFiles[];
     private Logger logger;
 
-    Import(Config config, String spatialTableName, String tileTableName,
-        URL sourceURL, String sourceParam, int commitCount,
-        Connection con, ImportTyp typ) throws IOException, SQLException {
+    Import(Config config, ImportParam param,  int commitCount,
+        Connection con ) throws IOException, SQLException {
         this.config = config;
         this.commitCount = commitCount;
-        this.spatialTableName = spatialTableName;
-        this.typ=typ;
-        
-        this.tileTableName = tileTableName;
+        this.spatialTableName = param.getSpatialTableName();
+        this.typ=param.getTyp();        
+        this.tileTableName = param.getTileTableName();
         
         if (typ==ImportTyp.SHAPE) {
-            this.shapeFileUrl = sourceURL;
-            this.keyInShapeFile = sourceParam;
+            this.shapeFileUrl = param.getSourceURL();
+            this.keyInShapeFile = param.getSourceParam();
         } else if (typ==ImportTyp.CSV){
-            this.csvFileURL = sourceURL;
-            this.csvDelimiter = sourceParam;;
+            this.csvFileURL = param.getSourceURL();
+            this.csvDelimiter = param.getSourceParam();
         } if (typ==ImportTyp.DIR) {
-        	this.directoryURL=sourceURL;
-        	this.extension=sourceParam;
+        	this.directoryURL=param.getSourceURL();
+        	this.extension=param.getSourceParam();
         }
 
         this.logger = Logger.getLogger("Import " + "<" + spatialTableName +
@@ -195,17 +202,20 @@ public class Import {
         Config config = null;
         String spatialTableName = null;
         String tileTableName = null;
+        String spatialTablePrefix = null;
+        String tileTablePrefix = null;
+
         int commitCount = DefaultCommitCount;
         URL csvUrl = null;
-        URL shapeUrl = null;
+        URL shapeUrl = null;        
         String csvDelim = null;
         String shapeKeyField = null;
-        String dir = null, extension=null;;
+        String extension=null,dir=null;
 
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-config")) {
+            if (args[i].equals(CONFIGPARAM)) {
                 try {
-                    config = Config.readFrom(Toolbox.getURLFromString(args[i + 1]));
+                    config = Config.readFrom(getURLFromString(args[i + 1]));
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);
@@ -218,18 +228,24 @@ public class Import {
             } else if (args[i].equals("-tileTN")) {
                 tileTableName = args[i + 1];
                 i++;
+            } else if (args[i].equals(SPATIALTNPREFIXPARAM)) {
+                spatialTablePrefix = args[i + 1];
+                i++;
+            } else if (args[i].equals(TILETNPREFIXPARAM)) {
+                tileTablePrefix = args[i + 1];
+                i++;                
             } else if (args[i].equals("-commitCount")) {
                 commitCount = new Integer(args[i + 1]);
                 i++;
             } else if (args[i].equals("-shape")) {
-                shapeUrl = Toolbox.getURLFromString(args[i + 1]);
+                shapeUrl = getURLFromString(args[i + 1]);
                 if (shapeUrl==null) {
                 	System.out.println("Cannot open " + args[i+1]);
                 	System.exit(1);
                 }
                 i++;
             } else if (args[i].equals("-csv")) {
-                csvUrl = Toolbox.getURLFromString(args[i + 1]);
+                csvUrl = getURLFromString(args[i + 1]);
                 if (csvUrl==null) {
                 	System.out.println("Cannot open " + args[i+1]);
                 	System.exit(1);
@@ -242,7 +258,12 @@ public class Import {
                 shapeKeyField = args[i + 1];
                 i++;
             } else if (args[i].equals("-dir")) {
-                dir = args[i + 1];
+                dir=args[i + 1];
+                File f = new File(dir);
+                if (f.exists()==false) {
+                	System.out.println("Cannot open " + args[i+1]);
+                	System.exit(1);                	
+                }
                 i++;
             } else if (args[i].equals("-ext")) {
                 extension = args[i + 1];
@@ -253,12 +274,25 @@ public class Import {
             }
         }
 
-        if ((config == null) || (spatialTableName == null) ||
-                (tileTableName == null)) {
+        if (config == null) {	// check  valid config
             System.out.println(UsageInfo);
-            System.exit(1);
+            System.exit(1);        	
         }
-
+        
+        // check if prefix or level import
+        boolean isLevelImport=false,isPrefixImport=false;
+        
+        if ( (spatialTableName != null) &&
+                (tileTableName != null)) isLevelImport=true;
+        
+        if ( (spatialTablePrefix != null) &&
+                (tileTablePrefix != null)) isPrefixImport=true;
+        
+        if ((isLevelImport && isPrefixImport) || (isLevelImport==false && isPrefixImport==false)) {
+            System.out.println(UsageInfo);
+            System.exit(1);        	        	
+        }
+        
         ImportTyp typ=null;
         int countNull=0;
         if (shapeUrl == null) 
@@ -295,17 +329,29 @@ public class Import {
             Class.forName(config.getDriverClassName());
             con = DriverManager.getConnection(config.getJdbcUrl(),
                     config.getUsername(), config.getPassword());
-
-            Import imp = null;
-            if (typ==ImportTyp.SHAPE) 
-            	imp = new Import(config, spatialTableName, tileTableName,shapeUrl,shapeKeyField,commitCount,con,typ);
-            if (typ==ImportTyp.CSV)
-            	imp = new Import(config, spatialTableName, tileTableName,csvUrl,csvDelim,commitCount,con,typ);
-            if (typ==ImportTyp.DIR) {            	
-            	imp = new Import(config, spatialTableName, tileTableName,new File(dir).toURI().toURL(),extension,commitCount,con,typ);
-            }
+            List<ImportParam> importParamList = new ArrayList<ImportParam>();
             
-            imp.fillSpatialTable();
+            if (isLevelImport) {            
+            	if (typ==ImportTyp.SHAPE)
+            		importParamList.add( new ImportParam(spatialTableName,tileTableName,shapeUrl,shapeKeyField,ImportTyp.SHAPE));            	
+            	if (typ==ImportTyp.CSV)
+            		importParamList.add( new ImportParam(spatialTableName,tileTableName,csvUrl,csvDelim,ImportTyp.CSV));
+            	if (typ==ImportTyp.DIR) 
+            		importParamList.add(new ImportParam(spatialTableName,tileTableName,new File(dir).toURI().toURL(),extension,ImportTyp.DIR));            	            		
+            }            
+            if (isPrefixImport) {
+            	if (typ==ImportTyp.SHAPE)
+            		fillImportParamList( spatialTablePrefix,tileTablePrefix,shapeUrl,shapeKeyField,ImportTyp.SHAPE,importParamList);            	
+            	if (typ==ImportTyp.CSV)
+            		fillImportParamList(spatialTablePrefix,tileTablePrefix,csvUrl,csvDelim,ImportTyp.CSV,importParamList);
+            	if (typ==ImportTyp.DIR) 
+            		fillImportParamList(spatialTablePrefix,tileTablePrefix,new File(dir).toURI().toURL(),extension,ImportTyp.DIR,importParamList);            	            		            	
+            }
+            for (ImportParam param : importParamList) {
+            	Import imp = new Import(config, param,commitCount,con);
+            	imp.fillSpatialTable();
+            	con.commit();
+            }	
             con.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -314,6 +360,60 @@ public class Import {
         System.exit(0);
     }
 
+	public static void fillImportParamList(String spatialTablePrefix,String tileTablePrefix,URL sourceUrl,String sourceParam,Import.ImportTyp typ,List<ImportParam> importParamList) {
+		// base image
+		ImportParam param = new ImportParam(getTableName(spatialTablePrefix, 0),
+											getTableName(tileTablePrefix,0), sourceUrl,sourceParam,typ);
+		importParamList.add(param);
+		
+		int level = 1;
+		String path = sourceUrl.getPath();
+		while (true) { // find pyramids
+			String pyramidPath = null;
+			int index = path.lastIndexOf('/');
+			if (typ == ImportTyp.CSV || typ == ImportTyp.SHAPE) {
+				if (index==-1)
+					pyramidPath=level+"/"+path;
+				else {
+					pyramidPath=path.substring(0, index+1)+level+"/"+path.substring(index+1,path.length());
+				}
+				URL pyramidUrl = null;
+				try {
+					pyramidUrl = new URL(sourceUrl.getProtocol(),sourceUrl.getHost(),sourceUrl.getPort(),pyramidPath);
+					pyramidUrl.openStream().close();
+				} catch (Exception e) {
+					return; // no pyramid found
+				}
+				param = new ImportParam(getTableName(spatialTablePrefix, level),
+						getTableName(tileTablePrefix,level), pyramidUrl,sourceParam,typ);
+				importParamList.add(param);
+								
+			}	
+			if (typ == ImportTyp.DIR) {
+				pyramidPath = path;
+				if (pyramidPath.endsWith("/")==false) pyramidPath+="/";
+				pyramidPath+=level;
+				File directory =new File(pyramidPath); 
+				if (directory.exists()) {
+					URL directoryURL = null;
+					try { 
+						directoryURL=directory.toURI().toURL();
+					} catch (MalformedURLException e) {
+						// should not happen
+					}
+					param = new ImportParam(getTableName(spatialTablePrefix, level),
+							getTableName(tileTablePrefix,level), directoryURL,sourceParam,typ);
+					importParamList.add(param);
+					
+				} else { // no further pyramid
+					return;
+				}
+			}
+			level++;
+		}
+		
+	}
+    
     private void prepareSpatialInsert() throws SQLException {
         if (config.getSpatialExtension() == SpatialExtension.UNIVERSAL) {
             if (isJoined()) {

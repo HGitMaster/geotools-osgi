@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import java.net.URL;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,17 +46,10 @@ import java.util.logging.Logger;
  * @author mcr
  *
  */
-class DDLGenerator {
+class DDLGenerator extends AbstractCmd {
     private final static int DefaultPyramids = 0;
     private final static String FN_CREATEMETA = "createmeta.sql";
-    private final static String FN_CREATETABLES = "createtables.sql";
-    private final static String FN_CREATEINDEXES = "createindexes.sql";
-    private final static String FN_FILLMETA = "fillmeta.sql";
-    private final static String FN_REGISTER = "register.sql";
-    private final static String FN_UNREGISTER = "unregister.sql";
     private final static String FN_DROPMETA = "dropmeta.sql";
-    private final static String FN_DROPTABLES = "droptables.sql";
-    private final static String FN_DROPINIDEXES = "dropindexes.sql";
     private final static String UsageInfo = "Generating DDL scripts\n" +
         "-config URLOrFile -spatialTNPrefix spatialTNPrefix [-tileTNPrefix tileTNPrefix]\n" +
         "  [-pyramids pyramids] -statementDelim statementDelim [-srs srs ] -targetDir directory";
@@ -113,19 +105,19 @@ class DDLGenerator {
         int pyramids = DefaultPyramids;
 
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-config")) {
+            if (args[i].equals(CONFIGPARAM)) {
                 try {
-                    config = Config.readFrom(Toolbox.getURLFromString(args[i + 1]));
+                    config = Config.readFrom(getURLFromString(args[i + 1]));
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);
                 }
 
                 i++;
-            } else if (args[i].equals("-spatialTNPrefix")) {
+            } else if (args[i].equals(SPATIALTNPREFIXPARAM)) {
                 spatialTNPrefix = args[i + 1];
                 i++;
-            } else if (args[i].equals("-tileTNPrefix")) {
+            } else if (args[i].equals(TILETNPREFIXPARAM)) {
                 tileTNPrefix = args[i + 1];
                 i++;
             } else if (args[i].equals("-statementDelim")) {
@@ -178,18 +170,39 @@ class DDLGenerator {
 
     void generate() throws Exception {
         writeCreateMeta();
-        writeFillMeta();
-        writeCreateTables();
-        writeCreateIndexes();
-        writeRegister();
-        writeUnRegister();
-        writeDropIndexes();
-        writeDropTables();
         writeDropMeta();
+        
+        String fn = targetDir+"add_"+config.getCoverageName()+".sql";
+        PrintWriter w = new PrintWriter(fn);
+        w.println();
+        writeFillMeta(w);
+        w.println();
+        writeCreateTables(w);
+        w.println();
+        writeRegister(w);        
+        w.println();
+        writeCreateIndexes(w);
+        
+        w.close();
+        if (logger.isLoggable(Level.INFO)) logger.info(fn + " generated");
+        
+        fn = targetDir+"remove_"+config.getCoverageName()+".sql";
+        w = new PrintWriter(fn);
+        w.println();
+        writeDropIndexes(w);
+        w.println();        
+        writeUnRegister(w);
+        w.println();
+        writeDropTables(w);
+        w.println();
+        writeDeleteMeta(w);
+        w.close();
+        if (logger.isLoggable(Level.INFO)) logger.info(fn + " generated");
+        
     }
 
-    void writeFillMeta() throws IOException {
-        PrintWriter w = new PrintWriter(targetDir+FN_FILLMETA);
+    void writeFillMeta(PrintWriter w) throws IOException {
+        
 
         String statmentString = "INSERT INTO " + config.getMasterTable() + "(" +
             config.getCoverageNameAttribute() + "," +
@@ -197,17 +210,36 @@ class DDLGenerator {
             config.getSpatialTableNameAtribute() + ") VALUES ('%s','%s','%s')";
 
         for (int i = 0; i <= pyramids; i++) {
-            String stn = getTabelName(spatialTNPrefix, i);
+            String stn = getTableName(spatialTNPrefix, i);
             String ttn = (tileTNPrefix == null) ? stn
-                                                : getTabelName(tileTNPrefix, i);
-            Object[] args = new Object[] { config.getCoverageName(), stn, ttn };
+                                                : getTableName(tileTNPrefix, i);
+            Object[] args = new Object[] { config.getCoverageName(), ttn, stn };
             w.printf(statmentString, args);
             w.println(statementDelim);
         }
 
-        w.close();
-        if (logger.isLoggable(Level.INFO)) logger.info(FN_FILLMETA + " generated");
     }
+    
+    void writeDeleteMeta(PrintWriter w) throws IOException {
+        
+
+        String statmentString = "DELETE FROM " + config.getMasterTable() + " WHERE " +
+            config.getCoverageNameAttribute() + " = '%s' AND " +
+            config.getTileTableNameAtribute() + " = '%s' AND " +
+            config.getSpatialTableNameAtribute() + " = '%s'  ";
+
+        for (int i = 0; i <= pyramids; i++) {
+            String stn = getTableName(spatialTNPrefix, i);
+            String ttn = (tileTNPrefix == null) ? stn
+                                                : getTableName(tileTNPrefix, i);
+            Object[] args = new Object[] { config.getCoverageName(), ttn, stn };
+            w.printf(statmentString, args);
+            w.println(statementDelim);
+        }
+
+        
+    }
+
 
     void writeCreateMeta() throws Exception {
         PrintWriter w = new PrintWriter(targetDir+FN_CREATEMETA);
@@ -217,39 +249,33 @@ class DDLGenerator {
         if (logger.isLoggable(Level.INFO)) logger.info(FN_CREATEMETA + " generated");
     }
 
-    void writeCreateTables() throws Exception {
-        PrintWriter w = new PrintWriter(targetDir+FN_CREATETABLES);
+    void writeCreateTables(PrintWriter w) throws Exception {
 
         for (int i = 0; i <= pyramids; i++) {
             if (tileTNPrefix == null) {
                 w.print(dbDialect.getCreateSpatialTableStatementJoined(
-                        getTabelName(spatialTNPrefix, i)));
+                        getTableName(spatialTNPrefix, i)));
                 w.println(statementDelim);
             } else {
-                w.print(dbDialect.getCreateSpatialTableStatement(getTabelName(
+                w.print(dbDialect.getCreateSpatialTableStatement(getTableName(
                             spatialTNPrefix, i)));
                 w.println(statementDelim);
-                w.print(dbDialect.getCreateTileTableStatement(getTabelName(
+                w.print(dbDialect.getCreateTileTableStatement(getTableName(
                             tileTNPrefix, i)));
                 w.println(statementDelim);
             }
         }
 
-        w.close();
-        if (logger.isLoggable(Level.INFO)) logger.info(FN_CREATETABLES + " generated");
     }
 
-    void writeCreateIndexes() throws Exception {
-        PrintWriter w = new PrintWriter(targetDir+FN_CREATEINDEXES);
+    void writeCreateIndexes(PrintWriter w) throws Exception {
 
         for (int i = 0; i <= pyramids; i++) {
-            w.print(dbDialect.getCreateIndexStatement(getTabelName(
+            w.print(dbDialect.getCreateIndexStatement(getTableName(
                         spatialTNPrefix, i)));
             w.println(statementDelim);
         }
 
-        w.close();
-        if (logger.isLoggable(Level.INFO)) logger.info(FN_CREATEINDEXES + " generated");
     }
 
     void writeDropMeta() throws IOException {
@@ -260,11 +286,10 @@ class DDLGenerator {
         if (logger.isLoggable(Level.INFO)) logger.info(FN_DROPMETA + " generated");
     }
 
-    void writeDropTables() throws IOException {
-        PrintWriter w = new PrintWriter(targetDir+FN_DROPTABLES);
+    void writeDropTables(PrintWriter w) throws IOException {
 
         for (int i = 0; i <= pyramids; i++) {
-            w.print(dbDialect.getDropTableStatement(getTabelName(
+            w.print(dbDialect.getDropTableStatement(getTableName(
                         spatialTNPrefix, i)));
             w.println(statementDelim);
         }
@@ -273,31 +298,23 @@ class DDLGenerator {
             w.println();
 
             for (int i = 0; i <= pyramids; i++) {
-                w.print(dbDialect.getDropTableStatement(getTabelName(
+                w.print(dbDialect.getDropTableStatement(getTableName(
                             tileTNPrefix, i)));
                 w.println(statementDelim);
             }
         }
 
-        w.close();
-        if (logger.isLoggable(Level.INFO))  logger.info(FN_DROPTABLES + " generated");
     }
 
-    String getTabelName(String prefix, int level) {
-        return prefix + "_" + level;
-    }
 
-    void writeDropIndexes() throws IOException {
-        PrintWriter w = new PrintWriter(targetDir+FN_DROPINIDEXES);
+    void writeDropIndexes(PrintWriter w) throws IOException {
 
         for (int i = 0; i <= pyramids; i++) {
-            w.print(dbDialect.getDropIndexStatment(getTabelName(
+            w.print(dbDialect.getDropIndexStatment(getTableName(
                         spatialTNPrefix, i)));
             w.println(statementDelim);
         }
 
-        w.close();
-        if (logger.isLoggable(Level.INFO)) logger.info(FN_DROPINIDEXES + " generated");
     }
 
     static boolean needsSpatialRegistry(Config config) {
@@ -312,37 +329,31 @@ class DDLGenerator {
         return false;
     }
 
-    void writeRegister() throws IOException {
+    void writeRegister(PrintWriter w) throws IOException {
         if (needsSpatialRegistry(config) == false) {
             return;
         }
 
-        PrintWriter w = new PrintWriter(targetDir+FN_REGISTER);
 
         for (int i = 0; i <= pyramids; i++) {
-            w.print(dbDialect.getRegisterSpatialStatement(getTabelName(
+            w.print(dbDialect.getRegisterSpatialStatement(getTableName(
                         spatialTNPrefix, i), srs));
             w.println(statementDelim);
         }
 
-        w.close();
-        if (logger.isLoggable(Level.INFO)) logger.info(FN_REGISTER + " generated");
     }
 
-    void writeUnRegister() throws IOException {
+    void writeUnRegister(PrintWriter w) throws IOException {
         if (needsSpatialRegistry(config) == false) {
             return;
         }
 
-        PrintWriter w = new PrintWriter(targetDir+FN_UNREGISTER);
 
         for (int i = 0; i <= pyramids; i++) {
-            w.print(dbDialect.getUnregisterSpatialStatement(getTabelName(
+            w.print(dbDialect.getUnregisterSpatialStatement(getTableName(
                         spatialTNPrefix, i)));
             w.println(statementDelim);
         }
 
-        w.close();
-        if (logger.isLoggable(Level.INFO)) logger.info(FN_UNREGISTER + " generated");
     }
 }

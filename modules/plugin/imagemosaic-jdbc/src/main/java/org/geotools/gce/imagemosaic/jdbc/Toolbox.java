@@ -16,11 +16,6 @@
  */
 package org.geotools.gce.imagemosaic.jdbc;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.logging.Level;
 
 /**
  * This class is a dispatcher class for utility classes. This class is also the
@@ -58,24 +53,5 @@ class Toolbox {
 		}
 	}
 
-	public static URL getURLFromString(String source) {
-		if (source == null) {
-			return null;
-		}
-
-		URL sourceURL = null;
-		File f = new File(source);
-		try {
-			if (f.exists()) {
-				return f.toURI().toURL();
-			}
-			sourceURL = new URL(URLDecoder.decode((String) source,"UTF8"));
-		
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		return sourceURL;
-	}
 
 }

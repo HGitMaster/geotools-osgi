@@ -27,6 +27,7 @@ import org.geotools.coverage.grid.io.GridFormatFinder;
 
 import org.geotools.factory.Hints;
 
+import org.geotools.gce.imagemosaic.jdbc.Import.ImportTyp;
 import org.geotools.geometry.GeneralEnvelope;
 
 import org.geotools.referencing.CRS;
@@ -47,12 +48,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -339,24 +343,22 @@ public abstract class AbstractTest extends TestCase {
             	            	              
               Import imp = null;
               if (i==0) {
-                  URL dirFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i);
+                  URL dirFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES );
             	  imp = new Import(getDBDialect().getConfig(),
-            			  getSpatialTableNames()[i], getTileTableNames()[i],
-            			  dirFileUrl, "tif", 2, Connection, Import.ImportTyp.DIR);
+            			  new ImportParam(getSpatialTableNames()[i], getTileTableNames()[i],dirFileUrl,"tif",Import.ImportTyp.DIR),            			  
+            			  2, Connection );
               }
               if (i==1) {              	
-                URL shapeFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i +
-                        File.separator + "index.shp");
+                URL shapeFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i +"/index.shp");
                 imp = new Import(getDBDialect().getConfig(),
-                        getSpatialTableNames()[i], getTileTableNames()[i],
-                        shapeFileUrl, "LOCATION", 2, Connection, Import.ImportTyp.SHAPE);
+                		new ImportParam(getSpatialTableNames()[i], getTileTableNames()[i],shapeFileUrl,"LOCATION",Import.ImportTyp.SHAPE),                        
+                        2, Connection);
               }
               if (i==2) {
-                  URL csvFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i +
-                          File.separator + "index.csv");
+                  URL csvFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i +"/index.csv");
                   imp = new Import(getDBDialect().getConfig(),
-                          getSpatialTableNames()[i], getTileTableNames()[i],
-                          csvFileUrl, ";", 2, Connection, Import.ImportTyp.CSV);
+                		  new ImportParam(getSpatialTableNames()[i], getTileTableNames()[i],csvFileUrl,";",Import.ImportTyp.CSV),                          
+                          2, Connection);
 
               }
               imp.fillSpatialTable();
@@ -379,6 +381,57 @@ public abstract class AbstractTest extends TestCase {
         return JDBCAccessFactory.JDBCAccessMap.get(getConfigUrl().toString());
     }
 
+    public void testImportParamList() {
+    	
+    	URL shapeFileUrl=null,csvFileUrl=null,dirFileUrl=null;
+    	
+    	try {
+	        shapeFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + "index.shp");
+	
+	        csvFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + "index.csv");
+		        
+	        dirFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES);
+    	} catch (MalformedURLException ex) {
+    		// should not happen
+    	}
+                
+        List<ImportParam> importParamList = null;
+        
+        
+        importParamList=new ArrayList<ImportParam>();
+        Import.fillImportParamList("SPAT", "TILE", dirFileUrl, "tif", ImportTyp.DIR, importParamList);
+        assertTrue(importParamList.size()==3);
+        
+        assertTrue(importParamList.get(0).getTileTableName().equals("TILE_0"));
+        assertTrue(importParamList.get(1).getTileTableName().equals("TILE_1"));
+        assertTrue(importParamList.get(2).getTileTableName().equals("TILE_2"));
+        assertTrue(importParamList.get(0).getSpatialTableName().equals("SPAT_0"));
+        assertTrue(importParamList.get(1).getSpatialTableName().equals("SPAT_1"));
+        assertTrue(importParamList.get(2).getSpatialTableName().equals("SPAT_2"));
+        
+        assertTrue(importParamList.get(0).getSourceURL().getPath().contains(OUTPUTDIR_RESOURCES));
+        assertTrue(importParamList.get(1).getSourceURL().getPath().contains(OUTPUTDIR_RESOURCES+1));
+        assertTrue(importParamList.get(2).getSourceURL().getPath().contains(OUTPUTDIR_RESOURCES+2));
+
+        importParamList=new ArrayList<ImportParam>();
+        Import.fillImportParamList("SPAT", "TILE", csvFileUrl, ";", ImportTyp.CSV, importParamList);
+        assertTrue(importParamList.size()==3);
+        
+        assertTrue(importParamList.get(0).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"index.csv"));
+        assertTrue(importParamList.get(1).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"1/index.csv"));
+        assertTrue(importParamList.get(2).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"2/index.csv"));
+
+        
+        importParamList=new ArrayList<ImportParam>();
+        Import.fillImportParamList("SPAT", "TILE", shapeFileUrl, "LOCATION", ImportTyp.SHAPE, importParamList);
+        assertTrue(importParamList.size()==3);
+
+        assertTrue(importParamList.get(0).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"index.shp"));
+        assertTrue(importParamList.get(1).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"1/index.shp"));
+        assertTrue(importParamList.get(2).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"2/index.shp"));
+        
+    }
+    
     public void testCreateJoined() {
         JDBCAccess access = getJDBCAccess();
 
@@ -409,24 +462,23 @@ public abstract class AbstractTest extends TestCase {
             for (int i = 0; i < getTileTableNames().length; i++) {
                 Import imp = null;
                 if (i==0) {
-                    URL dirFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i);
+                    URL dirFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES );
+                                        
               	  imp = new Import(getDBDialect().getConfig(),
-              			  getSpatialTableNames()[i], getSpatialTableNames()[i],
-              			  dirFileUrl, "tif", 2, Connection, Import.ImportTyp.DIR);
+              			new ImportParam(getSpatialTableNames()[i], getSpatialTableNames()[i],dirFileUrl,"tif",Import.ImportTyp.DIR),
+              			  2,Connection );
                 }
                 if (i==1) {              	
-                  URL shapeFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i +
-                          File.separator + "index.shp");
+                  URL shapeFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i +"/index.shp");
                   imp = new Import(getDBDialect().getConfig(),
-                          getSpatialTableNames()[i], getSpatialTableNames()[i],
-                          shapeFileUrl, "LOCATION", 2, Connection, Import.ImportTyp.SHAPE);
+                		  new ImportParam(getSpatialTableNames()[i], getSpatialTableNames()[i],shapeFileUrl,"LOCATION",Import.ImportTyp.SHAPE),
+                           2, Connection);
                 }
                 if (i==2) {
-                    URL csvFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i +
-                            File.separator + "index.csv");
+                    URL csvFileUrl = new URL("file:" + OUTPUTDIR_RESOURCES + i +"/index.csv");
                     imp = new Import(getDBDialect().getConfig(),
-                            getSpatialTableNames()[i], getSpatialTableNames()[i],
-                            csvFileUrl, ";", 2, Connection, Import.ImportTyp.CSV);
+                    		new ImportParam(getSpatialTableNames()[i], getSpatialTableNames()[i],csvFileUrl,";",Import.ImportTyp.CSV),                            
+                             2, Connection);
 
                 }
                 imp.fillSpatialTable();
