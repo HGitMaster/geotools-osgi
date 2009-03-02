@@ -19,7 +19,11 @@ import javax.swing.filechooser.FileFilter;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.gui.swing.JMapPane;
+import org.geotools.gui.swing.tool.JMapPanePanTool;
+import org.geotools.gui.swing.tool.JMapPaneZoomInTool;
+import org.geotools.gui.swing.tool.JMapPaneZoomOutTool;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.renderer.lite.StreamingRenderer;
@@ -150,7 +154,7 @@ public class ShapeLab {
 
     private static void showMap(MapContext map) throws IOException {
         final JMapPane mapPane = new JMapPane(new StreamingRenderer(), map);
-        mapPane.setMapArea(map.getLayerBounds());
+        mapPane.setMapArea( new Envelope2D( map.getLayerBounds() ));
         JFrame frame = new JFrame("ImageLab2");
 
         frame.setLayout(new BorderLayout());
@@ -159,7 +163,7 @@ public class ShapeLab {
         JButton zoomInButton = new JButton("Zoom In");
         zoomInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapPane.setState(JMapPane.ZoomIn);
+                mapPane.setCursorTool(new JMapPaneZoomInTool());
             }
         });
         buttons.add(zoomInButton);
@@ -167,7 +171,7 @@ public class ShapeLab {
         JButton zoomOutButton = new JButton("Zoom Out");
         zoomOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapPane.setState(JMapPane.ZoomOut);
+                mapPane.setCursorTool( new JMapPaneZoomOutTool() );
             }
         });
         buttons.add(zoomOutButton);
@@ -175,7 +179,7 @@ public class ShapeLab {
         JButton pamButton = new JButton("Move");
         pamButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapPane.setState(JMapPane.Pan);
+                mapPane.setCursorTool(new JMapPanePanTool());
             }
         });
         buttons.add(pamButton);

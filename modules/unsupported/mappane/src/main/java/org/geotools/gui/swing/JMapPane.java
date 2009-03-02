@@ -45,6 +45,7 @@ import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -264,13 +265,13 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      * Note: This method does <b>not</b> check that the requested area overlaps
      * the bounds of the current map layers.
      * 
-     * @param mapArea 
+     * @param mapArea Area of the map to display (you can use a geoapi Envelope implementations such as ReferenedEnvelope or Envelope2D)
      */
-    public void setMapArea(Envelope2D env) {
+    public void setMapArea(Envelope env) {
         if (context != null) {
             CoordinateReferenceSystem crs = context.getCoordinateReferenceSystem();
             if (crs != null) {
-                ReferencedEnvelope refEnv = new ReferencedEnvelope(env, crs);
+                ReferencedEnvelope refEnv = new ReferencedEnvelope(env);
                 context.setAreaOfInterest(refEnv);
                 setTransforms(refEnv, curPaintArea);
                 repaint();
@@ -284,7 +285,7 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      */
     public void reset() {
         try {
-            setMapArea(new Envelope2D(context.getLayerBounds()));
+            setMapArea(context.getLayerBounds());
         } catch(IOException ex) {
             ex.printStackTrace();
         }
