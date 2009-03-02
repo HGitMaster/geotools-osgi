@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2006-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2003-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,11 +14,23 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.event;
 
-import java.util.EventListener;
+package org.geotools.gui.swing.tool;
 
+import java.awt.Cursor;
 
-public interface HighlightChangeListener extends EventListener {
-    public void highlightChanged(HighlightChangedEvent e);
+/**
+ * The interface for map pane cursor tools. Simply adds a getCursor
+ * method to the JMapPaneTool interface
+ * 
+ * @author Michael Bedward
+ * @since 2.6
+ */
+public interface JMapPaneCursorTool extends JMapPaneTool {
+
+    /**
+     * Get the cursor for this tool
+     */
+    public Cursor getCursor();
+    
 }
