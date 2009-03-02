@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- =======================================================================
         Maven Project Configuration File
 
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32443 2009-02-09 12:38:20Z acuster $
+        Version: $Id: pom.xml 32570 2009-03-02 01:32:35Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -161,6 +161,12 @@
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
   <dependencies>
+    <dependency>
+      <groupId>org.opengis</groupId>
+      <artifactId>geoapi-pending</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+
     <!-- NOTE: The referencing module does not depends on JTS. -->
     <dependency>
       <groupId>java3d</groupId>
