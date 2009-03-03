@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32576 2009-03-02 12:19:38Z jive $              
+        Version: $Id: pom.xml 32584 2009-03-03 05:03:52Z mbedward $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -127,6 +127,11 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-wkt</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools.demo</groupId>
+      <artifactId>gt-mappane-use</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
