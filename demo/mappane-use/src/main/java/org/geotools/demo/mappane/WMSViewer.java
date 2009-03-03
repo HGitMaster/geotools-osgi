@@ -16,7 +16,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -29,10 +28,6 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.PanAction;
-import org.geotools.gui.swing.ResetAction;
-import org.geotools.gui.swing.ZoomInAction;
-import org.geotools.gui.swing.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
@@ -41,7 +36,12 @@ import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Envelope;
+import javax.swing.ButtonGroup;
+import javax.swing.JToggleButton;
+import org.geotools.gui.swing.action.JMapPanePanAction;
+import org.geotools.gui.swing.action.JMapPaneResetAction;
+import org.geotools.gui.swing.action.JMapPaneZoomInAction;
+import org.geotools.gui.swing.action.JMapPaneZoomOutAction;
 
 /**
  * Sample application that may be used to try JMapPane 
@@ -50,160 +50,163 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Ian Turton
  */
 public class WMSViewer implements ActionListener {
-	JFrame frame;
 
-	JMapPane mp;
+    JFrame frame;
+    JMapPane mp;
+    JLabel text;
+    GTRenderer renderer;
+    MapContext context;
+    final JFileChooser jfc = new JFileChooser();
 
-	JToolBar jtb;
+    public WMSViewer() {
+        frame = new JFrame("My WMS Viewer");
+        frame.setBounds(20, 20, 450, 200);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        Container content = frame.getContentPane();
+        mp = new JMapPane();
+        // mp.addZoomChangeListener(this);
+        content.setLayout(new BorderLayout());
 
-	JLabel text;
+        JToolBar jtb = new JToolBar();
 
-	GTRenderer renderer;
+        JButton load = new JButton("Load file");
+        load.addActionListener(this);
+        jtb.add(load);
 
-	MapContext context;
+        jtb.addSeparator();
 
-	final JFileChooser jfc = new JFileChooser();
+        JButton resetBtn = new JButton(new JMapPaneResetAction(mp));
+        jtb.add(resetBtn);
 
-	public WMSViewer() {
-		frame = new JFrame("My WMS Viewer");
-		frame.setBounds(20, 20, 450, 200);
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		Container content = frame.getContentPane();
-		mp = new JMapPane();
-		// mp.addZoomChangeListener(this);
-		content.setLayout(new BorderLayout());
-		jtb = new JToolBar();
+        jtb.addSeparator();
 
-		JButton load = new JButton("Load file");
-		load.addActionListener(this);
-		jtb.add(load);
-		Action zoomIn = new ZoomInAction(mp);
-		Action zoomOut = new ZoomOutAction(mp);
-		Action pan = new PanAction(mp);
-		// Action select = new SelectAction(mp);
-		Action reset = new ResetAction(mp);
-		jtb.add(zoomIn);
-		jtb.add(zoomOut);
-		jtb.add(pan);
-		jtb.addSeparator();
-		jtb.add(reset);
-		jtb.addSeparator();
-		// jtb.add(select);
-		final JButton button = new JButton();
-		button.setText("CRS");
-		button.setToolTipText("Change map prjection");
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+        ButtonGroup cursorGrp = new ButtonGroup();
+        JToggleButton zoomInBtn = new JToggleButton(new JMapPaneZoomInAction(mp));
+        jtb.add(zoomInBtn);
+        cursorGrp.add(zoomInBtn);
 
-				String code = JOptionPane.showInputDialog(button,
-						"Coordinate Reference System:", "EPSG:4326");
-				if (code == null)
-					return;
-				try {
-					CoordinateReferenceSystem crs = CRS.decode(code);
-					setCRS(crs);
-				} catch (Exception fe) {
-					fe.printStackTrace();
-					JOptionPane.showMessageDialog(button, fe.getMessage(), fe
-							.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-			}
-		});
-		jtb.add(button);
+        JToggleButton zoomOutBtn = new JToggleButton(new JMapPaneZoomOutAction(mp));
+        jtb.add(zoomOutBtn);
+        cursorGrp.add(zoomOutBtn);
 
-		content.add(jtb, BorderLayout.NORTH);
+        JToggleButton panBtn = new JToggleButton(new JMapPanePanAction(mp));
+        jtb.add(panBtn);
+        cursorGrp.add(panBtn);
 
-		// JComponent sp = mp.createScrollPane();
-		mp.setSize(400, 200);
-		content.add(mp, BorderLayout.CENTER);
+        jtb.addSeparator();
 
-		content.doLayout();
-		frame.setVisible(true);
+        final JButton crsBtn = new JButton("CRS");
+        crsBtn.setToolTipText("Change map prjection");
+        crsBtn.addActionListener(new ActionListener() {
 
-	}
+            public void actionPerformed(ActionEvent e) {
 
-	/**
-	 * Method used to set the current map projection.
-	 * 
-	 * @param crs
-	 *            A new CRS for the mappnae.
-	 */
-	public void setCRS(CoordinateReferenceSystem crs) {
-		mp.getContext().setAreaOfInterest(mp.getContext().getAreaOfInterest(),
-				crs);
-		mp.setReset(true);
-		mp.repaint();
-	}
+                String code = JOptionPane.showInputDialog(crsBtn, "Coordinate Reference System:", "EPSG:4326");
+                if (code == null) {
+                    return;
+                }
+                try {
+                    CoordinateReferenceSystem crs = CRS.decode(code);
+                    setCRS(crs);
+                } catch (Exception fe) {
+                    fe.printStackTrace();
+                    JOptionPane.showMessageDialog(crsBtn, fe.getMessage(), fe.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+        });
+        jtb.add(crsBtn);
 
-	public void load(WMSMapLayer layer) throws Exception {
+        content.add(jtb, BorderLayout.NORTH);
 
-		Envelope2D env = layer.getGrid().getEnvelope2D();
-		Envelope en = new Envelope(env.x, env.y, env.width, env.height);
-		mp.setMapArea(en);
+        // JComponent sp = mp.createScrollPane();
+        mp.setSize(400, 200);
+        content.add(mp, BorderLayout.CENTER);
 
-		CoordinateReferenceSystem crs = layer.getGrid()
-				.getCoordinateReferenceSystem();
-		if (crs == null)
-			crs = DefaultGeographicCRS.WGS84;
-		if (context == null) {
-			context = new DefaultMapContext(crs);
-			mp.setContext(context);
-		}
-		
-		//this allows us to listen for resize events and ask for the right size image
-		mp.addComponentListener(layer);
-		context.addLayer(layer);
-		context.addMapBoundsListener(layer);
-		// System.out.println(context.getLayerBounds());
-		// mp.setHighlightLayer(context.getLayer(0));
+        content.doLayout();
+        frame.setVisible(true);
 
-		if (renderer == null) {
-			if (false) {
-				renderer = new StreamingRenderer();
-				HashMap hints = new HashMap();
-				hints.put("memoryPreloadingEnabled", Boolean.TRUE);
-				renderer.setRendererHints(hints);
-			} else {
-				renderer = new StreamingRenderer();
-				HashMap hints = new HashMap();
-				hints.put("memoryPreloadingEnabled", Boolean.FALSE);
-				renderer.setRendererHints(hints);
-				RenderingHints rhints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
-				((StreamingRenderer)renderer).setJava2DHints(rhints);
-			}
-			mp.setRenderer(renderer);
-			
-		}
-		// mp.getRenderer().addLayer(new RenderedMapScale());
-		frame.repaint();
-		frame.doLayout();
-	}
+    }
 
-	public void actionPerformed(ActionEvent e) {
-		WMSChooser wmc = new WMSChooser(frame, "Select WMS", true);
-		//wmc.setServer("http://www.geovista.psu.edu/geoserver/wms");
-		wmc.setVisible(true);
-		int returnVal = wmc.getLayer();
-		if (returnVal == -1) {
-			return;
-		}
-		WebMapServer wms = wmc.getWms();
-		Layer l = (Layer) wmc.getLayers().get(returnVal);
-		WMSMapLayer layer = new WMSMapLayer(wms, l);
-		try {
-			load(layer);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	}
+    /**
+     * Method used to set the current map projection.
+     * 
+     * @param crs
+     *            A new CRS for the mappnae.
+     */
+    public void setCRS(CoordinateReferenceSystem crs) {
+        mp.getContext().setAreaOfInterest(mp.getContext().getAreaOfInterest(),
+                crs);
+        mp.reset();
+    }
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) throws Exception {
-		WMSViewer mapV = new WMSViewer();
+    public void load(WMSMapLayer layer) throws Exception {
 
-	}
+        Envelope2D env = layer.getGrid().getEnvelope2D();
+        mp.setMapArea(env);
+
+        CoordinateReferenceSystem crs = layer.getGrid().getCoordinateReferenceSystem();
+        if (crs == null) {
+            crs = DefaultGeographicCRS.WGS84;
+        }
+        if (context == null) {
+            context = new DefaultMapContext(crs);
+            mp.setContext(context);
+        }
+
+        //this allows us to listen for resize events and ask for the right size image
+        mp.addComponentListener(layer);
+        context.addLayer(layer);
+        context.addMapBoundsListener(layer);
+        // System.out.println(context.getLayerBounds());
+        // mp.setHighlightLayer(context.getLayer(0));
+
+        if (renderer == null) {
+            if (false) {
+                renderer = new StreamingRenderer();
+                HashMap hints = new HashMap();
+                hints.put("memoryPreloadingEnabled", Boolean.TRUE);
+                renderer.setRendererHints(hints);
+            } else {
+                renderer = new StreamingRenderer();
+                HashMap hints = new HashMap();
+                hints.put("memoryPreloadingEnabled", Boolean.FALSE);
+                renderer.setRendererHints(hints);
+                RenderingHints rhints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                ((StreamingRenderer) renderer).setJava2DHints(rhints);
+            }
+            mp.setRenderer(renderer);
+
+        }
+        // mp.getRenderer().addLayer(new RenderedMapScale());
+        frame.repaint();
+        frame.doLayout();
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        WMSChooser wmc = new WMSChooser(frame, "Select WMS", true);
+        //wmc.setServer("http://www.geovista.psu.edu/geoserver/wms");
+        wmc.setVisible(true);
+        int returnVal = wmc.getLayer();
+        if (returnVal == -1) {
+            return;
+        }
+        WebMapServer wms = wmc.getWms();
+        Layer l = (Layer) wmc.getLayers().get(returnVal);
+        WMSMapLayer layer = new WMSMapLayer(wms, l);
+        try {
+            load(layer);
+        } catch (Exception e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) throws Exception {
+        WMSViewer mapV = new WMSViewer();
+
+    }
 }

@@ -18,12 +18,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
-import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
 
@@ -31,11 +32,10 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.PanAction;
-import org.geotools.gui.swing.ResetAction;
-import org.geotools.gui.swing.SelectAction;
-import org.geotools.gui.swing.ZoomInAction;
-import org.geotools.gui.swing.ZoomOutAction;
+import org.geotools.gui.swing.action.JMapPanePanAction;
+import org.geotools.gui.swing.action.JMapPaneResetAction;
+import org.geotools.gui.swing.action.JMapPaneZoomInAction;
+import org.geotools.gui.swing.action.JMapPaneZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
@@ -46,6 +46,7 @@ import org.geotools.styling.SLDParser;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -56,7 +57,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class MapViewer implements ActionListener{
     JFrame frame;
     JMapPane mp;
-    JToolBar jtb;
     JLabel text;
     final JFileChooser jfc = new JFileChooser();
     public MapViewer(){
@@ -67,43 +67,56 @@ public class MapViewer implements ActionListener{
         mp = new JMapPane();
         //mp.addZoomChangeListener(this);
         content.setLayout(new BorderLayout());
-        jtb = new JToolBar();
+        
+        JToolBar jtb = new JToolBar();
 
         JButton load = new JButton("Load file");
         load.addActionListener(this);
         jtb.add(load);
-        Action zoomIn = new ZoomInAction(mp);
-        Action zoomOut = new ZoomOutAction(mp);
-        Action pan = new PanAction(mp);
-        Action select = new SelectAction(mp);
-        Action reset = new ResetAction(mp);
-        jtb.add(zoomIn);
-        jtb.add(zoomOut);
-        jtb.add(pan);
+        
         jtb.addSeparator();
-        jtb.add(reset);
+        
+        JButton resetBtn = new JButton(new JMapPaneResetAction(mp));
+        jtb.add(resetBtn);
+        
         jtb.addSeparator();
-        jtb.add(select);
-        final JButton button= new JButton();
-        button.setText("CRS");
-        button.setToolTipText("Change map prjection");
-        button.addActionListener(new ActionListener() {
+        
+        ButtonGroup cursorGrp = new ButtonGroup();
+        JToggleButton zoomInBtn = new JToggleButton(new JMapPaneZoomInAction(mp));
+        jtb.add(zoomInBtn);
+        cursorGrp.add(zoomInBtn);
+        
+        JToggleButton zoomOutBtn = new JToggleButton(new JMapPaneZoomOutAction(mp));
+        jtb.add(zoomOutBtn);
+        cursorGrp.add(zoomOutBtn);
+
+        JToggleButton panBtn = new JToggleButton(new JMapPanePanAction(mp));
+        jtb.add(panBtn);
+        cursorGrp.add(panBtn);
+
+        jtb.addSeparator();
+        
+        final JButton crsBtn = new JButton("CRS");
+        crsBtn.setToolTipText("Change map prjection");
+        crsBtn.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
 
-            	String code = JOptionPane.showInputDialog( button, "Coordinate Reference System:", "EPSG:4326" );
-            	if(code==null)return;
-            	try{
-             	   CoordinateReferenceSystem crs = CRS.decode( code );
-                   setCRS( crs );
+                String code = JOptionPane.showInputDialog(crsBtn, "Coordinate Reference System:", "EPSG:4326");
+                if (code == null) {
+                    return;
                 }
-                catch(Exception fe){
-                	fe.printStackTrace();
-             	   JOptionPane.showMessageDialog( button, fe.getMessage(), fe.getClass().toString(), JOptionPane.ERROR_MESSAGE );
-             	   return;
+                try {
+                    CoordinateReferenceSystem crs = CRS.decode(code);
+                    setCRS(crs);
+                } catch (Exception fe) {
+                    fe.printStackTrace();
+                    JOptionPane.showMessageDialog(crsBtn, fe.getMessage(), fe.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
             }
         });
-        jtb.add(button);
+        jtb.add(crsBtn);
 
         content.add(jtb,BorderLayout.NORTH);
 
@@ -124,15 +137,14 @@ public class MapViewer implements ActionListener{
      */
     public void setCRS(CoordinateReferenceSystem crs){
     	mp.getContext().setAreaOfInterest(mp.getContext().getAreaOfInterest(),crs);
-    	mp.setReset(true);
-    	mp.repaint();
+    	mp.reset();
    }
 
     public void load(URL shape, URL sld)throws Exception{
         ShapefileDataStore ds = new ShapefileDataStore(shape);
 
         FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource();
-        com.vividsolutions.jts.geom.Envelope env = fs.getBounds();
+        Envelope env = fs.getBounds();
         mp.setMapArea(env);
         StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
 
@@ -144,8 +156,8 @@ public class MapViewer implements ActionListener{
         MapContext context = new DefaultMapContext(crs);
         context.addLayer(fs,style[0]);
         context.getLayerBounds();
-        mp.setHighlightLayer(context.getLayer(0));
-        mp.setSelectionLayer(context.getLayer(0));
+        //mp.setHighlightLayer(context.getLayer(0));
+        //mp.setSelectionLayer(context.getLayer(0));
 
         GTRenderer renderer;
         if( true ){ 
