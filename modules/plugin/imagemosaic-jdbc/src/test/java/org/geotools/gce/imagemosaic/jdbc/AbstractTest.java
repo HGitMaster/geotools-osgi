@@ -381,7 +381,7 @@ public abstract class AbstractTest extends TestCase {
         return JDBCAccessFactory.JDBCAccessMap.get(getConfigUrl().toString());
     }
 
-    public void testImportParamList() {
+    public void testImportParamList() throws Exception {
     	
     	URL shapeFileUrl=null,csvFileUrl=null,dirFileUrl=null;
     	
@@ -409,27 +409,50 @@ public abstract class AbstractTest extends TestCase {
         assertTrue(importParamList.get(1).getSpatialTableName().equals("SPAT_1"));
         assertTrue(importParamList.get(2).getSpatialTableName().equals("SPAT_2"));
         
-        assertTrue(importParamList.get(0).getSourceURL().getPath().contains(OUTPUTDIR_RESOURCES));
-        assertTrue(importParamList.get(1).getSourceURL().getPath().contains(OUTPUTDIR_RESOURCES+1));
-        assertTrue(importParamList.get(2).getSourceURL().getPath().contains(OUTPUTDIR_RESOURCES+2));
+        assertTrue(isSameFile(importParamList.get(0).getSourceURL().getPath(), OUTPUTDIR_RESOURCES));
+        assertTrue(isSameFile(importParamList.get(1).getSourceURL().getPath(), OUTPUTDIR_RESOURCES+1));
+        assertTrue(isSameFile(importParamList.get(2).getSourceURL().getPath(), OUTPUTDIR_RESOURCES+2));
 
         importParamList=new ArrayList<ImportParam>();
         Import.fillImportParamList("SPAT", "TILE", csvFileUrl, ";", ImportTyp.CSV, importParamList);
         assertTrue(importParamList.size()==3);
         
-        assertTrue(importParamList.get(0).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"index.csv"));
-        assertTrue(importParamList.get(1).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"1/index.csv"));
-        assertTrue(importParamList.get(2).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"2/index.csv"));
+        assertTrue(isSameFile(importParamList.get(0).getSourceURL().getPath(), OUTPUTDIR_RESOURCES+"index.csv"));
+        assertTrue(isSameFile(importParamList.get(1).getSourceURL().getPath(), OUTPUTDIR_RESOURCES+"1/index.csv"));
+        assertTrue(isSameFile(importParamList.get(2).getSourceURL().getPath(), OUTPUTDIR_RESOURCES+"2/index.csv"));
 
         
         importParamList=new ArrayList<ImportParam>();
         Import.fillImportParamList("SPAT", "TILE", shapeFileUrl, "LOCATION", ImportTyp.SHAPE, importParamList);
         assertTrue(importParamList.size()==3);
 
-        assertTrue(importParamList.get(0).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"index.shp"));
-        assertTrue(importParamList.get(1).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"1/index.shp"));
-        assertTrue(importParamList.get(2).getSourceURL().getPath().equals(OUTPUTDIR_RESOURCES+"2/index.shp"));
+        assertTrue(isSameFile(importParamList.get(0).getSourceURL().getPath(), OUTPUTDIR_RESOURCES+"index.shp"));
+        assertTrue(isSameFile(importParamList.get(1).getSourceURL().getPath(), OUTPUTDIR_RESOURCES+"1/index.shp"));
+        assertTrue(isSameFile(importParamList.get(2).getSourceURL().getPath(), OUTPUTDIR_RESOURCES+"2/index.shp"));
         
+    }
+    
+    /**
+     * Test if files are the same by comparing their canonical name.
+     * 
+     * @param file1
+     * @param file2
+     * @return true if files have the same canonical name
+     * @throws Exception
+     */
+    public static boolean isSameFile(String file1, String file2) throws Exception {
+        return new File(file1).getCanonicalPath().equals(new File(file2).getCanonicalPath());
+    }
+    
+    /**
+     * Unit test for {{@link #isSameFile(String, String)}.
+     * 
+     * @throws Exception
+     */
+    public void testIsSameFile() throws Exception {
+        assertTrue(isSameFile("foo", "./foo"));
+        assertTrue(isSameFile("foo", "bar/../foo"));
+        assertFalse(isSameFile("foo", "bar"));
     }
     
     public void testCreateJoined() {
