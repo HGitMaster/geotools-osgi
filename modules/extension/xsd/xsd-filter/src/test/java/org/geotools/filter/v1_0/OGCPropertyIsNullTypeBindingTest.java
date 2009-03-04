@@ -17,6 +17,7 @@
 package org.geotools.filter.v1_0;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.opengis.filter.PropertyIsNull;
 import org.geotools.xml.Binding;
 
@@ -40,7 +41,13 @@ public class OGCPropertyIsNullTypeBindingTest extends FilterTestSupport {
 
     public void testEncode() throws Exception {
         Document doc = encode(FilterMockData.propertyIsNull(), OGC.PropertyIsNull);
-        assertEquals(1,
-            doc.getElementsByTagNameNS(OGC.NAMESPACE, OGC.PropertyName.getLocalPart()).getLength());
+        Element e = getElementByQName( doc, OGC.PropertyName);
+        assertEquals( "foo", e.getFirstChild().getNodeValue() );
+    }
+    
+    public void testEncodeAsFilter() throws Exception {
+        Document doc = encode(FilterMockData.propertyIsNull(), OGC.Filter);
+        Element e = getElementByQName( doc, OGC.PropertyName);
+        assertEquals( "foo", e.getFirstChild().getNodeValue() );
     }
 }

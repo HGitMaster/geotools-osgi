@@ -110,7 +110,7 @@ public class OGCPropertyIsLikeTypeBinding extends AbstractComplexBinding {
         }
 
         if (OGC.Literal.equals(name)) {
-            return isLike.getLiteral();
+            return isLike.getLiteral() != null ? factory.literal( isLike.getLiteral() ) : null; 
         }
 
         if ("wildCard".equals(name.getLocalPart())) {

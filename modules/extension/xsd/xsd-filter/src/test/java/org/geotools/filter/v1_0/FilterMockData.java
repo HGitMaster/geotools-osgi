@@ -192,7 +192,7 @@ public class FilterMockData {
     }
 
     static PropertyIsLike propertyIsLike() {
-        return f.like(literal(), "foo", "x", "y", "z");
+        return f.like(propertyName(), "foo", "x", "y", "z");
     }
 
     static Element propertyIsLike(Document document, Node parent) {

@@ -27,6 +27,9 @@ import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 
@@ -50,11 +53,21 @@ public class FilterParsingUtils {
         }
 
         //&lt;xsd:element ref="ogc:comparisonOps"/&gt;
-        if (OGC.comparisonOps.equals(name) && filter instanceof BinaryComparisonOperator
-                //JD: extra check here because many of our spatial implementations
+        if (OGC.comparisonOps.equals(name)) {
+            //JD: extra check here because many of our spatial implementations
             // extend both      
+            if ( filter instanceof BinaryComparisonOperator
                 && !(filter instanceof BinarySpatialOperator)) {
-            return filter;
+                return filter;    
+            }
+            else {
+                //filters that don't extend BinaryComparisonOperator but are still 
+                // comparisonOps
+                if ( filter instanceof PropertyIsLike || filter instanceof PropertyIsNull 
+                    || filter instanceof PropertyIsBetween ) {
+                    return filter;
+                }
+            }
         }
 
         //&lt;xsd:element ref="ogc:logicOps"/&gt;
