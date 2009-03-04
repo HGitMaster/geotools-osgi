@@ -170,16 +170,6 @@ public class JMapPane extends JPanel implements MapLayerListListener {
     }
 
     /**
-     * Check if the map context is initialized and has a
-     * CoordinateReferenceSystem and area of interest set
-     */
-    public boolean isValidContext() {
-        return (context != null && 
-                context.getCoordinateReferenceSystem() != null &&
-                context.getAreaOfInterest() != null);
-    }
-
-    /**
      * Set the current cursor tool
      * 
      * @param tool the tool to set; null means no active cursor tool
@@ -363,7 +353,11 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      * being used by this map pane.
      */
     public AffineTransform getScreenToWorldTransform() {
-       return new AffineTransform(screenToWorld); 
+        if (screenToWorld != null) {
+            return new AffineTransform(screenToWorld);
+        } else {
+            return null;
+        }
     }
     
     /**
@@ -375,7 +369,11 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      * }</pre>
      */
     public AffineTransform getWorldToScreenTransform() {
-       return new AffineTransform(worldToScreen); 
+        if (worldToScreen != null) {
+            return new AffineTransform(worldToScreen);
+        } else {
+            return null;
+        }
     }
     
     /**

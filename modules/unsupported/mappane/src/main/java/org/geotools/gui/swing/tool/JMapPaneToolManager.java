@@ -177,7 +177,7 @@ public class JMapPaneToolManager implements MouseInputListener, MouseWheelListen
 
     private JMapPaneMouseEvent convertEvent(MouseEvent e) {
         JMapPaneMouseEvent pme = null;
-        if (pane.isValidContext()) {
+        if (pane.getScreenToWorldTransform() != null) {
             pme = new JMapPaneMouseEvent(pane, e);
         }
         
@@ -186,7 +186,7 @@ public class JMapPaneToolManager implements MouseInputListener, MouseWheelListen
 
     private JMapPaneMouseEvent convertEvent(MouseWheelEvent e) {
         JMapPaneMouseEvent pme = null;
-        if (pane.isValidContext()) {
+        if (pane.getScreenToWorldTransform() != null) {
             pme = new JMapPaneMouseEvent(pane, e);
         }
         
