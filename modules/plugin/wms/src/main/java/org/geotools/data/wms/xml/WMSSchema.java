@@ -117,7 +117,7 @@ import org.xml.sax.SAXException;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wms/src/main/java/org/geotools/data/wms/xml/WMSSchema.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/wms/src/main/java/org/geotools/data/wms/xml/WMSSchema.java $
  */
 public class WMSSchema implements Schema {
 
@@ -490,7 +490,7 @@ public class WMSSchema implements Schema {
         }
 		public Element findChildElement(String localName, URI namespaceURI) {
             return (this.name!=null 
-            		&& this.name.equals(name)
+            		&& this.name.equals(localName)
             		&& getNamespace().equals(namespaceURI))?this:null;
 		}
     }
