@@ -45,6 +45,8 @@ import org.geotools.map.MapContext;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
+import org.geotools.renderer.label.LabelCacheImpl;
+import org.geotools.renderer.lite.LabelCache;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -110,6 +112,7 @@ public class JMapPane extends JPanel implements MapLayerListListener {
 
     private MapContext context;
     private GTRenderer renderer;
+    private LabelCache labelCache;
     private JMapPaneToolManager toolManager;
     
     private AffineTransform worldToScreen;
@@ -233,6 +236,12 @@ public class JMapPane extends JPanel implements MapLayerListListener {
             if (hints == null) {
                 hints = new HashMap();
             }
+            if (hints.containsKey(StreamingRenderer.LABEL_CACHE_KEY)) {
+                labelCache = (LabelCache) hints.get(StreamingRenderer.LABEL_CACHE_KEY);
+            } else {
+                labelCache = new LabelCacheImpl();
+                hints.put(StreamingRenderer.LABEL_CACHE_KEY, labelCache);
+            }
             renderer.setRendererHints(hints);
         }
 
@@ -290,15 +299,22 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      * Note: This method does <b>not</b> check that the requested area overlaps
      * the bounds of the current map layers.
      * 
-     * @param mapArea Area of the map to display (you can use a geoapi Envelope implementations such as ReferenedEnvelope or Envelope2D)
+     * @param mapArea Area of the map to display (you can use a geoapi Envelope implementations 
+     * such as ReferenedEnvelope or Envelope2D)
      */
     public void setMapArea(Envelope env) {
         if (context != null) {
             CoordinateReferenceSystem crs = context.getCoordinateReferenceSystem();
             if (crs != null) {
-                ReferencedEnvelope refEnv = new ReferencedEnvelope(env);
+                // overriding the env arg's crs (if any)
+                ReferencedEnvelope refEnv = new ReferencedEnvelope(
+                        env.getMinimum(0), env.getMaximum(0),
+                        env.getMinimum(1), env.getMaximum(1),
+                        crs);
+                
                 context.setAreaOfInterest(refEnv);
                 setTransforms(refEnv, curPaintArea);
+                labelCache.clear();
                 repaint();
             }
         }
@@ -397,8 +413,11 @@ public class JMapPane extends JPanel implements MapLayerListListener {
         
         if (needNewBaseImage) {
             baseImage = new BufferedImage(paintArea.width, paintArea.height, BufferedImage.TYPE_INT_ARGB);
+            curPaintArea = paintArea;
             needNewBaseImage = false;
             redrawBaseImage = true;
+            setTransforms(context.getAreaOfInterest(), curPaintArea);
+            labelCache.clear(); 
         }
         
 
@@ -407,19 +426,14 @@ public class JMapPane extends JPanel implements MapLayerListListener {
             return;
         }
 
-        if (!paintArea.equals(curPaintArea)) {
-            curPaintArea = paintArea;
-            setTransforms(context.getAreaOfInterest(), curPaintArea);
-        }
-
         if (redrawBaseImage) {
             if (baseImageMoved) {
                 afterImageMove(mapAOI, paintArea);
                 baseImageMoved = false;
+                labelCache.clear();
             }
             clearBaseImage();
             Graphics2D baseGr = baseImage.createGraphics();
-            renderer.setContext(context);
             renderer.paint(baseGr, paintArea, mapAOI, worldToScreen);
             imageOrigin.setLocation(margin, margin);
         } 

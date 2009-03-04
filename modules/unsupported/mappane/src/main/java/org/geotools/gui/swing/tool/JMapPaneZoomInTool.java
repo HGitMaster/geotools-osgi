@@ -120,7 +120,7 @@ public class JMapPaneZoomInTool extends JMapPaneZoomToolBase {
     /**
      * If the mouse was dragged, determines the bounds of the
      * box that the user defined and passes this to the pane's
-     * {@link org.geotools.gui.swing.JMapPane#setMapArea(org.geotools.geometry.Envelope2D)}
+     * {@link org.geotools.gui.swing.JMapPane#setMapArea(org.opengis.geometry.Envelope) }
      * method
      */
     @Override
