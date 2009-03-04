@@ -53,12 +53,13 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Sample application that may be used to try JMapPane from the command line.
  *
  * @author Ian Turton
+ * @author Michael Bedward
  */
-public class MapViewer implements ActionListener{
+public class MapViewer {
     JFrame frame;
     JMapPane mp;
     JLabel text;
-    final JFileChooser jfc = new JFileChooser();
+
     public MapViewer(){
         frame=new JFrame("My Map Viewer");
         frame.setBounds(20,20,450,200);
@@ -70,9 +71,13 @@ public class MapViewer implements ActionListener{
         
         JToolBar jtb = new JToolBar();
 
-        JButton load = new JButton("Load file");
-        load.addActionListener(this);
-        jtb.add(load);
+        JButton loadBtn = new JButton("Load file");
+        loadBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                loadFile();
+            }
+        });
+        jtb.add(loadBtn);
         
         jtb.addSeparator();
         
@@ -119,17 +124,13 @@ public class MapViewer implements ActionListener{
         jtb.add(crsBtn);
 
         content.add(jtb,BorderLayout.NORTH);
-
-
-        //JComponent sp = mp.createScrollPane();
-        mp.setSize(400,200);
         content.add(mp,BorderLayout.CENTER);
 
-        content.doLayout();
+        frame.setSize(500, 500);
         frame.setVisible(true);
 
     }
-
+    
     /**
      * Method used to set the current map projection.
      *
@@ -160,25 +161,18 @@ public class MapViewer implements ActionListener{
         //mp.setSelectionLayer(context.getLayer(0));
 
         GTRenderer renderer;
-        if( true ){ 
-        	renderer = new StreamingRenderer();
-        	HashMap hints = new HashMap();
-        	hints.put("memoryPreloadingEnabled", Boolean.TRUE);
-            renderer.setRendererHints( hints );
-        }
-        else {
-        	renderer = new StreamingRenderer();
-        	HashMap hints = new HashMap();
-        	hints.put("memoryPreloadingEnabled", Boolean.FALSE);
-            renderer.setRendererHints( hints );
-        }
+        renderer = new StreamingRenderer();
+        HashMap hints = new HashMap();
+        hints.put("memoryPreloadingEnabled", Boolean.TRUE);
+        renderer.setRendererHints(hints);
+
         mp.setRenderer(renderer);
         mp.setContext(context);
 
 
 //        mp.getRenderer().addLayer(new RenderedMapScale());
         frame.repaint();
-        frame.doLayout();
+        // frame.doLayout();
     }
     public static URL aquireURL( String target ){
     	if( new File( target ).exists() ){
@@ -193,35 +187,37 @@ public class MapViewer implements ActionListener{
         	return null;
         }
     }
-    public void actionPerformed(ActionEvent e) {
-		int returnVal = jfc.showOpenDialog(frame);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-            String pathname = jfc.getSelectedFile().getAbsolutePath();
-            URL shape = aquireURL( pathname );
-            if( shape == null ){
-            	JOptionPane.showMessageDialog( frame, "could not find file \""+pathname+"\"", "Could not find file", JOptionPane.ERROR_MESSAGE );
-        		System.err.println("Could not find shapefile: "+pathname);
-            	return;
+    
+    public void loadFile() {
+        URL url = getClass().getResource("/data");
+        JFileChooser chooser = new JFileChooser(url.getFile());
+
+        int returnVal = chooser.showOpenDialog(frame);
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String pathname = chooser.getSelectedFile().getAbsolutePath();
+            URL shape = aquireURL(pathname);
+            if (shape == null) {
+                JOptionPane.showMessageDialog(frame, "could not find file \"" + pathname + "\"", "Could not find file", JOptionPane.ERROR_MESSAGE);
+                System.err.println("Could not find shapefile: " + pathname);
+                return;
             }
             String filepart = pathname.substring(0, pathname.lastIndexOf("."));
-            URL sld = aquireURL( filepart+".sld" );
-            if( sld == null){
-            	JOptionPane.showMessageDialog( frame, "could not find SLD file \""+filepart+".sld\"", "Could not find SLD file", JOptionPane.ERROR_MESSAGE );
-            	System.err.println("Could not find sld file: "+filepart+".sld");
-            	return;
+            URL sld = aquireURL(filepart + ".sld");
+            if (sld == null) {
+                JOptionPane.showMessageDialog(frame, "could not find SLD file \"" + filepart + ".sld\"", "Could not find SLD file", JOptionPane.ERROR_MESSAGE);
+                System.err.println("Could not find sld file: " + filepart + ".sld");
+                return;
             }
             try {
-				this.load( shape, sld );
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
+                this.load(shape, sld);
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+    }
 
-	}
-    /**
-     * @param args
-     */
     public static void main(String[] args) throws Exception {
     	MapViewer mapV = new MapViewer();
         if( args.length==0 || !args[0].toLowerCase().endsWith(".shp")){
