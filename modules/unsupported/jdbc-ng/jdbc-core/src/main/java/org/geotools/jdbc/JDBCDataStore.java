@@ -3085,10 +3085,11 @@ public final class JDBCDataStore extends ContentDataStore
         
         int i =0;
         for (; i < attributes.length; i++) {
-            Class binding = attributes[i].getType().getBinding();
+            AttributeDescriptor att = attributes[i];
+			Class binding = att.getType().getBinding();
             if (Geometry.class.isAssignableFrom( binding ) ) {
                 Geometry g = (Geometry) values[i];
-                dialect.setGeometryValue(g, -1, binding, ps, i+1);
+                dialect.setGeometryValue(g, getDescriptorSRID(att), binding, ps, i+1);
             }
             else {
                 dialect.setValue( values[i], binding, ps, i+1, cx);    
