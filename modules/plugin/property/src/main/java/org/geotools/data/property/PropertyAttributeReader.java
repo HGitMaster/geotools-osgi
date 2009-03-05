@@ -67,7 +67,7 @@ import com.vividsolutions.jts.io.WKTReader;
  *  </code>
  *</pre>
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyAttributeReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyAttributeReader.java $
  */
 public class PropertyAttributeReader implements AttributeReader {
     /** DOCUMENT ME!  */
@@ -115,7 +115,7 @@ public class PropertyAttributeReader implements AttributeReader {
         String typeSpec = line.substring(2);
 
         try {
-            type = DataUtilities.createType(namespace + typeName, typeSpec);
+            type = DataUtilities.createType(namespace, typeName, typeSpec);
         } catch (SchemaException e) {
             throw new DataSourceException(typeName + " schema not available", e);
         }

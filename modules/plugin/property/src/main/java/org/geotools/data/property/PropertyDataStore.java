@@ -92,7 +92,7 @@ public class PropertyDataStore extends AbstractDataStore {
         //look for type name
         String typeSpec = property( typeName, "_");
         try {
-            return DataUtilities.createType( namespaceURI+"."+typeName,typeSpec );
+            return DataUtilities.createType( namespaceURI, typeName, typeSpec );
         } catch (SchemaException e) {
             e.printStackTrace();
             throw new DataSourceException( typeName+" schema not available", e);
