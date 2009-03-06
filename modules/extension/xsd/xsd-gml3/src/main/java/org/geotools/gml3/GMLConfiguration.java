@@ -58,6 +58,7 @@ import org.geotools.gml3.bindings.MultiPolygonPropertyTypeBinding;
 import org.geotools.gml3.bindings.MultiPolygonTypeBinding;
 import org.geotools.gml3.bindings.MultiSurfacePropertyTypeBinding;
 import org.geotools.gml3.bindings.MultiSurfaceTypeBinding;
+import org.geotools.gml3.bindings.NullTypeBinding;
 import org.geotools.gml3.bindings.PointArrayPropertyTypeBinding;
 import org.geotools.gml3.bindings.PointPropertyTypeBinding;
 import org.geotools.gml3.bindings.PointTypeBinding;
@@ -175,6 +176,8 @@ public class GMLConfiguration extends Configuration {
             MultiSurfaceTypeBinding.class);
         container.registerComponentImplementation(GML.MultiSurfacePropertyType,
             MultiSurfacePropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.NullType,
+                NullTypeBinding.class);
         container.registerComponentImplementation(GML.PointArrayPropertyType,
             PointArrayPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PointPropertyType,
