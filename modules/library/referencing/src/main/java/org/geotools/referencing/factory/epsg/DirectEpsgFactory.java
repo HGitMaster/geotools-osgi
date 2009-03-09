@@ -116,7 +116,7 @@ import org.geotools.util.logging.Logging;
  *
  * @since 2.4
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DirectEpsgFactory.java $
- * @version $Id: DirectEpsgFactory.java 32614 2009-03-09 16:50:46Z aaime $
+ * @version $Id: DirectEpsgFactory.java 32615 2009-03-09 16:59:33Z aaime $
  * @author Yann Cézard
  * @author Martin Desruisseaux (IRD)
  * @author Rueben Schulz
@@ -3076,6 +3076,16 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         } else {
             if(!isConnectionValid(connection)) {
                 statements.clear();
+                try {
+                    // we need to send back the connection to the eventual
+                    // pool setup by the datastore. The eventual pooling 
+                    // datasource is responsible to figure out that the 
+                    // connection is no more valid and get rid of it.
+                    connection.close();
+                } catch(Exception e) {
+                    LOGGER.log(Level.FINER, 
+                            "Error occurred while closing an invalid connection", e);
+                }
                 connection = dataSource.getConnection();
             }
         }
