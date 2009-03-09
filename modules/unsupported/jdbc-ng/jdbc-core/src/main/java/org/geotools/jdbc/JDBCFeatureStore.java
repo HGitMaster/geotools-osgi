@@ -269,6 +269,17 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
     @Override
     public void modifyFeatures(AttributeDescriptor[] types, Object[] values, Filter filter)
             throws IOException {
+        
+        // we cannot trust attribute definitions coming from outside, they might not
+        // have the same metadata the inner ones have. Let's remap them
+        AttributeDescriptor[] innerTypes = new AttributeDescriptor[types.length];
+        for (int i = 0; i < types.length; i++) {
+            innerTypes[i] = getSchema().getDescriptor(types[i].getLocalName());
+            if(innerTypes[i] == null)
+                throw new IllegalArgumentException("Unknon attribute " + types[i].getLocalName());
+        }
+        
+        // split the filter
         Filter[] splitted = delegate.splitFilter(filter);
         Filter preFilter = splitted[0];
         Filter postFilter = splitted[1];
@@ -276,7 +287,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         if(postFilter != null && !Filter.INCLUDE.equals(postFilter)) {
             // we don't have a fast way to perform this update, let's do it the
             // feature by feature way then
-            super.modifyFeatures(types, values, filter);
+            super.modifyFeatures(innerTypes, values, filter);
         } else {
             // let's grab the connection
             Connection cx = getDataStore().getConnection(getState());
@@ -289,7 +300,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
             catch (SQLException e) {
                 throw (IOException) new IOException().initCause( e );
             }
-            getDataStore().update(getSchema(), types, values, preFilter, cx);
+            getDataStore().update(getSchema(), innerTypes, values, preFilter, cx);
         }
     }
     
