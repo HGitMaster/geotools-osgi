@@ -34,8 +34,8 @@ import org.geotools.factory.Hints;
  * removes them programmatically here.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingHSQL.java $
- * @version $Id: FactoryUsingHSQL.java 30656 2008-06-12 20:32:50Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingHSQL.java $
+ * @version $Id: FactoryUsingHSQL.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Martin Desruisseaux
  */
 final class FactoryUsingHSQL extends FactoryUsingAnsiSQL {
@@ -93,7 +93,7 @@ final class FactoryUsingHSQL extends FactoryUsingAnsiSQL {
      */
     protected void shutdown(final boolean active) throws SQLException {
         if (active) {
-            final Statement statement = connection.createStatement();
+            final Statement statement = getConnection().createStatement();
             statement.execute("SHUTDOWN");
             statement.close();
         }

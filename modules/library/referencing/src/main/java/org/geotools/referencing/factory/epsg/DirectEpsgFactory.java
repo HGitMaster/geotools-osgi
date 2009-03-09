@@ -37,6 +37,7 @@ import java.util.logging.LogRecord;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.measure.unit.SI;
+import javax.sql.DataSource;
 
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.Extent;
@@ -114,8 +115,8 @@ import org.geotools.util.logging.Logging;
  * {@link #isPrimaryKey} method.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DirectEpsgFactory.java $
- * @version $Id: DirectEpsgFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DirectEpsgFactory.java $
+ * @version $Id: DirectEpsgFactory.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Yann Cézard
  * @author Martin Desruisseaux (IRD)
  * @author Rueben Schulz
@@ -419,9 +420,19 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
     AbstractAuthorityFactory buffered = this;
 
     /**
-     * The connection to the EPSG database.
+     * The cached (and replaceable) connection to the EPSG database.
      */
-    protected final Connection connection;
+    private Connection connection;
+    
+    /**
+     * The dataSource providing connections the EPSG database.
+     */
+    private DataSource dataSource;
+    
+    /**
+     * The "fast" sql query used to check if a connection is still valid
+     */
+    private String validationQuery;
 
     /**
      * Constructs an authority factory using the specified connection.
@@ -430,14 +441,24 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @param connection The connection to the underlying EPSG database.
      */
     public DirectEpsgFactory(final Hints userHints, final Connection connection) {
+        this(userHints, new SingleConnectionDataSource(connection));
+    }
+    
+    /**
+     * Constructs an authority factory using the specified connection.
+     *
+     * @param userHints The underlying factories used for objects creation.
+     * @param dataSource The data source connecting to the underlying EPSG database
+     */
+    public DirectEpsgFactory(final Hints userHints, final DataSource dataSource) {
         super(userHints, MAXIMUM_PRIORITY-20);
         // The following hints have no effect on this class behaviour,
         // but tell to the user what this factory do about axis order.
         hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
-        this.connection = connection;
-        ensureNonNull("connection", connection);
+        this.dataSource = dataSource;
+        ensureNonNull("dataSource", dataSource);
     }
 
     /**
@@ -449,8 +470,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         if (authority == null) try {
             final String query = adaptSQL("SELECT VERSION_NUMBER, VERSION_DATE FROM [Version History]" +
                                           " ORDER BY VERSION_DATE DESC");
-            final DatabaseMetaData metadata  = connection.getMetaData();
-            final Statement        statement = connection.createStatement();
+            final DatabaseMetaData metadata  = getConnection().getMetaData();
+            final Statement        statement = getConnection().createStatement();
             final ResultSet        result    = statement.executeQuery(query);
             if (result.next()) {
                 final String version = result.getString(1);
@@ -495,7 +516,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         }
         try {
             String s;
-            final DatabaseMetaData metadata = connection.getMetaData();
+            final DatabaseMetaData metadata = getConnection().getMetaData();
             if ((s=metadata.getDatabaseProductName()) != null) {
                 table.write(resources.getLabel(VocabularyKeys.DATABASE_ENGINE));
                 table.nextColumn();
@@ -599,7 +620,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                  * type computed by AuthorityCodes itself.
                  */
                 final AuthorityCodes codes;
-                codes = new AuthorityCodes(connection, TABLES_INFO[i], type, this);
+                codes = new AuthorityCodes(TABLES_INFO[i], type, this);
                 reference = authorityCodes.get(codes.type);
                 candidate = (reference!=null) ? reference.get() : null;
                 final boolean cache;
@@ -682,9 +703,13 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
     {
         assert Thread.holdsLock(this);
         PreparedStatement stmt = statements.get(key);
+        if(stmt != null && !isConnectionValid(stmt.getConnection()))
+            stmt = null;
         if (stmt == null) {
-            stmt = connection.prepareStatement(adaptSQL(sql));
+            stmt = getConnection().prepareStatement(adaptSQL(sql));
             statements.put(key, stmt);
+        } else {
+            
         }
         return stmt;
     }
@@ -2830,7 +2855,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             sql = adaptSQL(sql);
             final Set<String> result = new LinkedHashSet<String>();
             try {
-                final Statement s = connection.createStatement();
+                final Statement s = getConnection().createStatement();
                 final ResultSet r = s.executeQuery(sql);
                 while (r.next()) {
                     result.add(r.getString(1));
@@ -2961,6 +2986,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         final boolean shutdown = SHUTDOWN_THREAD.equals(Thread.currentThread().getName());
         final boolean isClosed;
         try {
+            Connection connection = getConnection();
             isClosed = connection.isClosed();
             for (final Iterator<Reference<AuthorityCodes>> it=
                     authorityCodes.values().iterator(); it.hasNext();)
@@ -2979,6 +3005,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 shutdown(true);
             }
             connection.close();
+            dataSource = null;
         } catch (SQLException exception) {
             throw new FactoryException(exception);
         }
@@ -3036,4 +3063,71 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         dispose();
         super.finalize();
     }
+
+    /**
+     * Access to the connection used by this EpsgFactory. The connection will
+     * be created as needed.
+     *
+     * @return the connection
+     */
+    protected synchronized Connection getConnection() throws SQLException {
+        if (connection == null) {
+            connection = dataSource.getConnection();
+        } else {
+            if(!isConnectionValid(connection)) {
+                statements.clear();
+                connection= dataSource.getConnection();
+            }
+        }
+        return connection;
+    }
+
+    /**
+     * Tests if the connection is valid by running the user provided
+     * validation query, if any. Subclasses may override with a more
+     * efficient connection checking method if needed.
+     * If the validation query is not set, the method returns true by
+     * default.
+     * @param conn The connection to be validated
+     * @return True if the connection is alive, false if it should be replaced
+     */
+    protected boolean isConnectionValid(Connection conn) {
+        if(validationQuery == null)
+            return true;
+        
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            st.execute(validationQuery);
+        } catch(SQLException e) {
+            return false;
+        } finally {
+            if(st != null)
+                try {
+                    st.close();
+                } catch (SQLException e) {
+                    // we tried our best ...
+                }
+        }
+        return true;
+    }
+
+    /**
+     * Returns the current validation query
+     * @return
+     */
+    public String getValidationQuery() {
+        return validationQuery;
+    }
+
+    /**
+     * Sets the query it's run before using connection and prepared statements
+     * in order to check the connection is still valid. The query should hit the
+     * database, but be as fast as possible.
+     * @param validationQuery
+     */
+    public void setValidationQuery(String validationQuery) {
+        this.validationQuery = validationQuery;
+    }
+    
 }

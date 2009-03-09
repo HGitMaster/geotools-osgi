@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.util.Properties;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+
 import javax.sql.DataSource;
 
 // Geotools dependencies
@@ -105,8 +107,8 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  * database.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-postgresql/src/main/java/org/geotools/referencing/factory/epsg/ThreadedPostgreSQLEpsgFactory.java $
- * @version $Id: ThreadedPostgreSQLEpsgFactory.java 30656 2008-06-12 20:32:50Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/epsg-postgresql/src/main/java/org/geotools/referencing/factory/epsg/ThreadedPostgreSQLEpsgFactory.java $
+ * @version $Id: ThreadedPostgreSQLEpsgFactory.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Didier Richard
  * @author Martin Desruisseaux
  *
@@ -206,8 +208,8 @@ public class ThreadedPostgreSQLEpsgFactory extends ThreadedEpsgFactory {
      * @throws SQLException if connection to the database failed.
      */
     protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
-        final Connection connection = getDataSource().getConnection();
-        final FactoryUsingAnsiSQL factory = new FactoryUsingAnsiSQL(hints, connection);
+        final FactoryUsingAnsiSQL factory = new FactoryUsingAnsiSQL(hints, getDataSource());
+        factory.setValidationQuery("select now()");
         if (schema != null) {
             factory.setSchema(schema);
         }
