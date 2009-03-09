@@ -116,7 +116,7 @@ import org.geotools.util.logging.Logging;
  *
  * @since 2.4
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DirectEpsgFactory.java $
- * @version $Id: DirectEpsgFactory.java 32612 2009-03-09 16:32:57Z aaime $
+ * @version $Id: DirectEpsgFactory.java 32614 2009-03-09 16:50:46Z aaime $
  * @author Yann Cézard
  * @author Martin Desruisseaux (IRD)
  * @author Rueben Schulz
@@ -1134,7 +1134,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                           +       " TARGET_UOM_CODE"
                                           + " FROM [Unit of Measure]"
                                           + " WHERE UOM_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final int source = getInt(result,   1, code);
@@ -1193,7 +1193,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                                +       " REMARKS"
                                                + " FROM [Ellipsoid]"
                                                + " WHERE ELLIPSOID_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 /*
@@ -1275,7 +1275,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                                    +       " REMARKS"
                                                    + " FROM [Prime Meridian]"
                                                    + " WHERE PRIME_MERIDIAN_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg      = getString(result, 1, code);
@@ -1323,7 +1323,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                           +       " AREA_EAST_BOUND_LON"
                                           + " FROM [Area]"
                                           + " WHERE AREA_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 ExtentImpl extent = null;
@@ -1406,7 +1406,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                  +    " ORDER BY CRS2.DATUM_CODE,"
                                  +             " ABS(CO.DEPRECATED), CO.COORD_OP_ACCURACY,"
                                  +             " CO.COORD_OP_CODE DESC"); // GEOT-846 fix
-        stmt.setString(1, code);
+        stmt.setInt(1, Integer.parseInt(code));
         ResultSet result = stmt.executeQuery();
         List<Object> bwInfos = null;
         while (result.next()) {
@@ -1465,8 +1465,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 safetyGuard.remove(code);
             }
             final BursaWolfParameters parameters = new BursaWolfParameters(datum);
-            stmt.setString(1, info.operation);
-            stmt.setInt   (2, info.method);
+            stmt.setInt(1, Integer.parseInt(info.operation));
+            stmt.setInt(2, info.method);
             result = stmt.executeQuery();
             while (result.next()) {
                 setBursaWolfParameter(parameters,
@@ -1520,7 +1520,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                            +       " PRIME_MERIDIAN_CODE" // Only for geodetic type
                                            + " FROM [Datum]"
                                            + " WHERE DATUM_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg    = getString(result, 1, code);
@@ -1606,7 +1606,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             stmt = prepareStatement("AxisName", "SELECT COORD_AXIS_NAME, DESCRIPTION, REMARKS"
                                     +       " FROM [Coordinate Axis Name]"
                                     +       " WHERE COORD_AXIS_NAME_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setInt(1, Integer.parseInt(code));
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String name  = getString(result, 1, code);
@@ -1654,7 +1654,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                     +             " UOM_CODE"
                                     +       " FROM [Coordinate Axis]"
                                     +      " WHERE COORD_AXIS_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg         = getString(result, 1, code);
@@ -1717,7 +1717,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                 +         " ORDER BY [ORDER]");
                                 // WARNING: Be careful about the column name :
                                 //          MySQL rejects ORDER as a column name !!!
-        stmt.setString(1, code);
+        stmt.setInt(1, Integer.parseInt(code));
         final ResultSet result = stmt.executeQuery();
         int i = 0;
         while (result.next()) {
@@ -1763,7 +1763,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                                       +       " REMARKS"
                                                       + " FROM [Coordinate System]"
                                                       + " WHERE COORD_SYS_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String    epsg = getString(result, 1, code);
@@ -1875,7 +1875,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                           +       " CMPD_VERTCRS_CODE"     // For CompoundCRS only
                                           + " FROM [Coordinate Reference System]"
                                           + " WHERE COORD_REF_SYS_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg    = getString(result, 1, code);
@@ -2051,7 +2051,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                       +       " DESCRIPTION"
                                       + " FROM [Coordinate_Operation Parameter]"
                                       + " WHERE PARAMETER_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg    = getString(result, 1, code);
@@ -2072,7 +2072,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                                  +   " WHERE (PARAMETER_CODE = ?)"
                                                  + " GROUP BY UOM_CODE"
                                                  + " ORDER BY COUNT(UOM_CODE) DESC");
-                units.setString(1, epsg);
+                units.setInt(1, Integer.parseInt(epsg));
                 final ResultSet resultUnits = units.executeQuery();
                 if (resultUnits.next()) {
                     String element = resultUnits.getString(1);
@@ -2118,7 +2118,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                    +    " FROM [Coordinate_Operation Parameter Usage]"
                                    +    " WHERE COORD_OP_METHOD_CODE = ?"
                                    + " ORDER BY SORT_ORDER");
-        stmt.setString(1, method);
+        stmt.setInt(1, Integer.parseInt(method));
         final ResultSet results = stmt.executeQuery();
         final List<ParameterDescriptor> descriptors = new ArrayList<ParameterDescriptor>();
         while (results.next()) {
@@ -2157,8 +2157,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                 +       " WHERE CV.COORD_OP_METHOD_CODE = ?"
                                 +         " AND CV.COORD_OP_CODE = ?"
                                 +    " ORDER BY CU.SORT_ORDER");
-        stmt.setString(1, method);
-        stmt.setString(2, operation);
+        stmt.setInt(1, Integer.parseInt(method));
+        stmt.setInt(2, Integer.parseInt(operation));
         final ResultSet result = stmt.executeQuery();
         while (result.next()) {
             final String name  = getString(result, 1, operation);
@@ -2244,7 +2244,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                                      +       " REMARKS"
                                                      +  " FROM [Coordinate_Operation Method]"
                                                      + " WHERE COORD_OP_METHOD_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             final ResultSet result = stmt.executeQuery();
             OperationMethod method = null;
             while (result.next()) {
@@ -2288,7 +2288,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                                 + " WHERE COORD_OP_METHOD_CODE = ?"
                                                 +   " AND SOURCE_CRS_CODE IS NOT NULL"
                                                 +   " AND TARGET_CRS_CODE IS NOT NULL");
-        stmt.setString(1, code);
+        stmt.setInt(1, Integer.parseInt(code));
         final ResultSet result = stmt.executeQuery();
         final Map<Dimensions,Dimensions> dimensions = new HashMap<Dimensions,Dimensions>();
         final Dimensions  temp = new Dimensions((2 << 16) | 2); // Default to (2,2) dimensions.
@@ -2412,7 +2412,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                                          +       " REMARKS"
                                                          + " FROM [Coordinate_Operation]"
                                                          + " WHERE COORD_OP_CODE = ?");
-            stmt.setString(1, primaryKey);
+            stmt.setInt(1, Integer.parseInt(primaryKey));
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg = getString(result, 1, code);
@@ -2759,7 +2759,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             boolean changed = false;
             for (int i=0; i<codes.length; i++) {
                 final String code = codes[i].toString();
-                stmt.setString(1, code);
+                stmt.setInt(1, Integer.parseInt(code));
                 final ResultSet result = stmt.executeQuery();
                 while (result.next()) {
                     final String replacement = getString(result, 1, code);
@@ -3076,7 +3076,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         } else {
             if(!isConnectionValid(connection)) {
                 statements.clear();
-                connection= dataSource.getConnection();
+                connection = dataSource.getConnection();
             }
         }
         return connection;
