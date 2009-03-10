@@ -66,7 +66,7 @@ public class WKTParserTest extends TestCase {
     }
     
     public void testLine1() throws Exception {
-        String WKT = "LINESTRING (60 380, 60 20, 200 400, 280 20, 360 400, 420 20, 500 400, 580 20, 620 400)";;
+        String WKT = "LINESTRING (60 380, 60 20, 200 400, 280 20, 360 400, 420 20, 500 400, 580 20, 620 400)";
         
         Object geometry = parser.parse( WKT );
         assertNotNull( geometry );
