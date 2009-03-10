@@ -234,7 +234,13 @@ public class SimpleFeatureImpl implements SimpleFeature {
     }
 
     public GeometryAttribute getDefaultGeometryProperty() {
-        return new GeometryAttributeImpl(getDefaultGeometry(), getFeatureType().getGeometryDescriptor(), null);
+        Object defaultGeometry = getDefaultGeometry();
+        if (defaultGeometry == null) {
+            return null;
+        } else {
+            return new GeometryAttributeImpl(getDefaultGeometry(), getFeatureType()
+                    .getGeometryDescriptor(), null);
+        }
     }
 
     public void setDefaultGeometryProperty(GeometryAttribute geometryAttribute) {
