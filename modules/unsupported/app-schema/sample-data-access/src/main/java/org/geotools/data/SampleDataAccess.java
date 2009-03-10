@@ -25,13 +25,17 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 
+import com.sun.org.apache.xml.internal.utils.UnImplNode;
+
 /**
  * Sample implementation of {@link DataAccess} for testing. Create with
  * {@link SampleDataAccessFactory}.
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: SampleDataAccess.java 32071 2008-12-24 03:03:33Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/sample-data-access/src/main/java/org/geotools/data/SampleDataAccess.java $
+ * @version $Id: SampleDataAccess.java 32619 2009-03-10 05:53:43Z bencaradocdavies $
+ * @source $URL:
+ *         http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/sample-data-access
+ *         /src/main/java/org/geotools/data/SampleDataAccess.java $
  * @since 2.6
  */
 @SuppressWarnings("serial")
@@ -62,6 +66,13 @@ public class SampleDataAccess implements DataAccess<FeatureType, Feature> {
     public FeatureSource<FeatureType, Feature> getFeatureSource(Name typeName) throws IOException {
         if (typeName.equals(SampleDataAccessData.MAPPEDFEATURE_TYPE_NAME)) {
             return new SampleDataAccessFeatureSource();
+        } else if (typeName.equals(SampleDataAccessData.GEOLOGICUNIT_TYPE_NAME)) {
+            throw new IllegalArgumentException("Although this DataAccess claims to provide "
+                    + SampleDataAccessData.GEOLOGICUNIT_TYPE_NAME
+                    + ", it does so only so that schema references"
+                    + " are resolved when this type is nested inside "
+                    + SampleDataAccessData.MAPPEDFEATURE_TYPE_NAME
+                    + ". Direct access to the former feature type is not supported.");
         } else {
             throw new RuntimeException("Unrecognised feature type " + typeName.toString());
         }
@@ -86,6 +97,7 @@ public class SampleDataAccess implements DataAccess<FeatureType, Feature> {
         return new ArrayList<Name>() {
             {
                 add(SampleDataAccessData.MAPPEDFEATURE_TYPE_NAME);
+                add(SampleDataAccessData.GEOLOGICUNIT_TYPE_NAME);
             }
         };
     }
@@ -99,6 +111,8 @@ public class SampleDataAccess implements DataAccess<FeatureType, Feature> {
     public FeatureType getSchema(Name name) throws IOException {
         if (name.equals(SampleDataAccessData.MAPPEDFEATURE_TYPE_NAME)) {
             return SampleDataAccessData.MAPPEDFEATURE_TYPE;
+        } else if (name.equals(SampleDataAccessData.GEOLOGICUNIT_TYPE_NAME)) {
+            return SampleDataAccessData.GEOLOGICUNIT_TYPE;
         } else {
             throw new RuntimeException("Unrecognised feature type " + name.toString());
         }
