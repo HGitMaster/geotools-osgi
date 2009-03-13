@@ -153,7 +153,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>geotools</artifactId>
   <packaging>pom</packaging>
-  <version>2.6-SNAPSHOT</version>
+  <version>2.6.0.osgi1</version>
   <name>Geotools</name>
   <url>http://maven.geotools.fr/reports/</url>
 
@@ -534,9 +534,9 @@
 
       <!-- GeoAPI and its dependencies -->
       <dependency>
-        <groupId>org.opengis.osgi</groupId>
+        <groupId>org.opengis</groupId>
         <artifactId>geoapi</artifactId>
-       	<version>2.2-SNAPSHOT</version>
+       	<version>2.2.0.osgi1</version>
       </dependency>
 
       <dependency>

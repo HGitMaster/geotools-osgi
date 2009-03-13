@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>modules</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.0.osgi1</version>
   </parent>
 
 
@@ -135,7 +135,15 @@
          <property><name>all</name></property>
        </activation>
        <modules>
+         <module>directory</module>
+         <module>geometry</module>
+         <module>gml</module>    
+         <module>jts-wrapper</module>
+         <module>mappane</module>
+         <module>oracle-spatial</module>
          <module>process</module>
+         <module>repository</module>
+         <module>widgets-swing-pending</module>
          <module>wps</module>
        </modules>
      </profile>
@@ -146,17 +154,12 @@
          <property><name>all</name></property>
        </activation>
        <modules>
-         <module>directory</module>
          <module>epsg-oracle</module>
-         <module>gml</module>    
          <module>gpx</module>
          <module>jdbc-ng</module>
-         <module>mappane</module>
          <module>mif</module>
          <module>mysql</module>
-         <module>oracle-spatial</module>
          <module>postgis-versioned</module>
-         <module>repository</module>
          <module>temporal</module>
          <module>tiger</module>
          <module>vpf</module>
