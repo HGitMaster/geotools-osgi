@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.geometry.jts.WKTReader2;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
@@ -35,7 +36,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  * WKT format. 
  *
  * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/attributeio/WKTAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/attributeio/WKTAttributeIO.java $
  */
 public class WKTAttributeIO implements AttributeIO {
     WKTReader reader;
@@ -47,7 +48,7 @@ public class WKTAttributeIO implements AttributeIO {
      */
     private WKTReader getWKTReader() {
         if (reader == null) {
-            reader = new WKTReader();
+            reader = new WKTReader2();
         }
 
         return reader;
