@@ -17,11 +17,9 @@
 package org.geotools.feature.type;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.resources.Utilities;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -41,8 +39,8 @@ import org.opengis.util.InternationalString;
  */
 public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	
-	protected GeometryDescriptor defaultGeometry;
-	protected CoordinateReferenceSystem crs;
+	private GeometryDescriptor defaultGeometry;
+	private CoordinateReferenceSystem crs;
 
 	public FeatureTypeImpl(
 		Name name, Collection<PropertyDescriptor> schema, GeometryDescriptor defaultGeometry, 
@@ -65,7 +63,7 @@ public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
                 crs = defaultGeometry.getType().getCoordinateReferenceSystem();
             }
     	    if(crs == null) {
-        	    for (PropertyDescriptor property : propertyMap.values()) {
+        	    for (PropertyDescriptor property : getDescriptors()) {
                     if ( property instanceof GeometryDescriptor ) {
                         GeometryDescriptor geometry = (GeometryDescriptor) property;
                         if ( geometry.getType().getCoordinateReferenceSystem() != null ) {
@@ -82,7 +80,7 @@ public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	
 	public GeometryDescriptor getGeometryDescriptor() {
 	    if (defaultGeometry == null) {
-            for (PropertyDescriptor property : propertyMap.values()) {
+            for (PropertyDescriptor property : getDescriptors()) {
                 if (property instanceof GeometryDescriptor ) {
                     defaultGeometry = (GeometryDescriptor) property; 
                     break;
@@ -93,22 +91,20 @@ public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	}
 	
 	public boolean equals(Object o) {
-	    if(this == o)
+	    if(this == o) {
 	        return true;
-	    
-		if(!(o instanceof FeatureType)){
-    		return false;
-    	}
-    	if(!super.equals(o)){
-    		return false;
-    	}
-    	
-    	FeatureType other = (FeatureType) o;
-    	if (!Utilities.equals( defaultGeometry, other.getGeometryDescriptor())) {
-    		return false;
-    	}
-    	
-    	return true;
+	    }
+	    if(!super.equals(o)){
+	        return false;
+	    }
+	    if (getClass() != o.getClass()) {
+	        return false;
+	    }
+	    FeatureType other = (FeatureType) o;
+	    if (!Utilities.equals( defaultGeometry, other.getGeometryDescriptor())) {
+	        return false;
+	    }
+	    return true;
 	}
 	
 	public int hashCode() {
