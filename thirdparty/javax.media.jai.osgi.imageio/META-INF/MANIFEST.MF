@@ -4,7 +4,7 @@ Bundle-Name: Java Advanced Imaging ImageIO
 Bundle-SymbolicName: javax.media.jai.osgi.jai_imageio
 Bundle-Description: OSGI bundle for Java Advanced Imaging ImageIO
 Bundle-Version: 1.1
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.5
 Import-Package: com.sun.media.jai.util,
  com.sun.medialib.codec.g3fax;resolution:=optional,
  com.sun.medialib.codec.g4fax;resolution:=optional,
