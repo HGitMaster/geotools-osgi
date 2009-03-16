@@ -27,7 +27,7 @@ import java.util.Map;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AttributeMapping.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @version $Id: AttributeMapping.java 32633 2009-03-16 01:44:12Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AttributeMapping.java $
  * @since 2.4
  */
@@ -38,7 +38,11 @@ public class AttributeMapping implements Serializable {
      * XPath expression addressing the target attribute in a target FeatureType.
      */
     private String targetAttributePath;
-
+    /**
+     * XPath expression addressing the input attribute in the input FeatureType if the source
+     * is a data access containing complex features.
+     */
+    private String inputAttributePath;
     /**
      * Expression whose evaluation result against a Feature of the source FeatureType is going to be
      * the value of the target attribute in output FeatureType.
@@ -120,6 +124,23 @@ public class AttributeMapping implements Serializable {
      */
     public void setSourceExpression(String sourceExpression) {
         this.sourceExpression = sourceExpression;
+    }
+    
+    /**
+     * Return the input XPath expression
+     * @return the input XPath expression
+     */
+    public String getInputAttributePath() {
+        return inputAttributePath;
+    }
+    
+    /**
+     * Set the input XPath expression where we are getting the features from a data access
+     * instead of a data store. 
+     * @param inputAttributePath
+     */
+    public void setInputAttributePath(String inputAttributePath) {
+        this.inputAttributePath = inputAttributePath;
     }
 
     /**
@@ -249,13 +270,14 @@ public class AttributeMapping implements Serializable {
         return "AttributeMappingDTO[id > "
                 + identifierExpression
                 + ", "
-                + sourceExpression
+                + ((sourceExpression == null) ? ((inputAttributePath == null ? ""
+                        : inputAttributePath)) : sourceExpression)
                 + " -> "
                 + targetAttributePath
                 + ", isMultiple: "
                 + isMultiple
                 + ((targetAttributeSchemaElement == null) ? ""
-                        : (", target node: " + targetAttributeSchemaElement)) 
+                        : (", target node: " + targetAttributeSchemaElement))
                 + ((linkElement == null) ? "" : (", linkElement: " + linkElement))
                 + ((linkField == null) ? "" : (", linkField: " + linkField)) + "]";
     }

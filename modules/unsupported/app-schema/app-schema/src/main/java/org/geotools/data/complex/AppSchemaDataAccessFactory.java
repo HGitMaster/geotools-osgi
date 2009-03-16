@@ -41,7 +41,7 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AppSchemaDataAccessFactory.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @version $Id: AppSchemaDataAccessFactory.java 32633 2009-03-16 01:44:12Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccessFactory.java $
  * @since 2.4
  */
@@ -52,16 +52,10 @@ public class AppSchemaDataAccessFactory implements DataAccessFactory {
     public static final DataAccessFactory.Param DBTYPE = new DataAccessFactory.Param("dbtype",
             String.class, "Fixed value '" + DBTYPE_STRING + "'", true, DBTYPE_STRING);
 
-    /**
-     * Registry for app schema data accesses so they can access each other's mappings
-     */
-    private AppSchemaDataAccessRegistry registry;
-
     public static final DataAccessFactory.Param URL = new DataAccessFactory.Param("url", URL.class,
             "URL to an application schema datastore XML configuration file", true);
 
     public AppSchemaDataAccessFactory() {
-        this.registry = AppSchemaDataAccessRegistry.newInstance();
     }
 
     public DataAccess<FeatureType, Feature> createDataStore(Map params) throws IOException {

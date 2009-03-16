@@ -29,6 +29,8 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Types;
 import org.geotools.feature.type.NonFeatureTypeProxy;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 
 /**
@@ -180,16 +182,15 @@ public class AppSchemaDataAccessRegistryTest extends TestCase {
         }
 
         // should return a simple feature source
-        FeatureSource source = AppSchemaDataAccessRegistry.getSimpleFeatureSource(typeName);
+        FeatureSource <FeatureType, Feature> source = AppSchemaDataAccessRegistry.getSimpleFeatureSource(typeName);
         assertNotNull(source);
         assertEquals(mapping.getSource(), source);
 
         // should return a mapping feature source
-        source = AppSchemaDataAccessRegistry.getMappingFeatureSource(typeName);
-        assertNotNull(source);
-        assertEquals(source instanceof MappingFeatureSource, true);
+        FeatureSource <FeatureType, Feature> mappedSource = DataAccessRegistry.getFeatureSource(typeName);
+        assertNotNull(mappedSource);
         // compare with the supplied data access
-        assertEquals(source.getDataStore().equals(dataAccess), true);
+        assertEquals(mappedSource.getDataStore().equals(dataAccess), true);
     }
 
     /**
@@ -202,7 +203,7 @@ public class AppSchemaDataAccessRegistryTest extends TestCase {
      * @throws IOException
      */
     private void unregister(DataAccess dataAccess, Name typeName) throws IOException {
-        AppSchemaDataAccessRegistry.unregister(dataAccess);
+        DataAccessRegistry.unregister(dataAccess);
         boolean notFound = false;
         try {
             FeatureTypeMapping mapping = AppSchemaDataAccessRegistry.getMapping(typeName);

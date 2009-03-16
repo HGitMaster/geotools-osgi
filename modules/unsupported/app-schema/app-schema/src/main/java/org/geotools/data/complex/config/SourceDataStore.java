@@ -27,28 +27,51 @@ import org.geotools.util.CheckedHashMap;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: SourceDataStore.java 31374 2008-09-03 07:26:50Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/SourceDataStore.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: SourceDataStore.java 32633 2009-03-16 01:44:12Z ang05a $
+ * @source $URL:
+ *         http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main
+ *         /java/org/geotools/data/complex/config/SourceDataStore.java $
  * @since 2.4
  */
-public class SourceDataStore implements Serializable{
-	private static final long serialVersionUID = 8540617713675342340L;
-	private String id;
-	private Map params = Collections.EMPTY_MAP;
-	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public Map getParams() {
-		return new HashMap( params);
-	}
-	public void setParams(Map params) {
-		this.params = new CheckedHashMap(Serializable.class, Serializable.class);
-		if(params != null){
-			this.params.putAll(params);
-		}
-	}
+public class SourceDataStore implements Serializable {
+    private static final long serialVersionUID = 8540617713675342340L;
+
+    private String id;
+
+    private Map params = Collections.EMPTY_MAP;
+
+    /**
+     * True if we have the data store connection params but we want to connect to a data access
+     * that's connected to the data store. This requires the data access to be registered in
+     * DataAccessRegistry upon creation.
+     */
+    private boolean isDataAccess;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Map getParams() {
+        return new HashMap(params);
+    }
+
+    public void setParams(Map params) {
+        this.params = new CheckedHashMap(Serializable.class, Serializable.class);
+        if (params != null) {
+            this.params.putAll(params);
+        }
+    }
+
+    public void setDataAccess(String isDataAccess) {
+        this.isDataAccess = Boolean.valueOf(isDataAccess).booleanValue();
+    }
+
+    public boolean isDataAccess() {
+        return isDataAccess;
+    }
 }

@@ -23,14 +23,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import junit.framework.TestCase;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.complex.config.EmfAppSchemaReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.Types;
+import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.RegfuncFilterFactoryImpl;
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;
@@ -75,20 +76,22 @@ public class FeatureChainingTest extends TestCase {
      * Map of geological unit values to mapped feature objects based on
      * mappedFeaturePropertyFile.properties
      */
-    final Map<String, String> mfToGuMap = new HashMap<String, String>() {
+    final static Map<String, String> mfToGuMap = new HashMap<String, String>() {
         {
             put("mf1", "gu.25699");
             put("mf2", "gu.25678");
+            put("mf3", "gu.25678");
+            put("mf4", "gu.25682");
         }
     };
 
     /**
      * Map of compositional part values to geological unit objects based on geologicUnit.properties
      */
-    final Map<String, String> guToCpMap = new HashMap<String, String>() {
+    final static Map<String, String> guToCpMap = new HashMap<String, String>() {
         {
             put("gu.25699", "cp.167775491936278844");
-            put("gu.25678", "cp.167775491936278856;cp.167775491936278844");
+            put("gu.25678", "cp.167775491936278844;cp.167775491936278856");
             put("gu.25682", "cp.167775491936278812");
         }
     };
@@ -96,7 +99,7 @@ public class FeatureChainingTest extends TestCase {
     /**
      * Map of exposure colour values to geological unit objects based on geologicUnit.properties
      */
-    final Map<String, String> guToExposureColorMap = new HashMap<String, String>() {
+    final static Map<String, String> guToExposureColorMap = new HashMap<String, String>() {
         {
             put("gu.25699", "Blue");
             put("gu.25678", "Yellow;Blue");
@@ -104,10 +107,12 @@ public class FeatureChainingTest extends TestCase {
         }
     };
 
+    public static final String CONTAINS_TEXT = "contains_text";
+
     /**
      * Map of out crop character values to geological unit objects based on geologicUnit.properties
      */
-    private Map<String, String> guToOutcropCharacterMap = new HashMap<String, String>() {
+    static Map<String, String> guToOutcropCharacterMap = new HashMap<String, String>() {
         {
             put("gu.25699", "x");
             put("gu.25678", "x;y");
@@ -117,8 +122,6 @@ public class FeatureChainingTest extends TestCase {
     };
 
     final String schemaBase = "/test-data/";
-
-    EmfAppSchemaReader reader;
 
     private FeatureSource mfSource;
 
@@ -156,25 +159,6 @@ public class FeatureChainingTest extends TestCase {
      * CGI Term Value data access
      */
     private DataAccess cgiDataAccess;
-
-    /**
-     * Set up the reader
-     * 
-     * @throws Exception
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-        reader = EmfAppSchemaReader.newInstance();
-    }
-
-    /**
-     * Release resources
-     * 
-     * @throws Exception
-     */
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
 
     /**
      * Test that chaining works
@@ -397,27 +381,37 @@ public class FeatureChainingTest extends TestCase {
         // </ogc:PropertyIsEqualTo>
         // </ogc:Filter>
 
+        // <ogc:PropertyName>
+        // gsml:specification/gsml:GeologicUnit/gml:description
         Expression property = ff.property("gsml:specification/gsml:GeologicUnit/gml:description");
+        // </ogc:PropertyName>
+        // <ogc:Literal>Olivine basalt, tuff, microgabbro, minor sedimentary rocks</ogc:Literal>
         Expression string = ff
                 .literal("Olivine basalt, tuff, microgabbro, minor sedimentary rocks");
+        // <ogc:Function name="contains_text">
+        Expression function = ff.function(CONTAINS_TEXT, property, string);
+        
         // <ogc:PropertyIsEqualTo>
-        Filter filter = ff.equals(property, string);
+        // <ogc:Literal>1</ogc:Literal>
+        // </ogc:PropertyIsEqualTo>
+        Filter filter = ff.equals(function, ff.literal(1));
 
         FeatureCollection filteredResults = mfSource.getFeatures(filter);
 
-        assertEquals(getCount(filteredResults), 2);
+        assertEquals(getCount(filteredResults), 3);
 
         /**
          * Test filtering on multi valued properties
          */
-        FeatureSource guSource = AppSchemaDataAccessRegistry.getMappingFeatureSource(GEOLOGIC_UNIT);
+        FeatureSource guSource = DataAccessRegistry.getFeatureSource(GEOLOGIC_UNIT);
         // composition part is a multi valued property
         // we're testing that we can get a geologic unit which has a composition part with a
         // significant proportion value
         property = ff
                 .property("gsml:composition/gsml:CompositionPart/gsml:proportion/gsml:CGI_TermValue/gsml:value");
         string = ff.literal("significant");
-        filter = ff.equals(property, string);
+        function = ff.function(CONTAINS_TEXT, property, string);
+        filter = ff.equals(function, ff.literal(1));
         filteredResults = guSource.getFeatures(filter);
         assertEquals(getCount(filteredResults), 3);
 
@@ -497,7 +491,7 @@ public class FeatureChainingTest extends TestCase {
         FeatureSource cgiSource = (FeatureSource) cgiDataAccess.getFeatureSource(CGI_TERM_VALUE);
         FeatureCollection cgiFeatures = (FeatureCollection) cgiSource.getFeatures();
 
-        int EXPECTED_RESULT_COUNT = 2;
+        int EXPECTED_RESULT_COUNT = 4;
 
         int resultCount = getCount(mfFeatures);
         assertEquals(EXPECTED_RESULT_COUNT, resultCount);
@@ -529,7 +523,7 @@ public class FeatureChainingTest extends TestCase {
         cgiDataAccess.dispose();
     }
 
-    private int getCount(FeatureCollection features) {
+    protected static int getCount(FeatureCollection features) {
         MappingFeatureIterator iterator = (MappingFeatureIterator) features.iterator();
         int count = 0;
         try {
@@ -541,5 +535,49 @@ public class FeatureChainingTest extends TestCase {
             features.close((Iterator<Feature>) iterator);
         }
         return count;
+    }
+
+    /**
+     * This is a mock contains_text function which is normally stored in the database.
+     * But we are using properties files for our test, so this needs to be written.
+     * @author ang05a
+     */
+    public static class ContainsTextFunctionExpression extends FunctionExpressionImpl {
+
+        public ContainsTextFunctionExpression() {
+            super("contains_text");
+        }
+
+        public int getArgCount() {
+            return 2;
+        }
+
+        public Object evaluate(final Object obj) {
+            assert obj instanceof Feature;
+            final Feature feature = (Feature) obj;
+
+            final List params = this.getParameters();
+            assertEquals(params.size(), getArgCount());
+            
+            final Object arg1 = params.get(0);
+            assertNotNull(arg1);
+            final Object arg2 = params.get(1);
+            assertNotNull(arg2);
+            assertEquals(arg1 instanceof Expression, true);
+            assertEquals(arg2 instanceof Expression, true);
+
+            final Object val1 = ((Expression) arg1).evaluate(feature);
+
+            if (val1 == null) {
+                return false;
+            }
+
+            final Object val2 = ((Expression) arg2).evaluate(feature);
+
+            if (val2 == null) {
+                return false;
+            }
+            return val1.toString().contains(val2.toString());
+        }
     }
 }

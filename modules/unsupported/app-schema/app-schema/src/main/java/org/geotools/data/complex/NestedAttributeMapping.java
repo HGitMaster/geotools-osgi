@@ -19,9 +19,12 @@ package org.geotools.data.complex;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
@@ -29,13 +32,14 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.identity.FeatureId;
 
 /**
  * This class represents AttributeMapping for attributes that are nested inside another complex
@@ -48,14 +52,19 @@ import org.opengis.filter.expression.Expression;
  */
 public class NestedAttributeMapping extends AttributeMapping {
     /**
-     * Simple feature source of the nested features
+     * Nested features mapped id expression
      */
-    private FeatureSource<SimpleFeatureType, SimpleFeature> source;
+    private Expression nestedIdExpression;
+
+    /**
+     * Input feature source of the nested features
+     */
+    private FeatureSource<FeatureType, Feature> source;
 
     /**
      * Mapped feature source of the nested features
      */
-    private MappingFeatureSource mappingSource;
+    private FeatureSource<FeatureType, Feature> mappingSource;
 
     /**
      * Name of the nested features element
@@ -75,7 +84,7 @@ public class NestedAttributeMapping extends AttributeMapping {
     /**
      * Stored simple features
      */
-    private ArrayList<SimpleFeature> simpleFeatures;
+    private ArrayList<Feature> simpleFeatures;
 
     /**
      * Stored built features
@@ -83,9 +92,9 @@ public class NestedAttributeMapping extends AttributeMapping {
     private ArrayList<Feature> features;
 
     /**
-     * Parent simple features
+     * Parent source features
      */
-    private ArrayList<SimpleFeature> parentFeatures;
+    private ArrayList<Feature> parentFeatures;
 
     /**
      * Filter factory
@@ -111,20 +120,22 @@ public class NestedAttributeMapping extends AttributeMapping {
      */
     public NestedAttributeMapping(Expression idExpression, Expression parentExpression,
             StepList targetXPath, boolean isMultiValued, Map<Name, Expression> clientProperties,
-            Name sourceElement, StepList sourcePath, FeatureSource parentSource) throws IOException {
+            Name sourceElement, StepList sourcePath,
+            FeatureSource<FeatureType, Feature> parentSource) throws IOException {
         super(idExpression, parentExpression, targetXPath, null, isMultiValued, clientProperties);
         this.nestedTargetXPath = sourcePath;
         this.nestedFeatureType = sourceElement;
-        // get all parent simple features
-        parentFeatures = new ArrayList<SimpleFeature>();
+        // get all parent source features
+        parentFeatures = new ArrayList<Feature>();
         DefaultQuery parentQuery = new DefaultQuery();
         parentQuery.setPropertyNames(new String[] { parentExpression.toString() });
-        FeatureCollection<SimpleFeatureType, SimpleFeature> parentFeatureCollection = parentSource
+        FeatureCollection<FeatureType, Feature> parentFeatureCollection = parentSource
                 .getFeatures(parentQuery);
-        Iterator<SimpleFeature> iterator = parentFeatureCollection.iterator();
+        Iterator<Feature> iterator = parentFeatureCollection.iterator();
         while (iterator.hasNext()) {
             parentFeatures.add(iterator.next());
         }
+        parentFeatureCollection.close(iterator);
     }
 
     @Override
@@ -143,11 +154,11 @@ public class NestedAttributeMapping extends AttributeMapping {
      * @return simple feature iterator
      * @throws IOException
      */
-    private synchronized Iterator<SimpleFeature> simpleIterator() throws IOException {
+    private synchronized Iterator<Feature> simpleIterator() throws IOException {
         if (simpleFeatures == null) {
             // We can't initiate this in the constructor because the feature type mapping
             // might not be built yet.
-            simpleFeatures = new ArrayList<SimpleFeature>();
+            simpleFeatures = new ArrayList<Feature>();
             FeatureTypeMapping featureTypeMapping = AppSchemaDataAccessRegistry
                     .getMapping(nestedFeatureType);
             assert featureTypeMapping != null;
@@ -164,17 +175,34 @@ public class NestedAttributeMapping extends AttributeMapping {
             // get all the nested values from all parent features so we only have to run
             // this big query once, rather than running multiple simple ones
             List<Filter> filters = new ArrayList<Filter>();
-            for (SimpleFeature parentFeature : parentFeatures) {
+            // HashSet is used to make sure the values are unique, no repeats
+            Set<Object> values = new HashSet<Object>();
+            for (Feature parentFeature : parentFeatures) {
                 Object value = this.getSourceExpression().evaluate(parentFeature);
+                if (value instanceof Attribute) {
+                    value = ((Attribute) value).getValue();
+                }
+                if (value instanceof Collection) {
+                    for (Object val : (Collection) value) {
+                        values.add(val);
+                    }
+                } else {
+                    values.add(value);
+                }
+            }
+
+            for (Object value : values) {
                 filters.add(filterFac.equals(this.nestedExpression, filterFac.literal(value)));
             }
 
             Filter filter = filterFac.or(filters);
             // get all the nested features based on the link values
-            Iterator<SimpleFeature> iterator = source.getFeatures(filter).iterator();
+            FeatureCollection<FeatureType, Feature> fCollection = source.getFeatures(filter);
+            Iterator<Feature> iterator = fCollection.iterator();
             while (iterator.hasNext()) {
                 simpleFeatures.add(iterator.next());
             }
+            fCollection.close(iterator);
         }
         return simpleFeatures.iterator();
     }
@@ -194,7 +222,7 @@ public class NestedAttributeMapping extends AttributeMapping {
             assert simpleFeatures != null;
 
             // this cannot be set in the constructor since it might not exist yet
-            mappingSource = AppSchemaDataAccessRegistry.getMappingFeatureSource(nestedFeatureType);
+            mappingSource = DataAccessRegistry.getFeatureSource(nestedFeatureType);
             assert mappingSource != null;
 
             // get mapped attribute name on nested features side
@@ -203,14 +231,25 @@ public class NestedAttributeMapping extends AttributeMapping {
             // get all the nested values from all parent features so we only have to run
             // this big query once, rather than running multiple simple ones
             List<Filter> filters = new ArrayList<Filter>();
-            for (SimpleFeature parentFeature : parentFeatures) {
+            for (Feature parentFeature : parentFeatures) {
                 Object value = this.getSourceExpression().evaluate(parentFeature);
-                filters.add(filterFac.equals(nestedPath, filterFac.literal(value)));
+                if (value instanceof Attribute) {
+                    value = ((Attribute) value).getValue();
+                }
+                if (value instanceof Collection) {
+                    for (Object val : (Collection) value) {
+                        filters.add(filterFac.equals(nestedPath, filterFac.literal(val)));
+                    }
+                } else {
+                    filters.add(filterFac.equals(nestedPath, filterFac.literal(value)));
+                }
             }
 
             Filter filter = filterFac.or(filters);
             // get all the mapped nested features based on the link values
-            Iterator<Feature> iterator = mappingSource.getFeatures(filter).iterator();
+            MappingFeatureIterator iterator = (MappingFeatureIterator) mappingSource.getFeatures(
+                    filter).iterator();
+            nestedIdExpression = iterator.featureFidMapping;
             while (iterator.hasNext()) {
                 features.add(iterator.next());
             }
@@ -226,9 +265,9 @@ public class NestedAttributeMapping extends AttributeMapping {
      * @throws IOException
      * @throws IOException
      */
-    public SimpleFeature getSimpleFeature(Object foreignKeyValue) throws IOException {
-        Iterator<SimpleFeature> it = simpleIterator();
-        SimpleFeature feature;
+    public Feature getInputFeature(Object foreignKeyValue) throws IOException {
+        Iterator<Feature> it = simpleIterator();
+        Feature feature;
         while (it.hasNext()) {
             feature = it.next();
             Object value = this.nestedExpression.evaluate(feature);
@@ -249,15 +288,36 @@ public class NestedAttributeMapping extends AttributeMapping {
      * @throws IOException
      */
     public Feature getFeature(Object foreignKeyValue) throws IOException {
-        // get a simple feature first since it uses the unique source expression which can be
+        // get an input feature first since it uses the unique source expression which can be
         // evaluated to the correct value, whereas with built features, we have to go through
-        // possibly multiple properties that has the same target xpath
-        SimpleFeature simpleFeature = getSimpleFeature(foreignKeyValue);
+        // possibly multiple properties that has the same target XPath
+        Feature inputFeature = getInputFeature(foreignKeyValue);
         Iterator<Feature> it = iterator();
+        // this should be set in iterator()
+        if (this.nestedIdExpression == null) {
+            throw new UnsupportedOperationException(
+                    "Iterator() should be called before getFeature(Object) in NestedAttributeMapping!");
+        }
         while (it.hasNext()) {
             Feature feature = it.next();
-            if (feature.getIdentifier().equals(simpleFeature.getIdentifier())) {
-                return feature;
+            FeatureId featureId = feature.getIdentifier();
+            Object inputFeatureId = this.nestedIdExpression.evaluate(inputFeature);
+            if (inputFeatureId == null) {
+                throw new RuntimeException(
+                        "This shouldn't have happened. This feature does not have an id!");
+            }
+            if (inputFeatureId instanceof FeatureId) {
+                if (featureId.equals(inputFeatureId)) {
+                    // this is when the input features are complex features
+                    // as a result of a data access being the input data source
+                    return feature;
+                }
+            } else {
+                if (featureId.toString().equals(inputFeatureId)) {
+                    // this is when input features are simple features
+                    // when a data store is the input data source
+                    return feature;
+                }
             }
         }
         throw new DataSourceException("Nested feature not found! Feature type: '"

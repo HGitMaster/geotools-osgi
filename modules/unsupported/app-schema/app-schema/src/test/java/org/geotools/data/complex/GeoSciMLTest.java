@@ -50,7 +50,7 @@ import org.opengis.feature.type.Name;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: GeoSciMLTest.java 32539 2009-02-23 04:43:58Z bencaradocdavies $
+ * @version $Id: GeoSciMLTest.java 32633 2009-03-16 01:44:12Z ang05a $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas
  *         /community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
@@ -258,6 +258,8 @@ public class GeoSciMLTest extends TestCase {
         FeatureCollection<FeatureType, Feature> features = source.getFeatures(query);
         assertNotNull(features);
         assertEquals(2, features.size());
+        
+        mappingDataStore.dispose();
     }
 
     private int getCount(FeatureCollection features) {

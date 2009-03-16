@@ -19,6 +19,7 @@ package org.geotools.data.complex;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -47,10 +48,9 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
@@ -73,7 +73,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: MappingFeatureIterator.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @version $Id: MappingFeatureIterator.java 32633 2009-03-16 01:44:12Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureIterator.java $
  * @since 2.4
  */
@@ -94,12 +94,12 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
      */
     protected FeatureFactory attf;
 
-    protected FeatureCollection<SimpleFeatureType, SimpleFeature> sourceFeatures;
+    protected FeatureCollection<FeatureType, Feature> sourceFeatures;
 
     /**
      * Hold on to iterator to allow features to be streamed.
      */
-    protected Iterator<SimpleFeature> sourceFeatureIterator;
+    protected Iterator<Feature> sourceFeatureIterator;
 
     protected AppSchemaDataAccess store;
 
@@ -124,7 +124,7 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
     /**
      * Next feature that doesn't already exist in processedFeatures map
      */
-    private SimpleFeature nextSrcFeature;
+    private Feature nextSrcFeature;
 
     /**
      * True if hasNext has been called prior to calling next()
@@ -173,7 +173,7 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         Query unrolledQuery = getUnrolledQuery(query);
         Filter filter = unrolledQuery.getFilter();
 
-        FeatureSource<SimpleFeatureType, SimpleFeature> mappedSource = mapping.getSource();
+        FeatureSource<FeatureType, Feature> mappedSource = mapping.getSource();
 
         sourceFeatures = mappedSource.getFeatures(filter);
 
@@ -261,7 +261,19 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         Object value = getValue(sourceExpression, source);
         if (attMapping.isNestedAttribute()) {
             // get built feature based on link value
-            value = ((NestedAttributeMapping) attMapping).getFeature(value);
+            if (value instanceof Collection) {
+                ArrayList<Feature> nestedFeatures = new ArrayList<Feature>(((Collection) value)
+                        .size());
+                for (Object val : (Collection) value) {
+                    if (val instanceof Attribute) {
+                        val = ((Attribute) val).getValue();
+                    }
+                    nestedFeatures.add(((NestedAttributeMapping) attMapping).getFeature(val));
+                }
+                value = nestedFeatures;
+            } else {
+                value = ((NestedAttributeMapping) attMapping).getFeature(value);
+            }
         }
         String id = null;
         if (Expression.NIL != attMapping.getIdentifierExpression()) {
@@ -318,7 +330,7 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         }
         // make sure features are unique by mapped id
         while (sourceFeatureIterator.hasNext()) {
-            SimpleFeature next = sourceFeatureIterator.next();
+            Feature next = sourceFeatureIterator.next();
             if (!processedFeatures.containsKey(extractIdForFeature(next))) {
                 nextSrcFeature = next;
                 return true;
@@ -360,10 +372,10 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         builder.setDescriptor(targetNode);
         Feature target = (Feature) builder.build(id);
         // automatically group by mapped id
-        Iterator<SimpleFeature> iterator = this.sourceFeatures.iterator();
-        ArrayList<SimpleFeature> sources = new ArrayList<SimpleFeature>();
+        Iterator<Feature> iterator = this.sourceFeatures.iterator();
+        ArrayList<Feature> sources = new ArrayList<Feature>();        
         while (iterator.hasNext()) {
-            SimpleFeature next = iterator.next();
+            Feature next = iterator.next();
             if (extractIdForFeature(next).equals(id)) {
                 sources.add(next);
             }
@@ -380,9 +392,9 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
                     continue;
                 }
             }
-            // extract the values from multiple simple features of the same id
+            // extract the values from multiple source features of the same id
             // and set them to one built feature
-            for (SimpleFeature source : sources) {
+            for (Feature source : sources) {
                 setAttributeValue(target, source, attMapping);
             }
         }
