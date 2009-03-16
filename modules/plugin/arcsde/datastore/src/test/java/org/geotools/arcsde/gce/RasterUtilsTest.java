@@ -25,6 +25,7 @@ import java.awt.geom.Rectangle2D;
 
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.Test;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -58,4 +59,16 @@ public class RasterUtilsTest {
         assertSame(expectedCRS, compatibleCRS);
     }
 
+    @Test
+    public void testFindCompatibleCRS_Null() throws Exception {
+        CoordinateReferenceSystem compatibleCRS = RasterUtils.findCompatibleCRS(null);
+
+        assertSame(DefaultEngineeringCRS.CARTESIAN_2D, compatibleCRS);
+
+        SeCoordinateReference seCoordRefSys = new SeCoordinateReference();
+
+        compatibleCRS = RasterUtils.findCompatibleCRS(seCoordRefSys);
+
+        assertSame(DefaultEngineeringCRS.CARTESIAN_2D, compatibleCRS);
+    }
 }

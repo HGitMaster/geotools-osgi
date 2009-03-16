@@ -51,6 +51,7 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageWriter;
@@ -475,7 +476,10 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 final SeCoordinateReference seCoordRef = rasterColumn.getCoordRef();
                 LOGGER.finer("Looking CRS for raster column " + rasterTable);
                 coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
-
+                if (DefaultEngineeringCRS.CARTESIAN_2D == coverageCrs) {
+                    LOGGER.warning("Raster " + rasterTable
+                            + " has not CRS set, using DefaultEngineeringCRS.CARTESIAN_2D");
+                }
                 if (sampleBand.hasColorMap()) {
                     rastersColorMaps = loadColorMaps(rasterColumnId, bitsPerSample, scon);
                 } else {
@@ -755,7 +759,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 query = new SeQuery(scon, new String[] { "OWNER" }, sqlCons);
                 query.prepareQuery();
             } catch (SeException e) {
-                //sde 9.3 calls it raster_columns, not sde_raster_columns...
+                // sde 9.3 calls it raster_columns, not sde_raster_columns...
                 rastersColumnsTable = dbaName + ".RASTER_COLUMNS";
                 sqlCons = new SeSqlConstruct(rastersColumnsTable);
                 sqlCons.setWhere("RASTERCOLUMN_ID = " + rasterColumnId);

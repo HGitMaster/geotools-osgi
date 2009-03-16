@@ -45,6 +45,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ComponentColorModelJAI;
@@ -73,7 +74,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32540 2009-02-23 06:36:00Z groldan $
+ * @version $Id: RasterUtils.java 32642 2009-03-16 19:04:51Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -123,13 +124,28 @@ class RasterUtils {
      * Gets the coordinate system that will be associated to the {@link GridCoverage}.
      * 
      * @param rasterAttributes
+     * @return if {@code seCoordRef.getcoordSys()} is {@code null} returns
+     *         {@link DefaultEngineeringCRS#CARTESIAN_2D}, otherwise an equivalent CRS from the EPSG
+     *         database if found, or a CRS built from the seCoordRef WKT otherwise.
      */
     public static CoordinateReferenceSystem findCompatibleCRS(final SeCoordinateReference seCoordRef)
             throws DataSourceException {
 
-        try {
-            final PeCoordinateSystem coordSys = seCoordRef.getCoordSys();
+        if (seCoordRef == null) {
+            LOGGER.fine("SeCoordinateReference is null, "
+                    + "using DefaultEngineeringCRS.CARTESIAN_2D");
+            return DefaultEngineeringCRS.CARTESIAN_2D;
+        }
 
+        final PeCoordinateSystem coordSys = seCoordRef.getCoordSys();
+
+        if (coordSys == null) {
+            LOGGER.fine("SeCoordinateReference.getCoordSys() is null, "
+                    + "using DefaultEngineeringCRS.CARTESIAN_2D");
+            return DefaultEngineeringCRS.CARTESIAN_2D;
+        }
+
+        try {
             int epsgCode = -1;
             final int[] seEpsgCodes;
             if (coordSys instanceof PeGeographicCS) {
@@ -137,7 +153,8 @@ class RasterUtils {
             } else if (coordSys instanceof PeProjectedCS) {
                 seEpsgCodes = PeFactory.projcsCodelist();
             } else {
-                throw new RuntimeException("Shouldnt happen!: Unnkown SeCoordSys type");
+                throw new RuntimeException("Shouldnt happen!: Unnkown SeCoordSys type: "
+                        + coordSys.getClass().getName());
             }
             int seEpsgCode;
             PeCoordinateSystem candidate;
