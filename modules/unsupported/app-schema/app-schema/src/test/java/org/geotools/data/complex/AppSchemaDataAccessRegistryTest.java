@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -41,6 +42,10 @@ import org.opengis.feature.type.Name;
  * @author Rini Angreani, Curtin Universtiy of Technology
  */
 public class AppSchemaDataAccessRegistryTest extends TestCase {
+
+    public static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.data.complex");
+
     static final String GSMLNS = "http://www.cgi-iugs.org/xml/GeoSciML/2";
 
     static final String GMLNS = "http://www.opengis.net/gml";
@@ -116,6 +121,30 @@ public class AppSchemaDataAccessRegistryTest extends TestCase {
     }
 
     /**
+     * Test that asking for a nonexistent type causes an excception to be thrown with the correct
+     * number of type names in the detail message.
+     * 
+     * @throws Exception
+     */
+    public void testThrowDataSourceException() throws Exception {
+        loadDataAccesses();
+        Name typeName = Types.typeName(GSMLNS, "DoesNotExist");
+        boolean handledException = false;
+        try {
+            AppSchemaDataAccessRegistry.getMapping(typeName);
+        } catch (DataSourceException e) {
+            String message = e.getMessage();
+            LOGGER.info(e.toString());
+            assertEquals("Count number of available type names in exception message", 4, message
+                    .split("Available:")[1].split(",").length);
+            handledException = true;
+        }
+        assertTrue("Expected a DataSourceException to have been thrown and handled",
+                handledException);
+        disposeDataAccesses();
+    }
+
+    /**
      * Load all data accesses
      * 
      * @throws Exception
@@ -182,12 +211,14 @@ public class AppSchemaDataAccessRegistryTest extends TestCase {
         }
 
         // should return a simple feature source
-        FeatureSource <FeatureType, Feature> source = AppSchemaDataAccessRegistry.getSimpleFeatureSource(typeName);
+        FeatureSource<FeatureType, Feature> source = AppSchemaDataAccessRegistry
+                .getSimpleFeatureSource(typeName);
         assertNotNull(source);
         assertEquals(mapping.getSource(), source);
 
         // should return a mapping feature source
-        FeatureSource <FeatureType, Feature> mappedSource = DataAccessRegistry.getFeatureSource(typeName);
+        FeatureSource<FeatureType, Feature> mappedSource = DataAccessRegistry
+                .getFeatureSource(typeName);
         assertNotNull(mappedSource);
         // compare with the supplied data access
         assertEquals(mappedSource.getDataStore().equals(dataAccess), true);

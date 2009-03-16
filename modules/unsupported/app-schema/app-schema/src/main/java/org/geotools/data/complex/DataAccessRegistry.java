@@ -72,9 +72,9 @@ public class DataAccessRegistry extends ArrayList<DataAccess<FeatureType, Featur
     }
 
     /**
-     * Unregister a data access. This is important especially at the end of test cases, so that
-     * the mappings contained in the data access do not conflict with mappings of the same type
-     * used in other tests.
+     * Unregister a data access. This is important especially at the end of test cases, so that the
+     * mappings contained in the data access do not conflict with mappings of the same type used in
+     * other tests.
      * 
      * @param dataAccess
      *            Data access to be unregistered
@@ -140,16 +140,23 @@ public class DataAccessRegistry extends ArrayList<DataAccess<FeatureType, Featur
      */
     protected static void throwDataSourceException(Name featureTypeName) throws IOException {
         StringBuffer availables = new StringBuffer("[");
-        for (DataAccess<FeatureType, Feature> dataAccess : registry) {
+        for (Iterator<DataAccess<FeatureType, Feature>> dataAccessIterator = registry.iterator(); dataAccessIterator
+                .hasNext();) {
+            DataAccess<FeatureType, Feature> dataAccess = dataAccessIterator.next();
             List<Name> typeNames = dataAccess.getNames();
             for (Iterator<Name> it = typeNames.iterator(); it.hasNext();) {
                 availables.append(it.next());
                 availables.append(it.hasNext() ? ", " : "");
             }
+            if (dataAccessIterator.hasNext()) {
+                // we assume that every data access has at least one feature type
+                availables.append(", ");
+            }
         }
         availables.append("]");
-        throw new DataSourceException(featureTypeName + " not found. Available: " + availables
-                + ". Has the data access been registered in DataAccessRegistry?");
+        throw new DataSourceException("Feature type " + featureTypeName + " not found."
+                + " Has the data access been registered in DataAccessRegistry?" + " Available: "
+                + availables);
     }
 
 }
