@@ -39,5 +39,9 @@ public class SeRow {
         // TODO Auto-generated method stub
         return null;
     }
+    public String getString(int i) throws SeException{
+        // TODO Auto-generated method stub
+        return null;
+    }
 	
 }
