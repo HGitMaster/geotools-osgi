@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.geotools.data.Query;
+import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -33,12 +34,17 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.util.ProgressListener;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * {@link FeatureCollection} for a {@link MappingFeatureIterator}.
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: MappingFeatureCollection.java 31815 2008-11-10 07:53:14Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureCollection.java $
+ * @version $Id: MappingFeatureCollection.java 32634 2009-03-16 02:49:51Z bencaradocdavies $
+ * @source $URL:
+ *         http://svn.geotools.org/trunk/modules/unsupported/app-schema/app-schema/src/main/java
+ *         /org/geotools/data/complex/MappingFeatureCollection.java $
  * @since 2.6
  */
 public class MappingFeatureCollection implements FeatureCollection<FeatureType, Feature> {
@@ -96,7 +102,8 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
     /*
      * (non-Javadoc)
      * 
-     * @see org.geotools.feature.FeatureCollection#addListener(org.geotools.feature.CollectionListener)
+     * @see
+     * org.geotools.feature.FeatureCollection#addListener(org.geotools.feature.CollectionListener)
      */
     public void addListener(CollectionListener listener) throws NullPointerException {
         throw new UnsupportedOperationException();
@@ -160,14 +167,33 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
         }
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * 
+     * Stolen from {@link ReprojectFeatureResults}.
      * 
      * @see org.geotools.feature.FeatureCollection#getBounds()
      */
     public ReferencedEnvelope getBounds() {
-        throw new UnsupportedOperationException();
-
+        FeatureIterator<Feature> features = features();
+        try {
+            Envelope newBBox = new Envelope();
+            Envelope internal;
+            Feature feature;
+            while (features.hasNext()) {
+                feature = features.next();
+                final Geometry geometry = ((Geometry) feature.getDefaultGeometryProperty()
+                        .getValue());
+                if (geometry != null) {
+                    internal = geometry.getEnvelopeInternal();
+                    newBBox.expandToInclude(internal);
+                }
+            }
+            return ReferencedEnvelope.reference(newBBox);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception occurred while computing bounds", e);
+        } finally {
+            features.close();
+        }
     }
 
     /*
@@ -241,7 +267,9 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
     /*
      * (non-Javadoc)
      * 
-     * @see org.geotools.feature.FeatureCollection#removeListener(org.geotools.feature.CollectionListener)
+     * @see
+     * org.geotools.feature.FeatureCollection#removeListener(org.geotools.feature.CollectionListener
+     * )
      */
     public void removeListener(CollectionListener listener) throws NullPointerException {
         throw new UnsupportedOperationException();
