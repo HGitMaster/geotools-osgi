@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Referencing Plug-in
 Bundle-SymbolicName: org.geotools.referencing
 Bundle-Version: 2.6.0.osgi1
-Bundle-RequiredExecutionEnvironment: JavaSE-1.5
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.metadata;bundle-version="2.6.0"
 Import-Package: javax.measure.converter,

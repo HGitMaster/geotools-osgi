@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Geotools EPSG WKT Plug-in
 Bundle-SymbolicName: org.geotools.epsg.wkt
 Bundle-Version: 2.6.0.osgi1
-Bundle-RequiredExecutionEnvironment: JavaSE-1.5
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.metadata;bundle-version="2.6.0",
  org.geotools.referencing;bundle-version="2.6.0"
