@@ -24,7 +24,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -119,7 +118,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * A {@link Param} subclass that allows to provide a default value to the lookUp method.
      * 
      * @author Gabriel Roldan
-     * @version $Id: WFSDataStoreFactory.java 32302 2009-01-23 01:16:54Z jive $
+     * @version $Id: WFSDataStoreFactory.java 32636 2009-03-16 02:57:03Z jive $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -531,10 +530,13 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      */
     public boolean canProcess(final Map params) {
         if (params == null) {
-            throw new NullPointerException("params");
+            return false; // throw new NullPointerException("params");
         }
         try {
-            URL.lookUp(params);
+            URL url = (URL) URL.lookUp(params);
+            if( !"http".equalsIgnoreCase(url.getProtocol()) && !"https".equalsIgnoreCase(url.getProtocol())){
+                return false; // must be http or https since we use SimpleHttpProtocol class
+            }
         } catch (Exception e) {
             return false;
         }

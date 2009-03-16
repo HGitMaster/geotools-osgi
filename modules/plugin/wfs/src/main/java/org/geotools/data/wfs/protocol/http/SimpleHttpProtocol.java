@@ -103,7 +103,13 @@ public class SimpleHttpProtocol extends AbstractHttpProtocol {
     }
 
     private HttpURLConnection openConnection(URL targetUrl, HttpMethod method) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) targetUrl.openConnection();
+        HttpURLConnection conn;
+        try {
+            conn = (HttpURLConnection) targetUrl.openConnection();
+        }
+        catch( ClassCastException wrongUrl ){
+            throw new IOException("HTTP connection required for "+targetUrl );
+        }
         if (0 < getTimeoutMillis()) {
             conn.setConnectTimeout(getTimeoutMillis());
             conn.setReadTimeout(getTimeoutMillis());
