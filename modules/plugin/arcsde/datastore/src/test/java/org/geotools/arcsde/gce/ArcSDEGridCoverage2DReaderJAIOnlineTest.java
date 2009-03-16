@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -31,7 +32,6 @@ import javax.imageio.ImageIO;
 
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
-import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -46,7 +46,6 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.resources.image.ColorUtilities;
-import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -205,8 +204,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     @Test
     public void testRead_16bit_S_ColorMapped() throws Exception {
         int[] ARGB = new int[65536];
-        ColorUtilities.expand(new Color[] { Color.BLACK, Color.WHITE}, ARGB, 0,
-                ARGB.length);
+        ColorUtilities.expand(new Color[] { Color.BLACK, Color.WHITE }, ARGB, 0, ARGB.length);
         IndexColorModel colorModel = ColorUtilities.getIndexColorModel(ARGB);
         tableName = rasterTestData.getRasterTableName(TYPE_16BIT_S, 1, true);
         rasterTestData.loadTestRaster(tableName, 1, TYPE_16BIT_S, colorModel);
@@ -332,13 +330,13 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         Envelope2D envelope2D = gridGeometry.getEnvelope2D();
         GridRange2D gridRange2D = gridGeometry.getGridRange2D();
 
-//         assertEquals(0, envelope2D.getMinX(), 1);
-//         assertEquals(0, envelope2D.getMinY(), 1);
-//         assertEquals(512, envelope2D.getMaxX(), 1);
-//         assertEquals(512, envelope2D.getMaxY(), 1);
-//        
-//         assertEquals(512, gridRange2D.width);
-//         assertEquals(512, gridRange2D.height);
+        // assertEquals(0, envelope2D.getMinX(), 1);
+        // assertEquals(0, envelope2D.getMinY(), 1);
+        // assertEquals(512, envelope2D.getMaxX(), 1);
+        // assertEquals(512, envelope2D.getMaxY(), 1);
+        //        
+        // assertEquals(512, gridRange2D.width);
+        // assertEquals(512, gridRange2D.height);
     }
 
     @Test
@@ -427,12 +425,12 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         assertNotNull("read coverage returned null", coverage);
 
         assertEquals(numBands, coverage.getNumSampleDimensions());
-//        for (int i = 0; i < numBands; i++) {
-//            NumberRange<?> range = cellType.getSampleValueRange();
-//            GridSampleDimension sampleDimension = coverage.getSampleDimension(i);
-//            assertNotNull("Sample dimension #" + i, sampleDimension);
-//            assertEquals(range, sampleDimension.getRange());
-//        }
+        // for (int i = 0; i < numBands; i++) {
+        // NumberRange<?> range = cellType.getSampleValueRange();
+        // GridSampleDimension sampleDimension = coverage.getSampleDimension(i);
+        // assertNotNull("Sample dimension #" + i, sampleDimension);
+        // assertEquals(range, sampleDimension.getRange());
+        // }
 
         assertNotNull(coverage.getEnvelope());
         GeneralEnvelope envelope = (GeneralEnvelope) coverage.getEnvelope();
@@ -446,10 +444,22 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         final RenderedImage image = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
         assertNotNull(image);
 
-        //////assertEquals(cellType.getDataBufferType(), image.getSampleModel().getDataType());
+        // ////assertEquals(cellType.getDataBufferType(), image.getSampleModel().getDataType());
         final int[] sampleSize = image.getSampleModel().getSampleSize();
-        for (int band = 0; band < numBands; band++) {
-            assertEquals(cellType.getBitsPerSample(), sampleSize[band]);
+        final ColorModel colorModel = image.getColorModel();
+        if (colorModel instanceof IndexColorModel) {
+            switch (cellType) {
+            case TYPE_8BIT_U:
+                assertEquals("8-bit indexed image should have been "
+                        + "promoted to 16bit to account for no-data values", 16, sampleSize[0]);
+                break;
+            default:
+                throw new IllegalArgumentException();
+            }
+        } else {
+            for (int band = 0; band < numBands; band++) {
+                assertEquals(cellType.getBitsPerSample(), sampleSize[band]);
+            }
         }
 
         final String fileName = "testReadFullLevel0_" + fileNamePostFix;

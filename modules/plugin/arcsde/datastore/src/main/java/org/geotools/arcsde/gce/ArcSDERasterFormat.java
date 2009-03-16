@@ -690,7 +690,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             final int bitsPerSample, ArcSDEPooledConnection scon) throws IOException {
         LOGGER.fine("Reading colormap for raster column " + rasterColumnId);
 
-        final String auxTableName = "SDE_AUX_" + rasterColumnId;
+        final String auxTableName = getAuxTableName(rasterColumnId, scon);
         LOGGER.fine("Quering auxiliary table " + auxTableName + " for color map data");
 
         Map<Long, IndexColorModel> colorMaps = new HashMap<Long, IndexColorModel>();
@@ -701,7 +701,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
             String whereClause = "TYPE = 3";
             sqlConstruct.setWhere(whereClause);
 
-            query = new SeQuery(scon, new String[] { "RASTERBAND_ID, OBJECT" }, sqlConstruct);
+            query = new SeQuery(scon, new String[] { "RASTERBAND_ID", "OBJECT" }, sqlConstruct);
             query.prepareQuery();
             query.execute();
 
@@ -723,8 +723,8 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 row = query.fetch();
             }
         } catch (SeException e) {
-            throw new ArcSdeException("Error fetching colormap data for column " + rasterColumnId,
-                    e);
+            throw new ArcSdeException("Error fetching colormap data for column " + rasterColumnId
+                    + " from table " + auxTableName, e);
         } finally {
             if (query != null) {
                 try {
@@ -737,6 +737,57 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         }
         LOGGER.fine("Read color map data for " + colorMaps.size() + " rasters");
         return colorMaps;
+    }
+
+    private String getAuxTableName(long rasterColumnId, ArcSDEPooledConnection scon)
+            throws IOException {
+
+        final String owner;
+        SeQuery query = null;
+        try {
+            final String dbaName = scon.getSdeDbaName();
+            String rastersColumnsTable = dbaName + ".SDE_RASTER_COLUMNS";
+
+            SeSqlConstruct sqlCons = new SeSqlConstruct(rastersColumnsTable);
+            sqlCons.setWhere("RASTERCOLUMN_ID = " + rasterColumnId);
+
+            try {
+                query = new SeQuery(scon, new String[] { "OWNER" }, sqlCons);
+                query.prepareQuery();
+            } catch (SeException e) {
+                //sde 9.3 calls it raster_columns, not sde_raster_columns...
+                rastersColumnsTable = dbaName + ".RASTER_COLUMNS";
+                sqlCons = new SeSqlConstruct(rastersColumnsTable);
+                sqlCons.setWhere("RASTERCOLUMN_ID = " + rasterColumnId);
+                query = new SeQuery(scon, new String[] { "OWNER" }, sqlCons);
+                query.prepareQuery();
+            }
+            query.execute();
+
+            SeRow row = query.fetch();
+            if (row == null) {
+                throw new IllegalArgumentException("No raster column registered with id "
+                        + rasterColumnId);
+            }
+            owner = row.getString(0);
+            query.close();
+        } catch (SeException e) {
+            throw new ArcSdeException("Error getting auxiliary table for raster column "
+                    + rasterColumnId, e);
+        } finally {
+            if (query != null) {
+                try {
+                    query.close();
+                } catch (SeException e) {
+                    LOGGER.log(Level.INFO, "ignoring exception when closing query to "
+                            + "fetch colormap data", e);
+                }
+            }
+        }
+
+        final String auxTableName = owner + ".SDE_AUX_" + rasterColumnId;
+
+        return auxTableName;
     }
 
     private DataBuffer readColorMap(final ByteArrayInputStream colorMapIS) throws IOException {
