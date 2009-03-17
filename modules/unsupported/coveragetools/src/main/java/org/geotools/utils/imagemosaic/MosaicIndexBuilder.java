@@ -16,11 +16,6 @@
  */
 package org.geotools.utils.imagemosaic;
 
-import org.geotools.utils.progress.BaseArgumentsManager;
-import org.geotools.utils.progress.ExceptionEvent;
-import org.geotools.utils.progress.ProcessingEvent;
-import org.geotools.utils.progress.ProcessingEventListener;
-
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
@@ -33,6 +28,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +48,7 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.apache.commons.cli2.Option;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.WildcardFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
@@ -61,12 +57,15 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.utils.progress.BaseArgumentsManager;
+import org.geotools.utils.progress.ExceptionEvent;
+import org.geotools.utils.progress.ProcessingEvent;
+import org.geotools.utils.progress.ProcessingEventListener;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.Envelope;
@@ -194,7 +193,7 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 	 */
 	private void recurse(List<File> allFiles, String locationPath) {
 		final File dir = new File(locationPath);
-		final FileFilter fileFilter = new WildcardFilter(wildcardString);
+		final FileFilter fileFilter = new WildcardFileFilter(wildcardString);
 		final File[] files = dir.listFiles(fileFilter);
 		final File[] dirs = dir
 				.listFiles((FileFilter) DirectoryFileFilter.INSTANCE);
@@ -226,7 +225,7 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 		// my.log
 		//
 		// /////////////////////////////////////////////////////////////////////
-		FileHandler handler;
+		FileHandler handler=null;
 		try {
 			boolean append = true;
 			handler = new FileHandler(new StringBuffer(locationPath).append(
@@ -234,13 +233,7 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 			handler.setLevel(Level.SEVERE);
 			// Add to the desired logger
 			LOGGER.addHandler(handler);
-		} catch (SecurityException el) {
-			fireException(el);
-			return;
-		} catch (IOException el) {
-			fireException(el);
-			return;
-		}
+			
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -265,7 +258,7 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 		PrecisionModel precMod = new PrecisionModel(PrecisionModel.FLOATING);
 		GeometryFactory geomFactory = new GeometryFactory(precMod);
 		try {
-			index = new ShapefileDataStore(new File(locationPath + "/"
+				index = new ShapefileDataStore(new File(locationPath + File.separator
 					+ indexName + ".shp").toURL());
 		} catch (MalformedURLException ex) {
 			if (LOGGER.isLoggable(Level.SEVERE))
@@ -353,6 +346,12 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 				// ////////////////////////////////////////////////////////
 				ImageInputStream inStream = ImageIO
 						.createImageInputStream(fileBeingProcessed);
+				if(inStream==null)
+				{
+					if(LOGGER.isLoggable(Level.SEVERE))
+						LOGGER.severe(fileBeingProcessed+" has been skipped since we could not get a stream for it");
+					continue;
+				}
 				inStream.mark();
 				final Iterator<ImageReader> it = ImageIO.getImageReaders(inStream);
 				ImageReader r = null;
@@ -429,8 +428,7 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 				// eveything.
 				//
 				// /////////////////////////////////////////////////////////////////////
-				final ImageTypeSpecifier its = ((ImageTypeSpecifier) r
-						.getImageTypes(0).next());
+				final ImageTypeSpecifier its = ((ImageTypeSpecifier) r.getImageTypes(0).next());
 				boolean skipFeature = false;
 				if (globEnvelope == null) {
 					// /////////////////////////////////////////////////////////////////////
@@ -468,14 +466,23 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 					// as well as
 					// computing the resolution
 					// //
-					// resetting reader and recreating stream, turnarounf for a
+					// resetting reader and recreating stream, turnaround for a
 					// strange imageio bug
 					r.reset();
 					try{
 						inStream.reset();
 					}catch (IOException e) {
 						inStream= ImageIO.createImageInputStream(fileBeingProcessed);
-					}					r.setInput(inStream);
+					}
+					//let's check if we got something now
+					if(inStream==null)
+					{
+						//skip file
+						if(LOGGER.isLoggable(Level.WARNING))
+							LOGGER.warning("Skipping file "+fileBeingProcessed.toString());
+						continue;
+					}
+					r.setInput(inStream);
 					numberOfLevels = r.getNumImages(true);
 					resolutionLevels = new double[2][numberOfLevels];
 					double[] res = getResolution(envelope, new Rectangle(r
@@ -501,19 +508,16 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 					// /////////////////////////////////////////////////////////////////////
 					final SimpleFeatureTypeBuilder featureBuilder = new SimpleFeatureTypeBuilder();
 					featureBuilder.setName("Flag");
-					featureBuilder.setNamespaceURI("http://localhost/");
-					featureBuilder.setCRS(this.actualCRS);
+					featureBuilder.setNamespaceURI("http://www.geo-solutions.it/");
 					featureBuilder.add("location", String.class);
-					featureBuilder.add("the_geom", Polygon.class,
-							this.actualCRS);
+					featureBuilder.add("the_geom", Polygon.class,this.actualCRS);
 					featureBuilder.setDefaultGeometry("the_geom");
-					final SimpleFeatureType simpleFeatureType = featureBuilder
-							.buildFeatureType();
+					final SimpleFeatureType simpleFeatureType = featureBuilder.buildFeatureType();
 					// create the schema for the new shape file
 					index.createSchema(simpleFeatureType);
 
 					// get a feature writer
-					fw = index.getFeatureWriter(index.getTypeNames()[0], t);
+					fw = index.getFeatureWriter( t);
 				} else {
 					// ////////////////////////////////////////////////////////
 					// 
@@ -621,9 +625,6 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 			} catch (ArrayIndexOutOfBoundsException e) {
 				fireException(e);
 				break;
-			} catch (IllegalAttributeException e) {
-				fireException(e);
-				break;
 			}
 
 		}
@@ -632,10 +633,27 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 				fw.close();
 			t.commit();
 			t.close();
+			index.dispose();
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		}
 		createPropertiesFiles(globEnvelope, doneSomething);
+		} catch (SecurityException el) {
+			fireException(el);
+			return;
+		} catch (IOException el) {
+			fireException(el);
+			return;
+		}
+		finally{
+			try{
+				if(handler!=null)
+					handler.close();
+			}catch (Throwable e) {
+				// ignore
+			}	
+			
+		}
 
 	}
 
@@ -684,17 +702,24 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 			properties.setProperty("Name", indexName);
 			properties.setProperty("ExpandToRGB", Boolean
 					.toString(mustConvertToRGB));
+			OutputStream outStream=null;
 			try {
-				properties.store(new BufferedOutputStream(new FileOutputStream(
-						locationPath + "/" + indexName + ".properties")), "");
+				outStream=new BufferedOutputStream(new FileOutputStream(locationPath + "/" + indexName + ".properties"));
+				properties.store(outStream, "");
 			} catch (FileNotFoundException e) {
-				if (LOGGER.isLoggable(Level.SEVERE))
-					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				fireEvent(e.getLocalizedMessage(), 0);
 			} catch (IOException e) {
-				if (LOGGER.isLoggable(Level.SEVERE))
-					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				fireEvent(e.getLocalizedMessage(), 0);
+			}
+			finally{
+				try{
+					if(outStream!=null)
+						outStream.close();
+				}catch (Throwable e) {
+
+					if (LOGGER.isLoggable(Level.FINE))
+						LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
+				}
 			}
 
 			// processing information
