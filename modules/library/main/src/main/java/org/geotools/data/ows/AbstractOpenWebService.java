@@ -25,21 +25,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import javax.swing.Icon;
-
-import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.ServiceInfo;
 import org.geotools.ows.ServiceException;
@@ -55,9 +50,10 @@ import org.geotools.ows.ServiceException;
  * implemented) and their own request/response instances.
  * 
  * @author Richard Gould
- *
  */
 public abstract class AbstractOpenWebService<C extends Capabilities, R extends Object> {
+    /** Define a interval to wait a server response  */
+    protected int requestTimeout = 30000; // 30 seconds
     protected final URL serverURL;
     protected C capabilities;
     protected ServiceInfo info;
@@ -68,6 +64,7 @@ public abstract class AbstractOpenWebService<C extends Capabilities, R extends O
     protected Specification specification;
     
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.ows");
+    private static final int DEFAULT_TIMEOUT = 0;
 
     /**
      * Set up the specifications used and retrieve the Capabilities document
@@ -77,48 +74,54 @@ public abstract class AbstractOpenWebService<C extends Capabilities, R extends O
      * @throws IOException if there is an error communicating with the server
      * @throws ServiceException if the server responds with an error
      */
-    public AbstractOpenWebService( final URL serverURL ) throws IOException, ServiceException {
-    	if (serverURL == null) {
-			throw new NullPointerException("ServerURL cannot be null");
-		}
-    	
-    	this.serverURL = serverURL;
-
-        setupSpecifications();
-        
-        capabilities = negotiateVersion();
-        if (capabilities == null) {
-        	throw new ServiceException("Unable to retrieve or parse Capabilities document.");
-        }
+    public AbstractOpenWebService(final URL serverURL) throws IOException, ServiceException {
+        this( serverURL, DEFAULT_TIMEOUT );
     }
 
+    public AbstractOpenWebService(final URL serverURL, int requestTimeout) throws IOException,
+            ServiceException {
+        if (serverURL == null) {
+            throw new NullPointerException("ServerURL cannot be null");
+        }
+
+        this.serverURL = serverURL;
+        this.requestTimeout = requestTimeout;
+
+        setupSpecifications();
+
+        capabilities = negotiateVersion();
+        if (capabilities == null) {
+            throw new ServiceException("Unable to retrieve or parse Capabilities document.");
+        }
+    }
+    
     public AbstractOpenWebService(C capabilties, URL serverURL) {
-		if (capabilties == null) {
-			throw new NullPointerException("Capabilities cannot be null.");
-		}
-		
-		if (serverURL == null) {
-			throw new NullPointerException("ServerURL cannot be null");
-		}
-		
-		setupSpecifications();
-		
-		for (int i = 0; i < specs.length; i++) {
-			if (specs[i].getVersion().equals(capabilties.getVersion())) {
-				specification = specs[i];
-				break;
-			}
-		}
-		
-		if (specification == null) {
-			specification = specs[specs.length-1];
-			LOGGER.warning("Unable to choose a specification based on cached capabilities. "
-					+"Arbitrarily choosing spec '"+specification.getVersion()+"'.");
-		}
-		
-		this.serverURL = serverURL;
-		this.capabilities = capabilties;
-	}
+                if (capabilties == null) {
+                        throw new NullPointerException("Capabilities cannot be null.");
+                }
+                
+                if (serverURL == null) {
+                        throw new NullPointerException("ServerURL cannot be null");
+                }
+                
+                setupSpecifications();
+                
+                for (int i = 0; i < specs.length; i++) {
+                        if (specs[i].getVersion().equals(capabilties.getVersion())) {
+                                specification = specs[i];
+                                break;
+                        }
+                }
+                
+                if (specification == null) {
+                        specification = specs[specs.length-1];
+                        LOGGER.warning("Unable to choose a specification based on cached capabilities. "
+                                        +"Arbitrarily choosing spec '"+specification.getVersion()+"'.");
+                }
+                
+                this.serverURL = serverURL;
+                this.capabilities = capabilties;
+        }
 
     /**
      * Description of this service.
@@ -221,8 +224,8 @@ public abstract class AbstractOpenWebService<C extends Capabilities, R extends O
             try {
                 tempCapabilities = (C) issueRequest(request).getCapabilities();
             } catch (ServiceException e) {
-            	tempCapabilities = null;
-            	exception = e;
+                tempCapabilities = null;
+                exception = e;
             }
 
             int compare = -1;
@@ -254,14 +257,14 @@ public abstract class AbstractOpenWebService<C extends Capabilities, R extends O
                 maxClient = test - 1; // set current version as limit
 
                 // lets try and go one lower?
-                //	           
+                //                 
                 clientVersion = before(versions, serverVersion);
 
                 if (clientVersion == null) {
                     if (exception != null) {
-                    	if (exception instanceof ServiceException) {
-                    		throw (ServiceException) exception;
-                    	}
+                        if (exception instanceof ServiceException) {
+                                throw (ServiceException) exception;
+                        }
                         IOException e = new IOException(exception.getMessage());
                         throw e;
                     }
@@ -278,9 +281,9 @@ public abstract class AbstractOpenWebService<C extends Capabilities, R extends O
 
                 if (clientVersion == null) {
                     if (exception != null) {
-                    	if (exception instanceof ServiceException) {
-                    		throw (ServiceException) exception;
-                    	}
+                        if (exception instanceof ServiceException) {
+                                throw (ServiceException) exception;
+                        }
                         IOException e = new IOException(exception.getMessage());
                         throw e;
                     }
@@ -370,43 +373,44 @@ public abstract class AbstractOpenWebService<C extends Capabilities, R extends O
         HttpURLConnection connection = (HttpURLConnection) finalURL.openConnection();
         
         connection.addRequestProperty("Accept-Encoding", "gzip");
+        connection.setConnectTimeout(this.requestTimeout);
         
         if (request.requiresPost()) {
-        	connection.setRequestMethod("POST");
-        	connection.setDoOutput(true);
-        	connection.setRequestProperty("Content-type", request.getPostContentType());
+                connection.setRequestMethod("POST");
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-type", request.getPostContentType());
 
-        	OutputStream outputStream = connection.getOutputStream();
+                OutputStream outputStream = connection.getOutputStream();
 
-        	if (LOGGER.isLoggable(Level.FINE)) {
-        		ByteArrayOutputStream out = new ByteArrayOutputStream();
-        		request.performPostOutput(out);
-        		
-        		InputStream in = new ByteArrayInputStream(out.toByteArray());
-        		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                if (LOGGER.isLoggable(Level.FINE)) {
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        request.performPostOutput(out);
+                        
+                        InputStream in = new ByteArrayInputStream(out.toByteArray());
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-        		PrintStream stream = new PrintStream(outputStream);
-        		
-        		String postText = "";
-        		
-        		while (reader.ready()) {
-        			String input = reader.readLine();
-        			postText = postText + input;
-        			stream.println(input);
-        		}
-        		LOGGER.fine(postText);
-        		System.out.println(postText);
-        		
-        		out.close();
-        		in.close();
-        	} else {
-        		request.performPostOutput(outputStream);
-        	}
-        	
-        	outputStream.flush();
-        	outputStream.close();
+                        PrintStream stream = new PrintStream(outputStream);
+                        
+                        String postText = "";
+                        
+                        while (reader.ready()) {
+                                String input = reader.readLine();
+                                postText = postText + input;
+                                stream.println(input);
+                        }
+                        LOGGER.fine(postText);
+                        System.out.println(postText);
+                        
+                        out.close();
+                        in.close();
+                } else {
+                        request.performPostOutput(outputStream);
+                }
+                
+                outputStream.flush();
+                outputStream.close();
         } else {
-        	connection.setRequestMethod("GET");
+                connection.setRequestMethod("GET");
         }
         
 
@@ -422,10 +426,10 @@ public abstract class AbstractOpenWebService<C extends Capabilities, R extends O
     }
     
     public GetCapabilitiesResponse issueRequest(GetCapabilitiesRequest request) throws IOException, ServiceException {
-    	return (GetCapabilitiesResponse) internalIssueRequest(request);
+        return (GetCapabilitiesResponse) internalIssueRequest(request);
     }
     
     public void setLoggingLevel(Level newLevel) {
-    	LOGGER.setLevel(newLevel);
+        LOGGER.setLevel(newLevel);
     }
 }

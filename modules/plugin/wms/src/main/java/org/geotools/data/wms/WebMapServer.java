@@ -87,7 +87,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </pre></code>
  * 
  * @author Richard Gould, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wms/src/main/java/org/geotools/data/wms/WebMapServer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/wms/src/main/java/org/geotools/data/wms/WebMapServer.java $
  */
 public class WebMapServer extends AbstractOpenWebService<WMSCapabilities,Layer> {
 
@@ -364,7 +364,20 @@ public class WebMapServer extends AbstractOpenWebService<WMSCapabilities,Layer> 
      * @throws ServiceException if the server responds with an error
      */
     public WebMapServer( final URL serverURL ) throws IOException, ServiceException {
-    	super(serverURL);
+        super(serverURL);
+    }
+    
+    /**
+     * Creates a new WebMapServer instance and attempts to retrieve the 
+     * Capabilities document specified by serverURL. 
+     * 
+     * @param serverURL a URL that points to the capabilities document of a server
+     * @param timeout a time to be wait a server response
+     * @throws IOException if there is an error communicating with the server
+     * @throws ServiceException if the server responds with an error
+     */
+    public WebMapServer( final URL serverURL, int timeout ) throws IOException, ServiceException {
+        super(serverURL,timeout);
     }
 
     /**
@@ -388,7 +401,7 @@ public class WebMapServer extends AbstractOpenWebService<WMSCapabilities,Layer> 
     }
     
     public GetCapabilitiesResponse issueRequest(GetCapabilitiesRequest request) throws IOException, ServiceException {
-    	return (GetCapabilitiesResponse) internalIssueRequest(request);
+        return (GetCapabilitiesResponse) internalIssueRequest(request);
     }
     
     public GetMapResponse issueRequest(GetMapRequest request) throws IOException, ServiceException {
@@ -427,15 +440,15 @@ public class WebMapServer extends AbstractOpenWebService<WMSCapabilities,Layer> 
     }
     
     private WMSSpecification getSpecification() {
-    	return (WMSSpecification) specification;
+        return (WMSSpecification) specification;
     }
     
     
     private URL findURL(OperationType operation) {
-    	if (operation.getGet() != null) {
-    		return operation.getGet();
-    	}
-    	return serverURL;
+        if (operation.getGet() != null) {
+                return operation.getGet();
+        }
+        return serverURL;
     }
     
     /**
@@ -450,7 +463,7 @@ public class WebMapServer extends AbstractOpenWebService<WMSCapabilities,Layer> 
         return (GetMapRequest) getSpecification().createGetMapRequest(onlineResource);
     }
 
-	/**
+    /**
      * Creates a GetFeatureInfoRequest that can be configured and then passed to
      * issueRequest(). 
      * 
