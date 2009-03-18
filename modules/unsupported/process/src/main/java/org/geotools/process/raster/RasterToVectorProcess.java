@@ -45,6 +45,7 @@ import org.geotools.process.ProcessFactory;
 import org.geotools.process.impl.AbstractProcess;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.SubProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -171,25 +172,40 @@ public class RasterToVectorProcess extends AbstractProcess {
      * @return a Map containing result objects 
      */
     public Map<String, Object> execute(Map<String, Object> input, ProgressListener monitor) {
-        if (monitor == null) {
-            monitor = new NullProgressListener();
-        }
-        try {
-            GridCoverage2D raster = (GridCoverage2D) input.get(RasterToVectorFactory.RASTER.key);
-            int band = (Integer) input.get(RasterToVectorFactory.BAND.key);
-            Collection<Double> outsideValues = (Collection<Double>)input.get(
-                    RasterToVectorFactory.OUTSIDE.key);
+        GridCoverage2D raster = (GridCoverage2D) input.get(RasterToVectorFactory.RASTER.key);
+        int band = (Integer) input.get(RasterToVectorFactory.BAND.key);
+        Collection<Double> outsideValues = (Collection<Double>)input.get(
+                RasterToVectorFactory.OUTSIDE.key);
 
-            FeatureCollection features = convert(raster, band, outsideValues, monitor);
+        FeatureCollection features = convert(raster, band, outsideValues, monitor);
 
-            Map<String, Object> results = new HashMap<String, Object>();
-            results.put(RasterToVectorFactory.RESULT_FEATURES.key, features);
-            return results;
-        } finally {
-            monitor.complete();
-        }
+        Map<String, Object> results = new HashMap<String, Object>();
+        results.put(RasterToVectorFactory.RESULT_FEATURES.key, features);
+        return results;        
     }
     
+    /**
+     * Convert the input raster coverage to vector polygons. This is a package-access method.
+     * Client code should start the process via the 
+     * {@linkplain org.geotools.process.Process#execute } method.
+     * 
+     * @param gridCoverage
+     *            The input coverage
+     * @param band
+     *            the index of the band to be vectorized
+     * @param outside
+     *            a collection of one or more values which represent 'outside' or no data
+     *
+     * @return a FeatureCollection containing simple polygon features
+     * 
+     */
+    public static FeatureCollection<SimpleFeatureType,SimpleFeature> process(GridCoverage2D gridCoverage, int band, Collection<Double> outsideValues,
+            ProgressListener progress){
+        RasterToVectorFactory factory = new RasterToVectorFactory();
+        RasterToVectorProcess process =  factory.create();
+        
+        return process.convert(gridCoverage, band, outsideValues, progress);
+    }
 
     /**
      * Convert the input raster coverage to vector polygons. This is a package-access method.
@@ -206,24 +222,29 @@ public class RasterToVectorProcess extends AbstractProcess {
      * @return a FeatureCollection containing simple polygon features
      * 
      */
-    private FeatureCollection convert(GridCoverage2D grid, int band, Collection<Double> outsideValues,
+    private FeatureCollection<SimpleFeatureType,SimpleFeature> convert(GridCoverage2D grid, int band, Collection<Double> outsideValues,
             ProgressListener progress) {
-        if (progress == null)
+        if (progress == null) {
             progress = new NullProgressListener();
-        
-        initialize(grid, new SubProgressListener(progress, 0.3f));
-        vectorizeAndCollectBoundaries(band, outsideValues, new SubProgressListener(progress, 0.3f));
-
-        /***********************************************************
-         * Assemble the LineStringss into Polygons, and create the collection of features to return
-         * 
-         ***********************************************************/
-        SimpleFeatureType schema = RasterToVectorFactory.getSchema(grid
-                .getCoordinateReferenceSystem());
-        FeatureCollection features = assembleFeatures(grid, band, schema, new SubProgressListener(
-                progress, 0.4f));
-
-        return features;
+        }
+        try {
+            
+            initialize(grid, new SubProgressListener(progress, 0.3f));
+            vectorizeAndCollectBoundaries(band, outsideValues, new SubProgressListener(progress, 0.3f));
+    
+            /***********************************************************
+             * Assemble the LineStringss into Polygons, and create the collection of features to return
+             * 
+             ***********************************************************/
+            SimpleFeatureType schema = RasterToVectorFactory.getSchema(grid
+                    .getCoordinateReferenceSystem());
+            FeatureCollection<SimpleFeatureType,SimpleFeature> features = assembleFeatures(grid, band, schema, new SubProgressListener(
+                    progress, 0.4f));
+    
+            return features;
+        } finally {
+            progress.complete();
+        }
     }
 
     /**
@@ -236,11 +257,11 @@ public class RasterToVectorProcess extends AbstractProcess {
      * @param progress a progress listener (may be null)
      * @return a new FeatureCollection containing the boundary polygons
      */
-    private FeatureCollection assembleFeatures(GridCoverage2D grid, int band,
+    private FeatureCollection<SimpleFeatureType,SimpleFeature> assembleFeatures(GridCoverage2D grid, int band,
             SimpleFeatureType type, ProgressListener progress) {
         if (progress == null)
             progress = new NullProgressListener();
-        FeatureCollection features = FeatureCollections.newCollection();
+        FeatureCollection<SimpleFeatureType,SimpleFeature> features = FeatureCollections.newCollection();
         SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
 
         InteriorPointArea ipa;
@@ -688,5 +709,5 @@ public class RasterToVectorProcess extends AbstractProcess {
             return false;
         }
     }
-
+    
 }

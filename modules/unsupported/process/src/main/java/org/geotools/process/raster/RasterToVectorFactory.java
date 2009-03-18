@@ -102,7 +102,7 @@ public class RasterToVectorFactory implements ProcessFactory {
     /**
      * Return a new instance of a RasterToVectorProcess
      */
-    public Process create() {
+    public RasterToVectorProcess create() {
         return new RasterToVectorProcess(this);
     }
 
