@@ -82,7 +82,7 @@ public class IndexedFidReader implements FIDReader, FileReader {
         streamLogger.open();
         getHeader(shpFiles);
 
-        buffer = ByteBuffer.allocateDirect(IndexedFidWriter.RECORD_SIZE);//allocateDirect(12 * 1024);
+        buffer = ByteBuffer.allocateDirect(IndexedFidWriter.RECORD_SIZE * 1024);
         buffer.position(buffer.limit());
     }
 
@@ -208,7 +208,7 @@ public class IndexedFidReader implements FIDReader, FileReader {
         }
 
         goTo(predictedRec);
-        buffer.limit(IndexedFidWriter.RECORD_SIZE);
+        hasNext(); // force data reading
         next();
         buffer.limit(buffer.capacity());
         if (currentId == desired) {
