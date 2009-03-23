@@ -78,7 +78,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/datastore/src/main
  *         /java/org/geotools/arcsde/data/ArcSDEAdapter.java $
- * @version $Id: ArcSDEAdapter.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEAdapter.java 32670 2009-03-23 16:24:16Z groldan $
  */
 public class ArcSDEAdapter {
     /** Logger for ths class' package */
@@ -954,7 +954,8 @@ public class ArcSDEAdapter {
                     String qualifiedName = null;
 
                     if (unqualifiedTypeName.indexOf('.') == -1) {
-                        qualifiedName = connection.getUser() + "." + featureType.getTypeName();
+                        // Use the already parsed name (unqualifiedTypeName)
+                        qualifiedName = connection.getUser() + "." + unqualifiedTypeName; //featureType.getTypeName();
                         LOGGER.finer("new full qualified type name: " + qualifiedName);
                     } else {
                         qualifiedName = unqualifiedTypeName;
@@ -1077,7 +1078,7 @@ public class ArcSDEAdapter {
         // Set the shape types that can be inserted into this layer
         int seShapeTypes = ArcSDEAdapter.guessShapeTypes(geometryAtt);
         layer.setShapeTypes(seShapeTypes);
-        layer.setGridSizes(1100, 0, 0);
+        layer.setGridSizes(1100.0, 0.0, 0.0);
         layer.setDescription("Created with GeoTools");
 
         // Define the layer's Coordinate Reference

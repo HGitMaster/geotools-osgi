@@ -28,7 +28,7 @@ public class SeLayer {
 	public void setTableName(String s) {}
 	public void setSpatialColumnName(String s) {}
 	public void setShapeTypes(int i) {}
-	public void setGridSizes(int i, int j, int k) {}
+	// public void setGridSizes(int i, int j, int k) {} NOT IN 9.1 or 9.2
 	public void setDescription(String s) {}
 	public void setExtent(SeExtent s) {}
 	public void setCoordRef(SeCoordinateReference s) {}
