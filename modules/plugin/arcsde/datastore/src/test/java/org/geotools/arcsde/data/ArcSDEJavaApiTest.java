@@ -73,7 +73,7 @@ import com.esri.sde.sdk.client.SeVersion;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/ArcSDEJavaApiTest.java $
- * @version $Id: ArcSDEJavaApiTest.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEJavaApiTest.java 32671 2009-03-23 16:36:40Z groldan $
  */
 public class ArcSDEJavaApiTest {
     /** package logger */
@@ -961,7 +961,7 @@ public class ArcSDEJavaApiTest {
                      * Define the layer's Coordinate Reference
                      */
                     SeCoordinateReference coordref = new SeCoordinateReference();
-                    coordref.setXY(0, 0, 100);
+                    coordref.setXY(0D, 0D, 100D);
                     layer.setCoordRef(coordref);
 
                     /*
