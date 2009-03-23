@@ -30,7 +30,7 @@ import org.opengis.filter.PropertyIsLike;
  *
  * @author Rob Hranac, Vision for New York
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/LikeFilterImpl.java $
- * @version $Id: LikeFilterImpl.java 32190 2009-01-09 11:13:13Z jesseeichar $
+ * @version $Id: LikeFilterImpl.java 32673 2009-03-23 20:10:39Z jive $
  */
 public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 
@@ -55,6 +55,8 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
     /** The matcher to match patterns with. */
     private Matcher match = null;
     
+    /** Used to indicate if case should be ignored or not */
+    boolean matchingCase;
     
     /**
 	 * Given OGC PropertyIsLike Filter information, construct
@@ -172,6 +174,13 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 		match = null;
 	}
 	
+	public boolean isMatchingCase() {
+            return matchingCase;
+    }
+
+    public void setMatchingCase(boolean matchingCase) {
+            this.matchingCase = matchingCase;
+    }
 	
     private Matcher getMatcher(){
         if(match == null){
