@@ -72,7 +72,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
- * @version $Id: ArcSDEFeatureSourceTest.java 32668 2009-03-23 14:47:37Z groldan $
+ * @version $Id: ArcSDEFeatureSourceTest.java 32669 2009-03-23 16:12:41Z groldan $
  */
 public class ArcSDEFeatureSourceTest {
     /** package logger */
@@ -294,7 +294,7 @@ public class ArcSDEFeatureSourceTest {
             assertNotNull(f.getBounds());
 
             GeometryAttribute defaultGeom = f.getDefaultGeometryProperty();
-            assertNotNull(defaultGeom);
+            assertNotNull("expected non null GeometryAttribute", defaultGeom);
 
             return true;
         }
@@ -334,7 +334,9 @@ public class ArcSDEFeatureSourceTest {
         final int EXPECTED_RESULT_COUNT = 1;
         FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(testData
                 .getTempTableName());
-        Filter bboxFilter = getBBoxfilter(fs);
+        SimpleFeatureType schema = fs.getSchema();
+        Filter bboxFilter = ff.bbox(schema.getGeometryDescriptor().getLocalName(), -60, -55, -40,
+                -20, schema.getCoordinateReferenceSystem().getName().getCode());
         Filter sqlFilter = CQL.toFilter("INT32_COL < 5");
         LOGGER.fine("Geometry filter: " + bboxFilter);
         LOGGER.fine("SQL filter: " + sqlFilter);
@@ -558,8 +560,26 @@ public class ArcSDEFeatureSourceTest {
 
     @Test
     public void testBBoxFilter() throws Exception {
-        int expected = 7;
-        testBBox(testData.getTempTableName(), expected);
+        String typeName = testData.getTempTableName();
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(typeName);
+        SimpleFeatureType schema = fs.getSchema();
+        BBOX bboxFilter = ff.bbox(schema.getGeometryDescriptor().getLocalName(), -180, -90, 180,
+                90, schema.getCoordinateReferenceSystem().getName().getCode());
+
+        int expected = 0;
+        FeatureIterator<SimpleFeature> features = fs.getFeatures().features();
+        try {
+            while (features.hasNext()) {
+                SimpleFeature next = features.next();
+                if (bboxFilter.evaluate(next)) {
+                    expected++;
+                }
+            }
+        } finally {
+            features.close();
+        }
+        assertTrue(expected > 0);
+        testFilter(bboxFilter, fs, expected);
     }
 
     /**
@@ -721,20 +741,6 @@ public class ArcSDEFeatureSourceTest {
         } finally {
             fc.close(fi);
         }
-    }
-
-    private void testBBox(String table, int expected) throws Exception {
-        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(table);
-        Filter bboxFilter = getBBoxfilter(fs);
-        testFilter(bboxFilter, fs, expected);
-    }
-
-    private Filter getBBoxfilter(FeatureSource<SimpleFeatureType, SimpleFeature> fs)
-            throws Exception {
-        SimpleFeatureType schema = fs.getSchema();
-        BBOX bbe = ff.bbox(schema.getGeometryDescriptor().getLocalName(), -60, -55, -40, -20,
-                schema.getCoordinateReferenceSystem().getName().getCode());
-        return bbe;
     }
 
 }

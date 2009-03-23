@@ -38,7 +38,7 @@ import com.esri.sde.sdk.client.SeTable;
 
 /**
  * @author Gabriel Roldan (TOPP)
- * @version $Id: FIDReaderTest.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: FIDReaderTest.java 32669 2009-03-23 16:12:41Z groldan $
  * @since 2.5.x
  */
 public class FIDReaderTest {
@@ -110,13 +110,14 @@ public class FIDReaderTest {
         assertNotNull(fidReader);
         assertTrue(fidReader instanceof FIDReader.ShapeFidReader);
         assertEquals(-1, fidReader.getColumnIndex());
-        assertEquals("GEOM.fid", fidReader.getFidColumn());
+        //use toUpperCase, case may be different depending on the backend rdbms
+        assertEquals("GEOM.FID", fidReader.getFidColumn().toUpperCase());
     }
 
     private FIDReader getFidReader(String tableName) throws IOException {
         FIDReader fidReader;
         String dbName = session.getDatabaseName();
-        tableName = dbName == null ? "" : (dbName + ".") + session.getUser() + "." + tableName;
+        tableName = ((dbName == null || "".equals(dbName)) ? "" : (dbName + ".")) + session.getUser() + "." + tableName;
         tableName = tableName.toUpperCase();
 
         SeTable table = session.getTable(tableName);
