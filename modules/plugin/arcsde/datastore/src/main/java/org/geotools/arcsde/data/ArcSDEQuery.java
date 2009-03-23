@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/ArcSDEQuery.java $
- * @version $Id: ArcSDEQuery.java 32322 2009-01-24 20:11:52Z groldan $
+ * @version $Id: ArcSDEQuery.java 32668 2009-03-23 14:47:37Z groldan $
  */
 class ArcSDEQuery {
     /** Shared package's logger */
@@ -446,48 +446,6 @@ class ArcSDEQuery {
     }
 
     /**
-     * creates an SeQuery with the filters provided to the constructor and returns it. Queries
-     * created with this method are to be used for calculating layer extents and result counts.
-     * These queries cannot be executed or used to fetch results.
-     * <p>
-     * Difference with {@link #createSeQueryForFetch(Session, String[])} is that this function tells
-     * <code>SeQuery.setSpatialConstraints</code> to return geometry based bitmasks, which are
-     * needed for calculating the query extent and result count, but not for fetching SeRows.
-     * </p>
-     * 
-     * @param whether
-     *            to instruct the query to gather "geometry masks". Should be true to calculate
-     *            counts and false to calculate bounds, or a DATABASE LEVEL ERROR is thrown by
-     *            ArcSDE...
-     * @return an SeQuery settled up with the attribute and spatial constraints to calculate result
-     *         count and envelope
-     * @throws IOException
-     *             DOCUMENT ME!
-     */
-    private SeQuery createSeQueryForQueryInfo(final boolean setReturnGeometryMasks)
-            throws IOException {
-
-        SeQuery query = session.issue(new Command<SeQuery>() {
-            @Override
-            public SeQuery execute(ISession session, SeConnection connection) throws SeException,
-                    IOException {
-                SeQuery seQuery = new SeQuery(connection);
-                SeFilter[] spatialConstraints = ArcSDEQuery.this.filters.getSpatialFilters();
-
-                if (spatialConstraints.length > 0) {
-                    seQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, setReturnGeometryMasks,
-                            spatialConstraints);
-                }
-
-                return seQuery;
-            }
-        });
-
-        setQueryVersionState(query);
-        return query;
-    }
-
-    /**
      * If the table being queried is multi versioned (we have a flag indicating it), retrieves the
      * default version and its current version state to use for the query object
      * 
@@ -604,29 +562,42 @@ class ArcSDEQuery {
 
         if (this.resultCount == -1) {
             if (filters.getUnsupportedFilter() == Filter.INCLUDE) {
-                final SeQuery countQuery = createSeQueryForQueryInfo(true);
+                final SeQuery countQuery = session.createSeQuery();
+                setQueryVersionState(countQuery);
 
+                final String aFieldName = "*";
+                final String[] columns = { aFieldName };
+                final SeQueryInfo sdeQueryInfo = filters.getQueryInfo(columns);
+                final SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
+
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    String msg = "ArcSDE query is: " + toString(sdeQueryInfo);
+                    LOGGER.finer(msg);
+                }
                 // there's nothing to filter post-db, so we're clear to do the
                 // result count
                 // by sending a query to the db and completely trusting the
                 // result.
-                final String aFieldName = "*";
-                final String[] columns = { aFieldName };
-                final SeQueryInfo qInfo = filters.getQueryInfo(columns);
+
                 try {
                     Integer resultCount = session.issue(new Command<Integer>() {
                         @Override
                         public Integer execute(ISession session, SeConnection connection)
                                 throws SeException, IOException {
 
+                            if (spatialConstraints.length > 0) {
+                                countQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, false,
+                                        spatialConstraints);
+                            }
                             SeTable.SeTableStats tableStats = countQuery.calculateTableStatistics(
-                                    aFieldName, SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
+                                    aFieldName, SeTable.SeTableStats.SE_COUNT_STATS, sdeQueryInfo,
+                                    0);
                             Integer resultCount = new Integer(tableStats.getCount());
                             return resultCount;
                         }
                     });
-
                     this.resultCount = resultCount.intValue();
+                    LOGGER.finest("resultCount = " + this.resultCount);
                 } catch (IOException e) {
                     if (LOGGER.isLoggable(Level.FINE)) {
                         LOGGER.fine("Error calculating result cout with SQL where clause: "
@@ -648,7 +619,7 @@ class ArcSDEQuery {
                         + "Can't pre-calculate result count.");
             }
         }
-
+        LOGGER.fine("Done calculating result count");
         return this.resultCount;
     }
 
@@ -667,21 +638,34 @@ class ArcSDEQuery {
 
         LOGGER.fine("Building a new SeQuery to consult it's resulting envelope");
 
-        final SeQuery extentQuery = createSeQueryForQueryInfo(false);
+        final SeQuery extentQuery = session.createSeQuery();
+        setQueryVersionState(extentQuery);
+
+        final String[] spatialCol = { schema.getGeometryDescriptor().getLocalName() };
+        final SeQueryInfo sdeQueryInfo = filters.getQueryInfo(spatialCol);
+        final SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
+
+        if (LOGGER.isLoggable(Level.FINER)) {
+            String msg = "ArcSDE query is: " + toString(sdeQueryInfo);
+            LOGGER.finer(msg);
+        }
         try {
-            final String[] spatialCol = { schema.getGeometryDescriptor().getLocalName() };
-            final SeQueryInfo sdeQueryInfo = filters.getQueryInfo(spatialCol);
             envelope = session.issue(new Command<Envelope>() {
                 @Override
                 public Envelope execute(ISession session, SeConnection connection)
                         throws SeException, IOException {
-                    SeExtent extent;
 
-                    extent = extentQuery.calculateLayerExtent(sdeQueryInfo);
+                    //extentQuery.prepareQueryInfo(sdeQueryInfo);
+                    if (spatialConstraints.length > 0) {
+                        extentQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, false,
+                                spatialConstraints);
+                    }
+
+                    SeExtent extent = extentQuery.calculateLayerExtent(sdeQueryInfo);
 
                     Envelope envelope = new Envelope(extent.getMinX(), extent.getMaxX(), extent
                             .getMinY(), extent.getMaxY());
-                    if(LOGGER.isLoggable(Level.FINE)){
+                    if (LOGGER.isLoggable(Level.FINE)) {
                         LOGGER.fine("got extent: " + extent + ", built envelope: " + envelope);
                     }
                     return envelope;
@@ -765,6 +749,7 @@ class ArcSDEQuery {
     }
 
     private SdeRow currentRow;
+
     /**
      * Fetches an SeRow of data.
      * 
@@ -780,23 +765,23 @@ class ArcSDEQuery {
         }
 
         final SeQuery seQuery = getSeQuery();
-        //commented out while SeToJTSGeometryFactory is in development
-//        if(currentRow == null){
-//            GeometryFactory geomFac = new SeToJTSGeometryFactory();
-//            currentRow = new SdeRow(geomFac);
-//            int geometryIndex = -1;
-//            for(int i = 0; i < schema.getAttributeCount(); i++){
-//                if(schema.getDescriptor(i) instanceof GeometryDescriptor){
-//                    geometryIndex = i;
-//                    break;
-//                }
-//            }
-//            currentRow.setGeometryIndex(geometryIndex);
-//        }
-//        try {
-//            currentRow = session.fetch(seQuery, currentRow);
-         try{
-             currentRow = session.fetch(seQuery);
+        // commented out while SeToJTSGeometryFactory is in development
+        // if(currentRow == null){
+        // GeometryFactory geomFac = new SeToJTSGeometryFactory();
+        // currentRow = new SdeRow(geomFac);
+        // int geometryIndex = -1;
+        // for(int i = 0; i < schema.getAttributeCount(); i++){
+        // if(schema.getDescriptor(i) instanceof GeometryDescriptor){
+        // geometryIndex = i;
+        // break;
+        // }
+        // }
+        // currentRow.setGeometryIndex(geometryIndex);
+        // }
+        // try {
+        // currentRow = session.fetch(seQuery, currentRow);
+        try {
+            currentRow = session.fetch(seQuery);
         } catch (IOException e) {
             close();
             String msg = "Error fetching row for " + this.schema.getTypeName() + "[";

@@ -29,6 +29,7 @@ import org.geotools.styling.Style;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -50,6 +51,7 @@ import com.vividsolutions.jts.util.Stopwatch;
  * This is a legacy benchmarking suite I'm using to assess the performance of some very large
  * datasets. Will be removed.
  */
+@Ignore
 public class LargePolygonsPerfTest {
 
     private static TestData testData;

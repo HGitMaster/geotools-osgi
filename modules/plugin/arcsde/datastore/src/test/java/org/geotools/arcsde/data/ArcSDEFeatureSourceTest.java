@@ -72,7 +72,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
- * @version $Id: ArcSDEFeatureSourceTest.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEFeatureSourceTest.java 32668 2009-03-23 14:47:37Z groldan $
  */
 public class ArcSDEFeatureSourceTest {
     /** package logger */
@@ -143,57 +143,22 @@ public class ArcSDEFeatureSourceTest {
      * @throws SeException
      */
     @Test
-    public void testGetFeatureReader() throws IOException, IllegalAttributeException, SeException {
-        final int NUM_READERS = Integer.parseInt(testData.getConProps().getProperty(
-                "pool.maxConnections"));
-        String[] typeNames = { testData.getTempTableName() };
+    public void testGetFeatureReader() throws IOException {
+        final String typeName = testData.getTempTableName();
 
-        FeatureReader<SimpleFeatureType, SimpleFeature>[] readers = new FeatureReader[NUM_READERS];
-        int[] counts = new int[NUM_READERS];
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReader(typeName);
 
-        for (int i = 0; i < NUM_READERS;) {
-            for (int j = 0; (j < typeNames.length) && (i < NUM_READERS); j++, i++) {
-                readers[i] = getReader(typeNames[j]);
+        assertNotNull(reader);
+        int count = 0;
+        try {
+            while (testNext(reader)) {
+                ++count;
             }
+        } finally {
+            reader.close();
         }
 
-        long t = System.currentTimeMillis();
-        boolean hasNext = false;
-
-        while (true) {
-            for (int i = 0; i < NUM_READERS; i++) {
-                if (readers[i].hasNext()) {
-                    hasNext = true;
-
-                    break;
-                }
-
-                hasNext = false;
-            }
-
-            if (!hasNext) {
-                for (int i = 0; i < NUM_READERS; i++)
-                    readers[i].close();
-
-                break;
-            }
-
-            for (int i = 0; i < NUM_READERS; i++) {
-                if (testNext(readers[i])) {
-                    ++counts[i];
-                }
-            }
-        }
-
-        t = System.currentTimeMillis() - t;
-
-        String scounts = "";
-
-        for (int i = 0; i < NUM_READERS; i++)
-            scounts += (counts[i] + ", ");
-
-        LOGGER.fine("testGetFeatureReader: traversed " + scounts + " features simultaneously from "
-                + NUM_READERS + " different FeatureReaders in " + t + "ms");
+        assertEquals(8, count);
     }
 
     /**
@@ -327,9 +292,6 @@ public class ArcSDEFeatureSourceTest {
             assertNotNull(f);
             assertNotNull(f.getFeatureType());
             assertNotNull(f.getBounds());
-
-            // Object geom = f.getDefaultGeometry();
-            // assertNotNull(geom);
 
             GeometryAttribute defaultGeom = f.getDefaultGeometryProperty();
             assertNotNull(defaultGeom);
@@ -745,19 +707,20 @@ public class ArcSDEFeatureSourceTest {
     private void testFilter(Filter filter, FeatureSource<SimpleFeatureType, SimpleFeature> fsource,
             int expected) throws IOException {
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fsource.getFeatures(filter);
-        int fCount = fc.size();
-        LOGGER.info("collection size: " + fCount);
 
         FeatureIterator<SimpleFeature> fi = fc.features();
-        int numFeat = 0;
-        while (fi.hasNext()) {
-            fi.next();
-            numFeat++;
-        }
+        try {
+            int numFeat = 0;
+            while (fi.hasNext()) {
+                fi.next();
+                numFeat++;
+            }
 
-        String failMsg = "Fully fetched features size and estimated num features count does not match";
-        assertEquals(failMsg, fCount, numFeat);
-        fc.close(fi);
+            String failMsg = "Fully fetched features size and estimated num features count does not match";
+            assertEquals(failMsg, expected, numFeat);
+        } finally {
+            fc.close(fi);
+        }
     }
 
     private void testBBox(String table, int expected) throws Exception {
