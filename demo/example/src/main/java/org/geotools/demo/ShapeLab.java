@@ -21,9 +21,9 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.tool.JMapPanePanTool;
-import org.geotools.gui.swing.tool.JMapPaneZoomInTool;
-import org.geotools.gui.swing.tool.JMapPaneZoomOutTool;
+import org.geotools.gui.swing.tool.PanTool;
+import org.geotools.gui.swing.tool.ZoomInTool;
+import org.geotools.gui.swing.tool.ZoomOutTool;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.renderer.lite.StreamingRenderer;
@@ -163,7 +163,7 @@ public class ShapeLab {
         JButton zoomInButton = new JButton("Zoom In");
         zoomInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapPane.setCursorTool(new JMapPaneZoomInTool());
+                mapPane.setCursorTool(new ZoomInTool());
             }
         });
         buttons.add(zoomInButton);
@@ -171,7 +171,7 @@ public class ShapeLab {
         JButton zoomOutButton = new JButton("Zoom Out");
         zoomOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapPane.setCursorTool( new JMapPaneZoomOutTool() );
+                mapPane.setCursorTool( new ZoomOutTool() );
             }
         });
         buttons.add(zoomOutButton);
@@ -179,7 +179,7 @@ public class ShapeLab {
         JButton pamButton = new JButton("Move");
         pamButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapPane.setCursorTool(new JMapPanePanTool());
+                mapPane.setCursorTool(new PanTool());
             }
         });
         buttons.add(pamButton);
