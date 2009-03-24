@@ -32,8 +32,8 @@ import org.opengis.feature.type.FeatureType;
  *
  * @author Cameron Shorter
  * @author Martin Desruisseaux
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/map/MapLayer.java $
- * @version $Id: MapLayer.java 30649 2008-06-12 19:44:08Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/map/MapLayer.java $
+ * @version $Id: MapLayer.java 32675 2009-03-24 00:11:46Z mbedward $
  */
 public interface MapLayer {
     /**
@@ -103,6 +103,23 @@ public interface MapLayer {
      *        <code>false</code>
      */
     void setVisible(boolean visible);
+
+    /**
+     * Determine whether this layer is currently selected.
+     *
+     * @return <code>true</code> if the layer is selected, or <code>false</code>
+     * otherwise
+     */
+    boolean isSelected();
+
+    /**
+     * Specify whether this layer is selected. A {@link LayerEvent} iw fired
+     * if the selected status is changed.
+     *
+     * @param selected Set the layer as selected if <code>true</code> or as
+     * unselected if <code>false</code>
+     */
+    void setSelected(boolean selected);
 
     /**
      * Returns the definition query (filter) for this layer. If no definition

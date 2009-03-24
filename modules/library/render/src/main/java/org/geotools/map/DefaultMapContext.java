@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * interface
  * 
  * @author Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/map/DefaultMapContext.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/map/DefaultMapContext.java $
  */
 public class DefaultMapContext implements MapContext {
 	/** The logger for the map module. */
@@ -83,6 +83,14 @@ public class DefaultMapContext implements MapContext {
 		public void layerHidden(MapLayerEvent event) {
 			fireAsListEvent(event);
 		}
+
+        public void layerSelected(MapLayerEvent event) {
+            fireAsListEvent(event);
+        }
+
+        public void layerDeselected(MapLayerEvent event) {
+            fireAsListEvent(event);
+        }
 
 		private void fireAsListEvent(MapLayerEvent event) {
 			MapLayer layer = (MapLayer) event.getSource();

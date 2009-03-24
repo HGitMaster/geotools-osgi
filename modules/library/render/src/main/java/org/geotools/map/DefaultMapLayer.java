@@ -33,7 +33,6 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.coverage.FeatureUtilities;
@@ -73,6 +72,9 @@ public class DefaultMapLayer implements MapLayer {
 	/** Whether this layer is visible or not. */
 	protected boolean visible;
 
+    /** Whether this layer is selected or not. */
+    protected boolean selected;
+
 	/** Utility field used by event firing mechanism. */
 	protected javax.swing.event.EventListenerList listenerList = null;
 
@@ -110,6 +112,7 @@ public class DefaultMapLayer implements MapLayer {
 		this.style = style;
 		this.title = title;
 		this.visible = true;
+        this.selected = false;
 	}
 
     public DefaultMapLayer(CollectionSource source, Style style, String title) {
@@ -121,6 +124,7 @@ public class DefaultMapLayer implements MapLayer {
         this.style = style;
         this.title = title;
         this.visible = true;
+        this.selected = false;
     }
     
     
@@ -324,7 +328,7 @@ public class DefaultMapLayer implements MapLayer {
 
 	/**
 	 * Getter for property visible.
-	 * 
+	 *
 	 * @return Value of property visible.
 	 */
 	public boolean isVisible() {
@@ -333,7 +337,7 @@ public class DefaultMapLayer implements MapLayer {
 
 	/**
 	 * Setter for property visible.
-	 * 
+	 *
 	 * @param visible
 	 *            New value of property visible.
 	 */
@@ -352,6 +356,38 @@ public class DefaultMapLayer implements MapLayer {
 			fireMapLayerListenerLayerShown(event);
 		} else {
 			fireMapLayerListenerLayerHidden(event);
+		}
+	}
+
+	/**
+	 * Getter for property selected.
+	 *
+	 * @return Value of property selected.
+	 */
+	public boolean isSelected() {
+		return this.selected;
+	}
+
+	/**
+	 * Setter for property selected.
+	 *
+	 * @param selected new value of property selected.
+	 */
+	public void setSelected(boolean selected) {
+		if (this.selected == selected) {
+			return;
+		}
+
+		// change selection status and fire events
+		this.selected = selected;
+
+		MapLayerEvent event = new MapLayerEvent(this,
+				MapLayerEvent.SELECTION_CHANGED);
+
+		if (selected) {
+			fireMapLayerListenerLayerSelected(event);
+		} else {
+			fireMapLayerListenerLayerDeselected(event);
 		}
 	}
 
@@ -535,6 +571,50 @@ public class DefaultMapLayer implements MapLayer {
 		}
 	}
 
+	/**
+	 * Notifies all registered listeners about the selection event.
+	 *
+	 * @param event
+	 *            The event to be fired
+	 */
+    protected void fireMapLayerListenerLayerSelected(
+			org.geotools.map.event.MapLayerEvent event) {
+		if (listenerList == null) {
+			return;
+		}
+
+		Object[] listeners = listenerList.getListenerList();
+		final int length=listeners.length;
+		for (int i = length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
+				((org.geotools.map.event.MapLayerListener) listeners[i + 1])
+						.layerSelected(event);
+			}
+		}
+	}
+
+	/**
+	 * Notifies all registered listeners about the deselection event.
+	 *
+	 * @param event
+	 *            The event to be fired
+	 */
+    protected void fireMapLayerListenerLayerDeselected(
+			org.geotools.map.event.MapLayerEvent event) {
+		if (listenerList == null) {
+			return;
+		}
+
+		Object[] listeners = listenerList.getListenerList();
+		final int length=listeners.length;
+		for (int i = length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
+				((org.geotools.map.event.MapLayerListener) listeners[i + 1])
+						.layerDeselected(event);
+			}
+		}
+	}
+
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
 		buf.append("DefaultMapLayer[ ");
@@ -548,6 +628,11 @@ public class DefaultMapLayer implements MapLayer {
 		} else {
 			buf.append(", HIDDEN");
 		}
+        if (selected) {
+            buf.append(", SELECTED");
+        } else {
+            buf.append(", UNSELECTED");
+        }
 		buf.append(", style=");
 		buf.append(style);
 		buf.append(", data=");
