@@ -295,6 +295,69 @@ public class Parser {
     }
 
     /**
+     * Validates an instance document defined by a input stream.
+     * <p>
+     * Clients should call {@link #getValidationErrors()} after this method to 
+     * retrieve any validation errors that occurred. Clients do not need to call 
+     * {@link #setValidating(boolean)} when using this method to validate. 
+     * </p>
+     * <p>
+     * This method does not do any of the work done by {@link #parse(InputSource)}, it
+     * only validates. 
+     * </p>
+     *
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
+    public void validate( InputStream in ) throws IOException, SAXException, ParserConfigurationException {
+        validate( new InputSource( in ) );
+    }
+
+    /**
+     * Validates an instance document defined by a reader.
+     * <p>
+     * Clients should call {@link #getValidationErrors()} after this method to 
+     * retrieve any validation errors that occurred. Clients do not need to call 
+     * {@link #setValidating(boolean)} when using this method to validate. 
+     * </p>
+     * <p>
+     * This method does not do any of the work done by {@link #parse(InputSource)}, it
+     * only validates. 
+     * </p>
+     *
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
+    public void validate( Reader reader ) throws IOException, SAXException, ParserConfigurationException {
+        validate( new InputSource( reader ) );
+    }
+    
+    /**
+     * Validates an instance document defined by a input source.
+     * <p>
+     * Clients should call {@link #getValidationErrors()} after this method to 
+     * retrieve any validation errors that occurred. Clients do not need to call 
+     * {@link #setValidating(boolean)} when using this method to validate. 
+     * </p>
+     * <p>
+     * This method does not do any of the work done by {@link #parse(InputSource)}, it
+     * only validates. 
+     * </p>
+     *
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
+    public void validate( InputSource source ) throws IOException, SAXException, ParserConfigurationException {
+        SAXParser parser = parser( true );
+        parser.setContentHandler( handler.getValidator() );
+        parser.setErrorHandler( handler.getValidator() );
+        parser.parse( source );
+    }
+
+    /**
      * Returns the schema objects referenced by the instance document being
      * parsed. This method can only be called after a successful parse has
      * begun.
@@ -334,6 +397,10 @@ public class Parser {
     }
 
     protected SAXParser parser() throws ParserConfigurationException, SAXException {
+        return parser( isValidating() );
+    }
+    
+    protected SAXParser parser(boolean validate) throws ParserConfigurationException, SAXException {
         //JD: we use xerces directly here because jaxp does seem to allow use to 
         // override all the namespaces to validate against
         SAXParser parser = new SAXParser();
@@ -341,7 +408,7 @@ public class Parser {
         //set the appropriate features
         parser.setFeature("http://xml.org/sax/features/namespaces", true);
 
-        if (handler.isValidating()) {
+        if (validate) {
             parser.setFeature("http://xml.org/sax/features/validation", true);
             parser.setFeature("http://apache.org/xml/features/validation/schema", true);
             parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);

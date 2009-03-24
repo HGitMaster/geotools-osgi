@@ -67,7 +67,22 @@ public class ParserTest extends TestCase {
         }
         catch( SAXException e ) {
         }
+    }
+    
+    public void testValidate() throws Exception {
+        Parser parser = new Parser(new MLConfiguration());
+        parser.validate(MLSchemaLocationResolver.class.getResourceAsStream("mails-invalid.xml"));
+
+        assertFalse(0 == parser.getValidationErrors().size());
         
+        //test immeediate failure case
+        parser.setFailOnValidationError(true);
+        try {
+            parser.validate(MLSchemaLocationResolver.class.getResourceAsStream("mails-invalid.xml"));    
+            fail( "should have thrown an error with setFailOnValidationError set");
+        }
+        catch( SAXException e ) {
+        }
     }
     
     public void testParserDelegate() throws Exception {

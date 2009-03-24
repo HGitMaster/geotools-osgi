@@ -102,20 +102,17 @@ public class ParserHandler extends DefaultHandler {
     /** flag to indicate if the parser should validate or not */
     boolean validating;
     
-    /** flag to control if an exception is thrown on a falidation error */
-    boolean failOnValidationError = false;
+    /** handler for validation errors */
+    ValidatorHandler validator;
     
     /** wether the parser is strict or not */
     boolean strict = false;
 
-    /** list of "errors" that occur while parsing */
-    List errors;
-
     public ParserHandler(Configuration config) {
         this.config = config;
-        errors = new ArrayList();
         namespaces = new NamespaceSupport();
         validating = false;
+        validator = new ValidatorHandler();
     }
 
     public Configuration getConfiguration() {
@@ -139,15 +136,19 @@ public class ParserHandler extends DefaultHandler {
     }
     
     public void setFailOnValidationError( boolean failOnValidationError ) {
-        this.failOnValidationError = failOnValidationError;
+        validator.setFailOnValidationError(failOnValidationError);
     }
     
     public boolean isFailOnValidationError() {
-        return failOnValidationError;
+        return validator.isFailOnValidationError();
     }
 
     public List getValidationErrors() {
-        return errors;
+        return validator.getErrors();
+    }
+    
+    public ValidatorHandler getValidator() {
+        return validator;
     }
 
     public HandlerFactory getHandlerFactory() {
@@ -226,6 +227,7 @@ public class ParserHandler extends DefaultHandler {
         //register configuration itself
         context.registerComponentInstance( config );
 
+        validator.startDocument();
         docHandler.startDocument();
     }
 
@@ -623,6 +625,8 @@ O:          for (int i = 0; i < schemas.length; i++) {
     }
 
     public void endDocument() throws SAXException {
+        validator.endDocument();
+        
         //only the document handler should be left on the stack
         documentHandler = (DocumentHandler) handlers.pop();
         documentHandler.endDocument();
@@ -640,18 +644,17 @@ O:          for (int i = 0; i < schemas.length; i++) {
     }
 
     public void warning(SAXParseException e) throws SAXException {
-        //errors.add( e );
+        if ( isValidating() ) {
+            validator.warning( e );
+        }
     }
 
     public void error(SAXParseException e) throws SAXException {
         logger.log(Level.WARNING, e.getMessage());
-        
-        //check fail on validation flag
-        if ( isFailOnValidationError() ) {
-            throw e;
+        if ( isValidating() ) {
+         
+            validator.error( e );
         }
-        
-        errors.add(e);
     }
 
     public Object getValue() {
