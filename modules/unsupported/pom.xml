@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32682 2009-03-24 09:37:41Z aaime $
+        Version: $Id: pom.xml 32685 2009-03-24 10:45:01Z aaime $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -116,11 +116,9 @@
      </profile>
      <profile>
        <id>swing</id>
-       <!--
        <activation>
          <property><name>all</name></property>
        </activation>
-       -->
        <modules>
          <module>widgets-swing-pending</module>
        </modules>
