@@ -19,18 +19,18 @@ package org.geotools.gui.swing.action;
 
 import java.awt.event.ActionEvent;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.tool.JMapPaneTool;
-import org.geotools.gui.swing.tool.JMapPaneZoomOutTool;
+import org.geotools.gui.swing.tool.MapTool;
+import org.geotools.gui.swing.tool.ZoomInTool;
 
 /**
  * An action for connect a control (probably a JButton) to
- * the JMapPaneZoomOutTool for ZoomOutg the map with mouse clicks
+ * the ZoomInTool for zooming the map with mouse clicks
  * or drags.
  * 
  * @author Michael Bedward
  * @since 2.6
  */
-public class JMapPaneZoomOutAction extends JMapPaneAction {
+public class ZoomInAction extends MapAction {
     
     /**
      * Constructor - when used with a JButton the button will
@@ -38,8 +38,8 @@ public class JMapPaneZoomOutAction extends JMapPaneAction {
      * 
      * @param pane the map pane being serviced by this action
      */
-    public JMapPaneZoomOutAction(JMapPane pane) {
-        this(pane, JMapPaneTool.SMALL_ICON, false);
+    public ZoomInAction(JMapPane pane) {
+        this(pane, MapTool.SMALL_ICON, false);
     }
 
     /**
@@ -47,33 +47,33 @@ public class JMapPaneZoomOutAction extends JMapPaneAction {
      * 
      * @param pane the map pane being serviced by this action
      * @param toolIcon specifies which, if any, icon the control (e.g. JButton)
-     * will display; one of JMapPaneTool.NO_ICON, JMapPaneTool.SMALL_ICON or
-     * JMapPaneTool.LARGE_ICON.
+     * will display; one of MapTool.NO_ICON, MapTool.SMALL_ICON or
+     * MapTool.LARGE_ICON.
      * @param showToolName set to true for the control to display the tool name
      */
-    public JMapPaneZoomOutAction(JMapPane pane, int toolIcon, boolean showToolName) {
-        String toolName = showToolName ? JMapPaneZoomOutTool.TOOL_NAME : null;
+    public ZoomInAction(JMapPane pane, int toolIcon, boolean showToolName) {
+        String toolName = showToolName ? ZoomInTool.TOOL_NAME : null;
         
         String iconImagePath = null;
         switch (toolIcon) {
-            case JMapPaneTool.LARGE_ICON:
-                iconImagePath = JMapPaneZoomOutTool.ICON_IMAGE_LARGE;
+            case MapTool.LARGE_ICON:
+                iconImagePath = ZoomInTool.ICON_IMAGE_LARGE;
                 break;
                 
-            case JMapPaneTool.SMALL_ICON:
-                iconImagePath = JMapPaneZoomOutTool.ICON_IMAGE_SMALL;
+            case MapTool.SMALL_ICON:
+                iconImagePath = ZoomInTool.ICON_IMAGE_SMALL;
                 break;
         }
         
-        super.init(pane, toolName, JMapPaneZoomOutTool.TOOL_TIP, iconImagePath);
+        super.init(pane, toolName, ZoomInTool.TOOL_TIP, iconImagePath);
     }
     
     /**
      * Called when the associated control is activated. Leads to the
-     * map pane's cursor tool being set to a new JMapPaneZoomOutTool object
+     * map pane's cursor tool being set to a new ZoomInTool object
      */
     public void actionPerformed(ActionEvent e) {
-        pane.setCursorTool(new JMapPaneZoomOutTool());
+        pane.setCursorTool(new ZoomInTool());
     }
 
 }

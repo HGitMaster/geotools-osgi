@@ -33,10 +33,10 @@ import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
 
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.action.JMapPanePanAction;
-import org.geotools.gui.swing.action.JMapPaneResetAction;
-import org.geotools.gui.swing.action.JMapPaneZoomInAction;
-import org.geotools.gui.swing.action.JMapPaneZoomOutAction;
+import org.geotools.gui.swing.action.PanAction;
+import org.geotools.gui.swing.action.ResetAction;
+import org.geotools.gui.swing.action.ZoomInAction;
+import org.geotools.gui.swing.action.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
@@ -350,21 +350,21 @@ public class DemoGUI {
 
         jtb.addSeparator();
         
-        JButton resetBtn = new JButton(new JMapPaneResetAction(jmp));
+        JButton resetBtn = new JButton(new ResetAction(jmp));
         jtb.add(resetBtn);
         
         jtb.addSeparator();
         
         ButtonGroup cursorGrp = new ButtonGroup();
-        JToggleButton zoomInBtn = new JToggleButton(new JMapPaneZoomInAction(jmp));
+        JToggleButton zoomInBtn = new JToggleButton(new ZoomInAction(jmp));
         jtb.add(zoomInBtn);
         cursorGrp.add(zoomInBtn);
         
-        JToggleButton zoomOutBtn = new JToggleButton(new JMapPaneZoomOutAction(jmp));
+        JToggleButton zoomOutBtn = new JToggleButton(new ZoomOutAction(jmp));
         jtb.add(zoomOutBtn);
         cursorGrp.add(zoomOutBtn);
 
-        JToggleButton panBtn = new JToggleButton(new JMapPanePanAction(jmp));
+        JToggleButton panBtn = new JToggleButton(new PanAction(jmp));
         jtb.add(panBtn);
         cursorGrp.add(panBtn);
 

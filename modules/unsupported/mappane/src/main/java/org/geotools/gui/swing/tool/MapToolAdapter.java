@@ -20,17 +20,17 @@ package org.geotools.gui.swing.tool;
 import java.awt.Cursor;
 import javax.swing.Icon;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.event.JMapPaneMouseEvent;
+import org.geotools.gui.swing.event.MapMouseEvent;
 
 /**
  * A convenience class that can be sub-classed by JMapPane cursor tool classes
  * that do not need to implement all of the mouse event methods defined in
- * JMapPaneTool.
+ * MapTool.
  * 
  * @author Michael Bedward
  * @since 2.6
  */
-public abstract class JMapPaneToolAdapter implements JMapPaneTool {
+public abstract class MapToolAdapter implements MapTool {
 
     /**
      * Get the name assigned to this tool (e.g. "Zoom in")
@@ -56,56 +56,56 @@ public abstract class JMapPaneToolAdapter implements JMapPaneTool {
      * Respond to a mouse click event received from the map pane.
      * Empty method.
      */
-    public void onMouseClicked(JMapPaneMouseEvent pme) {
+    public void onMouseClicked(MapMouseEvent pme) {
     }
 
     /**
      * Respond to a mouse dragged event received from the map pane.
      * Empty method.
      */
-    public void onMouseDragged(JMapPaneMouseEvent pme) {
+    public void onMouseDragged(MapMouseEvent pme) {
     }
 
     /**
      * Respond to a mouse entered event received from the map pane.
      * Empty method.
      */
-    public void onMouseEntered(JMapPaneMouseEvent pme) {
+    public void onMouseEntered(MapMouseEvent pme) {
     }
 
     /**
      * Respond to a mouse exited event received from the map pane.
      * Empty method.
      */
-    public void onMouseExited(JMapPaneMouseEvent pme) {
+    public void onMouseExited(MapMouseEvent pme) {
     }
 
     /**
      * Respond to a mouse moved event received from the map pane.
      * Empty method.
      */
-    public void onMouseMoved(JMapPaneMouseEvent pme) {
+    public void onMouseMoved(MapMouseEvent pme) {
     }
 
     /**
      * Respond to a mouse button pressed event received from the map pane.
      * Empty method.
      */
-    public void onMousePressed(JMapPaneMouseEvent pme) {
+    public void onMousePressed(MapMouseEvent pme) {
     }
 
     /**
      * Respond to a mouse button released event received from the map pane.
      * Empty method.
      */
-    public void onMouseReleased(JMapPaneMouseEvent pme) {
+    public void onMouseReleased(MapMouseEvent pme) {
     }
 
     /**
      * Respond to a mouse wheel event received from the map pane.
      * Empty method.
      */
-    public void onMouseWheelMoved(JMapPaneMouseEvent pme) {
+    public void onMouseWheelMoved(MapMouseEvent pme) {
     }
 
 }

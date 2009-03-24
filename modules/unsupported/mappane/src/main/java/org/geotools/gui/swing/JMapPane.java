@@ -37,10 +37,10 @@ import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.gui.swing.event.JMapPaneMouseListener;
-import org.geotools.gui.swing.tool.JMapPaneCursorTool;
-import org.geotools.gui.swing.tool.JMapPaneTool;
-import org.geotools.gui.swing.tool.JMapPaneToolManager;
+import org.geotools.gui.swing.event.MapMouseListener;
+import org.geotools.gui.swing.tool.CursorTool;
+import org.geotools.gui.swing.tool.MapTool;
+import org.geotools.gui.swing.tool.MapToolManager;
 import org.geotools.map.MapContext;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
@@ -113,7 +113,7 @@ public class JMapPane extends JPanel implements MapLayerListListener {
     private MapContext context;
     private GTRenderer renderer;
     private LabelCache labelCache;
-    private JMapPaneToolManager toolManager;
+    private MapToolManager toolManager;
     
     private AffineTransform worldToScreen;
     private AffineTransform screenToWorld;
@@ -152,7 +152,7 @@ public class JMapPane extends JPanel implements MapLayerListListener {
         setRenderer(renderer);
         setContext(context);
 
-        toolManager = new JMapPaneToolManager(this);
+        toolManager = new MapToolManager(this);
         DragBox dragBox = new DragBox();
         this.addMouseListener(dragBox);
         this.addMouseMotionListener(dragBox);
@@ -174,7 +174,7 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      * 
      * @param tool the tool to set; null means no active cursor tool
      */
-    public void setCursorTool(JMapPaneCursorTool tool) {
+    public void setCursorTool(CursorTool tool) {
         if (tool == null) {
             toolManager.setNoCursorTool();
             this.setCursor(Cursor.getDefaultCursor());
@@ -192,7 +192,7 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      * @todo this is an idea that might be going nowhere !
      * 
      */
-    public void addTool(JMapPaneTool tool) {
+    public void addTool(MapTool tool) {
         if (tool == null) {
             throw new IllegalArgumentException("tool must not be null");
         }
@@ -205,7 +205,7 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      * Add an object that wants to receive JMapPaneMouseEvents
      * from this pane
      */
-    public void addMouseListener(JMapPaneMouseListener listener) {
+    public void addMouseListener(MapMouseListener listener) {
         toolManager.addMouseListener(listener);
     }
 

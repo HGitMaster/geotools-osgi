@@ -21,12 +21,12 @@ import java.awt.Cursor;
 
 /**
  * The base class for map pane cursor tools. Simply adds a getCursor
- * method to the JMapPaneToolAdapter
+ * method to the MapToolAdapter
  * 
  * @author Michael Bedward
  * @since 2.6
  */
-public abstract class JMapPaneCursorTool extends JMapPaneToolAdapter {
+public abstract class CursorTool extends MapToolAdapter {
 
     /**
      * Get the cursor for this tool

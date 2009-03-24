@@ -30,7 +30,7 @@ import org.geotools.gui.swing.JMapPane;
  * @author Michael Bedward
  * @since 2.6
  */
-public abstract class JMapPaneAction extends AbstractAction {
+public abstract class MapAction extends AbstractAction {
 
     protected JMapPane pane;
 

@@ -29,7 +29,7 @@ import org.geotools.gui.swing.JMapPane;
  * @author Michael Bedward (adapted from code by Cameron Shorter)
  * @since 2.6
  */
-public final class JMapPaneMouseEvent extends MouseEvent {
+public final class MapMouseEvent extends MouseEvent {
     
     private DirectPosition2D geoCoords;
     private boolean isWheelEvent;
@@ -42,7 +42,7 @@ public final class JMapPaneMouseEvent extends MouseEvent {
      * @param pane the map pane sending this event
      * @param event the mouse event
      */
-    public JMapPaneMouseEvent(JMapPane pane, MouseEvent event) {
+    public MapMouseEvent(JMapPane pane, MouseEvent event) {
         super(event.getComponent(),
             event.getID(),
             event.getWhen(),
@@ -70,7 +70,7 @@ public final class JMapPaneMouseEvent extends MouseEvent {
      * @param pane
      * @param event
      */
-    public JMapPaneMouseEvent(JMapPane pane, MouseWheelEvent event) {
+    public MapMouseEvent(JMapPane pane, MouseWheelEvent event) {
         super(event.getComponent(),
             event.getID(),
             event.getWhen(),

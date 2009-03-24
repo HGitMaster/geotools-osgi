@@ -19,23 +19,17 @@ package org.geotools.gui.swing.action;
 
 import java.awt.event.ActionEvent;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.tool.JMapPaneTool;
-
+import org.geotools.gui.swing.tool.PanTool;
+import org.geotools.gui.swing.tool.MapTool;
 
 /**
  * An action for connect a control (probably a JButton) to
- * the JMapPane.reset() method which sets the bounds of the
- * map area to include the full extent of all map layers
+ * the PanTool for panning the map with mouse drags.
  * 
  * @author Michael Bedward
  * @since 2.6
  */
-public class JMapPaneResetAction extends JMapPaneAction {
-    
-    public static final String TOOL_NAME = "Reset";
-    public static final String TOOL_TIP = "Display full extent of all layers";
-    public static final String ICON_IMAGE_LARGE = "/org/geotools/gui/swing/images/reset_32.png";
-    public static final String ICON_IMAGE_SMALL = "/org/geotools/gui/swing/images/reset_24.png";
+public class PanAction extends MapAction {
     
     /**
      * Constructor - when used with a JButton the button will
@@ -43,8 +37,8 @@ public class JMapPaneResetAction extends JMapPaneAction {
      * 
      * @param pane the map pane being serviced by this action
      */
-    public JMapPaneResetAction(JMapPane pane) {
-        this(pane, JMapPaneTool.SMALL_ICON, false);
+    public PanAction(JMapPane pane) {
+        this(pane, MapTool.SMALL_ICON, false);
     }
 
     /**
@@ -52,33 +46,33 @@ public class JMapPaneResetAction extends JMapPaneAction {
      * 
      * @param pane the map pane being serviced by this action
      * @param toolIcon specifies which, if any, icon the control (e.g. JButton)
-     * will display; one of JMapPaneTool.NO_ICON, JMapPaneTool.SMALL_ICON or
-     * JMapPaneTool.LARGE_ICON.
+     * will display; one of MapTool.NO_ICON, MapTool.SMALL_ICON or
+     * MapTool.LARGE_ICON.
      * @param showToolName set to true for the control to display the tool name
      */
-    public JMapPaneResetAction(JMapPane pane, int toolIcon, boolean showToolName) {
-        String toolName = showToolName ? TOOL_NAME : null;
+    public PanAction(JMapPane pane, int toolIcon, boolean showToolName) {
+        String toolName = showToolName ? PanTool.TOOL_NAME : null;
         
         String iconImagePath = null;
         switch (toolIcon) {
-            case JMapPaneTool.LARGE_ICON:
-                iconImagePath = ICON_IMAGE_LARGE;
+            case MapTool.LARGE_ICON:
+                iconImagePath = PanTool.ICON_IMAGE_LARGE;
                 break;
                 
-            case JMapPaneTool.SMALL_ICON:
-                iconImagePath = ICON_IMAGE_SMALL;
+            case MapTool.SMALL_ICON:
+                iconImagePath = PanTool.ICON_IMAGE_SMALL;
                 break;
         }
         
-        super.init(pane, toolName, TOOL_TIP, iconImagePath);
+        super.init(pane, toolName, PanTool.TOOL_TIP, iconImagePath);
     }
     
     /**
-     * Called when the control is activated. Calls the map pane to reset the 
-     * display 
+     * Called when the associated control is activated. Leads to the
+     * map pane's cursor tool being set to a PanTool object
      */
     public void actionPerformed(ActionEvent e) {
-        pane.reset();
+        pane.setCursorTool(new PanTool());
     }
 
 }

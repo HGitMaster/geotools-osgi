@@ -22,8 +22,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.event.JMapPaneMouseEvent;
-import org.geotools.gui.swing.event.JMapPaneMouseListener;
+import org.geotools.gui.swing.event.MapMouseEvent;
+import org.geotools.gui.swing.event.MapMouseListener;
 
 /**
  * A status bar that displays the mouse map position
@@ -31,13 +31,13 @@ import org.geotools.gui.swing.event.JMapPaneMouseListener;
  * @author Michael Bedward
  * @since 2.6
  */
-public class JMapPaneStatusBar extends JPanel implements JMapPaneMouseListener {
+public class StatusBar extends JPanel implements MapMouseListener {
     
     private JMapPane pane;
     private JLabel space1;
     private JLabel space2;
 
-    public JMapPaneStatusBar() {
+    public StatusBar() {
         space1 = new JLabel();
         space1.setSize(100, 30);
         this.add(space1);
@@ -53,29 +53,29 @@ public class JMapPaneStatusBar extends JPanel implements JMapPaneMouseListener {
         this.pane = pane;
     }
 
-    public void onMouseClicked(JMapPaneMouseEvent e) {
+    public void onMouseClicked(MapMouseEvent e) {
     }
 
-    public void onMouseDragged(JMapPaneMouseEvent e) {
+    public void onMouseDragged(MapMouseEvent e) {
     }
 
-    public void onMouseEntered(JMapPaneMouseEvent e) {
+    public void onMouseEntered(MapMouseEvent e) {
     }
 
-    public void onMouseExited(JMapPaneMouseEvent e) {
+    public void onMouseExited(MapMouseEvent e) {
     }
 
-    public void onMouseMoved(JMapPaneMouseEvent e) {
+    public void onMouseMoved(MapMouseEvent e) {
         space1.setText(formatCoords(e.getMapPosition()));
     }
 
-    public void onMousePressed(JMapPaneMouseEvent e) {
+    public void onMousePressed(MapMouseEvent e) {
     }
 
-    public void onMouseReleased(JMapPaneMouseEvent e) {
+    public void onMouseReleased(MapMouseEvent e) {
     }
 
-    public void onMouseWheelMoved(JMapPaneMouseEvent e) {
+    public void onMouseWheelMoved(MapMouseEvent e) {
     }
 
     private String formatCoords(DirectPosition2D mapPos) {

@@ -19,13 +19,13 @@ package org.geotools.gui.swing.tool;
 
 import javax.swing.Icon;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.event.JMapPaneMouseListener;
+import org.geotools.gui.swing.event.MapMouseListener;
 
 /**
  * The interface for tools working with a JMapPane
  *
  */
-public interface JMapPaneTool extends JMapPaneMouseListener {
+public interface MapTool extends MapMouseListener {
     
     /**
      * Used with tool constructors to specify that the GUI control

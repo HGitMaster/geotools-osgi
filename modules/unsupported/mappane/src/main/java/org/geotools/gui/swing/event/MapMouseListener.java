@@ -22,7 +22,7 @@ import org.geotools.gui.swing.JMapPane;
 /**
  * Interface for classes that listen to JMapPaneMouseEvents
  */
-public interface JMapPaneMouseListener {
+public interface MapMouseListener {
     
     /**
      * Set the JMapPane instance for this tool
@@ -32,41 +32,41 @@ public interface JMapPaneMouseListener {
     /**
      * Respond to a mouse click event received from the map pane
      */
-    public void onMouseClicked(JMapPaneMouseEvent pme);
+    public void onMouseClicked(MapMouseEvent pme);
 
     /**
      * Respond to a mouse dragged event received from the map pane
      */
-    public void onMouseDragged(JMapPaneMouseEvent pme);
+    public void onMouseDragged(MapMouseEvent pme);
 
     /**
      * Respond to a mouse entered event received from the map pane
      */
-    public void onMouseEntered(JMapPaneMouseEvent pme);
+    public void onMouseEntered(MapMouseEvent pme);
 
     /**
      * Respond to a mouse exited event received from the map pane
      */
-    public void onMouseExited(JMapPaneMouseEvent pme);
+    public void onMouseExited(MapMouseEvent pme);
 
     /**
      * Respond to a mouse movement event received from the map pane
      */
-    public void onMouseMoved(JMapPaneMouseEvent pme);
+    public void onMouseMoved(MapMouseEvent pme);
 
     /**
      * Respond to a mouse button press event received from the map pane
      */
-    public void onMousePressed(JMapPaneMouseEvent pme);
+    public void onMousePressed(MapMouseEvent pme);
 
     /**
      * Respond to a mouse button release event received from the map pane
      */
-    public void onMouseReleased(JMapPaneMouseEvent pme);
+    public void onMouseReleased(MapMouseEvent pme);
 
     /**
      * Respond to a mouse wheel scroll event received from the map pane
      */
-    public void onMouseWheelMoved(JMapPaneMouseEvent pme);
+    public void onMouseWheelMoved(MapMouseEvent pme);
 
 }

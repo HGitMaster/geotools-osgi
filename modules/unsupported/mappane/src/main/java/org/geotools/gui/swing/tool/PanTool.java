@@ -24,7 +24,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.event.JMapPaneMouseEvent;
+import org.geotools.gui.swing.event.MapMouseEvent;
 
 /**
  * A map panning tool for JMapPane.  Allows the user to drag the map
@@ -33,7 +33,7 @@ import org.geotools.gui.swing.event.JMapPaneMouseEvent;
  * @author Michael Bedward
  * @since 2.6
  */
-public class JMapPanePanTool extends JMapPaneCursorTool {
+public class PanTool extends CursorTool {
     
     public static final String TOOL_NAME = "Pan";
     public static final String TOOL_TIP = "Click and drag to pan";
@@ -55,7 +55,7 @@ public class JMapPanePanTool extends JMapPaneCursorTool {
     /**
      * Constructor
      */
-    public JMapPanePanTool() {
+    public PanTool() {
         iconLarge = new ImageIcon(getClass().getResource(ICON_IMAGE_LARGE));
         iconSmall = new ImageIcon(getClass().getResource(ICON_IMAGE_SMALL));
 
@@ -79,7 +79,7 @@ public class JMapPanePanTool extends JMapPaneCursorTool {
      * signal the start of a mouse drag. Records the event's window position.
      */
     @Override
-    public void onMousePressed(JMapPaneMouseEvent pme) {
+    public void onMousePressed(MapMouseEvent pme) {
         panePos = pme.getPoint();
         panning = true;
     }
@@ -88,7 +88,7 @@ public class JMapPanePanTool extends JMapPaneCursorTool {
      * Respond to a mouse dragged event. Calls {@link org.geotools.gui.swing.JMapPane#moveImage()}
      */
     @Override
-    public void onMouseDragged(JMapPaneMouseEvent pme) {
+    public void onMouseDragged(MapMouseEvent pme) {
         if (panning) {
             Point pos = pme.getPoint();
             if (!pos.equals(panePos)) {
@@ -103,7 +103,7 @@ public class JMapPanePanTool extends JMapPaneCursorTool {
      * map pane to repaint the display
      */
     @Override
-    public void onMouseReleased(JMapPaneMouseEvent pme) {
+    public void onMouseReleased(MapMouseEvent pme) {
         panning = false;
         pane.repaint();
     }

@@ -38,10 +38,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JToggleButton;
-import org.geotools.gui.swing.action.JMapPanePanAction;
-import org.geotools.gui.swing.action.JMapPaneResetAction;
-import org.geotools.gui.swing.action.JMapPaneZoomInAction;
-import org.geotools.gui.swing.action.JMapPaneZoomOutAction;
+import org.geotools.gui.swing.action.PanAction;
+import org.geotools.gui.swing.action.ResetAction;
+import org.geotools.gui.swing.action.ZoomInAction;
+import org.geotools.gui.swing.action.ZoomOutAction;
 
 /**
  * Sample application that may be used to try JMapPane 
@@ -75,21 +75,21 @@ public class WMSViewer implements ActionListener {
 
         jtb.addSeparator();
 
-        JButton resetBtn = new JButton(new JMapPaneResetAction(mp));
+        JButton resetBtn = new JButton(new ResetAction(mp));
         jtb.add(resetBtn);
 
         jtb.addSeparator();
 
         ButtonGroup cursorGrp = new ButtonGroup();
-        JToggleButton zoomInBtn = new JToggleButton(new JMapPaneZoomInAction(mp));
+        JToggleButton zoomInBtn = new JToggleButton(new ZoomInAction(mp));
         jtb.add(zoomInBtn);
         cursorGrp.add(zoomInBtn);
 
-        JToggleButton zoomOutBtn = new JToggleButton(new JMapPaneZoomOutAction(mp));
+        JToggleButton zoomOutBtn = new JToggleButton(new ZoomOutAction(mp));
         jtb.add(zoomOutBtn);
         cursorGrp.add(zoomOutBtn);
 
-        JToggleButton panBtn = new JToggleButton(new JMapPanePanAction(mp));
+        JToggleButton panBtn = new JToggleButton(new PanAction(mp));
         jtb.add(panBtn);
         cursorGrp.add(panBtn);
 

@@ -27,7 +27,7 @@ import org.geotools.gui.swing.JMapPane;
  * @author Michael Bedward
  */
 
-public abstract class JMapPaneZoomToolBase extends JMapPaneCursorTool {
+public abstract class AbstractZoomTool extends CursorTool {
     public static final double DEFAULT_ZOOM_FACTOR = 1.5;
     
     protected JMapPane pane;
@@ -36,7 +36,7 @@ public abstract class JMapPaneZoomToolBase extends JMapPaneCursorTool {
     /**
      * Constructor
      */
-    public JMapPaneZoomToolBase() {
+    public AbstractZoomTool() {
         setZoom(DEFAULT_ZOOM_FACTOR);
     }
     
