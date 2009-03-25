@@ -37,7 +37,10 @@ import org.w3c.dom.NodeList;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
+
+import org.opengis.filter.And;
 import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsNotEqualTo;
 
 /**
  * Tests for the DOM parser.
@@ -45,7 +48,7 @@ import org.opengis.filter.Filter;
  * @author James MacGill, CCG
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/filter/DOMParserTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/filter/DOMParserTest.java $
  */
 public class DOMParserTest extends FilterTestSupport {
     /** Feature on which to preform tests */
@@ -204,6 +207,12 @@ public class DOMParserTest extends FilterTestSupport {
         assertTrue(list.contains("FID.3"));
         assertTrue(list.contains("FID.2"));
         assertTrue(list.contains("FID.1"));
+    }
+    
+    public void testNotEqual() throws Exception {
+        PropertyIsNotEqualTo filter = (PropertyIsNotEqualTo) parseDocumentFirst("testNotEqual.xml");
+        
+        assertTrue(filter.isMatchingCase());
     }
 
     public Filter parseDocument(String uri) throws Exception {

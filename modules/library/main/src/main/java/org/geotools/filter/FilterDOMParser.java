@@ -32,7 +32,6 @@ import org.w3c.dom.NodeList;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.Expression;
@@ -48,8 +47,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * A dom based parser to build filters as per OGC 01-067
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterDOMParser.java $
- * @version $Id: FilterDOMParser.java 31681 2008-10-18 19:02:26Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterDOMParser.java $
+ * @version $Id: FilterDOMParser.java 32694 2009-03-25 09:45:28Z aaime $
  *
  * @task TODO: split this class up into multiple methods.
  */
@@ -365,7 +364,7 @@ public final class FilterDOMParser {
                     return FILTER_FACT.lessOrEqual(left, right );
 
                 case FilterType.COMPARE_NOT_EQUALS:
-                    return FILTER_FACT.notEqual(left, right,false );
+                    return FILTER_FACT.notEqual(left, right, true);
 
                 default:
                     LOGGER.warning("Unable to build filter for " + childName);
