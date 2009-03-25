@@ -39,6 +39,7 @@ import org.eclipse.xsd.XSDModelGroup;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDConstants;
+import org.geotools.feature.NameImpl;
 import org.geotools.gml2.GML;
 import org.geotools.gml2.GMLConfiguration;
 import org.geotools.metadata.iso.citation.Citations;
@@ -49,10 +50,15 @@ import org.geotools.xml.Encoder;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.geotools.xs.XS;
+import org.opengis.feature.ComplexAttribute;
+import org.opengis.feature.Feature;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -77,7 +83,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Utility methods used by gml2 bindigns when encodding.
  *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
- *
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  */
 public class GML2EncodingUtils {
     
@@ -258,33 +264,39 @@ public class GML2EncodingUtils {
     }
     
     public static Element AbstractFeatureType_encode(Object object, Document document, Element value) {
-        SimpleFeature feature = (SimpleFeature) object;
-        SimpleFeatureType featureType = feature.getFeatureType();
+        Feature feature = (Feature) object;
+        FeatureType featureType = feature.getType();
 
         String namespace = featureType.getName().getNamespaceURI();
-        String typeName = featureType.getTypeName();
+        String typeName = featureType.getName().getLocalPart();
 
         Element encoding = document.createElementNS(namespace, typeName);
-        encoding.setAttributeNS(null, "fid", feature.getID());
+        encoding.setAttributeNS(null, "fid", feature.getIdentifier().getID());
 
         return encoding;
     }
 
-    static Set<QName> abstractFetureTypeProperties = new HashSet();
+    static Set<QName> abstractFeatureTypeProperties = new HashSet<QName>();
     static {
-        abstractFetureTypeProperties.add( GML.name );
-        abstractFetureTypeProperties.add( GML.description );
-        abstractFetureTypeProperties.add( GML.location );
+        abstractFeatureTypeProperties.add( GML.name );
+        abstractFeatureTypeProperties.add( GML.description );
+        abstractFeatureTypeProperties.add( GML.location );
        
     }
     
     public static Object AbstractFeatureType_getProperty(Object object,
             QName name, Configuration configuration) {
       
-        SimpleFeature feature = (SimpleFeature) object;
+        Feature feature = (Feature) object;
 
-        if ( abstractFetureTypeProperties.contains( name ) ) {
-            return feature.getAttribute( name.getLocalPart() );
+        if (abstractFeatureTypeProperties.contains(name)) {
+            Property property = feature.getProperty(new NameImpl(name.getNamespaceURI(), name
+                    .getLocalPart()));
+            if (property == null) {
+                return null;
+            } else {
+                return property.getValue();
+            }
         }
       
         if (GML.boundedBy.equals(name)) {
@@ -295,12 +307,13 @@ public class GML2EncodingUtils {
                 if (bounds.isEmpty()) {
                     //do a check for the case where the feature has no geometry 
                     // properties
-                    if (feature.getDefaultGeometry() == null) {
+                    if (feature.getDefaultGeometryProperty() == null
+                            || feature.getDefaultGeometryProperty().getValue() == null) {
                         return null;
                     }
                 }
         
-                return feature.getBounds();
+                return bounds;
             }
         }
         
@@ -312,7 +325,7 @@ public class GML2EncodingUtils {
     }
     
     public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex, Set<String> toFilter) {
-        SimpleFeature feature = (SimpleFeature) object;
+        Feature feature = (Feature) object;
         
         //check if this was a resolved feature, if so dont return anything
         // TODO: this is just a hack for our lame xlink implementation
@@ -320,7 +333,7 @@ public class GML2EncodingUtils {
             return Collections.EMPTY_LIST;
         }
 
-        SimpleFeatureType featureType = feature.getFeatureType();
+        FeatureType featureType = feature.getType();
 
         String namespace = featureType.getName().getNamespaceURI();
 
@@ -328,15 +341,15 @@ public class GML2EncodingUtils {
             namespace = element.getTargetNamespace();
         }
 
-        String typeName = featureType.getTypeName();
+        String typeName = featureType.getName().getLocalPart();
+        QName qualifiedTypeName = new QName(namespace, typeName);
 
         //find the type in the schema
-        XSDTypeDefinition type = schemaIndex.getTypeDefinition(new QName(namespace, typeName));
+        XSDTypeDefinition type = schemaIndex.getTypeDefinition(qualifiedTypeName);
 
         if (type == null) {
             //type not found, do a check for an element, and use its type
-            XSDElementDeclaration e = schemaIndex.getElementDeclaration(new QName(namespace,
-                        typeName));
+            XSDElementDeclaration e = schemaIndex.getElementDeclaration(qualifiedTypeName);
 
             if (e != null) {
                 type = e.getTypeDefinition();
@@ -344,10 +357,17 @@ public class GML2EncodingUtils {
         }
 
         if (type == null) {
-            //could not find the feature type in teh schema, create a mock one
-            LOGGER.warning( "Could find type for " + typeName + " in the schema, generating type" + 
-                    "from feature.");
-            type = createXmlTypeFromFeatureType( featureType, schemaIndex, toFilter );
+            if (featureType instanceof SimpleFeatureType) {
+                // could not find the feature type in the schema, create a mock one
+                LOGGER.warning("Could find type for " + typeName
+                        + " in the schema, generating type from feature.");
+                type = createXmlTypeFromFeatureType((SimpleFeatureType) featureType, schemaIndex,
+                        toFilter);
+            } else {
+                // we expect better from non-simple feature types, and so require defined types
+                throw new RuntimeException("Could not find type for " + qualifiedTypeName
+                        + " in schema");
+            }
         }
 
         List particles = Schemas.getChildElementParticles(type, true);
@@ -363,21 +383,44 @@ public class GML2EncodingUtils {
 
             //ignore abstract featureType properties
             if (GML.NAMESPACE.equals(attribute.getTargetNamespace())) {
-                for ( QName n : abstractFetureTypeProperties ) {
+                for ( QName n : abstractFeatureTypeProperties ) {
                     if ( n.getLocalPart().equals( attribute.getName() )) {
                         continue O;
                     }
                 }
                 
             }
-
-            //make sure the feature type has an element
-            if (featureType.getDescriptor(attribute.getName()) == null) {
-                continue;
+            
+            Object attributeValue;
+            if (featureType instanceof SimpleFeatureType) {
+                // simple feature brain damage: discard namespace
+                // make sure the feature type has an element
+                if (((SimpleFeatureType) featureType).getDescriptor(attribute.getName()) == null) {
+                    continue;
+                }
+                // get the value
+                attributeValue = ((SimpleFeature) feature).getAttribute(attribute.getName());
+            } else {
+                // namespaces matter for non-simple feature types
+                Name propertyName = new NameImpl(attribute.getTargetNamespace(), attribute
+                        .getName());
+                // make sure the feature type has an element
+                if (featureType.getDescriptor(propertyName) == null) {
+                    continue;
+                }
+                // get the value
+                Property property = feature.getProperty(propertyName);
+                if (property == null) {
+                    attributeValue = null;
+                } else if (property instanceof ComplexAttribute) {
+                    // do not unpack complex attributes as these may have their own bindings, which
+                    // will be applied by the encoder
+                    attributeValue = property;
+                } else {
+                    // non-complex bindings are unpacked as for simple feature case
+                    attributeValue = property.getValue();
+                }
             }
-
-            //get the value
-            Object attributeValue = feature.getAttribute(attribute.getName());
             properties.add(new Object[] { particle, attributeValue });
         }
 

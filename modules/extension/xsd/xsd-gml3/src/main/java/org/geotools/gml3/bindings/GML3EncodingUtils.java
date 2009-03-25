@@ -19,33 +19,27 @@ package org.geotools.gml3.bindings;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.gml3.GML;
-import org.geotools.xlink.XLINK;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.Configuration;
-import org.geotools.xml.Encoder;
 import org.geotools.xml.SchemaIndex;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 
 
@@ -142,14 +136,14 @@ public class GML3EncodingUtils {
     }
     
     public static Element AbstractFeatureType_encode(Object object, Document document, Element value) {
-        SimpleFeature feature = (SimpleFeature) object;
-        SimpleFeatureType featureType = feature.getFeatureType();
+        Feature feature = (Feature) object;
+        FeatureType featureType = feature.getType();
 
         String namespace = featureType.getName().getNamespaceURI();
-        String typeName = featureType.getTypeName();
+        String typeName = featureType.getName().getLocalPart();
 
         Element encoding = document.createElementNS(namespace, typeName);
-        encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getID());
+        encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getIdentifier().getID());
 
         return encoding;
     }

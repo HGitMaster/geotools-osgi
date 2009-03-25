@@ -22,6 +22,8 @@ import org.geotools.gml3.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+import org.opengis.feature.ComplexAttribute;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 
 
@@ -45,7 +47,6 @@ import org.opengis.feature.simple.SimpleFeature;
  *         </pre>
  * </p>
  *
- * @generated
  */
 public class FeaturePropertyTypeBinding extends AbstractComplexBinding {
     /**
@@ -62,7 +63,7 @@ public class FeaturePropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return SimpleFeature.class;
+        return Feature.class;
     }
 
     /**
@@ -73,13 +74,17 @@ public class FeaturePropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return node.getChildValue(SimpleFeature.class);
+        return node.getChildValue(Feature.class);
     }
     
     @Override
     public Object getProperty(Object object, QName name) throws Exception {
         if( GML._Feature.equals( name ) ) {
-            return object;    
+            if (object instanceof SimpleFeature) {
+                return object;
+            } else if (object instanceof ComplexAttribute) {
+                return ((ComplexAttribute) object).getProperties().iterator().next();
+            }
         }
         return null;
     }
