@@ -83,7 +83,6 @@
 					<sourceExpression>
 						<OCQL>COMPONENT_ROLE</OCQL>
 					</sourceExpression>
-					<isMultiple>true</isMultiple>
 				</AttributeMapping>
 				<AttributeMapping>
 					<targetAttribute>gsml:proportion</targetAttribute>
@@ -91,6 +90,14 @@
 						<OCQL>PROPORTION</OCQL>
 						<linkElement>gsml:CGI_TermValue</linkElement>
 						<linkField>gml:name</linkField>
+					</sourceExpression>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>gsml:lithology</targetAttribute>
+					<sourceExpression>
+						<OCQL>strTrim(getId())</OCQL>
+						<linkElement>gsml:ControlledConcept</linkElement>
+						<linkField>gml:name[2]</linkField>
 					</sourceExpression>
 					<isMultiple>true</isMultiple>
 				</AttributeMapping>

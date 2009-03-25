@@ -39,7 +39,6 @@ import org.geotools.util.CheckedArrayList;
 import org.geotools.xs.XSSchema;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
-import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.Property;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -65,7 +64,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: XPath.java 32506 2009-02-18 03:13:53Z ang05a $
+ * @version $Id: XPath.java 32690 2009-03-25 02:58:59Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/XPath.java $
  * @since 2.4
  */
@@ -672,13 +671,7 @@ public class XPath {
                 ArrayList<Property> list = new ArrayList<Property>();
                 list.add(buildSimpleContent(type, value));
                 return list;
-            } else {
-                if (value instanceof Feature) {
-                    ArrayList<Feature> list = new ArrayList<Feature>();
-                    list.add((Feature) value);
-                    return list;
-                }
-            }
+            } 
         }
         return FF.literal(value).evaluate(value, binding);
     }

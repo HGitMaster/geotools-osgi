@@ -331,14 +331,20 @@ public class DataAccessIntegrationTest extends TestCase {
         mfCollection.close(mfIterator);
 
         /**
-         * Load CGI Term Value data access
+         * Load geologic unit data access mapped from the input MO data access
          */
-        url = getClass().getResource(schemaBase + "CGITermValue.xml");
+
+        url = getClass().getResource(schemaBase + "EarthResourceToGeologicUnit.xml");
         assertNotNull(url);
 
         dsParams.put("url", url.toExternalForm());
-        cgiDataAccess = DataAccessFinder.getDataStore(dsParams);
-        assertNotNull(cgiDataAccess);
+
+        mappedGUDataAccess = DataAccessFinder.getDataStore(dsParams);
+        assertNotNull(mappedGUDataAccess);
+
+        guFeatureSource = mappedGUDataAccess.getFeatureSource(GEOLOGIC_UNIT);
+
+        assertNotNull(guFeatureSource);
 
         /**
          * Load composition part data access
@@ -354,27 +360,34 @@ public class DataAccessIntegrationTest extends TestCase {
                 .getFeatureSource(COMPOSITION_PART);
         FeatureCollection<FeatureType, Feature> cpCollection = cpSource.getFeatures();
         Iterator<Feature> cpIterator = cpCollection.iterator();
+
+        /**
+         * Load CGI Term Value data access
+         */
+        url = getClass().getResource(schemaBase + "CGITermValue.xml");
+        assertNotNull(url);
+
+        dsParams.put("url", url.toExternalForm());
+        cgiDataAccess = DataAccessFinder.getDataStore(dsParams);
+        assertNotNull(cgiDataAccess);
+
+        /**
+         * Load Controlled Concept data access
+         */
+        url = getClass().getResource(schemaBase + "ControlledConcept.xml");
+        assertNotNull(url);
+
+        dsParams.put("url", url.toExternalForm());
+        DataAccess<FeatureType, Feature> ccDataAccess = DataAccessFinder.getDataStore(dsParams);
+        assertNotNull(ccDataAccess);
+
         cpFeatures = new ArrayList<Feature>();
         while (cpIterator.hasNext()) {
             cpFeatures.add(cpIterator.next());
         }
         cpCollection.close(cpIterator);
 
-        /**
-         * Load geologic unit data access mapped from the input MO data access
-         */
-
-        url = getClass().getResource(schemaBase + "EarthResourceToGeologicUnit.xml");
-        assertNotNull(url);
-
-        dsParams.put("url", url.toExternalForm());
-
-        mappedGUDataAccess = DataAccessFinder.getDataStore(dsParams);
-        assertNotNull(mappedGUDataAccess);
-
-        guFeatureSource = mappedGUDataAccess.getFeatureSource(GEOLOGIC_UNIT);
-
-        assertNotNull(guFeatureSource);
+        ccDataAccess.dispose();
     }
 
     /**

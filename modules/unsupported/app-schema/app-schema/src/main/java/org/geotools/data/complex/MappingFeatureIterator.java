@@ -73,7 +73,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: MappingFeatureIterator.java 32633 2009-03-16 01:44:12Z ang05a $
+ * @version $Id: MappingFeatureIterator.java 32690 2009-03-25 02:58:59Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureIterator.java $
  * @since 2.4
  */
@@ -95,6 +95,8 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
     protected FeatureFactory attf;
 
     protected FeatureCollection<FeatureType, Feature> sourceFeatures;
+
+    private FeatureSource<FeatureType, Feature> mappedSource;
 
     /**
      * Hold on to iterator to allow features to be streamed.
@@ -173,7 +175,7 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         Query unrolledQuery = getUnrolledQuery(query);
         Filter filter = unrolledQuery.getFilter();
 
-        FeatureSource<FeatureType, Feature> mappedSource = mapping.getSource();
+        mappedSource = mapping.getSource();
 
         sourceFeatures = mappedSource.getFeatures(filter);
 
@@ -268,11 +270,11 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
                     if (val instanceof Attribute) {
                         val = ((Attribute) val).getValue();
                     }
-                    nestedFeatures.add(((NestedAttributeMapping) attMapping).getFeature(val));
+                    nestedFeatures.addAll(((NestedAttributeMapping) attMapping).getFeatures(val));
                 }
                 value = nestedFeatures;
             } else {
-                value = ((NestedAttributeMapping) attMapping).getFeature(value);
+                value = ((NestedAttributeMapping) attMapping).getFeatures(value);
             }
         }
         String id = null;
@@ -371,16 +373,31 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         AttributeBuilder builder = new AttributeBuilder(attf);
         builder.setDescriptor(targetNode);
         Feature target = (Feature) builder.build(id);
-        // automatically group by mapped id
-        Iterator<Feature> iterator = this.sourceFeatures.iterator();
-        ArrayList<Feature> sources = new ArrayList<Feature>();        
+        // Run another query to find same features, in case they're from a denormalized view
+        // ie. having many to many relationship.
+        // This is so we can encode the same features as one complex feature.
+        // FIXME: Perhaps this can be optimized in the future.. other options:
+        // - enforce an "ORDER BY" rule in the denormalized view, so everything is ordered,
+        // so we can just keep calling next until the next one is different.
+        // - use "sortBy" when running the main query, but not possible at the moment..
+        // - store these features in a list.. but not a good memory management, especially if
+        // the features could be deeply nested, ie. storing numerous features per iterator
+        ArrayList<Feature> sources = new ArrayList<Feature>();
+
+        FeatureCollection<FeatureType, Feature> matchingFeatures = this.mappedSource
+                .getFeatures(namespaceAwareFilterFactory.equals(this.featureFidMapping,
+                        namespaceAwareFilterFactory.literal(target.getIdentifier())));
+
+        Iterator<Feature> iterator = matchingFeatures.iterator();
+
         while (iterator.hasNext()) {
-            Feature next = iterator.next();
-            if (extractIdForFeature(next).equals(id)) {
-                sources.add(next);
-            }
+            sources.add(iterator.next());
         }
-        this.sourceFeatures.close(iterator);
+
+        matchingFeatures.close(iterator);
+
+        assert sources.size() >= 1; // there should be at least the current feature
+
         for (AttributeMapping attMapping : mappings) {
             StepList targetXpathProperty = attMapping.getTargetXPath();
             if (targetXpathProperty.size() == 1) {

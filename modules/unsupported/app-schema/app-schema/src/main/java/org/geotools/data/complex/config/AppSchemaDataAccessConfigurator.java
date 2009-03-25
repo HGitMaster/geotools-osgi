@@ -72,7 +72,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AppSchemaDataAccessConfigurator.java 32633 2009-03-16 01:44:12Z ang05a $
+ * @version $Id: AppSchemaDataAccessConfigurator.java 32690 2009-03-25 02:58:59Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AppSchemaDataAccessConfigurator.java $
  * @since 2.4
  */
@@ -185,8 +185,7 @@ public class AppSchemaDataAccessConfigurator {
 
             FeatureSource featureSource = getFeatureSource(dto);
             AttributeDescriptor target = getTargetDescriptor(dto);
-            List attMappings = getAttributeMappings(target, dto.getAttributeMappings(),
-                    featureSource);
+            List attMappings = getAttributeMappings(target, dto.getAttributeMappings());
 
             FeatureTypeMapping mapping;
 
@@ -220,12 +219,10 @@ public class AppSchemaDataAccessConfigurator {
      * 
      * @param root
      * @param attDtos
-     * @param fSource
-     *            Feature source
+     * 
      * @return
      */
-    private List getAttributeMappings(final AttributeDescriptor root, final List attDtos,
-            FeatureSource fSource) throws IOException {
+    private List getAttributeMappings(final AttributeDescriptor root, final List attDtos) throws IOException {
         List attMappings = new LinkedList();
 
         for (Iterator it = attDtos.iterator(); it.hasNext();) {
@@ -287,7 +284,7 @@ public class AppSchemaDataAccessConfigurator {
                 // a nested feature
                 attMapping = new NestedAttributeMapping(idExpression, sourceExpression,
                         targetXPathSteps, isMultiValued, clientProperties,
-                        degloseTypeName(sourceElement), sourceFieldSteps, fSource);
+                        degloseTypeName(sourceElement), sourceFieldSteps);
             } else {
                 attMapping = new AttributeMapping(idExpression, sourceExpression, targetXPathSteps,
                         expectedInstanceOf, isMultiValued, clientProperties);

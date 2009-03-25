@@ -168,6 +168,13 @@ public class GeologicUnitTest extends TestCase {
         FeatureType cgiType = cgiDataAccess.getSchema(FeatureChainingTest.CGI_TERM_VALUE);
         assertNotNull(cgiType);
 
+        url = getClass().getResource(schemaBase + "ControlledConcept.xml");
+        assertNotNull(url);
+
+        dsParams.put("url", url.toExternalForm());
+        DataAccess ccDataAccess = DataAccessFinder.getDataStore(dsParams);
+        assertNotNull(ccDataAccess);
+        
         /*
          * Make sure there are 3 geological unit features
          */
@@ -210,6 +217,7 @@ public class GeologicUnitTest extends TestCase {
         guDataStore.dispose();
         cpDataStore.dispose();
         cgiDataAccess.dispose();
+        ccDataAccess.dispose();
     }
 
     /**

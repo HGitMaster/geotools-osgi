@@ -123,7 +123,7 @@ public class FeatureChainingTest extends TestCase {
 
     final String schemaBase = "/test-data/";
 
-    private FeatureSource mfSource;
+    private FeatureSource<FeatureType, Feature> mfSource;
 
     /**
      * Generated mapped features
@@ -143,22 +143,27 @@ public class FeatureChainingTest extends TestCase {
     /**
      * Geological unit data access
      */
-    private DataAccess guDataAccess;
+    private DataAccess<FeatureType, Feature> guDataAccess;
 
     /**
      * Compositional part data access
      */
-    private DataAccess cpDataAccess;
+    private DataAccess<FeatureType, Feature> cpDataAccess;
 
     /**
      * Mapped feature data access
      */
-    private DataAccess mfDataAccess;
+    private DataAccess<FeatureType, Feature> mfDataAccess;
 
     /**
      * CGI Term Value data access
      */
-    private DataAccess cgiDataAccess;
+    private DataAccess<FeatureType, Feature> cgiDataAccess;
+
+    /**
+     * Controlled Concept data access
+     */
+    private DataAccess<?, Feature> ccDataAccess;
 
     /**
      * Test that chaining works
@@ -168,9 +173,9 @@ public class FeatureChainingTest extends TestCase {
     public void testFeatureChaining() throws Exception {
         this.loadDataAccesses();
 
-        Iterator mfIterator = mfFeatures.iterator();
+        Iterator<Feature> mfIterator = mfFeatures.iterator();
 
-        Iterator guIterator = guFeatures.iterator();
+        Iterator<Feature> guIterator = guFeatures.iterator();
 
         // Extract all geological unit features into a map by id
         Map<String, Feature> guMap = new HashMap<String, Feature>();
@@ -184,7 +189,7 @@ public class FeatureChainingTest extends TestCase {
         }
 
         // Extract all compositional part "features" into a map by id
-        Iterator cpIterator = cpFeatures.iterator();
+        Iterator<Feature> cpIterator = cpFeatures.iterator();
         Map<String, Feature> cpMap = new HashMap<String, Feature>();
         Feature cpFeature;
         while (cpIterator.hasNext()) {
@@ -196,10 +201,10 @@ public class FeatureChainingTest extends TestCase {
         }
 
         Feature mfFeature;
-        Collection nestedGuFeatures;
+        Collection<Feature> nestedGuFeatures;
         String guId;
         final String NESTED_LINK = "specification";
-        Collection nestedCpFeatures;
+        Collection<Feature> nestedCpFeatures;
         String cpId;
         while (mfIterator.hasNext()) {
             mfFeature = (Feature) mfIterator.next();
@@ -259,6 +264,64 @@ public class FeatureChainingTest extends TestCase {
         mfFeatures.close(mfIterator);
         guFeatures.close(guIterator);
         cpFeatures.close(cpIterator);
+
+        disposeDataAccesses();
+    }
+
+    /**
+     * testFeatureChaining() tests one to many relationship, but the many side was on the chaining
+     * side ie. geologic unit side (with many composition parts). This is to test that configuring
+     * many on the the chained works. We're using composition part -> lithology here.
+     * 
+     * @throws Exception
+     */
+    public void testManyOnChainedSide() throws Exception {
+
+        this.loadDataAccesses();
+
+        FeatureType ccType = ccDataAccess.getSchema(CONTROLLED_CONCEPT);
+        assertNotNull(ccType);
+
+        FeatureSource<FeatureType, Feature> ccSource = (FeatureSource<FeatureType, Feature>) ccDataAccess
+                .getFeatureSource(CONTROLLED_CONCEPT);
+        FeatureCollection<FeatureType, Feature> ccFeatures = (FeatureCollection<FeatureType, Feature>) ccSource
+                .getFeatures();
+
+        final String LITHOLOGY = "lithology";
+        final int EXPECTED_RESULT_COUNT = 2;
+        // get controlled concept features on their own
+        MappingFeatureIterator iterator = (MappingFeatureIterator) ccFeatures.iterator();
+        int count = 0;
+        ArrayList<Feature> featureList = new ArrayList<Feature>();
+        try {
+            while (iterator.hasNext()) {
+                featureList.add(iterator.next());
+                count++;
+            }
+        } finally {
+            ccFeatures.close((Iterator<Feature>) iterator);
+        }
+        assertEquals(EXPECTED_RESULT_COUNT, count);
+
+        Iterator<Feature> cpIterator = cpFeatures.iterator();
+        while (cpIterator.hasNext()) {
+            Feature cpFeature = (Feature) cpIterator.next();
+            Object lithology = cpFeature.getProperty(LITHOLOGY).getValue();
+            assertNotNull(lithology);
+            assertEquals(lithology instanceof Collection, true);
+            if (cpFeature.getIdentifier().toString().equals("cp.167775491936278812")) {
+                // see ControlledConcept.properties file:
+                // _=NAME:String,COMPOSITION_ID:String
+                // 1=name_a|cp.167775491936278812
+                // 1=name_b|cp.167775491936278812
+                // 1=name_c|cp.167775491936278812
+                // 2=name_2|cp.167775491936278812
+                assertEquals(((Collection) lithology).size(), EXPECTED_RESULT_COUNT);
+                assertEquals(featureList.containsAll((Collection) lithology), true);
+            } else {
+                assertEquals(((Collection) lithology).isEmpty(), true);
+            }
+        }
 
         disposeDataAccesses();
     }
@@ -330,7 +393,7 @@ public class FeatureChainingTest extends TestCase {
 
         dsParams.put("dbtype", "app-schema");
         dsParams.put("url", url.toExternalForm());
-        DataAccess dataAccess = DataAccessFinder.getDataStore(dsParams);
+        DataAccess<FeatureType, Feature> dataAccess = DataAccessFinder.getDataStore(dsParams);
         assertNotNull(dataAccess);
 
         FeatureType featureType = dataAccess.getSchema(CONTROLLED_CONCEPT);
@@ -396,14 +459,15 @@ public class FeatureChainingTest extends TestCase {
         // </ogc:PropertyIsEqualTo>
         Filter filter = ff.equals(function, ff.literal(1));
 
-        FeatureCollection filteredResults = mfSource.getFeatures(filter);
+        FeatureCollection<FeatureType, Feature> filteredResults = mfSource.getFeatures(filter);
 
         assertEquals(getCount(filteredResults), 3);
 
         /**
          * Test filtering on multi valued properties
          */
-        FeatureSource guSource = DataAccessRegistry.getFeatureSource(GEOLOGIC_UNIT);
+        FeatureSource<FeatureType, Feature> guSource = DataAccessRegistry
+                .getFeatureSource(GEOLOGIC_UNIT);
         // composition part is a multi valued property
         // we're testing that we can get a geologic unit which has a composition part with a
         // significant proportion value
@@ -456,7 +520,8 @@ public class FeatureChainingTest extends TestCase {
         FeatureType guType = guDataAccess.getSchema(GEOLOGIC_UNIT);
         assertNotNull(guType);
 
-        FeatureSource guSource = (FeatureSource) guDataAccess.getFeatureSource(GEOLOGIC_UNIT);
+        FeatureSource<FeatureType, Feature> guSource = (FeatureSource<FeatureType, Feature>) guDataAccess
+                .getFeatureSource(GEOLOGIC_UNIT);
         guFeatures = (FeatureCollection) guSource.getFeatures();
 
         /**
@@ -472,8 +537,9 @@ public class FeatureChainingTest extends TestCase {
         FeatureType cpType = cpDataAccess.getSchema(COMPOSITION_PART);
         assertNotNull(cpType);
 
-        FeatureSource cpSource = (FeatureSource) cpDataAccess.getFeatureSource(COMPOSITION_PART);
-        cpFeatures = (FeatureCollection) cpSource.getFeatures();
+        FeatureSource<FeatureType, Feature> cpSource = (FeatureSource) cpDataAccess
+                .getFeatureSource(COMPOSITION_PART);
+        cpFeatures = (FeatureCollection<FeatureType, Feature>) cpSource.getFeatures();
 
         /**
          * Load CGI Term Value data access
@@ -488,8 +554,20 @@ public class FeatureChainingTest extends TestCase {
         FeatureType cgiType = cgiDataAccess.getSchema(CGI_TERM_VALUE);
         assertNotNull(cgiType);
 
-        FeatureSource cgiSource = (FeatureSource) cgiDataAccess.getFeatureSource(CGI_TERM_VALUE);
-        FeatureCollection cgiFeatures = (FeatureCollection) cgiSource.getFeatures();
+        FeatureSource<FeatureType, Feature> cgiSource = (FeatureSource) cgiDataAccess
+                .getFeatureSource(CGI_TERM_VALUE);
+        FeatureCollection<FeatureType, Feature> cgiFeatures = (FeatureCollection<FeatureType, Feature>) cgiSource
+                .getFeatures();
+
+        /**
+         * Load Controlled Concept data access
+         */
+        url = getClass().getResource(schemaBase + "ControlledConcept.xml");
+        assertNotNull(url);
+
+        dsParams.put("url", url.toExternalForm());
+        ccDataAccess = DataAccessFinder.getDataStore(dsParams);
+        assertNotNull(ccDataAccess);
 
         int EXPECTED_RESULT_COUNT = 4;
 
@@ -521,9 +599,10 @@ public class FeatureChainingTest extends TestCase {
         guDataAccess.dispose();
         cpDataAccess.dispose();
         cgiDataAccess.dispose();
+        ccDataAccess.dispose();
     }
 
-    protected static int getCount(FeatureCollection features) {
+    protected static int getCount(FeatureCollection<FeatureType, Feature> features) {
         MappingFeatureIterator iterator = (MappingFeatureIterator) features.iterator();
         int count = 0;
         try {
@@ -538,8 +617,9 @@ public class FeatureChainingTest extends TestCase {
     }
 
     /**
-     * This is a mock contains_text function which is normally stored in the database.
-     * But we are using properties files for our test, so this needs to be written.
+     * This is a mock contains_text function which is normally stored in the database. But we are
+     * using properties files for our test, so this needs to be written.
+     * 
      * @author ang05a
      */
     public static class ContainsTextFunctionExpression extends FunctionExpressionImpl {

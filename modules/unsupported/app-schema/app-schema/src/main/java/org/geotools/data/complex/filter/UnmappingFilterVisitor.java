@@ -110,7 +110,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: UnmappingFilterVisitor.java 32633 2009-03-16 01:44:12Z ang05a $
+ * @version $Id: UnmappingFilterVisitor.java 32690 2009-03-25 02:58:59Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/UnmappingFilterVisitor.java $
  * @since 2.4
  */
@@ -918,8 +918,19 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
     private List <Expression> findMappingsFor(FeatureTypeMapping mappings,
             final StepList propertyName) {
         // collect all the mappings for the given property
-        // regardless of xpath index
-        List candidates = mappings.getAttributeMappingsIgnoreIndex(propertyName);
+        List candidates;
+
+        // get all matching mappings if index is not specified, otherwise
+        // get the specified mapping
+        if (!propertyName.toString().contains("[")) {
+            candidates = mappings.getAttributeMappingsIgnoreIndex(propertyName);
+        } else {
+            candidates = new ArrayList <AttributeMapping>();
+            AttributeMapping mapping = mappings.getAttributeMapping(propertyName);
+            if (mapping != null) {
+                candidates.add(mapping);
+            }
+        }
         List expressions = getExpressions(candidates);
 
         // does the last step refer to a client property of the parent step?

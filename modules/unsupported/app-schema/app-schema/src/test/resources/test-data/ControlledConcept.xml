@@ -56,7 +56,13 @@
 					</sourceExpression>
 					<isMultiple>true</isMultiple>
 				</AttributeMapping>
-			</attributeMappings>
+				<AttributeMapping>
+					<targetAttribute>gml:name[2]</targetAttribute>
+					<sourceExpression>
+						<OCQL>COMPOSITION_ID</OCQL>
+					</sourceExpression>
+				</AttributeMapping>
+			</attributeMappings>				
 		</FeatureTypeMapping>
 	</typeMappings>
 </as:AppSchemaDataAccess>
