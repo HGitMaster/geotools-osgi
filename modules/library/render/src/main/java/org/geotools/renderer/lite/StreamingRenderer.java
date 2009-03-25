@@ -138,7 +138,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32488 2009-02-16 17:48:45Z aaime $
+ * @version $Id: StreamingRenderer.java 32692 2009-03-25 08:51:24Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -992,60 +992,36 @@ public final class StreamingRenderer implements GTRenderer {
 			// filter2 OR filter3);
 
 			final int maxFilters = getMaxFiltersToSendToDatastore();
-			final ArrayList filtersToDS = new ArrayList();
-			final int actualFilters = 0;
-			final int stylesLength = styles.length;
-			int styleElseRulesLength;
-			int styleRulesLength;
-			LiteFeatureTypeStyle style;
+			final List<Filter> filtersToDS = new ArrayList<Filter>();
 			int u = 0;
-			Rule r;
-			if (stylesLength > maxFilters) // there's at least one per
-				return;
-			for (int t = 0; t < stylesLength; t++) // look at each
-			// featuretypestyle
-			{
-				style = styles[t];
-				styleElseRulesLength = style.elseRules.length;
-				styleRulesLength = style.ruleList.length;
-				if (styleElseRulesLength > 0) // uh-oh has elseRule
+			// look at each featuretypestyle
+			for(LiteFeatureTypeStyle style : styles) {
+				if (style.elseRules.length > 0) // uh-oh has elseRule
 					return;
-				for (u = 0; u < styleRulesLength; u++) // look at each
-				// rule in the
-				// featuretypestyle
-				{
+				// look at each rule in the featuretypestyle
+				for(Rule r : style.ruleList) {
 					r = style.ruleList[u];
 					if (r.getFilter() == null)
 						return; // uh-oh has no filter (want all rows)
 					filtersToDS.add(r.getFilter());
 				}
 			}
-			if (actualFilters > maxFilters)
+			
+			// if too many bail out
+			if (filtersToDS.size() > maxFilters)
 				return;
 
+			// or together all the filters
 			org.opengis.filter.Filter ruleFiltersCombined;
-			Filter newFilter;
-			// We're GOLD -- OR together all the Rule's Filters
-			if (filtersToDS.size() == 1) // special case of 1 filter
-			{
+			if (filtersToDS.size() == 1) {
 				ruleFiltersCombined = (Filter) filtersToDS.get(0);
 			} else {
-				// build it up
-				ruleFiltersCombined = (Filter) filtersToDS.get(0);
-				final int size = filtersToDS.size();
-				for (int t = 1; t < size; t++) // NOTE: dont
-				// redo 1st one
-				{
-					newFilter = (Filter) filtersToDS.get(t);
-					ruleFiltersCombined = filterFactory.or(
-							ruleFiltersCombined, newFilter );
-				}
+			    ruleFiltersCombined = filterFactory.or(filtersToDS); 
 			}
-			// combine with the geometry filter (preexisting)
+			
+			// combine with the pre-existing filter
 			ruleFiltersCombined = filterFactory.and(
 					q.getFilter(), ruleFiltersCombined);
-
-			// set the actual filter
 			q.setFilter(ruleFiltersCombined);
 		} catch (Exception e) {
 			if (LOGGER.isLoggable(Level.WARNING))
