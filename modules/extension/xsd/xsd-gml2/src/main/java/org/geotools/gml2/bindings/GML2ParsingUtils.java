@@ -251,9 +251,11 @@ public class GML2ParsingUtils {
             // create the type
             ftBuilder.minOccurs(min).maxOccurs(max).add(property.getName(), theClass);
 
-            //set the default geometry explicitly
+            //set the default geometry explicitly. Note we're comparing the GML namespace
+            //with String.startsWith to catch up on the GML 3.2 namespace too, which is hacky.
+            final String propNamespace = property.getTargetNamespace();
             if (Geometry.class.isAssignableFrom(theClass)
-                    && !GML.NAMESPACE.equals(property.getTargetNamespace())) {
+                    && (propNamespace == null || !propNamespace.startsWith(GML.NAMESPACE))) {
                 //only set if non-gml, we do this because of "gml:location", 
                 // we dont want that to be the default if the user has another
                 // geometry attribute
