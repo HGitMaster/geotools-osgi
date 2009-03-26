@@ -42,11 +42,7 @@
 	<catalog>mappedPolygons.oasis.xml</catalog>
 	<targetTypes>
 		<FeatureType>
-			<!--
-				Both input and output schemas are needed here.
-			-->
 			<schemaUri>commonSchemas_new/GeoSciML/geosciml.xsd</schemaUri>
-			<schemaUri>commonSchemas_new/mineralOccurrence/mineralOccurrence.xsd</schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>
