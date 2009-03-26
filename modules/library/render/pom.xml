@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32162 2009-01-07 13:48:06Z aaime $              
+        Version: $Id: pom.xml 32711 2009-03-26 16:18:07Z danieleromagnoli $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -122,7 +122,7 @@
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-arcgrid</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
