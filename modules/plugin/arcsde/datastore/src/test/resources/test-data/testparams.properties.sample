@@ -30,6 +30,8 @@ temp_table=DELETE_ME
 # Raster test parameters
 ############################
 
+#whether to write images resulting from raster tests to $HOME/arcsde_tests directory
+raster.test.debugToDisk=false
 
 #sample 1bit tiff image
 sampledata.onebitraster=1bit-raster.tiff

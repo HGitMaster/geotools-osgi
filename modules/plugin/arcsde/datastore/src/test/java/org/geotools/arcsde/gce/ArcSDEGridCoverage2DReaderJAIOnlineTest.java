@@ -66,12 +66,14 @@ import com.esri.sde.sdk.client.SeRaster;
 @SuppressWarnings( { "deprecation", "nls" })
 public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
 
+    private static final String RASTER_TEST_DEBUG_TO_DISK = "raster.test.debugToDisk";
+
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
 
     /**
      * Whether to write the fetched rasters to disk or not
      */
-    private static final boolean DEBUG = true;
+    private static boolean DEBUG;
 
     static RasterTestData rasterTestData;
 
@@ -81,6 +83,8 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     public static void setUpBeforeClass() throws Exception {
         rasterTestData = new RasterTestData();
         rasterTestData.setUp();
+        DEBUG = Boolean
+                .valueOf(rasterTestData.getRasterTestDataProperty(RASTER_TEST_DEBUG_TO_DISK));
         rasterTestData.setOverrideExistingTestTables(false);
     }
 
@@ -438,7 +442,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
 
         GridGeometry2D gridGeometry = coverage.getGridGeometry();
 
-        /////////////////////////////////////////////////////////////assertEquals(originalGridRange,
+        // ///////////////////////////////////////////////////////////assertEquals(originalGridRange,
         // gridGeometry.getGridRange());
 
         final RenderedImage image = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
@@ -449,12 +453,15 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         final ColorModel colorModel = image.getColorModel();
         if (colorModel instanceof IndexColorModel) {
             switch (cellType) {
+            case TYPE_1BIT:
+                assertEquals(1, sampleSize[0]);
+                break;
             case TYPE_8BIT_U:
                 assertEquals("8-bit indexed image should have been "
                         + "promoted to 16bit to account for no-data values", 16, sampleSize[0]);
                 break;
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(cellType.toString());
             }
         } else {
             for (int band = 0; band < numBands; band++) {
