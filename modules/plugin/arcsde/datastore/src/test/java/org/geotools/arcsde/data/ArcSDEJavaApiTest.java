@@ -73,7 +73,7 @@ import com.esri.sde.sdk.client.SeVersion;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/ArcSDEJavaApiTest.java $
- * @version $Id: ArcSDEJavaApiTest.java 32671 2009-03-23 16:36:40Z groldan $
+ * @version $Id: ArcSDEJavaApiTest.java 32709 2009-03-26 16:08:09Z groldan $
  */
 public class ArcSDEJavaApiTest {
     /** package logger */
@@ -316,6 +316,35 @@ public class ArcSDEJavaApiTest {
             SeFilter[] spatFilters = { bboxFilter };
 
             expCount = 1;
+
+            actualCount = getTempTableCount(session, typeName, where, spatFilters, null);
+
+            assertEquals(expCount, actualCount);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+    @Test
+    public void testCalculateCountSpatialFilter() throws Exception {
+        try {
+            String typeName = testData.getTempTableName();
+            String where = null;
+            int expCount = 4;
+            int actualCount;
+
+            SeExtent extent = new SeExtent(-180, -90, -170, -80);
+
+            SeLayer layer = session.getLayer(typeName);
+            SeShape filterShape = new SeShape(layer.getCoordRef());
+            filterShape.generateRectangle(extent);
+
+            SeShapeFilter bboxFilter = new SeShapeFilter(typeName, layer.getSpatialColumn(),
+                    filterShape, SeFilter.METHOD_ENVP, true);
+            SeFilter[] spatFilters = { bboxFilter };
+
+            expCount = 2;
 
             actualCount = getTempTableCount(session, typeName, where, spatFilters, null);
 

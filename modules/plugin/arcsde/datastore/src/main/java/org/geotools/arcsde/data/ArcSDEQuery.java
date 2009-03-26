@@ -30,6 +30,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
+import org.geotools.arcsde.data.versioning.AutoCommitDefaultVersionHandler;
 import org.geotools.arcsde.filter.FilterToSQLSDE;
 import org.geotools.arcsde.filter.GeometryEncoderException;
 import org.geotools.arcsde.filter.GeometryEncoderSDE;
@@ -55,9 +56,11 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeFilter;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeSqlConstruct;
+import com.esri.sde.sdk.client.SeState;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -69,7 +72,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/ArcSDEQuery.java $
- * @version $Id: ArcSDEQuery.java 32668 2009-03-23 14:47:37Z groldan $
+ * @version $Id: ArcSDEQuery.java 32709 2009-03-26 16:08:09Z groldan $
  */
 class ArcSDEQuery {
     /** Shared package's logger */
@@ -558,69 +561,81 @@ class ArcSDEQuery {
      *             DOCUMENT ME!
      */
     public int calculateResultCount() throws IOException {
-        LOGGER.fine("about to calculate result count");
 
-        if (this.resultCount == -1) {
-            if (filters.getUnsupportedFilter() == Filter.INCLUDE) {
-                final SeQuery countQuery = session.createSeQuery();
-                setQueryVersionState(countQuery);
+        final Command<Integer> countCmd = new Command<Integer>() {
+            @Override
+            public Integer execute(ISession session, SeConnection connection) throws SeException,
+                    IOException {
+                final String colName = ArcSDEQuery.this.schema.getGeometryDescriptor().getName()
+                        .getLocalPart();
+                final SeQueryInfo qInfo = filters.getQueryInfo(new String[] { colName });
 
-                final String aFieldName = "*";
-                final String[] columns = { aFieldName };
-                final SeQueryInfo sdeQueryInfo = filters.getQueryInfo(columns);
-                final SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
+                final SeFilter[] spatialFilters = filters.getSpatialFilters();
 
-                if (LOGGER.isLoggable(Level.FINER)) {
-                    String msg = "ArcSDE query is: " + toString(sdeQueryInfo);
-                    LOGGER.finer(msg);
-                }
-                // there's nothing to filter post-db, so we're clear to do the
-                // result count
-                // by sending a query to the db and completely trusting the
-                // result.
-
+                SeQuery query = new SeQuery(connection);
                 try {
-                    Integer resultCount = session.issue(new Command<Integer>() {
-                        @Override
-                        public Integer execute(ISession session, SeConnection connection)
-                                throws SeException, IOException {
+                    setQueryVersionState(query);
 
-                            if (spatialConstraints.length > 0) {
-                                countQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, false,
-                                        spatialConstraints);
-                            }
-                            SeTable.SeTableStats tableStats = countQuery.calculateTableStatistics(
-                                    aFieldName, SeTable.SeTableStats.SE_COUNT_STATS, sdeQueryInfo,
-                                    0);
-                            Integer resultCount = new Integer(tableStats.getCount());
-                            return resultCount;
-                        }
-                    });
-                    this.resultCount = resultCount.intValue();
-                    LOGGER.finest("resultCount = " + this.resultCount);
-                } catch (IOException e) {
-                    if (LOGGER.isLoggable(Level.FINE)) {
-                        LOGGER.fine("Error calculating result cout with SQL where clause: "
-                                + this.filters.getSeSqlConstruct().getWhere());
+                    if (spatialFilters != null && spatialFilters.length > 0) {
+                        query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true, spatialFilters);
                     }
-                    // why throw an exception here? Just return -1 and let the
-                    // caller deal with it...
-                    // throw new DataSourceException("Calculating result count:
-                    // " + e.getSeError().getErrDesc(), e);
+
+                    SeTable.SeTableStats tableStats = query.calculateTableStatistics("*",
+                            SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
+
+                    int actualCount = tableStats.getCount();
+                    return new Integer(actualCount);
                 } finally {
-                    close(countQuery, session);
+                    query.close();
+                }
+            }
+        };
+
+        final Integer count = session.issue(countCmd);
+        return count.intValue();
+    }
+
+    public int _calculateResultCount() throws IOException {
+
+        final Command<Integer> countCmd = new Command<Integer>() {
+            @Override
+            public Integer execute(ISession session, SeConnection connection) throws SeException,
+                    IOException {
+                final String colName = ArcSDEQuery.this.schema.getGeometryDescriptor().getName()
+                        .getLocalPart();
+                final SeQueryInfo queryInfo = filters.getQueryInfo(new String[] { colName });
+
+                final String[] columns = { "*" };
+                final SeFilter[] spatialFilters = filters.getSpatialFilters();
+
+                SeSqlConstruct sql = new SeSqlConstruct();
+                String[] tables = filters.getSeSqlConstruct().getTables();
+                sql.setTables(tables);
+                String whereClause = filters.getSeSqlConstruct().getWhere();
+                if (whereClause != null) {
+                    sql.setWhere(whereClause);
+                }
+                SeQuery query = new SeQuery(connection, columns, sql);
+                setQueryVersionState(query);
+
+                SeQueryInfo qInfo = new SeQueryInfo();
+                qInfo.setConstruct(sql);
+
+                if (spatialFilters != null && spatialFilters.length > 0) {
+                    query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true, spatialFilters);
                 }
 
-            } else {
-                // well, we've got to filter the results after the query, so
-                // let's not do that twice. -1 is the best anyone will get
-                // on this one...
-                LOGGER.fine("Non-supported ArcSDE filters included in this query.  "
-                        + "Can't pre-calculate result count.");
+                SeTable.SeTableStats tableStats = query.calculateTableStatistics("*",
+                        SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
+
+                int actualCount = tableStats.getCount();
+                query.close();
+                return new Integer(actualCount);
             }
-        }
-        LOGGER.fine("Done calculating result count");
-        return this.resultCount;
+        };
+
+        final Integer count = session.issue(countCmd);
+        return count.intValue();
     }
 
     /**
@@ -655,7 +670,7 @@ class ArcSDEQuery {
                 public Envelope execute(ISession session, SeConnection connection)
                         throws SeException, IOException {
 
-                    //extentQuery.prepareQueryInfo(sdeQueryInfo);
+                    // extentQuery.prepareQueryInfo(sdeQueryInfo);
                     if (spatialConstraints.length > 0) {
                         extentQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, false,
                                 spatialConstraints);

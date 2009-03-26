@@ -340,7 +340,7 @@ public class ArcSDEQueryTest {
     }
 
     @Test
-    public void testCalculateResultCount() throws Exception {
+    public void testCalculateResultCountAll() throws Exception {
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = dstore.getFeatureSource(
                 typeName).getFeatures();
         FeatureIterator<SimpleFeature> reader = features.features();
@@ -362,8 +362,12 @@ public class ArcSDEQueryTest {
             q.close();
         }
         Assert.assertEquals(read, calculated);
+    }
 
-        q = getQueryFiltered();
+    @Test
+    public void testCalculateResultCountNonSpatialFilter() throws Exception {
+        ArcSDEQuery q = getQueryFiltered();
+        int calculated;
         try {
             calculated = q.calculateResultCount();
         } finally {
@@ -372,7 +376,46 @@ public class ArcSDEQueryTest {
         }
         Assert.assertEquals(FILTERING_COUNT, calculated);
     }
-
+    
+    @Test
+    public void testCalculateResultCountSpatialFilter() throws Exception {
+        ISession session = dstore.getSession(Transaction.AUTO_COMMIT);
+        FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, session);
+        
+        //same filter than ArcSDEJavaApiTest.testCalculateCountSpatialFilter
+        Filter filter = CQL.toFilter("BBOX(SHAPE, -180, -90, -170, -80)");
+        filteringQuery = new DefaultQuery(typeName, filter);
+        ArcSDEQuery q = ArcSDEQuery.createQuery(session, ftype, filteringQuery, fti
+                .getFidStrategy(), new AutoCommitDefaultVersionHandler());
+        int calculated;
+        try {
+            calculated = q.calculateResultCount();
+        } finally {
+            q.session.dispose();
+            q.close();
+        }
+        Assert.assertEquals(2, calculated);
+    }
+    
+    @Test
+    public void testCalculateResultCountMixedFilter() throws Exception {
+        ISession session = dstore.getSession(Transaction.AUTO_COMMIT);
+        FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, session);
+        
+        Filter filter = CQL.toFilter("INT32_COL < 5 AND BBOX(SHAPE, -180, -90, -170, -80)");
+        filteringQuery = new DefaultQuery(typeName, filter);
+        ArcSDEQuery q = ArcSDEQuery.createQuery(session, ftype, filteringQuery, fti
+                .getFidStrategy(), new AutoCommitDefaultVersionHandler());
+        int calculated;
+        try {
+            calculated = q.calculateResultCount();
+        } finally {
+            q.session.dispose();
+            q.close();
+        }
+        Assert.assertEquals(1, calculated);
+    }
+    
     @Test
     public void testCalculateQueryExtent() throws Exception {
         {
