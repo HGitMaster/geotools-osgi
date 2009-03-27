@@ -189,13 +189,19 @@ public class OracleFilterToSQL extends PreparedFilterToSQL {
     protected void doSDODistance(BinarySpatialOperator filter,
             PropertyName property, Literal geometry, Object extraData) throws IOException {
         double distance = ((DistanceBufferOperator) filter).getDistance();
+        String unit = ((DistanceBufferOperator) filter).getDistanceUnits();
         String within = filter instanceof DWithin ? "TRUE" : "FALSE"; 
         
         out.write("SDO_WITHIN_DISTANCE(");
         property.accept(this, extraData);
         out.write(",");
         geometry.accept(this, extraData);
-        out.write(",'distance=" + distance + "') = '" + within + "' ");
+        
+        // encode the unit verbatim when available
+        if(unit != null && !"".equals(unit.trim()))
+            out.write(",'distance=" + distance + " unit=" + unit + "') = '" + within + "' ");
+        else
+            out.write(",'distance=" + distance + "') = '" + within + "' ");
     }
     
    
