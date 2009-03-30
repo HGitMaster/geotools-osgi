@@ -138,7 +138,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32692 2009-03-25 08:51:24Z aaime $
+ * @version $Id: StreamingRenderer.java 32725 2009-03-30 14:58:39Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -177,7 +177,7 @@ public final class StreamingRenderer implements GTRenderer {
 	
 	private final static PropertyName paramsPropertyName = filterFactory.property("params");
 	
-  private final static PropertyName defaultGeometryPropertyName = filterFactory.property("");
+	private final static PropertyName defaultGeometryPropertyName = filterFactory.property("");
 	
 
 	/**
@@ -993,14 +993,12 @@ public final class StreamingRenderer implements GTRenderer {
 
 			final int maxFilters = getMaxFiltersToSendToDatastore();
 			final List<Filter> filtersToDS = new ArrayList<Filter>();
-			int u = 0;
 			// look at each featuretypestyle
 			for(LiteFeatureTypeStyle style : styles) {
 				if (style.elseRules.length > 0) // uh-oh has elseRule
 					return;
 				// look at each rule in the featuretypestyle
 				for(Rule r : style.ruleList) {
-					r = style.ruleList[u];
 					if (r.getFilter() == null)
 						return; // uh-oh has no filter (want all rows)
 					filtersToDS.add(r.getFilter());
