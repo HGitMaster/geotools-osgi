@@ -40,7 +40,7 @@ public class OracleFilterToSqlTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        encoder = new OracleFilterToSQL();
+        encoder = new OracleFilterToSQL(null);
         ff = CommonFactoryFinder.getFilterFactory2(null);
         gf = new GeometryFactory();
     }

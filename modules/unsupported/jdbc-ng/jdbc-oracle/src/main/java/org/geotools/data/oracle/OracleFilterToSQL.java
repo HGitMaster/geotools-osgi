@@ -17,12 +17,17 @@
 package org.geotools.data.oracle;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.jdbc.PreparedFilterToSQL;
+import org.geotools.jdbc.PreparedStatementSQLDialect;
 import org.geotools.jdbc.SQLDialect;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Literal;
@@ -40,6 +45,17 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Oracle specific filter encoder.
@@ -67,6 +83,11 @@ public class OracleFilterToSQL extends PreparedFilterToSQL {
             put(Intersects.class, "anyinteract");
         }
     };
+    
+    /**
+     * The whole world in WGS84
+     */
+    private static final Envelope WORLD = new Envelope(-180.0,180.0,-90.0,90.0);
 
     /**
      * If we have to turn <code>a op b</code> into <code>b op2 a</code>, what's the op2 that returns
@@ -91,8 +112,9 @@ public class OracleFilterToSQL extends PreparedFilterToSQL {
      * Whether BBOX should be encoded as just a primary filter or primary+secondary
      */
     protected boolean looseBBOXEnabled;
-    
-    public OracleFilterToSQL() {
+
+    public OracleFilterToSQL(PreparedStatementSQLDialect dialect) {
+        super(dialect);
         setSqlNameEscape("\"");
     }
     
@@ -129,17 +151,60 @@ public class OracleFilterToSQL extends PreparedFilterToSQL {
     protected Object visitBinarySpatialOperator(BinarySpatialOperator filter, PropertyName property,
             Literal geometry, boolean swapped, Object extraData) {
         try {
-            // TODO: add a doSDOFilter for the looses bbox case
+            Geometry eval = geometry.evaluate(filter, Geometry.class);
+            // Oracle cannot deal with filters using geometries that span beyond the whole world
+            // in case the 
+            if (dialect != null && ((OracleDialect)dialect).isGeodeticSrid(currentSRID) &&
+                    !WORLD.contains(eval.getEnvelopeInternal())) {
+                Geometry result = eval.intersection(JTS.toGeometry(WORLD));
+                
+                if (result != null && !result.isEmpty()) {
+                    if(result instanceof GeometryCollection) {
+                        result = distillSameTypeGeometries((GeometryCollection) result, eval);
+                    } 
+                    geometry = new FilterFactoryImpl().createLiteralExpression(result);
+                }
+            }
+            
             if(filter instanceof Beyond || filter instanceof DWithin)
                 doSDODistance(filter, property, geometry, extraData);
-            else if(filter instanceof BBOX && looseBBOXEnabled)
+            else if(filter instanceof BBOX && looseBBOXEnabled) {
                 doSDOFilter(filter, property, geometry, extraData);
-            else
+            } else
                 doSDORelate(filter, property, geometry, swapped, extraData);
         } catch (IOException ioe) {
             throw new RuntimeException(IO_ERROR, ioe);
         }
         return extraData;
+    }
+    
+    protected Geometry distillSameTypeGeometries(GeometryCollection coll, Geometry original) {
+        if(original instanceof Polygon || original instanceof MultiPolygon) {
+            List<Polygon> polys = new ArrayList<Polygon>();
+            accumulateGeometries(polys, coll, Polygon.class);
+            return original.getFactory().createMultiPolygon(((Polygon[]) polys.toArray(new Polygon[polys.size()])));
+        } else if(original instanceof LineString || original instanceof MultiLineString) {
+            List<LineString> ls = new ArrayList<LineString>();
+            accumulateGeometries(ls, coll, LineString.class);
+            return original.getFactory().createMultiLineString((LineString[]) ls.toArray(new LineString[ls.size()]));
+        } else if(original instanceof Point || original instanceof MultiPoint) {
+            List<LineString> points = new ArrayList<LineString>();
+            accumulateGeometries(points, coll, LineString.class);
+            return original.getFactory().createMultiPoint((Point[]) points.toArray(new Point[points.size()]));
+        } else {
+            return original;
+        }
+    }
+    
+    protected <T> void accumulateGeometries(List<T> collection, Geometry g, Class<? extends T> target) {
+        if(target.isInstance(g)) {
+            collection.add((T) g);
+        } else if(g instanceof GeometryCollection) {
+            GeometryCollection coll = (GeometryCollection) g;
+            for (int i = 0; i < coll.getNumGeometries(); i++) {
+                accumulateGeometries(collection, coll.getGeometryN(i), target);
+            }
+        }
     }
     
     protected void doSDOFilter(Filter filter, PropertyName property, Literal geometry, Object extraData) throws IOException {
@@ -203,6 +268,5 @@ public class OracleFilterToSQL extends PreparedFilterToSQL {
         else
             out.write(",'distance=" + distance + "') = '" + within + "' ");
     }
-    
    
 }
