@@ -138,7 +138,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32725 2009-03-30 14:58:39Z aaime $
+ * @version $Id: StreamingRenderer.java 32739 2009-04-04 16:11:51Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -914,6 +914,11 @@ public final class StreamingRenderer implements GTRenderer {
 		}
 		query.setCoordinateSystem(featCrs);
 		query.setHints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory()));
+		
+		// simplify the filter
+		SimplifyingFilterVisitor simplifier = new SimplifyingFilterVisitor();
+		Filter simplifiedFilter = (Filter) query.getFilter().accept(simplifier, null);
+		query.setFilter(simplifiedFilter);
 
 		if (isMemoryPreloadingEnabled()) {
 			// TODO: attache a feature listener, we must erase the memory cache
