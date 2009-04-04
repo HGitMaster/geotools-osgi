@@ -19,7 +19,6 @@ package org.geotools.wfs;
 import net.opengis.wfs.WfsFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.go.CommonFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

@@ -51,7 +51,6 @@ import org.geotools.util.NumberRange;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
-import org.opengis.sld.Fill;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -60,7 +59,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  *
  * @author jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/test/java/org/geotools/renderer/style/SLDStyleFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/test/java/org/geotools/renderer/style/SLDStyleFactoryTest.java $
  */
 public class SLDStyleFactoryTest extends TestCase {
     

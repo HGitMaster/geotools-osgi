@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.StyleImpl;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
@@ -35,7 +36,6 @@ import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
-import org.opengis.layer.Style;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -44,7 +44,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wms/src/test/java/org/geotools/data/wms/test/WebMapServerOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/wms/src/test/java/org/geotools/data/wms/test/WebMapServerOnlineTest.java $
  */
 public class WebMapServerOnlineTest extends ServerTestCase {
     URL serverURL;
@@ -110,7 +110,7 @@ public class WebMapServerOnlineTest extends ServerTestCase {
             Random random = new Random();
             int randomInt = random.nextInt(styles.size());
             
-            request.addLayer(layer, (Style) styles.get(randomInt));
+            request.addLayer(layer, (StyleImpl) styles.get(randomInt));
         }
 
         Set srss = WMSUtils.getSRSs(capabilities);

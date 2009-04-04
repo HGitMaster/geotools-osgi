@@ -29,12 +29,17 @@ public class IsGreaterThanOrEqualToImpl extends CompareFilterImpl
 		this(factory, null, null);
 	}
 	
-	protected IsGreaterThanOrEqualToImpl(org.opengis.filter.FilterFactory factory, Expression expression1, Expression expression2) {
-		super(factory, expression1, expression2);
-		
-		//backwards compat with old type system
-		this.filterType = COMPARE_GREATER_THAN_EQUAL;
-	}
+        protected IsGreaterThanOrEqualToImpl(org.opengis.filter.FilterFactory factory, Expression expression1, Expression expression2) {
+            this(factory, expression1, expression2,false);
+    }
+    
+    public IsGreaterThanOrEqualToImpl(org.opengis.filter.FilterFactory factory,
+                    Expression expr1, Expression expr2, boolean matchCase) {
+            super(factory,expr1,expr2,matchCase);           
+            
+            //backwards compat with old type system
+            this.filterType = COMPARE_GREATER_THAN_EQUAL;
+    }
 	
 	//@Override
 	public boolean evaluate(Object feature) {

@@ -27,12 +27,16 @@ public class IsLessThenOrEqualToImpl extends CompareFilterImpl implements
 		this(factory, null, null);
 	}
 	
-	protected IsLessThenOrEqualToImpl(org.opengis.filter.FilterFactory factory, Expression expression1, Expression expression2) {
-		super(factory, expression1, expression2);
-		
-		//backwards compat with old type system
-		this.filterType = COMPARE_LESS_THAN_EQUAL;
-	}
+        protected IsLessThenOrEqualToImpl(org.opengis.filter.FilterFactory factory, Expression expression1, Expression expression2) {
+            this(factory, expression1, expression2,false);
+    }
+
+    protected IsLessThenOrEqualToImpl(org.opengis.filter.FilterFactory factory, Expression expression1, Expression expression2,boolean matchCase ) {
+            super(factory, expression1, expression2,matchCase);
+            
+            //backwards compat with old type system
+            this.filterType = COMPARE_LESS_THAN_EQUAL;
+    }
 
 	//@Override
 	public boolean evaluate(Object feature) {

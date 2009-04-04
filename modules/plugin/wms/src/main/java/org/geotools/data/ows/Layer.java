@@ -61,7 +61,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * to add your own.
  *
  * @author rgould
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wms/src/main/java/org/geotools/data/ows/Layer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/wms/src/main/java/org/geotools/data/ows/Layer.java $
  */
 public class Layer implements Comparable<Layer> {
     
@@ -94,7 +94,7 @@ public class Layer implements Comparable<Layer> {
     private CRSEnvelope latLonBoundingBox = null;
 
     /** A list of type org.opengis.layer.Style */
-    private List<org.opengis.layer.Style> styles;
+    private List<StyleImpl> styles;
     private Boolean queryable = null;
     
     private double scaleHintMin = Double.NaN;

@@ -61,7 +61,7 @@ import org.opengis.util.InternationalString;
  * 
  * @author iant
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleFactoryImpl.java $
- * @version $Id: StyleFactoryImpl.java 32580 2009-03-02 23:56:00Z jive $
+ * @version $Id: StyleFactoryImpl.java 32736 2009-04-04 06:51:02Z jive $
  */
 public class StyleFactoryImpl extends AbstractStyleFactory
     implements StyleFactory2, org.opengis.style.StyleFactory {
@@ -936,7 +936,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         return null;
     }
     
-    public ExtensionSymbolizer extensionSymbolizer(String name, Expression geometry,
+    public ExtensionSymbolizer extensionSymbolizer(String name, String propertyName,
             Description description, Unit<?> unit, String extensionName,
             Map<String, Expression> parameters) {
         return null;
