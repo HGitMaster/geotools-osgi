@@ -937,6 +937,9 @@ public class ShpFiles {
      */
     public StorageFile getStorageFile(ShpFileType type) throws IOException {
         String baseName = getTypeName();
+        if (baseName.length() < 3) { // min prefix length for createTempFile
+            baseName = baseName + "___".substring(0, 3 - baseName.length());
+        }
         File tmp = File.createTempFile(baseName, type.extensionWithPeriod);
         return new StorageFile(this, tmp, type);
     }
