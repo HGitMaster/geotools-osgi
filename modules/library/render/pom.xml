@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32711 2009-03-26 16:18:07Z danieleromagnoli $              
+        Version: $Id: pom.xml 32751 2009-04-07 09:46:46Z aaime $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -59,19 +59,19 @@
     <developer>
       <name>Jesse Eichar</name>
       <id>jeichar</id>
-      <email>jeichar@refractions.net</email>
-      <organization>Refraction Research Inc.</organization>
+      <email>jeichar@users.sourceforge.net</email>
+      <organization>CampToCamp</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
       <name>Andrea Aime</name>
       <id>aaime</id>
-      <email>andrea.aime@alice.it</email>
+      <email>aaime@users.sourceforge.net</email>
       <roles>
         <role>Java Developer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
     <developer>
