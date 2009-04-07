@@ -143,8 +143,6 @@ public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, 
         dbfWriter = new DbaseFileWriter(dbfHeader, dbfChannel, dbfCharset);
 
         if(attReader != null) {
-            // don't try to read a shx file we're writing to in parallel
-            attReader.shp.disableShxUsage();
             if(attReader.hasNext()) {
                 shapeType = attReader.shp.getHeader().getShapeType();
                 handler = shapeType.getShapeHandler();

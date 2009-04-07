@@ -34,6 +34,7 @@ import java.util.Map;
 import org.geotools.TestData;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
@@ -69,7 +70,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/ShapefileDataStoreTest.java $
- * @version $Id: ShapefileDataStoreTest.java 31746 2008-10-31 14:03:55Z aaime $
+ * @version $Id: ShapefileDataStoreTest.java 32757 2009-04-07 21:48:07Z aaime $
  * @author Ian Schneider
  */
 public class ShapefileDataStoreTest extends TestCaseSupport {
@@ -745,6 +746,35 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         reader = s.getFeatureReader(s.getSchema().getTypeName(), query);
         assertEquals(s.getSchema(), reader.getFeatureType());
         reader.close();
+    }
+    
+    public void testWrite() throws Exception {
+        // create feature type
+        SimpleFeatureType type = DataUtilities.createType("junk","a:Point,b:java.math.BigDecimal,c:java.math.BigInteger");
+
+        BigInteger bigInteger = new BigInteger("1234567890123456789");
+        BigDecimal bigDecimal = new BigDecimal(bigInteger, 2);
+
+        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
+        builder.add(new GeometryFactory().createPoint(new Coordinate(1, -1)));
+        builder.add(bigDecimal);
+        builder.add(bigInteger);
+        
+        
+        SimpleFeature feature = builder.buildFeature(null);;
+
+        // store features
+        File tmpFile = getTempFile();
+        tmpFile.createNewFile();
+        ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURL());
+        s.createSchema(type);
+        
+        // was failing in GEOT-2427
+        Transaction t= new DefaultTransaction();
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = s.getFeatureWriter(s.getTypeNames()[0], t);
+        SimpleFeature feature1 = writer.next();
+        
+        
     }
 
     /**

@@ -346,8 +346,9 @@ public class ShapefileReader implements FileReader {
      * @return True if has next record, false otherwise.
      */
     private boolean hasNext(boolean checkRecno) throws IOException {
-        // don't read past the end of the file
-        if(currentShape > 0 && currentShape >= shxReader.getRecordCount())
+        // don't read past the end of the file (provided currentShape accurately
+        // represents the current position)
+        if(currentShape > UNKNOWN && currentShape > shxReader.getRecordCount() - 1)
             return false;
         
         // mark current position
