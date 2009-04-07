@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/Decimator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/Decimator.java $
  */
 public final class Decimator {
 
@@ -72,26 +72,45 @@ public final class Decimator {
 	 */
 	public Decimator(MathTransform screenToWorld, Rectangle paintArea) {
 		if (screenToWorld != null) {
-			double[] original = new double[] {
-					paintArea.x + paintArea.width / 2.0,
-					paintArea.y + paintArea.height / 2.0,
-					paintArea.x + paintArea.width / 2.0 + 1,
-					paintArea.y + paintArea.height / 2.0 + 1, };
-			double[] coords = new double[4];
-			try {
-				screenToWorld.transform(original, 0, coords, 0, 2);
-			} catch (TransformException e) {
-				return;
-			}
-			this.spanx = Math.abs(coords[0] - coords[2]) * 0.8;
-			// 0.8 is just so you dont decimate "too much". magic
-			// number.
-			this.spany = Math.abs(coords[1] - coords[3]) * 0.8;
+		    try {
+		        double[] spans = computeGeneralizationDistances(screenToWorld, paintArea);
+		        this.spanx = spans[0];
+		        this.spany = spans[1];
+		    } catch(TransformException e) {
+		        throw new RuntimeException("Could not perform the generalization spans computation", e);
+		    }
 		} else {
 			this.spanx = 1;
 			this.spany = 1;
 		}
 	}
+
+	/**
+	 * Given a full transformation from screen to world and the paint area computes a best
+	 * guess of the maxium generalization distance that won't make the transformations induced
+	 * by the generalization visible on screen. <p>In other words, it computes how long a pixel
+	 * is in the native spatial reference system of the data</p>
+	 * @param screenToWorld
+	 * @param paintArea
+	 * @return
+	 * @throws TransformException
+	 */
+    public static double[] computeGeneralizationDistances(MathTransform screenToWorld, Rectangle paintArea)
+            throws TransformException {
+        double[] original = new double[] {
+        		paintArea.x + paintArea.width / 2.0,
+        		paintArea.y + paintArea.height / 2.0,
+        		paintArea.x + paintArea.width / 2.0 + 1,
+        		paintArea.y + paintArea.height / 2.0 + 1, };
+        double[] coords = new double[4];
+        	screenToWorld.transform(original, 0, coords, 0, 2);
+        double[] spans = new double[2]; 
+         // 0.8 is just so you dont decimate "too much". magic
+        // number.
+        spans[0] = Math.abs(coords[0] - coords[2]) * 0.8;
+        spans[1] = Math.abs(coords[1] - coords[3]) * 0.8;
+        return spans;
+    }
 
 	/**
 	 * @throws TransformException

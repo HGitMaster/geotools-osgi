@@ -22,6 +22,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Transparency;
+import java.awt.RenderingHints.Key;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -138,7 +140,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32739 2009-04-04 16:11:51Z aaime $
+ * @version $Id: StreamingRenderer.java 32750 2009-04-07 09:45:05Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -817,7 +819,6 @@ public final class StreamingRenderer implements GTRenderer {
 	    FeatureCollection<SimpleFeatureType, SimpleFeature> results = null;
 		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
 		Query definitionQuery;
-		String[] attributes;
 		final int length;
 		Filter filter = null;
 		
@@ -832,21 +833,24 @@ public final class StreamingRenderer implements GTRenderer {
                         + " pixels to consider stroke width");
             }
         }
+        
+        // build a list of attributes used in the rendering
+        String[] attributes;
+        if (styles == null) {
+            List<AttributeDescriptor> ats = schema.getAttributeDescriptors();
+            length = ats.size();
+            attributes = new String[length];
+            for (int t = 0; t < length; t++) {
+                attributes[t] = ats.get(t).getLocalName();
+            }
+        } else {
+            attributes = findStyleAttributes(styles, schema);
+        }
+        
 		ReferencedEnvelope envelope = new ReferencedEnvelope(mapArea, mapCRS);
 		if (isOptimizedDataLoadingEnabled()) {
 			// see what attributes we really need by exploring the styles
 			// for testing purposes we have a null case -->
-
-			if (styles == null) {
-				List<AttributeDescriptor> ats = schema.getAttributeDescriptors();
-				length = ats.size();
-				attributes = new String[length];
-				for (int t = 0; t < length; t++) {
-					attributes[t] = ats.get(t).getLocalName();
-				}
-			} else {
-				attributes = findStyleAttributes(styles, schema);
-			}
 
 			try {
 				// Then create the geometry filters. We have to create one for
@@ -913,13 +917,35 @@ public final class StreamingRenderer implements GTRenderer {
 			}
 		}
 		query.setCoordinateSystem(featCrs);
-		query.setHints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory()));
+		
+		// prepare hints
+		// ... basic one, we want fast and compact coordinate sequences
+		Hints hints = new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory());
+		// ... if possible we let the datastore do the generalization
+		Set<RenderingHints.Key> fsHints = source.getSupportedHints();
+		if(fsHints.contains(Hints.GEOMETRY_DISTANCE) || fsHints.contains(Hints.GEOMETRY_SIMPLIFICATION)) {
+		    CoordinateReferenceSystem crs = getNativeCRS(schema, Arrays.asList(attributes));
+		    if(crs != null) {
+		        try {
+    		        MathTransform mt = buildFullTransform(crs, mapCRS, worldToScreenTransform);
+    		        double[] spans = Decimator.computeGeneralizationDistances(mt.inverse(), screenSize);
+    		        double distance = spans[0] < spans[1] ? spans[0] : spans[1];
+    		        if(fsHints.contains(Hints.GEOMETRY_DISTANCE))
+    		            hints.put(Hints.GEOMETRY_DISTANCE, distance);
+    		        if(fsHints.contains(Hints.GEOMETRY_SIMPLIFICATION))
+    		            hints.put(Hints.GEOMETRY_SIMPLIFICATION, distance);
+		        } catch(Exception e) {
+		            LOGGER.log(Level.INFO, "Error computing the generalization hints", e);
+		        }
+		    }
+		}
+		query.setHints(hints);
 		
 		// simplify the filter
-		SimplifyingFilterVisitor simplifier = new SimplifyingFilterVisitor();
-		Filter simplifiedFilter = (Filter) query.getFilter().accept(simplifier, null);
-		query.setFilter(simplifiedFilter);
-
+        SimplifyingFilterVisitor simplifier = new SimplifyingFilterVisitor();
+        Filter simplifiedFilter = (Filter) query.getFilter().accept(simplifier, null);
+        query.setFilter(simplifiedFilter);
+		
 		if (isMemoryPreloadingEnabled()) {
 			// TODO: attache a feature listener, we must erase the memory cache
 			// if
@@ -933,28 +959,68 @@ public final class StreamingRenderer implements GTRenderer {
 		} else { // insert a debug point here to check your query
 			results = source.getFeatures(query);
 		}
-
-		// commenting this out for now, since it's causing connections to be
-		// left open, since it's making a transaction that is never committed.
-		// I think perhaps not getting FIDs should be set in client software
-		// anyways See GEOS-631 and related issues. -ch
-		/*
-		 * if ((source instanceof FeatureStore) && (doesntHaveFIDFilter(query))) {
-		 * try { FeatureStore fs = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
-		 * 
-		 * if (fs.getTransaction() == Transaction.AUTO_COMMIT) { // play it
-		 * safe, only update the transaction info if its an // auto_commit // it
-		 * logically possible that someone could be using the // Transaction to
-		 * do future (or past) processing. // We dont want to affect a future
-		 * Query // thats not possible with an AUTO_COMMIT so its safe.
-		 * Transaction t = new DefaultTransaction();
-		 * t.putProperty("doNotGetFIDS", Boolean.TRUE); fs.setTransaction(t); } }
-		 * catch (Exception e) { if (LOGGER.isLoggable(Level.WARNING))
-		 * LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e); // we // can
-		 * carry on, but report to // user } }
-		 */
+		
+		
 		return results;
 	}
+
+    /**
+     * Builds a full transform going from the source CRS to the denstionan CRS
+     * and from there to the screen
+     */
+    private MathTransform2D buildFullTransform(CoordinateReferenceSystem sourceCRS,
+            CoordinateReferenceSystem destCRS, AffineTransform worldToScreenTransform)
+            throws FactoryException {
+        // the basic crs transformation, if any
+        MathTransform2D mt;
+        if (sourceCRS == null || destCRS == null || CRS.equalsIgnoreMetadata(sourceCRS,
+                destCRS))
+            mt = null;
+        else
+            mt = (MathTransform2D) CRS.findMathTransform(sourceCRS, destCRS, true);
+        
+        // concatenate from world to screen
+        if (mt != null && !mt.isIdentity()) {
+            mt = (MathTransform2D) ConcatenatedTransform
+                    .create(mt, ProjectiveTransform.create(worldToScreenTransform));
+        } else {
+            mt = (MathTransform2D) ProjectiveTransform.create(worldToScreenTransform);
+        }
+        
+        return mt;
+    }
+
+    /**
+     * Scans the schema for the specified attributes are returns a single CRS
+     * if all the geometric attributes in the lot share one CRS, null if
+     * there are different ones
+     * @param schema
+     * @return
+     */
+    private CoordinateReferenceSystem getNativeCRS(SimpleFeatureType schema, List<String> attNames) {
+        // first off, check how many crs we have, this hint works only
+        // if we have just one native CRS at hand (and the native CRS is known
+        CoordinateReferenceSystem crs = null;
+        for (AttributeDescriptor att : schema.getAttributeDescriptors()) {
+            if(!attNames.contains(att.getLocalName()))
+                continue;
+            
+            if(att instanceof GeometryDescriptor) {
+                GeometryDescriptor gd = (GeometryDescriptor) att;
+                CoordinateReferenceSystem gdCrs = gd.getCoordinateReferenceSystem();
+                if(crs == null) {
+                    crs = gdCrs;
+                } else if(gdCrs == null) {
+                    crs = null;
+                    break;
+                } else if(!CRS.equalsIgnoreMetadata(crs, gdCrs)) {
+                    crs = null;
+                    break;
+                }
+            }
+        }
+        return crs;
+    }
 
 	/**
 	 * JE: If there is a single rule "and" its filter together with the query's
@@ -2329,7 +2395,8 @@ public final class StreamingRenderer implements GTRenderer {
 		
 		public RenderableFeature(MapLayer layer) {
 			this.layer = layer;
-			this.clone = !layer.getFeatureSource().getSupportedHints().contains(Hints.FEATURE_DETACHED);
+			final Set<Key> hints = layer.getFeatureSource().getSupportedHints();
+            this.clone = !hints.contains(Hints.FEATURE_DETACHED);
 		}
 		
 		public void setFeature(Object feature) {
@@ -2351,19 +2418,7 @@ public final class StreamingRenderer implements GTRenderer {
 				sa = new SymbolizerAssociation();
 				sa.setCRS(findGeometryCS(layer, content, symbolizer));
 				try {
-					if (sa.crs == null || CRS.equalsIgnoreMetadata(sa.crs,
-							destinationCrs))
-						transform = null;
-					else
-						transform = (MathTransform2D) CRS.findMathTransform(sa.crs, destinationCrs, true);
-					if (transform != null && !transform.isIdentity()) {
-						transform = (MathTransform2D) ConcatenatedTransform
-								.create(transform, ProjectiveTransform
-										.create(at));
-
-					} else {
-						transform = (MathTransform2D) ProjectiveTransform.create(at);
-					}
+				    transform = buildFullTransform(sa.crs, destinationCrs, at);
 				} catch (Exception e) {
 					// fall through
 					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
