@@ -193,7 +193,8 @@ public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisito
 		String wildcard=filter.getWildCard();
 		String singleChar=filter.getSingleChar();
 		String escape=filter.getEscape();
-		return getFactory(extraData).like(expr, pattern, wildcard, singleChar, escape);
+                boolean matchCase = filter.isMatchingCase();
+		return getFactory(extraData).like(expr, pattern, wildcard, singleChar, escape, matchCase);
 	}
 
 	public Object visit(PropertyIsNull filter, Object extraData) {

@@ -408,6 +408,7 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     	char esc = filter.getEscape().charAt(0);
     	char multi = filter.getWildCard().charAt(0);
     	char single = filter.getSingleChar().charAt(0);
+        boolean matchCase = filter.isMatchingCase();
         
         String literal = filter.getLiteral();
         Expression att = filter.getExpression();
@@ -419,11 +420,21 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
             literal += multi;
         }
         
-    	String pattern = LikeFilterImpl.convertToSQL92(esc,multi,single,literal);
+    	String pattern = LikeFilterImpl.convertToSQL92(esc, multi, single, matchCase, literal);
         
         try {
+            if (!matchCase){
+                out.write(" UPPER(");
+            }
+
 	    	att.accept(this, extraData);
-	    	out.write(" LIKE '");
+
+            if (!matchCase){
+                out.write(") LIKE '");
+            } else {
+                out.write(" LIKE '");
+            }
+
 	    	out.write(pattern);
 	    	out.write("' ");
     	} catch (java.io.IOException ioe) {
