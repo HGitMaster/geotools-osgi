@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/ShapefileDataStoreTest.java $
- * @version $Id: ShapefileDataStoreTest.java 32757 2009-04-07 21:48:07Z aaime $
+ * @version $Id: ShapefileDataStoreTest.java 32760 2009-04-08 16:32:28Z aaime $
  * @author Ian Schneider
  */
 public class ShapefileDataStoreTest extends TestCaseSupport {
@@ -333,7 +333,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      * remaining. Test for removal and proper update after reloading...
      */
     public void testUpdating() throws Throwable {
-        try {
             ShapefileDataStore sds = createDataStore();
             loadFeatures(sds);
 
@@ -360,15 +359,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             for (FeatureIterator<SimpleFeature> i = fc.features(); i.hasNext();) {
                 assertEquals(-1, ((Byte) i.next().getAttribute(1)).byteValue());
             }
-        } catch (Throwable t) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                System.out.println("Ignore " + t
-                        + " because you are on windows");
-                return;
-            } else {
-                throw t;
-            }
-        }
     }
 
     /**
@@ -376,37 +366,56 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      * are no features left.
      */
     public void testRemoveFromFrontAndClose() throws Throwable {
-        try {
-            ShapefileDataStore sds = createDataStore();
+        ShapefileDataStore sds = createDataStore();
 
-            int idx = loadFeatures(sds).size();
+        int idx = loadFeatures(sds).size();
 
-            while (idx > 0) {
-                FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
+        while (idx > 0) {
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
 
-                try {
-                    writer = sds.getFeatureWriter(sds.getTypeNames()[0],
-                            Filter.INCLUDE, Transaction.AUTO_COMMIT);
-                    writer.next();
-                    writer.remove();
-                } finally {
-                    if (writer != null) {
-                        writer.close();
-                        writer = null;
-                    }
+            try {
+                writer = sds.getFeatureWriter(sds.getTypeNames()[0],
+                        Filter.INCLUDE, Transaction.AUTO_COMMIT);
+                writer.next();
+                writer.remove();
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                    writer = null;
                 }
-                assertEquals(--idx, loadFeatures(sds).size());
             }
-        } catch (Throwable t) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                System.out.println("Ignore " + t
-                        + " because you are on windows");
-                return;
-            } else {
-                throw t;
-            }
+            assertEquals(--idx, loadFeatures(sds).size());
         }
+    }
+    
+    /**
+     * Create a test file, then continue removing the first entry until there
+     * are no features left.
+     */
+    public void testRemoveFromFrontAndCloseTransaction() throws Throwable {
+        ShapefileDataStore sds = createDataStore();
 
+        int idx = loadFeatures(sds).size();
+
+        while (idx > 0) {
+            Transaction t = new DefaultTransaction();
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
+
+            try {
+                writer = sds.getFeatureWriter(sds.getTypeNames()[0],
+                        Filter.INCLUDE, t);
+                writer.next();
+                writer.remove();
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                    writer = null;
+                }
+            }
+            t.commit();
+            t.close();
+            assertEquals(--idx, loadFeatures(sds).size());
+        }
     }
 
     /**
@@ -414,7 +423,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      * no features left.
      */
     public void testRemoveFromBackAndClose() throws Throwable {
-        try {
             ShapefileDataStore sds = createDataStore();
 
             int idx = loadFeatures(sds).size();
@@ -436,17 +444,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 }
                 assertEquals(--idx, loadFeatures(sds).size());
             }
-        } catch (Throwable t) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                System.out.println("Ignore " + t
-                        + " because you are on windows");
-                return;
-            } else {
-                throw t;
-            }
-        }
     }
-
+    
     public void testWriteShapefileWithNoRecords() throws Exception {
         SimpleFeatureType featureType = DataUtilities.createType("whatever",
                 "a:Polygon,b:String");
