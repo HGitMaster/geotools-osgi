@@ -104,6 +104,7 @@ org.geotools.filter.function.FilterFunction_in9
 org.geotools.filter.function.FilterFunction_in10
 org.geotools.filter.function.FilterFunction_dateParse
 org.geotools.filter.function.FilterFunction_dateFormat
+org.geotools.filter.function.FilterFunction_numberFormat
 org.geotools.filter.function.IDFunction
 org.geotools.filter.function.math.FilterFunction_IEEEremainder
 org.geotools.filter.function.math.FilterFunction_abs
