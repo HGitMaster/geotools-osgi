@@ -422,6 +422,17 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 sdePass);
     }
 
+    /**
+     * 
+     * @param scon
+     * @param coverageUrl
+     * @return
+     * @throws IOException
+     *             if an exception occurs accessing the raster metadata
+     * @throws IllegalArgumentException
+     *             if the raster has no CRS, contains no raster attributes, has no pyramids, no
+     *             bands or no statistics
+     */
     private RasterInfo gatherCoverageMetadata(final ArcSDEPooledConnection scon,
             final String coverageUrl) throws IOException {
         LOGGER.fine("Gathering raster dataset metadata for " + coverageUrl);
@@ -474,6 +485,10 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                     throw new ArcSdeException(e);
                 }
                 final SeCoordinateReference seCoordRef = rasterColumn.getCoordRef();
+                if (seCoordRef == null) {
+                    throw new IllegalArgumentException(rasterTable
+                            + " has no coordinate reference system set");
+                }
                 LOGGER.finer("Looking CRS for raster column " + rasterTable);
                 coverageCrs = RasterUtils.findCompatibleCRS(seCoordRef);
                 if (DefaultEngineeringCRS.CARTESIAN_2D == coverageCrs) {
@@ -491,6 +506,22 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
                 for (SeRasterAttr rAtt : rasterAttributes) {
                     LOGGER.fine("Gathering raster metadata for " + rasterTable + " raster "
                             + rAtt.getRasterId().longValue());
+
+                    if (rAtt.getMaxLevel() == 0) {
+                        throw new IllegalArgumentException(
+                                "Raster cotains no pyramid levels, we don't support non pyramid rasters");
+                    }
+                    if (rAtt.getNumBands() == 0) {
+                        throw new IllegalArgumentException("Raster "
+                                + rAtt.getRasterId().longValue() + " in " + rasterTable
+                                + " contains no raster attribtues");
+                    }
+                    if (!rAtt.getBandInfo(1).hasStats()) {
+                        throw new IllegalArgumentException(
+                                rasterTable
+                                        + " has no statistics generated. Please use sderaster -o stats to create them before use");
+                    }
+
                     PyramidInfo pyramidInfo = new PyramidInfo(rAtt, coverageCrs);
                     rastersLayoutInfo.add(pyramidInfo);
 
