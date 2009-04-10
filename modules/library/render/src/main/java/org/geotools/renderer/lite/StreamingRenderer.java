@@ -140,7 +140,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32750 2009-04-07 09:45:05Z aaime $
+ * @version $Id: StreamingRenderer.java 32766 2009-04-10 10:26:14Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -225,7 +225,7 @@ public final class StreamingRenderer implements GTRenderer {
 	private double scaleDenominator;
 
 	/** Maximum displacement for generalization during rendering */
-	private double generalizationDistance = 1.0;
+	private double generalizationDistance = 0.8;
 
 	/** Factory that will resolve symbolizers into rendered styles */
 	private SLDStyleFactory styleFactory = new SLDStyleFactory();
@@ -322,6 +322,13 @@ public final class StreamingRenderer implements GTRenderer {
 	private CoordinateReferenceSystem destinationCrs;
 
 	private boolean canTransform;
+	
+	/**
+	 * Whether the renderer must perform generalization for the current set of features.
+	 * For each layer we will set this flag depending on whether the datastore can do full
+	 * generalization for us, or not
+	 */
+	private boolean inMemoryGeneralization = true;
 
 	/**
 	 * Creates a new instance of LiteRenderer without a context. Use it only to
@@ -928,12 +935,18 @@ public final class StreamingRenderer implements GTRenderer {
 		    if(crs != null) {
 		        try {
     		        MathTransform mt = buildFullTransform(crs, mapCRS, worldToScreenTransform);
-    		        double[] spans = Decimator.computeGeneralizationDistances(mt.inverse(), screenSize);
+    		        double[] spans = Decimator.computeGeneralizationDistances(mt.inverse(), screenSize, generalizationDistance);
     		        double distance = spans[0] < spans[1] ? spans[0] : spans[1];
-    		        if(fsHints.contains(Hints.GEOMETRY_DISTANCE))
+    		        if(fsHints.contains(Hints.GEOMETRY_SIMPLIFICATION)) {
+    		            // good, we don't need to perform in memory generalization, the datastore
+    		            // does it all for us
+                        hints.put(Hints.GEOMETRY_SIMPLIFICATION, distance);
+                        inMemoryGeneralization = false;
+    		        } else if(fsHints.contains(Hints.GEOMETRY_DISTANCE)) {
+    		            // in this case the datastore can get us close, but we can still
+    		            // perform some in memory generalization
     		            hints.put(Hints.GEOMETRY_DISTANCE, distance);
-    		        if(fsHints.contains(Hints.GEOMETRY_SIMPLIFICATION))
-    		            hints.put(Hints.GEOMETRY_SIMPLIFICATION, distance);
+    		        }
 		        } catch(Exception e) {
 		            LOGGER.log(Level.INFO, "Error computing the generalization hints", e);
 		        }
@@ -1647,6 +1660,9 @@ public final class StreamingRenderer implements GTRenderer {
 			//
 			// /////////////////////////////////////////////////////////////////////
         
+	        // ... assume we have to do the generalization, the query layer process will
+	        // turn down the flag if we don't 
+	        inMemoryGeneralization = true;
         	features = queryLayer(currLayer, featureSource, schema,
 				featureTypeStyleArray,
 				mapArea, destinationCrs, sourceCrs, screenSize,
@@ -2292,7 +2308,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * Sets the generalizazion distance in the screen space.
 	 * </p>
 	 * <p>
-	 * Default value is 1, meaning that two subsequent points are collapsed to
+	 * Default value is 0.8, meaning that two subsequent points are collapsed to
 	 * one if their on screen distance is less than one pixel
 	 * </p>
 	 * <p>
@@ -2384,6 +2400,14 @@ public final class StreamingRenderer implements GTRenderer {
 		return null;
 	}
 	
+	/**
+	 * A decimator that will just transform coordinates
+	 */
+	private static final Decimator NULL_DECIMATOR = new Decimator(-1, -1);
+	
+	/**
+	 * A class transforming (and caching) feature's geometries to shapes
+	 **/
 	private class RenderableFeature {
 		Object content;
 		private MapLayer layer;
@@ -2392,6 +2416,7 @@ public final class StreamingRenderer implements GTRenderer {
 		private List shapes = new ArrayList();
 		private boolean clone;
 		private IdentityHashMap decimators = new IdentityHashMap();
+
 		
 		public RenderableFeature(MapLayer layer) {
 			this.layer = layer;
@@ -2477,12 +2502,18 @@ public final class StreamingRenderer implements GTRenderer {
 		 */
 		private Decimator getDecimator(MathTransform2D mathTransform)
 				throws org.opengis.referencing.operation.NoninvertibleTransformException {
+		    // returns a decimator that does nothing if the currently set generalization
+		    // distance is zero (no generalization desired) or if the datastore has
+		    // already done full generalization at the desired level
+            if (generalizationDistance == 0 || !inMemoryGeneralization)
+                return NULL_DECIMATOR;
+		    
 			Decimator decimator = (Decimator) decimators.get(mathTransform);
 			if (decimator == null) {
 				if (mathTransform != null && !mathTransform.isIdentity())
-					decimator = new Decimator(mathTransform.inverse(), screenSize);
+					decimator = new Decimator(mathTransform.inverse(), screenSize, generalizationDistance);
 				else
-					decimator = new Decimator(null, screenSize);
+					decimator = new Decimator(null, screenSize, generalizationDistance);
 
 				decimators.put(mathTransform, decimator);
 			}
