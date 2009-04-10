@@ -18,7 +18,10 @@
 package org.geotools.arcsde.gce;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
@@ -49,7 +52,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/gce/ArcSDEPyramidTest.java $
- * @version $Id: ArcSDEPyramidTest.java 32472 2009-02-11 17:32:48Z groldan $
+ * @version $Id: ArcSDEPyramidTest.java 32771 2009-04-10 17:36:02Z groldan $
  */
 public class ArcSDEPyramidTest {
 
@@ -95,25 +98,33 @@ public class ArcSDEPyramidTest {
 
         final CoordinateReferenceSystem crs = DefaultEngineeringCRS.CARTESIAN_2D;
 
-        pyramid.addPyramidLevel(0, new ReferencedEnvelope(0, 2026, 0, 2042, crs), 0, 0, 17, 17,
-                new Dimension(1013, 1021));
-        pyramid.addPyramidLevel(1, new ReferencedEnvelope(0, 2026.0000000000002, 0, 2042, crs), 0,
-                0, 9, 9, new Dimension(507, 511));
+        final Point imageOffset = new Point(0, 0);
+        final Point2D extentOffset = new Double(0, 0);
+
+        pyramid.addPyramidLevel(0, new ReferencedEnvelope(0, 2026, 0, 2042, crs), imageOffset,
+                extentOffset, 17, 17, new Dimension(1013, 1021));
+        pyramid.addPyramidLevel(1, new ReferencedEnvelope(0, 2026.0000000000002, 0, 2042, crs),
+                imageOffset, extentOffset, 9, 9, new Dimension(507, 511));
 
         pyramid.addPyramidLevel(2, new ReferencedEnvelope(2.0019762845849804, 2028.0019762845852,
-                -2.0019607843137237, 2039.9980392156863, crs), 0, 0, 5, 5, new Dimension(254, 256));
+                -2.0019607843137237, 2039.9980392156863, crs), imageOffset, extentOffset, 5, 5,
+                new Dimension(254, 256));
 
         pyramid.addPyramidLevel(3, new ReferencedEnvelope(6.005928853754941, 2023.9980237154152,
-                2.0019607843137237, 2035.9941176470588, crs), 0, 0, 3, 3, new Dimension(127, 128));
+                2.0019607843137237, 2035.9941176470588, crs), imageOffset, extentOffset, 3, 3,
+                new Dimension(127, 128));
 
         pyramid.addPyramidLevel(4, new ReferencedEnvelope(4.013833992094863, 2032.005928853755,
-                10.009803921568619, 2027.986274509804, crs), 0, 0, 2, 2, new Dimension(64, 64));
+                10.009803921568619, 2027.986274509804, crs), imageOffset, extentOffset, 2, 2,
+                new Dimension(64, 64));
 
         pyramid.addPyramidLevel(5, new ReferencedEnvelope(30.029644268774707, 2015.9901185770752,
-                26.025490196078408, 2011.9705882352941, crs), 0, 0, 1, 1, new Dimension(32, 23));
+                26.025490196078408, 2011.9705882352941, crs), imageOffset, extentOffset, 1, 1,
+                new Dimension(32, 23));
 
         pyramid.addPyramidLevel(6, new ReferencedEnvelope(62.06126482213439, 1983.9584980237157,
-                58.05686274509799, 1979.9392156862746, crs), 0, 0, 1, 1, new Dimension(16, 16));
+                58.05686274509799, 1979.9392156862746, crs), imageOffset, extentOffset, 1, 1,
+                new Dimension(16, 16));
         return pyramid;
     }
 
