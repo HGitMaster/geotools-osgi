@@ -83,5 +83,10 @@ public class SeRasterAttr {
         // TODO Auto-generated method stub
         return null;
     }
+
+	public SDEPoint getExtentOffsetByLevel(int level) throws SeException{
+		// TODO Auto-generated method stub
+		return null;
+	}
     
 }
