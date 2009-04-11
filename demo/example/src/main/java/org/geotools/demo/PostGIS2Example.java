@@ -52,6 +52,10 @@ public class PostGIS2Example {
 	
 	public static void main(String[] args) throws Exception {
 		DataStore dataStore = getDatabase(args);
+		if( dataStore == null ){
+		    System.out.println( "Could not connect");
+		    System.exit(0);
+		}
 		String[] typeNames = dataStore.getTypeNames();
 		String typeName = typeNames[0];
 
@@ -91,7 +95,8 @@ public class PostGIS2Example {
 		if( properties == null){
 			System.exit(0);
 		}
-		return DataStoreFinder.getDataStore( properties );
+		DataStore dataStore = DataStoreFinder.getDataStore( properties );
+		return dataStore;
 	}
 	
 	static class JQuery extends JDialog {
