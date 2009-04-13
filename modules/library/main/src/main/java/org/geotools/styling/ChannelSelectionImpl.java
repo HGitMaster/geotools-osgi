@@ -73,7 +73,6 @@ public class ChannelSelectionImpl
                 "Three channels are required in setRGBChannels, got "
                 + channels.length);
         }
-
         red = channels[0];
         green = channels[1];
         blue = channels[2];
@@ -84,6 +83,11 @@ public class ChannelSelectionImpl
         this.red = red;
         this.green = green;
         this.blue = blue;
+    }
+    public void setRGBChannels(org.opengis.style.SelectedChannelType red, org.opengis.style.SelectedChannelType green, org.opengis.style.SelectedChannelType blue ){
+        this.red = new SelectedChannelTypeImpl( red );
+        this.green = new SelectedChannelTypeImpl( green );
+        this.blue = new SelectedChannelTypeImpl( blue );
     }
 
     public void setSelectedChannels(SelectedChannelType[] channels) {

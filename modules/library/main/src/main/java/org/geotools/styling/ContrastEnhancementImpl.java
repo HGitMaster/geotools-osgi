@@ -20,6 +20,7 @@ package org.geotools.styling;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.style.ContrastMethod;
 import org.opengis.style.StyleVisitor;
@@ -89,6 +90,13 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
         this.gamma = contrastEnhancement.getGammaValue();
     }
 
+    public ContrastEnhancementImpl(FilterFactory2 factory, Expression gamma, ContrastMethod method) {
+        this.filterFactory = factory;
+        this.gamma = gamma;
+        this.method = method;
+        this.type = factory.literal( method.name() );
+    }
+
     public void setFilterFactory(FilterFactory factory) {
         filterFactory = factory;
     }
@@ -107,14 +115,17 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
 
     public void setHistogram() {
         type = filterFactory.literal("Histogram");
+        // method = ContrastMethod.HISTOGRAM;
     }
 
     public void setNormalize() {
         type = filterFactory.literal("Normalize");
+        // method = ContrastMethod.NORMALIZE;
     }
 
     public void setLogarithmic() {
         type = filterFactory.literal("Logarithmic");
+        // method = ContrastMethod.NONE;
     }
 
     public void setExponential() {

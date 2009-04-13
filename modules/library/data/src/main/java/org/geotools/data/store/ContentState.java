@@ -91,6 +91,7 @@ public class ContentState {
      * entry maintaining the state
      */
     protected ContentEntry entry;
+    
     /**
      * observers
      */

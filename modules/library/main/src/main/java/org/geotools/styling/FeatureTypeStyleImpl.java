@@ -45,8 +45,8 @@ import org.opengis.style.Description;
  *
  * @author James Macgill
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/FeatureTypeStyleImpl.java $
- * @version $Id: FeatureTypeStyleImpl.java 31411 2008-09-05 07:36:04Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/FeatureTypeStyleImpl.java $
+ * @version $Id: FeatureTypeStyleImpl.java 32784 2009-04-13 10:50:27Z jive $
  */
 public class FeatureTypeStyleImpl implements org.geotools.styling.FeatureTypeStyle, Cloneable {
     
@@ -56,6 +56,7 @@ public class FeatureTypeStyleImpl implements org.geotools.styling.FeatureTypeSty
     private Set<SemanticType> semantics = new LinkedHashSet<SemanticType>();
     private Id featureInstances = null;
     private Set<Name> featureTypeNames = new LinkedHashSet<Name>();
+    
     private final DescriptionImpl description = new DescriptionImpl(
             new SimpleInternationalString("title"), 
             new SimpleInternationalString("abstract"));

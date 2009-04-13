@@ -22,23 +22,23 @@ import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.visitor.DuplicatingFilterVisitor;
-import org.geotools.util.Utilities;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.Utilities;
 import org.opengis.filter.Filter;
 import org.opengis.metadata.citation.OnLineResource;
+import org.opengis.style.Description;
 import org.opengis.style.GraphicLegend;
+import org.opengis.style.Rule;
 import org.opengis.style.StyleVisitor;
 import org.opengis.util.Cloneable;
-import org.opengis.util.InternationalString;
-import org.opengis.style.Description;
 
 /**
  * Provides the default implementation of Rule.
  *
  * @author James Macgill
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/RuleImpl.java $
- * @version $Id: RuleImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/RuleImpl.java $
+ * @version $Id: RuleImpl.java 32784 2009-04-13 10:50:27Z jive $
  */
 public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
     private List<Symbolizer> symbolizers = new ArrayList<Symbolizer>();
@@ -91,6 +91,30 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
         
     }
     
+    /** Copy constructor */
+    public RuleImpl(Rule rule) {
+        this.symbolizers = new ArrayList<Symbolizer>();
+        for( org.opengis.style.Symbolizer sym : rule.symbolizers() ){
+            if( sym instanceof Symbolizer ){
+                this.symbolizers.add( (Symbolizer) sym );
+            }
+        }
+        if( rule.getDescription() != null && rule.getDescription().getTitle() != null ){
+            this.description.setTitle( rule.getDescription().getTitle() );
+        }
+        if( rule.getDescription() != null && rule.getDescription().getAbstract() != null ){
+            this.description.setTitle( rule.getDescription().getAbstract() );        
+        }
+        if( rule.getLegend() instanceof org.geotools.styling.Graphic ){
+            org.geotools.styling.Graphic graphic = (org.geotools.styling.Graphic) rule.getLegend();
+            setLegendGraphic( new org.geotools.styling.Graphic[]{ graphic } );
+        }        
+        this.name = rule.getName();
+        this.filter = rule.getFilter();
+        this.hasElseFilter = rule.isElseFilter();
+        this.maxScaleDenominator = rule.getMaxScaleDenominator();
+        this.minScaleDenominator = rule.getMinScaleDenominator();
+    }
 
     public org.geotools.styling.Graphic[] getLegendGraphic() {
         return legends.toArray(new org.geotools.styling.Graphic[0]);
@@ -145,7 +169,7 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
 
         ret = new org.geotools.styling.Symbolizer[symbolizers.size()];
         for(int i=0, n=symbolizers.size(); i<n; i++){
-            ret[i] = (org.geotools.styling.Symbolizer) symbolizers.get(i);
+            ret[i] = symbolizers.get(i);
         }
         
         return ret;

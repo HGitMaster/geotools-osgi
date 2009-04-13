@@ -61,4 +61,12 @@ class SingleConnectionDataSource implements DataSource {
         throw new UnsupportedOperationException();
     }
 
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return false;
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return null;
+    }
+
 }

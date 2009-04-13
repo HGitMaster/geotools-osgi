@@ -40,6 +40,11 @@ public class DescriptionImpl implements Description{
         this.desc = imp.desc;
     }
     
+    public DescriptionImpl(Description description) {
+        this.title = description.getTitle();
+        this.desc = description.getAbstract();
+    }
+
     public InternationalString getTitle() {
         return title;
     }
