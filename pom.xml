@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32573 2009-03-02 07:25:25Z jive $
+        Version: $Id: pom.xml 32786 2009-04-14 07:20:14Z bencaradocdavies $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -899,6 +899,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clover-plugin</artifactId>
           <version>2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <version>2.5</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
