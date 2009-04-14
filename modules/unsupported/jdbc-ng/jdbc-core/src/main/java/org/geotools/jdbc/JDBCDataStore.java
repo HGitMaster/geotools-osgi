@@ -17,6 +17,7 @@
 package org.geotools.jdbc;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URLDecoder;
@@ -29,6 +30,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1187,6 +1189,67 @@ public final class JDBCDataStore extends ContentDataStore
         }
         fid.setLength(fid.length()-1);
         return fid.toString();
+    }
+    
+    /**
+     * Decodes a fid into its components based on a primary key.
+     * 
+     * @param strict If set to true the value of the fid will be validated against
+     *   the type of the key columns. If a conversion can not be made, an exception will be thrown. 
+     */
+    protected List<Object> decodeFID( PrimaryKey key, String FID, boolean strict) {
+        //strip off the feature type name
+        if (FID.startsWith(key.getTableName() + ".")) {
+            FID = FID.substring(key.getTableName().length() + 1);
+        }
+
+        try {
+            FID = URLDecoder.decode(FID,"UTF-8");
+        } 
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException( e );
+        }
+
+        //check for case of multi column primary key and try to backwards map using
+        // "." as a seperator of values
+        List values = null;
+        if ( key.getColumns().size() > 1 ) {
+            String[] split = FID.split( "\\." );
+
+            //copy over to avoid array store exception
+            values = new ArrayList(split.length);
+            for ( int i = 0; i < split.length; i++ ) {
+                values.add(split[i]);
+            }
+        }
+        else {
+            //single value case
+            values = new ArrayList();
+            values.add( FID );
+        }
+        if ( values.size() != key.getColumns().size() ) {
+            throw new IllegalArgumentException( "Illegal fid: " + FID + ". Expected "
+                + key.getColumns().size() + " values but got " + values.size() );
+        }
+
+        //convert to the type of the key
+        //JD: usually this would be done by the dialect directly when the value
+        // actually gets set but the FIDMapper interface does not report types
+        for ( int i = 0; i < values.size(); i++ ) {
+            Object value = values.get( i );
+            if ( value != null ) {
+                Class type = key.getColumns().get( i ).getType();
+                Object converted = Converters.convert( value, type );
+                if ( converted != null ) {
+                    values.set(i, converted);
+                }
+                if (strict && !type.isInstance( values.get( i ) ) ) {
+                    throw new IllegalArgumentException( "Value " + values.get( i ) + " illegal for type " + type.getName() );
+                }
+            }
+        }
+
+        return values;
     }
     
     /**
@@ -3184,47 +3247,7 @@ public final class JDBCDataStore extends ContentDataStore
 
                     public Object[] getPKAttributes(String FID)
                         throws IOException {
-                        //strip off the feature type name
-                        if (FID.startsWith(featureType.getTypeName() + ".")) {
-                            FID = FID.substring(featureType.getTypeName().length() + 1);
-                        }
-
-                        FID = URLDecoder.decode(FID,"UTF-8");
-
-                        //check for case of multi column primary key and try to backwards map using
-                        // "." as a seperator of values
-                        Object[] values = null;
-                        if ( key.getColumns().size() > 1 ) {
-                            String[] split = FID.split( "\\." );
-
-                            //copy over to avoid array store exception
-                            values = new Object[split.length];
-                            for ( int i = 0; i < split.length; i++ ) {
-                                values[i] = split[i];
-                            }
-                        }
-                        else {
-                            //single value case
-                            values = new Object[]{ FID };
-                        }
-                        if ( values.length != key.getColumns().size() ) {
-                            throw new IllegalArgumentException( "Illegal fid: " + FID + ". Expected "
-                                + key.getColumns().size() + " values but got " + values.length );
-                        }
-
-                        //convert to the type of the key
-                        //JD: usually this would be done by the dialect directly when the value
-                        // actually gets set but the FIDMapper interface does not report types
-                        for ( int i = 0; i < values.length; i++ ) {
-                            if ( values[i] != null ) {
-                                Object converted = Converters.convert( values[i], key.getColumns().get( i ).getType() );
-                                if ( converted != null ) {
-                                    values[i] = converted;
-                                }
-                            }
-                        }
-
-                        return values;
+                        return decodeFID(key,FID,false).toArray();
                     }
 
                     public boolean hasAutoIncrementColumns() {
