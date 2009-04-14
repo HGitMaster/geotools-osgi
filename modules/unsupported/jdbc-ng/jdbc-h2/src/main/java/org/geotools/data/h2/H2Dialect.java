@@ -177,12 +177,13 @@ public class H2Dialect extends SQLDialect {
                 if ( ad instanceof GeometryDescriptor ) {
                     Class binding = ad.getType().getBinding();
                     if ( isConcreteGeometry( binding ) ) {
+                        String tableName = featureType.getTypeName();
                         String propertyName = ad.getName().getLocalPart();
                         StringBuffer sql = new StringBuffer();
                         sql.append( "ALTER TABLE ");
-                        encodeTableName(featureType.getTypeName(), sql);
+                        encodeTableName(tableName, sql);
                         sql.append( " ADD CONSTRAINT " );
-                        encodeTableName( propertyName + "GeometryType", sql );
+                        encodeTableName( tableName + "_"+propertyName + "GeometryType", sql );
                         sql.append( " CHECK ");
                         encodeColumnName( propertyName, sql );
                         sql.append( " IS NULL OR");
