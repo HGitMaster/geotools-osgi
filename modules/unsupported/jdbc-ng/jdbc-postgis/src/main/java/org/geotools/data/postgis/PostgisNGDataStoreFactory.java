@@ -24,8 +24,6 @@ import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
 
 public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
-    private static final String JDBC_PATH = "jdbc:oracle:thin:@";
-    
     /** parameter for namespace of the datastore */
     public static final Param LOOSEBBOX = new Param("Loose bbox", Boolean.class, "Perform only primary filter on bbox", false, Boolean.TRUE);
     
@@ -44,7 +42,7 @@ public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
 
     @Override
     protected String getDatabaseID() {
-        return "PostGIS2";
+        return "postgisng";
     }
     
     @Override
