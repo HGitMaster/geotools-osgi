@@ -433,6 +433,7 @@ public class PostGISDialect extends BasicSQLDialect {
     @Override
     public void postCreateTable(String schemaName,
             SimpleFeatureType featureType, Connection cx) throws SQLException {
+        schemaName = schemaName != null ? schemaName : "public"; 
         String tableName = featureType.getName().getLocalPart();
         Statement st = null;
         try {
