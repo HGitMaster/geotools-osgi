@@ -479,7 +479,8 @@ public class PostGISDialect extends BasicSQLDialect {
                     "DELETE FROM GEOMETRY_COLUMNS"
                             + " WHERE f_table_catalog=''" //
                             + " AND f_table_schema = '" + schemaName + "'" //
-                            + " AND f_table_name = '" + tableName + "'";
+                            + " AND f_table_name = '" + tableName + "'" // 
+                            + " AND f_geometry_column = '" + gd.getLocalName() + "'";
                     
                     LOGGER.fine( sql );
                     st.execute( sql );
