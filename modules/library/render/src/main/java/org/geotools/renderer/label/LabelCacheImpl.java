@@ -173,6 +173,9 @@ public final class LabelCacheImpl implements LabelCache {
     
     // Force labels to a readable orientation (so that they don't look "upside down")
     static final boolean DEFAULT_FORCE_LEFT_TO_RIGHT = true;
+    
+    // By default, put each label in the conflict resolution map
+    static final boolean DEFAULT_CONFLICT_RESOLUTION = true;
 
     /**
      * When true, the text is rendered as its GlyphVector outline (as a
@@ -391,6 +394,7 @@ public final class LabelCacheImpl implements LabelCache {
         item.setMaxAngleDelta(Math.toRadians(maxAngleDelta));
         item.setAutoWrap(getIntOption(symbolizer, "autoWrap", DEFAULT_AUTO_WRAP));
         item.setForceLeftToRightEnabled(getBooleanOption(symbolizer, "forceLeftToRight", DEFAULT_FORCE_LEFT_TO_RIGHT));
+        item.setConflictResolutionEnabled(getBooleanOption(symbolizer, "conflictResolution", DEFAULT_CONFLICT_RESOLUTION));
         return item;
     }
 
@@ -827,7 +831,8 @@ public final class LabelCacheImpl implements LabelCache {
                     if (painted) {
                         labelCount++;
                         groupLabels.addLabel(labelItem, labelEnvelope);
-                        paintedBounds.addLabel(labelItem, labelEnvelope);
+                        if(labelItem.isConflictResolutionEnabled())
+                            paintedBounds.addLabel(labelItem, labelEnvelope);
                     } else {
                         // this will generate a sequence like s, -2s, 3s, -4s,
                         // ...
@@ -992,7 +997,8 @@ public final class LabelCacheImpl implements LabelCache {
             // painter.graphics.setColor(Color.BLACK);
             // painter.graphics.draw(transformed);
             painter.paintStraightLabel(tempTransform);
-            glyphs.addLabel(labelItem, transformed);
+            if(labelItem.isConflictResolutionEnabled())
+                glyphs.addLabel(labelItem, transformed);
             return true;
         }
     }
@@ -1046,7 +1052,8 @@ public final class LabelCacheImpl implements LabelCache {
         // painter.graphics.draw(new Line2D.Double(centroid.getX(),
         // centroid.getY(), centroid.getX(), centroid.getY()));
         painter.paintStraightLabel(tempTransform);
-        glyphs.addLabel(labelItem, transformed);
+        if(labelItem.isConflictResolutionEnabled())
+            glyphs.addLabel(labelItem, transformed);
         return true;
     }
 
