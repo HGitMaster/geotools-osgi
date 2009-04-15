@@ -260,6 +260,14 @@ public class LabelPainter {
     public double getLineHeight() {
         return lines.get(0).gv.getVisualBounds().getHeight() - lines.get(0).layout.getDescent();
     }
+    
+    /**
+     * The full size above the baseline 
+     * @return
+     */
+    public double getAscent() {
+        return lines.get(0).layout.getAscent();
+    }
 
     /**
      * Returns the width of the label, as painted in straight form (
@@ -522,7 +530,7 @@ public class LabelPainter {
     boolean isLabelUpwards(LineStringCursor cursor) {
         // label angle is orthogonal to the line direction
         double labelAngle = cursor.getCurrentAngle() + Math.PI / 2;
-        // normalize the angle so that it's comprised between 0 and 360°
+        // normalize the angle so that it's comprised between 0 and 360Â°
         labelAngle = labelAngle % (Math.PI * 2);
         return labelAngle >= 0 && labelAngle < Math.PI;
     }

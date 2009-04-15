@@ -690,7 +690,7 @@ public final class LabelCacheImpl implements LabelCache {
 
         // pre compute some labelling params
         final Rectangle2D textBounds = painter.getFullLabelBounds();
-        final double step = painter.getLineHeight();
+        final double step = painter.getAscent();
         int space = labelItem.getSpaceAround();
         int haloRadius = Math.round(labelItem.getTextStyle().getHaloFill() != null ? labelItem
                 .getTextStyle().getHaloRadius() : 0);
