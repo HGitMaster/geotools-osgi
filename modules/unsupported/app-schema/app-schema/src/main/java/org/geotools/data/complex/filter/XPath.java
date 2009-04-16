@@ -64,7 +64,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: XPath.java 32690 2009-03-25 02:58:59Z ang05a $
+ * @version $Id: XPath.java 32808 2009-04-16 06:42:23Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/XPath.java $
  * @since 2.4
  */
@@ -463,12 +463,10 @@ public class XPath {
      * @param targetNodeType
      *            the expected type of the attribute addressed by <code>xpath</code>, or
      *            <code>null</code> if unknown
-     * @param isMultiple
-     *            true if the attribute mapping is multi valued 
      * @return
      */
     public Attribute set(final Attribute att, final StepList xpath, Object value, String id,
-            AttributeType targetNodeType, boolean isMultiple) {
+            AttributeType targetNodeType) {
         if (XPath.LOGGER.isLoggable(Level.CONFIG)) {
             XPath.LOGGER.entering("XPath", "set", new Object[] { att, xpath, value, id,
                     targetNodeType });
@@ -574,14 +572,13 @@ public class XPath {
                 }
                 int index = currStep.getIndex();
                 Attribute attribute = setValue(currStepDescriptor, id, value, index, parent,
-                        targetNodeType, isMultiple);
+                        targetNodeType);
                 return attribute;
             } else {
                 // parent = appendComplexProperty(parent, currStep,
                 // currStepDescriptor);
                 int index = currStep.getIndex();
-                Attribute _parent = setValue(currStepDescriptor, null, null, index, parent, null,
-                        isMultiple);
+                Attribute _parent = setValue(currStepDescriptor, null, null, index, parent, null);
                 parent = (ComplexAttribute) _parent;
             }
         }
@@ -590,16 +587,22 @@ public class XPath {
 
     private Attribute setValue(final AttributeDescriptor descriptor, final String id,
             final Object value, final int index, final ComplexAttribute parent,
-            final AttributeType targetNodeType, boolean isMultiple) {
+            final AttributeType targetNodeType) {
         // adapt value to context
         Object convertedValue = convertValue(descriptor, value);
         Attribute leafAttribute = null;
         final Name attributeName = descriptor.getName();
         Object currStepValue = parent.getProperties(attributeName);
         if (currStepValue instanceof Collection) {
-            List values = new ArrayList((Collection) currStepValue);
-            if (values.size() >= index) {
+            List <Attribute> values = new ArrayList((Collection) currStepValue);
+            if (convertedValue == null && values.size() >= index) {
                 leafAttribute = (Attribute) values.get(index - 1);
+            }
+            for (Attribute stepValue : values) {
+                // eliminate duplicates in case the values come from denormalized view..
+                if (stepValue.getValue().equals(convertedValue)) {
+                    return stepValue;
+                }
             }
         } else if (currStepValue instanceof Attribute) {
             leafAttribute = (Attribute) currStepValue;
@@ -608,7 +611,6 @@ public class XPath {
                     + ", addressed: " + currStepValue.getClass().getName() + " ["
                     + currStepValue.toString() + "]");
         }
-        Object previousValue = null;
         if (leafAttribute == null) {
             AttributeBuilder builder = new AttributeBuilder(featureFactory);
             builder.init(parent);
@@ -621,36 +623,10 @@ public class XPath {
             newValue.addAll((Collection) parent.getValue());
             newValue.add(leafAttribute);
             parent.setValue(newValue);
-        } else if (isMultiple) {
-            previousValue = leafAttribute.getValue();
         }
 
         if (convertedValue != null) {
-            // set multiple values from different denormalized view rows
-            // to the same built feature
-            if (previousValue != null) {
-                if (convertedValue instanceof Collection) {
-                    assert previousValue instanceof Collection;
-                    // we could have the same multiple entries from denormalized
-                    // view, so make sure they're unique
-                    if (!((Collection) previousValue).containsAll((Collection) convertedValue)) {
-                        ((Collection) convertedValue).addAll((Collection) previousValue);
-                        leafAttribute.setValue(convertedValue);
-                    }
-                } else if (previousValue instanceof Collection) {
-                    if (!((Collection) previousValue).contains(convertedValue)) {
-                        ArrayList temp = new ArrayList();
-                        temp.add(convertedValue);
-                        temp.addAll((Collection) previousValue);
-                        leafAttribute.setValue(temp);
-                    }
-                } else if (!previousValue.equals(convertedValue)) {
-                    ArrayList temp = new ArrayList();
-                    temp.add(convertedValue);
-                    temp.add(previousValue);
-                    leafAttribute.setValue(temp);
-                }
-            }
+            leafAttribute.setValue(convertedValue);
         }
         return leafAttribute;
     }

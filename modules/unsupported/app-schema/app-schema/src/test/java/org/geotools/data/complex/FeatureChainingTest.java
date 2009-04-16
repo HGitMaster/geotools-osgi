@@ -201,10 +201,10 @@ public class FeatureChainingTest extends TestCase {
         }
 
         Feature mfFeature;
-        Collection<Feature> nestedGuFeatures;
+        Collection<Property> nestedGuFeatures;
         String guId;
         final String NESTED_LINK = "specification";
-        Collection<Feature> nestedCpFeatures;
+        Collection<Property> nestedCpFeatures;
         String cpId;
         while (mfIterator.hasNext()) {
             mfFeature = (Feature) mfIterator.next();
@@ -212,12 +212,18 @@ public class FeatureChainingTest extends TestCase {
             String[] guIds = this.mfToGuMap.get(mfId).split(";");
 
             // make sure we have the right number of nested features
-            nestedGuFeatures = (Collection) mfFeature.getProperty(NESTED_LINK).getValue();
+            nestedGuFeatures = (Collection<Property>) mfFeature.getProperties(NESTED_LINK);
             assertEquals(guIds.length, nestedGuFeatures.size());
 
             ArrayList<String> nestedGuIds = new ArrayList<String>();
 
-            for (Feature nestedGuFeature : (Collection<Feature>) nestedGuFeatures) {
+            for (Property property : nestedGuFeatures) {
+                Object value = property.getValue();
+                assertNotNull(value);
+                assertEquals(value instanceof Collection, true);
+                assertEquals(((Collection) value).size(), 1);
+
+                Feature nestedGuFeature = (Feature) ((Collection) value).iterator().next();
                 /**
                  * Test geological unit
                  */
@@ -237,11 +243,18 @@ public class FeatureChainingTest extends TestCase {
                  */
                 // make sure the right number of nested features are there
                 String[] cpIds = this.guToCpMap.get(guId).split(";");
-                nestedCpFeatures = (Collection) guFeature.getProperty("composition").getValue();
+                nestedCpFeatures = (Collection<Property>) guFeature.getProperties("composition");
                 assertEquals(cpIds.length, nestedCpFeatures.size());
 
                 ArrayList<String> nestedCpIds = new ArrayList<String>();
-                for (Feature nestedCpFeature : (Collection<Feature>) nestedCpFeatures) {
+                for (Property cpProperty : nestedCpFeatures) {
+                    Object cpPropertyValue = cpProperty.getValue();
+                    assertNotNull(cpPropertyValue);
+                    assertEquals(cpPropertyValue instanceof Collection, true);
+                    assertEquals(((Collection) cpPropertyValue).size(), 1);
+
+                    Feature nestedCpFeature = (Feature) ((Collection) cpPropertyValue).iterator()
+                            .next();
                     // make sure each of the nested compositional part feature is valid
                     cpId = nestedCpFeature.getIdentifier().toString();
                     assertEquals(true, cpMap.containsKey(cpId));
@@ -306,9 +319,7 @@ public class FeatureChainingTest extends TestCase {
         Iterator<Feature> cpIterator = cpFeatures.iterator();
         while (cpIterator.hasNext()) {
             Feature cpFeature = (Feature) cpIterator.next();
-            Object lithology = cpFeature.getProperty(LITHOLOGY).getValue();
-            assertNotNull(lithology);
-            assertEquals(lithology instanceof Collection, true);
+            Collection<Property> lithologies = cpFeature.getProperties(LITHOLOGY);
             if (cpFeature.getIdentifier().toString().equals("cp.167775491936278812")) {
                 // see ControlledConcept.properties file:
                 // _=NAME:String,COMPOSITION_ID:String
@@ -316,10 +327,15 @@ public class FeatureChainingTest extends TestCase {
                 // 1=name_b|cp.167775491936278812
                 // 1=name_c|cp.167775491936278812
                 // 2=name_2|cp.167775491936278812
-                assertEquals(((Collection) lithology).size(), EXPECTED_RESULT_COUNT);
-                assertEquals(featureList.containsAll((Collection) lithology), true);
+                assertEquals(((Collection) lithologies).size(), EXPECTED_RESULT_COUNT);
+                Collection<Feature> lithologyFeatures = new ArrayList<Feature>();
+                for (Property lithologyProperty : lithologies) {
+                    lithologyFeatures.add((Feature) ((Collection) lithologyProperty.getValue())
+                            .iterator().next());
+                }
+                assertEquals(featureList.containsAll(lithologyFeatures), true);
             } else {
-                assertEquals(((Collection) lithology).isEmpty(), true);
+                assertEquals(lithologies.isEmpty(), true);
             }
         }
 
@@ -348,11 +364,19 @@ public class FeatureChainingTest extends TestCase {
             /**
              * Test exposure color
              */
-            Collection<Feature> nestedTermValues = (Collection<Feature>) guFeature.getProperty(
-                    EXPOSURE_COLOR).getValue();
+            Collection<Property> nestedTermValues = (Collection<Property>) guFeature
+                    .getProperties(EXPOSURE_COLOR);
             // get exposure color property values from geological unit feature
-            for (Feature feature : nestedTermValues) {
-                realValues.add(feature.getProperty("value").getValue());
+            for (Property property : nestedTermValues) {
+                Object value = property.getValue();
+                assertNotNull(value);
+                assertEquals(value instanceof Collection, true);
+                assertEquals(((Collection) value).size(), 1);
+
+                Feature feature = (Feature) ((Collection) value).iterator().next();
+                for (Property nestedProperty : feature.getProperties("value")) {
+                    realValues.add(nestedProperty.getValue());
+                }
             }
 
             // compares the values from the property file
@@ -363,12 +387,19 @@ public class FeatureChainingTest extends TestCase {
             /**
              * Test outcrop character
              */
-            nestedTermValues = (Collection<Feature>) guFeature.getProperty(OUTCROP_CHARACTER)
-                    .getValue();
+            nestedTermValues = (Collection<Property>) guFeature.getProperties(OUTCROP_CHARACTER);
             realValues.clear();
             // get nested outcrop character values from geological unit feature
-            for (Feature feature : nestedTermValues) {
-                realValues.add(feature.getProperty("value").getValue());
+            for (Property property : nestedTermValues) {
+                Object value = property.getValue();
+                assertNotNull(value);
+                assertEquals(value instanceof Collection, true);
+                assertEquals(((Collection) value).size(), 1);
+
+                Feature feature = (Feature) ((Collection) value).iterator().next();
+                for (Property nestedProperty : feature.getProperties("value")) {
+                    realValues.add(nestedProperty.getValue());
+                }
             }
             // compare with values from property file
             values = this.guToOutcropCharacterMap.get(guId).split(";");
@@ -408,15 +439,14 @@ public class FeatureChainingTest extends TestCase {
         Iterator<Feature> iterator = features.iterator();
         while (iterator.hasNext()) {
             Feature next = iterator.next();
-            Property name = next.getProperty("name");
-            Object value = name.getValue();
-            assertEquals(value instanceof Collection, true);
+            Collection<Property> names = next.getProperties("name");
             if (next.getIdentifier().toString().equals("1")) {
                 // see ControlledConcept.properties where id = 1
-                assertEquals(((Collection) value).size(), 3);
+                // 3 values in NAME + 1 for COMPOSITION_ID (gml:name[2] in ControlledConcept.xml)
+                assertEquals(names.size(), 4);
             } else {
                 // see ControlledConcept.properties where id = 2
-                assertEquals(((Collection) value).size(), 1);
+                assertEquals(names.size(), 2);
             }
         }
 

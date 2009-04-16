@@ -478,8 +478,8 @@ public class DataAccessIntegrationTest extends TestCase {
             /**
              * Check Feature Chaining : Composition Part as composition
              */
-            Collection<Property> gsmlCompositions = (Collection<Property>) next.getProperty(
-                    composition).getValue();
+            Collection<Property> gsmlCompositions = (Collection<Property>) next
+                    .getProperties(composition);
             Collection<Property> moCompositions = (Collection<Property>) moFeature.getProperty(
                     composition).getValue();
             Collection<String> cpIds = new ArrayList<String>();
@@ -490,8 +490,8 @@ public class DataAccessIntegrationTest extends TestCase {
             assertEquals(gsmlCompositions.size(), cpIds.size());
             ArrayList<String> nestedCpIds = new ArrayList<String>(cpIds.size());
             for (Property outputProperty : gsmlCompositions) {
-                assertEquals(outputProperty instanceof Feature, true);
-                Feature compositionPart = (Feature) outputProperty;
+                Collection<Feature> values = (Collection<Feature>) outputProperty.getValue();
+                Feature compositionPart = values.iterator().next();
                 // check the values
                 assertEquals(cpFeatures.contains(compositionPart), true);
                 nestedCpIds.add(compositionPart.getIdentifier().toString());
@@ -503,8 +503,8 @@ public class DataAccessIntegrationTest extends TestCase {
             /**
              * Check Feature Chaining : Mapped Feature as occurrence
              */
-            Collection<Property> occurrences = (Collection<Property>) next.getProperty(occurrence)
-                    .getValue();
+            Collection<Property> occurrences = (Collection<Property>) next
+                    .getProperties(occurrence);
             Collection<Property> commodities = (Collection<Property>) moFeature.getProperty(
                     commodity).getValue();
             Collection<String> mfIds = new ArrayList<String>();
@@ -515,8 +515,8 @@ public class DataAccessIntegrationTest extends TestCase {
             assertEquals(occurrences.size(), mfIds.size());
             ArrayList<String> nestedMfIds = new ArrayList<String>(mfIds.size());
             for (Property mf : occurrences) {
-                assertEquals(mf instanceof Feature, true);
-                Feature mfFeature = (Feature) mf;
+                Collection<Feature> values = (Collection<Feature>) mf.getValue();
+                Feature mfFeature = values.iterator().next();
                 // check the values
                 assertEquals(mfFeatures.contains(mfFeature), true);
                 nestedMfIds.add(mfFeature.getIdentifier().toString());
