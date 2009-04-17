@@ -112,11 +112,6 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
  */
 public final class LabelCacheImpl implements LabelCache {
 
-    /**
-     * labels that aren't this good will not be shown
-     */
-    public double MIN_GOODNESS_FIT = 0.7;
-
     public double DEFAULT_PRIORITY = 1000.0;
 
     /** Map<label, LabelCacheItem> the label cache */
@@ -176,6 +171,9 @@ public final class LabelCacheImpl implements LabelCache {
     
     // By default, put each label in the conflict resolution map
     static final boolean DEFAULT_CONFLICT_RESOLUTION = true;
+    
+    // Default value for the goodness of fit threshold
+    static final double DEFAULT_GOODNESS_OF_FIT = 0.7;
 
     /**
      * When true, the text is rendered as its GlyphVector outline (as a
@@ -395,6 +393,7 @@ public final class LabelCacheImpl implements LabelCache {
         item.setAutoWrap(getIntOption(symbolizer, "autoWrap", DEFAULT_AUTO_WRAP));
         item.setForceLeftToRightEnabled(getBooleanOption(symbolizer, "forceLeftToRight", DEFAULT_FORCE_LEFT_TO_RIGHT));
         item.setConflictResolutionEnabled(getBooleanOption(symbolizer, "conflictResolution", DEFAULT_CONFLICT_RESOLUTION));
+        item.setGoodnessOfFit(getDoubleOption(symbolizer, "goodnessOfFit", DEFAULT_GOODNESS_OF_FIT));
         return item;
     }
 
@@ -1042,7 +1041,7 @@ public final class LabelCacheImpl implements LabelCache {
                 .createTransformedShape(painter.getFullLabelBounds()).getBounds2D();
         if (!displayArea.contains(transformed)
                 || glyphs.labelsWithinDistance(transformed, labelItem.getSpaceAround())
-                || goodnessOfFit(painter, transformed, geom) < MIN_GOODNESS_FIT)
+                || goodnessOfFit(painter, transformed, geom) < painter.getLabel().getGoodnessOfFit())
             return false;
 
         // painter.graphics.setStroke(new BasicStroke(2));

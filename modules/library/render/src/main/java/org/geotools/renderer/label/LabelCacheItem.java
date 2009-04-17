@@ -70,6 +70,21 @@ public class LabelCacheItem implements Comparable<LabelCacheItem> {
     boolean forceLeftToRightEnabled = true;
     
     boolean conflictResolutionEnabled = true;
+    
+    double goodnessOfFit = 0;
+
+    public double getGoodnessOfFit() {
+        return goodnessOfFit;
+    }
+
+    /**
+     * A value between 0 and 1 representing the portion of the label
+     * that overlaps with the geometry (atm used only for polygons)
+     * @param goodnessOfFit
+     */
+    public void setGoodnessOfFit(double goodnessOfFit) {
+        this.goodnessOfFit = goodnessOfFit;
+    }
 
     public String getLabel() {
         return label;
