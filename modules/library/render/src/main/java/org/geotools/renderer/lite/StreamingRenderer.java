@@ -140,7 +140,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 32766 2009-04-10 10:26:14Z aaime $
+ * @version $Id: StreamingRenderer.java 32822 2009-04-17 21:41:12Z simonegiannecchini $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -1931,6 +1931,7 @@ public final class StreamingRenderer implements GTRenderer {
 					.append(drawMe.toString()).append(" - ").append(
 							grid).toString());
 
+		GridCoverage2D coverage=null;
 		try {
 			// /////////////////////////////////////////////////////////////////
 			//
@@ -1939,8 +1940,6 @@ public final class StreamingRenderer implements GTRenderer {
 			// rely on the gridocerage renderer itself.
 			//
 			// /////////////////////////////////////////////////////////////////
-//			METABUFFER SUPPORT			
-//			final GeneralEnvelope metaBufferedEnvelope=handleTileBordersArtifacts(mapExtent,java2dHints,this.worldToScreenTransform);
 			final GridCoverageRenderer gcr = new GridCoverageRenderer(
 					destinationCRS, originalMapExtent, screenSize, java2dHints);
 
@@ -1948,27 +1947,20 @@ public final class StreamingRenderer implements GTRenderer {
 			// It is a grid coverage
 			// //
 			if (grid instanceof GridCoverage)
-//				METABUFFER SUPPORT				
-//				gcr.paint(graphics, (GridCoverage2D) grid, symbolizer, metaBufferedEnvelope);
 				gcr.paint(graphics, (GridCoverage2D) grid, symbolizer);
 			else if (grid instanceof AbstractGridCoverage2DReader) {
+				
 				// //
 				// It is an AbstractGridCoverage2DReader, let's use parameters
 				// if we have any supplied by a user.
 				// //
 				// first I created the correct ReadGeometry
-				final Parameter readGG = new Parameter(
-						AbstractGridFormat.READ_GRIDGEOMETRY2D);
-//	METABUFFER SUPPORT
-//				readGG.setValue(new GridGeometry2D(new GeneralGridRange(
-//						screenSize), metaBufferedEnvelope));
-				readGG.setValue(new GridGeometry2D(new GeneralGridRange(
-						screenSize), mapExtent));
+				final Parameter<GridGeometry2D> readGG = new Parameter<GridGeometry2D>(AbstractGridFormat.READ_GRIDGEOMETRY2D);
+				readGG.setValue(new GridGeometry2D(new GridEnvelope2D(screenSize), mapExtent));
 				final AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) grid;
 				// then I try to get read parameters associated with this
 				// coverage if there are any.
 				final Object params = paramsPropertyName.evaluate(drawMe);
-				final GridCoverage2D coverage;
 				if (params != null) {
 					// //
 					//
@@ -1995,30 +1987,31 @@ public final class StreamingRenderer implements GTRenderer {
 						if (i < length) {
 							//we found another READ_GRIDGEOMETRY2D, let's override it.
 							((Parameter) readParams[i]).setValue(readGG);
-							coverage = (GridCoverage2D) reader
-							.read(readParams);
+							coverage = (GridCoverage2D) reader.read(readParams);
 						} else {
 							// add the correct read geometry to the supplied
 							// params since we did not find anything
 							GeneralParameterValue[] readParams2 = new GeneralParameterValue[length + 1];
-							System.arraycopy(readParams, 0, readParams2, 0,
-									length);
+							System.arraycopy(readParams, 0, readParams2, 0,length);
 							readParams2[length] = readGG;
-							coverage = (GridCoverage2D) reader
-									.read(readParams2);
+							coverage = (GridCoverage2D) reader.read(readParams2);
 						}
 					} else
 						// we have no parameters hence we just use the read grid
 						// geometry to get a coverage
-						coverage = (GridCoverage2D) reader
-								.read(new GeneralParameterValue[] { readGG });
+						coverage = (GridCoverage2D) reader.read(new GeneralParameterValue[] { readGG });
 				} else {
-					coverage = (GridCoverage2D) reader
-							.read(new GeneralParameterValue[] { readGG });
+					coverage = (GridCoverage2D) reader.read(new GeneralParameterValue[] { readGG });
 				}
-//				METABUFFER SUPPORT
-//				gcr.paint(graphics, coverage, symbolizer,metaBufferedEnvelope);
-				gcr.paint(graphics, coverage, symbolizer);
+				try{
+					gcr.paint(graphics, coverage, symbolizer);
+				}
+				finally {
+
+					//we need to try and dispose this coverage since it was created on purpose for rendering 
+					if(coverage!=null)
+						coverage.dispose(true);
+				}
 			}
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("Raster rendered");
@@ -2042,77 +2035,6 @@ public final class StreamingRenderer implements GTRenderer {
 
 	}
 
-	/**
-	 * This method captures a first attempt to handle in a coherent way the problem of having artifacts at the 
-	 * borders of drown tiles when using Tiling Clients like OpenLayers with higher order interpolation.
-	 * 
-	 * @param mapExtent to draw on.
-	 * @param java2dHints to control the drawing process.
-	 * @param worldToScreen transformation that maps onto the screen.
-	 * @return a {@link GeneralEnvelope} that might be expanded in order to avoid
-	 * 		   artifacts at the borders
-	 */
-	private GeneralEnvelope handleTileBordersArtifacts(
-			ReferencedEnvelope mapExtent, RenderingHints java2dHints,
-			AffineTransform worldToScreen) {
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Check if interpolation is required.
-		//
-		// /////////////////////////////////////////////////////////////////////
-		if (!java2dHints.containsKey(JAI.KEY_INTERPOLATION)) {
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER.fine("Unable to find interpolation for this request.");
-			return new GeneralEnvelope(mapExtent);
-		}
-		final Interpolation interp = (Interpolation) java2dHints
-				.get(JAI.KEY_INTERPOLATION);
-
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Ok, we have an interpolation, let's decide if we have to extend the
-		// requested area accordingly.
-		//
-		// /////////////////////////////////////////////////////////////////////
-		int buffer = 0;
-		if (interp instanceof InterpolationNearest) {
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER.fine("Interpolation Nearest no need for extending.");
-			return new GeneralEnvelope(mapExtent);
-
-		}
-		if (interp instanceof InterpolationBilinear)
-		{
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER.fine("Interpolation Bilinear  extending.by 1 pixel at least");
-			buffer = 10;
-		}
-		else if (interp instanceof InterpolationBicubic)
-		{
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER.fine("Interpolation Bicubic  extending.by 2 pixel at least");
-			buffer = 30;
-		}
-		if (buffer <= 0) {
-			return new GeneralEnvelope(mapExtent);
-		}
-		
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Doing the extension
-		//
-		// /////////////////////////////////////////////////////////////////////
-		final Envelope tempEnv =expandEnvelope(mapExtent, worldToScreen, buffer);
-		final GeneralEnvelope newEnv = new GeneralEnvelope(
-				new double[] { tempEnv.getMinX(),
-						tempEnv.getMinY() , }, new double[] {
-						tempEnv.getMaxX() ,
-						tempEnv.getMaxY()  });
-		newEnv.setCoordinateReferenceSystem(mapExtent
-				.getCoordinateReferenceSystem());
-		return newEnv;
-
-	}
 
 	/**
 	 * Finds the geometric attribute requested by the symbolizer

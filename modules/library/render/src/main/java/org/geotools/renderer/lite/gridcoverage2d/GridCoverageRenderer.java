@@ -25,6 +25,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImagingOpException;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +47,7 @@ import org.geotools.coverage.processing.operation.Scale;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
@@ -71,9 +73,10 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author  Andrea Aime
  * @author  Alessio Fabiani
  * @source  $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
- * @version  $Id: GridCoverageRenderer.java 32335 2009-01-26 19:28:34Z simonegiannecchini $
+ * @version  $Id: GridCoverageRenderer.java 32822 2009-04-17 21:41:12Z simonegiannecchini $
  * @task  Add support for SLD styles
  */
+@SuppressWarnings("deprecation")
 public final class GridCoverageRenderer {
     
     /**
@@ -96,20 +99,24 @@ public final class GridCoverageRenderer {
      * This variable is use for testing purposes in order to force this
      * {@link GridCoverageRenderer} to dump images at various steps on the disk.
      */
-    private final static boolean DEBUG = Boolean
+    private static boolean DEBUG = Boolean
             .getBoolean("org.geotools.renderer.lite.gridcoverage2d.debug");
 
     private static String debugDir;
     static {
         if (DEBUG) {
-            final File tempDir = new File("c:\\temp");
-            if (!tempDir.exists() || !tempDir.canWrite()) {
+            final File tempDir = new File(System.getProperty("user.home"),"gt-renderer");
+            if (!tempDir.exists() ) {
+            	if(!tempDir.mkdir())
                 System.out
                         .println("Unable to create debug dir, exiting application!!!");
-                System.exit(1);
+                DEBUG=false;
                 debugDir = null;
             } else
-                debugDir = tempDir.getAbsolutePath();
+               {
+            		debugDir = tempDir.getAbsolutePath();
+            		 System.out.println("Debug dir "+debugDir);
+               }
         }
 
     }
@@ -334,8 +341,6 @@ public final class GridCoverageRenderer {
         // ///////////////////////////////////////////////////////////////////
         final CoordinateReferenceSystem sourceCoverageCRS = gridCoverage.getCoordinateReferenceSystem2D();
         final GeneralEnvelope sourceCoverageEnvelope = (GeneralEnvelope) gridCoverage.getEnvelope();
-//        final GridGeometry2D sourceGridGeometry=gridCoverage.getGridGeometry();
-//        final boolean simpleG2WTransform=CoverageUtilities.isSimpleGridToWorldTransform((AffineTransform) sourceGridGeometry.getGridToCRS2D(PixelOrientation.UPPER_LEFT),1E-3);
 
         // ///////////////////////////////////////////////////////////////////
         //
@@ -500,14 +505,7 @@ public final class GridCoverageRenderer {
             preResample=gridCoverage;
 		}
         if (DEBUG) {
-            try {
-                ImageIO.write(
-                        preResample.geophysics(false).getRenderedImage(),
-                        "tiff",
-                        new File(debugDir,"cropped.tiff"));
-            } catch (IOException e) {
-                LOGGER.info(e.getLocalizedMessage());
-            }
+            writeRenderedImage(preResample.geophysics(false).getRenderedImage(),"preresample");
         }
 //        }
             
@@ -524,15 +522,10 @@ public final class GridCoverageRenderer {
                 LOGGER.fine(new StringBuilder("Reprojecting to crs ").append( destinationCRS.toWKT()).toString());
         } else
             preSymbolizer = preResample;
-
         if (DEBUG) {
-
-            try {
-                ImageIO.write(preSymbolizer.geophysics(false).getRenderedImage(), "tiff", new File(debugDir,"preSymbolizer.tiff"));
-            } catch (IOException e) {
-                LOGGER.info(e.getLocalizedMessage());
-            }
+            writeRenderedImage(preSymbolizer.geophysics(false).getRenderedImage(),"preSymbolizer");
         }
+
 
         // ///////////////////////////////////////////////////////////////////
         //
@@ -585,8 +578,6 @@ public final class GridCoverageRenderer {
         clonedFinalWorldToGrid.concatenate(finalGCgridToWorld);
         if (LOGGER.isLoggable(Level.FINE))
             LOGGER.fine(new StringBuilder("clonedFinalWorldToGrid ").append(clonedFinalWorldToGrid.toString()).toString());
-
-        // it should be a simple translation TODO check
         final RenderingHints oldHints = graphics.getRenderingHints();
         graphics.setRenderingHints(this.hints);
 
@@ -597,21 +588,40 @@ public final class GridCoverageRenderer {
         final Composite oldAlphaComposite = graphics.getComposite();
         graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
         try {
+        	//debug
+            if (DEBUG) {
+                writeRenderedImage(finalImage,"final");
+            }            	
+
             // //
             // Drawing the Image
             // //
             graphics.drawRenderedImage(finalImage, clonedFinalWorldToGrid);
+            
         } catch (Throwable t) {
             try {
-                if (DEBUG) {
-                    try {
-                        ImageIO.write(finalImage, "tiff", new File(debugDir,
-                                "final0.tiff"));
-                    } catch (IOException e) {
-
-                        e.printStackTrace();
+            	//log the error
+            	if(LOGGER.isLoggable(Level.FINE))
+            		LOGGER.log(Level.FINE,t.getLocalizedMessage(),t);              
+                
+                // /////////////////////////////////////////////////////////////
+				// this is a workaround for a bug in Java2D, we need to convert
+				// the image to component color model to make it work just fine.
+                // /////////////////////////////////////////////////////////////
+                if(t instanceof IllegalArgumentException){
+                    if (DEBUG) {
+                        writeRenderedImage(finalImage,"preWORKAROUND1");
                     }
+                	final RenderedImage image = new ImageWorker(finalImage).forceComponentColorModel(true).getRenderedImage();
+                	
+                    if (DEBUG) {
+                    	writeRenderedImage(image,"WORKAROUND1");
+                        
+                    }
+                    graphics.drawRenderedImage(image, clonedFinalWorldToGrid);
+            	
                 }
+                else if(t instanceof ImagingOpException)
                 // /////////////////////////////////////////////////////////////
                 // this is a workaround for a bug in Java2D
                 // (see bug 4723021
@@ -627,21 +637,32 @@ public final class GridCoverageRenderer {
                 // RESOURCES BY PERFORMING AN ALLOCATION OF MEMORY AND A COPY ON
                 // LARGE IMAGES.
                 // /////////////////////////////////////////////////////////////
-                final BufferedImage buf = new BufferedImage((int) finalImage.getWidth(), (int) finalImage.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-                final Graphics2D g = (Graphics2D) buf.getGraphics();
-                g.drawRenderedImage(finalImage, AffineTransform.getScaleInstance(1, 1));
-                g.dispose();
-                if (DEBUG) {
-                    try {
-                        ImageIO.write(buf, "tiff", new File(debugDir,
-                                "final1.tiff"));
-                    } catch (IOException e1) {
-
+                {
+                	BufferedImage buf = 
+                		finalImage.getColorModel().hasAlpha()?
+                				new BufferedImage(finalImage.getWidth(), finalImage.getHeight(), BufferedImage.TYPE_4BYTE_ABGR):
+                				new BufferedImage(finalImage.getWidth(), finalImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+                                if (DEBUG) {
+                                    writeRenderedImage(buf,"preWORKAROUND2");
+                                }
+                    final Graphics2D g = (Graphics2D) buf.getGraphics();
+                    final int translationX=finalImage.getMinX(),translationY=finalImage.getMinY();
+                    g.drawRenderedImage(finalImage, AffineTransform.getTranslateInstance(-translationX, -translationY));
+                    g.dispose();
+                    if (DEBUG) {
+                    	 writeRenderedImage(buf,"WORKAROUND2");
                     }
+                    clonedFinalWorldToGrid.concatenate(AffineTransform.getTranslateInstance(translationX, translationY));
+                    graphics.drawImage(buf, clonedFinalWorldToGrid, null);
+                    //release
+                    buf.flush();
+                    buf=null;                	
                 }
+                else 
+                	//log the error
+                	if(LOGGER.isLoggable(Level.FINE))
+                		LOGGER.fine("Unable to renderer this raster, no workaround found");
 
-                graphics.drawImage(buf, clonedFinalWorldToGrid, null);
-                buf.flush();
 
             } catch (Throwable t1) {
                 // if the workaround fails again, there is really nothing to do
@@ -659,5 +680,25 @@ public final class GridCoverageRenderer {
         graphics.setRenderingHints(oldHints);
 
     }
+
+	/**
+	 * Write the provided {@link RenderedImage} in the debug directory with the provided file name.
+	 * @param raster the {@link RenderedImage} that we have to write.
+	 * @param fileName a {@link String} indicating where we should write it.
+	 */
+	private void writeRenderedImage(final RenderedImage raster,final String fileName) {
+		if(debugDir==null)
+			throw new NullPointerException("Unable to write the provided coverage in the debug directory");
+		if(DEBUG==false)
+			throw new IllegalStateException("Unable to write the provided coverage since we are not in debug mode");
+		try {
+		    ImageIO.write(
+		    		raster,
+		            "tiff",
+		            new File(debugDir,fileName+".tiff"));
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE,e.getLocalizedMessage(),e);
+		}
+	}
 
 }
