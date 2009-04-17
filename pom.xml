@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32786 2009-04-14 07:20:14Z bencaradocdavies $
+        Version: $Id: pom.xml 32815 2009-04-17 10:48:08Z aaime $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -1002,6 +1002,19 @@
           <target>1.5</target>  <!-- The -target argument for the Java compiler. -->
           <debug>true</debug>   <!-- Whether to include debugging information.   -->
           <encoding>UTF-8</encoding> <!-- The -encoding argument for the Java compiler. -->
+        </configuration>
+      </plugin>
+
+
+
+      <!-- ======================================================= -->
+      <!--     Resources.                                          -->
+      <!-- ======================================================= -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
 
