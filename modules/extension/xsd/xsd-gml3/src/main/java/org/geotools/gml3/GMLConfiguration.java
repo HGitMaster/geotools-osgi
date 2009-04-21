@@ -62,11 +62,13 @@ import org.geotools.gml3.bindings.NullTypeBinding;
 import org.geotools.gml3.bindings.PointArrayPropertyTypeBinding;
 import org.geotools.gml3.bindings.PointPropertyTypeBinding;
 import org.geotools.gml3.bindings.PointTypeBinding;
+import org.geotools.gml3.bindings.PolygonPatchTypeBinding;
 import org.geotools.gml3.bindings.PolygonPropertyTypeBinding;
 import org.geotools.gml3.bindings.PolygonTypeBinding;
 import org.geotools.gml3.bindings.ReferenceTypeBinding;
 import org.geotools.gml3.bindings.SurfaceArrayPropertyTypeBinding;
 import org.geotools.gml3.bindings.SurfacePropertyTypeBinding;
+import org.geotools.gml3.bindings.SurfaceTypeBinding;
 import org.geotools.gml3.smil.SMIL20Configuration;
 import org.geotools.gml3.smil.SMIL20LANGConfiguration;
 import org.geotools.xlink.XLINKConfiguration;
@@ -183,6 +185,8 @@ public class GMLConfiguration extends Configuration {
         container.registerComponentImplementation(GML.PointPropertyType,
             PointPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PointType, PointTypeBinding.class);
+        container.registerComponentImplementation(GML.PolygonPatchType,
+                PolygonPatchTypeBinding.class);
         container.registerComponentImplementation(GML.PolygonPropertyType,
             PolygonPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PolygonType, PolygonTypeBinding.class);
@@ -191,6 +195,7 @@ public class GMLConfiguration extends Configuration {
             SurfaceArrayPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.SurfacePropertyType,
             SurfacePropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.SurfaceType, SurfaceTypeBinding.class);
     }
 
     /**
