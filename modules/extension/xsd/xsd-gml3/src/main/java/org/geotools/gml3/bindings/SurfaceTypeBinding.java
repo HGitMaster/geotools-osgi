@@ -76,7 +76,7 @@ import javax.xml.namespace.QName;
  * 
  * @generated
  */
-public class SurfaceTypeBinding extends AbstractComplexBinding {
+public class SurfaceTypeBinding extends AbstractComplexBinding implements Comparable {
 
     GeometryFactory gf;
     
@@ -112,6 +112,16 @@ public class SurfaceTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value) throws Exception {
         return new MultiPolygonTypeBinding(gf).parse(instance, node, value);
+    }
+
+    public int compareTo(Object o) {
+        //JD: HACK here, since we map SurfaceType and MultiSurfaceType to MultiPolygon, there is a 
+        // conflict when it comes to encoding where the actual type is not specifically specifid.
+        // this comparison is made to ensure backwards compatability and favor MultiSurfaceTypeBinding 
+        if ( o instanceof MultiSurfaceTypeBinding ) {
+            return 1;
+        }
+        return 0;
     }
 
 }
