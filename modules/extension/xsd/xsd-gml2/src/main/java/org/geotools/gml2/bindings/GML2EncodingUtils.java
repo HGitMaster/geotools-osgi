@@ -364,9 +364,15 @@ public class GML2EncodingUtils {
                 type = createXmlTypeFromFeatureType((SimpleFeatureType) featureType, schemaIndex,
                         toFilter);
             } else {
-                // we expect better from non-simple feature types, and so require defined types
-                throw new RuntimeException("Could not find type for " + qualifiedTypeName
-                        + " in schema");
+                // look for an element declaration smuggled in the UserData map.
+                XSDElementDeclaration e = (XSDElementDeclaration) feature.getDescriptor()
+                        .getUserData().get(XSDElementDeclaration.class);
+                if (e != null) {
+                    type = e.getTypeDefinition();
+                } else {
+                    throw new RuntimeException("Could not find type for " + qualifiedTypeName
+                            + " in schema");
+                }
             }
         }
 
@@ -391,7 +397,6 @@ public class GML2EncodingUtils {
                 
             }
             
-            Object attributeValue;
             if (featureType instanceof SimpleFeatureType) {
                 // simple feature brain damage: discard namespace
                 // make sure the feature type has an element
@@ -399,7 +404,8 @@ public class GML2EncodingUtils {
                     continue;
                 }
                 // get the value
-                attributeValue = ((SimpleFeature) feature).getAttribute(attribute.getName());
+                Object attributeValue = ((SimpleFeature) feature).getAttribute(attribute.getName());
+                properties.add(new Object[] { particle, attributeValue });
             } else {
                 // namespaces matter for non-simple feature types
                 Name propertyName = new NameImpl(attribute.getTargetNamespace(), attribute
@@ -408,20 +414,20 @@ public class GML2EncodingUtils {
                 if (featureType.getDescriptor(propertyName) == null) {
                     continue;
                 }
-                // get the value
-                Property property = feature.getProperty(propertyName);
-                if (property == null) {
-                    attributeValue = null;
-                } else if (property instanceof ComplexAttribute) {
-                    // do not unpack complex attributes as these may have their own bindings, which
-                    // will be applied by the encoder
-                    attributeValue = property;
-                } else {
-                    // non-complex bindings are unpacked as for simple feature case
-                    attributeValue = property.getValue();
+                // get the value (might be multiple)
+                for (Property property : feature.getProperties(propertyName)) {
+                    Object value;
+                    if (property instanceof ComplexAttribute) {
+                        // do not unpack complex attributes as these may have their own bindings, which
+                        // will be applied by the encoder
+                        value = property;
+                    } else {
+                        // non-complex bindings are unpacked as for simple feature case
+                        value = property.getValue();
+                    }
+                    properties.add(new Object[] { particle, value });
                 }
             }
-            properties.add(new Object[] { particle, attributeValue });
         }
 
         return properties;
