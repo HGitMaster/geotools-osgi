@@ -32,7 +32,7 @@ import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.SchemaIndex;
 import org.opengis.feature.Feature;
-import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.LineString;
  * Utility class for gml3 encoding.
  *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
- *
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  */
 public class GML3EncodingUtils {
     static DirectPosition[] positions(LineString line) {
@@ -137,14 +137,18 @@ public class GML3EncodingUtils {
     
     public static Element AbstractFeatureType_encode(Object object, Document document, Element value) {
         Feature feature = (Feature) object;
-        FeatureType featureType = feature.getType();
-
-        String namespace = featureType.getName().getNamespaceURI();
-        String typeName = featureType.getName().getLocalPart();
-
-        Element encoding = document.createElementNS(namespace, typeName);
+        Name typeName;
+        if (feature.getDescriptor() == null) {
+            // no descriptor, assume WFS feature type name is the same as the name of the content
+            // model type
+            typeName = feature.getType().getName();
+        } else {
+            // honour the name set in the descriptor
+            typeName = feature.getDescriptor().getName();
+        }
+        Element encoding = document.createElementNS(typeName.getNamespaceURI(), typeName
+                .getLocalPart());
         encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getIdentifier().getID());
-
         return encoding;
     }
 
