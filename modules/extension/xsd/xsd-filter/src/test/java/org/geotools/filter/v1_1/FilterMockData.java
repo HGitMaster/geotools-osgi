@@ -198,11 +198,11 @@ public class FilterMockData {
     }
 
     static Beyond beyond() {
-        return f.beyond(f.property("the_geom"), f.literal(geometry()), 1.0d, null);
+        return f.beyond(f.property("the_geom"), f.literal(geometry()), 1.0d, "m");
     }
 
     static DWithin dwithin() {
-        return f.dwithin(f.property("the_geom"), f.literal(geometry()), 1.0d, null);
+        return f.dwithin(f.property("the_geom"), f.literal(geometry()), 1.0d, "m");
     }
 
     static Element beyond(Document document, Node parent) {
@@ -217,6 +217,7 @@ public class FilterMockData {
         Element doperator = binarySpatialOperator(document, parent, name);
         Element distance = element(document, doperator, new QName(OGC.NAMESPACE, "Distance"));
         distance.appendChild(document.createTextNode("1.0"));
+        distance.setAttribute("units", "m");
 
         return doperator;
     }
