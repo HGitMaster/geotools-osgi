@@ -120,7 +120,8 @@ public class PreparedFilterToSQL extends FilterToSQL {
             else {
                 StringBuffer sb = new StringBuffer();
                 if ( Geometry.class.isAssignableFrom(literalValue.getClass()) ) {
-                    dialect.prepareGeometryValue((Geometry) literalValue, currentSRID, Geometry.class, sb);
+                    int srid = currentSRID != null ? currentSRID : -1;
+                    dialect.prepareGeometryValue((Geometry) literalValue, srid, Geometry.class, sb);
                 }
                 else if ( encodingFunction ) {
                     dialect.prepareFunctionArgument(clazz,sb);
