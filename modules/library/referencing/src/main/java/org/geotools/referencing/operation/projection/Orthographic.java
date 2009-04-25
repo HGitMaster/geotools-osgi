@@ -61,8 +61,8 @@ import static java.lang.Math.*;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/orthographic.html">"Orthographic" on www.remotesensing.org</A>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Orthographic.java $
- * @version $Id: Orthographic.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Orthographic.java $
+ * @version $Id: Orthographic.java 32866 2009-04-25 20:56:09Z aaime $
  * @author Rueben Schulz
  */
 public abstract class Orthographic extends MapProjection {
@@ -127,7 +127,7 @@ public abstract class Orthographic extends MapProjection {
      * provider} for a {@linkplain Orthographic Orthographic} projection.
      *
      * @since 2.1
-     * @version $Id: Orthographic.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: Orthographic.java 32866 2009-04-25 20:56:09Z aaime $
      * @author Rueben Schulz
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
@@ -180,7 +180,7 @@ public abstract class Orthographic extends MapProjection {
                 throws ParameterNotFoundException, FactoryException
         {
             // Values here are in radians (the standard units for the map projection package)
-            final double latitudeOfOrigin = abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
+            final double latitudeOfOrigin = abs(AbstractProvider.doubleValue(LATITUDE_OF_ORIGIN, parameters));
             if (isSpherical(parameters)) {
                 // Polar case.
                 if (abs(latitudeOfOrigin - PI/2) < EPSILON) {
