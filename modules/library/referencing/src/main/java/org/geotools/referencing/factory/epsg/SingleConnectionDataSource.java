@@ -66,7 +66,7 @@ class SingleConnectionDataSource implements DataSource {
     }
 
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
+        throw new SQLException("Not wrapping an object implementing "+ iface.getClass().getName() );
     }
 
 }
