@@ -40,6 +40,7 @@ import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
+import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
@@ -56,8 +57,8 @@ import static org.junit.Assert.*;
  * MS-Access database. Otherwise, the default will probably be the one backed by the HSQL
  * database, since this test live in the {@code epsg-hsql} module.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/DefaultFactoryTest.java $
- * @version $Id: DefaultFactoryTest.java 31840 2008-11-14 09:53:30Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/DefaultFactoryTest.java $
+ * @version $Id: DefaultFactoryTest.java 32864 2009-04-25 20:37:10Z aaime $
  * @author Martin Desruisseaux
  * @author Vadim Semenov
  *
@@ -90,7 +91,7 @@ public class DefaultFactoryTest {
      * @throws SQLException If the connection to the database failed.
      */
     @Before
-    public void setUp() throws SQLException {
+    public void setUp() throws Exception {
         if (factory == null) {
             factory = (ThreadedEpsgFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
                         new Hints(Hints.CRS_AUTHORITY_FACTORY, ThreadedEpsgFactory.class));
@@ -100,6 +101,8 @@ public class DefaultFactoryTest {
                 System.out.println(factory.getImplementationHints().get(Hints.VERSION));
             }
         }
+        // calling dispose clears all the caches, making tests runs independent of each other
+        factory.dispose();
         // No 'tearDown()' method: we rely on the DefaultFactory shutdown hook.
     }
 
