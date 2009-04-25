@@ -149,11 +149,11 @@ public class SLDStyleFactoryTest extends TestCase {
         symb.getGraphic().addMark(myMark);
         
         MarkStyle2D ms = (MarkStyle2D) sld.createStyle(feature, symb, range);
+        assertNotNull(ms.getShape());
         // make sure the style has been recognized as dynamic
         SymbolizerKey key = new SymbolizerKey(symb, range);
         assertTrue(sld.dynamicSymbolizers.containsKey(key));
         Shape expected = new TTFMarkFactory().getShape(null, ff.literal("ttf://Serif#0xF054"), feature);
-        assertTrue(ms.getShape() instanceof GeneralPath);
         
         // no general path equality implemented, we have to check manually
         PathIterator piExpected = expected.getPathIterator(new AffineTransform());
