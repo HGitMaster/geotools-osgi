@@ -59,7 +59,7 @@ import org.opengis.filter.Filter;
  * </p>
  *
  * @author David Zwiers, Refractions Research, Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/directory/src/main/java/org/geotools/data/dir/DirectoryDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/directory/src/main/java/org/geotools/data/dir/DirectoryDataStore.java $
  */
 public class DirectoryDataStore implements DataStore, LockingManager {
 
@@ -134,7 +134,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
         info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );
         info.setSource( dir.toURI() );
         try {
-            info.setPublisher( new URI(System.getenv("user.name")) );
+            info.setPublisher( new URI(System.getProperty("user.name")) );
         } catch (URISyntaxException e) {
         }
         return info;
