@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
+        Version: $Id: pom.xml 32877 2009-04-27 15:38:02Z aaime $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -91,12 +91,6 @@
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
   <dependencies>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-directory</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-graph</artifactId>
