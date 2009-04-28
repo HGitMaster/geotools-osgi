@@ -108,11 +108,13 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -140,5 +142,24 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+              <manifest>
+                <addClasspath>false</addClasspath>
+              </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Imagemosaic Datasource
+Bundle-SymbolicName: org.geotools.imagemosaic
+Bundle-Version: 2.6.0
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.geotools.main;bundle-version="2.6.0",
+ org.geotools.referencing;bundle-version="2.6.0",
+ org.geotools.coverage;bundle-version="2.6.0",
+ org.geotools.shapefile;bundle-version="2.6.0"
+Import-Package: com.vividsolutions.jts.geom,
+ com.vividsolutions.jts.index.strtree,
+ javax.measure.unit,
+ org.opengis.feature,
+ org.opengis.feature.simple
+Eclipse-RegisterBuddy: org.geotools.metadata
