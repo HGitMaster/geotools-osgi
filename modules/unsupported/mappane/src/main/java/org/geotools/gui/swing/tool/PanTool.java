@@ -22,7 +22,6 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.geotools.geometry.DirectPosition2D;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.event.MapMouseEvent;
 
@@ -49,7 +48,6 @@ public class PanTool extends CursorTool {
 
     private JMapPane pane;
     private Point panePos;
-    private DirectPosition2D startMapPos;
     boolean panning;
     
     /**

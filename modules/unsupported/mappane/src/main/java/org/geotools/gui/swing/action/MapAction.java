@@ -44,7 +44,7 @@ public abstract class MapAction extends AbstractAction {
         this.putValue(Action.SHORT_DESCRIPTION, toolTip);
 
         if (iconImagePath != null) {
-            this.putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource(iconImagePath)));
+            this.putValue(Action.SMALL_ICON, new ImageIcon(MapAction.class.getResource(iconImagePath)));
         }
     }
 }

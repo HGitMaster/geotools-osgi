@@ -178,11 +178,11 @@ public class JMapPane extends JPanel implements MapLayerListListener {
         if (tool == null) {
             toolManager.setNoCursorTool();
             this.setCursor(Cursor.getDefaultCursor());
+        } else {
+            tool.setMapPane(this);
+            this.setCursor(tool.getCursor());
+            toolManager.setCursorTool(tool);
         }
-        
-        tool.setMapPane(this);
-        this.setCursor(tool.getCursor());
-        toolManager.setCursorTool(tool);
     }
     
     /**
@@ -220,7 +220,7 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      * Set the renderer
      */
     public void setRenderer(GTRenderer renderer) {
-        Map hints = new HashMap();
+        Map hints;
         if (renderer instanceof StreamingRenderer) {
             hints = renderer.getRendererHints();
             if (hints == null) {
