@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.gce.geotiff.IIOMetadataAdpaters;
+package org.geotools.gce.geotiff.adapters;
 
 import org.geotools.util.Utilities;
 

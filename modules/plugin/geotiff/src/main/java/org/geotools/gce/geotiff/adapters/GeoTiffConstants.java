@@ -14,22 +14,26 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils;
+package org.geotools.gce.geotiff.adapters;
+
+import it.geosolutions.imageio.plugins.tiff.TIFFTag;
 
 /**
  * @author simone
  * 
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/IIOMetadataAdpaters/utils/GeoTiffConstants.java $
+ * @source $URL: http://svn.geotools.org/branches/2.5.x/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/IIOMetadataAdpaters/utils/GeoTiffConstants.java $
  */
 public final class GeoTiffConstants {
+    
+        public static final int TIFFTAG_NODATA = 42113;
+    
 	public static final short GTUserDefinedGeoKey = 32767;
 
 	static public final String GTUserDefinedGeoKey_String = "32767".intern();
 
 	public static final short ARRAY_ELEM_INCREMENT = 5;
 
-	public static final String GEOTIFF_IIO_METADATA_FORMAT_NAME = "com_sun_media_imageio_plugins_tiff_image_1.0"
-			.intern();
+	public static final String GEOTIFF_IIO_METADATA_FORMAT_NAME = it.geosolutions.imageioimpl.plugins.tiff.TIFFImageMetadata.nativeMetadataFormatName;
 
 	public static final String GEOTIFF_IIO_ROOT_ELEMENT_NAME = GEOTIFF_IIO_METADATA_FORMAT_NAME;
 
@@ -135,5 +139,8 @@ public final class GeoTiffConstants {
 	public static final int DEFAULT_KEY_REVISION_MINOR = 2;
 
 	public static final int UNDEFINED = 0;
+	
+	public static TIFFTag NODATA_TAG = new TIFFTag("GDAL_NODATA", GeoTiffConstants.TIFFTAG_NODATA, 
+                TIFFTag.TIFF_ASCII);
 
 }

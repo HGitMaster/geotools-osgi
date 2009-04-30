@@ -32,7 +32,7 @@
  *   - http://www.copyright.gov/title17/92chap1.html#105
  *   - http://www.gpoaccess.gov/uscode/  (enter "17USC105" in the search box.)
  */
-package org.geotools.gce.geotiff.crs_adapters;
+package org.geotools.gce.geotiff.adapters;
 
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
@@ -49,13 +49,9 @@ import javax.measure.unit.Unit;
 
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.GeoTiffException;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.PixelScale;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.TiePoint;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffCoordinateTransformationsCodes;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffGCSCodes;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffPCSCodes;
+import org.geotools.gce.geotiff.codes.GeoTiffCoordinateTransformationsCodes;
+import org.geotools.gce.geotiff.codes.GeoTiffGCSCodes;
+import org.geotools.gce.geotiff.codes.GeoTiffPCSCodes;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -123,19 +119,21 @@ import org.opengis.referencing.operation.MathTransformFactory;
  * 
  * @author Bryce Nordgren / USDA Forest Service
  * @author Simone Giannecchini
+ * @author Daniele Romagnoli
+ * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/crs_adapters/GeoTiffMetadata2CRSAdapter.java $
  */
 public final class GeoTiffMetadata2CRSAdapter {
 
 	/** {@link Logger}. */
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.geotiff.crs_adapters");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.geotiff.adapters.adapters.crs");
 
 	/**
 	 * This {@link AffineTransform} can be used when the underlying geotiff
 	 * declares to work with {@link GeoTiffConstants#RasterPixelIsArea} pixel
-	 * interpretation in order to convert the transformtion back to using the
-	 * {@link GeoTiffConstants#RasterPixelIsArea} convention which is the one
+	 * interpretation in order to convert the transformation back to using the
+	 * {@link GeoTiffConstants#RasterPixelIsPoint} convention which is the one
 	 * OGC requires for coverage.
 	 */
 	private static final AffineTransform PixelIsArea2PixelIsPoint = AffineTransform
@@ -451,17 +449,36 @@ public final class GeoTiffMetadata2CRSAdapter {
 		try {
 			return Integer.parseInt(metadata.getGeoKey(key));
 		} catch (NumberFormatException ne) {
-			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.log(Level.WARNING, ne.getLocalizedMessage(), ne);
-			return Integer.MIN_VALUE;
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.log(Level.FINE, ne.getLocalizedMessage(), ne);
+			return GeoTiffConstants.UNDEFINED;
 		}
 
 	}
+	
+	/**
+         * Create the grid to world (or raster to model) transformation for this
+         * source respecting ALWAYS the OGC {@link PixelInCell#CELL_CENTER}
+         * convention for the {@link ImageDatum} of the underlying {@link ImageCRS}.
+         * 
+         * @see <a
+         *      href="http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html">this
+         *      email post</a>
+         * @param metadata
+         *            containing the information to build the {@link MathTransform}
+         *            for going from grid to world.
+         * 
+         * @throws GeoTiffException
+         */
+        public MathTransform getRasterToModel(
+                        final GeoTiffIIOMetadataDecoder metadata) throws GeoTiffException {
+                return getRasterToModel(metadata, true);
+        }
+	
 
 	/**
 	 * Create the grid to world (or raster to model) transformation for this
-	 * source respecting ALWAYS the OGC {@link PixelInCell#CELL_CENTER}
-	 * convention for the {@link ImageDatum} of the underlying {@link ImageCRS}.
+	 * source.
 	 * 
 	 * @see <a
 	 *      href="http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html">this
@@ -469,11 +486,15 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * @param metadata
 	 *            containing the information to build the {@link MathTransform}
 	 *            for going from grid to world.
+	 * @param forceToCellCenter if <code>true</code>, force to create the raster to model
+	 * transformation respecting the OGC {@link PixelInCell#CELL_CENTER}
+         * convention for the {@link ImageDatum} of the underlying {@link ImageCRS}.
 	 * 
 	 * @throws GeoTiffException
 	 */
 	public MathTransform getRasterToModel(
-			final GeoTiffIIOMetadataDecoder metadata) throws GeoTiffException {
+			final GeoTiffIIOMetadataDecoder metadata, 
+			final boolean forceToCellCenter) throws GeoTiffException {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Load initials
@@ -505,12 +526,12 @@ public final class GeoTiffMetadata2CRSAdapter {
 			final double scaleRaster2ModelLongitude = pixScales.getScaleX();
 			final double scaleRaster2ModelLatitude = -pixScales.getScaleY();
 			final double tiePointColumn = tiePoints[0].getValueAt(0)
-					+ (rasterType == GeoTiffConstants.RasterPixelIsArea ? -0.5
+					+ ((forceToCellCenter && rasterType == GeoTiffConstants.RasterPixelIsArea) ? -0.5
 							: 0); // "raster" space
 			// coordinates
 			// (indicies)
 			final double tiePointRow = tiePoints[0].getValueAt(1)
-					+ (rasterType == GeoTiffConstants.RasterPixelIsArea ? -0.5
+					+ ((forceToCellCenter && rasterType == GeoTiffConstants.RasterPixelIsArea) ? -0.5
 							: 0);
 
 			// compute an "offset and scale" matrix
@@ -528,27 +549,42 @@ public final class GeoTiffMetadata2CRSAdapter {
 			xform = ProjectiveTransform.create(gm);
 
 		} else if (hasModelTransformation) {
-			if (rasterType == GeoTiffConstants.RasterPixelIsArea)
-				xform = ProjectiveTransform.create(metadata
-						.getModelTransformation());
-			else {
-				assert rasterType == GeoTiffConstants.RasterPixelIsPoint;
-				final AffineTransform tempTransform = new AffineTransform(
-						metadata.getModelTransformation());
-				tempTransform.concatenate(PixelIsArea2PixelIsPoint);
-				xform = ProjectiveTransform.create(tempTransform);
+                    if (rasterType == GeoTiffConstants.RasterPixelIsArea){
+                        final AffineTransform tempTransform = new AffineTransform(
+                                metadata.getModelTransformation());
+                        if (forceToCellCenter)
+                            tempTransform.concatenate(PixelIsArea2PixelIsPoint);
+                        xform = ProjectiveTransform.create(tempTransform);
+                            
+                    }
+                    else {
+                        assert rasterType == GeoTiffConstants.RasterPixelIsPoint;
+                        xform = ProjectiveTransform.create(metadata
+                                    .getModelTransformation());
 
-			}
-		} else
-			throw new GeoTiffException(metadata,
-					"Unknown Raster to Model configuration.", null);
+                    }
+                } else
+                    throw new GeoTiffException(metadata,
+                                    "Unknown Raster to Model configuration.", null);
 
-		return xform;
+                return xform;
 	}
-
+	
+	public PixelInCell getRasterType(GeoTiffIIOMetadataDecoder metadata){
+	    int rasterType = getGeoKeyAsInt(GeoTiffConstants.GTRasterTypeGeoKey,metadata);
+	    // geotiff spec says that PixelIsArea is the default
+	    if (rasterType == GeoTiffConstants.UNDEFINED)
+                rasterType = GeoTiffConstants.RasterPixelIsArea;
+	    if (rasterType == GeoTiffConstants.RasterPixelIsArea)
+	        return PixelInCell.CELL_CORNER;
+	    else if (rasterType == GeoTiffConstants.RasterPixelIsPoint)
+	        return PixelInCell.CELL_CENTER;
+	    throw new IllegalArgumentException ("Unsupported rasterType");
+	}
+	
 	/**
 	 * Getting a specified geotiff geo key as a double. It is somehow tolerant
-	 * in the sense that in case such a key does not exist it retrieves 0.
+	 * in the sense that in case such a key does not exist it returns <code>Double.NaN</code>.
 	 * 
 	 * @param key
 	 *            we want to get the value for.
@@ -561,7 +597,10 @@ public final class GeoTiffMetadata2CRSAdapter {
 			final GeoTiffIIOMetadataDecoder metadata) {
 
 		try {
-			return Double.parseDouble(metadata.getGeoKey(key));
+		        final String geoKey = metadata.getGeoKey(key);
+		        if (geoKey != null)
+		            return Double.parseDouble(geoKey);
+		        else return Double.NaN;
 		} catch (NumberFormatException ne) {
 			if (LOGGER.isLoggable(Level.WARNING))
 				LOGGER.log(Level.WARNING, ne.getLocalizedMessage(), ne);
@@ -1202,16 +1241,28 @@ public final class GeoTiffMetadata2CRSAdapter {
 			if (name.equalsIgnoreCase("mercator_1SP")
 					|| name.equalsIgnoreCase("Mercator_2SP")
 					|| code == GeoTiffCoordinateTransformationsCodes.CT_Mercator) {
-				parameters = mtFactory.getDefaultParameters("Mercator_1SP");
-				parameters.parameter("central_meridian").setValue(getOriginLong(metadata));
+			    
+			        final double standard_parallel_1 = 
+                                this.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjStdParallel1GeoKey,
+                                                    metadata);
+			        boolean isMercator2SP = false;
+			        if (!Double.isNaN(standard_parallel_1)){
+			            parameters = mtFactory.getDefaultParameters("Mercator_2SP");
+			            isMercator2SP = true;
+			        }
+			        else
+			            parameters = mtFactory.getDefaultParameters("Mercator_1SP");
+			        
+			        parameters.parameter("central_meridian").setValue(getOriginLong(metadata));
 				parameters.parameter("latitude_of_origin").setValue(getOriginLat(metadata));
-				parameters.parameter("scale_factor").setValue(
-						getScaleFactor(metadata));
 				parameters.parameter("false_easting").setValue(
 						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
 						getFalseNorthing(metadata));
-
+				if (isMercator2SP)
+				    parameters.parameter("standard_parallel_1").setValue(standard_parallel_1);
+				else
+				    parameters.parameter("scale_factor").setValue(getScaleFactor(metadata));
 				return parameters;
 			}
 
@@ -1450,6 +1501,27 @@ public final class GeoTiffMetadata2CRSAdapter {
 
 				return parameters;
 			}
+			
+			/**
+                         * 
+                         * Lambert Azimuthal Equal Area
+                         * 
+                         */
+			if (name.equalsIgnoreCase("Lambert_Azimuthal_Equal_Area")
+                                || code == GeoTiffCoordinateTransformationsCodes.CT_LambertAzimEqualArea) {
+                                parameters = mtFactory.getDefaultParameters("Lambert_Azimuthal_Equal_Area");
+        
+                                parameters.parameter("latitude_of_center").setValue(
+                                                getOriginLat(metadata));
+                                parameters.parameter("longitude_of_center").setValue(
+                                                getOriginLong(metadata));
+                                parameters.parameter("false_easting").setValue(
+                                                getFalseEasting(metadata));
+                                parameters.parameter("false_northing").setValue(
+                                                getFalseNorthing(metadata));
+        
+                                return parameters;
+                        }
 
 			/**
 			 * 

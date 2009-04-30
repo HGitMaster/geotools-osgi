@@ -17,19 +17,34 @@
  * Do not taunt Happy Fun Ball.
  *
  */
-package org.geotools.gce.geotiff.IIOMetadataAdpaters;
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2004-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package org.geotools.gce.geotiff.adapters;
+
+import it.geosolutions.imageio.plugins.tiff.GeoTIFFTagSet;
 
 import java.awt.geom.AffineTransform;
 
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffGCSCodes;
+import org.geotools.gce.geotiff.codes.GeoTiffGCSCodes;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.sun.media.imageio.plugins.tiff.GeoTIFFTagSet;
 
 /**
  * This class provides an abstraction from the details of TIFF data access for
@@ -357,6 +372,30 @@ public final class GeoTiffIIOMetadataDecoder {
 		return retVal;
 
 	}
+	
+	/**
+         * Gets the noData from the related TIFFField. Check metadata has noData
+         * using {@link #hasNoData()} method before calling this method.
+         * 
+         * @return the noData value or {@link Double#NaN} in case of unable to
+         *         get noData.
+         * 
+         */
+        public double getNoData() {
+                final IIOMetadataNode noDataNode = getTiffField(GeoTiffConstants.TIFFTAG_NODATA);
+                if (noDataNode == null)
+                    return Double.NaN;
+                final String noData = getTiffAscii(noDataNode);
+                if (noData == null)
+                    return Double.NaN;
+                try {
+                    return Double.parseDouble(noData);
+                } catch (NumberFormatException nfe){
+                    //TODO: Log a message.
+                    return Double.NaN;
+                }
+
+        }
 
 	/**
 	 * Tells me if the underlying {@link IIOMetadata} contains ModelTiepointTag
@@ -396,6 +435,22 @@ public final class GeoTiffIIOMetadataDecoder {
 		return true;
 
 	}
+	
+	/**
+         * Tells me if the underlying {@link IIOMetadata} contains NoData Tag.
+         * 
+         * @return true if NoData Tag is present, false otherwise.
+         * @see GeoTiffConstants#TIFFTAG_NODATA.
+         */
+        public boolean hasNoData() {
+            final IIOMetadataNode noDataNode = getTiffField(GeoTiffConstants.TIFFTAG_NODATA);
+            if (noDataNode == null)
+                return false;
+            final String noData = getTiffAscii(noDataNode);
+            if (noData == null || noData.trim().length() == 0)
+                    return false;
+            return true;
+        }
 
 	/**
 	 * Gets the model tie points from the appropriate TIFFField
@@ -578,18 +633,36 @@ public final class GeoTiffIIOMetadataDecoder {
 	 *         the final '|' character removed.
 	 */
 	private String getTiffAscii(final IIOMetadataNode tiffField,
-			final int start, final int length) {
+			int start, int length) {
 
 		// there should be only one, so get the first
 		// GeoTIFFWritingUtilities specification places a vertical bar '|' in
 		// place of \0
 		// null delimiters so drop off the vertical bar for Java Strings
-		return getValueAttribute(
-				((IIOMetadataNode) tiffField.getFirstChild())
-						.getElementsByTagName(
-								GeoTiffConstants.GEOTIFF_ASCII_TAG).item(0))
-				.substring(start, start + length - 1);
+	    final String valueAttribute = getValueAttribute(
+                    ((IIOMetadataNode) tiffField.getFirstChild())
+                    .getElementsByTagName(GeoTiffConstants.GEOTIFF_ASCII_TAG).item(0));
+	    if (start == -1) 
+	        start = 0;
+	    if (length == -1)
+	        length = valueAttribute.length() + 1;
+	    return  valueAttribute.substring(start, start + length - 1);
 
+	}
+	
+	/**
+         * Gets the TIFFAscii string
+         * 
+         * @param tiffField
+         *            An IIOMetadataNode pointing to a TIFFField element that
+         *            contains a TIFFAsciis element. This element should contain a
+         *            single TIFFAscii element.
+         * 
+         * @return The value contained in the TIFFAscii node, with
+         *         the final '|' character removed.
+         */
+	private String getTiffAscii(final IIOMetadataNode tiffField) {
+	         return getTiffAscii(tiffField,-1,-1);
 	}
 
 	public IIOMetadataNode getRootNode() {

@@ -16,13 +16,13 @@
  */
 package org.geotools.gce.geotiff;
 
+import it.geosolutions.imageio.plugins.tiff.TIFFImageWriteParam;
+
 import java.util.Locale;
 
 import javax.imageio.ImageWriteParam;
 
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
-
-import com.sun.media.imageio.plugins.tiff.TIFFImageWriteParam;
 
 /**
  * Subclass of {@link GeoToolsWriteParams} the allows the user to specify

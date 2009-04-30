@@ -14,17 +14,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gce.geotiff.IIOMetadataAdpaters;
+package org.geotools.gce.geotiff.adapters;
+
+import it.geosolutions.imageio.plugins.tiff.BaselineTIFFTagSet;
+import it.geosolutions.imageio.plugins.tiff.GeoTIFFTagSet;
+import it.geosolutions.imageio.plugins.tiff.TIFFTag;
 
 import java.awt.geom.AffineTransform;
 
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
 import org.geotools.util.KeySortedList;
 import org.jdom.Element;
-
-import com.sun.media.imageio.plugins.tiff.BaselineTIFFTagSet;
-import com.sun.media.imageio.plugins.tiff.GeoTIFFTagSet;
-import com.sun.media.imageio.plugins.tiff.TIFFTag;
 
 /**
  * This class is responsible for encoding the geotiff tags into suitable
@@ -60,9 +59,13 @@ public final class GeoTiffIIOMetadataEncoder {
 	private double[] geoTiffDoubleParams;
 
 	private int numGeoTiffAsciiParams;
-
+	
 	private StringBuffer geoTiffAsciiParams;
-
+	
+	private double noData;
+	
+	private boolean isNodataSet = false;
+	
 	public GeoTiffIIOMetadataEncoder() {
 		this(GeoTiffConstants.DEFAULT_GEOTIFF_VERSION,
 				GeoTiffConstants.DEFAULT_KEY_REVISION_MAJOR,
@@ -364,6 +367,10 @@ public final class GeoTiffIIOMetadataEncoder {
 		return GeoTIFFTagSet.getInstance().getTag(
 				GeoTIFFTagSet.TAG_MODEL_TRANSFORMATION);
 	}
+	
+	protected static TIFFTag getNoDataTag() {
+	        return GeoTiffConstants.NODATA_TAG;
+        }
 
 	private GeoKeyEntry getNonNullKeyEntry(int keyID) {
 		final GeoKeyEntry entry = getGeoKeyEntry(keyID);
@@ -458,6 +465,10 @@ public final class GeoTiffIIOMetadataEncoder {
 
 		if (numGeoTiffAsciiParams > 0) {
 			ifd.addContent(createGeoAsciiParamsElement());
+		}
+		
+		if (isNodataSet) {
+		    ifd.addContent(createNoDataElement());
 		}
 
 		return ifd;
@@ -597,6 +608,14 @@ public final class GeoTiffIIOMetadataEncoder {
 
 		return field;
 	}
+	
+	private Element createNoDataElement() {
+            Element field = createFieldElement(getNoDataTag());
+            Element data = new Element(GeoTiffConstants.GEOTIFF_ASCIIS_TAG);
+            field.addContent(data);
+            data.addContent(createAsciiElement(Double.toString(noData)));
+            return field;
+        }
 
 	private Element createFieldElement(final TIFFTag tag) {
 		Element field = new Element(GeoTiffConstants.GEOTIFF_FIELD_TAG);
@@ -637,4 +656,13 @@ public final class GeoTiffIIOMetadataEncoder {
 			data.addContent(GeoKeyRecord);
 		}
 	}
+
+        public double getNoData() {
+            return noData;
+        }
+    
+        public void setNoData(double noData) {
+            this.noData = noData;
+            isNodataSet = true;
+        }
 }

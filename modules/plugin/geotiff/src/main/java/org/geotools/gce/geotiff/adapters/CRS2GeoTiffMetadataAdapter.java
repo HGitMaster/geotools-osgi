@@ -14,12 +14,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gce.geotiff.crs_adapters;
+package org.geotools.gce.geotiff.adapters;
 
 import java.lang.ref.Reference;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,18 +29,18 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 import org.geotools.gce.geotiff.GeoTiffException;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataEncoder;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffCoordinateTransformationsCodes;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffGCSCodes;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffPCSCodes;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffUoMCodes;
+import org.geotools.gce.geotiff.codes.GeoTiffCoordinateTransformationsCodes;
+import org.geotools.gce.geotiff.codes.GeoTiffGCSCodes;
+import org.geotools.gce.geotiff.codes.GeoTiffPCSCodes;
+import org.geotools.gce.geotiff.codes.GeoTiffUoMCodes;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.operation.projection.AlbersEqualArea;
+import org.geotools.referencing.operation.projection.LambertAzimuthalEqualArea;
 import org.geotools.referencing.operation.projection.LambertConformal;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.referencing.operation.projection.Mercator;
@@ -55,6 +56,8 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.util.SoftValueHashMap;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -472,20 +475,33 @@ public final class CRS2GeoTiffMetadataAdapter {
 			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
-			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjNatOriginLongGeoKey,
-					parameters.parameter("central_meridian").doubleValue());
-			// metadata.addGeoDoubleParam(
-			// GeoTiffIIOMetadataDecoder.ProjNatOriginLatGeoKey,
-			// parameters.parameter("latitude_of_origin").doubleValue());
-			metadata.addGeoDoubleParam(
-					GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey, parameters
-							.parameter("scale_factor").doubleValue());
-			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjFalseEastingGeoKey,
-					parameters.parameter("false_easting").doubleValue());
-			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjFalseNorthingGeoKey,
-					parameters.parameter("false_northing").doubleValue());
+			List<GeneralParameterValue> values = parameters.values();
+                        for (GeneralParameterValue value : values){
+                            if (value instanceof ParameterValue){
+                                ParameterValue paramValue = (ParameterValue) value;
+                                if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), "latitude_of_origin")) {
+                                    metadata.addGeoDoubleParam(
+                                            GeoTiffPCSCodes.ProjNatOriginLatGeoKey,(paramValue).doubleValue());
+                                }else if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), "central_meridian")) {
+                                    metadata.addGeoDoubleParam(
+                                            GeoTiffPCSCodes.ProjNatOriginLongGeoKey,(paramValue).doubleValue());
+                                }else if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), "scale_factor")) {
+                                    metadata.addGeoDoubleParam(
+                                            GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey,(paramValue).doubleValue());
+                                }else if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), "standard_parallel_1")) {
+                                    metadata.addGeoDoubleParam(
+                                            GeoTiffPCSCodes.ProjStdParallel1GeoKey,(paramValue).doubleValue());
+                                }else if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), "false_easting")) {
+                                    metadata.addGeoDoubleParam(
+                                            GeoTiffPCSCodes.ProjFalseEastingGeoKey,(paramValue).doubleValue());
+                                }else if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), "false_northing")) {
+                                    metadata.addGeoDoubleParam(
+                                            GeoTiffPCSCodes.ProjFalseNorthingGeoKey,(paramValue).doubleValue());
+                                }
+                            }
+                        }
+                        
 			return;
-
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -720,6 +736,32 @@ public final class CRS2GeoTiffMetadataAdapter {
 					parameters.parameter("false_northing").doubleValue());
 			return;
 		}
+		
+		// /////////////////////////////////////////////////////////////////////
+                //
+                // Lambert Azimuthal Equal Area
+                //
+                // /////////////////////////////////////////////////////////////////////
+		if (projTransf instanceof LambertAzimuthalEqualArea
+                        && name.equalsIgnoreCase("Lambert_Azimuthal_Equal_Area")) {
+
+                // key 3075
+                    metadata.addGeoShortParam(GeoTiffPCSCodes.ProjCoordTransGeoKey,
+                                    GeoTiffCoordinateTransformationsCodes.CT_LambertAzimEqualArea);
+                    metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+    
+                    // params
+                    metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjCenterLatGeoKey,
+                                    parameters.parameter("latitude_of_center").doubleValue());
+                    metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjCenterLongGeoKey,
+                                    parameters.parameter("longitude_of_center").doubleValue());
+                    metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjFalseEastingGeoKey,
+                                    parameters.parameter("false_easting").doubleValue());
+                    metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjFalseNorthingGeoKey,
+                                    parameters.parameter("false_northing").doubleValue());
+                    return;
+                }
+		
 		// throw new
 		// GeoTiffException(null,"CRS2GeoTiffMetadataAdapter::parseCoordinateTransform::unknown
 		// projection transform");

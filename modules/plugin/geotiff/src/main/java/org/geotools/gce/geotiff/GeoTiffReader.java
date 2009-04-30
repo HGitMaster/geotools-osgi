@@ -34,17 +34,23 @@
  */
 package org.geotools.gce.geotiff;
 
-// JAI ImageIO Tools dependencies
+import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
+
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.image.RenderedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.channels.FileChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,22 +60,32 @@ import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 
+import org.geotools.coverage.Category;
 import org.geotools.coverage.CoverageFactoryFinder;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.TypeMap;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.PrjFileReader;
+import org.geotools.data.WorldFileReader;
 import org.geotools.factory.Hints;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
-import org.geotools.gce.geotiff.crs_adapters.GeoTiffMetadata2CRSAdapter;
+import org.geotools.gce.geotiff.adapters.GeoTiffIIOMetadataDecoder;
+import org.geotools.gce.geotiff.adapters.GeoTiffMetadata2CRSAdapter;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.util.NumberRange;
+import org.opengis.coverage.ColorInterpretation;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -79,10 +95,8 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
-import org.geotools.coverage.grid.io.OverviewPolicy;
 
 /**
  * this class is responsible for exposing the data and the Georeferencing
@@ -99,6 +113,16 @@ import org.geotools.coverage.grid.io.OverviewPolicy;
 public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 
+	/**
+	 * Number of coverages for this reader is 1
+	 * 
+	 * @return the number of coverages for this reader.
+	 */
+	@Override
+	public int getGridCoverageCount() {
+		return 1;
+	}
+
 	/** Logger for the {@link GeoTiffReader} class. */
 	private Logger LOGGER = org.geotools.util.logging.Logging.getLogger(GeoTiffReader.class.toString());
 
@@ -110,6 +134,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 
 	/** Adapter for the GeoTiff crs. */
 	private GeoTiffMetadata2CRSAdapter gtcs;
+	
+	private double noData = Double.NaN;
 
 	/**
 	 * Creates a new instance of GeoTiffReader
@@ -253,7 +279,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			DataSourceException {
 		// //
 		//
-		// Get a reader for this formatr
+		// Get a reader for this format
 		//
 		// //
 		final ImageReader reader = readerSPI.createReaderInstance();
@@ -265,9 +291,27 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// //
 		reader.setInput(inStream);
 		final IIOMetadata iioMetadata = reader.getImageMetadata(0);
-		metadata = new GeoTiffIIOMetadataDecoder(iioMetadata);
-		gtcs = (GeoTiffMetadata2CRSAdapter) GeoTiffMetadata2CRSAdapter.get(hints);
-
+		CoordinateReferenceSystem foundCrs = null;
+		boolean useWorldFile = false;
+		
+		try{
+		    metadata = new GeoTiffIIOMetadataDecoder(iioMetadata);
+		    gtcs = (GeoTiffMetadata2CRSAdapter) GeoTiffMetadata2CRSAdapter.get(hints);
+		    if (gtcs != null){
+                        foundCrs = gtcs.createCoordinateSystem(metadata);
+                    }
+		    else 
+		        useWorldFile = true;
+		    
+		    if (metadata.hasNoData())
+	                    noData = metadata.getNoData();
+		}catch (IllegalArgumentException iae){
+		    useWorldFile = true;
+		}catch (UnsupportedOperationException uoe){
+		    useWorldFile = true;
+		}
+		
+		
 		// //
 		//
 		// get the CRS INFO
@@ -277,11 +321,19 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 				.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
 		if (tempCRS != null) {
 			this.crs = (CoordinateReferenceSystem) tempCRS;
-			LOGGER.log(Level.WARNING, new StringBuffer(
+			LOGGER.log(Level.WARNING, new StringBuilder(
 					"Using forced coordinate reference system ").append(
 					crs.toWKT()).toString());
-		} else
-			crs = gtcs.createCoordinateSystem(metadata);
+		} else{
+		    if (useWorldFile)
+		        foundCrs = getCRS(source);
+		    crs = foundCrs;
+		}
+		
+		if (crs == null){
+                    throw new DataSourceException ("Coordinate Reference System is not available");
+                }
+			
 
 		// //
 		//
@@ -294,7 +346,17 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		final Rectangle actualDim = new Rectangle(0, 0, hrWidth, hrHeight);
 		originalGridRange = new GeneralGridRange(actualDim);
 
-		this.raster2Model = gtcs.getRasterToModel(metadata);
+		if (!useWorldFile && gtcs != null) {
+		    this.raster2Model = gtcs.getRasterToModel(metadata);
+                }
+                else {
+                    this.raster2Model = parseWorldFile(source);
+                }
+		
+		if (this.raster2Model == null){
+                    throw new DataSourceException ("Raster to Model Transformation is not available");
+                }
+		
 		final AffineTransform tempTransform = new AffineTransform((AffineTransform) raster2Model);
 		tempTransform.translate(-0.5, -0.5);
 		originalEnvelope = CRS.transform(ProjectiveTransform.create(tempTransform), new GeneralEnvelope(actualDim));
@@ -302,7 +364,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 
 		// ///
 		// 
-		// setting the higher resolution avalaible for this coverage
+		// setting the higher resolution available for this coverage
 		//
 		// ///
 		highestRes = new double[2];
@@ -457,7 +519,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
                 final double scaleY = originalGridRange.getLength(1) / (1.0 * ssHeight);
                 final AffineTransform tempRaster2Model = new AffineTransform((AffineTransform) raster2Model);
                 tempRaster2Model.concatenate(new AffineTransform(scaleX, 0, 0, scaleY, 0, 0));
-                return createImageCoverage(coverageRaster, ProjectiveTransform.create((AffineTransform) tempRaster2Model));
+                return createCoverage(coverageRaster, ProjectiveTransform.create((AffineTransform) tempRaster2Model));
 
 
 	}
@@ -472,13 +534,164 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	}
 	
 	/**
-	 * Number of coverages for this reader is 1
-	 * 
-	 * @return the number of coverages for this reader.
-	 */
-	@Override
-	public int getGridCoverageCount() {
-		return 1;
-	}
+         * Creates a {@link GridCoverage} for the provided {@link PlanarImage} using
+         * the {@link #raster2Model} that was provided for this coverage.
+         * 
+         * <p>
+         * This method is vital when working with coverages that have a raster to
+         * model transformation that is not a simple scale and translate.
+         * 
+         * @param image
+         *            contains the data for the coverage to create.
+         * @param raster2Model
+         *            is the {@link MathTransform} that maps from the raster space
+         *            to the model space.
+         * @return a {@link GridCoverage}
+         * @throws IOException
+         */
+        protected final GridCoverage createCoverage(PlanarImage image,
+                        MathTransform raster2Model) throws IOException {
+
+                // creating bands
+        final SampleModel sm = image.getSampleModel();
+        final ColorModel cm = image.getColorModel();
+                final int numBands = sm.getNumBands();
+                final GridSampleDimension[] bands = new GridSampleDimension[numBands];
+                // setting bands names.
+                
+                Category noDataCategory = null;
+                if (!Double.isNaN(noData)){
+                    noDataCategory = new Category(Vocabulary
+                            .formatInternational(VocabularyKeys.NODATA), new Color[] { new Color(0, 0, 0, 0) }, NumberRange
+                            .create(noData, noData), NumberRange
+                            .create(noData, noData));
+                }
+                
+                for (int i = 0; i < numBands; i++) {
+                        final ColorInterpretation colorInterpretation=TypeMap.getColorInterpretation(cm, i);
+                        if(colorInterpretation==null)
+                               throw new IOException("Unrecognized sample dimension type");
+                        Category[] categories = null;
+                        if (noDataCategory != null)
+                            categories = new Category[]{noDataCategory};
+                        bands[i] = new GridSampleDimension(colorInterpretation.name(),categories,null).geophysics(true);
+                }
+                // creating coverage
+                if (raster2Model != null) {
+                        return coverageFactory.create(coverageName, image, crs,
+                                        raster2Model, bands, null, null);
+                }
+                return coverageFactory.create(coverageName, image, new GeneralEnvelope(
+                                originalEnvelope), bands, null, null);
+
+        }
+	
+	
+        private CoordinateReferenceSystem getCRS(Object source) {
+            CoordinateReferenceSystem crs = null;
+        if (source instanceof File
+                || (source instanceof URL && (((URL) source).getProtocol() == "file"))) {
+            // getting name for the prj file
+            final String sourceAsString;
+
+            if (source instanceof File) {
+                sourceAsString = ((File) source).getAbsolutePath();
+            } else {
+                String auth = ((URL) source).getAuthority();
+                String path = ((URL) source).getPath();
+                if (auth != null && !auth.equals("")) {
+                    sourceAsString = "//" + auth + path;
+                } else {
+                    sourceAsString = path;
+                }
+            }
+
+            final int index = sourceAsString.lastIndexOf(".");
+            final StringBuilder base = new StringBuilder(sourceAsString
+                    .substring(0, index)).append(".prj");
+
+            // does it exist?
+            final File prjFile = new File(base.toString());
+            if (prjFile.exists()) {
+                // it exists then we have top read it
+                PrjFileReader projReader = null;
+                try {
+                    final FileChannel channel = new FileInputStream(prjFile)
+                            .getChannel();
+                    projReader = new PrjFileReader(channel);
+                    crs = projReader.getCoordinateReferenceSystem();
+                } catch (FileNotFoundException e) {
+                    // warn about the error but proceed, it is not fatal
+                    // we have at least the default crs to use
+                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                } catch (IOException e) {
+                    // warn about the error but proceed, it is not fatal
+                    // we have at least the default crs to use
+                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                } catch (FactoryException e) {
+                    // warn about the error but proceed, it is not fatal
+                    // we have at least the default crs to use
+                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                } finally {
+                    if (projReader != null)
+                        try {
+                            projReader.close();
+                        } catch (IOException e) {
+                            // warn about the error but proceed, it is not fatal
+                            // we have at least the default crs to use
+                            LOGGER
+                                    .log(Level.SEVERE, e.getLocalizedMessage(),
+                                            e);
+                        }
+                }
+
+            }
+        }
+        return crs;
+    }
+        
+        
+    /**
+     * @throws IOException
+     */
+    static MathTransform parseWorldFile(Object source) throws IOException {
+        MathTransform raster2Model = null;
+
+        // TODO: Add support for FileImageInputStreamExt
+        // TODO: Check for WorldFile on URL beside the actual connection.
+        if (source instanceof File) {
+            final File sourceFile = ((File) source);
+            String parentPath = sourceFile.getParent();
+            String filename = sourceFile.getName();
+            final int i = filename.lastIndexOf('.');
+            filename = (i == -1) ? filename : filename.substring(0, i);
+            
+            // getting name and extension
+            final String base = (parentPath != null) ? new StringBuilder(
+                    parentPath).append(File.separator).append(filename)
+                    .toString() : filename;
+
+            // We can now construct the baseURL from this string.
+            File file2Parse = new File(new StringBuilder(base).append(".wld")
+                    .toString());
+
+            if (file2Parse.exists()) {
+                final WorldFileReader reader = new WorldFileReader(file2Parse);
+                raster2Model = reader.getTransform();
+            } else {
+                // looking for another extension
+                file2Parse = new File(new StringBuilder(base).append(".tfw")
+                        .toString());
+
+                if (file2Parse.exists()) {
+                    // parse world file
+                    final WorldFileReader reader = new WorldFileReader(
+                            file2Parse);
+                    raster2Model = reader.getTransform();
+                }
+            }
+        }
+        return raster2Model;
+    }
 
 }

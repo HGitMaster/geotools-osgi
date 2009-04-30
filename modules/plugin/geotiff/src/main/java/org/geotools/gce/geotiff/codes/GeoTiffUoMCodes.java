@@ -14,13 +14,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
+package org.geotools.gce.geotiff.codes;
 
 /**
  * @author Simone Giannecchini
  * @since 2.3
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/IIOMetadataAdpaters/utils/codes/GeoTiffUoMCodes.java $
+ * @source $URL: http://svn.geotools.org/branches/2.5.x/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/IIOMetadataAdpaters/utils/codes/GeoTiffUoMCodes.java $
  */
 public final class GeoTiffUoMCodes {
 
