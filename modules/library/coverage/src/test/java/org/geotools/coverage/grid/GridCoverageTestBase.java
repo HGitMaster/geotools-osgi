@@ -61,8 +61,8 @@ import static org.junit.Assert.*;
  * Base class for grid coverage tests. This base class provides factory methods for sample
  * {@link GridCoverage2D}, and {@code assertEqual} methods for comparing values.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridCoverageTestBase.java $
- * @version $Id: GridCoverageTestBase.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridCoverageTestBase.java $
+ * @version $Id: GridCoverageTestBase.java 32888 2009-04-30 16:16:22Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */
 public class GridCoverageTestBase extends CoverageTestBase {
@@ -296,7 +296,7 @@ public class GridCoverageTestBase extends CoverageTestBase {
                  * Geographic extent  :  (90°S, 180°W) - (90°N, 180°E)
                  */
                 case 3:{
-                    path   = "BATHY.gif";
+                    path   = "BATHY.png";
                     bounds = new Rectangle2D.Double(-180, -90, 360, 180);
                     crs    = DefaultGeographicCRS.WGS84;
                     bands  = null;
