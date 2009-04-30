@@ -78,12 +78,8 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
         hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, l));
 
         File file = null;
-        try{
-            file = TestData.file(this, fileName);
-        }catch (FileNotFoundException fnfe){
-            LOGGER.warning("test-data not found: " + fileName + "\nTests are skipped");
-            return;
-        }
+            file =new File("/media/ext_hd_01/data/corine/IFMAP_up_landcover.img");
+       
         
         final BaseGDALGridCoverage2DReader reader = new ErdasImgReader(file, hints);
 
@@ -93,7 +89,7 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
         //
         // /////////////////////////////////////////////////////////////////////
         GridCoverage2D gc = (GridCoverage2D) reader.read(null);
-        forceDataLoading(gc);
+//        forceDataLoading(gc);
 
         // /////////////////////////////////////////////////////////////////////
         //
@@ -122,8 +118,7 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
             .createValue();
         gg.setValue(new GridGeometry2D(
                 new GeneralGridRange(
-                    new Rectangle(0, 0, (int) (range.width / 2.0 / cropFactor),
-                        (int) (range.height / 2.0 / cropFactor))), cropEnvelope));
+                    new Rectangle(0,0,512,512)), oldEnvelope));
         gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg });
         forceDataLoading(gc);
     }

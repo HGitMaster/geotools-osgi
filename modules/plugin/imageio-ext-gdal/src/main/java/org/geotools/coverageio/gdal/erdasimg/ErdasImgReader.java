@@ -18,8 +18,6 @@ package org.geotools.coverageio.gdal.erdasimg;
 
 import it.geosolutions.imageio.plugins.erdasimg.ErdasImgImageReaderSpi;
 
-import java.util.logging.Logger;
-
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverageio.gdal.BaseGDALGridCoverage2DReader;
 import org.geotools.data.DataSourceException;
@@ -38,9 +36,6 @@ import org.opengis.coverage.grid.GridCoverageReader;
  */
 @SuppressWarnings("deprecation")
 public final class ErdasImgReader extends BaseGDALGridCoverage2DReader implements GridCoverageReader {
-    /** Logger. */
-    private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
-            "org.geotools.coverageio.gdal.erdasimg");
     private final static String worldFileExt = "";
 
     /**
