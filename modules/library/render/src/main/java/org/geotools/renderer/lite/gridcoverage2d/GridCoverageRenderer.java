@@ -73,7 +73,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author  Andrea Aime
  * @author  Alessio Fabiani
  * @source  $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
- * @version  $Id: GridCoverageRenderer.java 32822 2009-04-17 21:41:12Z simonegiannecchini $
+ * @version  $Id: GridCoverageRenderer.java 32890 2009-04-30 16:56:18Z simonegiannecchini $
  * @task  Add support for SLD styles
  */
 @SuppressWarnings("deprecation")
@@ -482,8 +482,6 @@ public final class GridCoverageRenderer {
         //
         // /////////////////////////////////////////////////////////////////////
         GridCoverage2D preResample=gridCoverage;
-//        if(simpleG2WTransform)
-//        {
     	try{
 		    preResample = getCroppedCoverage(gridCoverage, intersectionEnvelope, sourceCoverageCRS,this.hints);
 		    if (preResample == null) {
@@ -507,7 +505,6 @@ public final class GridCoverageRenderer {
         if (DEBUG) {
             writeRenderedImage(preResample.geophysics(false).getRenderedImage(),"preresample");
         }
-//        }
             
         
         // /////////////////////////////////////////////////////////////////////
