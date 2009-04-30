@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32515 2009-02-18 20:00:51Z acuster $
+        Version: $Id: pom.xml 32884 2009-04-30 14:00:09Z simonegiannecchini $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -20,7 +20,7 @@
   </parent>
 
   <properties>
-    <imageio.ext.version>1.0.1</imageio.ext.version>
+    <imageio.ext.version>1.0.2</imageio.ext.version>
   </properties>
 
   <!-- =========================================================== -->
