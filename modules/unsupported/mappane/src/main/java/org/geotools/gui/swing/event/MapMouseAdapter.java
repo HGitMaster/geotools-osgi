@@ -19,54 +19,65 @@ package org.geotools.gui.swing.event;
 
 import org.geotools.gui.swing.JMapPane;
 
+
 /**
- * Interface for classes that listen to JMapPaneMouseEvents
+ * An adapter class that implements all of the mouse event handling methods
+ * defined in the MapMouseListener interface as empty methods, allowing sub-classes
+ * to just override the methods they need. Note that this class is abstract and
+ * sub-classes are required to implement
+ * {@linkplain MapMouseListener#setMapPane(org.geotools.gui.swing.JMapPane) }.
+ *
  */
-public interface MapMouseListener {
-    
+public class MapMouseAdapter implements MapMouseListener {
+
+//    private JMapPane pane;
+
+
     /**
      * Set the JMapPane instance for this tool
      */
-    //public void setMapPane(JMapPane pane);
-    
+    /*public void setMapPane(JMapPane pane) {
+        this.pane = pane;
+    }*/
+
     /**
      * Respond to a mouse click event received from the map pane
      */
-    public void onMouseClicked(MapMouseEvent pme);
+    public void onMouseClicked(MapMouseEvent ev) {}
 
     /**
      * Respond to a mouse dragged event received from the map pane
      */
-    public void onMouseDragged(MapMouseEvent pme);
+    public void onMouseDragged(MapMouseEvent ev) {}
 
     /**
      * Respond to a mouse entered event received from the map pane
      */
-    public void onMouseEntered(MapMouseEvent pme);
+    public void onMouseEntered(MapMouseEvent ev) {}
 
     /**
      * Respond to a mouse exited event received from the map pane
      */
-    public void onMouseExited(MapMouseEvent pme);
+    public void onMouseExited(MapMouseEvent ev) {}
 
     /**
      * Respond to a mouse movement event received from the map pane
      */
-    public void onMouseMoved(MapMouseEvent pme);
+    public void onMouseMoved(MapMouseEvent ev) {}
 
     /**
      * Respond to a mouse button press event received from the map pane
      */
-    public void onMousePressed(MapMouseEvent pme);
+    public void onMousePressed(MapMouseEvent ev) {}
 
     /**
      * Respond to a mouse button release event received from the map pane
      */
-    public void onMouseReleased(MapMouseEvent pme);
+    public void onMouseReleased(MapMouseEvent ev) {}
 
     /**
      * Respond to a mouse wheel scroll event received from the map pane
      */
-    public void onMouseWheelMoved(MapMouseEvent pme);
+    public void onMouseWheelMoved(MapMouseEvent ev) {}
 
 }

@@ -46,7 +46,6 @@ public class PanTool extends CursorTool {
     private Icon iconLarge;
     private Icon iconSmall;
 
-    private JMapPane pane;
     private Point panePos;
     boolean panning;
     
@@ -62,14 +61,6 @@ public class PanTool extends CursorTool {
         cursor = tk.createCustomCursor(imgIcon.getImage(), CURSOR_HOTSPOT, "Pan");
 
         panning = false;
-    }
-
-    /**
-     * Set the map pane being serviced by this tool
-     */
-    @Override
-    public void setMapPane(JMapPane pane) {
-        this.pane = pane;
     }
 
     /**

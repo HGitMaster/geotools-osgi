@@ -14,7 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.tool;
 
 import java.awt.event.MouseEvent;
@@ -36,11 +35,11 @@ import org.geotools.gui.swing.event.MapMouseListener;
  * @since 2.6
  */
 public class MapToolManager implements MouseInputListener, MouseWheelListener {
-    
+
     private JMapPane pane;
     private Set<MapMouseListener> listeners = new HashSet<MapMouseListener>();
     private CursorTool cursorTool;
-    
+
     /**
      * Constructor
      * 
@@ -57,7 +56,7 @@ public class MapToolManager implements MouseInputListener, MouseWheelListener {
         listeners.remove(cursorTool);
         cursorTool = null;
     }
-    
+
     /**
      * Set the active cursor tool
      * 
@@ -69,54 +68,43 @@ public class MapToolManager implements MouseInputListener, MouseWheelListener {
         if (tool == null) {
             throw new IllegalArgumentException("argument must not be null");
         }
-        
+
         if (cursorTool != null) {
             listeners.remove(cursorTool);
         }
-        
+
         cursorTool = tool;
         return listeners.add(tool);
     }
 
     /**
-     * Add a tool to the set of active tools
-     * 
-     * @param tool tool to add
+     * Add a listener for JMapPaneMouseEvents
+     *
      * @return true if successful; false otherwise
      * @throws IllegalArgumentException if the tool argument is null
      */
-    public boolean addTool(MapTool tool) {
-        if (tool == null) {
+    public boolean addMouseListener(MapMouseListener listener) {
+        if (listener == null) {
             throw new IllegalArgumentException("argument must not be null");
         }
-        
-        return listeners.add(tool);
-    }
-    
-    /**
-     * Remove a tool from the set of active tools. It is safe to
-     * call this method speculatively since it just returns false
-     * if the tool is not in the active set.
-     * 
-     * @param tool tool to remove
-     * 
-     * @return true if successful; false otherwise
-     * @throws IllegalArgumentException if the tool argument is null
-     */
-    public boolean removeTool(MapTool tool) {
-        if (tool == null) {
-            throw new IllegalArgumentException("argument must not be null");
-        }
-        
-        return listeners.remove(tool);
+
+        return listeners.add(listener);
     }
 
     /**
-     * Add a listener for JMapPaneMouseEvents
+     * Remove a MapMouseListener from the active listeners
+     *
+     * @return true if successful; false otherwise
+     * @throws IllegalArgumentException if the tool argument is null
      */
-    public void addMouseListener(MapMouseListener listener) {
+    public boolean removeMouseListener(MapMouseListener listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("argument must not be null");
+        }
+
+        return listeners.remove(listener);
     }
-    
+
     public void mouseClicked(MouseEvent e) {
         MapMouseEvent pme = convertEvent(e);
         if (pme != null) {
@@ -125,53 +113,67 @@ public class MapToolManager implements MouseInputListener, MouseWheelListener {
             }
         }
     }
-    
+
     public void mousePressed(MouseEvent e) {
         MapMouseEvent pme = convertEvent(e);
-        for (MapMouseListener listener : listeners) {
-            listener.onMousePressed(pme);
+        if (pme != null) {
+            for (MapMouseListener listener : listeners) {
+                listener.onMousePressed(pme);
+            }
         }
     }
 
     public void mouseReleased(MouseEvent e) {
         MapMouseEvent pme = convertEvent(e);
-        for (MapMouseListener listener : listeners) {
-            listener.onMouseReleased(pme);
+        if (pme != null) {
+            for (MapMouseListener listener : listeners) {
+                listener.onMouseReleased(pme);
+            }
         }
     }
 
     public void mouseEntered(MouseEvent e) {
         MapMouseEvent pme = convertEvent(e);
-        for (MapMouseListener listener : listeners) {
-            listener.onMouseEntered(pme);
+        if (pme != null) {
+            for (MapMouseListener listener : listeners) {
+                listener.onMouseEntered(pme);
+            }
         }
     }
 
     public void mouseExited(MouseEvent e) {
         MapMouseEvent pme = convertEvent(e);
-        for (MapMouseListener listener : listeners) {
-            listener.onMouseExited(pme);
+        if (pme != null) {
+            for (MapMouseListener listener : listeners) {
+                listener.onMouseExited(pme);
+            }
         }
     }
 
     public void mouseDragged(MouseEvent e) {
         MapMouseEvent pme = convertEvent(e);
-        for (MapMouseListener listener : listeners) {
-            listener.onMouseDragged(pme);
+        if (pme != null) {
+            for (MapMouseListener listener : listeners) {
+                listener.onMouseDragged(pme);
+            }
         }
     }
 
     public void mouseMoved(MouseEvent e) {
         MapMouseEvent pme = convertEvent(e);
-        for (MapMouseListener listener : listeners) {
-            listener.onMouseMoved(pme);
+        if (pme != null) {
+            for (MapMouseListener listener : listeners) {
+                listener.onMouseMoved(pme);
+            }
         }
     }
 
     public void mouseWheelMoved(MouseWheelEvent e) {
         MapMouseEvent pme = convertEvent(e);
-        for (MapMouseListener listener : listeners) {
-            listener.onMouseWheelMoved(pme);
+        if (pme != null) {
+            for (MapMouseListener listener : listeners) {
+                listener.onMouseWheelMoved(pme);
+            }
         }
     }
 
@@ -180,7 +182,7 @@ public class MapToolManager implements MouseInputListener, MouseWheelListener {
         if (pane.getScreenToWorldTransform() != null) {
             pme = new MapMouseEvent(pane, e);
         }
-        
+
         return pme;
     }
 
@@ -189,8 +191,7 @@ public class MapToolManager implements MouseInputListener, MouseWheelListener {
         if (pane.getScreenToWorldTransform() != null) {
             pme = new MapMouseEvent(pane, e);
         }
-        
+
         return pme;
     }
-
 }
