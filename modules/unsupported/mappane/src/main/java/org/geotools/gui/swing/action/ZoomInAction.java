@@ -73,7 +73,7 @@ public class ZoomInAction extends MapAction {
      * map pane's cursor tool being set to a new ZoomInTool object
      */
     public void actionPerformed(ActionEvent e) {
-        pane.setCursorTool(new ZoomInTool());
+        pane.setCursorTool(new ZoomInTool(pane));
     }
 
 }

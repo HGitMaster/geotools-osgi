@@ -163,7 +163,7 @@ public class ShapeLab {
         JButton zoomInButton = new JButton("Zoom In");
         zoomInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapPane.setCursorTool(new ZoomInTool());
+                mapPane.setCursorTool(new ZoomInTool(mapPane));
             }
         });
         buttons.add(zoomInButton);
@@ -171,7 +171,7 @@ public class ShapeLab {
         JButton zoomOutButton = new JButton("Zoom Out");
         zoomOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapPane.setCursorTool( new ZoomOutTool() );
+                mapPane.setCursorTool( new ZoomOutTool(mapPane) );
             }
         });
         buttons.add(zoomOutButton);
@@ -179,7 +179,7 @@ public class ShapeLab {
         JButton pamButton = new JButton("Move");
         pamButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapPane.setCursorTool(new PanTool());
+                mapPane.setCursorTool(new PanTool(mapPane));
             }
         });
         buttons.add(pamButton);

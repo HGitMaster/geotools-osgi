@@ -51,8 +51,11 @@ public class PanTool extends CursorTool {
     
     /**
      * Constructor
+     *
+     * @param pane the map pane that this tool is to work with
      */
-    public PanTool() {
+    public PanTool(JMapPane pane) {
+        setMapPane(pane);
         iconLarge = new ImageIcon(getClass().getResource(ICON_IMAGE_LARGE));
         iconSmall = new ImageIcon(getClass().getResource(ICON_IMAGE_SMALL));
 

@@ -72,7 +72,7 @@ public class PanAction extends MapAction {
      * map pane's cursor tool being set to a PanTool object
      */
     public void actionPerformed(ActionEvent e) {
-        pane.setCursorTool(new PanTool());
+        pane.setCursorTool(new PanTool(pane));
     }
 
 }
