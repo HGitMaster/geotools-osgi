@@ -1,40 +1,58 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>javax.media.jai.osgi</groupId>
-	<artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
-	<packaging>bundle</packaging>
-	<name>Java Advanced Imaging ImageIO</name>
-	<version>1.1</version>
-	<parent>
-		<groupId>org.geotools</groupId>
-		<artifactId>thirdparty</artifactId>
-		<version>2.6.0.osgi1</version>
-	</parent>
-	<dependencies>
-		<dependency>
-			<groupId>javax.media</groupId>
-			<artifactId>jai_imageio</artifactId>
-			<version>1.1</version>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>javax.media.jai.osgi</groupId>
+  <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
+  <packaging>bundle</packaging>
+  <name>Java Advanced Imaging ImageIO</name>
+  <version>1.1</version>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>thirdparty</artifactId>
+    <version>2.6.0.osgi1</version>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <version>1.1</version>
          <optional>true</optional>
          <scope>compile</scope>
-		</dependency>
-	</dependencies>
-   <build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions><_include>META-INF/MANIFEST.MF</_include>
-               <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
-					</instructions>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <manifestLocation>META-INF</manifestLocation>
+          <instructions>
+            <!--_include>META-INF/MANIFEST.MF</_include-->
+            <_include>META-INF/headers.txt</_include>
+            <Embed-Dependency>jai_imageio;scope=compile|runtime;inline=true</Embed-Dependency>
+            <Bundle-SymbolicName>javax.media.jai.osgi.jai_imageio</Bundle-SymbolicName>
+            <Export-Package>com.sun.media.*</Export-Package> 
+            <Import-Package>com.sun.medialib.*;resolution:=optional,!sun.security.action,*</Import-Package> 
+            <!--Include-Resource>META-INF/services/*</Include-Resource--> 
+          </instructions>
           <unpackBundle>true</unpackBundle>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+        </configuration>
+      </plugin>
+         <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addClasspath>false</addClasspath>
+                  </manifest>
+               </archive>
+            </configuration>
+
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
 
