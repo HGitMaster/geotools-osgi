@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32910 2009-05-02 09:27:03Z aaime $              
+        Version: $Id: pom.xml 32912 2009-05-02 10:00:36Z aaime $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -143,20 +143,6 @@
       <artifactId>gt-xsd-filter</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- GeoTools unsupported -->
-    <!--
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-widgets-swing-pending</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-geometry</artifactId>
-      <version>${project.version}</version>
-    </dependency>    
-    -->
   </dependencies>
 
   <!-- =========================================================== -->
