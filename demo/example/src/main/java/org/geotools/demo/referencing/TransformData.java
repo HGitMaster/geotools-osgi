@@ -12,26 +12,24 @@ package org.geotools.demo.referencing;
 //java dependancies
 import java.io.File;
 import java.net.URL;
-import java.util.Iterator;
 
-//geotools dedendancies
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.referencing.FactoryFinder;
-
-//geoapi dependancies
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 
-// JTS dependanceis
 import com.vividsolutions.jts.geom.CoordinateFilter;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -45,7 +43,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DefaultQuery method demoed in org.geotools.demo.data.ShapeReprojector would
  * be used instead.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/demo/referencing/src/main/java/org/geotools/demo/referencing/TransformData.java $
+ * @source $URL: http://svn.geotools.org/branches/2.5.x/demo/referencing/src/main/java/org/geotools/demo/referencing/TransformData.java $
  * @version $Id: TransformData.java 30574 2008-06-08 11:53:45Z acuster $
  * @author rschulz
  */
@@ -61,16 +59,15 @@ public class TransformData {
     //private static String WKT_4 = "PROJCS[\"TransverseMercator\", GEOGCS[\"Sphere\", DATUM[\"Sphere\", SPHEROID[\"Sphere\", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]],PRIMEM[\"Greenwich\", 0.0], UNIT[\"degree\",0.017453292519943295], AXIS[\"Longitude\",EAST], AXIS[\"Latitude\",NORTH]], PROJECTION[\"Transverse_Mercator\"], PARAMETER[\"semi_major\", 6370997], PARAMETER[\"semi_minor\", 6370997], PARAMETER[\"central_meridian\", 0.0], PARAMETER[\"latitude_of_origin\", 0.0], PARAMETER[\"scale_factor\", 1.0], PARAMETER[\"false_easting\", 0.0], PARAMETER[\"false_northing\", 0.0], UNIT[\"metre\",1.0], AXIS[\"x\",EAST], AXIS[\"y\",NORTH]]";
 
     /** Factory to create coordinate reference systems from WKT strings*/
-    private CRSFactory crsFactory = FactoryFinder.getCRSFactory(null);
+    private CRSFactory crsFactory = ReferencingFactoryFinder.getCRSFactory(null);
     
     /** Factory to create transformations from a source and target CS */
-    private CoordinateOperationFactory coFactory = FactoryFinder.getCoordinateOperationFactory(null);
+    private CoordinateOperationFactory coFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(null);
     
     /** Creates a new instance of TransformData */
     public TransformData(URL inURL, URL outURL, String inWKT, String outWKT) {
-        FeatureCollection fc = null;
-        Iterator i = null;
-        FeatureWriter outFeatureWriter = null;
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = null;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> outFeatureWriter = null;
         try {
             //create the CS's and transformation
             CoordinateReferenceSystem inCRS = crsFactory.createFromWKT(inWKT);
@@ -84,21 +81,21 @@ public class TransformData {
             //get the input shapefile
             DataStore inStore = new ShapefileDataStore(inURL);
             String name = inStore.getTypeNames()[0];
-            FeatureSource inSource = inStore.getFeatureSource(name);
+            FeatureSource<SimpleFeatureType, SimpleFeature> inSource = inStore.getFeatureSource(name);
             fc = inSource.getFeatures();
-            FeatureType inSchema = inSource.getSchema();
+            SimpleFeatureType inSchema = inSource.getSchema();
 
             //create the output shapefile
             DataStore outStore = new ShapefileDataStore(outURL);
-            Object[] outAttributes = new Object[inSchema.getAttributeCount()];
-            outStore.createSchema(inSchema);
+            outStore.createSchema(FeatureTypes.transform(inSchema, outCRS));
             outFeatureWriter = outStore.getFeatureWriter(outStore.getTypeNames()[0], Transaction.AUTO_COMMIT);
             
-            for( i=fc.iterator(); i.hasNext();){
-                Feature inFeature = (Feature)i.next();
+            FeatureIterator<SimpleFeature> i = fc.features();
+            while(i.hasNext()) {
+                SimpleFeature inFeature = i.next();
                 // create a new feature
-                Feature outFeature = outFeatureWriter.next();
-                for (int j = 0; j < inFeature.getNumberOfAttributes(); j++) {
+                SimpleFeature outFeature = outFeatureWriter.next();
+                for (int j = 0; j < inFeature.getAttributeCount(); j++) {
                     Object inAttribute = inFeature.getAttribute(j);
                     if (inAttribute instanceof Geometry) {
                         Geometry geom = (Geometry) inAttribute;
@@ -138,7 +135,7 @@ public class TransformData {
         URL inURL, outURL;
         
         if (args.length == 0) {
-            inURL = TransformData.class.getClassLoader().getResource("org/geotools/sampleData/statepop.shp");
+            inURL = TransformData.class.getClassLoader().getResource("org/geotools/test-data/shapes/statepop.shp");
             outURL = new File(System.getProperty("user.home") + "/statepopTransform.shp").toURL();
             new TransformData(inURL, outURL, SOURCE_WKT, TARGET_WKT);
         } else if (args.length == 2) {

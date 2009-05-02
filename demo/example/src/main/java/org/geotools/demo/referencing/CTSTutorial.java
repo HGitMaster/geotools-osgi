@@ -28,17 +28,31 @@ package org.geotools.demo.referencing;
 //J2SE dependancies
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.measure.unit.NonSI;
-import javax.measure.unit.SI; 
+import javax.measure.unit.SI;
 
-//GeoAPI dependencies
+import org.geotools.factory.Hints;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
+import org.geotools.referencing.operation.DefiningConversion;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.metadata.Identifier;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.*;
-import org.opengis.referencing.operation.*;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.cs.CartesianCS;
@@ -48,21 +62,14 @@ import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.IdentifiedObject;
-import org.opengis.metadata.Identifier;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.GenericName;
-
-// Geotools dependencies
-import org.geotools.factory.Hints;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
-import org.geotools.referencing.datum.DefaultGeodeticDatum;
-import org.geotools.referencing.datum.BursaWolfParameters;
 
 /**
  *
@@ -85,7 +92,7 @@ import org.geotools.referencing.datum.BursaWolfParameters;
  * START SNIPPET and END SNIPPET comments are used by the wiki to display code snippets from svn.
  * Factory creation is repeated below so that it shows up in the tutorial code snippets.
  * 
- * @source $URL: http://gtsvn.refractions.net/trunk/demo/referencing/src/main/java/org/geotools/demo/referencing/CTSTutorial.java $
+ * @source $URL: http://svn.geotools.org/branches/2.5.x/demo/referencing/src/main/java/org/geotools/demo/referencing/CTSTutorial.java $
  * @version $Id: CTSTutorial.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Rueben Schulz
  *
@@ -142,7 +149,7 @@ public class CTSTutorial {
 		System.out.println("------------------------------------------"); 
 		System.out.println("Creating a CRS from a WKT string:");
         // START SNIPPET: crsFromWKT
-		CRSFactory crsFactory = FactoryFinder.getCRSFactory(null);
+		CRSFactory crsFactory = ReferencingFactoryFinder.getCRSFactory(null);
 		String wkt = "PROJCS[\"UTM_Zone_10N\", "
 		               + "GEOGCS[\"WGS84\", "
 		                   + "DATUM[\"WGS84\", "
@@ -207,7 +214,7 @@ public class CTSTutorial {
 		System.out.println("Creating a CRS from an authority factory:");
 		// START SNIPPET: crsFromCode
 		String code = "26910";
-		CoordinateReferenceSystem crs = FactoryFinder.getCRSAuthorityFactory(
+		CoordinateReferenceSystem crs = ReferencingFactoryFinder.getCRSAuthorityFactory(
 				"EPSG", null).createCoordinateReferenceSystem(code);
 		// END SNIPPET: crsFromCode
 		System.out.println("  CRS: " + crs.toWKT());
@@ -227,8 +234,8 @@ public class CTSTutorial {
 		System.out.println("------------------------------------------"); 
 		System.out.println("Creating a CRS by hand:");
 //		 START SNIPPET: UTM10NcrsByHand
-		MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
-		FactoryGroup factories = new FactoryGroup();
+		MathTransformFactory mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
+		CRSFactory crsFactory = ReferencingFactoryFinder.getCRSFactory(null);
 		
 		GeographicCRS geoCRS = org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
 		CartesianCS cartCS = org.geotools.referencing.cs.DefaultCartesianCS.GENERIC_2D;
@@ -239,9 +246,10 @@ public class CTSTutorial {
 		parameters.parameter("scale_factor").setValue(0.9996);
 		parameters.parameter("false_easting").setValue(500000.0);
 		parameters.parameter("false_northing").setValue(0.0);
+		Conversion conversion = new DefiningConversion("Transverse_Mercator", parameters);
 		
-		Map properties = Collections.singletonMap("name", "WGS 84 / UTM Zone 12N");
-		ProjectedCRS projCRS = factories.createProjectedCRS(properties, geoCRS, null, parameters, cartCS);
+		Map<String, ?> properties = Collections.singletonMap("name", "WGS 84 / UTM Zone 12N");
+		ProjectedCRS projCRS = crsFactory.createProjectedCRS(properties, geoCRS, conversion, cartCS);
 //		 END SNIPPET: UTM10NcrsByHand
 		
 		//parameters.parameter("semi_major").setValue(((GeodeticDatum)geoCRS.getDatum()).getEllipsoid().getSemiMajorAxis());
@@ -271,11 +279,11 @@ public class CTSTutorial {
 		System.out.println("------------------------------------------");
 		System.out.println("Creating a CRS by hand:");
 		// START SNIPPET: nad27crsByHand
-		CRSFactory crsFactory = FactoryFinder.getCRSFactory(null);
-		DatumFactory datumFactory = FactoryFinder.getDatumFactory(null);
-		CSFactory csFactory = FactoryFinder.getCSFactory(null);
+		CRSFactory crsFactory = ReferencingFactoryFinder.getCRSFactory(null);
+		DatumFactory datumFactory = ReferencingFactoryFinder.getDatumFactory(null);
+		CSFactory csFactory = ReferencingFactoryFinder.getCSFactory(null);
 
-		Map map = new HashMap();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("name", "Clarke 1866");
 
 		Ellipsoid clark1866ellipse = datumFactory.createFlattenedSphere(map,
@@ -339,10 +347,10 @@ public class CTSTutorial {
 	void createCRSByHand3() throws FactoryException {
                 System.out.println("------------------------------------------"); 
 		System.out.println("Creating two CRSs by hand:");
-		CRSFactory crsFactory = FactoryFinder.getCRSFactory(null);
-		DatumFactory               datumFactory     = FactoryFinder.getDatumFactory(null);
-		CSFactory                  csFactory        = FactoryFinder.getCSFactory(null);
-		Map map = new HashMap();
+		CRSFactory crsFactory = ReferencingFactoryFinder.getCRSFactory(null);
+		DatumFactory               datumFactory     = ReferencingFactoryFinder.getDatumFactory(null);
+		CSFactory                  csFactory        = ReferencingFactoryFinder.getCSFactory(null);
+		Map<String, Object> map = new HashMap<String, Object>();
                 
 		//
                 // Create a datum used for each CRS
@@ -449,7 +457,7 @@ public class CTSTutorial {
 		System.out.println("Creating a math transform between two CRSs:");
 		
 // 		START SNIPPET: mathTransformBetweenCRSs
-		CoordinateOperationFactory coFactory = FactoryFinder
+		CoordinateOperationFactory coFactory = ReferencingFactoryFinder
 				.getCoordinateOperationFactory(null);
 
 		// Nad 27 geographic (lat,long)
@@ -506,7 +514,7 @@ public class CTSTutorial {
 		System.out.println("------------------------------------------"); 
 		System.out.println("Creating a math transform by hand:");
 // 		START SNIPPET: mathTransformByHand
-		MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
+		MathTransformFactory mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
 		
 		ParameterValueGroup params = mtFactory.getDefaultParameters("Hotine_Oblique_Mercator");
 		params.parameter("semi_major").setValue(6377298.556);
@@ -545,11 +553,11 @@ public class CTSTutorial {
         // This instructs Geotools to be tolerant to missing Bursa-Wolf parameters. 
         // However, you may get one kilometer error in such case if a datum shift 
         // is applied without such parameters.
-        CRSAuthorityFactory crsFactory = FactoryFinder.getCRSAuthorityFactory("EPSG", hints);
+        CRSAuthorityFactory crsFactory = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", hints);
         CoordinateReferenceSystem sourceCRS = crsFactory.createCoordinateReferenceSystem(sourceCode);
         CoordinateReferenceSystem targetCRS = crsFactory.createCoordinateReferenceSystem(targetCode);
 
-        CoordinateOperationFactory opFactory =  FactoryFinder.getCoordinateOperationFactory(hints);
+        CoordinateOperationFactory opFactory =  ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
         MathTransform mt = opFactory.createOperation(sourceCRS, targetCRS).getMathTransform();
         System.out.println("Math Transform: " + mt.toWKT());
         System.out.println("------------------------------------------"); 
@@ -563,7 +571,7 @@ public class CTSTutorial {
     //also want to play with  the new operation authority factory (especially the nad shift case)
     void createOperationFromAuthorityCode() throws Exception {
         //This is only on head, not in geotools 2.1rc
-        CoordinateOperationAuthorityFactory coaf = FactoryFinder.getCoordinateOperationAuthorityFactory("EPSG",null);
+        CoordinateOperationAuthorityFactory coaf = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory("EPSG",null);
         CoordinateOperation co = coaf.createCoordinateOperation("");
 //TODO find an operation code
     }
@@ -575,11 +583,10 @@ public class CTSTutorial {
      */
     void createTransformFromAuthorityCode() throws Exception {
         //This is only on head, not in geotools 2.1rc
-        CoordinateOperationAuthorityFactory coaf = FactoryFinder.getCoordinateOperationAuthorityFactory("EPSG",null);
-        Set coordOperations = coaf.createFromCoordinateReferenceSystemCodes("EPSG:4267","EPSG:4269");
+        CoordinateOperationAuthorityFactory coaf = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory("EPSG",null);
+        Set<CoordinateOperation> coordOperations = coaf.createFromCoordinateReferenceSystemCodes("EPSG:4267","EPSG:4269");
 //TODO it seems that no operations are being returned here, figure out why
-        for (Iterator it = coordOperations.iterator();it.hasNext();) {
-        	CoordinateOperation co = (CoordinateOperation)it.next();
+        for (CoordinateOperation co : coordOperations) {
         	System.out.println("  " + co.toWKT());
         	
         }
@@ -594,8 +601,7 @@ public class CTSTutorial {
         System.out.println("  getName().getAuthority() - " + identObj.getName().getAuthority());
         System.out.println("  getRemarks() - " + identObj.getRemarks());
         System.out.println("  getAliases():");
-        //GenericName[]
-        Iterator aliases = identObj.getAlias().iterator();
+        Iterator<GenericName> aliases = identObj.getAlias().iterator();
         if (! aliases.hasNext()) {
             System.out.println("    no aliases");
         } else {

@@ -16,28 +16,26 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Map;
 
-// geoapi interfaces
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.operation.DefiningConversion;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.CSFactory;
-import org.opengis.referencing.cs.EllipsoidalCS;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.cs.EllipsoidalCS;
 import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
-
-// geotools dependancies
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
-import org.geotools.geometry.GeneralDirectPosition;
 
 
 /**
@@ -57,7 +55,7 @@ import org.geotools.geometry.GeneralDirectPosition;
  *
  * To exit from the application, enter "exit".
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/demo/referencing/src/main/java/org/geotools/demo/referencing/TransformationConsole.java $
+ * @source $URL: http://svn.geotools.org/branches/2.5.x/demo/referencing/src/main/java/org/geotools/demo/referencing/TransformationConsole.java $
  * @version $Id: TransformationConsole.java 30628 2008-06-12 10:06:17Z acuster $
  * @author Martin Desruisseaux
  */
@@ -86,10 +84,9 @@ public class TransformationConsole {
         /*
          * The factories to use for constructing coordinate systems. 
          */
-        CRSFactory crsFactory = FactoryFinder.getCRSFactory(null);
-        CSFactory csFactory  = FactoryFinder.getCSFactory(null);
-        MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
-        FactoryGroup factories = new FactoryGroup();
+        CRSFactory crsFactory = ReferencingFactoryFinder.getCRSFactory(null);
+        CSFactory csFactory  = ReferencingFactoryFinder.getCSFactory(null);
+        MathTransformFactory mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
         /*
          * Construct the source CoordinateReferenceSystem. We will use a geographic coordinate
          * system,  i.e. one that use (latitude,longitude) coordinates.   Latitude values
@@ -127,8 +124,9 @@ public class TransformationConsole {
             
         }
         CartesianCS cartCS = org.geotools.referencing.cs.DefaultCartesianCS.GENERIC_2D;
-        Map properties = Collections.singletonMap("name", classification);
-	ProjectedCRS targetCRS = factories.createProjectedCRS(properties, sourceCRS, null, parameters,
+        Map<String, String> properties = Collections.singletonMap("name", classification);
+        Conversion conversion = new DefiningConversion("Mercator", parameters);
+    	ProjectedCRS targetCRS = crsFactory.createProjectedCRS(properties, sourceCRS, conversion,
             cartCS);
         
         /*
@@ -147,7 +145,7 @@ public class TransformationConsole {
          *
          * Now, get the transformation.
          */
-	CoordinateOperationFactory coFactory = FactoryFinder.getCoordinateOperationFactory(null);	
+	CoordinateOperationFactory coFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(null);	
         CoordinateOperation co = coFactory.createOperation(sourceCRS, targetCRS);
 
         /*
