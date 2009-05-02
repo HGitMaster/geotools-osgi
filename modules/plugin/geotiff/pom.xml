@@ -130,31 +130,31 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.media.jai</groupId>
-      <artifactId>com.springsource.javax.media.jai.codec</artifactId>
+      <groupId>javax.media</groupId>
+      <artifactId>javax.media.jai.osgi</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
   </dependencies>
   
-   <!-- =========================================================== -->
+  <!-- =========================================================== -->
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
-                  <manifest>
-                     <addClasspath>false</addClasspath>
-                  </manifest>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+              <manifest>
+                <addClasspath>false</addClasspath>
+              </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   
 
 </project>

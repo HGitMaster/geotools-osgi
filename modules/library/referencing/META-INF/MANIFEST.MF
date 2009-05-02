@@ -5,14 +5,12 @@ Bundle-SymbolicName: org.geotools.referencing
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
-Require-Bundle: org.geotools.metadata;bundle-version="2.6.0"
+Require-Bundle: org.geotools.metadata;bundle-version="2.6.0",
+ javax.media.jai.osgi;bundle-version="1.1.3"
 Import-Package: javax.measure.converter,
  javax.measure.quantity,
  javax.measure.unit,
- javax.media.jai;version="1.1.3",
- javax.media.jai.registry;version="1.1.3",
- javax.media.jai.util;version="1.1.3",
- javax.vecmath, 
+ javax.vecmath,
  org.apache.commons.pool;version="1.3.0",
  org.apache.commons.pool.impl;version="1.3.0",
  org.opengis.coverage.grid,

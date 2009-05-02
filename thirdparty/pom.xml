@@ -29,38 +29,15 @@
   <packaging>pom</packaging>
   <name>Geotools thirdparty libs</name>
   <description>
-    Geotools libraries.
+    Geotools third-party libraries, required for building and
+    running Geotools.
   </description>
   
-              
-
- 
-  <!-- =========================================================== -->
-  <!--     Build Configuration                                     -->
-  <!--         copies all JARs in a single directory.              -->
-  <!-- =========================================================== -->
- <!-- <build>
-    <plugins>
-      <plugin>
-        <groupId>org.geotools.maven</groupId>
-        <artifactId>jar-collector</artifactId>
-        <version>${project.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>collect</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  
-     -->
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
+    <module>javax.media.jai.osgi</module>
     <module>javax.media.jai.osgi.imageio</module>
     <module>java3d.osgi</module>
     <module>com.vividsolutions.osgi.jts</module>
