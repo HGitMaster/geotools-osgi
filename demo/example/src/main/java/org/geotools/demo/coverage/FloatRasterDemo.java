@@ -13,19 +13,17 @@ package org.geotools.demo.coverage;
 import java.awt.Color;
 import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
+
 import javax.media.jai.RasterFactory;
 
-// GeoAPI dependencies
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// Geotools dependencies
-import org.geotools.geometry.Envelope2D;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.geometry.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -34,7 +32,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * only one tile. Consequently, sample values are set directly in the raster (no need to deal for
  * multi-tiles).
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/demo/coverage-use/src/main/java/org/geotools/demo/coverage/FloatRasterDemo.java $
+ * @source $URL: http://svn.geotools.org/branches/2.5.x/demo/coverage-use/src/main/java/org/geotools/demo/coverage/FloatRasterDemo.java $
  * @version $Id: FloatRasterDemo.java 30570 2008-06-08 11:46:24Z acuster $
  * @author Martin Desruisseaux
  */
@@ -64,7 +62,7 @@ public class FloatRasterDemo extends junit.framework.TestCase {
          */
         CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
         Envelope envelope = new Envelope2D(crs, 0, 0, 30, 30);
-        GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+        GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(null);
         GridCoverage gc = factory.create("My grayscale coverage", raster, envelope);
         ((GridCoverage2D) gc).show(); // Convenience method specific to Geotools.
         /*
