@@ -128,13 +128,10 @@
       <version>1.0</version>
       <scope>runtime</scope>
     </dependency>
-
-    <!-- Test dependencies -->
     <dependency>
       <groupId>javax.media</groupId>
       <artifactId>javax.media.jai.osgi</artifactId>
       <!-- The version number is specified in the parent POM. -->
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
