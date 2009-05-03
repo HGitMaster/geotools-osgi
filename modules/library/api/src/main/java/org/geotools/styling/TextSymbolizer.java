@@ -81,20 +81,24 @@ import org.opengis.filter.expression.Expression;
  * </li>
  * </ul>
  * </p>
- * $Id: TextSymbolizer.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * $Id: TextSymbolizer.java 32919 2009-05-03 14:18:31Z jive $
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/TextSymbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/TextSymbolizer.java $
  */
 public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symbolizer {
+    /**
+     * Returns the expression that will be evaluated to determine what text is
+     * displayed.
+     *
+     * @return Expression that will be evaulated as a String to display on screen
+     */
+    Expression getLabel();
 
     /**
      * Sets the expression that will be evaluated to determine what text is
      * displayed. See {@link #getLabel} for details.
-     *
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setLabel(Expression label);
 
     /**
@@ -103,7 +107,6 @@ public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symboli
      *
      * @deprecated use getFont()
      */
-    @Deprecated
     Font[] getFonts();
     
     /**
@@ -116,19 +119,9 @@ public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symboli
      * sets a list of device independent Font objects to be used to render the
      * label.
      *
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated use getFont() setters to modify the set of font faces used
      */
-    @Deprecated
     void setFonts(Font[] fonts);
-
-    /**
-     * A LabelPlacement specifies how a text element should be rendered
-     * relative to its geometric point or line.
-     *
-     * @since Geotools 2.2 (GeoAPI 2.0)
-     */
-    @Deprecated
-    LabelPlacement getPlacement();
 
     /**
      * A LabelPlacement specifies how a text element should be rendered
@@ -139,50 +132,47 @@ public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symboli
     /**
      * A LabelPlacement specifies how a text element should be rendered
      * relative to its geometric point or line.
-     *
-     * @deprecated use setPlacement(LabelPlacement)
      */
-    @Deprecated
     void setLabelPlacement(LabelPlacement labelPlacement);
 
     /**
      * A LabelPlacement specifies how a text element should be rendered
      * relative to its geometric point or line.
-     *
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated Please use setLabelPlacement
      */
-    @Deprecated
     void setPlacement(LabelPlacement labelPlacement);
 
     /**
-     * A halo fills an extended area outside the glyphs of a rendered text
-     * label to make the label easier to read over a background.
+     * A LabelPlacement specifies how a text element should be rendered
+     * relative to its geometric point or line.
      *
+     * @deprecated Please use getLabelPlacement()     
      */
-    org.geotools.styling.Halo getHalo();
+    LabelPlacement getPlacement();
 
     /**
      * A halo fills an extended area outside the glyphs of a rendered text
      * label to make the label easier to read over a background.
      *
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
+    Halo getHalo();
+
+    /**
+     * A halo fills an extended area outside the glyphs of a rendered text
+     * label to make the label easier to read over a background.
+     */
     void setHalo(Halo halo);
 
     /**
      * Returns the object that indicates how the text will be filled.
      *
      */
-    org.geotools.styling.Fill getFill();
+    Fill getFill();
 
     /**
      * Sets the object that indicates how the text will be filled. See {@link
      * #getFill} for details.
-     *
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setFill(Fill fill);
 
     /**
@@ -199,20 +189,14 @@ public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symboli
      * @param name The name of the attribute in the feature being styled  that
      *        should be used.  If null then the default geometry should be
      *        used.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setGeometryPropertyName(String name);
 
     /**
-     * Priority -- null       = use the default labeling priority Expression =
+     * Priority -- null = use the default labeling priority Expression =
      * an expression that evaluates to a number (ie. Integer, Long, Double...)
      * Larger = more likely to be rendered
-     *
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setPriority(Expression e);
 
     /**
@@ -224,18 +208,16 @@ public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symboli
     Expression getPriority();
 
     /**
-     * adds a parameter value to the options map
-     *
-     * @deprecated symbolizers and underneath classes are immutable
+     * Adds a parameter value to the options map
+     * @deprecated Please use getOptions().put( key, value )
      */
-    @Deprecated
     void addToOptions(String key, String value);
 
     /**
      * Find the value of a key in the map (may return null)
      *
      * @param key
-     *
+     * @deprecated Please use getOptions.get( key )
      */
     String getOption(String key);
 

@@ -20,7 +20,7 @@ import org.opengis.style.StyleVisitor;
 
 
 /**
- * DOCUMENT ME!
+ * ChannelSelectionImpl
  *
  * @author iant
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/ChannelSelectionImpl.java $
@@ -112,4 +112,8 @@ public class ChannelSelectionImpl
     public void accept(org.geotools.styling.StyleVisitor visitor) {
         visitor.visit(this);
     }
+
+	public void accept(org.opengis.style.StyleVisitor visitor) {
+		visitor.visit( this,null );
+	}
 }

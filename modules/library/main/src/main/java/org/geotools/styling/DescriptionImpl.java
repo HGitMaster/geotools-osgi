@@ -1,108 +1,80 @@
-/*
- *    GeoTools - The Open Source Java GIS Toolkit
- *    http://geotools.org
- *
- *    (C) 2004-2008, Open Source Geospatial Foundation (OSGeo)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- */
 package org.geotools.styling;
 
-import org.geotools.util.Utilities;
-import org.opengis.style.Description;
-import org.opengis.style.StyleVisitor;
+import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
 
-/**
- *
- * @author Johann Sorel
- */
-public class DescriptionImpl implements Description{
-
+public class DescriptionImpl implements Description {
     private InternationalString title;
-    private InternationalString desc;
-    
-    public DescriptionImpl(InternationalString title, InternationalString desc){
+
+    private InternationalString description;
+
+    public DescriptionImpl() {
+        title = null;
+        description = null;
+    }
+
+    public DescriptionImpl(String title, String description) {
+        this(new SimpleInternationalString(title), new SimpleInternationalString(description));
+    }
+
+    public DescriptionImpl(InternationalString title, InternationalString description) {
         this.title = title;
-        this.desc = desc;
-    }
-    
-    DescriptionImpl(DescriptionImpl imp){
-        this.title = imp.title;
-        this.desc = imp.desc;
-    }
-    
-    public DescriptionImpl(Description description) {
-        this.title = description.getTitle();
-        this.desc = description.getAbstract();
+        this.description = description;
     }
 
     public InternationalString getTitle() {
         return title;
     }
-    
-    public void setTitle(InternationalString title){
+
+    public void setTitle(InternationalString title) {
         this.title = title;
     }
 
     public InternationalString getAbstract() {
-        return desc;
+        return description;
     }
 
-    public void setAbstract(InternationalString abs){
-        this.desc = abs;
-    }
-    
-    public Object accept(StyleVisitor visitor,Object data) {
-        return visitor.visit(this,data);
+    public void setAbstract(InternationalString description) {
+        this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return title.toString() + ", " + desc.toString();
+    public Object accept(org.opengis.style.StyleVisitor visitor, Object extraData) {
+        return null;
     }
 
-    @Override
-    public boolean equals(Object oth) {
-        if (this == oth) {
-            return true;
-        }
-
-        if (oth instanceof DescriptionImpl) {
-            DescriptionImpl other = (DescriptionImpl) oth;
-
-            return Utilities.equals(title, other.title)
-            && Utilities.equals(desc, other.desc);
-        }
-
-        return false;
+    public void accept(StyleVisitor visitor) {
+        // nothing to do
     }
 
     @Override
     public int hashCode() {
-        final int PRIME = 1000003;
-        int result = 0;
-
-        if (title != null) {
-            result = (PRIME * result) + title.hashCode();
-        }
-        
-        if (desc != null) {
-            result = (PRIME * result) + desc.hashCode();
-        }
-
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((title == null) ? 0 : title.hashCode());
         return result;
     }
-    
-    
-    
-    
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DescriptionImpl other = (DescriptionImpl) obj;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
+        if (title == null) {
+            if (other.title != null)
+                return false;
+        } else if (!title.equals(other.title))
+            return false;
+        return true;
+    }
+
 }

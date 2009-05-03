@@ -91,12 +91,12 @@ import org.opengis.style.GraphicalSymbol;
  *
  * @task REVISIT: There are no setter methods in this interface, is this a
  *       problem?
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/Graphic.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Graphic.java $
  */
 public interface Graphic extends org.opengis.style.Graphic,
                                  org.opengis.style.GraphicFill, 
                                  org.opengis.style.GraphicStroke,
-                                 org.opengis.style.GraphicLegend{
+                                 org.opengis.style.GraphicLegend {
     /**
      * A default Graphic instance.
      * <p>
@@ -188,6 +188,12 @@ public interface Graphic extends org.opengis.style.Graphic,
         };
 
     /**
+     * List of all symbols used to represent this graphic. 
+     * @return List of ExternalGraphic or Mark in the order provided.
+     */
+    List<GraphicalSymbol> graphicalSymbols();
+        
+    /**
      * Provides a list of external graphics which can be used to represent this
      * graphic. Each one should be an equivalent representation but in a
      * different format. If none are provided, or if none of the formats are
@@ -204,19 +210,17 @@ public interface Graphic extends org.opengis.style.Graphic,
      * 
      * @deprecated this method is replaced by a set : graphicalSymbols
      */
-    @Deprecated
     ExternalGraphic[] getExternalGraphics();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param externalGraphics 
+     * @deprecated Please use graphicalSymbols().clear(); and graphicalSymbols().addAll( externalGraphics )
      */
-    @Deprecated
     void setExternalGraphics(ExternalGraphic[] externalGraphics);
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated Please use graphicalSymbols().add( externalGraphic )
      */
-    @Deprecated
     void addExternalGraphic(ExternalGraphic externalGraphic);
 
     /**
@@ -228,21 +232,18 @@ public interface Graphic extends org.opengis.style.Graphic,
      *         default, a "square" with 50% gray fill and black outline with a
      *         size of 6 pixels (unless a size is specified) is provided.
      * 
-     * @deprecated this method is replaced by a set : graphicalSymbols
+     * @deprecated Please use graphicalSymbols()
      */
-    @Deprecated
     Mark[] getMarks();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated Please use graphicSymbols().addAll()
      */
-    @Deprecated
     void setMarks(Mark[] marks);
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated Please use grpahicSymbols().add( Mark )
      */
-    @Deprecated
     void addMark(Mark mark);
 
     /**
@@ -255,16 +256,9 @@ public interface Graphic extends org.opengis.style.Graphic,
      *         default, a "square" with 50% gray fill and black outline with a
      *         size of 6 pixels (unless a size is specified) is provided.
      * 
-     * @deprecated this method is replaced by a set : graphicalSymbols
+     * @deprecated Please use graphicalSymbols
      */
-    @Deprecated
     Symbol[] getSymbols();
-
-    /**
-     * List of all symbols used to represent this graphic. 
-     * @return List of ExternalGraphic or Mark in the order provided.
-     */
-    List<GraphicalSymbol> graphicalSymbols();
     
     /**
      * @deprecated symbolizers and underneath classes will be immutable in 2.6.x
@@ -292,9 +286,8 @@ public interface Graphic extends org.opengis.style.Graphic,
     Expression getOpacity();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param opacity opacity between 0 and 1
      */
-    @Deprecated
     void setOpacity(Expression opacity);
 
     /**
@@ -316,17 +309,18 @@ public interface Graphic extends org.opengis.style.Graphic,
     Expression getSize();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param size Size of graphic
      */
-    @Deprecated
     void setSize(Expression size);
 
+    /**
+     * @return Offset of graphic
+     */
     Displacement getDisplacement();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param offset Amount to offset graphic
      */
-    @Deprecated
     void setDisplacement(Displacement offset);
 
     /**
@@ -341,9 +335,9 @@ public interface Graphic extends org.opengis.style.Graphic,
     Expression getRotation();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * 
+     * @param rotation
      */
-    @Deprecated
     void setRotation(Expression rotation);
 
     /**
@@ -351,18 +345,14 @@ public interface Graphic extends org.opengis.style.Graphic,
      *
      * @return Value of property geometryPropertyName.
      */
-    @Deprecated
-    java.lang.String getGeometryPropertyName();
+    String getGeometryPropertyName();
 
     /**
      * Setter for property geometryPropertyName.
      *
      * @param geometryPropertyName New value of property geometryPropertyName.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
-    void setGeometryPropertyName(java.lang.String geometryPropertyName);
+    void setGeometryPropertyName(String geometryPropertyName);
 
     /**
      * accepts a StyleVisitor - used by xmlencoder and other packages which

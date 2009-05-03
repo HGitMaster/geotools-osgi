@@ -35,8 +35,8 @@ import org.opengis.util.Cloneable;
  * Provides a Java representation of the Font element of an SLD.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/FontImpl.java $
- * @version $Id: FontImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/FontImpl.java $
+ * @version $Id: FontImpl.java 32919 2009-05-03 14:18:31Z jive $
  */
 public class FontImpl implements Font, Cloneable {
     /** The logger for the default core module. */
@@ -94,6 +94,9 @@ public class FontImpl implements Font, Cloneable {
 	public Expression getSize() {
 		return fontSize;
 	}
+	public void setSize(Expression size) {
+		this.fontSize = size;
+	}
     /**
      * Setter for property fontSize.
      *
@@ -117,7 +120,9 @@ public class FontImpl implements Font, Cloneable {
     public Expression getStyle() {
     	return fontStyle;
     }
-
+    public void setStyle(Expression style) {
+    	fontStyle = style;
+    }
     /**
      * Setter for property fontStyle.
      *
@@ -141,7 +146,9 @@ public class FontImpl implements Font, Cloneable {
     public Expression getWeight() {
     	return fontWeight;
     }
-
+	public void setWeight(Expression weight) {
+		fontWeight = weight;
+	}
     /**
      * Setter for property fontWeight.
      *
@@ -231,10 +238,10 @@ public class FontImpl implements Font, Cloneable {
     public static Font createDefault( FilterFactory filterFactory ) {
         Font font = new FontImpl();
         try {
-            font.setFontSize(filterFactory.literal(
+            font.setSize(filterFactory.literal(
                     new Integer(10)));
-            font.setFontStyle(filterFactory.literal("normal"));
-            font.setFontWeight(filterFactory.literal("normal"));
+            font.setStyle(filterFactory.literal("normal"));
+            font.setWeight(filterFactory.literal("normal"));
             font.setFontFamily(filterFactory.literal("Serif"));
         } catch (org.geotools.filter.IllegalFilterException ife) {
             throw new RuntimeException("Error creating default", ife);

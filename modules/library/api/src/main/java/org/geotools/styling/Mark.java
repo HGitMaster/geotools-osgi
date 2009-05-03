@@ -64,10 +64,10 @@ import org.opengis.filter.expression.Expression;
  * </p>
  *
  * @author James Macgill
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/Mark.java $
- * @version $Id: Mark.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Mark.java $
+ * @version $Id: Mark.java 32919 2009-05-03 14:18:31Z jive $
  */
-public interface Mark extends org.opengis.style.Mark,Symbol {
+public interface Mark extends org.opengis.style.Mark, Symbol {
     public static final Mark[] MARKS_EMPTY = new Mark[0];
 
     /**
@@ -88,10 +88,7 @@ public interface Mark extends org.opengis.style.Mark,Symbol {
      *
      * @param wellKnownName The well-known name of a shape.  The default value
      *        is "square".
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setWellKnownName(Expression wellKnownName);
 
     /**
@@ -107,10 +104,7 @@ public interface Mark extends org.opengis.style.Mark,Symbol {
      * the Mark.
      *
      * @param stroke The Stroke definition to use when rendering the Mark.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setStroke(Stroke stroke);
 
     /**
@@ -124,34 +118,32 @@ public interface Mark extends org.opengis.style.Mark,Symbol {
      * This parameter defines which fill style to use when rendering the Mark.
      *
      * @param fill the Fill definition to use when rendering the Mark.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setFill(Fill fill);
 
     /**
-     * @deprecated this method is already defined in the parent class.
+     * @return size of mark
      */
-    @Deprecated
     Expression getSize();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * Size to display the mark.
+     * <p>
+     * If this value is not provided or is Expression.NIL then a default of 16x16
+     * (or the natural size of the image) will be used.
+     * 
+     * @param size 
      */
-    @Deprecated
     void setSize(Expression size);
 
     /**
-     * @deprecated this method is already defined in the parent class.
+     * @return rotation
      */
-    @Deprecated
     Expression getRotation();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param rotation
      */
-    @Deprecated
     void setRotation(Expression rotation);
 
     void accept(org.geotools.styling.StyleVisitor visitor);

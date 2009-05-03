@@ -74,8 +74,8 @@ import org.opengis.style.StyleVisitor;
  * </p>
  *
  * @author James Macgill, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/Fill.java $
- * @version $Id: Fill.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Fill.java $
+ * @version $Id: Fill.java 32919 2009-05-03 14:18:31Z jive $
  */
 public interface Fill extends org.opengis.style.Fill{
     static final Fill DEFAULT = new ConstantFill() {
@@ -159,10 +159,7 @@ public interface Fill extends org.opengis.style.Fill{
      * "#ff0000" (with no quotation marks).
      *
      * @param color solid color that will be used for a Fill
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setColor(Expression color);
 
     /**
@@ -175,12 +172,10 @@ public interface Fill extends org.opengis.style.Fill{
      * "#ff0000" (with no quotation marks).  The default color is defined to
      * be transparent.
      *
-     * @return The background color of the Fill encoded as a hexidecimal RGB
-     *         value.
+     * @return The background color of the Fill encoded as a hexidecimal RGB value.
      * 
      * @deprecated value is not used, please use getColor() 
      */
-    @Deprecated
     Expression getBackgroundColor();
 
     /**
@@ -193,10 +188,8 @@ public interface Fill extends org.opengis.style.Fill{
      * "#ff0000" (with no quotation marks).
      *
      * @param backgroundColor solid color that will be used as a background
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated Please use setColor( Expression )
      */
-    @Deprecated
     void setBackgroundColor(Expression backgroundColor);
 
     /**
@@ -218,10 +211,7 @@ public interface Fill extends org.opengis.style.Fill{
      * 0.0 representing totally transparent and 1.0 representing totally
      * opaque, with a linear scale of translucency for intermediate values.<br>
      * For example, "0.65" would represent 65% opacity.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setOpacity(Expression opacity);
 
     /**
@@ -236,16 +226,12 @@ public interface Fill extends org.opengis.style.Fill{
     /**
      * This parameter indicates that a stipple-fill repeated graphic will be
      * used and specifies the fill graphic to use.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setGraphicFill(Graphic graphicFill);
 
     void accept(org.geotools.styling.StyleVisitor visitor);
 
 }
-
 
 abstract class ConstantFill implements Fill {
     private void cannotModifyConstant() {
@@ -276,5 +262,4 @@ abstract class ConstantFill implements Fill {
         cannotModifyConstant();
         return null;
     }
-}
-;
+};

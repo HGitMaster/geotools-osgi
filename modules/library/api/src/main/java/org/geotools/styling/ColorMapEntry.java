@@ -31,24 +31,48 @@ import org.opengis.filter.expression.Expression;
  *  &lt;/xs:complexType&gt;
  *  &lt;/xs:element&gt;
  *  </pre>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/ColorMapEntry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/ColorMapEntry.java $
  */
-@Deprecated
 public interface ColorMapEntry {
+    /** Label for this Color Map Entry */
     String getLabel();
-
+    
+    /**
+     * @param label
+     */
     void setLabel(String label);
 
+    /**
+     * Expression resulting in a color
+     * @param color
+     */
     void setColor(Expression color);
 
+    /**
+     * @return Expression evaualted into a color
+     */
     Expression getColor();
 
+    /**
+     * @param opacity Expressed as a value between 0 and 1
+     */
     void setOpacity(Expression opacity);
-
+    /**
+     * 
+     * @return Opacity expressed as a value between 0 and 1
+     */
     Expression getOpacity();
 
+    /**
+     * Quantity marking the start of this color map entry.
+     * 
+     * @param quantity
+     */
     void setQuantity(Expression quantity);
-
+    
+    /**
+     * @return Quanity marking the start of this color map entry
+     */
     Expression getQuantity();
 
     void accept(org.geotools.styling.StyleVisitor visitor);

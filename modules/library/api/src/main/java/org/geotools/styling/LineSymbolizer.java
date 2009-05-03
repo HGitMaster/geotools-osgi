@@ -75,8 +75,8 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/LineSymbolizer.java $
- * @version $Id: LineSymbolizer.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/LineSymbolizer.java $
+ * @version $Id: LineSymbolizer.java 32919 2009-05-03 14:18:31Z jive $
  */
 public interface LineSymbolizer extends org.opengis.style.LineSymbolizer, Symbolizer {
     /**
@@ -92,15 +92,13 @@ public interface LineSymbolizer extends org.opengis.style.LineSymbolizer, Symbol
      * geometry.
      *
      * @param stroke The Stroke style to use when rendering lines.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setStroke(Stroke stroke);
 
+    String getGeometryPropertyName();
+
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param geometry property name
      */
-    @Deprecated
     void setGeometryPropertyName(String geometryPropertyName);
 }

@@ -17,6 +17,7 @@
 package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
+import org.opengis.style.ContrastMethod;
 
 
 /**
@@ -56,52 +57,69 @@ import org.opengis.filter.expression.Expression;
  * enhancement is performed.
  *
  * @author iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/ContrastEnhancement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/ContrastEnhancement.java $
  * 
  */
-public interface ContrastEnhancement extends org.opengis.style.ContrastEnhancement {
-    
+public interface ContrastEnhancement extends org.opengis.style.ContrastEnhancement {	
+	/**
+	 * Used to set the contrast enhancement method used.
+	 * @param method
+	 */
+	public void setMethod( ContrastMethod method );
+	
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param type Should be a Literal of "Normalize" or "Histogram" or "None", if null supplied "None" is assumed
+     * @deprecated Please use setMethod
      */
-    @Deprecated
     public void setType(Expression type);
 
     /**
-     * @deprecated this method will be replaced by getMethod in 2.6.x
+     * Returns a literal expression (one of NORMALIZE, HISTOGRAM, NONE)
+     * indicating which ContrastMethod value is to be used.
+     * 
+     * @deprecated Please use getMethod
      */
-    @Deprecated
     public Expression getType();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param gamma How much to brighten (greater than 1) or dim (less than 1) this channel; use 1.0 to indicate no change.
      */
-    @Deprecated
     public void setGammaValue(Expression gamma);
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * How much to brighten (values greater than 1.0) or dim (values less than 1.0) an image. The default GammaValue is 1.0
+     * (no change).
+     *
+     * @return Expression, if <code>null</code> a value of 1.0 is assumed indicating no change
+     */
+    public Expression getGammaValue();
+
+    /**
+     * @deprecated Please use setMethod( ContrastMethodt.NORMALIZE )
      */
     @Deprecated
     public void setNormalize();
 
      /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated Please use setMethod( ContrastMethodt.HISTOGRAM )
      */
     @Deprecated
     public void setHistogram();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated Please use setMethod; please note Logarithmic is not currently supported
      */
     @Deprecated
     public void setLogarithmic();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated Please use setMethod; please note Exponential is not currently supported
      */
-    @Deprecated
     public void setExponential();
 
-    public void accept(org.geotools.styling.StyleVisitor visitor);
+    /**
+     * Traversal of the style data structure.
+     * @param visitor
+     */
+    public void accept(StyleVisitor visitor);
 }
