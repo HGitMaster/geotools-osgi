@@ -20,6 +20,7 @@ import java.awt.Color;
 
 import javax.media.jai.PlanarImage;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.geotools.coverage.Category;
@@ -27,25 +28,22 @@ import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.renderer.lite.gridcoverage2d.BaseCoverageProcessingNode;
 import org.geotools.util.SimpleInternationalString;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * {@link TestCase}    subclass for    {@link BaseCoverageProcessingNode}    .
  * @author    Simone Giannecchini, GeoSlutions.
  */
-public class BaseCoverageProcessingNodeTest extends TestCase {
+public class BaseCoverageProcessingNodeTest  {
 
 	private BaseCoverageProcessingNode testedObject;
 
 	private BaseCoverageProcessingNode testedObject2;
 
-	public BaseCoverageProcessingNodeTest(String name) {
-		super(name);
-	}
-
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 		this.testedObject = new BaseCoverageProcessingNode(1,
 				SimpleInternationalString.wrap("fake node"),
 				SimpleInternationalString.wrap("fake node")) {
@@ -79,25 +77,27 @@ public class BaseCoverageProcessingNodeTest extends TestCase {
 		};
 	}
 
-	public final void testExecute() {
+	@Test
+	public final void execute() {
 		// execute
-		assertNotNull(testedObject2.getOutput());
+		Assert.assertNotNull(testedObject2.getOutput());
 		// do nothing
-		assertNotNull(testedObject2.getOutput());
+		Assert.assertNotNull(testedObject2.getOutput());
 
 		// add source clean output
 		testedObject2.addSource(testedObject);
 		testedObject2.addSink(testedObject);
 		// recompute
-		assertNotNull(testedObject2.getOutput());
+		Assert.assertNotNull(testedObject2.getOutput());
 
 		// dispose
 		testedObject2.dispose(true);
 	}
 
-	public final void testDispose() {
+	@Test
+	public final void dispose() {
 
-		assertNotNull(testedObject.getOutput());
+		Assert.assertNotNull(testedObject.getOutput());
 		// dispose
 		testedObject.dispose(true);
 		// do nothing
@@ -106,17 +106,18 @@ public class BaseCoverageProcessingNodeTest extends TestCase {
 			// trying to get the output from a disposed coverage should throw an
 			// error
 			testedObject.getOutput();
-			assertTrue(false);
+			Assert.assertTrue(false);
 		} catch (Exception e) {
 
 		}
 	}
 
-	public final void testAddSource() {
+	@Test
+	public final void addSource() {
 		// execute
-		assertNotNull(testedObject2.getOutput());
+		Assert.assertNotNull(testedObject2.getOutput());
 		// do nothing since we have already executed
-		assertNotNull(testedObject2.getOutput());
+		Assert.assertNotNull(testedObject2.getOutput());
 
 		// add source clean output but we also create a cycle which kills our
 		// small framework
@@ -124,12 +125,12 @@ public class BaseCoverageProcessingNodeTest extends TestCase {
 		testedObject.addSink((testedObject2));
 		try {
 			testedObject2.addSink((testedObject));
-			assertTrue(false);
+			Assert.assertTrue(false);
 		} catch (IllegalStateException e) {
 			// TODO: handle exception
 		}
 		// recompute
-		assertNotNull(testedObject2.getOutput());
+		Assert.assertNotNull(testedObject2.getOutput());
 
 		// dispose
 		testedObject2.dispose(true);

@@ -36,15 +36,11 @@ import java.util.Random;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RasterFactory;
-import javax.media.jai.widget.ScrollingImagePanel;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
+import junit.framework.Assert;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.CoverageFactoryFinder;
@@ -72,16 +68,27 @@ import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.UserLayer;
 import org.geotools.test.TestData;
+import org.opengis.style.ContrastMethod;
+
+import com.sun.media.jai.widget.DisplayJAI;
 
 /**
  * @author  Simone Giannecchini, GeoSolutions.
  */
-public class RasterSymbolizerTest extends TestCase {
+public class RasterSymbolizerTest  {
 
-	private final static StyleFactory sf = CommonFactoryFinder
-			.getStyleFactory(GeoTools.getDefaultHints());
+	private final static StyleFactory sf = CommonFactoryFinder.getStyleFactory(GeoTools.getDefaultHints());
 
-	public static BufferedImage getSynthetic(final double noDataValue) {
+	/**
+	 * Creates a simple 500x500 {@link RenderedImage} for testing purposes.
+	 * 
+	 * <p>
+	 * Values are randomly set to the provided noDataValue.
+	 * 
+	 * @param noDataValue
+	 * @return
+	 */
+	public static RenderedImage getSynthetic(final double noDataValue) {
 		final int width = 500;
 		final int height = 500;
 		final WritableRaster raster = RasterFactory.createBandedRaster(
@@ -102,32 +109,8 @@ public class RasterSymbolizerTest extends TestCase {
 		return image;
 	}
 
-	/**
-	 * @param name
-	 */
-	public RasterSymbolizerTest(String name) {
-		super(name);
-	}
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite();
-
-		// Test reading of a simple image
-		suite.addTest(new RasterSymbolizerTest("testColorMap"));
-		suite.addTest(new RasterSymbolizerTest("testRGB"));
-		suite.addTest(new RasterSymbolizerTest("testLandsat"));
-		suite.addTest(new RasterSymbolizerTest("testDEM"));
-		suite.addTest(new RasterSymbolizerTest("testContrastEnhancementMethods"));
-		suite.addTest(new RasterSymbolizerTest("test1BandFloat32_SLD"));
-//		suite.addTest(new RasterSymbolizerTest("test1BandFloat32_ColorMap_SLD"));
-		suite.addTest(new RasterSymbolizerTest("test1BandByte_SLD"));
-		suite.addTest(new RasterSymbolizerTest("test3BandsByte_SLD"));
-		suite.addTest(new RasterSymbolizerTest("test3BandsByte_ColorMap_SLD"));
-		suite.addTest(new RasterSymbolizerTest("test4BandsUInt16_SLD"));
-		return suite;
-	}
-
-	public void testContrastEnhancementMethods() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
+	@org.junit.Test
+	public void contrastEnhancementMethods() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
 		// the GridCoverage
 		GridCoverage2D gc = CoverageFactoryFinder.getGridCoverageFactory(null)
 				.create(
@@ -150,11 +133,7 @@ public class RasterSymbolizerTest extends TestCase {
 		SubchainStyleVisitorCoverageProcessingAdapter rsh_SLD = new RasterSymbolizerHelper(gc, null);
 
 		// build the RasterSymbolizer
-		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		final Style style = nl.getUserStyles()[0];
-		final FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		final Rule rule = fts.getRules()[0];
-		final RasterSymbolizer rs_1 = (RasterSymbolizer) rule.getSymbolizers()[0];
+		final RasterSymbolizer rs_1 = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh_SLD.visit(rs_1);
@@ -187,7 +166,7 @@ public class RasterSymbolizerTest extends TestCase {
 		final SelectedChannelType chTypeGray = new SelectedChannelTypeImpl();
 		final ContrastEnhancement cntEnh = new ContrastEnhancementImpl();
 
-		cntEnh.setHistogram();
+		cntEnh.setMethod(ContrastMethod.HISTOGRAM);;
 		//cntEnh.setType(type);
 		//cntEnh.setGammaValue(sldBuilder.literalExpression(0.50));
 		
@@ -223,11 +202,7 @@ public class RasterSymbolizerTest extends TestCase {
 		rsh_SLD = new RasterSymbolizerHelper(gc, null);
 
 		// build the RasterSymbolizer
-		final UserLayer nl_2 = (UserLayer) sld.getStyledLayers()[0];
-		final Style style_2 = nl_2.getUserStyles()[0];
-		final FeatureTypeStyle fts_2 = style_2.getFeatureTypeStyles()[0];
-		final Rule rule_2 = fts_2.getRules()[0];
-		final RasterSymbolizer rs_2 = (RasterSymbolizer) rule_2.getSymbolizers()[0];
+		final RasterSymbolizer rs_2 = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh_SLD.visit(rs_2);
@@ -295,11 +270,7 @@ public class RasterSymbolizerTest extends TestCase {
 		rsh_SLD = new RasterSymbolizerHelper(gc, null);
 
 		// build the RasterSymbolizer
-		final UserLayer nl_3 = (UserLayer) sld.getStyledLayers()[0];
-		final Style style_3 = nl_3.getUserStyles()[0];
-		final FeatureTypeStyle fts_3 = style_3.getFeatureTypeStyles()[0];
-		final Rule rule_3 = fts_3.getRules()[0];
-		final RasterSymbolizer rs_3 = (RasterSymbolizer) rule_3.getSymbolizers()[0];
+		final RasterSymbolizer rs_3 = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh_SLD.visit(rs_3);
@@ -349,7 +320,8 @@ public class RasterSymbolizerTest extends TestCase {
 
 	}
 	
-	public void test1BandFloat32_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
+	@org.junit.Test
+	public void bandFloat32_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
 		// the GridCoverage
 		GridCoverage2D gc = CoverageFactoryFinder.getGridCoverageFactory(null)
 				.create(
@@ -371,11 +343,7 @@ public class RasterSymbolizerTest extends TestCase {
 		SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
 
 		// build the RasterSymbolizer
-		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		final Style style = nl.getUserStyles()[0];
-		final FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		final Rule rule = fts.getRules()[0];
-		final RasterSymbolizer rs_1 = (RasterSymbolizer) rule.getSymbolizers()[0];
+		final RasterSymbolizer rs_1 = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh.visit(rs_1);
@@ -489,7 +457,7 @@ public class RasterSymbolizerTest extends TestCase {
 //		final SelectedChannelType chTypeGray = new SelectedChannelTypeImpl();
 //		final ContrastEnhancement cntEnh = new ContrastEnhancementImpl();
 //
-//		cntEnh.setHistogram();
+//		cntEnh.setMethod(ContrastMethod.HISTOGRAM);;
 //		//cntEnh.setGammaValue(sldBuilder.literalExpression(0.50));
 //		
 //		chTypeGray.setChannelName("1");
@@ -529,7 +497,8 @@ public class RasterSymbolizerTest extends TestCase {
 //
 //	}
  
-	public void test4BandsUInt16_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
+	@org.junit.Test
+	public void bandsUInt16_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
 		// the GridCoverage
 		final GridSampleDimension[] gsd={
 				new GridSampleDimension("test1BandByte_SLD1"),
@@ -541,8 +510,10 @@ public class RasterSymbolizerTest extends TestCase {
 				.create(
 						"name",
 						JAI.create("ImageRead", new File(TestData.url(this, "small_4bands_UInt16.tif").toURI())),
-						new GeneralEnvelope(new double[] { -90, -180 },
-								new double[] { 90, 180 }),gsd,null,null);
+						new GeneralEnvelope(new double[] { -90, -180 },new double[] { 90, 180 }),
+						gsd,
+						null,
+						null);
 
 		// ////////////////////////////////////////////////////////////////////
 		//
@@ -559,68 +530,72 @@ public class RasterSymbolizerTest extends TestCase {
 		SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
 
 		// build the RasterSymbolizer
-		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		final Style style = nl.getUserStyles()[0];
-		final FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		final Rule rule = fts.getRules()[0];
-		final RasterSymbolizer rs_1 = (RasterSymbolizer) rule.getSymbolizers()[0];
+		final RasterSymbolizer rs_1 = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh.visit(rs_1);
 		testRasterSymbolizerHelper(rsh);
-		
-		
-		// ////////////////////////////////////////////////////////////////////
-		//
-		// Test #1: [StyleBuilder]
-		//    - Opacity: 1.0
-		//    - ChannelSelection: RGB
-		//	  - Contrast Enh: Histogram
-		//
-		// ////////////////////////////////////////////////////////////////////
-		gc = CoverageFactoryFinder.getGridCoverageFactory(null)
-		.create(
-				"name",
-				JAI.create("ImageRead", new File(TestData.url(this, "small_4bands_UInt16.tif").toURI())),
-				new GeneralEnvelope(new double[] { -90, -180 },
-						new double[] { 90, 180 }));
-		// the RasterSymbolizer Helper
-		rsh = new RasterSymbolizerHelper(gc, null);
-		// build the RasterSymbolizer
-		StyleBuilder sldBuilder = new StyleBuilder();
-		// the RasterSymbolizer Helper
-		rsh = new RasterSymbolizerHelper(gc, null);
-
-		final RasterSymbolizer rsb_1 = sldBuilder.createRasterSymbolizer();
-		final ChannelSelection chSel = new ChannelSelectionImpl();
-		final SelectedChannelType chTypeRed  	= new SelectedChannelTypeImpl();
-		final SelectedChannelType chTypeBlue   	= new SelectedChannelTypeImpl();
-		final SelectedChannelType chTypeGreen 	= new SelectedChannelTypeImpl();
-		final ContrastEnhancement cntEnh = new ContrastEnhancementImpl();
-
-		cntEnh.setHistogram();
-		//cntEnh.setGammaValue(sldBuilder.literalExpression(0.50));
-		
-		chTypeRed.setChannelName("1");
-		chTypeBlue.setChannelName("2");
-		chTypeGreen.setChannelName("3");
-		
-		chSel.setRGBChannels(chTypeRed, chTypeBlue, chTypeGreen);
-
-		rsb_1.setChannelSelection(chSel);
-		rsb_1.setOpacity(sldBuilder.literalExpression(1.0));
-		rsb_1.setContrastEnhancement(cntEnh);
-		rsb_1.setOverlap(sldBuilder.literalExpression("AVERAGE"));
-		
-		// visit the RasterSymbolizer
-		rsh.visit(rsb_1);
-		
-		testRasterSymbolizerHelper(rsh);
+//		
+//		
+//		// ////////////////////////////////////////////////////////////////////
+//		//
+//		// Test #1: [StyleBuilder]
+//		//    - Opacity: 1.0
+//		//    - ChannelSelection: RGB
+//		//	  - Contrast Enh: Histogram
+//		//
+//		// ////////////////////////////////////////////////////////////////////
+//		gc = CoverageFactoryFinder.getGridCoverageFactory(null)
+//		.create(
+//				"name",
+//				JAI.create("ImageRead", new File(TestData.url(this, "small_4bands_UInt16.tif").toURI())),
+//				new GeneralEnvelope(new double[] { -90, -180 },new double[] { 90, 180 }));
+//		// the RasterSymbolizer Helper
+//		rsh = new RasterSymbolizerHelper(gc, null);
+//		// build the RasterSymbolizer
+//		StyleBuilder sldBuilder = new StyleBuilder();
+//		// the RasterSymbolizer Helper
+//		rsh = new RasterSymbolizerHelper(gc, null);
+//
+//		final RasterSymbolizer rsb_1 = sldBuilder.createRasterSymbolizer();
+//		final ChannelSelection chSel = new ChannelSelectionImpl();
+//		final SelectedChannelType chTypeRed  	= new SelectedChannelTypeImpl();
+//		final SelectedChannelType chTypeBlue   	= new SelectedChannelTypeImpl();
+//		final SelectedChannelType chTypeGreen 	= new SelectedChannelTypeImpl();
+//		final ContrastEnhancement cntEnh = new ContrastEnhancementImpl();
+//
+//		cntEnh.setMethod(ContrastMethod.HISTOGRAM);;
+//		//cntEnh.setGammaValue(sldBuilder.literalExpression(0.50));
+//		
+//		chTypeRed.setChannelName("1");
+//		chTypeBlue.setChannelName("2");
+//		chTypeGreen.setChannelName("3");
+//		
+//		chSel.setRGBChannels(chTypeRed, chTypeBlue, chTypeGreen);
+//
+//		rsb_1.setChannelSelection(chSel);
+//		rsb_1.setOpacity(sldBuilder.literalExpression(1.0));
+//		rsb_1.setContrastEnhancement(cntEnh);
+//		rsb_1.setOverlap(sldBuilder.literalExpression("AVERAGE"));
+//		
+//		// visit the RasterSymbolizer
+//		rsh.visit(rsb_1);
+//		
+//		testRasterSymbolizerHelper(rsh);
 
 	}
 
+	private static RasterSymbolizer extractRasterSymbolizer(StyledLayerDescriptor sld) {
+		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
+		final Style style = nl.getUserStyles()[0];
+		final FeatureTypeStyle fts = style.featureTypeStyles().get(0);
+		final Rule rule = fts.rules().get(0);
+		final RasterSymbolizer rs_1 = (RasterSymbolizer) rule.getSymbolizers()[0];
+		return rs_1;
+	}
 
-	public void test3BandsByte_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
+	@org.junit.Test
+	public void bandsByte_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
 		// the GridCoverage
 		final GridSampleDimension[] gsd={
 				new GridSampleDimension("test1BandByte_SLD1"),
@@ -649,11 +624,7 @@ public class RasterSymbolizerTest extends TestCase {
 		SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
 
 		// build the RasterSymbolizer
-		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		final Style style = nl.getUserStyles()[0];
-		final FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		final Rule rule = fts.getRules()[0];
-		final RasterSymbolizer rs_1 = (RasterSymbolizer) rule.getSymbolizers()[0];
+		final RasterSymbolizer rs_1 = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh.visit(rs_1);
@@ -688,7 +659,7 @@ public class RasterSymbolizerTest extends TestCase {
 		final SelectedChannelType chTypeGreen 	= new SelectedChannelTypeImpl();
 		final ContrastEnhancement cntEnh = new ContrastEnhancementImpl();
 
-		cntEnh.setHistogram();
+		cntEnh.setMethod(ContrastMethod.HISTOGRAM);;
 		cntEnh.setGammaValue(sldBuilder.literalExpression(0.50));
 		
 		chTypeRed.setChannelName("1");
@@ -706,8 +677,8 @@ public class RasterSymbolizerTest extends TestCase {
 		testRasterSymbolizerHelper(rsh);
 
 	}
-
-	public void test3BandsByte_ColorMap_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
+	@org.junit.Test
+	public void bandsByte_ColorMap_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
 		// the GridCoverage
 		final GridSampleDimension[] gsd={
 				new GridSampleDimension("test1BandByte_SLD1"),
@@ -736,11 +707,7 @@ public class RasterSymbolizerTest extends TestCase {
 		SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
 
 		// build the RasterSymbolizer
-		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		final Style style = nl.getUserStyles()[0];
-		final FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		final Rule rule = fts.getRules()[0];
-		final RasterSymbolizer rs_1 = (RasterSymbolizer) rule.getSymbolizers()[0];
+		final RasterSymbolizer rs_1 = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh.visit(rs_1);
@@ -777,7 +744,7 @@ public class RasterSymbolizerTest extends TestCase {
 		final SelectedChannelType chTypeGray  	= new SelectedChannelTypeImpl();
 		final ContrastEnhancement cntEnh = new ContrastEnhancementImpl();
 
-		cntEnh.setHistogram();
+		cntEnh.setMethod(ContrastMethod.HISTOGRAM);;
 		//cntEnh.setGammaValue(sldBuilder.literalExpression(0.50));
 		
 		chTypeGray.setChannelName("1");		
@@ -815,7 +782,8 @@ public class RasterSymbolizerTest extends TestCase {
 
 	}
 
-	public void test1BandByte_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
+	@org.junit.Test
+	public void BandByte_SLD() throws IOException, TransformerException, FactoryRegistryException, IllegalArgumentException, URISyntaxException {
 		// the GridCoverage
 		GridCoverage2D gc = CoverageFactoryFinder.getGridCoverageFactory(null)
 				.create(
@@ -838,11 +806,7 @@ public class RasterSymbolizerTest extends TestCase {
 		// the RasterSymbolizer Helper
 		SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
 
-		UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		Style style = nl.getUserStyles()[0];
-		FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		Rule rule = fts.getRules()[0];
-		RasterSymbolizer rs_1 = (RasterSymbolizer) rule.getSymbolizers()[0];
+		RasterSymbolizer rs_1 = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh.visit(rs_1);
@@ -876,7 +840,7 @@ public class RasterSymbolizerTest extends TestCase {
 		final ContrastEnhancement cntEnh = new ContrastEnhancementImpl();
 
 		//this will convert to byte!!!
-		cntEnh.setHistogram();
+		cntEnh.setMethod(ContrastMethod.HISTOGRAM);
 		chTypeGray.setChannelName("1");
 		chTypeGray.setContrastEnhancement(cntEnh);
 		chSel.setGrayChannel(chTypeGray);
@@ -885,7 +849,7 @@ public class RasterSymbolizerTest extends TestCase {
 		// visit the RasterSymbolizer
 		rsh.visit(rsb_1);
 		final RenderedImage im=((GridCoverage2D) rsh.getOutput()).getRenderedImage();
-		assertTrue(im.getSampleModel().getDataType()==0);
+		Assert.assertTrue(im.getSampleModel().getDataType()==0);
 		
 		testRasterSymbolizerHelper(rsh);
 
@@ -914,11 +878,7 @@ public class RasterSymbolizerTest extends TestCase {
 		rsh = new RasterSymbolizerHelper(gc, null);
 
 		// build the RasterSymbolizer
-		nl = (UserLayer) sld.getStyledLayers()[0];
-		style = nl.getUserStyles()[0];
-		fts = style.getFeatureTypeStyles()[0];
-		rule = fts.getRules()[0];
-		rs_1 = (RasterSymbolizer) rule.getSymbolizers()[0];
+		rs_1 = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh.visit(rs_1);
@@ -928,7 +888,8 @@ public class RasterSymbolizerTest extends TestCase {
  
 
  
-	public void testColorMap() throws IOException, TransformerException {
+	@org.junit.Test
+	public void colorMap() throws IOException, TransformerException {
 		////
 		//
 		// Test using an SLD file
@@ -952,11 +913,7 @@ public class RasterSymbolizerTest extends TestCase {
 
 	
 		SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
-		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		final Style style = nl.getUserStyles()[0];
-		final FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		final Rule rule = fts.getRules()[0];
-		RasterSymbolizer rs = (RasterSymbolizer) rule.getSymbolizers()[0];
+		RasterSymbolizer rs = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh.visit(rs);
@@ -1010,11 +967,11 @@ public class RasterSymbolizerTest extends TestCase {
 		IndexColorModel icm2 = (IndexColorModel) ((GridCoverage2D)rsh.getOutput()).getRenderedImage().getColorModel();
 		testRasterSymbolizerHelper(rsh);
 		//check that the two color models are equals!
-		assertTrue(icm1.equals(icm2));
+		Assert.assertTrue(icm1.equals(icm2));
 
 	}
-
-	public void testRGB() throws IOException, TransformerException {
+	@org.junit.Test
+	public void RGB() throws IOException, TransformerException {
 		java.net.URL surl = TestData.url(this, "testrgb.sld");
 		SLDParser stylereader = new SLDParser(sf, surl);
 		StyledLayerDescriptor sld = stylereader.parseSLD();
@@ -1035,11 +992,7 @@ public class RasterSymbolizerTest extends TestCase {
 
 		// build the RasterSymbolizer
 		final SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
-		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		final Style style = nl.getUserStyles()[0];
-		final FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		final Rule rule = fts.getRules()[0];
-		final RasterSymbolizer rs = (RasterSymbolizer) rule.getSymbolizers()[0];
+		final RasterSymbolizer rs = extractRasterSymbolizer(sld);
 
 		// visit the RasterSymbolizer
 		rsh.visit(rs);
@@ -1048,7 +1001,8 @@ public class RasterSymbolizerTest extends TestCase {
 
 	}
 
-	public void testDEM() throws IOException, TransformerException {
+	@org.junit.Test
+	public void DEM() throws IOException, TransformerException {
 		
 		////
 		//
@@ -1067,11 +1021,7 @@ public class RasterSymbolizerTest extends TestCase {
 						new GeneralEnvelope(new double[] { -90, -180 },
 								new double[] { 90, 180 }),new GridSampleDimension[]{new GridSampleDimension("dem")},null,null);
 		SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
-		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		final Style style = nl.getUserStyles()[0];
-		final FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		final Rule rule = fts.getRules()[0];
-		RasterSymbolizer rs = (RasterSymbolizer) rule.getSymbolizers()[0];
+		final RasterSymbolizer rs = extractRasterSymbolizer(sld);
 		rsh.visit(rs);
 		testRasterSymbolizerHelper(rsh);
 		
@@ -1124,8 +1074,8 @@ public class RasterSymbolizerTest extends TestCase {
 		testRasterSymbolizerHelper(rsh);
 
 	}
-
-	public void testLandsat() throws IOException, TransformerException {
+	@org.junit.Test
+	public void landsat() throws IOException, TransformerException {
 		java.net.URL surl = TestData.url(this, "landsat.sld");
 		SLDParser stylereader = new SLDParser(sf, surl);
 		StyledLayerDescriptor sld = stylereader.parseSLD();
@@ -1147,21 +1097,20 @@ public class RasterSymbolizerTest extends TestCase {
 						new GeneralEnvelope(new double[] { -90, -180 },
 								new double[] { 90, 180 }),gsd,null,null);
 		final SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
-		final UserLayer nl = (UserLayer) sld.getStyledLayers()[0];
-		final Style style = nl.getUserStyles()[0];
-		final FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
-		final Rule rule = fts.getRules()[0];
-		RasterSymbolizer rs = (RasterSymbolizer) rule.getSymbolizers()[0];
+		final RasterSymbolizer rs = extractRasterSymbolizer(sld);
 		rsh.visit(rs);
 		
 		final RenderedImage ri = ((GridCoverage2D)rsh.getOutput()).getRenderedImage();
-		assertTrue(ri.getColorModel() instanceof ComponentColorModel);
-		assertTrue(ri.getColorModel().getNumComponents()==3);
+		Assert.assertTrue(ri.getColorModel() instanceof ComponentColorModel);
+		Assert.assertTrue(ri.getColorModel().getNumComponents()==3);
 		testRasterSymbolizerHelper(rsh);
 
 	}
 
 	private static void testRasterSymbolizerHelper(final SubchainStyleVisitorCoverageProcessingAdapter rsh) {
+		
+//		RenderedImageBrowser.showChain(((GridCoverage2D)rsh.getOutput()).getRenderedImage());
+		
 		if (TestData.isInteractiveTest()) {
 			visualize(((GridCoverage2D)rsh.getOutput()).getRenderedImage(), rsh.getName()
 					.toString());
@@ -1185,7 +1134,7 @@ public class RasterSymbolizerTest extends TestCase {
 		//actually shows this image.
 		final JFrame jf= new JFrame(name);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		jf.getContentPane().add(new ScrollingImagePanel(ri,800,800));
+		jf.getContentPane().add(new DisplayJAI(ri));
 		SwingUtilities.invokeLater(new Runnable(){
 
 			public void run() {
@@ -1199,8 +1148,5 @@ public class RasterSymbolizerTest extends TestCase {
 
 	}
 
-	public static void main(String[] args) {
-		TestRunner.run(suite());
-	}
 
 }

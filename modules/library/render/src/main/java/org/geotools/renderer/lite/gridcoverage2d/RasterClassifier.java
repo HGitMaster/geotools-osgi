@@ -19,7 +19,6 @@ package org.geotools.renderer.lite.gridcoverage2d;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
-import java.awt.image.RasterFormatException;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
@@ -48,7 +47,7 @@ import org.geotools.renderer.i18n.Errors;
 
 /**
  * Images are created using the        {@code                LinearClassifier.CRIF}        inner class, where "CRIF" stands for       {@link java.awt.image.renderable.ContextualRenderedImageFactory}        . The image operation name is "org.geotools.RasterClassifier".
- * @version        $Id: RasterClassifier.java 30649 2008-06-12 19:44:08Z acuster $
+ * @version        $Id: RasterClassifier.java 32922 2009-05-03 23:56:10Z simonegiannecchini $
  * @author        Simone Giannecchini - GeoSolutions
  * @since        2.4
  */
@@ -311,7 +310,7 @@ public class RasterClassifier extends PointOpImage {
 					new Class[] { ColorMapTransform.class,
 							Integer.class }, // Argument
 					// classes
-					new Object[] { NO_PARAMETER_DEFAULT, new Integer(-1) }, // Default
+					new Object[] { NO_PARAMETER_DEFAULT, Integer.valueOf(-1) }, // Default
 					// values
 					// for parameters,
 					null // No restriction on valid parameter values.

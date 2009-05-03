@@ -46,11 +46,6 @@ class RootNode extends BaseCoverageProcessingNode implements
 	}
 
 	/**
-	 * Logger for this class. 
-	 */
-	private final static Logger LOGGER = Logging
-			.getLogger(RootNode.class.getName());
-	/**
 	 * The source {@link GridCoverage2D} for this {@link RootNode}.
 	 */
 	private GridCoverage2D sourceCoverage;

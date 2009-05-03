@@ -146,7 +146,7 @@ class ColorMapNode extends StyleVisitorCoverageProcessingNodeAdapter implements
 			final int numSD = sourceCoverage.getNumSampleDimensions();
 			if (numSD>1)
 				throw new IllegalArgumentException(
-						Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,new Integer(numSD)));
+						Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,Integer.valueOf(numSD)));
 
 			// /////////////////////////////////////////////////////////////////////
 			//

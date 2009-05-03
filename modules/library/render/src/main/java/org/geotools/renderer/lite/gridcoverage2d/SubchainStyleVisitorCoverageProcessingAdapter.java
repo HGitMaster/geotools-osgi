@@ -94,7 +94,7 @@ public abstract class SubchainStyleVisitorCoverageProcessingAdapter extends
      * @param  sink
      * @uml.property  name="sink"
      */
-	protected void setSink(CoverageProcessingNode sink) {
+	protected synchronized void setSink(CoverageProcessingNode sink) {
 		ensureNotNull(sink, "sink");
 		if (this.sink != null)
 			throw new IllegalStateException(Errors
@@ -113,7 +113,7 @@ public abstract class SubchainStyleVisitorCoverageProcessingAdapter extends
 		}
 		//log an helper message
 		if(LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("Sicnk for this chain is null, It was probably not set.");
+			LOGGER.fine("Sink for this chain is null, It was probably not set.");
 
 		// something bad happened
 		return null;

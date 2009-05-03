@@ -38,7 +38,6 @@ import org.geotools.renderer.i18n.Vocabulary;
 import org.geotools.renderer.i18n.VocabularyKeys;
 import org.geotools.styling.SelectedChannelType;
 import org.geotools.util.SimpleInternationalString;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 
@@ -108,7 +107,7 @@ class BandSelectionNode extends StyleVisitorCoverageProcessingNodeAdapter
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final List<CoverageProcessingNode> sources = this.getSources();
-		if (sources != null || !sources.isEmpty()) {
+		if (sources != null && !sources.isEmpty()) {
 			final GridCoverage2D source = (GridCoverage2D) getSource(0).getOutput();
 			ensureSourceNotNull(source, this.getName().toString());
 			GridCoverage2D output = null;
@@ -127,7 +126,7 @@ class BandSelectionNode extends StyleVisitorCoverageProcessingNodeAdapter
 				final int numSampleDimensions = source.getNumSampleDimensions();
 				if (bandIndex < 1 || bandIndex > numSampleDimensions)
 					throw new IllegalArgumentException(
-							Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,new Integer(bandIndex)));
+							Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,Integer.valueOf(bandIndex)));
 
 				// //
 				//
@@ -210,7 +209,7 @@ class BandSelectionNode extends StyleVisitorCoverageProcessingNodeAdapter
 			} catch (NumberFormatException e) {
 				// something bad happened
 				final IllegalArgumentException iee = new IllegalArgumentException(
-						Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,new Integer(bandIndex)));
+						Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,Integer.valueOf(bandIndex)));
 				iee.initCause(e);
 				throw iee;
 			}

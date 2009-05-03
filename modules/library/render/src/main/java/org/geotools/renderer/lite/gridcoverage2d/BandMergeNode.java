@@ -22,11 +22,9 @@ import java.awt.color.ColorSpace;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.RenderedImage;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
 
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
@@ -45,7 +43,6 @@ import org.geotools.renderer.i18n.Errors;
 import org.geotools.renderer.i18n.Vocabulary;
 import org.geotools.renderer.i18n.VocabularyKeys;
 import org.geotools.util.SimpleInternationalString;
-import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.util.InternationalString;
 
@@ -67,12 +64,6 @@ class BandMergeNode extends BaseCoverageProcessingNode implements
 	public InternationalString getName() {
 		return Vocabulary.formatInternational(VocabularyKeys.BAND_MERGE);
 	}
-
-	/**
-	 * Logger for this class. 
-	 */
-	private final static Logger LOGGER = Logging
-			.getLogger(BandMergeNode.class.getName());
 
 	/*
 	 * (non-Javadoc)
@@ -129,7 +120,7 @@ class BandMergeNode extends BaseCoverageProcessingNode implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final List<CoverageProcessingNode> sources = this.getSources();
-		if (sources != null || sources.isEmpty()) {
+		if (sources != null && !sources.isEmpty()) {
 			// //
 			//
 			// only one source, let's forward it, nothing to do.
@@ -146,8 +137,7 @@ class BandMergeNode extends BaseCoverageProcessingNode implements
 			// //
 			if (size != 3) {
 				throw new IllegalArgumentException(Errors.format(
-						ErrorKeys.INVALID_NUMBER_OF_SOURCES_$1, new Integer(
-								size)));
+						ErrorKeys.INVALID_NUMBER_OF_SOURCES_$1, Integer.valueOf(size)));
 			}
 
 			// /////////////////////////////////////////////////////////////////////
@@ -196,8 +186,7 @@ class BandMergeNode extends BaseCoverageProcessingNode implements
 				if (op == null)
 					op = currentSourceCoverage.getRenderedImage();
 				else {
-					op = BandMergeDescriptor.create(op, currentSourceCoverage
-							.getRenderedImage(), hints);
+					op = BandMergeDescriptor.create(op, currentSourceCoverage.getRenderedImage(), hints);
 					// //
 					//
 					// Save the intermediate image
@@ -215,8 +204,7 @@ class BandMergeNode extends BaseCoverageProcessingNode implements
 			// /////////////////////////////////////////////////////////////////////
 			if (layout != null)
 				hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
-			op = FormatDescriptor.create(op, new Integer(op.getSampleModel()
-					.getDataType()), hints);
+			op = FormatDescriptor.create(op, Integer.valueOf(op.getSampleModel().getDataType()), hints);
 			final GridSampleDimension [] sd= new GridSampleDimension[op.getSampleModel().getNumBands()];
 			for(int i=0;i<sd.length;i++)
 			    sd[i]= new GridSampleDimension(TypeMap.getColorInterpretation(op.getColorModel(), i).name());

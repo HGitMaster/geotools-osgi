@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.media.jai.Histogram;
 import javax.media.jai.ImageLayout;
@@ -60,7 +59,6 @@ import org.geotools.styling.ContrastEnhancement;
 import org.geotools.styling.StyleVisitor;
 import org.geotools.util.NumberRange;
 import org.geotools.util.SimpleInternationalString;
-import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.operation.TransformException;
@@ -75,11 +73,6 @@ import org.opengis.util.InternationalString;
  */
 class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 		implements StyleVisitor, CoverageProcessingNode {
-
-	/** {@link Logger} for this class. */
-	private final static Logger LOGGER = Logging
-			.getLogger(ContrastEnhancementNode.class.getName());
-	
     /**
      * Minimal normalized value.
      */
@@ -159,13 +152,11 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 		// /////////////////////////////////////////////////////////////////////
 		final Expression expType = ce.getType();
 		if (expType != null) {
-			final String type = (String) expType.evaluate(null, String.class);
+			final String type = expType.evaluate(null, String.class);
 			if (type != null) {
 				this.type = type.toUpperCase();
 				if (!SUPPORTED_HE_ALGORITHMS.contains(type.toUpperCase()))
-					throw new IllegalArgumentException(Errors.format(
-							ErrorKeys.OPERATION_NOT_FOUND_$1, type
-									.toUpperCase()));
+					throw new IllegalArgumentException(Errors.format(ErrorKeys.OPERATION_NOT_FOUND_$1, type.toUpperCase()));
 			}
 		}
 
@@ -176,16 +167,14 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 		// /////////////////////////////////////////////////////////////////////
 		final Expression gamma = ce.getGammaValue();
 		if (gamma != null) {
-			final Number number = (Number) gamma.evaluate(null, Double.class);
+			final Number number = gamma.evaluate(null, Double.class);
 			if (number != null) {
 				gammaValue = number.doubleValue();
 				// check the gamma value
 				if (gammaValue < 0)
-					throw new IllegalArgumentException(Errors.format(
-							ErrorKeys.ILLEGAL_ARGUMENT_$2, "Gamma", number));
+					throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "Gamma", number));
 				if (Double.isNaN(gammaValue) || Double.isInfinite(gammaValue))
-					throw new IllegalArgumentException(Errors.format(
-							ErrorKeys.ILLEGAL_ARGUMENT_$2, "Gamma", number));
+					throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "Gamma", number));
 			}
 		}
 
@@ -219,7 +208,8 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 	 * 
 	 * @see org.geotools.renderer.lite.gridcoverage2d.StyleVisitorCoverageProcessingNodeAdapter#execute()
 	 */
-    protected GridCoverage2D execute() {
+    @SuppressWarnings("unchecked")
+	protected GridCoverage2D execute() {
 		assert Thread.holdsLock(this);
 		final Hints hints = getHints();
 
@@ -230,12 +220,14 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final List<CoverageProcessingNode> sources = this.getSources();
-		if (sources != null || !sources.isEmpty()) {
+		if (sources != null && !sources.isEmpty()) {
 			final GridCoverage2D source = (GridCoverage2D) getSource(0).getOutput();
 			ensureSourceNotNull(source, this.getName().toString());
 			GridCoverage2D output;
-			if ((!Double.isNaN(gammaValue) && !Double.isInfinite(gammaValue) && !(gammaValue == 1 - 0))
-					|| (type != null && type.length() > 0)) {
+			if ((!Double.isNaN(gammaValue) && 
+					!Double.isInfinite(gammaValue) && 
+					!(Math.abs(gammaValue -1)<1E-6))||
+					(type != null && type.length() > 0)) {
 
 				// /////////////////////////////////////////////////////////////////////
 				//
@@ -267,15 +259,20 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				RenderedImage initialImage;
 				if(type!=null&&type.equalsIgnoreCase("HISTOGRAM"))
 				{
-					initialImage = new ImageWorker(sourceImage).setRenderingHints(hints)
-						.forceComponentColorModel().rescaleToBytes()
-						.getRenderedImage();
+					initialImage = 
+						new ImageWorker(sourceImage)
+							.setRenderingHints(hints)
+							.forceComponentColorModel()
+							.rescaleToBytes()
+							.getRenderedImage();
 				}
 				else
 				{
-					initialImage = new ImageWorker(sourceImage).setRenderingHints(hints)
-						.forceComponentColorModel()
-						.getRenderedImage();
+					initialImage = 
+						new ImageWorker(sourceImage)
+							.setRenderingHints(hints)
+							.forceComponentColorModel()
+							.getRenderedImage();
 				}
 				final int numbands = initialImage.getSampleModel().getNumBands();
 
@@ -342,8 +339,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				// 
 				//
 				// /////////////////////////////////////////////////////////////////////
-				final RenderedImage heImage = performContrastEnhancement(
-						intensityImage, hints);
+				final RenderedImage heImage = performContrastEnhancement(intensityImage, hints);
 					
 
 				// /////////////////////////////////////////////////////////////////////
@@ -354,8 +350,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				// correction function's values.
 				//
 				// /////////////////////////////////////////////////////////////////////
-				RenderedImage finalImage = performGammaCorrection(heImage,
-						hints);
+				RenderedImage finalImage = performGammaCorrection(heImage,hints);
 
 				// /////////////////////////////////////////////////////////////////////
 				//
@@ -382,12 +377,9 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 					final ImageLayout imageLayout = new ImageLayout();
 					imageLayout.setColorModel(IHS.getColorModel());
 					imageLayout.setSampleModel(IHS.getSampleModel());
-					@SuppressWarnings("unchecked")
-					final RenderingHints rendHints = new RenderingHints(
-							Collections.EMPTY_MAP);
+					final RenderingHints rendHints = new RenderingHints(Collections.EMPTY_MAP);
 					rendHints.add(hints);
-					rendHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
-							imageLayout));
+					rendHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT,imageLayout));
 					
 					// merge and go to rgb again
 					final ParameterBlock pb = new ParameterBlock();
@@ -395,9 +387,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 					pb.addSource(hChannel);
 					pb.addSource(sChannel);
 					finalImage = JAI.create("bandmerge", pb, rendHints);
-
-					finalImage = new ImageWorker(finalImage).setRenderingHints(
-							hints).forceColorSpaceRGB().getRenderedImage();
+					finalImage = new ImageWorker(finalImage).setRenderingHints(hints).forceColorSpaceRGB().getRenderedImage();
 
 				}
 
@@ -419,12 +409,13 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 							Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE);
 					final ImageLayout imageLayout = new ImageLayout();
 					imageLayout.setColorModel(cm);
-					imageLayout.setSampleModel(cm.createCompatibleSampleModel(
-							finalImage.getWidth(), finalImage.getHeight()));
+					imageLayout.setSampleModel(cm.createCompatibleSampleModel(finalImage.getWidth(), finalImage.getHeight()));
 					// merge and go to rgb
-					finalImage = new ImageWorker(finalImage).setRenderingHints(
-							hints).setRenderingHint(JAI.KEY_IMAGE_LAYOUT,
-							imageLayout).addBand(alphaBand, false)
+					finalImage = 
+						new ImageWorker(finalImage)
+							.setRenderingHints(hints)
+							.setRenderingHint(JAI.KEY_IMAGE_LAYOUT,imageLayout)
+							.addBand(alphaBand, false)
 							.getRenderedOperation();
 
 				}
@@ -443,7 +434,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 					        (GridGeometry2D)source.getGridGeometry(),
 					        source.getSampleDimensions(),
 					        new GridCoverage[]{source},
-					        new HashMap(source.getProperties()));
+					        new HashMap<Object,Object>(source.getProperties()));
 				else
 				{
 					//replicate input bands
@@ -456,7 +447,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 					        (GridGeometry2D)source.getGridGeometry(),
 					        sd,
 					        new GridCoverage[]{source},
-					        new HashMap(source.getProperties()));
+					        new HashMap<Object,Object>(source.getProperties()));
 				}
 
 
@@ -503,8 +494,8 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 			if (type.equalsIgnoreCase("NORMALIZE")) {
 				//step 1 do the extrema to get the statistics for this image
 				final RenderedOp image = ExtremaDescriptor.create(inputImage,
-						null, new Integer(1), new Integer(1), null,
-						new Integer(1), null);
+						null, Integer.valueOf(1), Integer.valueOf(1), null,
+						Integer.valueOf(1), null);
 				final double[][] extrema = (double[][]) image
 						.getProperty("extrema");
 				final int numBands = extrema[0].length;
@@ -599,8 +590,8 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				////
 				//step 1 do the extrema to get the statistics for this image
 				final RenderedOp statistics = ExtremaDescriptor.create(inputImage,
-						null, new Integer(1), new Integer(1), null,
-						new Integer(1), null);
+						null, Integer.valueOf(1), Integer.valueOf(1), null,
+						Integer.valueOf(1), null);
 				final double[] minimum=(double[]) statistics.getProperty("minimum");
 				final double[] maximum=(double[]) statistics.getProperty("maximum");
 				final double normalizationFactor=maximum[0];
@@ -646,7 +637,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 							GenericPiecewise.OPERATION_NAME);
 					pbj.addSource(inputImage);
 					pbj.setParameter("Domain1D", transform);
-					pbj.setParameter("bandIndex", new Integer(0));
+					pbj.setParameter("bandIndex", Integer.valueOf(0));
 					return JAI.create(
 							GenericPiecewise.OPERATION_NAME, pbj);
 			}			
@@ -661,7 +652,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				if(dataType==DataBuffer.TYPE_BYTE){
 					////
 					//
-					// Optimisation for byte images,si m we use lookup
+					// Optimisation for byte images m we use lookup
 					//
 					////
 					final byte lut[] = new byte[256];
@@ -686,8 +677,8 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				////
 				//step 1 do the extrema to get the statistics for this image
 				final RenderedOp statistics = ExtremaDescriptor.create(inputImage,
-						null, new Integer(1), new Integer(1), null,
-						new Integer(1), null);
+						null, Integer.valueOf(1), Integer.valueOf(1), null,
+						Integer.valueOf(1), null);
 				final double[] minimum=(double[]) statistics.getProperty("minimum");
 				final double[] maximum=(double[]) statistics.getProperty("maximum");
 				final double normalizationFactor=maximum[0];
@@ -734,7 +725,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 							GenericPiecewise.OPERATION_NAME);
 					pbj.addSource(inputImage);
 					pbj.setParameter("Domain1D", transform);
-					pbj.setParameter("bandIndex", new Integer(0));
+					pbj.setParameter("bandIndex", Integer.valueOf(0));
 					return JAI.create(
 							GenericPiecewise.OPERATION_NAME, pbj);
 			}			
@@ -751,8 +742,8 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				inputImage=new ImageWorker(inputImage).rescaleToBytes().getRenderedImage();
 				// compute the histogram
 				final RenderedOp hist = HistogramDescriptor.create(inputImage,
-						null, new Integer(1), new Integer(1),
-						new int[] { 255 }, new double[] { 1 },
+						null, Integer.valueOf(1), Integer.valueOf(1),
+						new int[] { 256 }, new double[] { 0 },
 						new double[] { 256 }, null);
 				final Histogram h = (Histogram) hist.getProperty("histogram");
 
@@ -768,9 +759,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 
 				// this is the scale factor for the histogram equalization
 				// process
-				final float scale = (float) (h.getHighValue(0) - 1 - h
-						.getLowValue(0))
-						/ totalBinSum;
+				final float scale = (float) (h.getHighValue(0) - 1 - h.getLowValue(0))/ totalBinSum;
 				float sum = 0;
 				for (int i = 1; i < cumulative.length; i++) {
 					sum += h.getBinSize(0, i - 1);
@@ -803,7 +792,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 		
 		final int dataType=inputImage.getSampleModel().getDataType();
 		RenderedImage result=inputImage;
-		if (!Double.isNaN(gammaValue) && Math.abs(gammaValue - 1.0) > 1E-4) {
+		if (!Double.isNaN(gammaValue) && Math.abs(gammaValue - 1.0) > 1E-6) {
 			if (dataType == DataBuffer.TYPE_BYTE) {
 
 				////
@@ -835,13 +824,12 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				////
 				//step 1 do the extrema to get the statistics for this image
 				final RenderedOp statistics = ExtremaDescriptor.create(inputImage,
-						null, new Integer(1), new Integer(1), null,
-						new Integer(1), null);
+						null, Integer.valueOf(1), Integer.valueOf(1), null,
+						Integer.valueOf(1), null);
 				final double[] minimum=(double[]) statistics.getProperty("minimum");
 				final double[] maximum=(double[]) statistics.getProperty("maximum");
 				final double scale  = (maximum[0]-minimum[0])/(MAX_VALUE-MIN_VALUE);
 		                final double offset = minimum[0] - MIN_VALUE*scale;
-				
 				////
 				//
 				// STEP 2 do the gamma correction by using generic piecewise
@@ -882,7 +870,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 							GenericPiecewise.OPERATION_NAME);
 					pbj.addSource(inputImage);
 					pbj.setParameter("Domain1D", transform);
-					pbj.setParameter("bandIndex", new Integer(0));
+					pbj.setParameter("bandIndex", Integer.valueOf(0));
 					result = JAI.create(
 							GenericPiecewise.OPERATION_NAME, pbj);
 			}

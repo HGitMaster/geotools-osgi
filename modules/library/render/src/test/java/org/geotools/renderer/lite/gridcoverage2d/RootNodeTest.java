@@ -20,31 +20,32 @@ import java.awt.Color;
 
 import javax.media.jai.PlanarImage;
 
-import junit.framework.TestCase;
+import junit.framework.Assert;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.renderer.lite.gridcoverage2d.RootNode;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Simple TestCase for      {@link RootNode}      class.
  * @author       Simone Giannecchini, GeoSolutions
  */
-public class RootNodeTest extends TestCase {
+public class RootNodeTest{
+
+	public RootNodeTest() {
+	}
 
 	private RootNode root1;
 	private RootNode root2;
 	private RootNode root3;
-
-	public RootNodeTest(String name) {
-		super(name);
-	}
-
-	protected void setUp() throws Exception {
-		super.setUp();
+	
+	@Before
+	public void setUp() throws Exception {
 		// get a coverage
 		final GridCoverage2D gc = CoverageFactoryFinder.getGridCoverageFactory(null)
 				.create(
@@ -61,86 +62,90 @@ public class RootNodeTest extends TestCase {
 
 	}
 
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		root1.dispose(true);
 		root2.dispose(true);
 		root3.dispose(true);
-		super.tearDown();
 	}
 
-	public final void testExecute() {
-		assertNotNull(root1.getOutput());
-		assertNotNull(root2.getOutput());
-		assertNotNull(root3.getOutput());
+	@Test
+	public final void execute() {
+		Assert.assertNotNull(root1.getOutput());
+		Assert.assertNotNull(root2.getOutput());
+		Assert.assertNotNull(root3.getOutput());
 	}
 
-	public final void testAddSource() {
+	@Test
+	public final void addSource() {
 	
 		try {
 			root3.addSource(root2);
-			assertFalse(true);
+			Assert.assertFalse(true);
 		} catch (Exception e) {
 			
 		}
 
 	}
 
-	public final void testGetSource() {
+	@Test
+	public final void getSource() {
 		try {
 			root1.getSource(2);
-			assertFalse(true);
+			Assert.assertFalse(true);
 		} catch (Exception e) {
 			
 		}
 		try {
 			root2.getSource(2);
-			assertFalse(true);
+			Assert.assertFalse(true);
 		} catch (Exception e) {
 			
 		}
 		try {
 			root3.getSource(2);
-			assertFalse(true);
+			Assert.assertFalse(true);
 		} catch (Exception e) {
 			
 		}
 
 		try {
-			assertNotNull(root3.getSource(0));
-			assertFalse(true);
+			Assert.assertNotNull(root3.getSource(0));
+			Assert.assertFalse(true);
 		} catch (Exception e) {
 			
 		}
 		try {
-			assertNotNull(root2.getSource(0));
-			assertFalse(true);
+			Assert.assertNotNull(root2.getSource(0));
+			Assert.assertFalse(true);
 		} catch (Exception e) {
 			
 		}
 		try {
-			assertNotNull(root1.getSource(0));
-			assertFalse(true);
+			Assert.assertNotNull(root1.getSource(0));
+			Assert.assertFalse(true);
 		} catch (Exception e) {
 			
 		}
 
 	}
 
-	public final void testGetSources() {
+	@Test
+	public final void getSources() {
 		try {
-			assertNotNull(root1.getSources());
-			assertTrue(root1.getSources().size()==0);
+			Assert.assertNotNull(root1.getSources());
+			Assert.assertTrue(root1.getSources().size()==0);
 		} catch (Exception e) {
 		}
 		try {
-			assertNotNull(root2.getSources());
-			assertTrue(root2.getSources().size()==0);
+			Assert.assertNotNull(root2.getSources());
+			Assert.assertTrue(root2.getSources().size()==0);
 		} catch (Exception e) {
 			
 		}
 		try {
-			assertNotNull(root3.getSources());
-			assertTrue(root3.getSources().size()==0);
+			Assert.assertNotNull(root3.getSources());
+			Assert.assertTrue(root3.getSources().size()==0);
 		} catch (Exception e) {
 			
 		}
