@@ -268,23 +268,25 @@ public class DataAccessIntegrationTest extends TestCase {
             // mo:composition
             propertyName = "COMPOSITION";
             String[] cpIds = next.getProperty(propertyName).getValue().toString().split(",");
-            Collection<Property> cpProperties = new ArrayList<Property>(cpIds.length);
             for (String cpId : cpIds) {
+                Collection<Property> cpProperties = new ArrayList<Property>(cpIds.length);
                 cpProperties.add(new AttributeImpl(cpId, stringDescriptor, null));
+                properties.add(new AttributeImpl(cpProperties,
+                        (AttributeDescriptor) earthResourceType.getDescriptor(Types.typeName(MO,
+                                "composition")), null));
             }
-            properties.add(new AttributeImpl(cpProperties, (AttributeDescriptor) earthResourceType
-                    .getDescriptor(Types.typeName(MO, "composition")), null));
 
             // mo:commodityDescription
             propertyName = "COMMODITYDESCRIPTION";
-            ArrayList<Property> mfProperties = new ArrayList<Property>();
 
             String[] mfIds = next.getProperty(propertyName).getValue().toString().split(",");
             for (String mfId : mfIds) {
+                ArrayList<Property> mfProperties = new ArrayList<Property>();
                 mfProperties.add(new AttributeImpl(mfId, stringDescriptor, null));
+                properties.add(new AttributeImpl(mfProperties,
+                        (AttributeDescriptor) earthResourceType.getDescriptor(Types.typeName(MO,
+                                "commodityDescription")), null));
             }
-            properties.add(new AttributeImpl(mfProperties, (AttributeDescriptor) earthResourceType
-                    .getDescriptor(Types.typeName(MO, "commodityDescription")), null));
 
             features.add(new FeatureImpl(properties, featureDesc, next.getIdentifier()));
         }
@@ -434,6 +436,7 @@ public class DataAccessIntegrationTest extends TestCase {
     public void testMappings() throws IOException {
         FeatureCollection<FeatureType, Feature> guCollection = (FeatureCollection<FeatureType, Feature>) guFeatureSource
                 .getFeatures();
+        // mo:EarthResource -> gsml:GeologicUnit output iterator
         MappingFeatureIterator iterator = (MappingFeatureIterator) guCollection.iterator();
         FeatureTypeMapping guSchema = AppSchemaDataAccessRegistry.getMapping(GEOLOGIC_UNIT);
         Hints hints = new Hints(FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT, guSchema
@@ -480,11 +483,14 @@ public class DataAccessIntegrationTest extends TestCase {
              */
             Collection<Property> gsmlCompositions = (Collection<Property>) next
                     .getProperties(composition);
-            Collection<Property> moCompositions = (Collection<Property>) moFeature.getProperty(
-                    composition).getValue();
+            Collection<Property> moCompositions = (Collection<Property>) moFeature
+                    .getProperties(composition);
             Collection<String> cpIds = new ArrayList<String>();
             for (Property inputProperty : moCompositions) {
-                cpIds.add(inputProperty.getValue().toString());
+                Collection<Attribute> values = (Collection<Attribute>) inputProperty.getValue();
+                for (Attribute attrib : values) {
+                    cpIds.add(attrib.getValue().toString());
+                }
             }
             assertEquals(cpIds.size() > 0, true);
             assertEquals(gsmlCompositions.size(), cpIds.size());
@@ -505,11 +511,14 @@ public class DataAccessIntegrationTest extends TestCase {
              */
             Collection<Property> occurrences = (Collection<Property>) next
                     .getProperties(occurrence);
-            Collection<Property> commodities = (Collection<Property>) moFeature.getProperty(
-                    commodity).getValue();
+            Collection<Property> commodities = (Collection<Property>) moFeature
+                    .getProperties(commodity);
             Collection<String> mfIds = new ArrayList<String>();
             for (Property property : commodities) {
-                mfIds.add(property.getValue().toString());
+                Collection<Attribute> values = (Collection<Attribute>) property.getValue();
+                for (Attribute attrib : values) {
+                    mfIds.add(attrib.getValue().toString());
+                }
             }
             assertEquals(mfIds.size() > 0, true);
             assertEquals(occurrences.size(), mfIds.size());
