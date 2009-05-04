@@ -47,7 +47,7 @@
             <Bundle-SymbolicName>javax.media.jai.osgi</Bundle-SymbolicName>
             <Bundle-DocURL>http://download.java.net/media/jai/javadoc/1.1.3/jai-apidocs/</Bundle-DocURL>
             <Bundle-Vendor>Harman/Becker</Bundle-Vendor>
-            <Export-Package>javax.media.jai.*,com.sun.media.jai.*</Export-Package> 
+            <Export-Package>javax.media.jai.*;version="${version}",com.sun.media.jai.*;version="${version}"</Export-Package> 
             <Import-Package>!sun.*,!com.sun.image.*,*</Import-Package> 
           </instructions>
         </configuration>
