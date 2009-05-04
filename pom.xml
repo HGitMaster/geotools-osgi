@@ -1208,12 +1208,6 @@
     	<url>http://repository.springsource.com/maven/bundles/external</url>
     </repository>
 
-    <repository>
-      <id>geotools.bin.deps</id>
-      <name>Geotools binary dependencies</name>
-      <url>file:${basedir}/thirdparty/repository</url>
-    </repository>
-
   </repositories>
 
 

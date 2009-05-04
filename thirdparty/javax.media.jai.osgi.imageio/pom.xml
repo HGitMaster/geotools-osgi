@@ -78,6 +78,14 @@
     </plugins>
   </build>
 
+  <repositories>
+    <repository>
+      <id>jiio.bin.deps</id>
+      <name>JAI ImageIO binary dependencies</name>
+      <url>file:${basedir}/repository</url>
+    </repository>
+  </repositories>
+
 </project>
 
 

@@ -5,4 +5,4 @@ target
 bin
 *~
 *.log
-
+thirdparty\javax.media.jai.osgi.imageio\META-INF\MANIFEST.MF

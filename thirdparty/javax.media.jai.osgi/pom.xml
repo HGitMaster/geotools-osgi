@@ -74,6 +74,14 @@
     </license>
   </licenses>
 
+  <repositories>
+    <repository>
+      <id>jai.bin.deps</id>
+      <name>JAI binary dependencies</name>
+      <url>file:${basedir}/repository</url>
+    </repository>
+  </repositories>
+
 
 
 </project>

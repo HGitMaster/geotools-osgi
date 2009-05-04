@@ -97,8 +97,8 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>hsqldb</groupId>        <!-- Overrides the HSQL dependency (from epsg-hsql) with     -->
-      <artifactId>hsqldb</artifactId>  <!-- "provided" scope instead of "runtime", because the HSQL -->
+      <groupId>org.hsqldb</groupId>        <!-- Overrides the HSQL dependency (from epsg-hsql) with     -->
+      <artifactId>com.springsource.org.hsqldb</artifactId>  <!-- "provided" scope instead of "runtime", because the HSQL -->
       <scope>provided</scope>          <!-- engine is already included in OpenOffice environment.   -->
       <!-- The version number is specified in the parent POM. -->
     </dependency>

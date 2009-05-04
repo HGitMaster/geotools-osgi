@@ -115,8 +115,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>com.springsource.org.hsqldb</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
