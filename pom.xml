@@ -1249,6 +1249,7 @@
     <module>build</module>
     <module>modules</module>
     <module>demo</module>
+    <module>eclipse</module>
   </modules>
 </project>
 

@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.geotools</groupId>
+  <artifactId>org.geotools.deps</artifactId>
+  <packaging>jar</packaging>
+  <name>Geotools Dependencies Branding Plug-In</name>
+  <version>2.6.0.osgi1</version>
+  <description>Geotools Dependencies Branding Plug-In</description>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>eclipse</artifactId>
+    <version>2.6.0.osgi1</version>
+  </parent>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>${basedir}</directory>
+        <includes>
+          <include>about.ini</include>
+          <include>META-INF/**</include>
+        </includes>
+      </resource>
+    </resources>
+
+    <plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+						<manifest>
+							<addClasspath>false</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+    </plugins>
+  </build>
+</project>
+
+
