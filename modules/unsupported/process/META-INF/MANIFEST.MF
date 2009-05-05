@@ -25,3 +25,4 @@ Export-Package: org.geotools.process,
  org.geotools.process.literal,
  org.geotools.process.raster,
  org.geotools.text
+Bundle-Vendor: Harman/Becker

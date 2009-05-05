@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Shapefile Plug-in
+Bundle-Name: Geotools Shapefile Support
 Bundle-SymbolicName: org.geotools.shapefile
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -36,3 +36,4 @@ Export-Package: org.geotools.data.shapefile,
  org.geotools.index.rtree.database.mysql,
  org.geotools.index.rtree.fs,
  org.geotools.index.rtree.memory
+Bundle-Vendor: Harman/Becker

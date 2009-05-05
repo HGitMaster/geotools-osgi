@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Cql Plug-in
+Bundle-Name: Geotools CQL Parser
 Bundle-SymbolicName: org.geotools.cql
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -22,3 +22,4 @@ Export-Package: org.geotools.filter.function,
  org.geotools.filter.text.cql2,
  org.geotools.filter.text.generated.parsers,
  org.geotools.filter.text.txt
+Bundle-Vendor: Harman/Becker

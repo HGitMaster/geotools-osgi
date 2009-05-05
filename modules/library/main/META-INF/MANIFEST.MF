@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Main Plug-in
+Bundle-Name: Geotools Main Module
 Bundle-SymbolicName: org.geotools.main
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -84,3 +84,4 @@ Export-Package: org.geotools.data,
  org.geotools.styling.visitor,
  org.geotools.util,
  org.geotools.xml.transform
+Bundle-Vendor: Harman/Becker

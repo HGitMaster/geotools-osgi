@@ -161,12 +161,12 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
+ 				<configuration>
 					<archive>
 						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
-                  <manifest>
-                     <addClasspath>false</addClasspath>
-                  </manifest>
+            <manifest>
+              <addClasspath>false</addClasspath>
+            </manifest>
 					</archive>
 				</configuration>
 			</plugin>

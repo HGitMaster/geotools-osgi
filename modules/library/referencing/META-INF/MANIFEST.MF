@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Referencing Plug-in
+Bundle-Name: Geotools Referencing Services
 Bundle-SymbolicName: org.geotools.referencing
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -53,3 +53,4 @@ Export-Package: org.geotools.geometry,
  org.geotools.referencing.wkt,
  org.geotools.resources,
  org.geotools.resources.geometry
+Bundle-Vendor: Harman/Becker

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Geotools Brewer
+Bundle-Name: Geotools Color Brewer
 Bundle-SymbolicName: org.geotools.brewer
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -13,3 +13,4 @@ Import-Package: com.vividsolutions.jts.geom,
  org.opengis.filter,
  org.opengis.style
 Export-Package: org.geotools.brewer.color
+Bundle-Vendor: Harman/Becker

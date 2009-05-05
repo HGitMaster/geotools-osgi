@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Metadata Plug-in
+Bundle-Name: Geotools Metadata Module
 Bundle-SymbolicName: org.geotools.metadata
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -94,3 +94,4 @@ Export-Package: org.geotools.console,
  org.geotools.resources.i18n,
  org.geotools.util,
  org.geotools.util.logging
+Bundle-Vendor: Harman/Becker

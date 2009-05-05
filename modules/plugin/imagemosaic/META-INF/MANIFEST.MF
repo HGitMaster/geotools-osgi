@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Imagemosaic Datasource
+Bundle-Name: Geotools ImageMosaic
 Bundle-SymbolicName: org.geotools.imagemosaic
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -18,3 +18,4 @@ Import-Package: com.vividsolutions.jts.geom,
  javax.media.jai.operator
 Eclipse-RegisterBuddy: org.geotools.metadata
 Export-Package: org.geotools.gce.imagemosaic
+Bundle-Vendor: Harman/Becker

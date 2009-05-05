@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Api Plug-in
+Bundle-Name: Geotools API
 Bundle-SymbolicName: org.geotools.api
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -34,3 +34,4 @@ Export-Package: org.geotools.data,
  org.geotools.geometry.jts,
  org.geotools.styling,
  org.geotools.util
+Bundle-Vendor: Harman/Becker

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Render Plug-in
+Bundle-Name: Geotools Renderer
 Bundle-SymbolicName: org.geotools.render
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -62,3 +62,4 @@ Export-Package: org.geotools.filter,
  org.geotools.renderer.style,
  org.geotools.styling,
  org.geotools.util
+Bundle-Vendor: Harman/Becker

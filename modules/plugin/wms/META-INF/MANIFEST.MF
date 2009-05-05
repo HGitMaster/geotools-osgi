@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Web Map Server Plug-in
+Bundle-Name: Geotools Web Map Server Client
 Bundle-SymbolicName: org.geotools.wms
 Bundle-Version: 2.6.0.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -26,3 +26,4 @@ Export-Package: org.geotools.data.ows,
  org.geotools.data.wms.request,
  org.geotools.data.wms.response,
  org.geotools.data.wms.xml
+Bundle-Vendor: Harman/Becker
