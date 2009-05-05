@@ -16,34 +16,40 @@
  */
 package org.geotools.image;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Color;
 import java.awt.Transparency;
 import java.awt.image.ColorModel;
-import java.awt.image.RenderedImage;
-import java.awt.image.IndexColorModel;
 import java.awt.image.ComponentColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.FileOutputStream;
+
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageOutputStream;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Viewer;
 import org.geotools.test.TestData;
-
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
  * Tests the {@link ImageWorker} implementation.
  *
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/test/java/org/geotools/image/ImageWorkerTest.java $
- * @version $Id: ImageWorkerTest.java 32888 2009-04-30 16:16:22Z simonegiannecchini $
+ * @version $Id: ImageWorkerTest.java 32940 2009-05-05 06:18:23Z simonegiannecchini $
  * @author Simone Giannecchini (GeoSolutions)
  * @author Martin Desruisseaux (Geomatys)
  */
