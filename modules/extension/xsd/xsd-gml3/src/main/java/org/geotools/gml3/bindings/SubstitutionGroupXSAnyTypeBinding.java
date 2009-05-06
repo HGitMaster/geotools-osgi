@@ -77,6 +77,8 @@ public class SubstitutionGroupXSAnyTypeBinding extends XSAnyTypeBinding {
                         // Without the wrapper, get an NPE in BindingPropertyExtractor.
                         XSDParticle substitutedChildParticle = XSDFactory.eINSTANCE
                                 .createXSDParticle();
+                        substitutedChildParticle.setMaxOccurs(childParticle.getMaxOccurs());
+                        substitutedChildParticle.setMinOccurs(childParticle.getMinOccurs());
                         XSDElementDeclaration wrapper = XSDFactory.eINSTANCE
                                 .createXSDElementDeclaration();
                         wrapper.setResolvedElementDeclaration(e);
