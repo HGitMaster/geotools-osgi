@@ -1,6 +1,21 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.renderer.chart;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -16,6 +31,34 @@ import org.jfree.eastwood.Parameters;
 import org.opengis.feature.Feature;
 import org.opengis.filter.expression.Expression;
 
+/**
+ * Parses Google charts like requests into various kinds of charts.
+ * <p>
+ * Underlying implementation is based on <a href="http://www.jfree.org/eastwood/">Eastwood charts</a>
+ * and <a href="http://www.jfree.org/jfreechart/index.html">JFreeChart</a>
+ * <p>
+ * And example of a valid symbolizer use in SLD is:
+ * <pre>
+ * &lt;ExternalGraphic&gt;
+ *   &lt;OnlineResource xlink:href=&quot;http://chart?cht=p&amp;amp;chl=male|female&amp;amp;chd=t:${100 * male / (male + female)},${100 * female / (male + female)}&amp;amp;chs=200x100&amp;amp;chf=bg,s,FFFFFF00&quot;/&gt;
+ *   &lt;Format&gt;application/chart&lt;/Format&gt;
+ * &lt;/ExternalGraphic&gt;
+ * </pre>
+ * This request will generate a pie chart representing the percentages of female and male
+ * population using attribute features and CQL expression to buid the percentage value to be
+ * used.
+ * </p>
+ * <p>
+ * For details on the URL format documentation refer to the online 
+ * <a href="http://code.google.com/intl/it-IT/apis/chart/">Google charts API</a>.
+ * </p>
+ * <p>
+ * Also mind Eastwood does not implement all of the Google charts API, for example,
+ * Venn diagram and spider diagrams are not supported. Check on the Eastwood project
+ * pages for details. 
+ * </p>
+ * @since 2.5.6
+ */
 public class ChartGraphicFactory implements ExternalGraphicFactory {
 
     public static final String FORMAT = "application/chart";
