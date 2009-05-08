@@ -390,53 +390,10 @@ public abstract class DataFeatureCollection implements FeatureCollection<SimpleF
     }
 
     public boolean containsAll( Collection<?> collection ) {
-        if( collection instanceof FeatureCollection ){
-            return containsAll( (FeatureCollection<?,?>) collection );
-        }
-        try {
-            FeatureReader reader = reader();
-            try {
-               while( reader.hasNext() ){
-                   Feature feature = reader.next();
-                   if( !collection.contains( feature )){
-                       return false;
-                   }
-               }
-            }
-            finally {
-                if( reader != null ) reader.close();
-            }
-        }
-        catch( IOException ignore ){
-        }
-        return true;
-    }
-    
-    public boolean containsAll(FeatureCollection<?,?> resource) {
-        try {
-            final HashSet<FeatureId> fids = new HashSet<FeatureId>();
-            resource.accepts(new org.opengis.feature.FeatureVisitor() {
-                public void visit(Feature feature) {
-                    fids.add(feature.getIdentifier());
-                }
-            }, null );
-            FeatureReader reader = reader();
-            try {
-               while( reader.hasNext() ){
-                   Feature feature = reader.next();
-                   FeatureId id = feature.getIdentifier();                   
-                   if( !fids.contains( id )){
-                       return false;
-                   }
-               }
-            }
-            finally {
-                if( reader != null ) reader.close();
-            }
-            return true;
-        } catch( IOException ignore ){
-            return false; // unable to verify all are contained
-        }
+    	for (Object o: collection) {
+    		if (contains(o)==false) return false;
+    	}
+    	return true;
     }
 
     /**
