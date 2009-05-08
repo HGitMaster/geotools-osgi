@@ -27,10 +27,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.Query;
+import org.geotools.factory.Hints;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
@@ -558,6 +560,45 @@ public abstract class SQLDialect {
     public void encodeGeometryColumn(GeometryDescriptor gatt, int srid, StringBuffer sql) {
         encodeColumnName(gatt.getLocalName(), sql);
     }
+    
+    /**
+     * Encodes a generalized geometry using a DB provided SQL function if available
+     * If not supported, subclasses should not implement
+     * Only called if {@link Hints#GEOMETRY_GENERALIZATION is supported}  
+     * 
+     * Example:
+     * </p>
+     * <pre>
+     *   <code>
+     *   sql.append( "asText(generalize(" );
+     *   column( gatt.getLocalName(), sql );
+     *   sql.append( "," );
+	 *   sql.append(distance);
+     *   sql.append( "))" );
+     *   </code>
+     * </pre>
+     * </p>
+     * <p>
+     * 
+     */
+    
+    public void encodeGeometryColumnGeneralized(GeometryDescriptor gatt, int srid,StringBuffer sql, Double distance) {
+        throw new UnsupportedOperationException("Geometry generalization not supported");
+    }
+    
+    
+    /**
+     * 
+     * Encodes a simplified geometry using a DB provided SQL function if available
+     * If not supported, subclasses should not implement
+     * Only called if {@link Hints#GEOMETRY_SIMPLIFICATION is supported}  
+     * @see SQLDialect#encodeGeometryColumnGeneralized(GeometryDescriptor, StringBuffer, Double)
+     * 
+     */
+    public void encodeGeometryColumnSimplified(GeometryDescriptor gatt, int srid,StringBuffer sql, Double distance) {
+        throw new UnsupportedOperationException("Geometry simplification not supported");
+    }
+
 
     /**
      * Decodes a geometry value from the result of a query.
@@ -772,4 +813,18 @@ public abstract class SQLDialect {
     public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
         throw new UnsupportedOperationException("Ovveride this method when isLimitOffsetSupported returns true");
     }
+    /**
+     * Add hints to the JDBC Feature Source. A subclass 
+     * can override
+     * 
+     * possible hints (but not limited to)
+     *  
+     * {@link Hints#GEOMETRY_GENERALIZATION}
+     * {@link Hints#GEOMETRY_SIMPLIFICATION}
+     *  
+     * @param hints
+     */
+    protected void addSupportedHints(Set<Hints.Key> hints) {       	
+    }
+
 }

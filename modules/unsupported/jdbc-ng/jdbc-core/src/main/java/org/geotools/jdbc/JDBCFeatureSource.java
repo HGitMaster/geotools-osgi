@@ -84,6 +84,7 @@ public class JDBCFeatureSource extends ContentFeatureSource {
         // mark the features as detached, that is, the user can directly alter them
         // without altering the state of the datastore
         hints.add(Hints.FEATURE_DETACHED);
+        getDataStore().getSQLDialect().addSupportedHints(hints);
     }
 
     /**

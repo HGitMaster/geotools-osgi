@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -31,6 +34,7 @@ import org.geotools.data.ResourceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -73,6 +77,12 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                 JDBCFeatureStore.this.setTransaction(transaction);
             }
         };
+        
+    	Set<Hints.Key> jdbcHints = new HashSet<Hints.Key>();      		
+    	jdbcHints.addAll(hints);
+    	getDataStore().getSQLDialect().addSupportedHints(jdbcHints);
+    	hints=Collections.unmodifiableSet(jdbcHints);    	
+
     }
 
     @Override

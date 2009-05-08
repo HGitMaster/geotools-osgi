@@ -83,6 +83,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -2323,7 +2324,7 @@ public final class JDBCDataStore extends ContentDataStore
         for (AttributeDescriptor att : featureType.getAttributeDescriptors()) {
             if (att instanceof GeometryDescriptor) {
                 //encode as geometry
-                dialect.encodeGeometryColumn((GeometryDescriptor) att, getDescriptorSRID(att), sql);
+            	encodeGeometryColumn((GeometryDescriptor) att, sql, query.getHints());
 
                 //alias it to be the name of the original geometry
                 dialect.encodeColumnAlias(att.getLocalName(), sql);
@@ -2445,7 +2446,7 @@ public final class JDBCDataStore extends ContentDataStore
         for (AttributeDescriptor att : featureType.getAttributeDescriptors()) {
             if (att instanceof GeometryDescriptor) {
                 //encode as geometry
-                dialect.encodeGeometryColumn((GeometryDescriptor) att, getDescriptorSRID(att), sql);
+            	encodeGeometryColumn((GeometryDescriptor) att, sql, query.getHints());
 
                 //alias it to be the name of the original geometry
                 dialect.encodeColumnAlias(att.getLocalName(), sql);
@@ -3456,4 +3457,67 @@ public final class JDBCDataStore extends ContentDataStore
             }
         }
     }
+    /**
+     * Checks if geometry generalization required and makes sense
+     * 
+     * @param hints 	hints hints passed in
+     * @param gatt 		Geometry attribute descriptor
+     * @return			true to indicate generalization 
+     */    
+    protected boolean isGeneralizationRequired(Hints hints,GeometryDescriptor gatt) {
+    	return isGeometryReduceRequired(hints, gatt, Hints.GEOMETRY_GENERALIZATION);
+    }
+    
+    /**
+     * Checks if geometry simplification required and makes sense
+     * 
+     * @param hints 	hints hints passed in
+     * @param gatt 		Geometry attribute descriptor
+     * @return			true to indicate simplification 
+     */
+    protected boolean isSimplificationRequired(Hints hints, GeometryDescriptor gatt) {
+    	return isGeometryReduceRequired(hints, gatt, Hints.GEOMETRY_SIMPLIFICATION);    	
+    }
+    /**
+     * Checks if reduction required and makes sense
+     *       
+     * @param hints	  hints passed in 
+     * @param gatt   Geometry attribute descriptor
+     * @param param  {@link Hints#GEOMETRY_GENERALIZATION} or {@link Hints#GEOMETRY_SIMPLIFICATION}
+     * @return true to indicate reducing the geometry, false otherwise
+     */
+    protected boolean isGeometryReduceRequired(Hints hints, GeometryDescriptor gatt, Hints.Key param) {
+    	if (hints==null) return false;
+    	if (hints.containsKey(param)==false) return false;
+    	if (gatt.getType().getBinding() == Point.class)  
+    		return false;
+    	return true;    		
+    }
+
+    /**
+     * Encoding a geometry column with respect to hints
+     * Supported Hints are provided by {@link SQLDialect#addSupportedHints(Set)}
+     * 
+     * @param gatt
+     * @param sql
+     * @param hints , may be null 
+     */
+    protected void encodeGeometryColumn(GeometryDescriptor gatt, StringBuffer sql,Hints hints) {
+    	
+    	int srid = getDescriptorSRID(gatt);
+    	if (isGeneralizationRequired(hints, gatt)==true) {
+    		Double distance = (Double) hints.get(Hints.GEOMETRY_GENERALIZATION);
+    		dialect.encodeGeometryColumnGeneralized(gatt, srid,sql,distance);
+    		return;    		
+    	}
+    		     	
+    	if (isSimplificationRequired(hints, gatt)==true) {
+    		Double distance = (Double) hints.get(Hints.GEOMETRY_SIMPLIFICATION);
+    		dialect.encodeGeometryColumnSimplified(gatt,srid, sql,distance);
+    		return;    		
+    	}
+    	   	    	
+    	dialect.encodeGeometryColumn(gatt,srid, sql);        
+    }
+
 }
