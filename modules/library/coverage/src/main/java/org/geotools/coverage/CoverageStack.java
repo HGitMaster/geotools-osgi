@@ -36,7 +36,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.FactoryException;
@@ -117,8 +117,8 @@ import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
  * {@code CoverageStack} implementation is thread-safe.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/CoverageStack.java $
- * @version $Id: CoverageStack.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/CoverageStack.java $
+ * @version $Id: CoverageStack.java 32440 2009-02-09 11:14:54Z acuster $
  * @author Martin Desruisseaux (IRD)
  */
 public class CoverageStack extends AbstractCoverage {
@@ -142,7 +142,7 @@ public class CoverageStack extends AbstractCoverage {
      * (which may be useful for large images database backed by a distant server).
      *
      * @since 2.1
-     * @version $Id: CoverageStack.java 31445 2008-09-07 18:14:23Z desruisseaux $
+     * @version $Id: CoverageStack.java 32440 2009-02-09 11:14:54Z acuster $
      * @author Martin Desruisseaux
      */
     public static interface Element {
@@ -215,7 +215,7 @@ public class CoverageStack extends AbstractCoverage {
      * required for each method.
      *
      * @since 2.1
-     * @version $Id: CoverageStack.java 31445 2008-09-07 18:14:23Z desruisseaux $
+     * @version $Id: CoverageStack.java 32440 2009-02-09 11:14:54Z acuster $
      * @author Martin Desruisseaux
      */
     public static class Adapter implements Element {
@@ -948,7 +948,7 @@ public class CoverageStack extends AbstractCoverage {
         final Element element = elements[index];
         final GridGeometry geometry = element.getGridGeometry();
         if (geometry != null) {
-            final GridRange     range     = geometry.getGridRange();
+            final GridEnvelope  range     = geometry.getGridRange();
             final MathTransform transform = geometry.getGridToCRS();
             final int           dimension = transform.getSourceDimensions();
             DirectPosition position = new GeneralDirectPosition(dimension);
@@ -959,8 +959,8 @@ public class CoverageStack extends AbstractCoverage {
             try {
                 position = transform.inverse().transform(position, position);
                 for (int i=dimension; --i>=0;) {
-                    position.setOrdinate(i, Math.max(range.getLower(i),
-                                            Math.min(range.getUpper(i)-1,
+                    position.setOrdinate(i, Math.max(range.getLow(i),
+                                            Math.min(range.getHigh(i),
                                        (int)Math.rint(position.getOrdinate(i)))));
                 }
                 position = transform.transform(position, position);
@@ -1514,7 +1514,7 @@ public class CoverageStack extends AbstractCoverage {
      * A listener for monitoring image loading. The purpose for this listener is to
      * log a message when an image is about to be loaded.
      *
-     * @version $Id: CoverageStack.java 31445 2008-09-07 18:14:23Z desruisseaux $
+     * @version $Id: CoverageStack.java 32440 2009-02-09 11:14:54Z acuster $
      * @author Martin Desruisseaux
      */
     private final class Listeners extends IIOReadProgressAdapter {

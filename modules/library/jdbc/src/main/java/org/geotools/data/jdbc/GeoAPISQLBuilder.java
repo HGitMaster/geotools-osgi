@@ -28,6 +28,7 @@ import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.visitor.ClientTransactionAccessor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
+import org.geotools.filter.visitor.SimplifyingFilterVisitor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
@@ -151,8 +152,36 @@ public class GeoAPISQLBuilder implements SQLBuilder {
 
         lastPreFilter = (Filter) pfv.getFilterPre();
         lastPostFilter = (Filter) pfv.getFilterPost();
+
+        SimplifyingFilterVisitor.FIDValidator validator = getFidValidator();
+        SimplifyingFilterVisitor visitor = new SimplifyingFilterVisitor();
+        visitor.setFIDValidator(validator);
+        lastPreFilter = (Filter) lastPreFilter.accept(visitor, null);
+        lastPostFilter = (Filter) lastPostFilter.accept(visitor, null);
     }
     
+    /**
+     * Returns a fid validator to filter out the invalid fids from a Filter
+     * 
+     * @return a fid validator wrapping the {@link SQLEncoder encoder}'s
+     *         {@link FIDMapper#isValid(String)}
+     * @see #splitFilter(Filter)
+     */
+    protected SimplifyingFilterVisitor.FIDValidator getFidValidator() {
+        final FIDMapper mapper = this.encoder.getFIDMapper();
+        SimplifyingFilterVisitor.FIDValidator validator;
+        if (mapper == null) {
+            validator = SimplifyingFilterVisitor.ANY_FID_VALID;
+        } else {
+            validator = new SimplifyingFilterVisitor.FIDValidator() {
+                public boolean isValid(String fid) {
+                    return mapper.isValid(fid);
+                }
+            };
+        }
+        return validator;
+    }
+
     /**
      * Constructs the FROM clause for a featureType
      * 

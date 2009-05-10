@@ -115,7 +115,7 @@ public class ForceCoordinateSystemFeatureIteratorTest extends TestCase {
         assertFalse( original.hasNext() );
         assertFalse( modified.hasNext() );
         
-        assertNotNull(modified.schema);
+        assertNotNull(modified.builder);
     }
     
     public void testNullDestination() throws Exception {
@@ -160,6 +160,6 @@ public class ForceCoordinateSystemFeatureIteratorTest extends TestCase {
         assertFalse( original.hasNext() );
         assertFalse( modified.hasNext() );
         
-        assertNotNull(modified.schema);
+        assertNotNull(modified.builder);
     }
 }

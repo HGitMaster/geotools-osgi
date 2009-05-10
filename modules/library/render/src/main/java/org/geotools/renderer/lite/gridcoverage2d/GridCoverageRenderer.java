@@ -70,8 +70,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author  Simone Giannecchini
  * @author  Andrea Aime
  * @author  Alessio Fabiani
- * @source  $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
- * @version  $Id: GridCoverageRenderer.java 31043 2008-07-21 23:17:45Z simboss $
+ * @source  $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
+ * @version  $Id: GridCoverageRenderer.java 32335 2009-01-26 19:28:34Z simonegiannecchini $
  * @task  Add support for SLD styles
  */
 public final class GridCoverageRenderer {
@@ -458,9 +458,9 @@ public final class GridCoverageRenderer {
         final GeneralEnvelope intersectionEnvelope = new GeneralEnvelope(destinationEnvelopeInSourceCRS);
         intersectionEnvelope.intersect(sourceCoverageEnvelope);
         if (intersectionEnvelope.isEmpty()||intersectionEnvelope.isNull()) {
-            if (LOGGER.isLoggable(Level.FINE)) {
+            if (LOGGER.isLoggable(Level.INFO)) {
                 LOGGER
-                        .warning("The destination envelope does not intersect the envelope of the source coverage.");
+                        .info("The destination envelope does not intersect the envelope of the source coverage.");
             }
             return;
         }

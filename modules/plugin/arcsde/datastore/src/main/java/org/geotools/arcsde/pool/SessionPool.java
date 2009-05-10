@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 
@@ -37,36 +38,31 @@ import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeRelease;
 
 /**
- * Maintains <code>SeConnection</code>'s for a single set of connection
- * properties (for instance: by server, port, user and password) in a pool to
- * recycle used connections.
+ * Maintains <code>SeConnection</code>'s for a single set of connection properties (for instance: by
+ * server, port, user and password) in a pool to recycle used connections.
  * <p>
- * We are making use of an Apache Commons ObjectPool to maintain connections.
- * This connection pool is configurable in the sense that some parameters can be
- * passed to establish the pooling policy. To pass parameters to the connection
- * pool, you should set properties in the parameters Map passed to
- * SdeDataStoreFactory.createDataStore, which will invoke
- * SdeConnectionPoolFactory to get the SDE instance's pool singleton. That
- * instance singleton will be created with the preferences passed the first time
- * createDataStore is called for a given SDE instance/user, if subsequent calls
+ * We are making use of an Apache Commons ObjectPool to maintain connections. This connection pool
+ * is configurable in the sense that some parameters can be passed to establish the pooling policy.
+ * To pass parameters to the connection pool, you should set properties in the parameters Map passed
+ * to SdeDataStoreFactory.createDataStore, which will invoke SdeConnectionPoolFactory to get the SDE
+ * instance's pool singleton. That instance singleton will be created with the preferences passed
+ * the first time createDataStore is called for a given SDE instance/user, if subsequent calls
  * change that preferences, they will be ignored.
  * </p>
  * <p>
- * The expected optional parameters that you can set up in the argument Map for
- * createDataStore are:
+ * The expected optional parameters that you can set up in the argument Map for createDataStore are:
  * <ul>
- * <li> pool.minConnections Integer, tells the minimum number of open
- * connections the pool will maintain opened </li>
- * <li> pool.maxConnections Integer, tells the maximum number of open
- * connections the pool will create and maintain opened </li>
- * <li> pool.timeOut Integer, tells how many milliseconds a calling thread is
- * guaranteed to wait before getConnection() throws an
- * UnavailableArcSDEConnectionException </li>
+ * <li>pool.minConnections Integer, tells the minimum number of open connections the pool will
+ * maintain opened</li>
+ * <li>pool.maxConnections Integer, tells the maximum number of open connections the pool will
+ * create and maintain opened</li>
+ * <li>pool.timeOut Integer, tells how many milliseconds a calling thread is guaranteed to wait
+ * before getConnection() throws an UnavailableArcSDEConnectionException</li>
  * </ul>
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: SessionPool.java 31122 2008-07-31 21:59:08Z groldan $
+ * @version $Id: SessionPool.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class SessionPool {
     /** package's logger */
@@ -94,19 +90,18 @@ public class SessionPool {
     protected ObjectPool pool;
 
     /**
-     * Creates a new SdeConnectionPool object with the connection parameters
-     * holded by <code>config</code>
+     * Creates a new SdeConnectionPool object with the connection parameters holded by
+     * <code>config</code>
      * 
      * @param config
-     *            holds connection options such as server, user and password, as
-     *            well as tuning options as maximum number of connections
-     *            allowed
-     * @throws DataSourceException
+     *            holds connection options such as server, user and password, as well as tuning
+     *            options as maximum number of connections allowed
+     * @throws IOException
      *             If connection could not be established
      * @throws NullPointerException
      *             If config is null
      */
-    protected SessionPool(ArcSDEConnectionConfig config) throws DataSourceException {
+    protected SessionPool(ArcSDEConnectionConfig config) throws IOException {
         if (config == null) {
             throw new NullPointerException("parameter config can't be null");
         }
@@ -145,6 +140,8 @@ public class SessionPool {
             for (int i = 0; i < minConnections; i++) {
                 this.pool.returnObject(preload[i]);
             }
+        } catch (IOException e) {
+            throw e;
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "can't connect to " + config, e);
             throw new DataSourceException(e);
@@ -152,8 +149,7 @@ public class SessionPool {
     }
 
     /**
-     * SeConnectionFactory used to create {@link ISession} instances for the
-     * pool.
+     * SeConnectionFactory used to create {@link ISession} instances for the pool.
      * <p>
      * Subclass may overide to customize this behaviour.
      * </p>
@@ -165,8 +161,8 @@ public class SessionPool {
     }
 
     /**
-     * returns the number of actual connections holded by this connection pool.
-     * In other words, the sum of used and available connections, regardless
+     * returns the number of actual connections held by this connection pool. In other words, the
+     * sum of used and available connections, regardless
      * 
      * @return DOCUMENT ME!
      */
@@ -178,8 +174,8 @@ public class SessionPool {
     }
 
     /**
-     * closes all connections in this pool. The first call closes all
-     * SeConnections, further calls have no effect.
+     * closes all connections in this pool. The first call closes all SeConnections, further calls
+     * have no effect.
      */
     public void close() {
         if (pool != null) {
@@ -209,8 +205,7 @@ public class SessionPool {
     }
 
     /**
-     * Ensures proper closure of connection pool at this object's finalization
-     * stage.
+     * Ensures proper closure of connection pool at this object's finalization stage.
      */
     @Override
     protected void finalize() {
@@ -240,9 +235,8 @@ public class SessionPool {
     /**
      * Retrieve the connection for the provided transaction.
      * <p>
-     * The connection is held open until while the transaction is underway. A a
-     * Transaction.State is registered for this SessionPool in order to hold the
-     * session.
+     * The connection is held open until while the transaction is underway. A a Transaction.State is
+     * registered for this SessionPool in order to hold the session.
      * </p>
      * 
      * @param transaction
@@ -262,11 +256,10 @@ public class SessionPool {
     }
 
     /**
-     * Grab a session from the pool, this session is the responsibility of the
-     * calling code and must be closed after use.
+     * Grab a session from the pool, this session is the responsibility of the calling code and must
+     * be closed after use.
      * 
-     * @return A Session, when close() is called it will be recycled into the
-     *         pool
+     * @return A Session, when close() is called it will be recycled into the pool
      * @throws DataSourceException
      *             If we could not get a connection
      * @throws UnavailableArcSDEConnectionException
@@ -295,13 +288,13 @@ public class SessionPool {
             connection.markActive();
             return connection;
         } catch (NoSuchElementException e) {
-            LOGGER.log(Level.WARNING, "Out of connections: " + e.getMessage(), e);
+            LOGGER.log(Level.WARNING, "Out of connections: " + e.getMessage() + ". Config: "
+                    + this.config);
             throw new UnavailableArcSDEConnectionException(this.pool.getNumActive(), this.config);
         } catch (SeException se) {
-            LOGGER.log(Level.WARNING, "ArcSDE error getting connection: "
-                    + se.getSeError().getErrDesc(), se);
-            throw new DataSourceException("ArcSDE Error Message: " + se.getSeError().getErrDesc(),
-                    se);
+            ArcSdeException sdee = new ArcSdeException(se);
+            LOGGER.log(Level.WARNING, "ArcSDE error getting connection for " + config, sdee);
+            throw sdee;
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Unknown problem getting connection: " + e.getMessage(), e);
             throw new DataSourceException(
@@ -312,8 +305,8 @@ public class SessionPool {
     /**
      * Gets the list of available layer names on the database
      * 
-     * @return a <code>List&lt;String&gt;</code> with the registered
-     *         featureclasses on the ArcSDE database
+     * @return a <code>List&lt;String&gt;</code> with the registered featureclasses on the ArcSDE
+     *         database
      * @throws DataSourceException
      */
     @SuppressWarnings("unchecked")
@@ -360,11 +353,11 @@ public class SessionPool {
     }
 
     /**
-     * PoolableObjectFactory intended to be used by a Jakarta's commons-pool
-     * objects pool, that provides ArcSDE's SeConnections.
+     * PoolableObjectFactory intended to be used by a Jakarta's commons-pool objects pool, that
+     * provides ArcSDE's SeConnections.
      * 
      * @author Gabriel Roldan, Axios Engineering
-     * @version $Id: SessionPool.java 31122 2008-07-31 21:59:08Z groldan $
+     * @version $Id: SessionPool.java 32195 2009-01-09 19:00:35Z groldan $
      */
     protected class SeConnectionFactory extends BasePoolableObjectFactory {
         /** DOCUMENT ME! */
@@ -426,15 +419,13 @@ public class SessionPool {
         }
 
         /**
-         * is invoked in an implementation-specific fashion to determine if an
-         * instance is still valid to be returned by the pool. It will only be
-         * invoked on an "activated" instance.
+         * is invoked in an implementation-specific fashion to determine if an instance is still
+         * valid to be returned by the pool. It will only be invoked on an "activated" instance.
          * 
          * @param an
          *            instance of {@link Session} maintained by this pool.
-         * @return <code>true</code> if the connection is still alive and
-         *         operative (checked by asking its user name),
-         *         <code>false</code> otherwise.
+         * @return <code>true</code> if the connection is still alive and operative (checked by
+         *         asking its user name), <code>false</code> otherwise.
          */
         @Override
         public boolean validateObject(Object obj) {
@@ -451,7 +442,8 @@ public class SessionPool {
                         LOGGER.finest("    Connection validated, user: " + user);
                     }
                 } catch (IOException e) {
-                    LOGGER.info("Can't validate SeConnection, discarding it: " + session);
+                    LOGGER.info("Can't validate SeConnection, discarding it: " + session
+                            + ". Reason: " + e.getMessage());
                     valid = false;
                 }
             }
@@ -459,9 +451,8 @@ public class SessionPool {
         }
 
         /**
-         * is invoked on every instance when it is being "dropped" from the pool
-         * (whether due to the response from validateObject, or for reasons
-         * specific to the pool implementation.)
+         * is invoked on every instance when it is being "dropped" from the pool (whether due to the
+         * response from validateObject, or for reasons specific to the pool implementation.)
          * 
          * @param obj
          *            an instance of {@link Session} maintained by this pool.

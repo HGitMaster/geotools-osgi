@@ -17,7 +17,10 @@
 
 package org.geotools.data.complex;
 
+import java.awt.RenderingHints;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -28,17 +31,15 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
-import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
-import org.opengis.filter.capability.FilterCapabilities;
 
 /**
- * A FeatureSource2 that uses a {@linkplain org.geotools.data.complex.FeatureTypeMapping} to perform
+ * A FeatureSource that uses a {@linkplain org.geotools.data.complex.FeatureTypeMapping} to perform
  * Feature fetching.
  * 
  * <p>
@@ -54,9 +55,9 @@ import org.opengis.filter.capability.FilterCapabilities;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: MappingFeatureSource.java 31784 2008-11-06 06:20:21Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/MappingFeatureSource.java $
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: MappingFeatureSource.java 32538 2009-02-23 04:14:22Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureSource.java $
  * @since 2.4
  */
 class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
@@ -80,6 +81,13 @@ class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
 
     private DefaultQuery namedQuery(Filter filter, int countLimit) {
         DefaultQuery query = new DefaultQuery();
+        if (getName().getNamespaceURI() != null) {
+            try {
+                query.setNamespace(new URI(getName().getNamespaceURI()));
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
         query.setTypeName(getName().getLocalPart());
         query.setFilter(filter);
         query.setMaxFeatures(countLimit);
@@ -132,18 +140,6 @@ class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
         throw new UnsupportedOperationException("this is a read only feature source");
     }
 
-    public Object describe() {
-        return mapping.getTargetFeature();
-    }
-
-    public void dispose() {
-        store.dispose();
-    }
-
-    public FilterCapabilities getFilterCapabilities() {
-        throw new UnsupportedOperationException();
-    }
-
     public ResourceInfo getInfo() {
         throw new UnsupportedOperationException();
     }
@@ -153,14 +149,18 @@ class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
         return name;
     }
 
-    public void setTransaction(Transaction t) {
-        throw new UnsupportedOperationException();
+    /**
+     * Not a supported operation.
+     * 
+     * @see org.geotools.data.FeatureSource#getSupportedHints()
+     */
+    public Set<RenderingHints.Key> getSupportedHints() {
+        return Collections.emptySet();
     }
 
-    public Set getSupportedHints() {
-        return Collections.EMPTY_SET;
-    }
-
+    /**
+     * @see org.geotools.data.FeatureSource#getQueryCapabilities()
+     */
     public QueryCapabilities getQueryCapabilities() {
         return new QueryCapabilities();
     }

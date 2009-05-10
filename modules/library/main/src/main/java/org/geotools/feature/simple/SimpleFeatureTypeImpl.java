@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  * 
- *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2002-2009, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,9 +17,7 @@
 package org.geotools.feature.simple;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +35,7 @@ import org.opengis.util.InternationalString;
  * in a list.
  * 
  * @author Justin
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  */
 public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
         SimpleFeatureType {
@@ -44,22 +43,29 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
     // list of types
     List<AttributeType> types = null;
 
-    List<AttributeDescriptor> descriptors;
-
     Map<String, Integer> index;
 
+    @SuppressWarnings("unchecked")
     public SimpleFeatureTypeImpl(Name name, List<AttributeDescriptor> schema,
             GeometryDescriptor defaultGeometry, boolean isAbstract,
             List<Filter> restrictions, AttributeType superType,
             InternationalString description) {
+        // Note intentional circumvention of generics type checking;
+        // this is only valid if schema is not modified.
         super(name, (List) schema, defaultGeometry, isAbstract, restrictions,
                 superType, description);
-        descriptors = schema;
         index = buildIndex(this);
     }
 
-    public List<AttributeDescriptor> getAttributeDescriptors() {
-        return Collections.unmodifiableList(descriptors);
+    /**
+     * @see org.opengis.feature.simple.SimpleFeatureType#getAttributeDescriptors()
+     */
+    @SuppressWarnings("unchecked")
+    public final List<AttributeDescriptor> getAttributeDescriptors() {
+        // Here we circumvent the generics type system. Because we provide the schema and know it is
+        // copied into an ArrayList in ComplexTypeImpl, this must work. Ugly, but then so are simple
+        // features.
+        return (List) getDescriptors();
     }
 
     public List<AttributeType> getTypes() {
@@ -67,15 +73,12 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
             synchronized (this) {
                 if (types == null) {
                     types = new ArrayList<AttributeType>();
-                    for (Iterator<AttributeDescriptor> itr = descriptors
-                            .iterator(); itr.hasNext();) {
-                        AttributeDescriptor ad = itr.next();
+                    for (AttributeDescriptor ad : getAttributeDescriptors()) {
                         types.add(ad.getType());
                     }
                 }
             }
         }
-
         return types;
     }
 
@@ -84,7 +87,6 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
         if (attribute != null) {
             return attribute.getType();
         }
-
         return null;
     }
 
@@ -93,7 +95,6 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
         if (attribute != null) {
             return attribute.getType();
         }
-
         return null;
     }
 
@@ -110,34 +111,35 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
     }
 
     public AttributeDescriptor getDescriptor(int index) {
-        return descriptors.get(index);
+        return getAttributeDescriptors().get(index);
     }
 
     public int indexOf(Name name) {
-        if(name.getNamespaceURI() == null)
+        if(name.getNamespaceURI() == null) {
             return indexOf(name.getLocalPart());
-        
+        }
         // otherwise do a full scan
         int index = 0;
-        for (Iterator<AttributeDescriptor> itr = getAttributeDescriptors().iterator(); itr.hasNext(); index++) {
-            AttributeDescriptor descriptor = (AttributeDescriptor) itr.next();
+        for (AttributeDescriptor descriptor :  getAttributeDescriptors()) {
             if (descriptor.getName().equals(name)) {
                 return index;
             }
+            index++;
         }
         return -1;
     }
 
     public int indexOf(String name) {
         Integer idx = index.get(name);
-        if(idx != null)
+        if(idx != null) {
             return idx.intValue();
-        else
+        } else {
             return -1;
+        }
     }
 
     public int getAttributeCount() {
-        return descriptors.size();
+        return getAttributeDescriptors().size();
     }
 
     public String getTypeName() {

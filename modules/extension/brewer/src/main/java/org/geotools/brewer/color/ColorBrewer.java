@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -41,7 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author James Macgill
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/brewer/src/main/java/org/geotools/brewer/color/ColorBrewer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/brewer/src/main/java/org/geotools/brewer/color/ColorBrewer.java $
  */
 public class ColorBrewer {
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.brewer.color");
@@ -291,8 +292,10 @@ public class ColorBrewer {
             return;
         }
 
-        String paletteSet = type.getName().toLowerCase();
+        // force to lower case with US locale for http://jira.codehaus.org/browse/UDIG-1265
+        String paletteSet = type.getName().toLowerCase(Locale.US);        
         URL url = getClass().getResource("resources/" + paletteSet + ".xml");
+        
         InputStream stream;
 
         try {

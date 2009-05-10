@@ -44,6 +44,11 @@ import org.geotools.test.OnlineTestCase;
  * </pre>
  * 
  * See {@link OnlineTestCase} for more about online test fixtures.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: AbstractRegfuncPostgisOnlineTestCase.java 31819 2008-11-11 02:31:21Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/jdbc-regfunc/src/test/java/org/geotools/data/postgis/AbstractRegfuncPostgisOnlineTestCase.java $
+ * @since 2.4
  */
 public abstract class AbstractRegfuncPostgisOnlineTestCase extends OnlineTestCase {
 

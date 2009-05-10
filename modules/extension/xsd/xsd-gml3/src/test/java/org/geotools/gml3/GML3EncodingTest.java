@@ -23,17 +23,26 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import junit.framework.TestCase;
 
 import org.apache.xerces.parsers.SAXParser;
 import org.eclipse.xsd.XSDSchema;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.gml3.bindings.GML3MockData;
 import org.geotools.gml3.bindings.TEST;
 import org.geotools.gml3.bindings.TestConfiguration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.Parser;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -163,5 +172,27 @@ public class GML3EncodingTest extends TestCase {
         saxParser.parse(new InputSource(new ByteArrayInputStream(output.toByteArray())));
 
         assertTrue(errors.isEmpty());
+    }
+    
+    public void testEncodeFeatureWithBounds() throws Exception {
+        SimpleFeature feature = GML3MockData.feature();
+        TestConfiguration configuration  = new TestConfiguration();
+        //configuration.getProperties().add( org.geotools.gml2.GMLConfiguration.NO_FEATURE_BOUNDS );
+    
+        Encoder encoder = new Encoder( configuration );
+        Document dom = encoder.encodeAsDOM(feature, TEST.TestFeature );
+        
+        assertEquals( 1, dom.getElementsByTagName("gml:boundedBy").getLength());
+    }
+    
+    public void testEncodeFeatureWithNoBounds() throws Exception {
+        SimpleFeature feature = GML3MockData.feature();
+        TestConfiguration configuration  = new TestConfiguration();
+        configuration.getProperties().add( org.geotools.gml2.GMLConfiguration.NO_FEATURE_BOUNDS );
+    
+        Encoder encoder = new Encoder( configuration );
+        Document dom = encoder.encodeAsDOM(feature, TEST.TestFeature );
+        
+        assertEquals( 0, dom.getElementsByTagName("gml:boundedBy").getLength());
     }
 }

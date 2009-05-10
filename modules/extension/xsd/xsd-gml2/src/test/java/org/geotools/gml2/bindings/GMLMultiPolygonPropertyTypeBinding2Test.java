@@ -29,7 +29,7 @@ public class GMLMultiPolygonPropertyTypeBinding2Test extends GMLTestSupport {
     }
 
     public void testExecutionMode() {
-        assertEquals(Binding.AFTER, binding(GML.MultiPolygonPropertyType).getExecutionMode());
+        assertEquals(Binding.OVERRIDE, binding(GML.MultiPolygonPropertyType).getExecutionMode());
     }
 
     public void testParse() throws Exception {

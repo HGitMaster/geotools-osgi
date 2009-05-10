@@ -52,7 +52,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * Produces SLD to an output stream.
  *
  * @author Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/SLDTransformer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/SLDTransformer.java $
  */
 public class SLDTransformer extends TransformerBase {
     /** The logger for this package. */
@@ -143,21 +143,52 @@ public class SLDTransformer extends TransformerBase {
             new FileOutputStream(System.getProperty("java.io.tmpdir")
                 + "/junk.eraseme"));
     }
-
+    /**
+     * Translates the Style data structure into a series of XML events
+     * that can be encoded etc...
+     * <p>
+     * This Translator makes use of the following (currently hardcoded) information:
+     * <ul>
+     * <li>prefix: sld
+     * <li>namespace: http://www.opengis.net/sld
+     * </ul>
+     * @author Jody
+     */
     static class SLDTranslator extends TranslatorSupport implements StyleVisitor {
+        /**
+         * Handles any Filters used in our data structure.
+         */
         FilterTransformer.FilterTranslator filterTranslator;
 
+        /**
+         * Translates into the default of prefix "sld" for "http://www.opengis.net/sld".
+         * 
+         * @param handler
+         */
         public SLDTranslator(ContentHandler handler) {
-            super(handler, "sld", "http://www.opengis.net/sld");
+            this( handler, "sld", "http://www.opengis.net/sld");
+        }
+
+        /**
+         * Translates
+         * @param handler
+         */
+        public SLDTranslator(ContentHandler handler, String prefix, String uri ) {
+            super(handler, prefix, uri );
             filterTranslator = new FilterTransformer.FilterTranslator(handler);
             addNamespaceDeclarations(filterTranslator);
         }
-
-        void element(String element, Expression e) {
-            if( e == null || e == Expression.NIL ) return;
+        
+        /**
+         * Utility method used to quickly package up the provided expression.
+         * @param element
+         * @param expr
+         */
+        void element(String element, Expression expr) {
+            if( expr == null || expr == Expression.NIL ) return;
             
             start(element);
-            filterTranslator.encode(e);
+            filterTranslator.encode(expr);
             end(element);
         }
         
@@ -178,12 +209,6 @@ public class SLDTransformer extends TransformerBase {
         	start(value);
         	end(value);
         	end(element);
-        }
-
-        void element(String element, Filter f) {
-            start(element);
-            filterTranslator.encode(f);
-            end(element);
         }
 
         public void visit(PointPlacement pp) {
@@ -502,7 +527,13 @@ public class SLDTransformer extends TransformerBase {
                 // no filter
             }
             else {
-                element("Filter", filter);
+                try {
+                    contentHandler.startElement("", "", "ogc:Filter", NULL_ATTS);
+                    filterTranslator.encode(filter);
+                    contentHandler.endElement("","","ogc:Filter");
+                } catch (SAXException se) {
+                    throw new RuntimeException(se);
+                }
             }
 
             if (rule.hasElseFilter()) {

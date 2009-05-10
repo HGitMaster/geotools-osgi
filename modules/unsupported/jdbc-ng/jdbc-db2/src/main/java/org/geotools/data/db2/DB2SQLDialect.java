@@ -90,6 +90,18 @@ public class DB2SQLDialect extends SQLDialect  {
     private String SELECT_SRS_NAME_FROM_ORG = 
     	"select srs_name,srs_id from db2gse.st_spatial_reference_systems where organization = ? and organization_coordsys_id=?";
 
+    private static String SELECT_INCLUDE_WITH_SCHEMA ="select table_schema,table_name  from db2gse.st_geometry_columns where table_schema = ? and table_name=?";
+    private static String SELECT_INCLUDE="select table_schema,table_name  from db2gse.st_geometry_columns where table_schema = current schema  and table_name=?";
+    
+    //private static String SELECT_ROWNUMBER="select rownumber() over () as rownum,ibmreqd from sysibm.sysdummy1";
+    private static String SELECT_ROWNUMBER="select * from sysibm.sysdummy1 where rownum = 1";
+    private  Boolean isRowNumberSupported=null;
+    private  static String ROWNUMBER_MESSAGE=
+    	"DB2 handles paged select statements inefficiently\n"+
+    	"Since Version 9.5 you can do the following\n"+
+    	"dbstop\n"+
+    	"db2set DB2_COMPATIBILITY_VECTOR=01\n"+
+    	"db2start\n";
     
     public DB2SQLDialect(JDBCDataStore dataStore) {
         super(dataStore);
@@ -109,6 +121,7 @@ public class DB2SQLDialect extends SQLDialect  {
      */
     @Override
     public CoordinateReferenceSystem createCRS(int srid, Connection cx) throws SQLException {
+    	    	
     	PreparedStatement ps = cx.prepareStatement(SELECT_CRS_WKT);
     	ps.setInt(1, srid);
     	ResultSet rs = ps.executeQuery();
@@ -123,21 +136,24 @@ public class DB2SQLDialect extends SQLDialect  {
     	ps.close();
     	rs.close();
     	
-    	if (wkt==null) return null; // nothing found
+    	if (orgid !=0 && org!=null ) {
+	        try {
+	        	return CRS.decode(org+":" + orgid);        
+	        } catch(Exception e) {
+	            if(LOGGER.isLoggable(Level.WARNING)) 
+	                LOGGER.log(Level.WARNING, "Could not decode " + org+":"+orgid + " using the geotools database", e);
+	        }
+    	}
     	
-        try {
-        	return CRS.parseWKT(wkt);
-            
-        } catch(Exception e) {     
-            if(LOGGER.isLoggable(Level.WARNING)) 
-                LOGGER.log(Level.WARNING, "Could not decode db2 wkt definition for " + srid  );            	    	
-        }
-        try {
-        	return CRS.decode(org+":" + orgid);        
-        } catch(Exception e) {
-            if(LOGGER.isLoggable(Level.WARNING)) 
-                LOGGER.log(Level.WARNING, "Could not decode " + org+":"+orgid + " using the geotools database", e);
-        }
+    	    	    	
+    	if (wkt!=null) {    	    	    	
+    		try {
+    			return CRS.parseWKT(wkt);            
+    		} catch(Exception e) {     
+    			if(LOGGER.isLoggable(Level.WARNING)) 
+    				LOGGER.log(Level.WARNING, "Could not decode db2 wkt definition for " + srid  );            	    	
+    		}
+    	}		
        return null;    
     }
     
@@ -224,7 +240,6 @@ public class DB2SQLDialect extends SQLDialect  {
         byte[] wkb = rs.getBytes(column);
 
         try {
-            //TODO: srid
             Polygon polygon = (Polygon) new WKBReader().read(wkb);            
             return polygon.getEnvelopeInternal();
         } catch (ParseException e) {
@@ -412,7 +427,68 @@ public class DB2SQLDialect extends SQLDialect  {
         
     }
 
+	@Override
+	public boolean includeTable(String schemaName, String tableName, Connection cx) throws SQLException {
+		
+	
+				
+		PreparedStatement ps = null;
+		if (schemaName!=null && schemaName.trim().length()>0) { 
+			ps = cx.prepareStatement(SELECT_INCLUDE_WITH_SCHEMA); 
+			ps.setString(1,schemaName);
+			ps.setString(2,tableName);
+		}	else {
+			ps = cx.prepareStatement(SELECT_INCLUDE);
+			ps.setString(1,tableName);
+		}
+			
+		ResultSet rs = ps.executeQuery();
+		boolean isGeomTable = rs.next();
+		rs.close();
+		ps.close();		
+		return isGeomTable;
+	}
+
+    @Override   
+    public boolean isLimitOffsetSupported() {
+    	if (isRowNumberSupported==null)
+    		setIsRowNumberSupported();
+        return isRowNumberSupported;
+    }
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+    	// Using the same code as in the OracleDialict. This method is only invoked if
+    	// DB2 is configured to be compatible to Oracle with 
+    	// "db2set DB2_COMPATIBILITY_VECTOR=01"
+    	// enabling the rownum pseudo column
+    	
+        if(offset == 0) {
+            sql.insert(0, "SELECT * FROM (");
+            sql.append(") WHERE ROWNUM <= " + limit);
+        } else {
+            long max = (limit == Integer.MAX_VALUE ? Long.MAX_VALUE : limit + offset);
+            sql.insert(0, "SELECT * FROM (SELECT A.*, ROWNUM RNUM FROM ( ");
+            sql.append(") A WHERE ROWNUM <= " + max + ")");
+            sql.append("WHERE RNUM > " + offset);
+        }
+    }
 
 
-
+    private void setIsRowNumberSupported() {
+    	
+    	try {
+    		Connection con = dataStore.getDataSource().getConnection();
+    		PreparedStatement ps = con.prepareStatement(SELECT_ROWNUMBER); 
+    		ResultSet rs = ps.executeQuery();
+    		if (rs.next()) isRowNumberSupported=Boolean.TRUE;    		
+    		rs.close();
+    		ps.close();
+    		con.close();
+    	}
+    	catch (SQLException ex) {
+    		LOGGER.warning(ROWNUMBER_MESSAGE);
+    		isRowNumberSupported=Boolean.FALSE;
+    	}
+    }
+    
 }

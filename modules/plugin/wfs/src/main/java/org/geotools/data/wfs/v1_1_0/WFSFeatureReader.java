@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
+import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.protocol.wfs.GetFeatureParser;
 import org.geotools.data.wfs.v1_1_0.parsers.EmfAppSchemaParser;
 import org.opengis.feature.simple.SimpleFeature;
@@ -31,13 +32,12 @@ import org.opengis.feature.type.FeatureType;
  * for all the data content related implementations in the WFS module.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: WFSFeatureReader.java 31805 2008-11-07 19:23:45Z groldan $
+ * @version $Id: WFSFeatureReader.java 31823 2008-11-11 16:11:49Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
  *         /wfs/v1_1_0/WFSFeatureReader.java $
- * @see WFS110ProtocolHandler#getFeatureReader(org.geotools.data.Query,
- *      org.geotools.data.Transaction)
+ * @see WFSDataStore#getFeatureReader(org.geotools.data.Query, org.geotools.data.Transaction)
  */
 class WFSFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFeature> {
 
@@ -47,7 +47,7 @@ class WFSFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFeature
 
     private SimpleFeatureType featureType;
 
-    public WFSFeatureReader( final GetFeatureParser parser ) throws IOException {
+    public WFSFeatureReader(final GetFeatureParser parser) throws IOException {
         this.parser = parser;
         this.next = parser.parse();
         if (this.next != null) {

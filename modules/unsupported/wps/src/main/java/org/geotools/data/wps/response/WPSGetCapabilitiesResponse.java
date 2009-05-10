@@ -22,12 +22,9 @@ import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.opengis.ows11.ExceptionReportType;
-import net.opengis.wps.ProcessDescriptionsType;
-import net.opengis.wps.WPSCapabilitiesType;
+import net.opengis.wps10.WPSCapabilitiesType;
 
 import org.geotools.data.ows.AbstractWPSGetCapabilitiesResponse;
-import org.geotools.data.ows.Capabilities;
-import org.geotools.data.ows.GetCapabilitiesResponse;
 import org.geotools.ows.ServiceException;
 import org.geotools.wps.WPSConfiguration;
 import org.geotools.xml.Configuration;

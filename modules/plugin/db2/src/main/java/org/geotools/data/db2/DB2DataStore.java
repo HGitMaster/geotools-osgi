@@ -76,7 +76,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2DataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2DataStore.java $
  */
 public class DB2DataStore extends JDBCDataStore implements DataStore{
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
@@ -506,7 +506,7 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
 	 * (non-Javadoc)
 	 * 
 	 * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
-	 *      org.geotools.filter.Filter, org.geotools.data.Transaction)
+	 *      Filter, org.geotools.data.Transaction)
 	 */
 	public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final SimpleFeatureType requestType,
 			final Filter filter, final Transaction transaction)

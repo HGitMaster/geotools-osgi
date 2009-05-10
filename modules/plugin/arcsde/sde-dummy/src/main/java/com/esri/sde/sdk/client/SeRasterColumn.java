@@ -16,5 +16,12 @@ public class SeRasterColumn {
     public void setConfigurationKeyword(String s) {}
     
     public void create() {}
+    public String getTableName() {
+        return null;
+    }
+    public SeObjectId getID() throws SeException{
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

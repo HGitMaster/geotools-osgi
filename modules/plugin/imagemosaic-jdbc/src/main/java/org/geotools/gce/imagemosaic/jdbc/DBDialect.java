@@ -173,7 +173,7 @@ public abstract class DBDialect {
     String getCreateMasterStatement() throws Exception {
         Config config = getConfig();
         String doubleType = getDoubleSQLType();
-        String statement = " CREATE TABLE " + config.getMasterTable();
+        String statement = "CREATE TABLE " + config.getMasterTable();
         statement += ("(" + config.getCoverageNameAttribute() +
         " CHARACTER (64)  NOT NULL");
         statement += ("," + config.getSpatialTableNameAtribute() +
@@ -202,7 +202,7 @@ public abstract class DBDialect {
      */
     String getCreateTileTableStatement(String tableName)
         throws Exception {
-        String statement = " CREATE TABLE " + tableName;
+        String statement = "CREATE TABLE " + tableName;
         statement += ("(" + getConfig().getKeyAttributeNameInTileTable() +
         " CHAR(64) NOT NULL ");
         statement += ("," + getConfig().getBlobAttributeNameInTileTable() +
@@ -221,7 +221,7 @@ public abstract class DBDialect {
      */
     protected String getCreateSpatialTableStatement(String tableName)
         throws Exception {
-        String statement = " CREATE TABLE " + tableName;
+        String statement = "CREATE TABLE " + tableName;
         statement += (" ( " + getConfig().getKeyAttributeNameInSpatialTable() +
         " CHAR(64) NOT NULL, " +
         getConfig().getGeomAttributeNameInSpatialTable() + " " +
@@ -240,7 +240,7 @@ public abstract class DBDialect {
      */
     protected String getCreateSpatialTableStatementJoined(String tableName)
         throws Exception {
-        String statement = " CREATE TABLE " + tableName;
+        String statement = "CREATE TABLE " + tableName;
         statement += (" ( " + getConfig().getKeyAttributeNameInSpatialTable() +
         " CHAR(64) NOT NULL, " +
         getConfig().getGeomAttributeNameInSpatialTable() + " " +

@@ -16,11 +16,12 @@
  */
 package org.geotools.caching.spatialindex.store;
 
+import java.util.Properties;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
+
+import org.geotools.caching.grid.spatialindex.store.DiskStorage;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.Storage;
 
@@ -33,7 +34,6 @@ public class DiskStorageTest extends AbstractStorageTest {
     @Override
     Storage createStorage() {
         Storage storage = DiskStorage.createInstance();
-        storage.setParent(this.grid);
 
         return storage;
     }
@@ -45,7 +45,6 @@ public class DiskStorageTest extends AbstractStorageTest {
         Properties pset = this.store.getPropertySet();
         this.store.flush();
         this.store = DiskStorage.createInstance(pset);
-        this.store.setParent(this.grid);
 
         Node g = store.get(id);
         assertEquals(n.getIdentifier(), g.getIdentifier());

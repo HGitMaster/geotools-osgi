@@ -21,8 +21,25 @@ import java.util.logging.Logger;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.Subtract;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.Id;
+import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
 
 /**
  * Encodes a filter into a SQL WHERE statement for MySQL.  This class adds
@@ -87,20 +104,27 @@ public class SQLEncoderMySQL extends org.geotools.data.jdbc.FilterToSQL implemen
         capabilities.addType(FilterCapabilities.LOGIC_OR);
         capabilities.addType(FilterCapabilities.LOGIC_AND);
         capabilities.addType(FilterCapabilities.LOGIC_NOT);
+        capabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
         capabilities.addType(FilterCapabilities.COMPARE_EQUALS);
         capabilities.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
         capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN);
         capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN);
         capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
         capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
+        capabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
         capabilities.addType(FilterCapabilities.NULL_CHECK);
+        capabilities.addType(PropertyIsNull.class);
         capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(PropertyIsBetween.class);
         capabilities.addType(FilterCapabilities.NONE);
         capabilities.addType(FilterCapabilities.ALL);
         capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
+        capabilities.addType(BBOX.class);
         capabilities.addType(FilterCapabilities.FID);
+        capabilities.addType(Id.class);
         capabilities.addType(FilterCapabilities.LIKE);
-
+        capabilities.addType(PropertyIsLike.class);
+        
         return capabilities;
     }
 

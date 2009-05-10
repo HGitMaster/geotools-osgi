@@ -47,8 +47,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Rob Hranac, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/GeometryFilterImpl.java $
- * @version $Id: GeometryFilterImpl.java 31682 2008-10-19 13:23:25Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/GeometryFilterImpl.java $
+ * @version $Id: GeometryFilterImpl.java 32201 2009-01-12 10:20:34Z jesseeichar $
  *
  * @task REVISIT: make this class (and all filters) immutable, implement
  *       cloneable and return new filters when calling addLeftGeometry and
@@ -111,17 +111,22 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     }
     
     public void setExpression1(org.opengis.filter.expression.Expression expression) {
-    	Expression leftGeometry = (Expression)expression;
-    	
-    	//Checks if this is geometry filter or not and handles appropriately
-        if (DefaultExpression.isGeometryExpression(leftGeometry.getType())
-                || permissiveConstruction) {
-            super.setExpression1(leftGeometry);
+        if (expression instanceof Expression) {
+            Expression leftGeometry = (Expression) expression;
+
+            // Checks if this is geometry filter or not and handles appropriately
+            if (DefaultExpression.isGeometryExpression(leftGeometry.getType())
+                    || permissiveConstruction) {
+                super.setExpression1(leftGeometry);
+            } else {
+                throw new IllegalFilterException("Attempted to add (left)"
+                        + " non-geometry expression" + " to geometry filter.");
+            }
         } else {
-            throw new IllegalFilterException("Attempted to add (left)"
-                + " non-geometry expression" + " to geometry filter.");
+            // I guess we assume it is a good expression...
+            super.setExpression1(expression);
         }
-    	
+
     }
 
     /**
@@ -141,20 +146,26 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     }
   
     public void setExpression2(org.opengis.filter.expression.Expression expression) {
-    	Expression rightGeometry = (Expression)expression;
-    	
-    	//Checks if this is math filter or not and handles appropriately
-        if (DefaultExpression.isGeometryExpression(rightGeometry.getType())
-                || permissiveConstruction) {
-            super.setExpression2(rightGeometry);
+        if (expression instanceof Expression) {
+            Expression rightGeometry = (Expression) expression;
+
+            // Checks if this is math filter or not and handles appropriately
+            if (DefaultExpression.isGeometryExpression(rightGeometry.getType())
+                    || permissiveConstruction) {
+                super.setExpression2(rightGeometry);
+            } else {
+                throw new IllegalFilterException("Attempted to add (right)" + " non-geometry"
+                        + "expression to geometry filter.");
+            }
         } else {
-            throw new IllegalFilterException("Attempted to add (right)"
-                + " non-geometry" + "expression to geometry filter.");
+            // I guess we assume it is a good expression...
+            super.setExpression2(expression);
         }
     }
+
     /**
      * Retrieves the expression on the left side of the comparison.
-     *
+     * 
      * @return the expression on the left.
      * @deprecated use {@link org.opengis.filter.spatial.BinarySpatialOperator#getExpression1()}
      */

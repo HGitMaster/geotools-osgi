@@ -21,20 +21,21 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BBoxExpression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -44,7 +45,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * CrossesIntegrity<br>
  * @author bowens, ptozer<br>
  * Created Apr 27, 2004<br>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/CrossesIntegrity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/CrossesIntegrity.java $
  * @version <br>
  * 
  * <b>Puropse:</b><br>
@@ -162,7 +163,7 @@ public class CrossesIntegrity extends RelationIntegrity
 	{
 		boolean success = true;
 		
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+		FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 		Filter filter = null;
 
 		//JD: fix this!!
@@ -316,18 +317,9 @@ public class CrossesIntegrity extends RelationIntegrity
 	private Filter filterBBox(ReferencedEnvelope bBox, SimpleFeatureType ft)
 		throws FactoryRegistryException, IllegalFilterException
 	{
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-		BBoxExpression bboxExpr = ff.createBBoxExpression(bBox);
-		AttributeExpression geomExpr = ff.createAttributeExpression(ft, ft.getGeometryDescriptor().getLocalName());
-		GeometryFilter containsFilter = ff.createGeometryFilter(Filter.GEOMETRY_DISJOINT);
-		containsFilter.addLeftGeometry(bboxExpr);
-		containsFilter.addRightGeometry(geomExpr);
-		
-//		GeometryFilter overlapsFilter = ff.createGeometryFilter(Filter.GEOMETRY_OVERLAPS);
-//		overlapsFilter.addLeftGeometry(bboxExpr);
-//		overlapsFilter.addRightGeometry(geomExpr);
-//		Filter filter = containsFilter.or(overlapsFilter);
-		Filter filter = containsFilter.and(containsFilter);
+		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+		Disjoint filter = ff.disjoint(ff.property(ft.getGeometryDescriptor().getLocalName()), 
+		        ff.literal(JTS.toGeometry((BoundingBox) bBox)));
 		return filter;
 	}
 }

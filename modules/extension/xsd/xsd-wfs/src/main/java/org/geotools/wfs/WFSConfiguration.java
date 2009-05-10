@@ -18,8 +18,6 @@ package org.geotools.wfs;
 
 import net.opengis.wfs.WfsFactory;
 
-import org.geotools.filter.v1_1.OGCConfiguration;
-import org.geotools.ows.OWSConfiguration;
 import org.geotools.wfs.bindings.ActionTypeBinding;
 import org.geotools.wfs.bindings.AllSomeTypeBinding;
 import org.geotools.wfs.bindings.BaseRequestTypeBinding;
@@ -70,17 +68,14 @@ import org.picocontainer.MutablePicoContainer;
  *
  * @generated
  */
-public class WFSConfiguration extends Configuration {
+public abstract class WFSConfiguration extends Configuration {
     /**
      * Creates a new configuration.
      *
      * @generated
      */
-    public WFSConfiguration() {
-        super(WFS.getInstance());
-
-        addDependency(new OWSConfiguration());
-        addDependency(new OGCConfiguration());
+    protected WFSConfiguration(WFS wfs) {
+        super(wfs);
     }
 
     /**

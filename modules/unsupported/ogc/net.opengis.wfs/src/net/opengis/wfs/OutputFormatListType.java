@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: OutputFormatListType.java 31719 2008-10-24 22:55:22Z groldan $
+ * $Id: OutputFormatListType.java 31894 2008-11-20 20:35:38Z jdeolive $
  */
 package net.opengis.wfs;
 
@@ -58,7 +58,7 @@ public interface OutputFormatListType extends EObject {
 	 * <!-- end-user-doc -->
      * @return the value of the '<em>Format</em>' attribute list.
      * @see net.opengis.wfs.WfsPackage#getOutputFormatListType_Format()
-     * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true" transient="true" volatile="true" derived="true"
+     * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true" transient="true" volatile="true" derived="true" many="true"
      *        extendedMetaData="kind='element' name='Format' namespace='##targetNamespace' group='#group:0'"
      * @generated
      */

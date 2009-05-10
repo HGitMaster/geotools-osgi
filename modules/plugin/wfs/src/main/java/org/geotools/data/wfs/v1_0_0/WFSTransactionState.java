@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,6 +51,7 @@ import org.geotools.filter.FidFilter;
 import org.geotools.util.logging.Logging;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
+import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.wfs.WFSSchema;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -248,7 +251,16 @@ public class WFSTransactionState implements State {
         while (i.hasNext()) {
             String target = (String) i.next();
             SimpleFeatureType schema = ds.getSchema(target);
-            ns.add(schema.getName().getNamespaceURI());
+
+            String namespaceURI = schema.getName().getNamespaceURI();
+            ns.add(namespaceURI);
+            try {
+                // if this is not added then sometimes the schema for the describe feature type cannot be loaded and
+                // an exception will be thrown during the commit 
+                SchemaFactory.getInstance(new URI(namespaceURI), new URI(namespaceURI));
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
         }
         hints.put(DocumentWriter.SCHEMA_ORDER, ns.toArray(new String[ns.size()])); // Transaction
 

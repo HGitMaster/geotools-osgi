@@ -110,8 +110,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Chris Holmes, TOPP
  * @author Andrea Aime
  * @author Paolo Rizzi
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStore.java $
- * @version $Id: PostgisDataStore.java 31385 2008-09-03 16:38:26Z jdeolive $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStore.java $
+ * @version $Id: PostgisDataStore.java 32627 2009-03-13 12:00:55Z jive $
  *
  * @task REVISIT: So Paolo Rizzi has a number of improvements in
  *       http://jira.codehuas.org/browse/GEOT-379  I rolled in a few of them,
@@ -151,6 +151,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         GEOM_TYPE_MAP.put("MULTIPOLYGONM", MultiPolygon.class);
         GEOM_TYPE_MAP.put("GEOMETRYCOLLECTION", GeometryCollection.class);
         GEOM_TYPE_MAP.put("GEOMETRYCOLLECTIONM", GeometryCollection.class);
+
+        // SQL MM "Curve" extensions
+        GEOM_TYPE_MAP.put("CIRCULARSTRING", LineString.class);
+        GEOM_TYPE_MAP.put("COMPOUNDCURVE", LineString.class);
+        GEOM_TYPE_MAP.put("CURVEPOLYGON", Polygon.class);
     }
 
     private static Map CLASS_MAPPINGS = new HashMap();

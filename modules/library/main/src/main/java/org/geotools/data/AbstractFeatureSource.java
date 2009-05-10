@@ -72,7 +72,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  *
  * @author Jody Garnett, Refractions Research Inc
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/AbstractFeatureSource.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/AbstractFeatureSource.java $
  */
 public abstract class AbstractFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
     /** The logger for the filter module. */
@@ -358,37 +358,45 @@ public abstract class AbstractFeatureSource implements FeatureSource<SimpleFeatu
         if ((dataStore == null) || !(dataStore instanceof AbstractDataStore)) {
             // too expensive
             return -1;
-        } else {
-            // ask the abstract data store
-            Transaction t = getTransaction();
-            //State state = t.getState(dataStore);
-            int delta = 0;
-            if(t != Transaction.AUTO_COMMIT){
-                if (!(t.getState(dataStore) instanceof TransactionStateDiff)) {
-                	//we cannot proceed; abort!
-                	return -1;
-                }
-            	Diff diff = ((AbstractDataStore)dataStore).state(t).diff(namedQuery(query).getTypeName());
-            	synchronized (diff) {
-            		Iterator it = diff.added.values().iterator();
-            		while(it.hasNext()){
-            			Object feature = it.next();
-            			if( query.getFilter().evaluate(feature) )
-            				delta++;
-            		}
-            		
-            		it = diff.modified2.values().iterator();
-            		while(it.hasNext()){
-            			Object feature = it.next();
-            			
-            			if(feature==TransactionStateDiff.NULL){
-            				delta--;
-            			}
-            		}
-            	}
+        } 
+        // ask the abstract data store
+        Transaction t = getTransaction();
+        
+        int nativeCount = ((AbstractDataStore) dataStore).getCount( namedQuery(query));
+        if(nativeCount == -1)
+        	return -1;
+        
+        //State state = t.getState(dataStore);
+        int delta = 0;
+        if(t != Transaction.AUTO_COMMIT) { 
+        	if(t.getState(dataStore) == null)
+        		return nativeCount;
+        	
+            if (!(t.getState(dataStore) instanceof TransactionStateDiff)) {
+            	//we cannot proceed; abort!
+            	return -1;
             }
-            return ((AbstractDataStore) dataStore).getCount( namedQuery(query))+delta;
+        	Diff diff = ((AbstractDataStore)dataStore).state(t).diff(namedQuery(query).getTypeName());
+        	synchronized (diff) {
+        		Iterator it = diff.added.values().iterator();
+        		while(it.hasNext()){
+        			Object feature = it.next();
+        			if( query.getFilter().evaluate(feature) )
+        				delta++;
+        		}
+        		
+        		it = diff.modified2.values().iterator();
+        		while(it.hasNext()){
+        			Object feature = it.next();
+        			
+        			if(feature == TransactionStateDiff.NULL && query.getFilter().evaluate(feature)) {
+        				delta--;
+        			}
+        		}
+        	}
         }
+        
+		return nativeCount + delta;
     }
     
     /**

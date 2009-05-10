@@ -137,5 +137,14 @@ public class BasicFIDMapper extends AbstractFIDMapper {
         // to strings for the rest, so the only non word character is really ":"
         return "fid-" + new UID().toString().replace(':', '_');
     }
-
+    
+    /**
+     * @return {@code true}, this mapper is used for the most trivial things and often the fids does
+     *         not match the "fid-<UUID>" pattern used at this mapper's
+     *         {@link #createID(Connection, SimpleFeature, Statement)} method
+     * @see FIDMapper#isValid(String)
+     */
+    public boolean isValid(String fid) {
+        return true;
+    }
 }

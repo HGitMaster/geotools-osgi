@@ -44,6 +44,11 @@ import org.opengis.filter.expression.Expression;
  * <p>
  * 
  * See {@link AbstractRegfuncPostgisOnlineTestCase} for a description of this test fixture.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: RegFuncPostgisDataStoreOnlineTest.java 31819 2008-11-11 02:31:21Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/jdbc-regfunc/src/test/java/org/geotools/data/postgis/RegFuncPostgisDataStoreOnlineTest.java $
+ * @since 2.4
  */
 public class RegFuncPostgisDataStoreOnlineTest extends AbstractRegfuncPostgisOnlineTestCase {
 

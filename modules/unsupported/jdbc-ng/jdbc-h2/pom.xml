@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31708 2008-10-23 22:28:43Z jdeolive $              
+        Version: $Id: pom.xml 32061 2008-12-22 20:36:44Z jdeolive $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>unsupported</artifactId>
-    <version>2.6.0.osgi1</version>
+    <version>2.6.0.osgi2</version>
   </parent>
 
 
@@ -31,9 +31,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/jdbc-h2/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/jdbc-ng/jdbc-h2/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/jdbc-ng/jdbc-h2/</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/jdbc-ng/jdbc-h2/</url>
   </scm>
 
   <description>
@@ -74,7 +74,6 @@
     <dependency>
       <groupId>org.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>

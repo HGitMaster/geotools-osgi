@@ -101,8 +101,7 @@ class ImageDecoderThread extends AbstractThread {
             	bufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes));
             else           
             	bufferedImage = readImage2(imageBytes);
-            
-
+                        
             if (requestEnvelope.contains(tileEnvelope, true) == false) {
                 GeneralEnvelope savedTileEnvelope = new GeneralEnvelope(tileEnvelope);
                 tileEnvelope.intersect(requestEnvelope);

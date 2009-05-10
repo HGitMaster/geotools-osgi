@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<as:AppSchemaDataAccess xmlns:as="http://www.geotools.org/app-schema"
+	xmlns:ogc="http://www.opengis.net/ogc" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geotools.org/app-schema AppSchemaDataAccess.xsd
+                      http://www.opengis.net/ogc http://schemas.opengis.net/filter/1.1.0/expr.xsd">
+	<!-- 
+        Mapping file for gsml:GeologicUnit where a data access containing mo:EarthResource is
+        used. The complex features from the input data access is re-mapped to gsml:features.
+    -->
+	<namespaces>
+		<Namespace>
+			<prefix>gml</prefix>
+			<uri>http://www.opengis.net/gml</uri>
+		</Namespace>
+		<Namespace>
+			<prefix>gsml</prefix>
+			<uri>http://www.cgi-iugs.org/xml/GeoSciML/2</uri>
+		</Namespace>
+		<Namespace>
+			<prefix>mo</prefix>
+			<uri>urn:cgi:xmlns:GGIC:MineralOccurrence:1.0</uri>
+		</Namespace>
+	</namespaces>
+	<sourceDataStores>
+		<DataStore>
+			<id>EarthResource</id>
+			<parameters>
+				<Parameter>
+					<name>directory</name>
+					<!-- path can be relative to this file if starts with "file: -->
+					<value>file:./</value>
+				</Parameter>
+			</parameters>
+	        <!--
+		      This flag marks that we want to connect to the data access, instead of
+		      using the underlying data store
+	        -->
+			<isDataAccess>true</isDataAccess>
+		</DataStore>
+	</sourceDataStores>
+	<catalog>mappedPolygons.oasis.xml</catalog>
+	<targetTypes>
+		<FeatureType>
+			<schemaUri>commonSchemas_new/GeoSciML/geosciml.xsd</schemaUri>
+		</FeatureType>
+	</targetTypes>
+	<typeMappings>
+		<FeatureTypeMapping>
+			<sourceDataStore>EarthResource</sourceDataStore>
+			<sourceType>EarthResource</sourceType>
+			<targetElement>gsml:GeologicUnit</targetElement>
+			<attributeMappings>
+				<AttributeMapping>
+					<targetAttribute>gsml:GeologicUnit</targetAttribute>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>gml:name</targetAttribute>
+					<sourceExpression>
+						<OCQL>strConcat('er.', getID())</OCQL>
+					</sourceExpression>
+				</AttributeMapping>
+				<AttributeMapping>
+					<!--
+						This is used for chaining geological unit inside mapped feature as
+						specification
+					-->
+					<targetAttribute>gml:name[2]</targetAttribute>
+					<sourceExpression>
+						<OCQL>strConcat('gu.', getID())</OCQL>
+					</sourceExpression>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>gsml:bodyMorphology</targetAttribute>
+					<targetAttributeNode>gsml:CGI_TermValuePropertyType</targetAttributeNode>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>gsml:bodyMorphology/gsml:CGI_TermValue/gsml:value</targetAttribute>
+					<sourceExpression>
+					    <!-- 
+					        This input XPath expression from the input complex feature is 
+					        mapped to the output XPath expression of a different XML form.
+					      -->
+						<inputAttribute>mo:form</inputAttribute>
+					</sourceExpression>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>gsml:classifier</targetAttribute>
+					<targetAttributeNode>gsml:ControlledConceptPropertyType</targetAttributeNode>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>gsml:classifier/gsml:ControlledConcept/gsml:preferredName</targetAttribute>
+					<sourceExpression>
+						<inputAttribute>mo:classification/mo:MineralDepositModel/mo:mineralDepositGroup</inputAttribute>
+					</sourceExpression>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>
+			            gsml:composition
+		            </targetAttribute>
+					<sourceExpression>
+						<inputAttribute>mo:composition</inputAttribute>
+						<linkElement>gsml:CompositionPart</linkElement>
+						<linkField>gml:name</linkField>
+					</sourceExpression>
+					<isMultiple>true</isMultiple>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>
+		                gsml:occurence
+		            </targetAttribute>
+					<sourceExpression>
+						<inputAttribute>mo:commodityDescription</inputAttribute>
+						<linkElement>gsml:MappedFeature</linkElement>
+						<linkField>gml:name[2]</linkField>
+					</sourceExpression>
+					<isMultiple>true</isMultiple>
+				</AttributeMapping>
+			</attributeMappings>
+		</FeatureTypeMapping>
+	</typeMappings>
+</as:AppSchemaDataAccess>

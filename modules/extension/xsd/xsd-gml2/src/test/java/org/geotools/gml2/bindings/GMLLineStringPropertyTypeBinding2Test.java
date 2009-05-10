@@ -29,7 +29,7 @@ public class GMLLineStringPropertyTypeBinding2Test extends GMLTestSupport {
     }
 
     public void testExecutionMode() {
-        assertEquals(Binding.AFTER, binding(GML.LineStringPropertyType).getExecutionMode());
+        assertEquals(Binding.OVERRIDE, binding(GML.LineStringPropertyType).getExecutionMode());
     }
 
     public void testParse() throws Exception {
@@ -41,7 +41,7 @@ public class GMLLineStringPropertyTypeBinding2Test extends GMLTestSupport {
 
     public void testEncode() throws Exception {
         Document doc = encode(GML2MockData.lineString(), GML.lineStringProperty);
-
+        
         assertEquals(1,
             doc.getElementsByTagNameNS(GML.NAMESPACE, GML.LineString.getLocalPart()).getLength());
     }

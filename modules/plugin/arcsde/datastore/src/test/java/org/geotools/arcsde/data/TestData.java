@@ -19,22 +19,23 @@ package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.Command;
 import org.geotools.arcsde.pool.ISession;
 import org.geotools.arcsde.pool.SessionPool;
 import org.geotools.arcsde.pool.SessionPoolFactory;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
-import org.geotools.data.DataSourceException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
@@ -71,16 +72,18 @@ import com.vividsolutions.jts.io.WKTReader;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/TestData.java $
- * @version $Id: TestData.java 31197 2008-08-20 20:56:42Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/TestData.java $
+ * @version $Id: TestData.java 32500 2009-02-17 18:31:11Z groldan $
  */
+@SuppressWarnings( { "nls", "unchecked" })
 public class TestData {
     /** DOCUMENT ME! */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(TestData.class
             .getPackage().getName());
 
     public static final String[] TEST_TABLE_COLS = { "INT32_COL", "INT16_COL", "FLOAT32_COL",
-            "FLOAT64_COL", "STRING_COL", "DATE_COL", "SHAPE" };
+            "FLOAT64_COL", "STRING_COL", "NSTRING_COL", "DATE_COL", "SHAPE" };
 
     private SeColumnDefinition[] tempTableColumns;
 
@@ -89,14 +92,12 @@ public class TestData {
     // private SeTable tempTable;
 
     /**
-     * the set of test parameters loaded from
-     * {@code test-data/testparams.properties}
+     * the set of test parameters loaded from {@code test-data/testparams.properties}
      */
     private Properties conProps = null;
 
     /**
-     * the name of a table that can be manipulated without risk of loosing
-     * important data
+     * the name of a table that can be manipulated without risk of loosing important data
      */
     private String temp_table;
 
@@ -116,9 +117,9 @@ public class TestData {
     }
 
     /**
-     * Must be called from inside the test's setUp() method. Loads the test
-     * fixture from <code>testparams.properties</code>, besides that, does
-     * not creates any connection nor any other costly resource.
+     * Must be called from inside the test's setUp() method. Loads the test fixture from
+     * <code>testparams.properties</code>, besides that, does not creates any connection nor any
+     * other costly resource.
      * 
      * @throws IOException
      *             if the test fixture can't be loaded
@@ -177,8 +178,8 @@ public class TestData {
     }
 
     /**
-     * creates an ArcSDEDataStore using {@code test-data/testparams.properties}
-     * as holder of datastore parameters
+     * creates an ArcSDEDataStore using {@code test-data/testparams.properties} as holder of
+     * datastore parameters
      * 
      * @return DOCUMENT ME!
      * @throws IOException
@@ -191,7 +192,7 @@ public class TestData {
         return dataStore;
     }
 
-    public SessionPool getConnectionPool() throws DataSourceException {
+    public SessionPool getConnectionPool() throws IOException {
         if (this._pool == null) {
             SessionPoolFactory pfac = SessionPoolFactory.getInstance();
             ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(this.conProps);
@@ -243,8 +244,7 @@ public class TestData {
     }
 
     /**
-     * Gracefully deletes the temp table hiding any exception (no problem if it
-     * does not exist)
+     * Gracefully deletes the temp table hiding any exception (no problem if it does not exist)
      */
     public void deleteTempTable() {
         // only if the datastore was used
@@ -260,28 +260,27 @@ public class TestData {
 
     public void deleteTable(final String typeName) throws IOException,
             UnavailableArcSDEConnectionException {
+        deleteTable(typeName, true);
+    }
+
+    public void deleteTable(final String typeName, final boolean ignoreFailure) throws IOException,
+            UnavailableArcSDEConnectionException {
         SessionPool connectionPool = getConnectionPool();
-        deleteTable(connectionPool, typeName);
+        deleteTable(connectionPool, typeName, ignoreFailure);
     }
 
     /**
-     * Gracefully deletes the temp table hiding any exception (no problem if it
-     * does not exist)
+     * Gracefully deletes the temp table hiding any exception (no problem if it does not exist)
      * 
      * @param connPool
-     *            to get the connection to use in deleting
-     *            {@link #getTempTableName()}
+     *            to get the connection to use in deleting {@link #getTempTableName()}
      */
-    public void deleteTempTable(SessionPool connPool) {
-        try {
-            deleteTable(connPool, getTempTableName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void deleteTempTable(SessionPool connPool) throws IOException {
+        deleteTable(connPool, getTempTableName(), true);
     }
 
-    private static void deleteTable(final SessionPool connPool, final String tableName)
-            throws IOException, UnavailableArcSDEConnectionException {
+    private static void deleteTable(final SessionPool connPool, final String tableName,
+            final boolean ignoreFailure) throws IOException, UnavailableArcSDEConnectionException {
 
         final ISession session = connPool.getSession();
 
@@ -305,7 +304,10 @@ public class TestData {
                 try {
                     table.delete();
                 } catch (SeException ignorable) {
-                    // table did not already exist
+                    // table did not already exist? or was locked...
+                    if (!ignoreFailure) {
+                        throw new ArcSdeException(ignorable);
+                    }
                 }
                 return null;
             }
@@ -316,9 +318,8 @@ public class TestData {
     }
 
     /**
-     * Creates an ArcSDE feature type names as <code>getTemp_table()</code> on
-     * the underlying database and if <code>insertTestData == true</code> also
-     * inserts some sample values.
+     * Creates an ArcSDE feature type names as <code>getTemp_table()</code> on the underlying
+     * database and if <code>insertTestData == true</code> also inserts some sample values.
      * 
      * @param insertTestData
      *            wether to insert some sample rows or not
@@ -334,8 +335,8 @@ public class TestData {
 
         try {
             /*
-             * Create a qualified table name with current user's name and the
-             * name of the table to be created, "EXAMPLE".
+             * Create a qualified table name with current user's name and the name of the table to
+             * be created, "EXAMPLE".
              */
             final String tableName = getTempTableName(session);
 
@@ -364,10 +365,9 @@ public class TestData {
     }
 
     /**
-     * Truncates the temp layer and populates it with fresh data. This method
-     * cannot be called if {@link #createTempTable(boolean)} has not been called
-     * first, no matter if the table already exists, it needs instance state
-     * initialized by createTempTable
+     * Truncates the temp layer and populates it with fresh data. This method cannot be called if
+     * {@link #createTempTable(boolean)} has not been called first, no matter if the table already
+     * exists, it needs instance state initialized by createTempTable
      * 
      * @throws Exception
      */
@@ -423,33 +423,37 @@ public class TestData {
             public SeColumnDefinition[] execute(ISession session, SeConnection connection)
                     throws SeException, IOException {
 
-                SeColumnDefinition[] colDefs = new SeColumnDefinition[8];
+                SeColumnDefinition[] colDefs = new SeColumnDefinition[9];
 
                 /*
-                 * Define the columns and their attributes for the table to be
-                 * created. NOTE: The valid range/values of size and scale
-                 * parameters vary from one database to another.
+                 * Define the columns and their attributes for the table to be created. NOTE: The
+                 * valid range/values of size and scale parameters vary from one database to
+                 * another.
                  */
                 boolean isNullable = true;
 
                 // first column to be SDE managed feature id
-                colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INTEGER, 10,
-                        0, false);
+                colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INT32, 10, 0,
+                        false);
 
                 colDefs[1] = new SeColumnDefinition(TEST_TABLE_COLS[0],
-                        SeColumnDefinition.TYPE_INTEGER, 10, 0, isNullable);
+                        SeColumnDefinition.TYPE_INT32, 10, 0, isNullable);
                 colDefs[2] = new SeColumnDefinition(TEST_TABLE_COLS[1],
-                        SeColumnDefinition.TYPE_SMALLINT, 4, 0, isNullable);
+                        SeColumnDefinition.TYPE_INT16, 4, 0, isNullable);
                 colDefs[3] = new SeColumnDefinition(TEST_TABLE_COLS[2],
-                        SeColumnDefinition.TYPE_FLOAT, 5, 2, isNullable);
+                        SeColumnDefinition.TYPE_FLOAT32, 5, 2, isNullable);
                 colDefs[4] = new SeColumnDefinition(TEST_TABLE_COLS[3],
-                        SeColumnDefinition.TYPE_DOUBLE, 25, 4, isNullable);
+                        SeColumnDefinition.TYPE_FLOAT64, 25, 4, isNullable);
                 colDefs[5] = new SeColumnDefinition(TEST_TABLE_COLS[4],
                         SeColumnDefinition.TYPE_STRING, 25, 0, isNullable);
+
                 colDefs[6] = new SeColumnDefinition(TEST_TABLE_COLS[5],
+                        SeColumnDefinition.TYPE_NSTRING, 25, 0, isNullable);
+
+                colDefs[7] = new SeColumnDefinition(TEST_TABLE_COLS[6],
                         SeColumnDefinition.TYPE_DATE, 1, 0, isNullable);
                 // this is a blob one and should be ignored to all effects
-                colDefs[7] = new SeColumnDefinition("SE_ANNO_CAD_DATA",
+                colDefs[8] = new SeColumnDefinition("SE_ANNO_CAD_DATA",
                         SeColumnDefinition.TYPE_BLOB, 1000, 0, isNullable);
 
                 try {
@@ -458,14 +462,13 @@ public class TestData {
                     // ignore
                 }
                 /*
-                 * Create the table using the DBMS default configuration
-                 * keyword. Valid keywords are defined in the dbtune table.
+                 * Create the table using the DBMS default configuration keyword. Valid keywords are
+                 * defined in the dbtune table.
                  */
                 table.create(colDefs, configKeyword);
 
                 /*
-                 * Register the column to be used as feature id and managed by
-                 * sde
+                 * Register the column to be used as feature id and managed by sde
                  */
                 SeRegistration reg = new SeRegistration(connection, table.getName());
                 LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
@@ -477,14 +480,13 @@ public class TestData {
                 /*
                  * Define the attributes of the spatial column
                  */
-                layer.setSpatialColumnName(TEST_TABLE_COLS[6]);
+                layer.setSpatialColumnName(TEST_TABLE_COLS[TEST_TABLE_COLS.length - 1]);
 
                 /*
-                 * Set the type of shapes that can be inserted into the layer.
-                 * Shape type can be just one or many. NOTE: Layers that contain
-                 * more than one shape type can only be accessed through the C
-                 * and Java APIs and Arc Explorer Java 3.x. They cannot be seen
-                 * from ArcGIS desktop applications.
+                 * Set the type of shapes that can be inserted into the layer. Shape type can be
+                 * just one or many. NOTE: Layers that contain more than one shape type can only be
+                 * accessed through the C and Java APIs and Arc Explorer Java 3.x. They cannot be
+                 * seen from ArcGIS desktop applications.
                  */
                 layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK
                         | SeLayer.SE_LINE_TYPE_MASK | SeLayer.SE_SIMPLE_LINE_TYPE_MASK
@@ -587,15 +589,16 @@ public class TestData {
         /*
          * Define the names of the columns that data is to be inserted into.
          */
-        final String[] columns = new String[7];
+        final String[] columns = new String[8];
 
         columns[0] = colDefs[1].getName(); // INT32 column
         columns[1] = colDefs[2].getName(); // INT16 column
         columns[2] = colDefs[3].getName(); // FLOAT32 column
         columns[3] = colDefs[4].getName(); // FLOAT64 column
         columns[4] = colDefs[5].getName(); // String column
-        columns[5] = colDefs[6].getName(); // Date column
-        columns[6] = "SHAPE"; // Shape column
+        columns[5] = colDefs[6].getName(); // NString column
+        columns[6] = colDefs[7].getName(); // Date column
+        columns[7] = "SHAPE"; // Shape column
 
         Command<Void> insertDataCmd = new Command<Void>() {
             @Override
@@ -619,10 +622,11 @@ public class TestData {
                         row.setFloat(2, new Float(i / 10.0F));
                         row.setDouble(3, new Double(i / 10D));
                         row.setString(4, "FEATURE_" + i);
+                        row.setNString(5, "NSTRING_" + i);
                         cal.set(Calendar.DAY_OF_MONTH, i);
-                        row.setTime(5, cal);
+                        row.setTime(6, cal);
                         SeShape seShape = shapes[i - 1];
-                        row.setShape(6, seShape);
+                        row.setShape(7, seShape);
 
                         insert.execute();
                     }
@@ -638,20 +642,22 @@ public class TestData {
     } // End method insertData
 
     /**
-     * Creates a FeatureCollection<SimpleFeatureType, SimpleFeature> with
-     * features whose schema adheres to the one created in
-     * <code>createTestData()</code> and returns it.
+     * Creates a FeatureCollection<SimpleFeatureType, SimpleFeature> with features whose schema
+     * adheres to the one created in <code>createTestData()</code> and returns it.
      * <p>
      * This schema is something like:
      * 
      * <pre>
-     *  colDefs[0] &quot;INT32_COL&quot;, SeColumnDefinition.TYPE_INTEGER, 10, 0, true
-     *  colDefs[1] = &quot;INT16_COL&quot;, SeColumnDefinition.TYPE_SMALLINT, 4, 0, true
-     *  colDefs[2] = &quot;FLOAT32_COL&quot;, SeColumnDefinition.TYPE_FLOAT, 5, 2, true
-     *  colDefs[3] = &quot;FLOAT64_COL&quot;, SeColumnDefinition.TYPE_DOUBLE, 15, 4, true
-     *  colDefs[4] = &quot;STRING_COL&quot;, SeColumnDefinition.TYPE_STRING, 25, 0, true
-     *  colDefs[5] = &quot;DATE_COL&quot;, SeColumnDefinition.TYPE_DATE, 1, 0, true
-     *  colDefs[6] = &quot;SHAPE&quot;, Geometry, 1, 0, true
+     * 
+     * colDefs[0] &quot;INT32_COL&quot;, SeColumnDefinition.TYPE_INTEGER, 10, 0, true colDefs[1] =
+     * &quot;INT16_COL&quot;, SeColumnDefinition.TYPE_SMALLINT, 4, 0, true colDefs[2] =
+     * &quot;FLOAT32_COL&quot;, SeColumnDefinition.TYPE_FLOAT, 5, 2, true colDefs[3] =
+     * &quot;FLOAT64_COL&quot;, SeColumnDefinition.TYPE_DOUBLE, 15, 4, true colDefs[4] =
+     * &quot;STRING_COL&quot;, SeColumnDefinition.TYPE_STRING, 25, 0, true colDefs[5] =
+     * &quot;NSTRING_COL&quot;, SeColumnDefinition.TYPE_NSTRING, 25, 0, true colDefs[6] =
+     * &quot;DATE_COL&quot;, SeColumnDefinition.TYPE_DATE, 1, 0, true colDefs[7] =
+     * &quot;SHAPE&quot;, Geometry, 1, 0, true
+     * 
      * </pre>
      * 
      * </p>
@@ -661,16 +667,11 @@ public class TestData {
      * @param numFeatures
      *            number of features to create.
      * @throws IOException
-     *             if the schema for te test table cannot be fetched from the
-     *             database.
-     * @throws IllegalAttributeException
-     *             if the feature type created from the test table cannot build
-     *             a feature with the given attribute values.
+     *             if the schema for te test table cannot be fetched from the database.
      * @throws SeException
      */
     public FeatureCollection<SimpleFeatureType, SimpleFeature> createTestFeatures(
-            Class jtsGeomType, int numFeatures) throws IOException, IllegalAttributeException,
-            SeException {
+            Class jtsGeomType, int numFeatures) throws IOException, SeException {
         FeatureCollection<SimpleFeatureType, SimpleFeature> col = FeatureCollections
                 .newCollection();
         SimpleFeatureType type = getDataStore().getSchema(getTempTableName());
@@ -684,11 +685,12 @@ public class TestData {
             values[2] = new Float(0.1 * i);
             values[3] = new Double(1000 * i);
             values[4] = "String value #" + i;
+            values[5] = "NString value #" + i;
 
             Calendar cal = Calendar.getInstance();
             cal.set(Calendar.DAY_OF_MONTH, i);
-            values[5] = cal.getTime();
-            values[6] = createTestGeometry(jtsGeomType, i);
+            values[6] = cal.getTime();
+            values[7] = createTestGeometry(jtsGeomType, i);
 
             SimpleFeature f = SimpleFeatureBuilder.build(type, values, null);
             col.add(f);
@@ -856,13 +858,12 @@ public class TestData {
     }
 
     /**
-     * Creates and returns a <code>SeCoordinateReference</code> CRS, though
-     * based on WGS84, is inclusive enough (in terms of valid coordinate range
-     * and presicion) to deal with most coordintates.
+     * Creates and returns a <code>SeCoordinateReference</code> CRS, though based on WGS84, is
+     * inclusive enough (in terms of valid coordinate range and presicion) to deal with most
+     * coordintates.
      * <p>
-     * Actually tested to deal with coordinates with 0.0002 units of separation
-     * as well as with large coordinates such as UTM (values greater than
-     * 500,000.00)
+     * Actually tested to deal with coordinates with 0.0002 units of separation as well as with
+     * large coordinates such as UTM (values greater than 500,000.00)
      * </p>
      * 
      * @return DOCUMENT ME!
@@ -888,7 +889,9 @@ public class TestData {
         TestData testData = new TestData();
         try {
             testData.setUp();
-            testData.createSimpleTestTables();
+            // testData.createSimpleTestTables();
+            testData.createSampleLayers(2000);
+            // testData.deleteSampleLayers(5000);
             System.err.println("test tables successfully created");
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "while creating test tables got '" + e.getMessage() + "'");
@@ -896,6 +899,81 @@ public class TestData {
         } finally {
             System.exit(0);
         }
+    }
+
+    private void deleteSampleLayers(final int numLayersToCreate) throws IOException {
+        final SessionPool connectionPool = getConnectionPool();
+        final ISession session = connectionPool.getSession();
+        final NumberFormat formatter = NumberFormat.getInstance();
+        formatter.setMinimumIntegerDigits(4);
+        formatter.setGroupingUsed(false);
+
+        session.issue(new Command<Void>() {
+            @Override
+            public Void execute(ISession session, SeConnection connection) throws SeException,
+                    IOException {
+                LOGGER.info("Deleting tables GT_MULTIPLE_LAYER_" + formatter.format(1)
+                        + " to GT_MULTIPLE_LAYER_" + formatter.format(numLayersToCreate));
+                for (int i = 1; i <= numLayersToCreate; i++) {
+                    String tableName = "GT_MULTIPLE_LAYER_" + formatter.format(i);
+                    SeTable table = new SeTable(connection, tableName);
+                    try {
+                        table.delete();
+                    } catch (SeException e) {
+                        LOGGER.info("Couldn't delete table " + tableName);
+                    }
+                }
+                LOGGER.info("Tables deleted");
+                return null;
+            }
+        });
+    }
+
+    /**
+     * This private method is used to create a lot of layers in the test database in order to fix
+     * GEOT-1956
+     */
+    private void createSampleLayers(final int numLayersToCreate) throws IOException {
+        final SessionPool connectionPool = getConnectionPool();
+        final ISession session = connectionPool.getSession();
+
+        String tableName;
+        String rowIdColName;
+        int rowIdColumnType;
+        int shapeTypeMask;
+        NumberFormat formatter = NumberFormat.getInstance();
+        formatter.setMinimumIntegerDigits(4);
+        formatter.setGroupingUsed(false);
+
+        // use a double linked list to set to alternate between rowid
+        // registration types
+        LinkedList<Integer> registrationTypes = new LinkedList<Integer>();
+        registrationTypes.add(Integer
+                .valueOf(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER));
+        registrationTypes.add(Integer
+                .valueOf(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE));
+        registrationTypes.add(Integer
+                .valueOf(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE));
+
+        LOGGER.info("Creating " + numLayersToCreate + " layers...");
+        try {
+            rowIdColName = "ROW_ID";
+            shapeTypeMask = SeLayer.SE_POINT_TYPE_MASK;
+            for (int count = 1; count <= numLayersToCreate; count++) {
+                tableName = "GT_MULTIPLE_LAYER_" + formatter.format(count);
+                System.err.println("Creating " + tableName);
+
+                Integer registrationType = registrationTypes.removeFirst();
+                rowIdColumnType = registrationType.intValue();
+                registrationTypes.addLast(registrationType);
+
+                createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType,
+                        shapeTypeMask);
+            }
+        } finally {
+            session.dispose();
+        }
+        LOGGER.info(numLayersToCreate + " created successfully");
     }
 
     public void createSimpleTestTables() throws IOException {
@@ -994,14 +1072,13 @@ public class TestData {
                         SeColumnDefinition.TYPE_BLOB, 4000, 0, isNullable);
 
                 /*
-                 * Create the table using the DBMS default configuration
-                 * keyword. Valid keywords are defined in the dbtune table.
+                 * Create the table using the DBMS default configuration keyword. Valid keywords are
+                 * defined in the dbtune table.
                  */
                 table.create(colDefs, configKeyword);
 
                 /*
-                 * Register the column to be used as feature id and managed by
-                 * sde
+                 * Register the column to be used as feature id and managed by sde
                  */
                 if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE != rowIdColumnType) {
                     SeRegistration reg = new SeRegistration(connection, table.getName());
@@ -1094,8 +1171,8 @@ public class TestData {
                 SeTable table;
 
                 /*
-                 * Create a qualified table name with current user's name and
-                 * the name of the table to be created, "EXAMPLE".
+                 * Create a qualified table name with current user's name and the name of the table
+                 * to be created, "EXAMPLE".
                  */
                 String dbname = connection.getDatabaseName();
                 String user = connection.getUser();
@@ -1128,8 +1205,7 @@ public class TestData {
                 layer.setSpatialColumnName("SHAPE");
 
                 /*
-                 * Register the column to be used as feature id and managed by
-                 * sde
+                 * Register the column to be used as feature id and managed by sde
                  */
                 SeRegistration reg = new SeRegistration(connection, table.getName());
                 LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());

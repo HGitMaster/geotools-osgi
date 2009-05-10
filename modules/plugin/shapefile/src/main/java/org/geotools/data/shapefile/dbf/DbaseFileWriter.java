@@ -20,9 +20,11 @@
 package org.geotools.data.shapefile.dbf;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Calendar;
@@ -52,14 +54,15 @@ import org.geotools.resources.NIOUtilities;
 public class DbaseFileWriter {
 
     private DbaseFileHeader header;
-    private DbaseFileWriter.FieldFormatter formatter = new DbaseFileWriter.FieldFormatter();
+    private DbaseFileWriter.FieldFormatter formatter;
     WritableByteChannel channel;
     private ByteBuffer buffer;
     private final Number NULL_NUMBER = new Integer(0);
     private final String NULL_STRING = "";
     private final Date NULL_DATE = new Date();
     private StreamLogging streamLogger = new StreamLogging("Dbase File Writer");
-
+    private Charset charset;
+    
     /**
      * Create a DbaseFileWriter using the specified header and writing to the
      * given channel.
@@ -73,9 +76,29 @@ public class DbaseFileWriter {
      */
     public DbaseFileWriter(DbaseFileHeader header, WritableByteChannel out)
             throws IOException {
+        this(header, out, null);
+    }
+    
+
+    /**
+     * Create a DbaseFileWriter using the specified header and writing to the
+     * given channel.
+     * 
+     * @param header
+     *                The DbaseFileHeader to write.
+     * @param out
+     *                The Channel to write to.
+     * @param charset The charset the dbf is (will be) encoded in
+     * @throws IOException
+     *                 If errors occur while initializing.
+     */
+    public DbaseFileWriter(DbaseFileHeader header, WritableByteChannel out, Charset charset)
+            throws IOException {
         header.writeHeader(out);
         this.header = header;
         this.channel = out;
+        this.charset = charset == null ? Charset.defaultCharset() : charset;
+        this.formatter = new DbaseFileWriter.FieldFormatter(this.charset);
         streamLogger.open();
         init();
     }
@@ -116,12 +139,12 @@ public class DbaseFileWriter {
 
         for (int i = 0; i < header.getNumFields(); i++) {
             String fieldString = fieldString(record[i], i);
-            if (header.getFieldLength(i) != fieldString.getBytes().length) {
+            if (header.getFieldLength(i) != fieldString.getBytes(charset.name()).length) {
                 // System.out.println(i + " : " + header.getFieldName(i)+" value
                 // = "+fieldString+"");
                 buffer.put(new byte[header.getFieldLength(i)]);
             } else {
-                buffer.put(fieldString.getBytes());
+                buffer.put(fieldString.getBytes(charset.name()));
             }
 
         }
@@ -214,8 +237,9 @@ public class DbaseFileWriter {
         private Calendar calendar = Calendar.getInstance(Locale.US);
         private String emptyString;
         private static final int MAXCHARS = 255;
+        private Charset charset;
 
-        public FieldFormatter() {
+        public FieldFormatter(Charset charset) {
             // Avoid grouping on number format
             numFormat.setGroupingUsed(false);
 
@@ -225,41 +249,47 @@ public class DbaseFileWriter {
             for (int i = 0; i < MAXCHARS; i++) {
                 sb.setCharAt(i, ' ');
             }
+            
+            this.charset = charset;
 
             emptyString = sb.toString();
         }
 
         public String getFieldString(int size, String s) {
-            buffer.replace(0, size, emptyString);
-            buffer.setLength(size);
-            // international characters must be accounted for so size != length.
-            int maxSize = size;
-            if (s != null) {
-                buffer.replace(0, size, s);
-                int currentBytes = s.substring(0, Math.min(size, s.length()))
-                        .getBytes().length;
-                if (currentBytes > size) {
-                    char[] c = new char[1];
-                    for (int index = size - 1; currentBytes > size; index--) {
-                        c[0] = buffer.charAt(index);
-                        String string = new String(c);
-                        buffer.deleteCharAt(index);
-                        currentBytes -= string.getBytes().length;
-                        maxSize--;
-                    }
-                } else {
-                    if (s.length() < size) {
-                        maxSize = size - (currentBytes - s.length());
-                        for (int i = s.length(); i < size; i++) {
-                            buffer.append(' ');
+            try {
+                buffer.replace(0, size, emptyString);
+                buffer.setLength(size);
+                // international characters must be accounted for so size != length.
+                int maxSize = size;
+                if (s != null) {
+                    buffer.replace(0, size, s);
+                    int currentBytes = s.substring(0, Math.min(size, s.length()))
+                            .getBytes(charset.name()).length;
+                    if (currentBytes > size) {
+                        char[] c = new char[1];
+                        for (int index = size - 1; currentBytes > size; index--) {
+                            c[0] = buffer.charAt(index);
+                            String string = new String(c);
+                            buffer.deleteCharAt(index);
+                            currentBytes -= string.getBytes().length;
+                            maxSize--;
+                        }
+                    } else {
+                        if (s.length() < size) {
+                            maxSize = size - (currentBytes - s.length());
+                            for (int i = s.length(); i < size; i++) {
+                                buffer.append(' ');
+                            }
                         }
                     }
                 }
+
+                buffer.setLength(maxSize);
+    
+                return buffer.toString();
+            } catch(UnsupportedEncodingException e) {
+                throw new RuntimeException("This error should never occurr", e);
             }
-
-            buffer.setLength(maxSize);
-
-            return buffer.toString();
         }
 
         public String getFieldString(Date d) {

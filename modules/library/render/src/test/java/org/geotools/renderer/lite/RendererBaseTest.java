@@ -17,6 +17,7 @@
 package org.geotools.renderer.lite;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -27,9 +28,15 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.renderer.GTRenderer;
+import org.geotools.styling.SLDParser;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.test.TestData;
 
 /**
@@ -60,8 +67,8 @@ public abstract class RendererBaseTest {
 	 */
     protected static void showRender(String testName, Object renderer,
             long timeOut, ReferencedEnvelope bounds) throws Exception {
-        int w = 300;
-        int h = 300;
+        final int w = 300;
+        final int h = 300;
         final BufferedImage image = new BufferedImage(w, h,
                 BufferedImage.TYPE_INT_ARGB);
         Graphics g = image.getGraphics();
@@ -84,14 +91,20 @@ public abstract class RendererBaseTest {
 
                     /** <code>serialVersionUID</code> field */
                     private static final long serialVersionUID = 1L;
+                    
+                    {
+                        setPreferredSize(new Dimension(w, h));
+                    }
 
                     public void paint(Graphics g) {
                         g.drawImage(image, 0, 0, this);
                     }
+                    
+                    
                 };
 
                 frame.add(p);
-                frame.setSize(w, h);
+                frame.pack();
                 frame.setVisible(true);
 
                 Thread.sleep(timeOut);
@@ -136,4 +149,14 @@ public abstract class RendererBaseTest {
 			}
 		}
 	}
+	
+	protected static Style loadStyle(Object loader, String sldFilename) throws IOException {
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
+
+        java.net.URL surl = TestData.getResource(loader, sldFilename);
+        SLDParser stylereader = new SLDParser(factory, surl);
+
+        Style style = stylereader.readXML()[0];
+        return style;
+    }
 }

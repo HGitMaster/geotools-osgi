@@ -20,9 +20,12 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -69,9 +72,11 @@ import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -557,6 +562,66 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertNotNull(reader);
         reader.close();
         t.close();
+    }
+    
+    /**
+     * GEOT-2182, make sure no invalid fids are passed down to the database
+     */
+    public void testGetFeatureReaderWipesOutInvalidFilterFids() throws IOException, IllegalFilterException {
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+
+        //grab some valid fids...
+        reader = data.getFeatureReader(new DefaultQuery("road"), Transaction.AUTO_COMMIT);
+        final String fid1, fid2, fid3;
+        try{
+            //roads contains initially 3 features, as set up in #dataSetup()
+            fid1 = reader.next().getID();
+            fid2 = reader.next().getID();
+            fid3 = reader.next().getID();
+        }finally{
+            reader.close();
+        }
+        
+        FilterFactory2 factory = CommonFactoryFinder.getFilterFactory2(null);
+        
+        Set<Identifier> ids = new HashSet<Identifier>();
+        ids.add(factory.featureId(fid1));
+        ids.add(factory.featureId(fid2));
+        // the following one should be stripped out from the request. Its structure keeps being
+        // <someString>.<number> but the FIDMapper.isValid() method should return false for it
+        ids.add(factory.featureId("_" + fid3));
+        
+        org.opengis.filter.Filter filter = factory.id(ids);
+
+        Transaction t = new DefaultTransaction();
+        reader = data.getFeatureReader(new DefaultQuery("road", filter), t);
+        assertNotNull(reader);
+        try {
+            Set<String> expected = new HashSet<String>();
+            expected.add(fid1);
+            expected.add(fid2);
+            
+            Set<String> returned = new HashSet<String>();
+            assertTrue(reader.hasNext());
+            returned.add( reader.next().getID());
+            assertTrue(reader.hasNext());
+            returned.add( reader.next().getID() );
+            assertFalse("expected only 2 features", reader.hasNext());
+            
+            assertEquals(expected, returned);
+        } finally {
+            reader.close();
+            t.close();
+        }
+    }
+
+    public void testCaseInsensitiveFilter() throws Exception {
+        final String riverName = riverType.getName().getLocalPart();
+        FeatureSource<SimpleFeatureType, SimpleFeature> rivers = data.getFeatureSource(riverName);
+        org.opengis.filter.Filter caseSensitive = ff.equal(ff.property("river"), ff.literal("Rv1"), true);
+        assertEquals(0, rivers.getCount(new DefaultQuery(riverName, caseSensitive)));
+        org.opengis.filter.Filter caseInsensitive = ff.equal(ff.property("river"), ff.literal("Rv1"), false);
+        assertEquals(1, rivers.getCount(new DefaultQuery(riverName, caseInsensitive)));
     }
 
     public void testGetFeatureReaderRetypeBug() throws Exception {
@@ -1439,16 +1504,16 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertTrue((count == 3) || (count == -1));
 
         ReferencedEnvelope bounds = road.getBounds(Query.ALL);
-        assertTrue((bounds == null) || bounds.equals(roadBounds));
+        assertTrue((bounds == null) || new Envelope(bounds).equals(roadBounds));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> all = road.getFeatures();
         assertEquals(3, all.size());
-        assertEquals(roadBounds, all.getBounds());
+        assertEquals(roadBounds, new Envelope(all.getBounds()));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(roadFeatures);
 
         assertCovers("all", expected, all);
-        assertEquals(roadBounds, all.getBounds());
+        assertEquals(roadBounds, new Envelope(all.getBounds()));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> some = road.getFeatures(rd12Filter);
         assertEquals(2, some.size());
@@ -1456,7 +1521,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         ReferencedEnvelope e = new ReferencedEnvelope();
         e.include(roadFeatures[0].getBounds());
         e.include(roadFeatures[1].getBounds());
-        assertEquals(e, some.getBounds());
+        assertEquals(e, new Envelope(some.getBounds()));
         assertEquals(some.getSchema(), road.getSchema());
 
         DefaultQuery query = new DefaultQuery("road", rd12Filter, new String[] { "name" });
@@ -1484,12 +1549,12 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         ReferencedEnvelope b = half.getBounds();
         ReferencedEnvelope expectedBounds = isEnvelopeComputingEnabled() ? roadBounds : new ReferencedEnvelope();
-        assertEquals(expectedBounds, b); 
+        assertEquals(expectedBounds, new Envelope(b)); 
     }
     
     public void testBoundsReproject() throws Exception {
         FeatureSource<SimpleFeatureType, SimpleFeature> road = data.getFeatureSource("road");
-        assertEquals(roadBounds, road.getBounds());
+        assertEquals(new Envelope(roadBounds), road.getBounds());
         
         CoordinateReferenceSystem epsg4326 = CRS.decode("EPSG:4326");
         CoordinateReferenceSystem epsg3003 = CRS.decode("EPSG:3003");
@@ -1523,12 +1588,12 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> all = river.getFeatures();
         assertEquals(2, all.size());
-        assertEquals(riverBounds, all.getBounds());
+        assertEquals(riverBounds, new Envelope(all.getBounds()));
         assertTrue("rivers", covers(all.features(), riverFeatures));
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(riverFeatures);
         assertCovers("all", expected, all);
-        assertEquals(riverBounds, all.getBounds());
+        assertEquals(riverBounds, new Envelope(all.getBounds()));
     }
 
     public void testGetFeaturesSortBy() throws NoSuchElementException, IOException,

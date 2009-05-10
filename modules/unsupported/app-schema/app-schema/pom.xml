@@ -5,7 +5,7 @@
   The Geotools Project                                                    
   http://www.geotools.org/                                            
   
-  Version: $Id: pom.xml 31787 2008-11-06 07:12:25Z bencd $              
+  Version: $Id: pom.xml 32011 2008-12-16 04:29:03Z bencaradocdavies $              
   ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>app-schema</artifactId>
-    <version>2.6.0.osgi1</version>
+    <version>2.6.0.osgi2</version>
   </parent>
 
 
@@ -25,9 +25,9 @@
   <url>http://maven.geotools.fr/reports/main/</url>
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/app-schema/app-schema
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/app-schema/app-schema</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema</url>
   </scm>
   <description>
     DataAccess to create FeatureTypes defined in application schema.

@@ -46,6 +46,8 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
     final protected String table6 = "tmp_pgtest 6";
     /** just like table1, but will be inserted in a different schema */
     final protected String table7 =  "tmp_pgtest_7";
+    /** just like table1, but with no primary key */
+    final protected String table8 =  "tmp_pgtest_8";
     
     protected void connect() throws Exception {
         super.connect();
@@ -84,6 +86,8 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
         st.execute(sql);
         sql = preSql + "'" + TEST_SCHEMA +"', '" + table7 + "'" + postSql;
         st.execute(sql);
+        sql = preSql + "'public', '" + table8 + "'" + postSql;
+        st.execute(sql);
     }
     
     protected void purgeGeometryColumns(Statement st) throws Exception {
@@ -100,6 +104,7 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
         createTable6(st);
         createTestSchema(st);
         createTable7(st);
+        createTable8(st);
     }
     
     protected void createTestSchema(Statement st) throws Exception {
@@ -170,6 +175,12 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
         st.execute(sql);
     }
 
+    protected void createTable8(Statement st) throws Exception {
+        String sql = "CREATE TABLE " + table8 + "(" 
+        + "name varchar(10), the_geom geometry) WITHOUT OIDS;";
+        st.execute(sql);
+    }
+    
     protected void dropTables(Statement st) throws Exception {
         dropTable(st, table1);
         dropTable(st, table2);
@@ -181,6 +192,7 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
         dropTable(st, table6);
         dropSequence(st, table6 + "_fid_seq");
         dropTable(st, table7);
+        dropTable(st, table8);
         dropSequence(st, TEST_SCHEMA + "." + table7 + "_fid_seq");
         dropSchema(st, TEST_SCHEMA);
     }

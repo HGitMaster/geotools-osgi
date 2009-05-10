@@ -1,1 +1,1 @@
-org.geotools.geometry.jts.aggregate.HTSAggregateFactory
+org.geotools.geometry.jts.spatialschema.geometry.aggregate.JTSAggregateFactory

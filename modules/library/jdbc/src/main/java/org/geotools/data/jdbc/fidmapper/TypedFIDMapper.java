@@ -177,4 +177,18 @@ public class TypedFIDMapper extends AbstractFIDMapper {
     public boolean isVolatile() {
         return wrappedMapper.isVolatile();
     }
+
+    /**
+     * @see FIDMapper#isValid(String)
+     */
+    public boolean isValid(String fid) {
+        if (!fid.startsWith(this.featureTypeName + ".")) {
+            return false;
+        }
+        if (fid.length() < this.featureTypeName.length() + 1) {
+            return false;
+        }
+        String wrappedFid = fid.substring(this.featureTypeName.length() + 1);
+        return wrappedMapper.isValid(wrappedFid);
+    }
 }

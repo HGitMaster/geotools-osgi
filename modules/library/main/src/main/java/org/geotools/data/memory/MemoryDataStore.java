@@ -72,19 +72,29 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/memory/MemoryDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/memory/MemoryDataStore.java $
  */
 public class MemoryDataStore extends AbstractDataStore {
     /** Memory holds Map of Feature by fid by typeName. */
-    protected Map memory = new HashMap();
+    protected Map<String,Map<String,SimpleFeature>> memory = new HashMap<String,Map<String,SimpleFeature>>();
 
     /** Schema holds FeatureType by typeName */
-    protected Map schema = new HashMap();
+    protected Map<String,SimpleFeatureType> schema = new HashMap<String,SimpleFeatureType>();
 
     public MemoryDataStore() {
         super(true);
     }
 
+    /**
+     * Construct an MemoryDataStore around an empty collection of the provided SimpleFeatureType
+     * @param schema An empty feature collection of this type will be made available
+     */
+    public MemoryDataStore(SimpleFeatureType featureType) {
+        Map<String,SimpleFeature> featureMap = new HashMap<String,SimpleFeature>();
+        String typeName = featureType.getTypeName();
+        schema.put(typeName, featureType);
+        memory.put(typeName, featureMap);
+    }
     public MemoryDataStore(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
         addFeatures(collection);
     }
@@ -114,7 +124,7 @@ public class MemoryDataStore extends AbstractDataStore {
             // use an order preserving map, so that features are returned in the same
             // order as they were inserted. This is important for repeatable rendering
             // of overlapping features.
-            Map featureMap = new LinkedHashMap();
+            Map<String,SimpleFeature> featureMap = new LinkedHashMap<String,SimpleFeature>();
             String typeName;
             SimpleFeature feature;
 
@@ -155,7 +165,7 @@ public class MemoryDataStore extends AbstractDataStore {
     public void addFeatures(FeatureIterator<SimpleFeature> reader) throws IOException {
         try {
             SimpleFeatureType featureType;
-            Map featureMap = new HashMap();
+            Map<String,SimpleFeature> featureMap = new HashMap<String,SimpleFeature>();
             String typeName;
             SimpleFeature feature;
 
@@ -204,7 +214,7 @@ public class MemoryDataStore extends AbstractDataStore {
             }
         }
     }
-    public void addFeatures(FeatureCollection collection) {
+    public void addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
         if ((collection == null) ) {
             throw new IllegalArgumentException("Provided FeatureCollection<SimpleFeatureType, SimpleFeature> is empty");
         }

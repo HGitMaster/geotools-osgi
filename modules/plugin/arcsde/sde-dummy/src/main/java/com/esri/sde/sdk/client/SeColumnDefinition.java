@@ -28,7 +28,7 @@ public class SeColumnDefinition {
 	public String getName() { return null; }
 	public int getType() { return 0; }
 	public int getSize() { return 0; }
-	public int getScale() { return 0; }
+	public short getScale() { return 0; }
 	public short getRowIdType() { return 0; }
 	
 	

@@ -24,27 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.opengis.ows11.ExceptionReportType;
-import net.opengis.wps.ComplexDataCombinationsType;
-import net.opengis.wps.ComplexDataDescriptionType;
-import net.opengis.wps.DataType;
-import net.opengis.wps.ExecuteResponseType;
-import net.opengis.wps.InputDescriptionType;
-import net.opengis.wps.LiteralDataType;
-import net.opengis.wps.OutputDataType;
-import net.opengis.wps.ProcessBriefType;
-import net.opengis.wps.ProcessDescriptionType;
-import net.opengis.wps.ProcessDescriptionsType;
-import net.opengis.wps.ProcessOfferingsType;
-import net.opengis.wps.SupportedComplexDataInputType;
-import net.opengis.wps.WPSCapabilitiesType;
+import junit.framework.TestCase;
+import net.opengis.wps10.ProcessBriefType;
+import net.opengis.wps10.ProcessDescriptionType;
+import net.opengis.wps10.ProcessDescriptionsType;
+import net.opengis.wps10.ProcessOfferingsType;
+import net.opengis.wps10.WPSCapabilitiesType;
 
 import org.eclipse.emf.common.util.EList;
-import org.geotools.data.Parameter;
 import org.geotools.data.wps.request.DescribeProcessRequest;
-import org.geotools.data.wps.request.ExecuteProcessRequest;
 import org.geotools.data.wps.response.DescribeProcessResponse;
-import org.geotools.data.wps.response.ExecuteProcessResponse;
 import org.geotools.ows.ServiceException;
 import org.geotools.process.Process;
 
@@ -58,8 +47,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
-
-import junit.framework.TestCase;
 
 /**
  * Test requests using the WPSFactory and WPSProcess objects

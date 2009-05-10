@@ -72,8 +72,11 @@ public class PropertyFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     private void writeImplementation( SimpleFeature f ) throws IOException{
         writer.next();
         writer.writeFeatureID( f.getID() );        
-        for( int i=0; i<f.getAttributeCount(); i++){
-            writer.write( i, f.getAttribute( i ));
+        for( int i=0; i<f.getAttributeCount(); i++) {
+        	if(f.getAttribute(i) == null)
+        		writer.write(i, "<null>");
+        	else
+        		writer.write( i, f.getAttribute( i ));
         }   
     }
     public SimpleFeature next() throws IOException {

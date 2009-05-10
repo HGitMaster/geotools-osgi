@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,6 +34,7 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
@@ -50,7 +52,7 @@ import org.opengis.filter.FilterFactory2;
  * Test functioning of PropertyDataStore.
  * 
  * @author Jody Garnett, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
  */
 public class PropertyDataStoreTest extends TestCase {
     PropertyDataStore store;
@@ -79,6 +81,19 @@ public class PropertyDataStoreTest extends TestCase {
         writer.write("fid3=3|dave"); writer.newLine();
         writer.write("fid4=4|justin");
         writer.close();
+        
+        file = new File( dir ,"dots.in.name.properties");
+        if( file.exists()){
+            file.delete();
+        }        
+        writer = new BufferedWriter( new FileWriter( file ) );
+        writer.write("_=id:Integer,name:String"); writer.newLine();
+        writer.write("fid1=1|jody"); writer.newLine();
+        writer.write("fid2=2|brent"); writer.newLine();
+        writer.write("fid3=3|dave"); writer.newLine();
+        writer.write("fid4=4|justin");
+        writer.close();
+        
         store = new PropertyDataStore( dir );
         super.setUp();
     }
@@ -94,8 +109,10 @@ public class PropertyDataStoreTest extends TestCase {
 
     public void testGetNames() {
         String names[] = store.getTypeNames();
-        assertEquals( 1, names.length );
-        assertEquals( "road", names[0] );                
+        Arrays.sort(names);
+        assertEquals( 2, names.length );
+        assertEquals( "dots.in.name", names[0] );
+        assertEquals( "road", names[1] );              
     }
 
     public void testGetSchema() throws IOException {
@@ -261,6 +278,19 @@ public class PropertyDataStoreTest extends TestCase {
         writer.close();
         assertEquals( 5, count( "road" ));    
     }
+    public void testWriterAppendLastNull() throws Exception{
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = (FeatureWriter)
+                    store.getFeatureWriterAppend("road", Transaction.AUTO_COMMIT);
+        SimpleFeature f;
+        assertFalse( writer.hasNext() );
+        f = writer.next();
+        assertNotNull( f );
+        f.setAttribute(0,new Integer(-1));        
+        f.setAttribute(1,null); // this made the datastore break
+        writer.write();
+        writer.close();
+        assertEquals( 5, count( "road" ));    
+    }
     public void testWriterChangeRemoveFirst() throws Exception{
         PropertyFeatureWriter writer = (PropertyFeatureWriter)
                     store.getFeatureWriter("road");
@@ -315,6 +345,7 @@ public class PropertyDataStoreTest extends TestCase {
         writer.close();
         assertEquals( 4, count( "road" ));                    
     }
+    
     public void testGetFeatureSource() throws Exception {
         FeatureSource<SimpleFeatureType, SimpleFeature> road = store.getFeatureSource( "road" );
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = road.getFeatures();

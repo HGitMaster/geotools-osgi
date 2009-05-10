@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +37,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.expression.PropertyAccessor;
 import org.geotools.filter.expression.PropertyAccessorFactory;
+import org.geotools.referencing.CRS;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -50,14 +52,19 @@ import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.Contains;
 import org.opengis.filter.spatial.DWithin;
 import org.opengis.filter.spatial.Disjoint;
 import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Within;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -75,7 +82,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  *
  * @author James MacGill, CCG
  * @author Rob Hranac, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/filter/FilterTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/filter/FilterTest.java $
  */
 public class FilterTest extends TestCase {
     /** The logger for the filter module. */
@@ -579,14 +586,8 @@ public class FilterTest extends TestCase {
         assertFalse(filter.evaluate(testFeature));
     }
 
-
-    /**
-     * Test the geometry operators.
-     *
-     * @throws IllegalFilterException If the constructed filter is not valid.
-     */
-    public void testGeometry() throws IllegalFilterException {
-        Coordinate[] coords = new Coordinate[3];
+    public void testGeometryEquals() throws Exception {
+    	Coordinate[] coords = new Coordinate[3];
         coords[0] = new Coordinate(1, 2);
         coords[1] = new Coordinate(3, 4);
         coords[2] = new Coordinate(5, 6);
@@ -594,28 +595,175 @@ public class FilterTest extends TestCase {
         // Test Equals
         PropertyName left = new AttributeExpressionImpl(testSchema, "testGeometry");
         GeometryFactory gf = new GeometryFactory(new PrecisionModel());
-        Literal right = new LiteralExpressionImpl(gf.createLineString(coords));
+        LineString geom = gf.createLineString(coords);
+        Literal right = new LiteralExpressionImpl(geom);
         Equals filter = fac.equal(left, right);
 
         LOGGER.finer( filter.toString());            
         LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
         assertTrue(filter.evaluate(testFeature));
 
+        Function function = new GeometryFunction(geom);
+        filter = fac.equal(left, function);
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertTrue(filter.evaluate(testFeature));
+
         coords[0] = new Coordinate(0, 0);
-        right = new LiteralExpressionImpl(gf.createLineString(coords));
+        right = new LiteralExpressionImpl(geom);
         filter = fac.equal(left, right); 
 
         LOGGER.finer( filter.toString());            
         LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
-        assertTrue(!filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
 
-        // Test Disjoint
-        left = new AttributeExpressionImpl(testSchema, "testGeometry");
+        filter = fac.equal(left, new LiteralExpressionImpl(null)); 
+
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
+        
+        
+	}
+
+    public void testContains() throws Exception {
+    	Coordinate[] coords = {
+    			new Coordinate(0, 0),
+    			new Coordinate(6, 0),
+    	        new Coordinate(6, 7),
+    	        new Coordinate(0, 7),
+    	        new Coordinate(0, 0)
+    	};
+
+        // Test Equals
+    	GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+    	Polygon geom = gf.createPolygon(gf.createLinearRing(coords), new LinearRing[0]);
+        Literal expr1 = new LiteralExpressionImpl(geom);
+        PropertyName expr2 = new AttributeExpressionImpl(testSchema, "testGeometry");
+        
+        Contains filter = fac.contains(expr1, expr2);
+
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertTrue(filter.evaluate(testFeature));
+
+        Function function = new GeometryFunction(geom);
+        filter = fac.contains(expr1, function);
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertTrue(filter.evaluate(testFeature));
+
+        filter = fac.contains(expr2, expr1);
+
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
+
+        coords = new Coordinate[] {
+    			new Coordinate(2, 2),
+    			new Coordinate(6, 0),
+    	        new Coordinate(6, 7),
+    	        new Coordinate(0, 7),
+    	        new Coordinate(2, 2)
+    	};
+        geom = gf.createPolygon(gf.createLinearRing(coords), new LinearRing[0]);
+        expr1 = new LiteralExpressionImpl(geom);
+        filter = fac.contains(expr1, expr2); 
+
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
+        
+        filter = fac.contains(new LiteralExpressionImpl(null), expr2); 
+
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
+
+	}
+
+
+    public void testWithin() throws Exception {
+    	Coordinate[] coords = {
+    			new Coordinate(0, 0),
+    			new Coordinate(6, 0),
+    	        new Coordinate(6, 7),
+    	        new Coordinate(0, 7),
+    	        new Coordinate(0, 0)
+    	};
+
+        // Test Equals
+    	GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+    	Polygon geom = gf.createPolygon(gf.createLinearRing(coords), new LinearRing[0]);
+        Literal expr2 = new LiteralExpressionImpl(geom );
+        PropertyName expr1 = new AttributeExpressionImpl(testSchema, "testGeometry");
+        
+        Within filter = fac.within(expr1, expr2);
+
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertTrue(filter.evaluate(testFeature));
+
+        Function function = new GeometryFunction(geom);
+        filter = fac.within(expr1, function);
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertTrue(filter.evaluate(testFeature));
+
+        filter = fac.within(expr2, expr1);
+
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
+
+        coords = new Coordinate[] {
+    			new Coordinate(2, 2),
+    			new Coordinate(6, 0),
+    	        new Coordinate(6, 7),
+    	        new Coordinate(0, 7),
+    	        new Coordinate(2, 2)
+    	};
+        expr2 = new LiteralExpressionImpl(gf.createPolygon(gf.createLinearRing(coords), new LinearRing[0]));
+        filter = fac.within(expr2, expr1); 
+
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
+        
+        expr2 = new LiteralExpressionImpl(null);
+        filter = fac.within(expr2, expr1); 
+
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
+
+	}
+
+    public void testDisjoint() throws Exception {
+    	Coordinate[] coords = new Coordinate[3];
         coords[0] = new Coordinate(0, 0);
         coords[1] = new Coordinate(3, 0);
         coords[2] = new Coordinate(6, 0);
-        right = new LiteralExpressionImpl(gf.createLineString(coords));
-        Disjoint disjoint = fac.disjoint(left, right);
+
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        
+        // Test Disjoint
+        AttributeExpressionImpl expr1 = new AttributeExpressionImpl(testSchema, "testGeometry");
+        LineString geom = gf.createLineString(coords);
+        LiteralExpressionImpl expr2 = new LiteralExpressionImpl(geom);
+        Disjoint disjoint = fac.disjoint(expr1, expr2);
+
+        LOGGER.finer( disjoint.toString());            
+        LOGGER.finer( "contains feature: " + disjoint.evaluate(testFeature));
+        assertTrue(disjoint.evaluate(testFeature));
+
+        Function function = new GeometryFunction(geom);
+        disjoint = fac.disjoint(expr1, function);
+        LOGGER.finer( disjoint.toString());            
+        LOGGER.finer( "contains feature: " + disjoint.evaluate(testFeature));
+        assertTrue(disjoint.evaluate(testFeature));
+        
+        disjoint = fac.disjoint(expr2, expr1);
 
         LOGGER.finer( disjoint.toString());            
         LOGGER.finer( "contains feature: " + disjoint.evaluate(testFeature));
@@ -624,15 +772,85 @@ public class FilterTest extends TestCase {
         coords[0] = new Coordinate(1, 2);
         coords[1] = new Coordinate(3, 0);
         coords[2] = new Coordinate(6, 0);
-        right = new LiteralExpressionImpl(gf.createLineString(coords));
-        disjoint = fac.disjoint(left, right);
+        geom = gf.createLineString(coords);
+        expr2 = new LiteralExpressionImpl(geom);
+        disjoint = fac.disjoint(expr1, expr2);
 
-        LOGGER.finer( filter.toString());            
+        LOGGER.finer( disjoint.toString());            
         LOGGER.finer( "contains feature: " + disjoint.evaluate(testFeature));
         assertTrue(!disjoint.evaluate(testFeature));
 
+        expr2 = new LiteralExpressionImpl(null);
+        disjoint = fac.disjoint(expr1, expr2);
+
+        LOGGER.finer( disjoint.toString());            
+        LOGGER.finer( "contains feature: " + disjoint.evaluate(testFeature));
+        assertTrue(!disjoint.evaluate(testFeature));
+
+	}
+
+    public void testIntersects() throws Exception {
+    	Coordinate[] coords = new Coordinate[3];
+        coords[0] = new Coordinate(1, 5);
+        coords[1] = new Coordinate(3, 4);
+        coords[2] = new Coordinate(5, 1);
+
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        
+        // Test Disjoint
+        AttributeExpressionImpl expr1 = new AttributeExpressionImpl(testSchema, "testGeometry");
+        LineString geom = gf.createLineString(coords);
+        LiteralExpressionImpl expr2 = new LiteralExpressionImpl(geom);
+        Intersects intersects = fac.intersects(expr1, expr2);
+
+        LOGGER.finer( intersects.toString());            
+        LOGGER.finer( "contains feature: " + intersects.evaluate(testFeature));
+        assertTrue(intersects.evaluate(testFeature));
+     
+        intersects = fac.intersects(expr2, expr1);
+
+        LOGGER.finer( intersects.toString());            
+        LOGGER.finer( "contains feature: " + intersects.evaluate(testFeature));
+        assertTrue(intersects.evaluate(testFeature));
+
+        Function function = new GeometryFunction(geom);
+        intersects = fac.intersects(expr1, function);
+        LOGGER.finer( intersects.toString());            
+        LOGGER.finer( "contains feature: " + intersects.evaluate(testFeature));
+        assertTrue(intersects.evaluate(testFeature));
+        
+
+        LOGGER.finer( intersects.toString());            
+        LOGGER.finer( "contains feature: " + intersects.evaluate(testFeature));
+        assertTrue( intersects.evaluate(testFeature) );
+        
+        coords[0] = new Coordinate(0, 0);
+        coords[1] = new Coordinate(3, 0);
+        coords[2] = new Coordinate(6, 0);
+        expr2 = new LiteralExpressionImpl(gf.createLineString(coords));
+        intersects = fac.intersects(expr1, expr2);
+
+        LOGGER.finer( intersects.toString());            
+        LOGGER.finer( "contains feature: " + intersects.evaluate(testFeature));
+        assertTrue(!intersects.evaluate(testFeature));
+
+        expr2 = new LiteralExpressionImpl(null);
+        intersects = fac.intersects(expr1, expr2);
+
+        LOGGER.finer( intersects.toString());            
+        LOGGER.finer( "contains feature: " + intersects.evaluate(testFeature));
+        assertTrue(!intersects.evaluate(testFeature));
+	}
+    
+    /**
+     * Test the geometry operators.
+     *
+     * @throws IllegalFilterException If the constructed filter is not valid.
+     */
+    public void testBBOX() throws IllegalFilterException {
+        
         // Test BBOX
-        left = new AttributeExpressionImpl(testSchema, "testGeometry");
+        AttributeExpressionImpl left = new AttributeExpressionImpl(testSchema, "testGeometry");
         BBOX bbox = fac.bbox(left, 0, 0, 10, 10, null);
 
         LOGGER.finer( bbox.toString());
@@ -644,6 +862,20 @@ public class FilterTest extends TestCase {
         LOGGER.finer( bbox.toString());            
         LOGGER.finer( "contains feature: " + bbox.evaluate(testFeature));
         assertTrue(!bbox.evaluate(testFeature));
+        
+        bbox = fac.bbox(left, 0, 0, 10, 10, "EPSG:4326");
+
+        LOGGER.finer( bbox.toString());            
+        LOGGER.finer( "contains feature: " + bbox.evaluate(testFeature));
+        assertTrue(bbox.evaluate(testFeature));
+        
+        bbox = fac.bbox(left, 0, 0, 10, 10, "");
+
+        LOGGER.finer( bbox.toString());            
+        LOGGER.finer( "contains feature: " + bbox.evaluate(testFeature));
+        assertTrue(bbox.evaluate(testFeature));
+        
+        
     }
 
     public void testDWithin() throws Exception {
@@ -664,7 +896,13 @@ public class FilterTest extends TestCase {
         LOGGER.finer(filter.toString());
         LOGGER.finer("contains feature: " + filter.evaluate(testFeature));
         assertTrue(filter.evaluate(testFeature));
+
+        filter = fac.dwithin(left, right, 2, "m");
+        LOGGER.finer(filter.toString());
+        LOGGER.finer("contains feature: " + filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
         
+        right = new LiteralExpressionImpl(null);
         filter = fac.dwithin(left, right, 2, "m");
         LOGGER.finer(filter.toString());
         LOGGER.finer("contains feature: " + filter.evaluate(testFeature));
@@ -704,6 +942,13 @@ public class FilterTest extends TestCase {
         LOGGER.finer(filter.toString());
         LOGGER.finer("contains feature: " + filter.evaluate(testFeature));
         assertTrue(filter.evaluate(testFeature));
+        
+        right = new LiteralExpressionImpl(null);
+        filter = fac.beyond(left, right, 2, "m");
+        LOGGER.finer(filter.toString());
+        LOGGER.finer("contains feature: " + filter.evaluate(testFeature));
+        assertFalse(filter.evaluate(testFeature));
+
     }
 
     public void testFid() {
@@ -918,5 +1163,37 @@ public class FilterTest extends TestCase {
 			};
 		}
     	
+    }
+
+    private final class GeometryFunction implements Function {
+        final Geometry ls;
+
+        public GeometryFunction(Geometry geom) throws Exception {
+            ls=geom;
+        }
+
+        public String getName() {
+            return "function";
+        }
+
+        public List<org.opengis.filter.expression.Expression> getParameters() {
+            return Collections.emptyList();
+        }
+
+        public Object accept(ExpressionVisitor visitor, Object extraData) {
+            return visitor.visit(this, extraData);
+        }
+
+        public Object evaluate(Object object) {
+            return ls;
+        }
+
+        public <T> T evaluate(Object object, Class<T> context) {
+            return context.cast(ls);
+        }
+
+        public Literal getFallbackValue() {
+            return null;
+        }
     }
 }

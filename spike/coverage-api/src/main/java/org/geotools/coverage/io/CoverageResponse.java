@@ -25,6 +25,8 @@ import org.opengis.util.ProgressListener;
 /**
  * A coverage response; please check the status before assuming any data is
  * available.
+ * 
+ * @author Simone Giannecchini, GeoSolutions SAS
  */
 public interface CoverageResponse {
 
@@ -53,6 +55,7 @@ public interface CoverageResponse {
      */
     public Status getStatus();
 
+    
     public Collection<? extends Exception> getExceptions();
 
     /**

@@ -17,7 +17,6 @@
 package org.geotools.filter.spatial;
 
 import org.geotools.filter.CartesianDistanceFilter;
-import org.geotools.filter.FilterFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
@@ -41,10 +40,12 @@ public class BeyondImpl extends CartesianDistanceFilter implements Beyond {
 	}
 
 	public boolean evaluate(Object feature) {
-		
 		Geometry left = getLeftGeometry(feature);
 		Geometry right = getRightGeometry(feature);
 		
+		if( left==null || right == null ){
+			return false;
+		}
 		return !left.isWithinDistance(right, getDistance());
 	}
 	

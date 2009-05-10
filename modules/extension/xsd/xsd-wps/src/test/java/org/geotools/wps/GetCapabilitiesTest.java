@@ -17,7 +17,6 @@
 package org.geotools.wps;
 
 import junit.framework.TestCase;
-
 import net.opengis.ows11.AddressType;
 import net.opengis.ows11.CodeType;
 import net.opengis.ows11.ContactType;
@@ -32,9 +31,10 @@ import net.opengis.ows11.RequestMethodType;
 import net.opengis.ows11.ResponsiblePartySubsetType;
 import net.opengis.ows11.ServiceIdentificationType;
 import net.opengis.ows11.ServiceProviderType;
-import net.opengis.wps.ProcessBriefType;
-import net.opengis.wps.ProcessOfferingsType;
-import net.opengis.wps.WPSCapabilitiesType;
+import net.opengis.wps10.LanguagesType1;
+import net.opengis.wps10.ProcessBriefType;
+import net.opengis.wps10.ProcessOfferingsType;
+import net.opengis.wps10.WPSCapabilitiesType;
 
 import org.geotools.xml.Parser;
 
@@ -52,6 +52,7 @@ public class GetCapabilitiesTest extends TestCase {
         assertServiceProvider( caps.getServiceProvider() );
         assertOperationsMetadata( caps.getOperationsMetadata() );
         assertProcessOfferings( caps.getProcessOfferings() );
+        assertLanguages( caps.getLanguages() );
     }
     
     /**
@@ -243,5 +244,14 @@ public class GetCapabilitiesTest extends TestCase {
         assertEquals( 2, pb.getMetadata().size() );
         assertEquals( "buffer", ((MetadataType)pb.getMetadata().get(0)).getTitle() );
         assertEquals( "polygon", ((MetadataType)pb.getMetadata().get(1)).getTitle() );
+    }
+    
+    void assertLanguages( LanguagesType1 l ) {
+        assertNotNull( l.getDefault() );
+        assertEquals( "en-CA", l.getDefault().getLanguage() );
+       
+        assertEquals( 2, l.getSupported().getLanguage().size() );
+        assertEquals( "en-CA", l.getSupported().getLanguage().get( 0 ) );
+        assertEquals( "fr-CA", l.getSupported().getLanguage().get( 1 ) );
     }
 }

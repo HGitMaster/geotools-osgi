@@ -18,19 +18,15 @@ package org.geotools.caching.util;
 
 import java.io.IOException;
 import java.io.ObjectInput;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import org.opengis.feature.Attribute;
+
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.IllegalAttributeException;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.IllegalAttributeException;
 
 
 /** Simple marshaller that can write features to an ObjectOutputStream.
@@ -64,36 +60,40 @@ public class SimpleFeatureMarshaller {
      */
     public static final int FEATURE = -1;
     public static final int SIMPLEATTRIBUTE = 0;
-    static DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
-    HashMap<TypeKey, SimpleFeatureType> types;
+    
+    private HashMap<String, SimpleFeatureType> types;
+    private HashMap<String, SimpleFeatureBuilder> builders;
 
     /** Default constructor.
      */
     public SimpleFeatureMarshaller() {
-        types = new HashMap<TypeKey, SimpleFeatureType>();
+        types = new HashMap<String, SimpleFeatureType>();
+        builders = new HashMap<String, SimpleFeatureBuilder>();
     }
 
+    /**
+     * Registers a type with the feature marshaller
+     * 
+     * @param type
+     */
     public void registerType(SimpleFeatureType type) {
-        TypeKey key = new TypeKey(type);
-
-        if (!types.containsKey(key)) {
-            types.put(key, type);
+        if (!types.containsKey(type.getName().getURI())){
+            types.put(type.getName().getURI(), type);
         }
     }
 
-    public SimpleFeatureType typeLookUp(int typeHash, String typeName) {
-        TypeKey key = new TypeKey(typeHash, typeName);
-
-        return types.get(key);
-    }
-
-    public Map getRegisteredTypes() {
-        return types;
+    /**
+     * Looks in the type cache for a particular feature  type
+     * @param typeName
+     * @return
+     */
+    private SimpleFeatureType typeLookUp(String typeName) {
+        return types.get(typeName);
     }
 
     /** Marshall a feature into a stream.
      * The type of that feature is not marshalled,
-     * only hashCode of FeatureType and type name is marshalled.
+     * type name is marshalled.
      *
      * @param f the Feature to marshall
      * @param s the stream to write to
@@ -103,16 +103,15 @@ public class SimpleFeatureMarshaller {
         throws IOException {
         SimpleFeatureType type = (SimpleFeatureType) f.getType();
         registerType(type);
-        s.writeInt(type.hashCode());
         s.writeObject(type.getName().getURI());
         s.writeObject(f.getID());
-
-        int natt = f.attributes().size();
+        
+        int natt = f.getAttributes().size();
         s.writeInt(natt);
-
-        for (Iterator it = f.attributes().iterator(); it.hasNext();) {
-            Attribute att = (Attribute) it.next();
-            marshallSimpleAttribute(att.getValue(), s);
+        
+        for (Iterator<Object> it = f.getAttributes().iterator(); it.hasNext();) {
+        	Object att = it.next();
+        	marshallSimpleAttribute(att, s);
         }
     }
 
@@ -126,14 +125,7 @@ public class SimpleFeatureMarshaller {
      */
     protected void marshallSimpleAttribute(Object o, ObjectOutput s)
         throws IOException {
-        if (o instanceof Collection) { // this should never happen ...
-                                       //            Collection c = (Collection) o;
-                                       //            s.writeInt(c.size());
-                                       //
-                                       //            for (Iterator it = c.iterator(); it.hasNext();) {
-                                       //                Object nxt = it.next();
-                                       //                marshallComplexAttribute(nxt, s);
-                                       //            }
+        if (o instanceof Collection) {
             throw new IllegalArgumentException(
                 "Got instance of SimpleFeature with complex attributes.");
         } else if (o instanceof SimpleFeature) {
@@ -155,9 +147,8 @@ public class SimpleFeatureMarshaller {
      */
     public SimpleFeature unmarshall(ObjectInput s)
         throws IOException, ClassNotFoundException, IllegalAttributeException {
-        int typeHash = s.readInt();
         String typeName = (String) s.readObject();
-        SimpleFeatureType type = typeLookUp(typeHash, typeName);
+        SimpleFeatureType type = typeLookUp(typeName);
 
         if (type != null) {
             SimpleFeature f = unmarshall(s, type);
@@ -186,7 +177,7 @@ public class SimpleFeatureMarshaller {
         String fid = (String) s.readObject();
         int natt = s.readInt();
 
-        builder.setType(type);
+        SimpleFeatureBuilder builder = lookupBuilder(type);
 
         if (!(natt == type.getAttributeCount())) {
             throw new IOException("Schema error");
@@ -195,8 +186,21 @@ public class SimpleFeatureMarshaller {
         for (int i = 0; i < natt; i++) {
             builder.add(unmarshallSimpleAttribute(s));
         }
-
-        return builder.feature(fid);
+        //return builder.feature(fid);
+        return builder.buildFeature(fid);
+    }
+    
+    /*
+     * Looks up a feature builder from the builder cache; if not found then
+     * it will create a new one and add it to the cache.
+     */
+    private SimpleFeatureBuilder lookupBuilder(SimpleFeatureType type){
+        SimpleFeatureBuilder builder = builders.get(type.getName().getURI());
+        if (builder == null){
+            builder = new SimpleFeatureBuilder(type);
+            builders.put(type.getName().getURI(), builder);
+        }
+        return builder;
     }
 
     /** Read attribute values from a stream.
@@ -210,7 +214,7 @@ public class SimpleFeatureMarshaller {
     protected Object unmarshallSimpleAttribute(ObjectInput s)
         throws IOException, ClassNotFoundException, IllegalAttributeException {
         int m = s.readInt();
-        Object att;
+        Object att = null;
 
         if (m == SIMPLEATTRIBUTE) {
             att = s.readObject();
@@ -218,52 +222,9 @@ public class SimpleFeatureMarshaller {
             SimpleFeature f = unmarshall(s);
             att = f;
         } else { // this should never happen
-            throw new IllegalAttributeException(
-                "Found complex attribute which is not legal for SimpleFeature.");
-
-            //            for (int i = 0; i < m; i++) {
-            //                atts.addAll(unmarshallComplexAttribute(s));
-            //            }
+            throw new IllegalAttributeException(null, null, "Found complex attribute which is not legal for SimpleFeature.");
         }
 
         return att;
-    }
-}
-
-
-class TypeKey implements Serializable {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 3939840339831295334L;
-    int typeHash;
-    String typeName;
-
-    public TypeKey(SimpleFeatureType type) {
-        this.typeHash = type.hashCode();
-        this.typeName = type.getName().getURI();
-    }
-
-    public TypeKey(int hash, String name) {
-        this.typeHash = hash;
-        this.typeName = name;
-    }
-
-    public int hashCode() {
-        return typeHash;
-    }
-
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-
-        if (o instanceof TypeKey) {
-            TypeKey key = (TypeKey) o;
-
-            return (typeHash == key.typeHash) && (typeName.equals(key.typeName));
-        } else {
-            return false;
-        }
     }
 }

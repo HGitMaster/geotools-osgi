@@ -801,7 +801,7 @@ public abstract class AbstractGridCoverage2DReader implements
     */
    public ServiceInfo getInfo(){
        DefaultServiceInfo info = new DefaultServiceInfo();
-       info.setDescription( source.toString() );
+       info.setDescription( source == null? null : String.valueOf(source) );
        if( source instanceof URL ){
            URL url = (URL) source;
            info.setTitle( url.getFile() );

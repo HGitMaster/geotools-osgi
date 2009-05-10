@@ -88,7 +88,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: EmfAppSchemaReader.java 31742 2008-10-31 06:00:25Z bencd $
+ * @version $Id: EmfAppSchemaReader.java 32633 2009-03-16 01:44:12Z ang05a $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/EmfAppSchemaReader.java $
  * @since 2.4
@@ -131,6 +131,24 @@ public class EmfAppSchemaReader {
 
     private EmfAppSchemaReader() {
         typeFactory = new FeatureTypeFactoryImpl();
+        
+        // RA: I moved the following chunk of code from parse(configuration)
+        // method so we can have multiple schemas in the registry, instead of
+        // resetting the type registry per mapping file. This is to cater
+        // for app-schema integration with another data access input.
+        
+        // set up the type registry
+        typeRegistry = new HashMap();
+        descriptorRegistry = new HashMap();
+        processingTypes = new Stack();
+        
+        // register the "fundation" gml types already bound to geotools
+        // AttributeTypes
+        if (EmfAppSchemaReader.FOUNDATION_TYPES.isEmpty()) {
+            createFoundationTypes();
+        }
+        typeRegistry.putAll(EmfAppSchemaReader.FOUNDATION_TYPES);
+        descriptorRegistry.putAll(EmfAppSchemaReader.FOUNDATION_DESCRIPTORS);
     }
 
     public FeatureTypeFactory getTypeFactory() {
@@ -171,20 +189,7 @@ public class EmfAppSchemaReader {
      */
     public void parse(Configuration configuration) throws IOException {
         // find out the schemas involved in the app schema configuration
-        final SchemaIndex appSchemaIndex = Schemas.findSchemas(configuration);
-
-        // set up the type registry
-        typeRegistry = new HashMap();
-        descriptorRegistry = new HashMap();
-        processingTypes = new Stack();
-
-        // register the "fundation" gml types already bound to geotools
-        // AttributeTypes
-        if (EmfAppSchemaReader.FOUNDATION_TYPES.isEmpty()) {
-            createFoundationTypes();
-        }
-        typeRegistry.putAll(EmfAppSchemaReader.FOUNDATION_TYPES);
-        descriptorRegistry.putAll(EmfAppSchemaReader.FOUNDATION_DESCRIPTORS);
+        final SchemaIndex appSchemaIndex = Schemas.findSchemas(configuration);        
 
         // with the application schemas...
         XSDSchema[] appSchemas = appSchemaIndex.getSchemas();

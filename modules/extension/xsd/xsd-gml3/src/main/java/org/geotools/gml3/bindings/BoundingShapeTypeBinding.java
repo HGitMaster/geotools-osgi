@@ -88,15 +88,17 @@ public class BoundingShapeTypeBinding extends AbstractComplexBinding {
     }
 
     public Object getProperty(Object object, QName name) {
-        if (name.equals(GML.Envelope)) {
-            if (object instanceof Envelope) {
-                return object;
-            }
-
-            //check for a polygon
-            if (object instanceof Polygon) {
-                return ((Polygon) object).getEnvelopeInternal();
-            }
+        //check for a polygon
+        if (object instanceof Polygon) {
+            object = ((Polygon) object).getEnvelopeInternal();
+        }
+        Envelope e = (Envelope) object;
+        
+        if (name.equals(GML.Envelope) && !e.isNull()) {
+            return e;
+        }
+        if (name.equals(GML.Null) && e.isNull()) {
+            return e;
         }
 
         return null;

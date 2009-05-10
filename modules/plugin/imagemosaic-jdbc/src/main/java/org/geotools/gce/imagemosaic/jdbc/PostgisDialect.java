@@ -33,7 +33,7 @@ public class PostgisDialect extends DBDialect {
      */
     @Override
     protected String getRegisterSpatialStatement(String tn, String srs) {
-        return " select AddGeometryColumn('" + tn + "','" +
+        return "select AddGeometryColumn('" + tn + "','" +
         config.getGeomAttributeNameInSpatialTable() + "'," + srs + ",'" +
         getMultiPolygonSQLType() + "',2)";
     }

@@ -23,7 +23,7 @@ import org.opengis.style.StyleVisitor;
  * DOCUMENT ME!
  *
  * @author iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/ChannelSelectionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/ChannelSelectionImpl.java $
  */
 public class ChannelSelectionImpl 
     implements ChannelSelection {
@@ -62,6 +62,9 @@ public class ChannelSelectionImpl
 
     public void setGrayChannel(SelectedChannelType gray) {
         this.gray = gray;
+    }
+    public void setGrayChannel(org.opengis.style.SelectedChannelType gray ){
+        this.gray = new SelectedChannelTypeImpl( gray );
     }
 
     public void setRGBChannels(SelectedChannelType[] channels) {

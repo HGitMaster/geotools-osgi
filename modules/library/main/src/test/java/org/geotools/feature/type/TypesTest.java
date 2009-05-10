@@ -18,6 +18,7 @@ package org.geotools.feature.type;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.feature.AttributeImpl;
@@ -32,8 +33,7 @@ import org.opengis.filter.PropertyIsEqualTo;
 public class TypesTest extends TestCase {
     public void testWithoutRestriction(){
         // used to prevent warning
-        FilterFactory fac = CommonFactoryFinder.getFilterFactory(GeoTools
-                .getDefaultHints());
+        FilterFactory fac = CommonFactoryFinder.getFilterFactory(null);
 
         String attributeName = "string";
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder(); //$NON-NLS-1$
@@ -50,8 +50,7 @@ public class TypesTest extends TestCase {
      * This utility class is used by Types to prevent attribute modification.
      */
     public void testRestrictionCheck() {
-        FilterFactory fac = CommonFactoryFinder.getFilterFactory(GeoTools
-                .getDefaultHints());
+        FilterFactory fac = CommonFactoryFinder.getFilterFactory(null);
 
         String attributeName = "string";
         PropertyIsEqualTo filter = fac.equals(fac.property("."), fac
@@ -68,4 +67,39 @@ public class TypesTest extends TestCase {
         assertNotNull( feature );
 
     }
+    
+    public void testAssertNamedAssignable(){
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        builder.setName("Test");
+        builder.add("name", String.class );
+        builder.add("age", Double.class );
+        SimpleFeatureType test = builder.buildFeatureType();
+        
+        builder.setName("Test");
+        builder.add("age", Double.class );
+        builder.add("name",String.class);
+        SimpleFeatureType test2 = builder.buildFeatureType();
+        
+        builder.setName("Test");
+        builder.add("name",String.class);
+        SimpleFeatureType test3 = builder.buildFeatureType();
+     
+        builder.setName("Test");
+        builder.add("name",String.class);
+        builder.add("distance", Double.class );
+        SimpleFeatureType test4 = builder.buildFeatureType();
+     
+        Types.assertNameAssignable( test, test );        
+        Types.assertNameAssignable( test, test2 );
+        Types.assertNameAssignable( test2, test );        
+        try {
+            Types.assertNameAssignable( test, test3 );    
+            fail("Expected assertNameAssignable to fail as age is not covered");
+        }
+        catch ( IllegalArgumentException expected ){            
+        }
+        
+        Types.assertOrderAssignable( test, test4 );
+    }
+    
 }

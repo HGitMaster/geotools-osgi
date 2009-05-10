@@ -32,10 +32,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
 import org.geotools.data.DataSourceException;
@@ -77,6 +80,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
+import org.opengis.filter.identity.Identifier;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -92,6 +96,14 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class IndexedShapefileDataStore extends ShapefileDataStore implements
         FileWriter {
+    private final static class IdentifierComparator implements Comparator<Identifier>
+    {
+        public int compare(Identifier o1, Identifier o2)
+        {
+            return o1.toString().compareTo(o2.toString());
+        }
+    }
+
     IndexType treeType;
 
     final boolean useIndex;
@@ -380,9 +392,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
         CloseableCollection<Data> goodRecs = null;
         if (filter instanceof Id && shpFiles.isLocal() && shpFiles.exists(FIX)) {
             Id fidFilter = (Id) filter;
-            Set<?> fids = (Set<?>) fidFilter.getIDs();
 
-            goodRecs = queryFidIndex((Set<String>) fids);
+            TreeSet idsSet = new TreeSet(new IdentifierComparator());
+            idsSet.addAll(fidFilter.getIdentifiers());
+            goodRecs = queryFidIndex(idsSet);
         } else {
             if (filter != null) {
                 // Add additional bounds from the filter
@@ -434,23 +447,20 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
      * for the list of fids
      * 
      * @param fids
-     *                the fids of the features to find.
+     *                the fids of the features to find.  If the set is sorted by alphabet the performance is likely to be better.
      * @return a list of Data objects
      * @throws IOException
      * @throws TreeException
      */
-    private CloseableCollection<Data> queryFidIndex(Set<String> idsSet) throws IOException {
+    private CloseableCollection<Data> queryFidIndex(Set<Identifier> idsSet) throws IOException {
 
         if (!indexUseable(FIX)) {
             return null;
         }
 
-        String fids[] = (String[]) idsSet.toArray(new String[idsSet.size()]);
-        Arrays.sort(fids);
-
         IndexedFidReader reader = new IndexedFidReader(shpFiles);
 
-        CloseableCollection<Data> records = new CloseableArrayList(fids.length);
+        CloseableCollection<Data> records = new CloseableArrayList(idsSet.size());
         try {
             IndexFile shx = openIndexFile();
             try {
@@ -458,11 +468,12 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
                 DataDefinition def = new DataDefinition("US-ASCII");
                 def.addField(Integer.class);
                 def.addField(Long.class);
-                for (int i = 0; i < fids.length; i++) {
-                    long recno = reader.findFid(fids[i]);
+                for (Identifier identifier : idsSet) {
+                    String fid = identifier.toString();
+                    long recno = reader.findFid(fid);
                     if (recno == -1){
                         if(LOGGER.isLoggable(Level.FINEST)){
-                            LOGGER.finest("fid " + fids[i] + " not found in index, continuing with next queried fid...");
+                            LOGGER.finest("fid " + fid+ " not found in index, continuing with next queried fid...");
                         }
                         continue;
                     }
@@ -472,7 +483,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
                         data.addValue(new Long(shx
                                 .getOffsetInBytes((int) recno)));
                         if(LOGGER.isLoggable(Level.FINEST)){
-                            LOGGER.finest("fid " + fids[i] + " found for record #"
+                            LOGGER.finest("fid " + fid+ " found for record #"
                                     + data.getValue(0) + " at index file offset "
                                     + data.getValue(1));
                         }
@@ -763,7 +774,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
         }
 
         return new IndexedShapefileFeatureWriter(typeName, shpFiles, attReader,
-                featureReader, this);
+                featureReader, this, dbfCharset);
     }
 
     /**
@@ -783,8 +794,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
         // }
         // }
 
-        Set<String> fids = (Set<String>) filter.accept(
-                IdCollectorFilterVisitor.ID_COLLECTOR, new HashSet());
+        Comparator<Identifier> identifierComparator = new IdentifierComparator();
+        Set<Identifier> fids = (Set<Identifier>) filter.accept(
+                IdCollectorFilterVisitor.IDENTIFIER_COLLECTOR, new TreeSet<Identifier>(identifierComparator));
 
         if (!fids.isEmpty()) {
             Collection<Data> recordsFound = queryFidIndex(fids);

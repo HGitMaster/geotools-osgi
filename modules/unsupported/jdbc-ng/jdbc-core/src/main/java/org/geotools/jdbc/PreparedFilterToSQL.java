@@ -28,10 +28,14 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Id;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BinarySpatialOperator;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Extension of FilterToSQL intended for use with prepared statements.
@@ -55,10 +59,24 @@ public class PreparedFilterToSQL extends FilterToSQL {
     protected List<Object> literalValues = new ArrayList<Object>();
     protected List<Class> literalTypes = new ArrayList<Class>();
     protected List<Integer> SRIDs = new ArrayList<Integer>();
+    protected PreparedStatementSQLDialect dialect;
     boolean prepareEnabled = true;
     
+    /**
+     * Default constructor
+     * @deprecated Use {@link PreparedFilterToSQL(PreparedStatementSQLDialect)} instead
+     */
     public PreparedFilterToSQL() {
-        super();
+        this.dialect = null;
+    }
+    
+    /**
+     * Contructor taking a reference to the SQL dialect, will use it to 
+     * encode geometry placeholders
+     * @param dialect
+     */
+    public PreparedFilterToSQL(PreparedStatementSQLDialect dialect) {
+        this.dialect = dialect;
     }
 
     /**
@@ -83,17 +101,35 @@ public class PreparedFilterToSQL extends FilterToSQL {
         if(!prepareEnabled)
             return super.visit(expression, context);
         
-        //evaluate the literal and store it for later
+        // evaluate the literal and store it for later
         Object literalValue = evaluateLiteral( expression, (context instanceof Class ? (Class) context : null) );
         literalValues.add(literalValue);
         SRIDs.add(currentSRID);
+        
+        Class clazz = null;
         if(literalValue != null)
-            literalTypes.add(literalValue.getClass());
+            clazz = literalValue.getClass();
         else if(context instanceof Class)
-            literalTypes.add((Class) context);
+            clazz = (Class) context;
+        literalTypes.add( clazz );
         
         try {
-            out.write( "?" );
+            if ( literalValue == null || dialect == null ) {
+                out.write( "?" );
+            }
+            else {
+                StringBuffer sb = new StringBuffer();
+                if ( Geometry.class.isAssignableFrom(literalValue.getClass()) ) {
+                    dialect.prepareGeometryValue((Geometry) literalValue, currentSRID, Geometry.class, sb);
+                }
+                else if ( encodingFunction ) {
+                    dialect.prepareFunctionArgument(clazz,sb);
+                }
+                else {
+                    sb.append("?");
+                }
+                out.write( sb.toString() );
+            }
         } 
         catch (IOException e) {
             throw new RuntimeException( e );
@@ -231,4 +267,5 @@ public class PreparedFilterToSQL extends FilterToSQL {
             Literal geometry, boolean swapped, Object extraData) {
         return super.visitBinarySpatialOperator(filter, extraData);
     }
+
 }

@@ -76,7 +76,6 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.Conversion;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
@@ -196,8 +195,7 @@ public class DemoBase {
     final String imageFileEnd = "image.png";
     
     /* Cartographic variables */
-    final Envelope envlp_NoEdges = new Envelope(-179.0,179.0,-80.0,80.0);
-    final ReferencedEnvelope envlp_NoEdges2 = 
+    final ReferencedEnvelope envNoEdges = 
                              new ReferencedEnvelope(-179.0,179.0,-80.0,80.0, 
                                                     DefaultGeographicCRS.WGS84);
     // TODO: move to demoGUI
@@ -301,11 +299,11 @@ public class DemoBase {
 //      demoGUI.context.addLayer(dbFS,dbStyl);
         
         /* Configure JMapPane */
-        demoGUI.jmp.setHighlightLayer(demoGUI.context.getLayer(0));
+        //demoGUI.jmp.setHighlightLayer(demoGUI.context.getLayer(0));
 //        jmp.setSize(200,600);
         //TODO: Set boundary to all that's visible, disabled for projection
 //        jmp.setMapArea(context.getLayerBounds());
-        demoGUI.jmp.setMapArea(envlp_NoEdges);
+        demoGUI.jmp.setMapArea(envNoEdges);
 
         /* Paint */
         demoGUI.frame.repaint();
@@ -789,7 +787,7 @@ public class DemoBase {
         try {
             demoGUI.textArea.append("Start: Project the map.\n");
             
-            ReferencedEnvelope llEnvelope = new ReferencedEnvelope(envlp_NoEdges, DefaultGeographicCRS.WGS84);
+            ReferencedEnvelope llEnvelope = new ReferencedEnvelope(envNoEdges, DefaultGeographicCRS.WGS84);
             ReferencedEnvelope projEnvelope = llEnvelope.transform(projCRS, true);
             demoGUI.context.setAreaOfInterest(projEnvelope);
             
@@ -801,8 +799,7 @@ public class DemoBase {
             demoGUI.frame.doLayout();
             
             demoGUI.jmp.setMapArea(demoGUI.jmp.getContext().getAreaOfInterest());
-            demoGUI.jmp.setReset(true);
-            demoGUI.jmp.repaint();
+            demoGUI.jmp.reset();
     
             demoGUI.textArea.append("  End: Projected the map.\n");
         } catch(Exception te) {

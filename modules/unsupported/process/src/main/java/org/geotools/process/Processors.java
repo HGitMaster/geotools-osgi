@@ -61,10 +61,13 @@ public class Processors extends FactoryFinder {
      * time this method is invoked.
      */
     private static FactoryRegistry getServiceRegistry() {
-        assert Thread.holdsLock(Processors.class);
         if (registry == null) {
-            registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
-            		ProcessFactory.class}));
+            synchronized ( Processors.class ) {
+                if ( registry == null ) {
+                    registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
+                            ProcessFactory.class}));    
+                }
+            }
         }
         return registry;
     }

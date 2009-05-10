@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+        Version: $Id: pom.xml 32522 2009-02-19 21:54:01Z groldan $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                                http://maven.apache.org/maven-v4_0_0.xsd">
@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>arcsde-plugin</artifactId>
-    <version>2.6.0.osgi1</version>
+    <version>2.6.0.osgi2</version>
   </parent>
 
 
@@ -28,9 +28,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/plugin/arcsde/datastore/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/plugin/arcsde/datastore/</url>
   </scm>
 
   <description> ArcSDE DataStore plugin. </description>
@@ -101,15 +101,6 @@
       <artifactId>gt-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--
-    This dependency was being used by FilterTest, which anyway
-    is not being executed as it relies in non available data.
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-jts-wrapper</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-     -->
     <dependency>
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
@@ -142,6 +133,16 @@
       <artifactId>gt-render</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>javax.media.jai.osgi</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media.jai.osgi</groupId>
+      <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -183,13 +184,7 @@
       </build>
     </profile>
     <profile>
-      <id>haveSDEJars</id>
-      <activation>
-        <property>
-          <name>haveSDEJars</name>
-          <value>true</value>
-        </property>
-      </activation>
+      <id>arcsde</id>
       <dependencies>
         <dependency>
           <groupId>com.esri</groupId>
@@ -200,6 +195,10 @@
           <groupId>com.esri</groupId>
           <artifactId>jsde_jpe_sdk</artifactId>
           <version>${sde.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>com.ibm.icu</groupId>
+          <artifactId>icu4j</artifactId>
         </dependency>
       </dependencies>
       <build>
@@ -225,32 +224,10 @@
               <includes>
                 <include>**/*Test.java</include>
               </includes>
-              <excludes>
-                <!-- These tests are currently broken.  Don't enable them -->
-                <exclude>**/FilterTest.java</exclude>
-                <exclude>**/gce/**</exclude>
-              </excludes>
             </configuration>
           </plugin>
         </plugins>
       </build>
-    </profile>
-    <profile>
-      <!-- this profile auto-drags in the ArcSDE 9.2 dependecy
-           on the icu4j libraries -->
-      <activation>
-        <property>
-          <name>sde.version</name>
-          <value>9.2</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>com.esri</groupId>
-          <artifactId>jsde_icu4j</artifactId>
-          <version>${sde.version}</version>
-        </dependency>
-      </dependencies>
     </profile>
   </profiles>
 </project>

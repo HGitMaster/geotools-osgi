@@ -18,7 +18,7 @@ package org.geotools.data.wps.request;
 
 import java.util.List;
 
-import net.opengis.wps.DataType;
+import net.opengis.wps10.DataType;
 
 import org.geotools.data.ows.Request;
 

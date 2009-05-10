@@ -63,9 +63,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XPath.java 31723 2008-10-28 06:51:03Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/filter/XPath.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: XPath.java 32690 2009-03-25 02:58:59Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/XPath.java $
  * @since 2.4
  */
 public class XPath {
@@ -458,15 +458,17 @@ public class XPath {
      * @param value
      *                the value of the attribute addressed by <code>xpath</code>
      * @param id
-     *                the identifier of the attribute addressed by <code>xpath</code>, might be
-     *                <code>null</code>
+     *            the identifier of the attribute addressed by <code>xpath</code>, might be
+     *            <code>null</code>
      * @param targetNodeType
-     *                the expected type of the attribute addressed by <code>xpath</code>, or
-     *                <code>null</code> if unknown
+     *            the expected type of the attribute addressed by <code>xpath</code>, or
+     *            <code>null</code> if unknown
+     * @param isMultiple
+     *            true if the attribute mapping is multi valued 
      * @return
      */
     public Attribute set(final Attribute att, final StepList xpath, Object value, String id,
-            AttributeType targetNodeType) {
+            AttributeType targetNodeType, boolean isMultiple) {
         if (XPath.LOGGER.isLoggable(Level.CONFIG)) {
             XPath.LOGGER.entering("XPath", "set", new Object[] { att, xpath, value, id,
                     targetNodeType });
@@ -572,13 +574,14 @@ public class XPath {
                 }
                 int index = currStep.getIndex();
                 Attribute attribute = setValue(currStepDescriptor, id, value, index, parent,
-                        targetNodeType);
+                        targetNodeType, isMultiple);
                 return attribute;
             } else {
                 // parent = appendComplexProperty(parent, currStep,
                 // currStepDescriptor);
                 int index = currStep.getIndex();
-                Attribute _parent = setValue(currStepDescriptor, null, null, index, parent, null);
+                Attribute _parent = setValue(currStepDescriptor, null, null, index, parent, null,
+                        isMultiple);
                 parent = (ComplexAttribute) _parent;
             }
         }
@@ -587,7 +590,7 @@ public class XPath {
 
     private Attribute setValue(final AttributeDescriptor descriptor, final String id,
             final Object value, final int index, final ComplexAttribute parent,
-            final AttributeType targetNodeType) {
+            final AttributeType targetNodeType, boolean isMultiple) {
         // adapt value to context
         Object convertedValue = convertValue(descriptor, value);
         Attribute leafAttribute = null;
@@ -605,6 +608,7 @@ public class XPath {
                     + ", addressed: " + currStepValue.getClass().getName() + " ["
                     + currStepValue.toString() + "]");
         }
+        Object previousValue = null;
         if (leafAttribute == null) {
             AttributeBuilder builder = new AttributeBuilder(featureFactory);
             builder.init(parent);
@@ -617,10 +621,36 @@ public class XPath {
             newValue.addAll((Collection) parent.getValue());
             newValue.add(leafAttribute);
             parent.setValue(newValue);
+        } else if (isMultiple) {
+            previousValue = leafAttribute.getValue();
         }
 
         if (convertedValue != null) {
-            leafAttribute.setValue(convertedValue);
+            // set multiple values from different denormalized view rows
+            // to the same built feature
+            if (previousValue != null) {
+                if (convertedValue instanceof Collection) {
+                    assert previousValue instanceof Collection;
+                    // we could have the same multiple entries from denormalized
+                    // view, so make sure they're unique
+                    if (!((Collection) previousValue).containsAll((Collection) convertedValue)) {
+                        ((Collection) convertedValue).addAll((Collection) previousValue);
+                        leafAttribute.setValue(convertedValue);
+                    }
+                } else if (previousValue instanceof Collection) {
+                    if (!((Collection) previousValue).contains(convertedValue)) {
+                        ArrayList temp = new ArrayList();
+                        temp.add(convertedValue);
+                        temp.addAll((Collection) previousValue);
+                        leafAttribute.setValue(temp);
+                    }
+                } else if (!previousValue.equals(convertedValue)) {
+                    ArrayList temp = new ArrayList();
+                    temp.add(convertedValue);
+                    temp.add(previousValue);
+                    leafAttribute.setValue(temp);
+                }
+            }
         }
         return leafAttribute;
     }
@@ -636,15 +666,14 @@ public class XPath {
     private Object convertValue(final AttributeDescriptor descriptor, final Object value) {
         final AttributeType type = descriptor.getType();
         Class<?> binding = type.getBinding();
-        if (type instanceof ComplexType && isSimpleContentType(type) && binding == Collection.class) {
-            return new ArrayList<Property>() {
-                {
-                    add(buildSimpleContent(type, value));
-                }
-            };
-        } else {
-            return FF.literal(value).evaluate(value, binding);
+        if (type instanceof ComplexType && binding == Collection.class) {
+            if (isSimpleContentType(type)) {
+                ArrayList<Property> list = new ArrayList<Property>();
+                list.add(buildSimpleContent(type, value));
+                return list;
+            } 
         }
+        return FF.literal(value).evaluate(value, binding);
     }
 
     /**

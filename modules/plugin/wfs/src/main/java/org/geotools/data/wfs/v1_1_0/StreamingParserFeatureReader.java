@@ -141,4 +141,11 @@ class StreamingParserFeatureReader implements GetFeatureParser {
         return feature;
     }
 
+    /**
+     * @see GetFeatureParser#getNumberOfFeatures()
+     */
+    public int getNumberOfFeatures() {
+        return -1;
+    }
+
 }

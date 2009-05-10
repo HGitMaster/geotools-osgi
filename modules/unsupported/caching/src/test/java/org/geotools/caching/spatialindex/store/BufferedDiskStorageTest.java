@@ -18,6 +18,8 @@ package org.geotools.caching.spatialindex.store;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.geotools.caching.grid.spatialindex.store.BufferedDiskStorage;
 import org.geotools.caching.spatialindex.Storage;
 
 
@@ -29,8 +31,6 @@ public class BufferedDiskStorageTest extends AbstractStorageTest {
     @Override
     Storage createStorage() {
         Storage storage = BufferedDiskStorage.createInstance();
-        storage.setParent(this.grid);
-
         return storage;
     }
 }

@@ -29,8 +29,8 @@ import org.opengis.filter.PropertyIsLike;
  * Defines a like filter, which checks to see if an attribute matches a REGEXP.
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/LikeFilterImpl.java $
- * @version $Id: LikeFilterImpl.java 31682 2008-10-19 13:23:25Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/LikeFilterImpl.java $
+ * @version $Id: LikeFilterImpl.java 32673 2009-03-23 20:10:39Z jive $
  */
 public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 
@@ -55,6 +55,8 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
     /** The matcher to match patterns with. */
     private Matcher match = null;
     
+    /** Used to indicate if case should be ignored or not */
+    boolean matchingCase;
     
     /**
 	 * Given OGC PropertyIsLike Filter information, construct
@@ -172,6 +174,13 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 		match = null;
 	}
 	
+	public boolean isMatchingCase() {
+            return matchingCase;
+    }
+
+    public void setMatchingCase(boolean matchingCase) {
+            this.matchingCase = matchingCase;
+    }
 	
     private Matcher getMatcher(){
         if(match == null){
@@ -277,7 +286,17 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
     	filterType = LIKE;
     }
 
-    /**
+    public LikeFilterImpl(org.opengis.filter.expression.Expression expr, String pattern, String wildcardMulti,
+			String wildcardSingle, String escape) {
+    	this();
+    	setExpression(expr);
+        setLiteral(pattern);
+        setWildCard(wildcardMulti);
+        setSingleChar(wildcardSingle);
+        setEscape(escape);
+	}
+
+	/**
      * Sets the expression to be evalutated as being like the pattern
      *
      * @param attribute The value of the attribute for comparison.
@@ -297,7 +316,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      * 
      * @deprecated use {@link #getExpression()}.
      */
-    public final Expression getValue() {
+    public final org.geotools.filter.Expression getValue() {
         return attribute;
     }
 
@@ -341,7 +360,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      * 	{@link PropertyIsLike#setSingleChar(String)}
      * 	{@link PropertyIsLike#setEscape(String)}
      */
-    public final void setPattern(Expression p, String wildcardMulti,
+    public final void setPattern(org.geotools.filter.Expression p, String wildcardMulti,
         String wildcardSingle, String escape) {
         setPattern(p.toString(), wildcardMulti, wildcardSingle, escape);
     }

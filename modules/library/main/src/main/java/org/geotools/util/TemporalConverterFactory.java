@@ -43,6 +43,8 @@ import org.geotools.factory.Hints;
  *  <li>{@link java.util.Calendar} to {@link java.sql.Time}
  *  <li>{@link XMLGregorianCalendar} to {@link Calendar}
  *  <li>{@link Calendar} to {@link XMLGregorianCalendar}
+ *  <li>{@link XMLGregorianCalendar} to {@link Date}
+ *  <li>{@link Date} to {@link XMLGregorianCalendar}
  * </ul>
  * </p>
  * <p>
@@ -83,6 +85,21 @@ public class TemporalConverterFactory implements ConverterFactory {
 					
 				};
 			}
+			
+			if ( XMLGregorianCalendar.class.isAssignableFrom( target ) ) {
+                            return new Converter() {
+                                public <T> T convert(Object source, Class<T> target)
+                                        throws Exception {
+                                    Date date = (Date) source;
+                                    Calendar calendar = createConverter(Date.class, Calendar.class,null)
+                                        .convert( date, Calendar.class);
+                                    
+                                    return (T) createConverter( Calendar.class, XMLGregorianCalendar.class, null )
+                                        .convert( calendar, XMLGregorianCalendar.class );
+                                        
+                                }
+                            };
+                        }
 //			if ( String.class.equals( target ) ) {
 //				final DateFormat fFormat;
 //				if ( dateFormat != null ) {
@@ -153,6 +170,20 @@ public class TemporalConverterFactory implements ConverterFactory {
                                     throws Exception {
                                 XMLGregorianCalendar calendar = (XMLGregorianCalendar) source;
                                 return (T) calendar.toGregorianCalendar();
+                            }
+		        };
+		    }
+		    if ( Date.class.isAssignableFrom( target ) ) {
+		        return new Converter() {
+		            public <T> T convert(Object source, Class<T> target)
+                                    throws Exception {
+		                Calendar calendar = createConverter(XMLGregorianCalendar.class, Calendar.class, null)
+	                            .convert( source, Calendar.class );
+	                        if ( calendar != null ) {
+	                            return (T) createConverter( Calendar.class, Date.class, null )
+	                                .convert( calendar, Date.class );
+	                        }
+	                        return null;
                             }
 		        };
 		    }

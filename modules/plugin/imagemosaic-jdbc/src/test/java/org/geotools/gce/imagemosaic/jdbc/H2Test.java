@@ -83,6 +83,8 @@ public class H2Test extends AbstractTest {
         }
 
         suite.addTest(new H2Test("testScripts"));
+        suite.addTest(new H2Test("testIsSameFile"));
+        suite.addTest(new H2Test("testImportParamList"));
         suite.addTest(new H2Test("testGetConnection"));
         suite.addTest(new H2Test("testDrop"));
         suite.addTest(new H2Test("testCreate"));

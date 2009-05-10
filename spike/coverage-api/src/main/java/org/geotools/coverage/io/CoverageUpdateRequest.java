@@ -20,7 +20,11 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.opengis.coverage.Coverage;
-
+/**
+ * 
+ * @author Simone Giannecchini, GeoSolutions SAS
+ *
+ */
 public interface CoverageUpdateRequest extends CoverageRequest{
 
 	public abstract java.lang.String[] getMetadataNames()

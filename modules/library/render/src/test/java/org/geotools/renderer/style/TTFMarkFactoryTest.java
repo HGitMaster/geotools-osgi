@@ -21,6 +21,8 @@ import java.awt.Shape;
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.renderer.lite.StreamingRenderer;
+import org.geotools.test.TestData;
 import org.opengis.filter.FilterFactory;
 
 public class TTFMarkFactoryTest extends TestCase {
@@ -87,6 +89,18 @@ public class TTFMarkFactoryTest extends TestCase {
      */
     public void testValidPathUnicode() throws Exception {
         Shape shape = ttf.getShape(null, ff.literal("ttf://Serif#U+0041"), null);
+        assertNotNull(shape);
+        assertTrue(shape.getBounds2D().getWidth() <= 1);
+        assertTrue(shape.getBounds2D().getHeight() <= 1);
+    }
+    
+    /**
+     * Checks valid paths
+     * @throws Exception
+     */
+    public void testLocalFont() throws Exception {
+        String fontPath = TestData.getResource(StreamingRenderer.class, "recreate.ttf").toURI().toString();
+        Shape shape = ttf.getShape(null, ff.literal("ttf://" +  fontPath + "#U+0021"), null);
         assertNotNull(shape);
         assertTrue(shape.getBounds2D().getWidth() <= 1);
         assertTrue(shape.getBounds2D().getHeight() <= 1);

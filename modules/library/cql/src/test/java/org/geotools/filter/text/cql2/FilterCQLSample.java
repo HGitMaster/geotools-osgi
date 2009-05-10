@@ -16,7 +16,6 @@
  */
 package org.geotools.filter.text.cql2;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -57,8 +56,9 @@ public class FilterCQLSample {
 
     
     private static final FilterFactory FACTORY = CommonFactoryFinder.getFilterFactory((Hints) null);
-    private static final DateFormat DATE_TIME_FORMATTER = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+    private static final String DATE_TIME_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    
     private static final Calendar CALENDAR = Calendar.getInstance();
     public static final String LESS_FILTER_SAMPLE = "ATTR1 < 1";
     public static final String LESS_EQ_FILTER_SAMPLE = "ATTR1 <= 1";
@@ -209,7 +209,8 @@ public class FilterCQLSample {
             Filter beforeFilter = null;
 
             try {
-                Date dateTime = DATE_TIME_FORMATTER.parse(FIRST_DATE);
+                SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+                Date dateTime = dateFormatter.parse(FIRST_DATE);
                 beforeFilter = FACTORY.less(FACTORY.property("ATTR1"), FACTORY.literal(dateTime));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -237,7 +238,9 @@ public class FilterCQLSample {
                 Date lastDate = null;
 
                 try {
-                    lastDate = DATE_TIME_FORMATTER.parse(LAST_DATE);
+                    SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+
+                    lastDate = dateFormatter.parse(LAST_DATE);
 
                     Date firstDate = subtractDuration(lastDate);
 
@@ -260,7 +263,9 @@ public class FilterCQLSample {
             Filter afterFilter = null;
 
             try {
-                Date dateTime = DATE_TIME_FORMATTER.parse(LAST_DATE);
+                SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+                
+                Date dateTime = dateFormatter.parse(LAST_DATE);
                 afterFilter = FACTORY.greater(FACTORY.property("ATTR1"), FACTORY.literal(dateTime));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -274,7 +279,9 @@ public class FilterCQLSample {
             try {
                 Date lastDate;
 
-                Date firstDate = DATE_TIME_FORMATTER.parse(FIRST_DATE);
+                SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+
+                Date firstDate = dateFormatter.parse(FIRST_DATE);
 
                 // Days
                 CALENDAR.setTime(firstDate);
@@ -368,8 +375,10 @@ public class FilterCQLSample {
             // During with period between dates
             Filter duringFilter = null;
 
-            final Date firstDate = DATE_TIME_FORMATTER.parse(FIRST_DATE);
-            final Date lastDate = DATE_TIME_FORMATTER.parse(LAST_DATE);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+
+            final Date firstDate = dateFormatter.parse(FIRST_DATE);
+            final Date lastDate = dateFormatter.parse(LAST_DATE);
             final String propName = "ATTR1";
 
             duringFilter = FACTORY.and(FACTORY.lessOrEqual(FACTORY.literal(firstDate),
@@ -385,8 +394,9 @@ public class FilterCQLSample {
             // creates during with period between date and duration
             {
                 Filter duringFilter = null;
+                SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
 
-                final Date firstDate = DATE_TIME_FORMATTER.parse(FIRST_DATE);
+                final Date firstDate = dateFormatter.parse(FIRST_DATE);
 
                 // date and duration YMD_HMS
                 Date lastDate = addDuration(firstDate);
@@ -405,7 +415,9 @@ public class FilterCQLSample {
                 // create during whith period during and date
                 Filter duringFilter = null;
 
-                final Date lastDate = DATE_TIME_FORMATTER.parse(LAST_DATE);
+                SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+
+                final Date lastDate = dateFormatter.parse(LAST_DATE);
 
                 Date firstDate = subtractDuration(lastDate);
 
@@ -426,8 +438,9 @@ public class FilterCQLSample {
         // result filter for Before or During test
         try {
             Filter filter = null;
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
 
-            final Date lastDate = DATE_TIME_FORMATTER.parse(LAST_DATE);
+            final Date lastDate = dateFormatter.parse(LAST_DATE);
             final String propName = "ATTR1";
 
             filter = FACTORY.lessOrEqual(FACTORY.property(propName), FACTORY.literal(lastDate));
@@ -438,8 +451,10 @@ public class FilterCQLSample {
 
         try {
             Filter filter = null;
+            
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
 
-            final Date lastDate = DATE_TIME_FORMATTER.parse(LAST_DATE);
+            final Date lastDate = dateFormatter.parse(LAST_DATE);
 
             // creates a filter prop <= lastDate
             final String propName = "ATTR1";
@@ -454,7 +469,9 @@ public class FilterCQLSample {
         try {
             Filter filter = null;
 
-            final Date firstDate = DATE_TIME_FORMATTER.parse(FIRST_DATE);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+
+            final Date firstDate = dateFormatter.parse(FIRST_DATE);
 
             Date lastDate = addDuration(firstDate);
 
@@ -474,7 +491,9 @@ public class FilterCQLSample {
             // period: first date / last date
             Filter filter = null;
 
-            final Date firstDate = DATE_TIME_FORMATTER.parse(FIRST_DATE);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+
+            final Date firstDate = dateFormatter.parse(FIRST_DATE);
             final String propName = "ATTR1";
 
             filter = FACTORY.greaterOrEqual(FACTORY.property(propName), FACTORY.literal(firstDate));
@@ -487,7 +506,9 @@ public class FilterCQLSample {
             // period: duration / last date
             Filter filter = null;
 
-            final Date lastDate = DATE_TIME_FORMATTER.parse(LAST_DATE);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+
+            final Date lastDate = dateFormatter.parse(LAST_DATE);
             Date firstDate = subtractDuration(lastDate);
 
             final String propName = "ATTR1";
@@ -502,7 +523,9 @@ public class FilterCQLSample {
             // period: first date / duration
             Filter filter = null;
 
-            final Date firstDate = DATE_TIME_FORMATTER.parse(FIRST_DATE);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_TIME_FORMATTER);
+
+            final Date firstDate = dateFormatter.parse(FIRST_DATE);
 
             final String propName = "ATTR1";
 

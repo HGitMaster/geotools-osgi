@@ -27,6 +27,7 @@ import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.PropertyExtractor;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
@@ -38,7 +39,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Special property extractor for extracting attributes from features.
  *
  * @author Justin Deoliveira, The Open Planning Project
- *
+ * @deprecated This interface is replaced with {@link ComplexBinding#getProperties(Object, XSDElementDeclaration)}
  */
 public class FeaturePropertyExtractor implements PropertyExtractor {
     SchemaIndex schemaIndex;

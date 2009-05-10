@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Coverage Plug-in
 Bundle-SymbolicName: org.geotools.coverage
-Bundle-Version: 2.6.0.osgi1
+Bundle-Version: 2.6.0.osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.api;bundle-version="2.6.0",

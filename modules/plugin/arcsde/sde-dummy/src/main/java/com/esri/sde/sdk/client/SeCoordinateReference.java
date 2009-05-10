@@ -12,7 +12,11 @@ public class SeCoordinateReference {
 	public SeExtent getXYEnvelope() throws SeException { return null; }
 	public PeCoordinateSystem getCoordSys() { return null; }
 	
-	public void setXY(int i, int j, int k){}
+	public void setXY(double i, double j, double k){}
 	public void setXYByEnvelope(SeExtent s) {}
     public void setPrecision(int precision){}
+    public void setCoordSysByID(SeObjectId seObjectId) {
+        // TODO Auto-generated method stub
+        
+    }
 }

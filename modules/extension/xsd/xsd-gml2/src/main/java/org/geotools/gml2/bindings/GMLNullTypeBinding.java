@@ -22,6 +22,8 @@ import org.geotools.gml2.GML;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 
 /**
  * Binding object for the type http://www.opengis.net/gml:NullType.
@@ -68,7 +70,7 @@ public class GMLNullTypeBinding implements SimpleBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return OVERRIDE;
     }
 
     /**
@@ -78,7 +80,7 @@ public class GMLNullTypeBinding implements SimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Envelope.class;
     }
 
     /**
@@ -103,7 +105,6 @@ public class GMLNullTypeBinding implements SimpleBinding {
      * @generated modifiable
      */
     public String encode(Object object, String value) {
-        //TODO: implement
-        return null;
+        return "unknown";
     }
 }

@@ -17,20 +17,13 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
-import org.geotools.arcsde.pool.ISession;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.store.DataFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureReaderIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
@@ -46,10 +39,11 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </p>
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: ArcSdeFeatureCollection.java 30921 2008-07-05 07:51:23Z jgarnett $
+ * @version $Id: ArcSdeFeatureCollection.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSdeFeatureCollection.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/ArcSdeFeatureCollection.java $
  * @see FeatureCollection
  */
 public class ArcSdeFeatureCollection extends DataFeatureCollection {
@@ -60,27 +54,15 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
 
     private final Query query;
 
-    private final Set<ArcSdeFeatureReaderIterator> openIterators;
-
     private final SimpleFeatureType childrenSchema;
 
     // private Session session;
 
-    public ArcSdeFeatureCollection(final ArcSdeFeatureSource featureSource, final Query namedQuery) throws IOException {
+    public ArcSdeFeatureCollection(final ArcSdeFeatureSource featureSource,
+            SimpleFeatureType queryType, final Query namedQuery) throws IOException {
         this.featureSource = featureSource;
         this.query = namedQuery;
-        //this.childrenSchema = ArcSDEQuery.getQuerySchema(namedQuery, featureSource.getSchema());
-
-        FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReader();
-        try{
-            this.childrenSchema = reader.getFeatureType();
-        }finally{
-            reader.close();
-        }
-
-        final Set<ArcSdeFeatureReaderIterator> iterators;
-        iterators = new HashSet<ArcSdeFeatureReaderIterator>();
-        this.openIterators = Collections.synchronizedSet(iterators);
+        this.childrenSchema = queryType;
     }
 
     /**
@@ -122,88 +104,12 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
         return featureSource.getCount(query);
     }
 
-    /**
-     * @param openIterator an {@link ArcSdeFeatureReaderIterator}
-     */
     @Override
-    protected final void closeIterator(Iterator<SimpleFeature> openIterator) throws IOException {
-        ArcSdeFeatureReaderIterator iterator = (ArcSdeFeatureReaderIterator) openIterator;
-        iterator.close();
-    }
-
-    private void releaseIterator(ArcSdeFeatureReaderIterator iterator) {
-        this.openIterators.remove(iterator);
-    }
-
-    /**
-     * Extends FeatureReaderIterator to instruct the parent collection to close the session at this
-     * iterator's close method if its the last open iterator in the collection.
-     * 
-     * @author Gabriel Roldan (TOPP)
-     * @see ArcSdeFeatureCollection#closeConnectionIfNeedBe()
-     */
-    private static class ArcSdeFeatureReaderIterator extends FeatureReaderIterator<SimpleFeature> {
-
-        private final ArcSdeFeatureCollection parent;
-
-        public ArcSdeFeatureReaderIterator(final FeatureReader<SimpleFeatureType, SimpleFeature> reader,
-                                           final ArcSdeFeatureCollection parent) {
-            super(reader);
-            this.parent = parent;
-        }
-
-        @Override
-        public void close() {
-            try {
-                // close the underlying feature reader
-                super.close();
-            } finally {
-                parent.releaseIterator(this);
-            }
-        }
-    }
-
-    /**
-     * Returns
-     */
-    @Override
-    protected synchronized final Iterator<SimpleFeature> openIterator() throws IOException {
-        final FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReader();
-        final ArcSdeFeatureReaderIterator iterator;
-        iterator = new ArcSdeFeatureReaderIterator(reader, this);
-        this.openIterators.add(iterator);
-        return iterator;
-    }
-
-    private FeatureReader<SimpleFeatureType, SimpleFeature> getReader() throws IOException {
+    public FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
         final FeatureReader<SimpleFeatureType, SimpleFeature> reader;
 
-        final ArcSDEDataStore dataStore = featureSource.getDataStore();
-        final ArcSdeVersionHandler versionHandler = featureSource.getVersionHandler();
+        reader = featureSource.getfeatureReader(childrenSchema, query);
 
-        final ISession session = getSession();
-        try {
-            reader = dataStore.getFeatureReader(query, session, versionHandler);
-        } catch (IOException ioe) {
-            session.dispose();
-            throw ioe;
-        } catch (RuntimeException re) {
-            session.dispose();
-            throw re;
-        }
         return reader;
-    }
-
-    /**
-     * Returns the underlying feature source connection priorly locking it for thread safety. Relies
-     * on the feature source to return an appropriate connection depending on whether it is under a
-     * transaction or not.
-     * 
-     * @return
-     * @throws IOException
-     * @throws RuntimeException if the connection can't be acquired
-     */
-    private synchronized ISession getSession() throws IOException {
-        return featureSource.getSession();
     }
 }

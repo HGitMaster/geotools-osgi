@@ -18,15 +18,10 @@ package org.geotools.data.wps;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 
 import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
-import org.geotools.data.ows.AbstractRequest;
 import org.geotools.data.ows.GetCapabilitiesRequest;
 import org.geotools.data.ows.Response;
 import org.geotools.data.wps.request.AbstractDescribeProcessRequest;
@@ -36,10 +31,7 @@ import org.geotools.data.wps.request.ExecuteProcessRequest;
 import org.geotools.data.wps.response.DescribeProcessResponse;
 import org.geotools.data.wps.response.ExecuteProcessResponse;
 import org.geotools.data.wps.response.WPSGetCapabilitiesResponse;
-import org.geotools.gml2.GMLConfiguration;
 import org.geotools.ows.ServiceException;
-import org.geotools.xml.Configuration;
-import org.geotools.xml.Encoder;
 
 /**
  * Provides support for the Web Processing Service 1.0.0 Specification.

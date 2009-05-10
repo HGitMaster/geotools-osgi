@@ -18,7 +18,12 @@ package org.geotools.caching;
 
 import org.geotools.caching.spatialindex.NodeIdentifier;
 
-
+/**
+ * Class for evicting nodes from the cache.
+ * 
+ *
+ */
 public interface EvictableTree {
+	
     public void evict(NodeIdentifier node);
 }

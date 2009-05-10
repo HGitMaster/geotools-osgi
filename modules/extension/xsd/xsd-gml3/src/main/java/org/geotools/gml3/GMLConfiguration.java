@@ -16,10 +16,8 @@
  */
 package org.geotools.gml3;
 
-import org.picocontainer.MutablePicoContainer;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
+import javax.xml.namespace.QName;
+
 import org.geotools.gml2.FeaturePropertyExtractor;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.bindings.GMLCoordTypeBinding;
@@ -50,6 +48,8 @@ import org.geotools.gml3.bindings.LocationPropertyTypeBinding;
 import org.geotools.gml3.bindings.MeasureTypeBinding;
 import org.geotools.gml3.bindings.MultiCurvePropertyTypeBinding;
 import org.geotools.gml3.bindings.MultiCurveTypeBinding;
+import org.geotools.gml3.bindings.MultiGeometryPropertyTypeBinding;
+import org.geotools.gml3.bindings.MultiGeometryTypeBinding;
 import org.geotools.gml3.bindings.MultiLineStringPropertyTypeBinding;
 import org.geotools.gml3.bindings.MultiLineStringTypeBinding;
 import org.geotools.gml3.bindings.MultiPointPropertyTypeBinding;
@@ -58,6 +58,7 @@ import org.geotools.gml3.bindings.MultiPolygonPropertyTypeBinding;
 import org.geotools.gml3.bindings.MultiPolygonTypeBinding;
 import org.geotools.gml3.bindings.MultiSurfacePropertyTypeBinding;
 import org.geotools.gml3.bindings.MultiSurfaceTypeBinding;
+import org.geotools.gml3.bindings.NullTypeBinding;
 import org.geotools.gml3.bindings.PointArrayPropertyTypeBinding;
 import org.geotools.gml3.bindings.PointPropertyTypeBinding;
 import org.geotools.gml3.bindings.PointTypeBinding;
@@ -71,6 +72,11 @@ import org.geotools.gml3.smil.SMIL20LANGConfiguration;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
+import org.picocontainer.MutablePicoContainer;
+
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 
 
 /**
@@ -80,6 +86,12 @@ import org.geotools.xml.Parser;
  *
  */
 public class GMLConfiguration extends Configuration {
+    
+    /**
+     * Boolean property which controls whether encoded features should include bounds.
+     */
+    public static final QName NO_FEATURE_BOUNDS = org.geotools.gml2.GMLConfiguration.NO_FEATURE_BOUNDS;
+
     public GMLConfiguration() {
         super(GML.getInstance());
 
@@ -147,6 +159,8 @@ public class GMLConfiguration extends Configuration {
         container.registerComponentImplementation(GML.MultiCurveType, MultiCurveTypeBinding.class);
         container.registerComponentImplementation(GML.MultiCurvePropertyType,
             MultiCurvePropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.MultiGeometryType, MultiGeometryTypeBinding.class);
+        container.registerComponentImplementation(GML.MultiGeometryPropertyType, MultiGeometryPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiLineStringPropertyType,
             MultiLineStringPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiLineStringType,
@@ -162,6 +176,8 @@ public class GMLConfiguration extends Configuration {
             MultiSurfaceTypeBinding.class);
         container.registerComponentImplementation(GML.MultiSurfacePropertyType,
             MultiSurfacePropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.NullType,
+                NullTypeBinding.class);
         container.registerComponentImplementation(GML.PointArrayPropertyType,
             PointArrayPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PointPropertyType,
@@ -191,7 +207,6 @@ public class GMLConfiguration extends Configuration {
         super.configureContext(container);
 
         container.registerComponentInstance(new FeatureTypeCache());
-        container.registerComponentImplementation(FeaturePropertyExtractor.class);
 
         //factories
         container.registerComponentInstance(CoordinateSequenceFactory.class,

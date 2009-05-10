@@ -15,10 +15,14 @@
  *    Lesser General Public License for more details.
  */
 package org.geotools.data.wfs.v1_1_0;
-import static org.junit.Assert.*;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.CUBEWERX_GOVUNITCE;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.createTestProtocol;
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.wfs;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,13 +32,10 @@ import java.util.List;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
-import org.geotools.data.wfs.protocol.http.HTTPResponse;
 import org.geotools.data.wfs.v1_1_0.DataTestSupport.TestHttpProtocol;
 import org.geotools.data.wfs.v1_1_0.DataTestSupport.TestHttpResponse;
-import org.geotools.gml.TestHandler;
 import org.geotools.test.TestData;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
@@ -44,7 +45,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Unit test suite for {@link WFS_1_1_0_DataStore}
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStoreTest.java 31769 2008-11-05 15:21:49Z groldan $
+ * @version $Id: WFS_1_1_0_DataStoreTest.java 31902 2008-11-22 00:37:35Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/test/java/org/geotools/data

@@ -29,8 +29,9 @@ import java.util.logging.Logger;
  * 
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/pool/ArcSDEConnectionConfig.java $
- * @version $Id: ArcSDEConnectionConfig.java 30722 2008-06-13 18:15:42Z acuster $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/pool/ArcSDEConnectionConfig.java $
+ * @version $Id: ArcSDEConnectionConfig.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class ArcSDEConnectionConfig {
     /**
@@ -120,10 +121,12 @@ public class ArcSDEConnectionConfig {
     /**
      * Configure arcsde connection information from supplied connection parameters.
      * 
-     * @param params Connection parameters
-     * @throws NullPointerException if at least one mandatory parameter is null
-     * @throws IllegalArgumentException if at least one mandatory parameter is present but does not
-     *             have a "valid" value.
+     * @param params
+     *            Connection parameters
+     * @throws NullPointerException
+     *             if at least one mandatory parameter is null
+     * @throws IllegalArgumentException
+     *             if at least one mandatory parameter is present but does not have a "valid" value.
      */
     public ArcSDEConnectionConfig(Map params) throws NullPointerException, IllegalArgumentException {
         init(params);
@@ -133,21 +136,24 @@ public class ArcSDEConnectionConfig {
      * Define arcsde connection information.
      * 
      * @param dbType
-     * @param serverName host or ip address of server
-     * @param portNumber port number the server is listenting on
-     * @param databaseName database to connect to
-     * @param userName user name for arcsde
-     * @param userPassword user password for arcsde
-     * @throws NullPointerException If any of the parameters are null
-     * @throws IllegalArgumentException If any of the paramters is not valid
+     * @param serverName
+     *            host or ip address of server
+     * @param portNumber
+     *            port number the server is listenting on
+     * @param databaseName
+     *            database to connect to
+     * @param userName
+     *            user name for arcsde
+     * @param userPassword
+     *            user password for arcsde
+     * @throws NullPointerException
+     *             If any of the parameters are null
+     * @throws IllegalArgumentException
+     *             If any of the paramters is not valid
      */
-    public ArcSDEConnectionConfig(String dbType,
-                                  String serverName,
-                                  String portNumber,
-                                  String databaseName,
-                                  String userName,
-                                  String userPassword) throws NullPointerException,
-                                                      IllegalArgumentException {
+    public ArcSDEConnectionConfig(String dbType, String serverName, String portNumber,
+            String databaseName, String userName, String userPassword) throws NullPointerException,
+            IllegalArgumentException {
         Map params = new HashMap();
         params.put(DBTYPE_PARAM, dbType);
         params.put(SERVER_NAME_PARAM, serverName);
@@ -161,9 +167,12 @@ public class ArcSDEConnectionConfig {
     /**
      * Extra connection parameters from the provided map.
      * 
-     * @param params Connection parameters
-     * @throws NumberFormatException If port could not be parsed into a number
-     * @throws IllegalArgumentException If any of the parameters are invalid
+     * @param params
+     *            Connection parameters
+     * @throws NumberFormatException
+     *             If port could not be parsed into a number
+     * @throws IllegalArgumentException
+     *             If any of the parameters are invalid
      */
     private void init(Map params) throws NumberFormatException, IllegalArgumentException {
         String dbtype = (String) params.get(DBTYPE_PARAM);
@@ -184,8 +193,10 @@ public class ArcSDEConnectionConfig {
     /**
      * Handle optional parameters; most are focused on connection pool use.
      * 
-     * @param params Connection parameters
-     * @throws IllegalArgumentException If any of the optional prameters are invlaid.
+     * @param params
+     *            Connection parameters
+     * @throws IllegalArgumentException
+     *             If any of the optional prameters are invlaid.
      */
     private void setUpOptionalParams(Map params) throws IllegalArgumentException {
         String exceptionMsg = "";
@@ -225,8 +236,10 @@ public class ArcSDEConnectionConfig {
     /**
      * Convert value to an Integer, or use the default value
      * 
-     * @param value Object to convert to int
-     * @param defaultValue Default value if conversion fails
+     * @param value
+     *            Object to convert to int
+     * @param defaultValue
+     *            Default value if conversion fails
      * @return value as an interger, or default value if that is not possible
      */
     private static final Integer getInt(Object value, int defaultValue) {
@@ -246,22 +259,27 @@ public class ArcSDEConnectionConfig {
     /**
      * DOCUMENT ME!
      * 
-     * @param dbType DOCUMENT ME!
-     * @param serverName DOCUMENT ME!
-     * @param portNumber DOCUMENT ME!
-     * @param databaseName DOCUMENT ME!
-     * @param userName DOCUMENT ME!
-     * @param userPassword DOCUMENT ME!
+     * @param dbType
+     *            DOCUMENT ME!
+     * @param serverName
+     *            DOCUMENT ME!
+     * @param portNumber
+     *            DOCUMENT ME!
+     * @param databaseName
+     *            DOCUMENT ME!
+     * @param userName
+     *            DOCUMENT ME!
+     * @param userPassword
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
-     * @throws NullPointerException DOCUMENT ME!
+     * @throws IllegalArgumentException
+     *             DOCUMENT ME!
+     * @throws NullPointerException
+     *             DOCUMENT ME!
      */
-    private static Integer checkParams(String dbType,
-            String serverName,
-            String portNumber,
-            String databaseName,
-            String userName,
-            String userPassword) throws IllegalArgumentException, NullPointerException {
+    private static Integer checkParams(String dbType, String serverName, String portNumber,
+            String databaseName, String userName, String userPassword)
+            throws IllegalArgumentException, NullPointerException {
         // check if dbtype is 'arcsde'
         if (!(DBTYPE_PARAM_VALUE.equals(dbType))) {
             throw new IllegalArgumentException("parameter dbtype must be " + DBTYPE_PARAM_VALUE);
@@ -303,9 +321,12 @@ public class ArcSDEConnectionConfig {
     /**
      * DOCUMENT ME!
      * 
-     * @param paramName DOCUMENT ME!
-     * @param paramValue DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param paramName
+     *            DOCUMENT ME!
+     * @param paramValue
+     *            DOCUMENT ME!
+     * @throws IllegalArgumentException
+     *             DOCUMENT ME!
      */
     private static void throwIllegal(String paramName, String paramValue)
             throws IllegalArgumentException {
@@ -378,10 +399,11 @@ public class ArcSDEConnectionConfig {
     }
 
     /**
-     * Checks for equality over another <code>ArcSDEConnectionConfig</code>, taking into account
-     * the values of database name, user name, and port number.
+     * Checks for equality over another <code>ArcSDEConnectionConfig</code>, taking into account the
+     * values of database name, user name, and port number.
      * 
-     * @param o DOCUMENT ME!
+     * @param o
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
      */
     @Override

@@ -38,16 +38,16 @@ public class JDBCUpdateFeatureWriter extends JDBCFeatureReader implements
     ResultSetFeature last;
     
     public JDBCUpdateFeatureWriter(String sql, Connection cx,
-            JDBCFeatureStore featureStore, Hints hints) throws SQLException, IOException {
+            JDBCFeatureSource featureSource, Hints hints) throws SQLException, IOException {
         
-        super(sql, cx, featureStore, featureStore.getSchema(), hints);
+        super(sql, cx, featureSource, featureSource.getSchema(), hints);
         last = new ResultSetFeature( rs, cx );
     }
     
     public JDBCUpdateFeatureWriter(PreparedStatement ps, Connection cx,
-            JDBCFeatureStore featureStore, Hints hints) throws SQLException, IOException {
+            JDBCFeatureSource featureSource, Hints hints) throws SQLException, IOException {
         
-        super(ps, cx, featureStore, featureStore.getSchema(), hints);
+        super(ps, cx, featureSource, featureSource.getSchema(), hints);
         last = new ResultSetFeature( rs, ps.getConnection());
     }
 

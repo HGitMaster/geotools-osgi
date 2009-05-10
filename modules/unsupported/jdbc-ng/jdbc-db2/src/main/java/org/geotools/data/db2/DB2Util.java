@@ -18,9 +18,16 @@
 package org.geotools.data.db2;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Blob;
 import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -33,6 +40,7 @@ public class DB2Util {
 
 	private static Map<Class, String> PARAMETER_LITERALS = null;
 	private static Map<Class, String> PARAMETER_MARKES = null;
+	private static Map<Class, String> CAST_EPXPRESSIONS= null;
 
 	private static String quote(String s) {
 		return "\""+s+"\"";
@@ -92,9 +100,30 @@ public class DB2Util {
 		PARAMETER_LITERALS.put(Geometry.class, "DB2GSE.ST_GeomFromText({0},{1})");
 		PARAMETER_LITERALS.put(GeometryCollection.class, "DB2GSE.ST_GeomCollFromText({0},{1})");
 		
+		CAST_EPXPRESSIONS= new HashMap<Class,String>();
+		CAST_EPXPRESSIONS.put(Short.class, "CAST (? as SMALLINT)");
+		CAST_EPXPRESSIONS.put(Integer.class, "CAST (? as INTEGER)");
+		CAST_EPXPRESSIONS.put(Long.class, "CAST (? as BIGINT)");
+		CAST_EPXPRESSIONS.put(BigDecimal.class, "CAST (? as DECFLOAT(34))");		
+		CAST_EPXPRESSIONS.put(Float.class, "CAST (? as REAL)");
+		CAST_EPXPRESSIONS.put(Double.class, "CAST (? as DOBULE)");
+		CAST_EPXPRESSIONS.put(Date.class, "CAST (? as DATE)");
+		CAST_EPXPRESSIONS.put(java.util.Date.class, "CAST (? as DATE)");
+		CAST_EPXPRESSIONS.put(Time.class, "CAST (? as TIME)");
+		CAST_EPXPRESSIONS.put(Timestamp.class, "CAST (? as TIMESTAMP)");
+		CAST_EPXPRESSIONS.put(URL.class, "CAST (? as DATALINK)");
+
+		
+		CAST_EPXPRESSIONS.put(String.class, "CAST (? as VARCHAR(32000))");
 	
 	}
 
+	static public String getCastExpression(Class aClass ) {
+		if (Clob.class.isAssignableFrom(aClass)) return "CAST (? as CLOB(1G))";
+		if (Blob.class.isAssignableFrom(aClass)) return "CAST (? as BLOB(2G))";
+		return CAST_EPXPRESSIONS.get(aClass); 
+	}
+	
 	static public void prepareGeometryValue(Geometry geom, int srid, Class binding, StringBuffer sql) {
 		String pattern = PARAMETER_MARKES.get(binding);
 		sql.append(MessageFormat.format(pattern, new Object[]{Integer.toString(srid)}));		

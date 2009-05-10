@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Ows10PackageImpl.java 31717 2008-10-24 22:50:25Z groldan $
+ * $Id: Ows10PackageImpl.java 32447 2009-02-09 13:34:55Z aaime $
  */
 package net.opengis.ows10.impl;
 
@@ -1164,6 +1164,15 @@ public class Ows10PackageImpl extends EPackageImpl implements Ows10Package {
 
 	/**
      * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EAttribute getGetCapabilitiesType_Namespace() {
+        return (EAttribute)getCapabilitiesTypeEClass.getEStructuralFeatures().get(5);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
      */
@@ -1868,6 +1877,7 @@ public class Ows10PackageImpl extends EPackageImpl implements Ows10Package {
         createEReference(getCapabilitiesTypeEClass, GET_CAPABILITIES_TYPE__ACCEPT_FORMATS);
         createEAttribute(getCapabilitiesTypeEClass, GET_CAPABILITIES_TYPE__UPDATE_SEQUENCE);
         createEAttribute(getCapabilitiesTypeEClass, GET_CAPABILITIES_TYPE__BASE_URL);
+        createEAttribute(getCapabilitiesTypeEClass, GET_CAPABILITIES_TYPE__NAMESPACE);
 
         httpTypeEClass = createEClass(HTTP_TYPE);
         createEAttribute(httpTypeEClass, HTTP_TYPE__GROUP);
@@ -2087,6 +2097,7 @@ public class Ows10PackageImpl extends EPackageImpl implements Ows10Package {
         initEReference(getGetCapabilitiesType_AcceptFormats(), this.getAcceptFormatsType(), null, "acceptFormats", null, 0, 1, GetCapabilitiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
         initEAttribute(getGetCapabilitiesType_UpdateSequence(), this.getUpdateSequenceType(), "updateSequence", null, 0, 1, GetCapabilitiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
         initEAttribute(getGetCapabilitiesType_BaseUrl(), theXMLTypePackage.getString(), "baseUrl", null, 0, 1, GetCapabilitiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEAttribute(getGetCapabilitiesType_Namespace(), theXMLTypePackage.getString(), "namespace", null, 0, 1, GetCapabilitiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
         initEClass(httpTypeEClass, HTTPType.class, "HTTPType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getHTTPType_Group(), theEcorePackage.getEFeatureMapEntry(), "group", null, 0, -1, HTTPType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

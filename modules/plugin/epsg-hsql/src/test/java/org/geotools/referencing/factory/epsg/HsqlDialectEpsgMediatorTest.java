@@ -1,7 +1,7 @@
 /*
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
- * 
+ *
  *    (C) 2007-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
@@ -106,7 +106,10 @@ public class HsqlDialectEpsgMediatorTest extends TestCase {
 
         finder.setFullScanAllowed(false);
         String id = finder.findIdentifier(crs);
-        assertEquals("The CRS should still in the cache.","EPSG:4326", id);
+        // this is broken because, as we know from above, it is ambiguous, so it may not be EPSG:4326 in the cache at all!
+        // assertEquals("The CRS should still in the cache.","EPSG:4326", id);
+        assertEquals("The CRS should still in the cache.",
+                found.getCodeSpace()+':'+found.getCode(), id);
     }
 
     public void testFindBeijing1954() throws FactoryException {

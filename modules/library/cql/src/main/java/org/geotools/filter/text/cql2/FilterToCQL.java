@@ -18,7 +18,6 @@ package org.geotools.filter.text.cql2;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -90,7 +89,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 class FilterToCQL implements FilterVisitor, ExpressionVisitor {
     /** Standard java logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     
     /**
      * Process the possibly user supplied extraData parameter into a StringBuffer.
@@ -564,7 +563,10 @@ class FilterToCQL implements FilterVisitor, ExpressionVisitor {
      * @return output
      */
     public StringBuffer date( Date date, StringBuffer output ){
-        String text = DATE_FORMAT.format( date );
+        
+        DateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
+        
+        String text = dateFormatter.format( date );
         output.append( text );        
         return output;
     }

@@ -27,16 +27,12 @@ import java.util.Set;
 
 import net.opengis.ows11.CodeType;
 import net.opengis.ows11.Ows11Factory;
-import net.opengis.wps.ComplexDataType;
-import net.opengis.wps.DataInputsType1;
-import net.opengis.wps.DataType;
-import net.opengis.wps.ExecuteType;
-import net.opengis.wps.InputType;
-import net.opengis.wps.LiteralDataType;
-import net.opengis.wps.ResponseFormType;
-import net.opengis.wps.WpsFactory;
+import net.opengis.wps10.DataInputsType1;
+import net.opengis.wps10.DataType;
+import net.opengis.wps10.ExecuteType;
+import net.opengis.wps10.InputType;
+import net.opengis.wps10.Wps10Factory;
 
-import org.geotools.gml2.GMLConfiguration;
 import org.geotools.wps.WPS;
 import org.geotools.wps.WPSConfiguration;
 import org.geotools.xml.Configuration;
@@ -107,7 +103,7 @@ public abstract class AbstractExecuteProcessRequest extends AbstractWPSRequest i
     
     @SuppressWarnings("unchecked")
     private ExecuteType createExecuteType() {
-        ExecuteType request = WpsFactory.eINSTANCE.createExecuteType();
+        ExecuteType request = Wps10Factory.eINSTANCE.createExecuteType();
         
         // identifier
         CodeType codetype = Ows11Factory.eINSTANCE.createCodeType();
@@ -121,7 +117,7 @@ public abstract class AbstractExecuteProcessRequest extends AbstractWPSRequest i
         
         // inputs - loop through inputs and add them
         if (this.inputs != null && !this.inputs.isEmpty()) {
-	        DataInputsType1 inputtypes = WpsFactory.eINSTANCE.createDataInputsType1();
+	        DataInputsType1 inputtypes = Wps10Factory.eINSTANCE.createDataInputsType1();
 	        
 	    	Set<Object> keyset = this.inputs.keySet();
 	    	Iterator<Object> iterator = keyset.iterator();
@@ -134,7 +130,7 @@ public abstract class AbstractExecuteProcessRequest extends AbstractWPSRequest i
 	    		while (iterator2.hasNext()) {
 		    		// identifier
 	    			DataType dt = (DataType) iterator2.next();
-		    		InputType input = WpsFactory.eINSTANCE.createInputType();
+		    		InputType input = Wps10Factory.eINSTANCE.createInputType();
 		    		CodeType ct = Ows11Factory.eINSTANCE.createCodeType();
 		    		ct.setValue((String)key);
 		    		input.setIdentifier(ct);
@@ -147,7 +143,7 @@ public abstract class AbstractExecuteProcessRequest extends AbstractWPSRequest i
         }
         
         // responsetype
-        //ResponseFormType respF = WpsFactory.eINSTANCE.createResponseFormType();
+        //ResponseFormType respF = Wps10Factory.eINSTANCE.createResponseFormType();
         //respF.
         //request.setResponseForm(respF);
         
@@ -168,5 +164,6 @@ public abstract class AbstractExecuteProcessRequest extends AbstractWPSRequest i
     		inputs.put(name, value);
     	}
     }
+    
     
 }

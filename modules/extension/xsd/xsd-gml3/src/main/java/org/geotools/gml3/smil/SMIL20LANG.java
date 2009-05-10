@@ -98,7 +98,7 @@ public final class SMIL20LANG extends XSD {
         return getClass().getResource("smil20-language.xsd").toString();
     }
 
-    protected SchemaLocator createSchemaLocator() {
+    public SchemaLocator createSchemaLocator() {
         return null;
     }
 

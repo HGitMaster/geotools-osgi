@@ -37,7 +37,8 @@ import org.geotools.gml3.ApplicationSchemaConfiguration;
 import org.geotools.gml3.GML;
 import org.geotools.gml3.bindings.GML3ParsingUtils;
 import org.geotools.util.logging.Logging;
-import org.geotools.wfs.WFSConfiguration;
+
+import org.geotools.wfs.v1_1.WFSConfiguration;
 import org.geotools.xml.Binding;
 import org.geotools.xml.BindingFactory;
 import org.geotools.xml.Configuration;
@@ -71,7 +72,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: EmfAppSchemaParser.java 31792 2008-11-06 19:17:35Z groldan $
+ * @version $Id: EmfAppSchemaParser.java 32043 2008-12-19 03:23:35Z jdeolive $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools

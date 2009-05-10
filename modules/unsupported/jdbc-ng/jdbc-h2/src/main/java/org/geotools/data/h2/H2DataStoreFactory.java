@@ -18,11 +18,13 @@ package org.geotools.data.h2;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.geotools.data.DataStore;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
@@ -95,7 +97,7 @@ public class H2DataStoreFactory extends JDBCDataStoreFactory {
         //return new H2DialectPrepared(dataStore);
     }
 
-    protected DataSource createDataSource(Map params) throws IOException {
+    protected DataSource createDataSource(Map params, SQLDialect dialect) throws IOException {
         String database = (String) DATABASE.lookUp(params);
         BasicDataSource dataSource = new BasicDataSource();
 
@@ -125,4 +127,12 @@ public class H2DataStoreFactory extends JDBCDataStoreFactory {
 
         return dataStore;
     }
+
+    @Override
+    protected String getValidationQuery() {
+        // no need for this until we are using H2 embedded, there is no
+        // network connection that can fail
+        return null;
+    }
+   
 }

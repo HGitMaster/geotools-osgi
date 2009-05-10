@@ -126,7 +126,7 @@ public final class SMIL20 extends XSD {
         return getClass().getResource("smil20.xsd").toString();
     }
 
-    protected SchemaLocator createSchemaLocator() {
+    public SchemaLocator createSchemaLocator() {
         //we explicity return null here because of a circular dependnecy with 
         //gml3 schema... returning null breaks the circle when the schemas are 
         //being built

@@ -55,10 +55,12 @@ import org.geotools.filter.spatial.IntersectsImpl;
 import org.geotools.filter.spatial.OverlapsImpl;
 import org.geotools.filter.spatial.TouchesImpl;
 import org.geotools.filter.spatial.WithinImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
@@ -71,8 +73,8 @@ import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.opengis.filter.PropertyIsLike;
-import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.capability.ArithmeticOperators;
 import org.opengis.filter.capability.ComparisonOperators;
 import org.opengis.filter.capability.FilterCapabilities;
@@ -110,8 +112,11 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.geometry.Geometry;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -119,8 +124,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * defaultcore.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryImpl.java $
- * @version $Id: FilterFactoryImpl.java 30746 2008-06-17 03:58:48Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryImpl.java $
+ * @version $Id: FilterFactoryImpl.java 32190 2009-01-09 11:13:13Z jesseeichar $
  */
 public class FilterFactoryImpl implements FilterFactory {
     
@@ -222,9 +227,7 @@ public class FilterFactoryImpl implements FilterFactory {
     public PropertyIsLike like(Expression expr, String pattern,
             String wildcard, String singleChar, String escape) {
         
-        LikeFilterImpl filter = new LikeFilterImpl();
-        filter.setExpression(expr);
-        filter.setPattern(pattern,wildcard,singleChar,escape);
+        LikeFilterImpl filter = new LikeFilterImpl(expr, pattern, wildcard, singleChar, escape);
         
         return filter;
     }
@@ -258,8 +261,7 @@ public class FilterFactoryImpl implements FilterFactory {
     }
     
     public BBOX bbox( Expression geometry, BoundingBox bounds ) {
-        return bbox( geometry, bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY(),
-                CRS.toSRS( bounds.getCoordinateReferenceSystem() ) );
+        return new BBOXImpl(this, geometry, createBBoxExpression(new ReferencedEnvelope(bounds)));
     }
     
     public BBOX bbox(Expression e, double minx, double miny, double maxx, double maxy, String srs) {
@@ -274,21 +276,12 @@ public class FilterFactoryImpl implements FilterFactory {
         
         BBoxExpression bbox = null;
         try {
-            bbox = createBBoxExpression(new Envelope(minx,maxx,miny,maxy));
+    		bbox = createBBoxExpression(new Envelope(minx,maxx,miny,maxy));
         } 
         catch (IllegalFilterException ife) {
             new IllegalArgumentException().initCause(ife);
         }
-        
-        BBOXImpl box = new BBOXImpl(this,e,bbox);
-        box.setPropertyName( name.getPropertyName() );
-        box.setSRS(srs);
-        box.setMinX(minx);
-        box.setMinY(miny);
-        box.setMaxX(maxx);
-        box.setMaxY(maxy);
-        
-        return box;
+		return new BBOXImpl(this, name,minx,miny,maxx,maxy,srs);
     }
     
     public Beyond beyond(String propertyName, Geometry geometry,

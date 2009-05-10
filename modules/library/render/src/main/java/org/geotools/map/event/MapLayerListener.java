@@ -30,7 +30,7 @@ import org.geotools.map.MapLayer;
  *
  * @see MapLayer
  * @see MapLayerEvent
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/map/event/MapLayerListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/map/event/MapLayerListener.java $
  */
 public interface MapLayerListener extends EventListener {
     /**
@@ -54,4 +54,18 @@ public interface MapLayerListener extends EventListener {
      * @param event encapsulating the event information
      */
     void layerHidden(MapLayerEvent event);
+
+    /**
+     * Invoked when the component has been set as selected.
+     *
+     * @param event encapsulating the event information
+     */
+    void layerSelected(MapLayerEvent event);
+
+    /**
+     * nvoked when the component has been set as not selected.
+     *
+     * @param event encapsulating the event information
+     */
+    void layerDeselected(MapLayerEvent event);
 }

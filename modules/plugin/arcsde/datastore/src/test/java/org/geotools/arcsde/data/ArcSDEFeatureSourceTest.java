@@ -17,6 +17,12 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,12 +31,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.pool.SessionPool;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
@@ -44,11 +44,15 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
@@ -66,10 +70,11 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
- * @version $Id: ArcSDEFeatureSourceTest.java 30921 2008-07-05 07:51:23Z jgarnett $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
+ * @version $Id: ArcSDEFeatureSourceTest.java 32669 2009-03-23 16:12:41Z groldan $
  */
-public class ArcSDEFeatureSourceTest extends TestCase {
+public class ArcSDEFeatureSourceTest {
     /** package logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(ArcSDEFeatureSourceTest.class.getPackage().getName());
@@ -83,54 +88,16 @@ public class ArcSDEFeatureSourceTest extends TestCase {
     /** a filter factory for testing */
     FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
-    /**
-     * Creates a new ArcSDEDataStoreTest object.
-     */
-    public ArcSDEFeatureSourceTest() {
-        this("ArcSDE DataStore unit tests");
-    }
-
-    /**
-     * Creates a new ArcSDEDataStoreTest object.
-     * 
-     * @param name a name for the junit test
-     */
-    public ArcSDEFeatureSourceTest(String name) {
-        super(name);
-    }
-
-    /**
-     * Builds a test suite for all this class' tests with per suite initialization directed to
-     * {@link #oneTimeSetUp()} and per suite clean up directed to {@link #oneTimeTearDown()}
-     * 
-     * @return
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(ArcSDEFeatureSourceTest.class);
-
-        TestSetup wrapper = new TestSetup(suite) {
-            @Override
-            protected void setUp() throws Exception {
-                oneTimeSetUp();
-            }
-
-            @Override
-            protected void tearDown() {
-                oneTimeTearDown();
-            }
-        };
-        return wrapper;
-    }
-
-    private static void oneTimeSetUp() throws Exception {
+    @BeforeClass
+    public static void oneTimeSetUp() throws Exception {
         testData = new TestData();
         testData.setUp();
         final boolean insertTestData = true;
         testData.createTempTable(insertTestData);
     }
 
-    private static void oneTimeTearDown() {
+    @AfterClass
+    public static void oneTimeTearDown() {
         boolean cleanTestTable = false;
         boolean cleanPool = true;
         testData.tearDown(cleanTestTable, cleanPool);
@@ -140,11 +107,11 @@ public class ArcSDEFeatureSourceTest extends TestCase {
      * loads {@code testData/testparams.properties} into a Properties object, wich is used to obtain
      * test tables names and is used as parameter to find the DataStore
      * 
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         // facilitates running a single test at a time (eclipse lets you do this
         // and it's very useful)
         if (testData == null) {
@@ -153,79 +120,9 @@ public class ArcSDEFeatureSourceTest extends TestCase {
         this.store = testData.getDataStore();
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         this.store = null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
-    public void _testStress() throws Exception {
-
-        ArcSDEDataStore ds = testData.getDataStore();
-
-        SessionPool pool = testData.getConnectionPool();
-        final int initialAvailableCount = pool.getAvailableCount();
-        final int initialPoolSize = pool.getPoolSize();
-
-        String typeName = testData.getTempTableName();
-
-        FeatureSource<SimpleFeatureType, SimpleFeature> source;
-        source = ds.getFeatureSource(typeName);
-
-        assertEquals(initialAvailableCount, pool.getAvailableCount());
-        assertEquals(initialPoolSize, pool.getPoolSize());
-
-        SimpleFeatureType schema = source.getSchema();
-
-        assertEquals("After getSchema()", initialAvailableCount, pool.getAvailableCount());
-        assertEquals("After getSchema()", initialPoolSize, pool.getPoolSize());
-
-        final Envelope layerBounds = source.getBounds();
-
-        assertEquals("After getBounds()", initialAvailableCount, pool.getAvailableCount());
-        assertEquals("After getBounds()", initialPoolSize, pool.getPoolSize());
-
-        source.getCount(Query.ALL);
-
-        assertEquals("After size()", initialAvailableCount, pool.getAvailableCount());
-        assertEquals("After size()", initialPoolSize, pool.getPoolSize());
-
-        BBOX bbox = ff.bbox(schema.getGeometryDescriptor().getLocalName(), layerBounds.getMinX() + 10,
-                layerBounds.getMinY() + 10, layerBounds.getMaxX() - 10, layerBounds.getMaxY() - 10,
-                schema.getCoordinateReferenceSystem().getName().getCode());
-
-        for (int i = 0; i < 20; i++) {
-            LOGGER.fine("Running iteration #" + i);
-
-            FeatureCollection<SimpleFeatureType, SimpleFeature> res;
-            res = source.getFeatures(bbox);
-            FeatureIterator<SimpleFeature> reader = res.features();
-            try {
-                assertNotNull(reader.next());
-
-                assertTrue(0 < res.size());
-                assertNotNull(res.getBounds());
-
-                assertNotNull(reader.next());
-
-                assertTrue(0 < res.size());
-                assertNotNull(res.getBounds());
-
-                assertNotNull(reader.next());
-            } finally {
-                reader.close();
-            }
-        }
     }
 
     /**
@@ -239,61 +136,29 @@ public class ArcSDEFeatureSourceTest extends TestCase {
      * is thrown by de Java ArcSDE API saying that a "NETWORK I/O OPERATION FAILED"
      * </p>
      * 
-     * @throws IOException DOCUMENT ME!
-     * @throws IllegalAttributeException DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws IllegalAttributeException
+     *             DOCUMENT ME!
      * @throws SeException
      */
-    public void testGetFeatureReader() throws IOException, IllegalAttributeException, SeException {
-        final int NUM_READERS = Integer.parseInt(testData.getConProps().getProperty(
-                "pool.maxConnections"));
-        String[] typeNames = { testData.getTempTableName() };
+    @Test
+    public void testGetFeatureReader() throws IOException {
+        final String typeName = testData.getTempTableName();
 
-        FeatureReader<SimpleFeatureType, SimpleFeature>[] readers = new FeatureReader[NUM_READERS];
-        int[] counts = new int[NUM_READERS];
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReader(typeName);
 
-        for (int i = 0; i < NUM_READERS;) {
-            for (int j = 0; (j < typeNames.length) && (i < NUM_READERS); j++, i++) {
-                readers[i] = getReader(typeNames[j]);
+        assertNotNull(reader);
+        int count = 0;
+        try {
+            while (testNext(reader)) {
+                ++count;
             }
+        } finally {
+            reader.close();
         }
 
-        long t = System.currentTimeMillis();
-        boolean hasNext = false;
-
-        while (true) {
-            for (int i = 0; i < NUM_READERS; i++) {
-                if (readers[i].hasNext()) {
-                    hasNext = true;
-
-                    break;
-                }
-
-                hasNext = false;
-            }
-
-            if (!hasNext) {
-                for (int i = 0; i < NUM_READERS; i++)
-                    readers[i].close();
-
-                break;
-            }
-
-            for (int i = 0; i < NUM_READERS; i++) {
-                if (testNext(readers[i])) {
-                    ++counts[i];
-                }
-            }
-        }
-
-        t = System.currentTimeMillis() - t;
-
-        String scounts = "";
-
-        for (int i = 0; i < NUM_READERS; i++)
-            scounts += (counts[i] + ", ");
-
-        LOGGER.fine("testGetFeatureReader: traversed " + scounts + " features simultaneously from "
-                + NUM_READERS + " different FeatureReaders in " + t + "ms");
+        assertEquals(8, count);
     }
 
     /**
@@ -303,6 +168,7 @@ public class ArcSDEFeatureSourceTest extends TestCase {
      * @throws IllegalAttributeException
      * @throws SeException
      */
+    @Test
     public void testRestrictsAttributes() throws IOException, IllegalAttributeException,
             SeException {
         final String typeName = testData.getTempTableName();
@@ -338,10 +204,13 @@ public class ArcSDEFeatureSourceTest extends TestCase {
      * Checks that arcsde datastore returns featuretypes whose attributes are exactly in the
      * requested order.
      * 
-     * @throws IOException DOCUMENT ME!
-     * @throws IllegalAttributeException DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws IllegalAttributeException
+     *             DOCUMENT ME!
      * @throws SeException
      */
+    @Test
     public void testRespectsAttributeOrder() throws IOException, IllegalAttributeException,
             SeException {
         final String typeName = testData.getTempTableName();
@@ -373,44 +242,42 @@ public class ArcSDEFeatureSourceTest extends TestCase {
             reader.close();
         }
     }
-    
+
     /**
-     * Say the query contains a set of propertynames to retrieve and the query
-     * filter others, the returned feature type should still match the ones in
-     * Query.propertyNames
+     * Say the query contains a set of propertynames to retrieve and the query filter others, the
+     * returned feature type should still match the ones in Query.propertyNames
      * 
      * @throws IOException
      * @throws IllegalAttributeException
      * @throws SeException
-     * @throws CQLException 
+     * @throws CQLException
      */
+    @Test
     public void testRespectsQueryAttributes() throws IOException, IllegalAttributeException,
             SeException, CQLException {
         final String typeName = testData.getTempTableName();
         final DataStore ds = testData.getDataStore();
         final FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource(typeName);
-        
-        final String[] queryAtts = {"SHAPE"};
+
+        final String[] queryAtts = { "SHAPE" };
         final Filter filter = CQL.toFilter("INT32_COL = 1");
-        
 
         // build the query asking for a subset of attributes
         final Query query = new DefaultQuery(typeName, filter, queryAtts);
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = fs.getFeatures(query);
         SimpleFeatureType resultSchema = features.getSchema();
-        
+
         assertEquals(1, resultSchema.getAttributeCount());
         assertEquals("SHAPE", resultSchema.getDescriptor(0).getLocalName());
-    
 
-        Feature feature=null;
+        Feature feature = null;
         FeatureIterator<SimpleFeature> iterator = null;
         try {
             iterator = features.features();
             feature = iterator.next();
         } finally {
-            if(iterator != null){
+            if (iterator != null) {
                 features.close(iterator);
             }
         }
@@ -418,14 +285,6 @@ public class ArcSDEFeatureSourceTest extends TestCase {
         assertEquals(resultSchema, feature.getType());
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param r DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     * @throws IllegalAttributeException DOCUMENT ME!
-     */
     private boolean testNext(FeatureReader<SimpleFeatureType, SimpleFeature> r) throws IOException,
             IllegalAttributeException {
         if (r.hasNext()) {
@@ -434,11 +293,8 @@ public class ArcSDEFeatureSourceTest extends TestCase {
             assertNotNull(f.getFeatureType());
             assertNotNull(f.getBounds());
 
-            // Object geom = f.getDefaultGeometry();
-            // assertNotNull(geom);
-
             GeometryAttribute defaultGeom = f.getDefaultGeometryProperty();
-            assertNotNull(defaultGeom);
+            assertNotNull("expected non null GeometryAttribute", defaultGeom);
 
             return true;
         }
@@ -446,13 +302,6 @@ public class ArcSDEFeatureSourceTest extends TestCase {
         return false;
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param typeName DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     */
     private FeatureReader<SimpleFeatureType, SimpleFeature> getReader(String typeName)
             throws IOException {
         Query q = new DefaultQuery(typeName, Filter.INCLUDE);
@@ -472,19 +321,22 @@ public class ArcSDEFeatureSourceTest extends TestCase {
      * natural separation of things in the Esri Java API for ArcSDE. This is necessary since mixed
      * queries sometimes are problematic. So this test ensures that:
      * <ul>
-     * <li> A mixed query respects all filters </li>
-     * <li> A mixed query does not fails when getBounds() is performed </li>
-     * <li> A mixed query does not fails when size() is performed </li>
+     * <li>A mixed query respects all filters</li>
+     * <li>A mixed query does not fails when getBounds() is performed</li>
+     * <li>A mixed query does not fails when size() is performed</li>
      * </ul>
      * </p>
      * 
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception
      */
+    @Test
     public void testMixedQueries() throws Exception {
         final int EXPECTED_RESULT_COUNT = 1;
         FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(testData
                 .getTempTableName());
-        Filter bboxFilter = getBBoxfilter(fs);
+        SimpleFeatureType schema = fs.getSchema();
+        Filter bboxFilter = ff.bbox(schema.getGeometryDescriptor().getLocalName(), -60, -55, -40,
+                -20, schema.getCoordinateReferenceSystem().getName().getCode());
         Filter sqlFilter = CQL.toFilter("INT32_COL < 5");
         LOGGER.fine("Geometry filter: " + bboxFilter);
         LOGGER.fine("SQL filter: " + sqlFilter);
@@ -535,8 +387,9 @@ public class ArcSDEFeatureSourceTest extends TestCase {
      * to expose GEOT-408, tests that queries in which only non spatial attributes are requested
      * does not fails due to the datastore trying to parse the geometry attribute.
      * 
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception
      */
+    @Test
     public void testAttributeOnlyQuery() throws Exception {
         DataStore ds = testData.getDataStore();
         FeatureSource<SimpleFeatureType, SimpleFeature> fSource = ds.getFeatureSource(testData
@@ -587,8 +440,9 @@ public class ArcSDEFeatureSourceTest extends TestCase {
     /**
      * Test that FID filters are correctly handled
      * 
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception
      */
+    @Test
     public void testFidFilters() throws Exception {
         final DataStore ds = testData.getDataStore();
         final String typeName = testData.getTempTableName();
@@ -626,6 +480,7 @@ public class ArcSDEFeatureSourceTest extends TestCase {
         results.close(iterator);
     }
 
+    @Test
     public void testMoreThan1000FidFilters() throws Exception {
         final DataStore ds = testData.getDataStore();
         final String typeName = testData.getTempTableName();
@@ -668,20 +523,15 @@ public class ArcSDEFeatureSourceTest extends TestCase {
     /**
      * test that getFeatureSource over an sde layer works
      * 
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException
      * @throws SeException
      */
+    @Test
     public void testGetFeatureSourcePoint() throws IOException, SeException {
         testGetFeatureSource(store.getFeatureSource(testData.getTempTableName()));
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param wich DOCUMENT ME!
-     * @param table DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     */
+    @Test
     public void testGetFeatures() throws Exception {
         final String table = testData.getTempTableName();
         LOGGER.fine("getting all features from " + table);
@@ -699,11 +549,7 @@ public class ArcSDEFeatureSourceTest extends TestCase {
         LOGGER.fine("fetched " + fCount + " features for " + table + " layer, OK");
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
+    @Test
     public void testSQLFilter() throws Exception {
         int expected = 4;
         Filter filter = CQL.toFilter("INT32_COL < 5");
@@ -712,14 +558,112 @@ public class ArcSDEFeatureSourceTest extends TestCase {
         testFilter(filter, fsource, expected);
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
+    @Test
     public void testBBoxFilter() throws Exception {
-        int expected = 7;
-        testBBox(testData.getTempTableName(), expected);
+        String typeName = testData.getTempTableName();
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(typeName);
+        SimpleFeatureType schema = fs.getSchema();
+        BBOX bboxFilter = ff.bbox(schema.getGeometryDescriptor().getLocalName(), -180, -90, 180,
+                90, schema.getCoordinateReferenceSystem().getName().getCode());
+
+        int expected = 0;
+        FeatureIterator<SimpleFeature> features = fs.getFeatures().features();
+        try {
+            while (features.hasNext()) {
+                SimpleFeature next = features.next();
+                if (bboxFilter.evaluate(next)) {
+                    expected++;
+                }
+            }
+        } finally {
+            features.close();
+        }
+        assertTrue(expected > 0);
+        testFilter(bboxFilter, fs, expected);
+    }
+
+    /**
+     * A bbox filter with an empty attribute name should work against the default geometry attribute
+     */
+    @SuppressWarnings("nls")
+    @Test
+    public void testBboxFilterWithEmptyAttributeName() throws Exception {
+        BBOX emptyAttNameFilter = ff.bbox("", -10, -10, 10, 10, "EPSG:4326");
+        String typeName = testData.getTempTableName();
+        SimpleFeatureType schema = store.getSchema(typeName);
+
+        FeatureSource<SimpleFeatureType, SimpleFeature> source;
+        source = store.getFeatureSource(typeName);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features;
+        features = source.getFeatures(emptyAttNameFilter);
+
+        FeatureIterator<SimpleFeature> iterator = features.features();
+        try {
+            assertTrue(iterator.hasNext());
+        } finally {
+            iterator.close();
+        }
+    }
+
+    @Test
+    public void testStress() throws Exception {
+
+        ArcSDEDataStore ds = testData.getDataStore();
+
+        SessionPool pool = testData.getConnectionPool();
+        final int initialAvailableCount = pool.getAvailableCount();
+        final int initialPoolSize = pool.getPoolSize();
+
+        String typeName = testData.getTempTableName();
+
+        FeatureSource<SimpleFeatureType, SimpleFeature> source;
+        source = ds.getFeatureSource(typeName);
+
+        assertEquals(initialAvailableCount, pool.getAvailableCount());
+        assertEquals(initialPoolSize, pool.getPoolSize());
+
+        SimpleFeatureType schema = source.getSchema();
+
+        assertEquals("After getSchema()", initialAvailableCount, pool.getAvailableCount());
+        assertEquals("After getSchema()", initialPoolSize, pool.getPoolSize());
+
+        final Envelope layerBounds = source.getBounds();
+
+        assertEquals("After getBounds()", initialAvailableCount, pool.getAvailableCount());
+        assertEquals("After getBounds()", initialPoolSize, pool.getPoolSize());
+
+        source.getCount(Query.ALL);
+
+        assertEquals("After size()", initialAvailableCount, pool.getAvailableCount());
+        assertEquals("After size()", initialPoolSize, pool.getPoolSize());
+
+        BBOX bbox = ff.bbox(schema.getGeometryDescriptor().getLocalName(),
+                layerBounds.getMinX() + 10, layerBounds.getMinY() + 10, layerBounds.getMaxX() - 10,
+                layerBounds.getMaxY() - 10, schema.getCoordinateReferenceSystem().getName()
+                        .getCode());
+
+        for (int i = 0; i < 20; i++) {
+            LOGGER.fine("Running iteration #" + i);
+
+            FeatureCollection<SimpleFeatureType, SimpleFeature> res;
+            res = source.getFeatures(bbox);
+            FeatureIterator<SimpleFeature> reader = res.features();
+            try {
+                assertNotNull(reader.next());
+
+                assertTrue(0 < res.size());
+                assertNotNull(res.getBounds());
+
+                assertNotNull(reader.next());
+
+                assertTrue(0 < res.size());
+                assertNotNull(res.getBounds());
+
+                assertNotNull(reader.next());
+            } finally {
+                reader.close();
+            }
+        }
     }
 
     // ///////////////// HELPER FUNCTIONS ////////////////////////
@@ -727,19 +671,21 @@ public class ArcSDEFeatureSourceTest extends TestCase {
     /**
      * for a given FeatureSource, makes the following assertions:
      * <ul>
-     * <li> it's not null </li>
-     * <li> .getDataStore() != null </li>
-     * <li> .getDataStore() == the datastore obtained in setUp() </li>
-     * <li> .getSchema() != null </li>
-     * <li> .getBounds() != null </li>
-     * <li> .getBounds().isNull() == false </li>
-     * <li> .getFeatures().getCounr() > 0 </li>
-     * <li> .getFeatures().reader().hasNex() == true </li>
-     * <li> .getFeatures().reader().next() != null </li>
+     * <li>it's not null</li>
+     * <li>.getDataStore() != null</li>
+     * <li>.getDataStore() == the datastore obtained in setUp()</li>
+     * <li>.getSchema() != null</li>
+     * <li>.getBounds() != null</li>
+     * <li>.getBounds().isNull() == false</li>
+     * <li>.getFeatures().getCounr() > 0</li>
+     * <li>.getFeatures().reader().hasNex() == true</li>
+     * <li>.getFeatures().reader().next() != null</li>
      * </ul>
      * 
-     * @param fsource DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
+     * @param fsource
+     *            DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
      */
     private void testGetFeatureSource(FeatureSource<SimpleFeatureType, SimpleFeature> fsource)
             throws IOException {
@@ -778,59 +724,23 @@ public class ArcSDEFeatureSourceTest extends TestCase {
         reader.close();
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param filter DOCUMENT ME!
-     * @param fsource DOCUMENT ME!
-     * @param expected DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     */
-    private void testFilter(Filter filter,
-            FeatureSource<SimpleFeatureType, SimpleFeature> fsource,
+    private void testFilter(Filter filter, FeatureSource<SimpleFeatureType, SimpleFeature> fsource,
             int expected) throws IOException {
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fsource.getFeatures(filter);
-        int fCount = fc.size();
-        LOGGER.info("collection size: " + fCount);
 
         FeatureIterator<SimpleFeature> fi = fc.features();
-        int numFeat = 0;
-        while (fi.hasNext()) {
-            fi.next();
-            numFeat++;
+        try {
+            int numFeat = 0;
+            while (fi.hasNext()) {
+                fi.next();
+                numFeat++;
+            }
+
+            String failMsg = "Fully fetched features size and estimated num features count does not match";
+            assertEquals(failMsg, expected, numFeat);
+        } finally {
+            fc.close(fi);
         }
-
-        String failMsg = "Fully fetched features size and estimated num features count does not match";
-        assertEquals(failMsg, fCount, numFeat);
-        fc.close(fi);
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param table DOCUMENT ME!
-     * @param expected DOCUMENT ME!
-     * @throws Exception DOCUMENT ME!
-     */
-    private void testBBox(String table, int expected) throws Exception {
-        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(table);
-        Filter bboxFilter = getBBoxfilter(fs);
-        testFilter(bboxFilter, fs, expected);
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param fs DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws Exception DOCUMENT ME!
-     */
-    private Filter getBBoxfilter(FeatureSource<SimpleFeatureType, SimpleFeature> fs)
-            throws Exception {
-        SimpleFeatureType schema = fs.getSchema();
-        BBOX bbe = ff.bbox(schema.getGeometryDescriptor().getLocalName(), -60, -55, -40, -20, schema
-                .getCoordinateReferenceSystem().getName().getCode());
-        return bbe;
     }
 
 }

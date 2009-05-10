@@ -1,0 +1,816 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2002-2009, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+package org.geotools.arcsde.gce;
+
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
+import java.awt.image.renderable.ParameterBlock;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.stream.ImageInputStream;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.InterpolationNearest;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.FormatDescriptor;
+import javax.media.jai.operator.MosaicDescriptor;
+
+import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.gce.RasterUtils.QueryInfo;
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.coverage.CoverageFactoryFinder;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
+import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.OverviewPolicy;
+import org.geotools.data.DefaultServiceInfo;
+import org.geotools.data.ServiceInfo;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.util.logging.Logging;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.operation.MathTransform;
+
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeQuery;
+import com.esri.sde.sdk.client.SeRaster;
+import com.esri.sde.sdk.client.SeRasterAttr;
+import com.esri.sde.sdk.client.SeRasterConstraint;
+import com.esri.sde.sdk.client.SeRow;
+import com.esri.sde.sdk.client.SeSqlConstruct;
+import com.sun.media.imageio.stream.RawImageInputStream;
+import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
+
+/**
+ * 
+ * @author Gabriel Roldan (OpenGeo)
+ * @since 2.5.4
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32540 2009-02-23 06:36:00Z groldan $
+ * @source $URL$
+ */
+@SuppressWarnings( { "deprecation", "nls" })
+final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
+
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.gce");
+
+    private static final boolean DEBUG = false;
+
+    private static final File debugDir = new File(System.getProperty("user.home") + File.separator
+            + "arcsde_test");
+    static {
+        if (DEBUG) {
+            debugDir.mkdir();
+        }
+    }
+
+    private final ArcSDERasterFormat parent;
+
+    private final ArcSDEConnectionPool connectionPool;
+
+    private final RasterInfo rasterInfo;
+
+    private DefaultServiceInfo serviceInfo;
+
+    public ArcSDEGridCoverage2DReaderJAI(final ArcSDERasterFormat parent,
+            final ArcSDEConnectionPool connectionPool, final RasterInfo rasterInfo,
+            final Hints hints) throws IOException {
+        // check it's a supported format
+        {
+            final int bitsPerSample = rasterInfo.getBand(0, 0).getCellType().getBitsPerSample();
+            if (rasterInfo.getNumBands() > 1 && (bitsPerSample == 1 || bitsPerSample == 4)) {
+                throw new IllegalArgumentException(bitsPerSample
+                        + "-bit rasters with more than one band are not supported");
+            }
+        }
+        this.parent = parent;
+        this.connectionPool = connectionPool;
+        this.rasterInfo = rasterInfo;
+
+        super.hints = hints;
+        super.coverageFactory = CoverageFactoryFinder.getGridCoverageFactory(this.hints);
+        super.crs = rasterInfo.getCoverageCrs();
+        super.originalEnvelope = rasterInfo.getOriginalEnvelope();
+
+        GeneralGridEnvelope gridRange = rasterInfo.getOriginalGridRange();
+        super.originalGridRange = new GeneralGridRange(gridRange.toRectangle());
+
+        super.coverageName = rasterInfo.getRasterTable();
+        final int numLevels = rasterInfo.getNumPyramidLevels(0);
+
+        // level 0 is not an overview, but the raster itself
+        super.numOverviews = numLevels - 1;
+
+        // ///
+        // 
+        // setting the higher resolution avalaible for this coverage
+        //
+        // ///
+        highestRes = super.getResolution(originalEnvelope, originalGridRange.toRectangle(), crs);
+        // //
+        //
+        // get information for the successive images
+        //
+        // //
+        // REVISIT may the different rasters in the raster dataset have different pyramid levels? I
+        // guess so
+        if (numOverviews > 0) {
+            overViewResolutions = new double[numOverviews][2];
+            for (int pyramidLevel = 1; pyramidLevel <= numOverviews; pyramidLevel++) {
+                Rectangle levelGridRange = rasterInfo.getGridRange(0, pyramidLevel);
+                GeneralEnvelope levelEnvelope = rasterInfo.getGridEnvelope(0, pyramidLevel);
+                overViewResolutions[pyramidLevel - 1] = super.getResolution(levelEnvelope,
+                        levelGridRange, crs);
+            }
+        } else {
+            overViewResolutions = null;
+        }
+    }
+
+    /**
+     * @see GridCoverageReader#getFormat()
+     */
+    public Format getFormat() {
+        return parent;
+    }
+
+    @Override
+    public ServiceInfo getInfo() {
+        if (serviceInfo == null) {
+            serviceInfo = new DefaultServiceInfo();
+            serviceInfo.setTitle(rasterInfo.getRasterTable() + " is an ArcSDE Raster");
+            serviceInfo.setDescription(rasterInfo.toString());
+            Set<String> keywords = new HashSet<String>();
+            keywords.add("ArcSDE");
+            serviceInfo.setKeywords(keywords);
+        }
+        return serviceInfo;
+    }
+
+    /**
+     * @see GridCoverageReader#read(GeneralParameterValue[])
+     */
+    public GridCoverage read(GeneralParameterValue[] params) throws IOException {
+
+        final GeneralEnvelope requestedEnvelope;
+        final Rectangle requestedDim;
+        final OverviewPolicy overviewPolicy;
+        {
+            final ReadParameters opParams = RasterUtils.parseReadParams(getOriginalEnvelope(),
+                    params);
+            overviewPolicy = opParams.overviewPolicy;
+            requestedEnvelope = opParams.requestedEnvelope;
+            requestedDim = opParams.dim;
+        }
+
+        /*
+         * For each raster in the raster dataset, obtain the tiles, pixel range, and resulting
+         * envelope
+         */
+        final List<QueryInfo> queries;
+        queries = findMatchingRasters(requestedEnvelope, requestedDim, overviewPolicy);
+        if (queries.isEmpty()) {
+            /*
+             * none of the rasters match the requested envelope. This may happen by the tiled nature
+             * of the raster dataset
+             */
+            return createFakeCoverage(requestedEnvelope, requestedDim);
+        }
+
+        final GeneralEnvelope resultEnvelope = getResultEnvelope(queries);
+
+        final LoggingHelper geomLog = new LoggingHelper();
+        geomLog.appendLoggingGeometries(LoggingHelper.REQ_ENV, requestedEnvelope);
+        geomLog.appendLoggingGeometries(LoggingHelper.RES_ENV, resultEnvelope);
+
+        /*
+         * Once we collected the matching rasters and their image subsets, find out where in the
+         * overall resulting mosaic they fit. If the rasters does not share the spatial resolution,
+         * the QueryInfo.resultDimension and QueryInfo.mosaicLocation width or height won't match
+         */
+        final Rectangle mosaicDimension;
+        mosaicDimension = RasterUtils.setMosaicLocations(rasterInfo, resultEnvelope, queries);
+
+        /*
+         * Gather the rendered images for each of the rasters that match the requested envelope
+         */
+        final ArcSDEPooledConnection conn = connectionPool.getConnection();
+        final SeQuery preparedQuery = createSeQuery(conn);
+        try {
+            preparedQuery.execute();
+
+            final Map<Long, QueryInfo> byRasterdIdQueries = new HashMap<Long, QueryInfo>();
+            for (QueryInfo q : queries) {
+                byRasterdIdQueries.put(q.getRasterId(), q);
+            }
+
+            SeRow row = preparedQuery.fetch();
+
+            while (row != null) {
+                final SeRasterAttr rAttr = row.getRaster(0);
+                final Long rasterId = Long.valueOf(rAttr.getRasterId().longValue());
+                final RenderedImage rasterImage;
+
+                if (byRasterdIdQueries.containsKey(rasterId)) {
+
+                    final QueryInfo rasterQueryInfo = byRasterdIdQueries.get(rasterId);
+
+                    LOGGER.finer(rasterQueryInfo.toString());
+                    geomLog.appendLoggingGeometries(LoggingHelper.MOSAIC_EXPECTED, rasterQueryInfo
+                            .getMosaicLocation());
+                    geomLog.appendLoggingGeometries(LoggingHelper.MOSAIC_ENV, rasterQueryInfo
+                            .getResultEnvelope());
+
+                    final int pyramidLevelChoice = rasterQueryInfo.getPyramidLevel();
+
+                    rasterImage = getRasterMatchingTileRange(pyramidLevelChoice, preparedQuery,
+                            row, rAttr, rasterQueryInfo);
+
+                    {
+                        final Rectangle tiledImageSize = rasterQueryInfo.getTiledImageSize();
+                        int width = rasterImage.getWidth();
+                        int height = rasterImage.getHeight();
+                        if (tiledImageSize.width != width || tiledImageSize.height != height) {
+                            throw new IllegalStateException(
+                                    "Read image is not of the expected size. Image=" + width + "x"
+                                            + height + ", expected: " + tiledImageSize.width + "x"
+                                            + tiledImageSize.height);
+                        }
+                        if (tiledImageSize.x != rasterImage.getMinX()
+                                || tiledImageSize.y != rasterImage.getMinY()) {
+                            throw new IllegalStateException(
+                                    "Read image is not at the expected location "
+                                            + tiledImageSize.x + "," + tiledImageSize.y + ": "
+                                            + rasterImage.getMinX() + "," + rasterImage.getMinY());
+                        }
+                    }
+
+                    rasterQueryInfo.setResultImage(rasterImage);
+                }
+                // advance to the next raster in the dataset
+                row = preparedQuery.fetch();
+            }
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
+        } finally {
+            try {
+                preparedQuery.close();
+            } catch (SeException e) {
+                throw new ArcSdeException(e);
+            } finally {
+                conn.close();
+            }
+        }
+
+        /*
+         * BUILDING COVERAGE
+         */
+        final GridSampleDimension[] bands = rasterInfo.getGridSampleDimensions();
+
+        geomLog.log(LoggingHelper.REQ_ENV);
+        geomLog.log(LoggingHelper.RES_ENV);
+        geomLog.log(LoggingHelper.MOSAIC_ENV);
+        geomLog.log(LoggingHelper.MOSAIC_EXPECTED);
+
+        final RenderedImage coverageRaster = createMosaic(queries);
+
+        // return coverageFactory.create(coverageName, coverageRaster, resultEnvelope, bands, null,
+        // null);
+        MathTransform rasterToModel = RasterUtils.createRasterToModel(mosaicDimension,
+                resultEnvelope);
+        return super.createImageCoverage(PlanarImage.wrapRenderedImage(coverageRaster),
+                rasterToModel);
+    }
+
+    /**
+     * Called when the requested envelope do overlap the coverage envelope but none of the rasters
+     * in the dataset do
+     * 
+     * @param requestedEnvelope
+     * @param requestedDim
+     * @return
+     */
+    private GridCoverage createFakeCoverage(GeneralEnvelope requestedEnvelope,
+            Rectangle requestedDim) {
+
+        ImageTypeSpecifier its = rasterInfo.getRenderedImageSpec(0);
+        SampleModel sampleModel = its.getSampleModel(requestedDim.width, requestedDim.height);
+        ColorModel colorModel = its.getColorModel();
+
+        WritableRaster raster = Raster.createWritableRaster(sampleModel, null);
+        BufferedImage image = new BufferedImage(colorModel, raster, false, null);
+        return coverageFactory.create(coverageName, image, requestedEnvelope);
+    }
+
+    private List<QueryInfo> findMatchingRasters(final GeneralEnvelope requestedEnvelope,
+            final Rectangle requestedDim, final OverviewPolicy overviewPolicy) {
+
+        final List<QueryInfo> matchingQueries;
+        matchingQueries = RasterUtils.findMatchingRasters(rasterInfo, requestedEnvelope,
+                requestedDim, overviewPolicy);
+
+        if (matchingQueries.isEmpty()) {
+            return matchingQueries;
+        }
+
+        for (QueryInfo match : matchingQueries) {
+            RasterUtils.fitRequestToRaster(requestedEnvelope, rasterInfo, match);
+        }
+        return matchingQueries;
+    }
+
+    private GeneralEnvelope getResultEnvelope(final List<QueryInfo> queryInfos) {
+
+        GeneralEnvelope finalEnvelope = null;
+
+        for (QueryInfo rasterQueryInfo : queryInfos) {
+            // gather resulting envelope
+            if (finalEnvelope == null) {
+                finalEnvelope = new GeneralEnvelope(rasterQueryInfo.getResultEnvelope());
+            } else {
+                finalEnvelope.add(rasterQueryInfo.getResultEnvelope());
+            }
+        }
+        if (finalEnvelope == null) {
+            throw new IllegalStateException("Restult envelope is null, this shouldn't happen!! "
+                    + "we checked the request overlaps the coverage envelope before!");
+        }
+        return finalEnvelope;
+    }
+
+    /**
+     * For each raster: crop->scale->translate->add to mosaic
+     * 
+     * @param queries
+     * @return
+     * @throws IOException
+     */
+    private RenderedImage createMosaic(final List<QueryInfo> queries) throws IOException {
+        // if (queries.size() == 1) {
+        // // no need to mosaic at all
+        // return queries.get(0).getResultImage();
+        // }
+
+        List<RenderedImage> transformed = new ArrayList<RenderedImage>(queries.size());
+
+        /*
+         * Do we need to expand to RGB color space and then create a new colormapped image with the
+         * whole mosaic?
+         */
+        boolean expandThenContractCM = queries.size() > 1 && rasterInfo.isColorMapped();
+        if (expandThenContractCM) {
+            LOGGER.info("Creating mosaic out of " + queries.size()
+                    + " colormapped rasters. The mosaic tiles will be expanded to "
+                    + "\nRGB space and the resulting mosaic reduced to a new IndexColorModel");
+        }
+        for (QueryInfo query : queries) {
+            RenderedImage image = query.getResultImage();
+            if (DEBUG) {
+                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                        + "_01_original.tiff"));
+            }
+
+            image = cropToRequiredDimension(image, query.getResultDimensionInsideTiledImage());
+            if (DEBUG) {
+                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                        + "_02_crop.tiff"));
+            }
+
+            final Rectangle mosaicLocation = query.getMosaicLocation();
+            // scale
+            Float scaleX = Float.valueOf((float) (mosaicLocation.getWidth() / image.getWidth()));
+            Float scaleY = Float.valueOf((float) (mosaicLocation.getHeight() / image.getHeight()));
+            Float translateX = null;
+            Float translateY = null;
+
+            ParameterBlock pb = new ParameterBlock();
+            pb.addSource(image);
+            pb.add(scaleX);
+            pb.add(scaleY);
+            pb.add(translateX);
+            pb.add(translateY);
+            pb.add(new InterpolationNearest());
+
+            image = JAI.create("scale", pb);
+
+            if (DEBUG) {
+                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                        + "_03_scale.tiff"));
+            }
+
+            int width = image.getWidth();
+            int height = image.getHeight();
+
+            assert mosaicLocation.width == width;
+            assert mosaicLocation.height == height;
+
+            // translate
+            pb = new ParameterBlock();
+            pb.addSource(image);
+            pb.add(Float.valueOf(mosaicLocation.x - image.getMinX()));
+            pb.add(Float.valueOf(mosaicLocation.y - image.getMinY()));
+            pb.add(null);
+
+            image = JAI.create("translate", pb);
+            if (DEBUG) {
+                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                        + "_04_translate.tiff"));
+            }
+
+            assert image.getMinX() == mosaicLocation.x : image.getMinX() + " != "
+                    + mosaicLocation.x;
+            assert image.getMinY() == mosaicLocation.y : image.getMinY() + " != "
+                    + mosaicLocation.y;
+            assert image.getWidth() == mosaicLocation.width : image.getWidth() + " != "
+                    + mosaicLocation.width;
+            assert image.getHeight() == mosaicLocation.height : image.getHeight() + " != "
+                    + mosaicLocation.height;
+
+            if (expandThenContractCM) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    LOGGER.finer("Creating color expanded version of tile for raster #"
+                            + query.getRasterId());
+                }
+
+                /*
+                 * reformat the image as a 4 band rgba backed by byte data
+                 */
+                image = FormatDescriptor.create(image, Integer.valueOf(DataBuffer.TYPE_BYTE), null);
+
+                if (DEBUG) {
+                    ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
+                            + "_04_1_colorExpanded.tiff"));
+                }
+            }
+
+            transformed.add(image);
+        }
+
+        ParameterBlock mosaicParams = new ParameterBlock();
+
+        final LoggingHelper geomLog = new LoggingHelper();
+        for (RenderedImage img : transformed) {
+            mosaicParams.addSource(img);
+            geomLog.appendLoggingGeometries(LoggingHelper.MOSAIC_RESULT, img);
+        }
+        geomLog.log(LoggingHelper.MOSAIC_RESULT);
+
+        mosaicParams.add(MosaicDescriptor.MOSAIC_TYPE_OVERLAY); // mosaic type
+        mosaicParams.add(null); // alpha mask
+        mosaicParams.add(null); // source ROI mask
+        mosaicParams.add(null); // source threshold
+        mosaicParams.add(null); // destination background value
+
+        LOGGER.fine("Creating mosaic out of " + queries.size() + " raster tiles");
+        RenderedImage mosaic = JAI.create("Mosaic", mosaicParams);
+
+        if (DEBUG) {
+            ImageIO.write(mosaic, "TIFF",
+                    new File(debugDir, coverageName + "_05_mosaicResult.tiff"));
+        }
+
+        // if (expandThenContractCM) {
+        // if (LOGGER.isLoggable(Level.FINE)) {
+        // LOGGER.fine("The original rasters are colormapped, "
+        // + "reducing the mosaic color space to an indexed one");
+        // }
+        // ImageWorker imageWorker = new ImageWorker(mosaic);
+        // imageWorker.forceIndexColorModel(true);
+        // mosaic = imageWorker.getRenderedImage();
+        // if (DEBUG) {
+        // ImageIO.write(mosaic, "TIFF", new File(debugDir, coverageName
+        // + "_05.1_colorReduced.tiff"));
+        // }
+        // }
+        return mosaic;
+    }
+
+    private RenderedImage getRasterMatchingTileRange(int pyramidLevelChoice,
+            final SeQuery preparedQuery, SeRow row, final SeRasterAttr rAttr,
+            final QueryInfo rasterQueryInfo) throws IOException {
+
+        /*
+         * Create the prepared query (not executed) stream to fetch the tiles from
+         */
+        final Rectangle matchingTiles = rasterQueryInfo.getMatchingTiles();
+
+        // covers an area of full tiles
+        final RenderedImage fullTilesRaster;
+
+        /*
+         * Create the tiled raster covering the full area of the matching tiles
+         */
+        fullTilesRaster = createTiledRaster(preparedQuery, row, rAttr, matchingTiles,
+                pyramidLevelChoice, rasterQueryInfo.getTiledImageSize().getLocation(),
+                rasterQueryInfo.getRasterIndex());
+
+        /*
+         * REVISIT: This is odd, we need to force the data to be loaded so we're free to release the
+         * stream, which gives away the streamed, tiled nature of this rasters, but I don't see the
+         * GCE api having a very clear usage workflow that ensures close() is always being called to
+         * the underlying ImageInputStream so we could let it close the SeQuery when done.
+         */
+        try {
+            fullTilesRaster.getData();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Fetching data for " + rasterQueryInfo.toString(), e);
+        }
+        return fullTilesRaster;
+    }
+
+    private RenderedImage cropToRequiredDimension(final RenderedImage fullTilesRaster,
+            final Rectangle cropTo) {
+
+        int minX = fullTilesRaster.getMinX();
+        int minY = fullTilesRaster.getMinY();
+        int width = fullTilesRaster.getWidth();
+        int height = fullTilesRaster.getHeight();
+
+        Rectangle origDim = new Rectangle(minX, minY, width, height);
+        if (!origDim.contains(cropTo)) {
+            throw new IllegalArgumentException("Original image (" + origDim
+                    + ") does not contain desired dimension (" + cropTo + ")");
+        } else if (origDim.equals(cropTo)) {
+            if (LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.finer("No need to crop image, full tiled dimension and target one "
+                        + "do match: original: " + width + "x" + height + ", target: "
+                        + cropTo.width + "x" + cropTo.height);
+            }
+            return fullTilesRaster;
+        }
+
+        ParameterBlock cropParams = new ParameterBlock();
+
+        cropParams.addSource(fullTilesRaster);// Source
+        cropParams.add(Float.valueOf(cropTo.x)); // x origin for each band
+        cropParams.add(Float.valueOf(cropTo.y)); // y origin for each band
+        cropParams.add(Float.valueOf(cropTo.width));// width for each band
+        cropParams.add(Float.valueOf(cropTo.height));// height for each band
+
+        final RenderingHints hints = null;
+        RenderedImage image = JAI.create("Crop", cropParams, hints);
+
+        assert cropTo.x == image.getMinX();
+        assert cropTo.y == image.getMinY();
+        assert cropTo.width == image.getWidth();
+        assert cropTo.height == image.getHeight();
+        return image;
+    }
+
+    static class ReadParameters {
+        GeneralEnvelope requestedEnvelope;
+
+        Rectangle dim;
+
+        OverviewPolicy overviewPolicy;
+    }
+
+    /**
+     * Creates a prepared query for the coverage's table, does not set any constraint nor executes
+     * it.
+     */
+    private SeQuery createSeQuery(final ArcSDEPooledConnection conn) throws IOException {
+        final SeQuery seQuery;
+        final String[] rasterColumns = rasterInfo.getRasterColumns();
+        final String tableName = rasterInfo.getRasterTable();
+        try {
+            seQuery = new SeQuery(conn, rasterColumns, new SeSqlConstruct(tableName));
+            seQuery.prepareQuery();
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
+        }
+        return seQuery;
+    }
+
+    private RenderedOp createTiledRaster(final SeQuery preparedQuery, final SeRow row,
+            final SeRasterAttr rAttr, final Rectangle matchingTiles, final int pyramidLevel,
+            final Point imageLocation, final int rasterIndex) throws IOException {
+
+        final int tileWidth;
+        final int tileHeight;
+        final int numberOfBands;
+        final RasterCellType pixelType;
+        try {
+            numberOfBands = rAttr.getNumBands();
+            pixelType = RasterCellType.valueOf(rAttr.getPixelType());
+            tileWidth = rAttr.getTileWidth();
+            tileHeight = rAttr.getTileHeight();
+
+            int[] bandsToQuery = new int[numberOfBands];
+            for (int bandN = 1; bandN <= numberOfBands; bandN++) {
+                bandsToQuery[bandN - 1] = bandN;
+            }
+
+            int minTileX = matchingTiles.x;
+            int minTileY = matchingTiles.y;
+            int maxTileX = minTileX + matchingTiles.width - 1;
+            int maxTileY = minTileY + matchingTiles.height - 1;
+            LOGGER.fine("Requesting tiles [" + minTileX + "," + minTileY + ":" + maxTileX + ","
+                    + maxTileY + "]");
+
+            Rectangle tiledImageSize = new Rectangle(0, 0, tileWidth * matchingTiles.width,
+                    tileHeight * matchingTiles.height);
+
+            LOGGER.fine("Tiled image size: " + tiledImageSize);
+
+            final int interleaveType = SeRaster.SE_RASTER_INTERLEAVE_BIP;
+
+            SeRasterConstraint rConstraint = new SeRasterConstraint();
+            rConstraint.setBands(bandsToQuery);
+            rConstraint.setLevel(pyramidLevel);
+            rConstraint.setEnvelope(minTileX, minTileY, maxTileX, maxTileY);
+            rConstraint.setInterleave(interleaveType);
+
+            preparedQuery.queryRasterTile(rConstraint);
+
+        } catch (SeException se) {
+            throw new ArcSdeException(se);
+        }
+
+        final TileReader tileReader = TileReader.getInstance(row, pixelType.getBitsPerSample(),
+                numberOfBands, matchingTiles, new Dimension(tileWidth, tileHeight));
+
+        final int tiledImageWidth = tileReader.getTilesWide() * tileReader.getTileWidth();
+        final int tiledImageHeight = tileReader.getTilesHigh() * tileReader.getTileHeight();
+
+        // Prepare temporary colorModel and sample model, needed to build the final
+        // ArcSDEPyramidLevel level;
+        final ColorModel colorModel;
+        final SampleModel sampleModel;
+        {
+            final ImageTypeSpecifier fullImageSpec = rasterInfo.getRenderedImageSpec(rasterIndex);
+            colorModel = fullImageSpec.getColorModel();
+            sampleModel = fullImageSpec.getSampleModel(tiledImageWidth, tiledImageHeight);
+        }
+
+        final long[] imageOffsets = new long[] { 0 };
+        final Dimension[] imageDimensions = new Dimension[] { new Dimension(tiledImageWidth,
+                tiledImageHeight) };
+
+        final ImageTypeSpecifier its = new ImageTypeSpecifier(colorModel, sampleModel);
+
+        // Finally, build the image input stream
+        final RawImageInputStream raw;
+        {
+            final ImageInputStream tiledImageInputStream;
+            final boolean promoted = (colorModel instanceof IndexColorModel)
+                    && ((IndexColorModel) colorModel).getPixelSize() == 16
+                    && pixelType.getBitsPerSample() == 8;
+            tiledImageInputStream = new ArcSDETiledImageInputStream(tileReader, promoted);
+
+            raw = new RawImageInputStream(tiledImageInputStream, its, imageOffsets, imageDimensions);
+        }
+
+        // building the final image layout
+        final ImageLayout imageLayout;
+        {
+            int minX = imageLocation.x;
+            int minY = imageLocation.y;
+            int width = tiledImageWidth;
+            int height = tiledImageHeight;
+
+            int tileGridXOffset = imageLocation.x;
+            int tileGridYOffset = imageLocation.y;
+
+            imageLayout = new ImageLayout(minX, minY, width, height, tileGridXOffset,
+                    tileGridYOffset, tileWidth, tileHeight, sampleModel, colorModel);
+        }
+
+        // First operator: read the image
+        final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, imageLayout);
+
+        ParameterBlock pb = new ParameterBlock();
+        pb.add(raw);// Input
+        /*
+         * image index, always 0 since we're already fetching the required pyramid level
+         */
+        pb.add(Integer.valueOf(0)); // Image index
+        pb.add(Boolean.TRUE); // Read metadata
+        pb.add(Boolean.TRUE);// Read thumbnails
+        pb.add(Boolean.TRUE);// Verify input
+        pb.add(null);// Listeners
+        pb.add(null);// Locale
+        final ImageReadParam rParam = new ImageReadParam();
+        pb.add(rParam);// ReadParam
+        RawImageReaderSpi imageIOSPI = new RawImageReaderSpi();
+        ImageReader readerInstance = imageIOSPI.createReaderInstance();
+        pb.add(readerInstance);// Reader
+
+        RenderedOp image = JAI.create("ImageRead", pb, hints);
+        image.getData();
+        return image;
+    }
+
+    /**
+     * A simple helper class to guard and easy logging the mosaic geometries in both geographical
+     * and pixel ranges
+     */
+    private static class LoggingHelper {
+
+        public Level GEOM_LEVEL = Level.FINER;
+
+        public static String REQ_ENV = "Requested envelope";
+
+        public static String RES_ENV = "Resulting envelope";
+
+        public static String MOSAIC_ENV = "Resulting mosaiced envelopes";
+
+        public static String MOSAIC_EXPECTED = "Expected mosaic layout (in pixels)";
+
+        public static String MOSAIC_RESULT = "Resulting image mosaic layout (in pixels)";
+
+        private Map<String, StringBuilder> geoms = null;
+
+        LoggingHelper() {
+            // not much to to
+        }
+
+        private StringBuilder getGeom(String geomName) {
+            if (geoms == null) {
+                geoms = new HashMap<String, StringBuilder>();
+            }
+            StringBuilder sb = geoms.get(geomName);
+            if (sb == null) {
+                sb = new StringBuilder("MULTIPOLYGON(\n");
+                geoms.put(geomName, sb);
+            }
+            return sb;
+        }
+
+        public void appendLoggingGeometries(String geomName, RenderedImage img) {
+            if (LOGGER.isLoggable(GEOM_LEVEL)) {
+                appendLoggingGeometries(geomName, new Rectangle(img.getMinX(), img.getMinY(), img
+                        .getWidth(), img.getHeight()));
+            }
+        }
+
+        public void appendLoggingGeometries(String geomName, Rectangle env) {
+            if (LOGGER.isLoggable(GEOM_LEVEL)) {
+                appendLoggingGeometries(geomName, new GeneralEnvelope(env));
+            }
+        }
+
+        public void appendLoggingGeometries(String geomName, GeneralEnvelope env) {
+            if (LOGGER.isLoggable(GEOM_LEVEL)) {
+                StringBuilder sb = getGeom(geomName);
+                sb.append("\n  ((" + env.getMinimum(0) + " " + env.getMinimum(1) + ", "
+                        + env.getMaximum(0) + " " + env.getMinimum(1) + ", " + env.getMaximum(0)
+                        + " " + env.getMaximum(1) + ", " + env.getMinimum(0) + " "
+                        + env.getMaximum(1) + ", " + env.getMinimum(0) + " " + env.getMinimum(1)
+                        + ")),");
+            }
+        }
+
+        public void log(String geomName) {
+            if (LOGGER.isLoggable(GEOM_LEVEL)) {
+                StringBuilder sb = getGeom(geomName);
+                sb.setLength(sb.length() - 1);
+                sb.append("\n)");
+                LOGGER.log(GEOM_LEVEL, geomName + ":\n" + sb.toString());
+            }
+        }
+    }
+}

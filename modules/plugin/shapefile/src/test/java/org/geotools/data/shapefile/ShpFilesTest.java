@@ -173,6 +173,15 @@ public class ShpFilesTest extends TestCase{
         }
     }
 
+    public void testFileInNonExistingDirectory() throws Exception {
+        try {
+            new ShpFiles(new File("nowhere/test.shp"));
+            // ok
+        } catch (Exception e) {
+            fail(e.getClass().getSimpleName() + " should not be thrown");
+        }
+    }
+
     public void testNonFileURLs() throws IOException {
         Map<ShpFileType, URL> expected = new HashMap<ShpFileType, URL>();
         String base = "http://www.geotools.org/testFile";

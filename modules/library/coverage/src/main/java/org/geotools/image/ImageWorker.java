@@ -69,8 +69,8 @@ import org.geotools.resources.image.ImageUtilities;
  * is left in an undetermined state and should not be used anymore.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
- * @version $Id: ImageWorker.java 31735 2008-10-30 01:55:57Z simboss $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
+ * @version $Id: ImageWorker.java 32491 2009-02-17 00:39:21Z simonegiannecchini $
  * @author Simone Giannecchini
  * @author Bryce Nordgren
  * @author Martin Desruisseaux
@@ -1056,7 +1056,7 @@ public class ImageWorker {
      * @see FormatDescriptor
      */
     public final ImageWorker forceComponentColorModel(boolean checkTransparent) {
-        final ColorModel cm = image.getColorModel();
+    	final ColorModel cm = image.getColorModel();
         if (cm instanceof ComponentColorModel) {
             // Already an component color model - nothing to do.
             return this;
@@ -1064,29 +1064,74 @@ public class ImageWorker {
         // shortcut for index color model
         if (cm instanceof IndexColorModel) {
             final IndexColorModel icm = (IndexColorModel) cm;
+            final SampleModel sm=this.image.getSampleModel();
+            final int datatype =sm.getDataType();
             final boolean gray     = ColorUtilities.isGrayPalette(icm, checkTransparent);
             final boolean alpha    = icm.hasAlpha();
-            final int     numSourceBands = icm.getNumComponents();
             /*
-             * If the image is grayscale, retain only the first band.
+             * If the image is grayscale, retain only the needed bands.
              *
              */            
             final int     numDestinationBands = gray?(alpha?2:1):(alpha?4:3);
-            
-            final byte    data[][] = new byte[numDestinationBands][icm.getMapSize()];
-            icm.getReds  (data[0]);
-            if(numDestinationBands>=2)
-            	icm.getGreens(data[1]);
-            if(numDestinationBands>=3)
-            	icm.getBlues (data[2]);
-            if (numDestinationBands == 4) {
-                icm.getAlphas(data[3]);
-            }
-            final LookupTableJAI lut = new LookupTableJAI(data);
+            LookupTableJAI lut = null;
+
+            switch (datatype) {
+			case DataBuffer.TYPE_BYTE:
+				{
+		            final byte    data[][] = new byte[numDestinationBands][icm.getMapSize()];
+		            icm.getReds  (data[0]);
+		            if(numDestinationBands>=2)
+		            	// remember to optimize for grayscale images
+		            	if(!gray)
+		            		icm.getGreens(data[1]);
+		            	else
+		            		icm.getAlphas(data[1]);
+		            if(numDestinationBands>=3)
+		            	icm.getBlues (data[2]);
+		            if (numDestinationBands == 4) {
+		                icm.getAlphas(data[3]);
+		            }		
+		            lut = new LookupTableJAI(data);
+
+				}
+				break;
+				
+			case DataBuffer.TYPE_USHORT:
+			{
+				final int mapSize=icm.getMapSize();
+				final short    data[][] = new short[numDestinationBands][mapSize];
+				for(int i=0;i<mapSize;i++)
+				{
+					data[0][i]=(short) icm.getRed(i);
+					if(numDestinationBands>=2)
+		            	// remember to optimize for grayscale images
+		            	if(!gray)
+		            		data[1][i]=(short)icm.getGreen(i);
+		            	else
+		            		data[1][i]=(short)icm.getAlpha(i);
+		            if(numDestinationBands>=3)
+		            	data[2][i]=(short)icm.getBlue(i);
+		            if (numDestinationBands == 4) {
+		            	data[3][i]=(short)icm.getAlpha(i);
+		            }
+				}
+				lut = new LookupTableJAI(data,datatype==DataBuffer.TYPE_USHORT);	
+	            
+	            				
+			}			
+			default:
+				throw new IllegalArgumentException(
+								Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,"datatype", datatype));
+			}
+
+            //did we initialized the LUT?
+            if(lut==null)
+            	throw new IllegalStateException(
+						Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"lut"));
             /*
              * Get the default hints, which usually contains only informations
              * about tiling. If the user overrode the rendering hints with an
-             * explict color model, keep the user's choice.
+             * explicit color model, keep the user's choice.
              */
             final RenderingHints hints = (RenderingHints) getRenderingHints();
             final ImageLayout layout;
@@ -1099,12 +1144,18 @@ public class ImageWorker {
             	layout= new ImageLayout(image);
             	hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT,layout));
             }
+            
+            int[] bits= new int[numDestinationBands];
+            //bits per component
+            for(int i=0;i<numDestinationBands;i++)
+            	bits[i]=sm.getSampleSize(i);            
             final ComponentColorModel destinationColorModel=new ComponentColorModel(
             		numDestinationBands>=3?ColorSpace.getInstance(ColorSpace.CS_sRGB):ColorSpace.getInstance(ColorSpace.CS_GRAY),
+            				bits,
                     		alpha,
                     		cm.isAlphaPremultiplied(),
                     		cm.getTransparency(),
-                    		cm.getTransferType());
+                    		datatype);
             final SampleModel destinationSampleModel=destinationColorModel.createCompatibleSampleModel(image.getWidth(), image.getHeight());
             layout.setColorModel(destinationColorModel);
             layout.setSampleModel(destinationSampleModel);

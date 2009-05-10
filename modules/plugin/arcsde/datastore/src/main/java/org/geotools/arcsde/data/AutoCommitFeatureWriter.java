@@ -34,20 +34,18 @@ import org.opengis.filter.Filter;
  * A FeatureWriter for auto commit mode.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: AutoCommitFeatureWriter.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: AutoCommitFeatureWriter.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/AutoCommitFeatureWriter.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/AutoCommitFeatureWriter.java $
  */
 class AutoCommitFeatureWriter extends ArcSdeFeatureWriter {
 
-    public AutoCommitFeatureWriter(final FIDReader fidReader,
-                                   final SimpleFeatureType featureType,
-                                   final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
-                                   final ISession session,
-                                   final FeatureListenerManager listenerManager,
-                                   final ArcSdeVersionHandler versionHandler) throws NoSuchElementException,
-                                                                             IOException {
+    public AutoCommitFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
+            final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
+            final ISession session, final FeatureListenerManager listenerManager,
+            final ArcSdeVersionHandler versionHandler) throws NoSuchElementException, IOException {
 
         super(fidReader, featureType, filteredContent, session, listenerManager, versionHandler);
     }

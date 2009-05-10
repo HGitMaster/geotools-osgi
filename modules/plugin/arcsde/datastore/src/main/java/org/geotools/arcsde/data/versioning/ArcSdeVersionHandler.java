@@ -24,10 +24,11 @@ import com.esri.sde.sdk.client.SeStreamOp;
 
 /**
  * @author Gabriel Roldan (TOPP)
- * @version $Id: ArcSdeVersionHandler.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: ArcSdeVersionHandler.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5.x
  * @source $URL:
- *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/versioning/ArcSdeVersionHandler.java $
+ *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/geotools
+ *         /arcsde/data/versioning/ArcSdeVersionHandler.java $
  */
 public interface ArcSdeVersionHandler {
 

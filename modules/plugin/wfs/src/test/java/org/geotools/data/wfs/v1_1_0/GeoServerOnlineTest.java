@@ -16,7 +16,11 @@
  *    Lesser General Public License for more details.
  */
 package org.geotools.data.wfs.v1_1_0;
+
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.GEOS_STATES;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -26,6 +30,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -46,6 +51,7 @@ public class GeoServerOnlineTest extends AbstractWfsDataStoreOnlineTest {
                 .singleton(ff.featureId("states.1"))));
     }
 
+    @Test
     public void testFeatureSourceGetFeaturesFilter() throws IOException {
         if (Boolean.FALSE.equals(serviceAvailable)) {
             return;

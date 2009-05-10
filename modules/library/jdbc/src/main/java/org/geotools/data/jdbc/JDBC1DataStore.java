@@ -143,7 +143,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Chris Holmes, TOPP
  * @author Andrea Aime
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBC1DataStore.java $
- * @version $Id: JDBC1DataStore.java 31660 2008-10-14 14:08:55Z jgarnett $
+ * @version $Id: JDBC1DataStore.java 31941 2008-12-02 10:57:52Z aaime $
  */
 public abstract class JDBC1DataStore implements DataStore {
 
@@ -1314,7 +1314,7 @@ public abstract class JDBC1DataStore implements DataStore {
 				atb.setBinding(type);
 				atb.setMinOccurs(min);
 				atb.setMaxOccurs(1);
-				atb.setLength( rs.getInt( LENGTH ) );
+//				atb.setLength( rs.getInt( LENGTH ) );
 //				atb.setNillable(nillable);
 				return atb.buildDescriptor(columnName);
 			}

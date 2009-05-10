@@ -71,7 +71,7 @@ public class WFSParsingTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        configuration = new WFSConfiguration();
+        configuration = new org.geotools.wfs.v1_1.WFSConfiguration();
     }
 
     public void testParseGetCapabilities() throws Exception {
@@ -271,9 +271,10 @@ public class WFSParsingTest extends TestCase {
             SimpleFeature f = features.next();
 
             assertEquals("PrimitiveGeoFeature.f001", f.getID());
-            assertNotNull(f.getDefaultGeometry());
+            assertNull(f.getDefaultGeometry());
 
-            Point p = (Point) f.getDefaultGeometry();
+            assertNotNull(f.getAttribute("pointProperty"));
+            Point p = (Point) f.getAttribute("pointProperty");
 
             assertEquals(39.73245, p.getX(), 0.1);
             assertEquals(2.00342, p.getY(), 0.1);

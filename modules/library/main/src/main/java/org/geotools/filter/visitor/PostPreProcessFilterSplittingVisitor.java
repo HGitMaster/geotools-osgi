@@ -118,7 +118,7 @@ import org.opengis.filter.spatial.Within;
  * @author dzwiers
  * @author commented and ported from gt to ogc filters by saul.farber
  * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/visitor/PostPreProcessFilterSplittingVisitor.java $
- * 
+ * @deprecated use {@link CapabilitiesFilterSplitter} instead for geoapi FilterCapabilities
  */
 public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, ExpressionVisitor {
 		private static final Logger logger=org.geotools.util.logging.Logging.getLogger("org.geotools.filter");

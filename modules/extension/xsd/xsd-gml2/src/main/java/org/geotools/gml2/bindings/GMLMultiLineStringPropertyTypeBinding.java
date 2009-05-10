@@ -16,15 +16,17 @@
  */
 package org.geotools.gml2.bindings;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
 import com.vividsolutions.jts.geom.MultiLineString;
-
 
 /**
  * Binding object for the type http://www.opengis.net/gml:MultiLineStringPropertyType.
@@ -69,16 +71,6 @@ public class GMLMultiLineStringPropertyTypeBinding extends AbstractComplexBindin
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
         return MultiLineString.class;
     }
@@ -91,6 +83,17 @@ public class GMLMultiLineStringPropertyTypeBinding extends AbstractComplexBindin
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return (MultiLineString) value;
+        return node.getChildValue(MultiLineString.class);
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        return GML2EncodingUtils.GeometryPropertyType_getProperty((MultiLineString)object,name,false);
+    }
+    
+    @Override
+    public List getProperties(Object object, XSDElementDeclaration element)
+            throws Exception {
+        return GML2EncodingUtils.GeometryPropertyType_getProperties((MultiLineString)object);
     }
 }

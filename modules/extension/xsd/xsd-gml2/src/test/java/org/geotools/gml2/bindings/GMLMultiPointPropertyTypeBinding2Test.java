@@ -29,7 +29,7 @@ public class GMLMultiPointPropertyTypeBinding2Test extends GMLTestSupport {
     }
 
     public void testExecutionMode() {
-        assertEquals(Binding.AFTER, binding(GML.MultiPointPropertyType).getExecutionMode());
+        assertEquals(Binding.OVERRIDE, binding(GML.MultiPointPropertyType).getExecutionMode());
     }
 
     public void testParse() throws Exception {
@@ -41,8 +41,8 @@ public class GMLMultiPointPropertyTypeBinding2Test extends GMLTestSupport {
 
     public void testEncode() throws Exception {
         Document doc = encode(GML2MockData.multiPoint(), GML.multiPointProperty);
-
         assertEquals(1,
             doc.getElementsByTagNameNS(GML.NAMESPACE, GML.MultiPoint.getLocalPart()).getLength());
+        assertEquals(2, doc.getElementsByTagNameNS(GML.NAMESPACE, GML.Point.getLocalPart()).getLength());
     }
 }

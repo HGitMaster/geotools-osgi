@@ -58,12 +58,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author jgarnett, Refractions Research, Inc.
  * @author aaime
  * @author $Author: jive $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemIterator.java $
- * @version $Id: ForceCoordinateSystemIterator.java 31101 2008-07-29 14:23:19Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemIterator.java $
+ * @version $Id: ForceCoordinateSystemIterator.java 32123 2008-12-30 16:53:44Z aaime $
  */
 public class ForceCoordinateSystemIterator implements Iterator<SimpleFeature> {
     protected FeatureIterator<SimpleFeature> reader;
-    protected SimpleFeatureType schema;
+    protected SimpleFeatureBuilder builder;
 
     /**
      * Shortcut constructor that can be used if the new schema has already been computed
@@ -72,7 +72,7 @@ public class ForceCoordinateSystemIterator implements Iterator<SimpleFeature> {
      */
     ForceCoordinateSystemIterator(FeatureIterator<SimpleFeature> reader, SimpleFeatureType schema) {
         this.reader = reader;
-        this.schema = schema;
+        this.builder = new SimpleFeatureBuilder(schema);
     }
 
     /**
@@ -94,10 +94,9 @@ public class ForceCoordinateSystemIterator implements Iterator<SimpleFeature> {
                                                    .getCoordinateReferenceSystem();
 
         if (!cs.equals(originalCs)) {
-            schema = FeatureTypes.transform(type, cs);
-        } else {
-            schema = type;
-        }
+            type = FeatureTypes.transform(type, cs);
+        } 
+        builder = new SimpleFeatureBuilder(type);
 
         this.reader = reader;
     }
@@ -106,10 +105,10 @@ public class ForceCoordinateSystemIterator implements Iterator<SimpleFeature> {
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public SimpleFeatureType getFeatureType() {
-        if (reader == null || schema == null ) {
+        if (reader == null || builder == null ) {
             throw new IllegalStateException("Reader has already been closed");
         }        
-        return schema;
+        return builder.getFeatureType();
     }
 
     /**
@@ -122,13 +121,12 @@ public class ForceCoordinateSystemIterator implements Iterator<SimpleFeature> {
         }
 
         SimpleFeature next = reader.next();
-        if( schema==null )
+        if( builder == null )
             return next;
         
         try {
-            return SimpleFeatureBuilder.retype(next, schema);
-        }
-        catch( IllegalAttributeException eep){
+            return SimpleFeatureBuilder.retype(next, builder);
+        } catch( IllegalAttributeException eep){
             throw (IllegalStateException) new IllegalStateException(eep.getMessage()).initCause(eep );
         }
     }
@@ -156,6 +154,6 @@ public class ForceCoordinateSystemIterator implements Iterator<SimpleFeature> {
         }
         reader.close();
         reader = null;
-        schema = null;
+        builder = null;
     }
 }

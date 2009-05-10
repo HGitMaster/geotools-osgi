@@ -36,6 +36,7 @@ import org.geotools.arcsde.data.ArcSDEAdapter;
 import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.filter.FilterCapabilities;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.ExcludeFilter;
@@ -62,12 +63,12 @@ import org.opengis.filter.identity.Identifier;
  * @author Gabriel Roldan
  * @see org.geotools.data.sde.GeometryEncoderSDE
  * @source $URL:
- *         http://gtsvn.refractions.net/geotools/branches/2.4.x/modules/unsupported/arcsde/datastore/src/main/java/org/geotools/arcsde/filter/FilterToSQLSDE.java $
+ *         http://gtsvn.refractions.net/geotools/branches/2.4.x/modules/unsupported/arcsde/datastore
+ *         /src/main/java/org/geotools/arcsde/filter/FilterToSQLSDE.java $
  */
 public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
     /** Standard java logger */
-    private static Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger("org.geotools.filter");
+    private static Logger LOGGER = Logging.getLogger(FilterToSQLSDE.class.getName());
 
     private final String layerQualifiedName;
 
@@ -82,15 +83,15 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
     private Map attributeNames = Collections.EMPTY_MAP;
 
     /**
-     * @param layerQName full qualified name of the ArcSDE layer
-     * @param layerFidColName name of the column that holds fids
+     * @param layerQName
+     *            full qualified name of the ArcSDE layer
+     * @param layerFidColName
+     *            name of the column that holds fids
      * @param ft
      * @param definitionQuery
      */
-    public FilterToSQLSDE(String layerQName,
-                          String layerFidColName,
-                          SimpleFeatureType ft,
-                          PlainSelect definitionQuery) {
+    public FilterToSQLSDE(String layerQName, String layerFidColName, SimpleFeatureType ft,
+            PlainSelect definitionQuery) {
         this.layerQualifiedName = layerQName;
         this.layerFidFieldName = layerFidColName;
         this.featureType = ft;
@@ -184,9 +185,12 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
     /**
      * overriden just to avoid the "WHERE" keyword
      * 
-     * @param out DOCUMENT ME!
-     * @param filter DOCUMENT ME!
-     * @throws GeoAPIFilterToSQLEncoderException DOCUMENT ME!
+     * @param out
+     *            DOCUMENT ME!
+     * @param filter
+     *            DOCUMENT ME!
+     * @throws GeoAPIFilterToSQLEncoderException
+     *             DOCUMENT ME!
      */
     @Override
     public void encode(Filter filter) throws FilterToSQLException {
@@ -201,8 +205,10 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * This only exists the fulfill the interface - unless There is a way of determining the FID
      * column in the database...
      * 
-     * @param filter the Fid Filter.
-     * @throws RuntimeException DOCUMENT ME!
+     * @param filter
+     *            the Fid Filter.
+     * @throws RuntimeException
+     *             DOCUMENT ME!
      */
     @Override
     public Object visit(final Id filter, final Object unused) {
@@ -258,8 +264,10 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * in process sql query, the attribute name encoded will be the actual one, not the alias (if
      * any) used in the sql query.
      * 
-     * @param expression the attribute to turn to SQL.
-     * @throws RuntimeException for io exception with writer
+     * @param expression
+     *            the attribute to turn to SQL.
+     * @throws RuntimeException
+     *             for io exception with writer
      */
     @Override
     public Object visit(PropertyName expression, Object extraData) throws RuntimeException {
@@ -292,7 +300,8 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
     /**
      * @see {@link FilterVisitor#visit(ExcludeFilter, Object)} Writes the SQL for the IncludeFilter
      *      by writing "FALSE".
-     * @param the filter to be visited
+     * @param the
+     *            filter to be visited
      */
     @Override
     public Object visit(ExcludeFilter filter, Object extraData) {
@@ -307,7 +316,8 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
     /**
      * @see {@link FilterVisitor#visit(IncludeFilter, Object)} Writes the SQL for the IncludeFilter
      *      by writing "TRUE".
-     * @param the filter to be visited
+     * @param the
+     *            filter to be visited
      */
     @Override
     public Object visit(IncludeFilter filter, Object extraData) {

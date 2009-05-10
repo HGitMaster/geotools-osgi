@@ -26,9 +26,9 @@ import java.util.Map;
  * Configuration object for the mapping of a community schema attribute.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AttributeMapping.java 31784 2008-11-06 06:20:21Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/AttributeMapping.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: AttributeMapping.java 32633 2009-03-16 01:44:12Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AttributeMapping.java $
  * @since 2.4
  */
 public class AttributeMapping implements Serializable {
@@ -38,7 +38,11 @@ public class AttributeMapping implements Serializable {
      * XPath expression addressing the target attribute in a target FeatureType.
      */
     private String targetAttributePath;
-
+    /**
+     * XPath expression addressing the input attribute in the input FeatureType if the source
+     * is a data access containing complex features.
+     */
+    private String inputAttributePath;
     /**
      * Expression whose evaluation result against a Feature of the source FeatureType is going to be
      * the value of the target attribute in output FeatureType.
@@ -48,6 +52,16 @@ public class AttributeMapping implements Serializable {
      * </p>
      */
     private String sourceExpression;
+
+    /**
+     * Name of the linked element type of which this attribute is nesting/targeting.
+     */
+    private String linkElement;
+
+    /**
+     * XPath expression addressing the target attribute in the linked target feature type.
+     */
+    private String linkField;
 
     /**
      * Expression whose evaluation result against a Feature of the source FeatureType is going to be
@@ -111,6 +125,60 @@ public class AttributeMapping implements Serializable {
     public void setSourceExpression(String sourceExpression) {
         this.sourceExpression = sourceExpression;
     }
+    
+    /**
+     * Return the input XPath expression
+     * @return the input XPath expression
+     */
+    public String getInputAttributePath() {
+        return inputAttributePath;
+    }
+    
+    /**
+     * Set the input XPath expression where we are getting the features from a data access
+     * instead of a data store. 
+     * @param inputAttributePath
+     */
+    public void setInputAttributePath(String inputAttributePath) {
+        this.inputAttributePath = inputAttributePath;
+    }
+
+    /**
+     * Returns the name of the linked element type of which this attribute is nesting/targeting.
+     * 
+     * @return the link element name
+     */
+    public String getLinkElement() {
+        return linkElement;
+    }
+
+    /**
+     * Sets the name of the linked element type of which this attribute is nesting/targeting.
+     * 
+     * @param linkElement
+     */
+    public void setLinkElement(String linkElement) {
+        this.linkElement = linkElement;
+    }
+
+    /**
+     * Returns the XPath expression addressing the target attribute in the linked target feature
+     * type
+     * 
+     * @return the linked field
+     */
+    public String getLinkField() {
+        return linkField;
+    }
+
+    /**
+     * Sets the XPath expression addressing the target attribute in the linked target feature type
+     * 
+     * @param linkField
+     */
+    public void setLinkField(String linkField) {
+        this.linkField = linkField;
+    }
 
     /**
      * Returns the XPath expression addressing the target attribute in a target FeatureType.
@@ -138,7 +206,7 @@ public class AttributeMapping implements Serializable {
      * <p>
      * For example, the target FeatureType may define a property as GeometryAttributeType, but the
      * actual instance should be PointPropertyType. In which case, it should be set to
-     * "gml:PointPropertyType" so ComplexDataStore knows it should create a point property an thus
+     * "gml:PointPropertyType" so AppSchemaDataAccess knows it should create a point property an thus
      * its subelements are to be addressable by subsequent mappings.
      * </p>
      * 
@@ -202,13 +270,16 @@ public class AttributeMapping implements Serializable {
         return "AttributeMappingDTO[id > "
                 + identifierExpression
                 + ", "
-                + sourceExpression
+                + ((sourceExpression == null) ? ((inputAttributePath == null ? ""
+                        : inputAttributePath)) : sourceExpression)
                 + " -> "
                 + targetAttributePath
                 + ", isMultiple: "
                 + isMultiple
                 + ((targetAttributeSchemaElement == null) ? ""
-                        : (", target node: " + targetAttributeSchemaElement)) + "]";
+                        : (", target node: " + targetAttributeSchemaElement))
+                + ((linkElement == null) ? "" : (", linkElement: " + linkElement))
+                + ((linkField == null) ? "" : (", linkField: " + linkField)) + "]";
     }
 
     public Map getClientProperties() {

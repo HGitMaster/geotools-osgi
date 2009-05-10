@@ -16,12 +16,17 @@
  */
 package org.geotools.gml2;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.eclipse.xsd.XSDSchema;
 import org.geotools.xlink.XLINK;
 import org.geotools.xml.XSD;
+import org.opengis.feature.type.Schema;
 
 
 /**
@@ -31,10 +36,6 @@ import org.geotools.xml.XSD;
  * @generated
  */
 public final class GML extends XSD {
-    /**
-     * singleton instance.
-     */
-    private static GML instance = new GML();
 
     /** @generated*/
     public static final String NAMESPACE = "http://www.opengis.net/gml";
@@ -564,12 +565,35 @@ public final class GML extends XSD {
     }
 
     /**
+     * singleton instance.
+     */
+    private static GML instance = new GML();
+
+    /**
      * The singleton instance;
      */
     public static GML getInstance() {
         return instance;
     }
 
+    @Override
+    protected Schema buildTypeSchema() {
+        return new GMLSchema();
+    }
+    
+    @Override
+    protected Schema buildTypeMappingProfile(Schema typeSchema) {
+        Set profile = new LinkedHashSet();
+        profile.add(name(GML.PointPropertyType));
+        profile.add(name(GML.MultiPointPropertyType));
+        profile.add(name(GML.LineStringPropertyType));
+        profile.add(name(GML.MultiLineStringPropertyType));
+        profile.add(name(GML.PolygonPropertyType));
+        profile.add(name(GML.MultiPolygonPropertyType));
+        profile.add(name(GML.GeometryPropertyType));
+        return typeSchema.profile( profile );
+    }
+    
     protected void addDependencies(Set dependencies) {
         //add xlink dependency
         dependencies.add(XLINK.getInstance());

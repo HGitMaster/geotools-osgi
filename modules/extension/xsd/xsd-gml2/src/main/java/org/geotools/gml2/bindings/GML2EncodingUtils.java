@@ -16,15 +16,49 @@
  */
 package org.geotools.gml2.bindings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.xsd.XSDComplexTypeDefinition;
+import org.eclipse.xsd.XSDCompositor;
+import org.eclipse.xsd.XSDDerivationMethod;
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDFactory;
+import org.eclipse.xsd.XSDModelGroup;
+import org.eclipse.xsd.XSDParticle;
+import org.eclipse.xsd.XSDTypeDefinition;
+import org.eclipse.xsd.util.XSDConstants;
+import org.geotools.feature.NameImpl;
 import org.geotools.gml2.GML;
+import org.geotools.gml2.GMLConfiguration;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.util.logging.Logging;
+import org.geotools.xlink.XLINK;
+import org.geotools.xml.Configuration;
+import org.geotools.xml.Encoder;
+import org.geotools.xml.SchemaIndex;
+import org.geotools.xml.Schemas;
+import org.geotools.xs.XS;
+import org.opengis.feature.ComplexAttribute;
+import org.opengis.feature.Feature;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -36,15 +70,26 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
  * Utility methods used by gml2 bindigns when encodding.
  *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
- *
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  */
 public class GML2EncodingUtils {
+    
+    /** logging instance */
+    static Logger LOGGER = Logging.getLogger( "org.geotools.gml");
+    
     static final int LON_LAT = 0;
     static final int LAT_LON = 1;
     static final int INAPPLICABLE = 2;
@@ -76,16 +121,23 @@ public class GML2EncodingUtils {
 
     /**
      * Encodes the crs object as a uri.
+     */
+    public static String toURI(CoordinateReferenceSystem crs) {
+        return toURI(crs,false);
+    }
+    
+    /**
+     * Encodes the crs object as a uri.
      * <p>
      * The axis order of the crs determines which form of uri is used.
      * </p>
      */
-    public static String toURI(CoordinateReferenceSystem crs) {
+    public static String toURI(CoordinateReferenceSystem crs, boolean forceOldStyle) {
         String code = epsgCode(crs);
         int axisOrder = axisOrder(crs);
 
         if (code != null) {
-            if ((axisOrder == LON_LAT) || (axisOrder == INAPPLICABLE)) {
+            if (forceOldStyle ||( (axisOrder == LON_LAT) || (axisOrder == INAPPLICABLE)) ) {
                 return "http://www.opengis.net/gml/srs/epsg.xml#" + code;
             } else {
                 //return "urn:x-ogc:def:crs:EPSG:6.11.2:" + code;
@@ -212,52 +264,303 @@ public class GML2EncodingUtils {
     }
     
     public static Element AbstractFeatureType_encode(Object object, Document document, Element value) {
-        SimpleFeature feature = (SimpleFeature) object;
-        SimpleFeatureType featureType = feature.getFeatureType();
+        Feature feature = (Feature) object;
+        FeatureType featureType = feature.getType();
 
         String namespace = featureType.getName().getNamespaceURI();
-        String typeName = featureType.getTypeName();
+        String typeName = featureType.getName().getLocalPart();
 
         Element encoding = document.createElementNS(namespace, typeName);
-        encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getID());
+        encoding.setAttributeNS(null, "fid", feature.getIdentifier().getID());
 
         return encoding;
     }
 
+    static Set<QName> abstractFeatureTypeProperties = new HashSet<QName>();
+    static {
+        abstractFeatureTypeProperties.add( GML.name );
+        abstractFeatureTypeProperties.add( GML.description );
+        abstractFeatureTypeProperties.add( GML.location );
+       
+    }
+    
     public static Object AbstractFeatureType_getProperty(Object object,
-            QName name) {
-      //JD: here we only handle the "GML" attributes, all the application 
-        // schema attributes are handled by FeaturePropertyExtractor
+            QName name, Configuration configuration) {
+      
+        Feature feature = (Feature) object;
 
-        //JD: TODO: handle all properties here and kill FeautrePropertyExtractor
-        SimpleFeature feature = (SimpleFeature) object;
-
-        if (GML.name.equals(name)) {
-            return feature.getAttribute("name");
+        if (abstractFeatureTypeProperties.contains(name)) {
+            Property property = feature.getProperty(new NameImpl(name.getNamespaceURI(), name
+                    .getLocalPart()));
+            if (property == null) {
+                return null;
+            } else {
+                return property.getValue();
+            }
         }
-
-        if (GML.description.equals(name)) {
-            return feature.getAttribute("description");
-        }
-
-        if (GML.location.equals(name)) {
-            return feature.getAttribute("location");
-        }
-
+      
         if (GML.boundedBy.equals(name)) {
-            BoundingBox bounds = feature.getBounds();
+            //check for flag not to include bounds
+            if ( !configuration.hasProperty( GMLConfiguration.NO_FEATURE_BOUNDS ) ) {
+                BoundingBox bounds = feature.getBounds();
+        
+                if (bounds.isEmpty()) {
+                    //do a check for the case where the feature has no geometry 
+                    // properties
+                    if (feature.getDefaultGeometryProperty() == null
+                            || feature.getDefaultGeometryProperty().getValue() == null) {
+                        return null;
+                    }
+                }
+        
+                return bounds;
+            }
+        }
+        
+        return null;
+    }
+    
+    public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex) {
+        return AbstractFeatureType_getProperties(object, element, schemaIndex, new HashSet<String>(Arrays.asList("name","description","boundedBy")));
+    }
+    
+    public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex, Set<String> toFilter) {
+        Feature feature = (Feature) object;
+        
+        //check if this was a resolved feature, if so dont return anything
+        // TODO: this is just a hack for our lame xlink implementation
+        if (feature.getUserData().get("xlink:id") != null) {
+            return Collections.EMPTY_LIST;
+        }
 
-            if (bounds.isEmpty()) {
-                //do a check for the case where the feature has no geometry 
-                // properties
-                if (feature.getDefaultGeometry() == null) {
+        FeatureType featureType = feature.getType();
+
+        String namespace = featureType.getName().getNamespaceURI();
+
+        if (namespace == null) {
+            namespace = element.getTargetNamespace();
+        }
+
+        String typeName = featureType.getName().getLocalPart();
+        QName qualifiedTypeName = new QName(namespace, typeName);
+
+        //find the type in the schema
+        XSDTypeDefinition type = schemaIndex.getTypeDefinition(qualifiedTypeName);
+
+        if (type == null) {
+            //type not found, do a check for an element, and use its type
+            XSDElementDeclaration e = schemaIndex.getElementDeclaration(qualifiedTypeName);
+
+            if (e != null) {
+                type = e.getTypeDefinition();
+            }
+        }
+
+        if (type == null) {
+            if (featureType instanceof SimpleFeatureType) {
+                // could not find the feature type in the schema, create a mock one
+                LOGGER.warning("Could find type for " + typeName
+                        + " in the schema, generating type from feature.");
+                type = createXmlTypeFromFeatureType((SimpleFeatureType) featureType, schemaIndex,
+                        toFilter);
+            } else {
+                // we expect better from non-simple feature types, and so require defined types
+                throw new RuntimeException("Could not find type for " + qualifiedTypeName
+                        + " in schema");
+            }
+        }
+
+        List particles = Schemas.getChildElementParticles(type, true);
+        List properties = new ArrayList();
+
+    O:  for (Iterator p = particles.iterator(); p.hasNext();) {
+            XSDParticle particle = (XSDParticle) p.next();
+            XSDElementDeclaration attribute = (XSDElementDeclaration) particle.getContent();
+
+            if (attribute.isElementDeclarationReference()) {
+                attribute = attribute.getResolvedElementDeclaration();
+            }
+
+            //ignore abstract featureType properties
+            if (GML.NAMESPACE.equals(attribute.getTargetNamespace())) {
+                for ( QName n : abstractFeatureTypeProperties ) {
+                    if ( n.getLocalPart().equals( attribute.getName() )) {
+                        continue O;
+                    }
+                }
+                
+            }
+            
+            Object attributeValue;
+            if (featureType instanceof SimpleFeatureType) {
+                // simple feature brain damage: discard namespace
+                // make sure the feature type has an element
+                if (((SimpleFeatureType) featureType).getDescriptor(attribute.getName()) == null) {
+                    continue;
+                }
+                // get the value
+                attributeValue = ((SimpleFeature) feature).getAttribute(attribute.getName());
+            } else {
+                // namespaces matter for non-simple feature types
+                Name propertyName = new NameImpl(attribute.getTargetNamespace(), attribute
+                        .getName());
+                // make sure the feature type has an element
+                if (featureType.getDescriptor(propertyName) == null) {
+                    continue;
+                }
+                // get the value
+                Property property = feature.getProperty(propertyName);
+                if (property == null) {
+                    attributeValue = null;
+                } else if (property instanceof ComplexAttribute) {
+                    // do not unpack complex attributes as these may have their own bindings, which
+                    // will be applied by the encoder
+                    attributeValue = property;
+                } else {
+                    // non-complex bindings are unpacked as for simple feature case
+                    attributeValue = property.getValue();
+                }
+            }
+            properties.add(new Object[] { particle, attributeValue });
+        }
+
+        return properties;
+    }
+    
+    public static XSDTypeDefinition createXmlTypeFromFeatureType(SimpleFeatureType featureType, SchemaIndex schemaIndex, Set<String> toFilter ) { 
+        XSDFactory f = XSDFactory.eINSTANCE;
+        Document dom;
+        try {
+            dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException( e );
+        }
+        
+        XSDComplexTypeDefinition type = f.createXSDComplexTypeDefinition();
+        type.setTargetNamespace( featureType.getName().getNamespaceURI() );
+        type.setName( featureType.getTypeName() + "Type" );
+        type.setDerivationMethod(XSDDerivationMethod.EXTENSION_LITERAL);
+        type.setBaseTypeDefinition(schemaIndex.getTypeDefinition( GML.AbstractFeatureType ) );
+                
+        XSDModelGroup group = f.createXSDModelGroup();
+        group.setCompositor(XSDCompositor.SEQUENCE_LITERAL);
+
+        List attributes = featureType.getAttributeDescriptors();
+        for (int i = 0; i < attributes.size(); i++) {
+            AttributeDescriptor attribute = (AttributeDescriptor) attributes.get(i);
+
+            if ( toFilter.contains( attribute.getLocalName() ) ) {
+                continue;
+            }
+           
+            XSDElementDeclaration element = f.createXSDElementDeclaration();
+            element.setName(attribute.getLocalName());
+            element.setNillable(attribute.isNillable());
+
+            //check for geometry
+            if ( attribute instanceof GeometryDescriptor ) {
+                Class binding = attribute.getType().getBinding();
+                if ( Point.class.isAssignableFrom( binding ) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.PointPropertyType));
+                }
+                else if ( LineString.class.isAssignableFrom( binding ) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.LineStringPropertyType));
+                }
+                else if ( Polygon.class.isAssignableFrom( binding) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.PolygonPropertyType));
+                }
+                else if ( MultiPoint.class.isAssignableFrom( binding ) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.MultiPointPropertyType));
+                }
+                else if ( MultiLineString.class.isAssignableFrom( binding ) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.MultiLineStringPropertyType));
+                }
+                else if ( MultiPolygon.class.isAssignableFrom( binding) ) {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.MultiPolygonPropertyType));
+                }
+                else {
+                    element.setTypeDefinition( schemaIndex.getTypeDefinition(GML.GeometryPropertyType));
+                }
+            }
+            else {
+                //TODO: do a proper mapping
+                element.setTypeDefinition(schemaIndex.getTypeDefinition(XS.STRING));
+            }
+            
+
+            XSDParticle particle = f.createXSDParticle();
+            particle.setMinOccurs(attribute.getMinOccurs());
+            particle.setMaxOccurs(attribute.getMaxOccurs());
+            particle.setContent(element);
+            particle.setElement( dom.createElementNS( XSDConstants.SCHEMA_FOR_SCHEMA_URI_2001, "element" ) );
+            
+            group.getContents().add(particle);
+        }
+
+        XSDParticle particle = f.createXSDParticle();
+        particle.setContent(group);
+        particle.setElement( dom.createElementNS( XSDConstants.SCHEMA_FOR_SCHEMA_URI_2001, "sequence") );
+        type.setContent(particle);
+        return type;
+    }
+
+    public static Object GeometryPropertyType_getProperty(Geometry geometry,
+            QName name) {
+        return GeometryPropertyType_getProperty(geometry,name,true);
+    }
+    public static Object GeometryPropertyType_getProperty(Geometry geometry,
+            QName name, boolean includeAbstractGeometry ) {
+        if (GML.Point.equals( name ) || GML.LineString.equals( name ) || GML.Polygon.equals( name ) 
+            || GML.MultiPoint.equals( name ) || GML.MultiLineString.equals( name ) || GML.MultiPolygon.equals( name )
+            || (includeAbstractGeometry && GML._Geometry.equals(name) )) {
+                //if the geometry is null, return null
+                if ( isEmpty( geometry ) ) {
                     return null;
+                }
+                
+                return geometry;
+            }
+            
+            if (XLINK.HREF.equals(name)) {
+                //only process if geometry is empty
+                if ( isEmpty(geometry) ) {
+                    String id = getID( geometry );
+                    if ( id != null ) {
+                        return "#" + id;
+                    }
                 }
             }
 
-            return feature.getBounds();
-        }
+            return null;
+    }
 
+    public static List GeometryPropertyType_getProperties(Geometry geometry) {
+
+        String id = getID( geometry );
+        
+        if ( !isEmpty(geometry) && id != null ) {
+            // return a comment which is hte xlink href
+            return Collections.singletonList(new Object[] { Encoder.COMMENT, "#" +id });            
+        }
+        
         return null;
     }
+    
+    static boolean isEmpty( Geometry geometry ) {
+        if ( geometry.isEmpty() ) {
+            //check for case of multi geometry, if it has > 0 goemetries 
+            // we consider this to be not empty
+            if ( geometry instanceof GeometryCollection ) {
+                if ( ((GeometryCollection) geometry).getNumGeometries() != 0 ) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        return false;
+    }
+    
+    
+    
 }

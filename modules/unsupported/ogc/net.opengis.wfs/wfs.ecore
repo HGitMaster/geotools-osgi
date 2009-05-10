@@ -759,6 +759,7 @@
         <details key="documentation" value="&#xA;                     The traverseXlinkExpiry attribute value is specified in&#xA;                     minutes.  It indicates how long a Web Feature Service&#xA;                     should wait to receive a response to a nested GetGmlObject&#xA;                     request.&#xA;                     This attribute is only relevant if a value is specified&#xA;                     for the traverseXlinkDepth attribute."/>
       </eAnnotations>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="formatOptions" eType="#//Map"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="GetFeatureWithLockType" eSuperTypes="#//GetFeatureType">
     <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">
@@ -1108,7 +1109,7 @@
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="format" unique="false"
-        lowerBound="1" upperBound="-1" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/XMLType.ecore#//AnyURI"
+        lowerBound="1" upperBound="-1" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/XMLType.ecore#//String"
         volatile="true" transient="true" derived="true">
       <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">
         <details key="kind" value="element"/>
@@ -1583,4 +1584,5 @@
   <eClassifiers xsi:type="ecore:EDataType" name="Function" instanceClassName="org.opengis.filter.expression.Function"/>
   <eClassifiers xsi:type="ecore:EDataType" name="SortBy" instanceClassName="org.opengis.filter.sort.SortBy"/>
   <eClassifiers xsi:type="ecore:EDataType" name="TypeNameListType" instanceClassName="java.util.List"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="Map" instanceClassName="java.util.Map"/>
 </ecore:EPackage>

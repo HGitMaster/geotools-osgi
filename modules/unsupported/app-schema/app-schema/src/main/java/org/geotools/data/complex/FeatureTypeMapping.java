@@ -25,25 +25,25 @@ import java.util.List;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.filter.XPath.StepList;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.filter.expression.Expression;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
- * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: FeatureTypeMapping.java 31514 2008-09-15 08:36:50Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/FeatureTypeMapping.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: FeatureTypeMapping.java 32633 2009-03-16 01:44:12Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/FeatureTypeMapping.java $
  * @since 2.4
  */
 public class FeatureTypeMapping {
     /**
-     * 
+     * It's bad to leave this with no parameters type, but we should allow for both complex and
+     * simple feature source as we could now take in a data access instead of a data store as
+     * the source data store
      */
-    private FeatureSource<SimpleFeatureType, SimpleFeature> source;
+    private FeatureSource source;
 
     /**
      * Encapsulates the name and type of target Features
@@ -65,8 +65,8 @@ public class FeatureTypeMapping {
         this(null, null, new LinkedList<AttributeMapping>(), new NamespaceSupport());
     }
 
-    public FeatureTypeMapping(FeatureSource<SimpleFeatureType, SimpleFeature> source,
-            AttributeDescriptor target, List<AttributeMapping> mappings, NamespaceSupport namespaces) {
+    public FeatureTypeMapping(FeatureSource source, AttributeDescriptor target,
+            List<AttributeMapping> mappings, NamespaceSupport namespaces) {
         this.source = source;
         this.target = target;
         this.attributeMappings = new LinkedList<AttributeMapping>(mappings);
@@ -84,14 +84,35 @@ public class FeatureTypeMapping {
      * @param targetPath
      * @return
      */
-    public List/* <AttributeMapping> */getAttributeMappingsIgnoreIndex(final StepList targetPath) {
+    public List<AttributeMapping> getAttributeMappingsIgnoreIndex(final StepList targetPath) {
         AttributeMapping attMapping;
-        List mappings = Collections.EMPTY_LIST;
-        for (Iterator it = attributeMappings.iterator(); it.hasNext();) {
+        List<AttributeMapping> mappings = Collections.emptyList();
+        for (Iterator<AttributeMapping> it = attributeMappings.iterator(); it.hasNext();) {
             attMapping = (AttributeMapping) it.next();
             if (targetPath.equalsIgnoreIndex(attMapping.getTargetXPath())) {
                 if (mappings.size() == 0) {
-                    mappings = new ArrayList(2);
+                    mappings = new ArrayList<AttributeMapping>(2);
+                }
+                mappings.add(attMapping);
+            }
+        }
+        return mappings;
+    }
+
+    /**
+     * Finds the attribute mappings for the given source expression.
+     * 
+     * @param sourceExpression
+     * @return list of matching attribute mappings
+     */
+    public List<AttributeMapping> getAttributeMappingsByExpression(final Expression sourceExpression) {
+        AttributeMapping attMapping;
+        List<AttributeMapping> mappings = Collections.emptyList();
+        for (Iterator<AttributeMapping> it = attributeMappings.iterator(); it.hasNext();) {
+            attMapping = (AttributeMapping) it.next();
+            if (sourceExpression.equals(attMapping.getSourceExpression())) {
+                if (mappings.size() == 0) {
+                    mappings = new ArrayList<AttributeMapping>(2);
                 }
                 mappings.add(attMapping);
             }
@@ -109,7 +130,7 @@ public class FeatureTypeMapping {
      */
     public AttributeMapping getAttributeMapping(final StepList exactPath) {
         AttributeMapping attMapping;
-        for (Iterator it = attributeMappings.iterator(); it.hasNext();) {
+        for (Iterator<AttributeMapping> it = attributeMappings.iterator(); it.hasNext();) {
             attMapping = (AttributeMapping) it.next();
             if (exactPath.equals(attMapping.getTargetXPath())) {
                 return attMapping;
@@ -140,7 +161,7 @@ public class FeatureTypeMapping {
         return this.target;
     }
 
-    public FeatureSource<SimpleFeatureType, SimpleFeature> getSource() {
+    public FeatureSource getSource() {
         return this.source;
     }
 

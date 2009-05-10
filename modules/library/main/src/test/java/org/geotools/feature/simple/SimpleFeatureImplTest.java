@@ -19,6 +19,7 @@ package org.geotools.feature.simple;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
+import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -30,7 +31,7 @@ public class SimpleFeatureImplTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        schema = DataUtilities.createType("buildings", "_=the_geom:MultiPolygon,name:String,ADDRESS:String");
+        schema = DataUtilities.createType("buildings", "the_geom:MultiPolygon,name:String,ADDRESS:String");
         feature = SimpleFeatureBuilder.build(schema, new Object[] {null, "ABC", "Random Road, 12"}, "building.1");
     }
     
@@ -39,5 +40,23 @@ public class SimpleFeatureImplTest extends TestCase {
         assertEquals("ABC", feature.getProperty("name").getValue());
         assertNull(feature.getProperty("NOWHERE"));
         assertEquals(0, feature.getProperties("NOWHERE").size());
+    }
+    
+    
+    public void testGetPropertyNullValue(){
+        assertNotNull(feature.getProperty("the_geom"));
+        assertNull(feature.getProperty("the_geom").getValue());
+    }
+
+    public void testGeometryPropertyType(){
+        assertTrue("expected GeometryAttribute, got " + feature.getProperty("the_geom").getClass().getName(),
+                feature.getProperty("the_geom") instanceof GeometryAttribute);
+    }
+
+    public void testDefaultGeometryProperty(){
+        assertTrue("expected GeometryAttribute, got " + feature.getProperty("the_geom").getClass().getName(),
+                feature.getProperty("the_geom") instanceof GeometryAttribute);
+        assertNotNull(feature.getDefaultGeometryProperty());
+        assertNull(feature.getDefaultGeometryProperty().getValue());
     }
 }

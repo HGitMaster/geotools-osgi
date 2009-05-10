@@ -27,6 +27,12 @@ import java.util.logging.Logger;
 import org.opengis.feature.Feature;
 import org.opengis.filter.expression.Expression;
 
+/**
+ * The WellKnownMarkFactory is used to hold the knolwedge of how to draw
+ * all the marks hardboiled into the SLD specification (cross, arrow, triangle etc...)
+ * 
+ * @author James
+ */
 public class WellKnownMarkFactory implements MarkFactory {
 
     /** The logger for the rendering module. */

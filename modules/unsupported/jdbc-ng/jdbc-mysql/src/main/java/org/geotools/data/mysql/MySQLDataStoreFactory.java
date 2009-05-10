@@ -16,6 +16,11 @@
  */
 package org.geotools.data.mysql;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Map;
+
+import org.geotools.data.DataStore;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
@@ -46,5 +51,10 @@ public class MySQLDataStoreFactory extends JDBCDataStoreFactory {
 
     public String getDescription() {
         return "MySQL Database";
+    }
+
+    @Override
+    protected String getValidationQuery() {
+        return "select version()";
     }
 }

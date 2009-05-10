@@ -26,7 +26,7 @@ import org.opengis.filter.spatial.Contains;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class ContainsImpl extends GeometryFilterImpl implements Contains {
+public class ContainsImpl extends AbstractPreparedGeometryFilter implements Contains {
 
 	public ContainsImpl(org.opengis.filter.FilterFactory factory,Expression e1,Expression e2) {
 		super(factory,e1,e2);
@@ -38,9 +38,32 @@ public class ContainsImpl extends GeometryFilterImpl implements Contains {
 		if (feature instanceof SimpleFeature && !validate((SimpleFeature)feature))
 			return false;
 		
-		Geometry left = getLeftGeometry(feature);
-		Geometry right = getRightGeometry(feature);
-		
+		Geometry left;
+        Geometry right;
+
+        switch (literals) {
+        case BOTH:
+            return cacheValue;
+        case RIGHT: {
+        	// since it is left contains right there is no
+        	// benefit of having a prepared geometry for the right side
+            left = getLeftGeometry(feature);
+            right = rightPreppedGeom.getGeometry();
+            return basicEvaluate(left, right);
+        }
+        case LEFT: {
+            return leftPreppedGeom.contains(getRightGeometry(feature));
+        }
+        default: {
+            left = getLeftGeometry(feature);
+            right = getRightGeometry(feature);
+            return basicEvaluate(left, right);
+        }
+        }
+	}
+	
+	@Override
+	protected boolean basicEvaluate(Geometry left, Geometry right) {
 		Envelope envLeft = left.getEnvelopeInternal();
 		Envelope envRight = right.getEnvelopeInternal();
 		
@@ -49,7 +72,6 @@ public class ContainsImpl extends GeometryFilterImpl implements Contains {
         
         return false;
 	}
-	
 	public Object accept(FilterVisitor visitor, Object extraData) {
 		return visitor.visit(this,extraData);
 	}

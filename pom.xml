@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 31202 2008-08-21 09:06:17Z jgarnett $
+        Version: $Id: pom.xml 32573 2009-03-02 07:25:25Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -144,6 +144,16 @@
         </site>
       </distributionManagement>
     </profile>
+    <profile>
+      <id>deploy.opengeo</id>
+      <distributionManagement>
+        <repository>
+          <id>opengeo</id>
+          <name>OpenGeo Maven Repository</name>
+          <url>dav:http://repo.opengeo.org</url>
+        </repository>
+      </distributionManagement>
+    </profile>
   </profiles>
 
 
@@ -153,7 +163,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>geotools</artifactId>
   <packaging>pom</packaging>
-  <version>2.6.0.osgi1</version>
+  <version>2.6.0.osgi2</version>
   <name>Geotools</name>
   <url>http://maven.geotools.fr/reports/</url>
 
@@ -352,7 +362,7 @@
       <name>Jody Garnett</name>
       <id>jive</id>
       <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
+      <organization>LISAsoft</organization>
       <roles>
         <role>Java Developer</role>
         <role>Module Maintainer</role>
@@ -471,7 +481,6 @@
       <name>David Zwiers</name>
       <id>dmzwiers</id>
       <email>dzwiers@refractions.net</email>
-      <organization>Refractions Research Inc.</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -480,7 +489,6 @@
       <name>Brent Owens</name>
       <id>sploreg</id>
       <email>sploreg@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
       <roles>
         <role>Java Developer</role>
         <role>Module Maintainer</role>
@@ -536,7 +544,17 @@
       <dependency>
         <groupId>org.opengis</groupId>
         <artifactId>geoapi</artifactId>
-       	<version>2.2.0.osgi1</version>
+       	<version>2.3.0.osgi1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opengis</groupId>
+        <artifactId>geoapi-dummy-pending</artifactId>
+        <version>2.3.0.osgi1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opengis</groupId>
+        <artifactId>geoapi-pending</artifactId>
+        <version>2.3.0.osgi1</version>
       </dependency>
 
       <dependency>
@@ -684,6 +702,11 @@
         <version>1.1.1</version>
       </dependency>
       <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.12</version>  <!-- Same as the dependency in commons-logging -->
@@ -764,6 +787,13 @@
         <version>10.2.0</version>
       </dependency>
 
+      <!-- H2 -->
+      <dependency>
+        <artifactId>h2</artifactId>
+        <groupId>org.h2database</groupId>
+        <version>1.1.104</version>
+      </dependency>
+
       <!-- Grid data formats -->
       <dependency>
         <groupId>edu.ucar</groupId>
@@ -824,6 +854,13 @@
         <artifactId>mockrunner</artifactId>
         <version>0.3.6</version>
         <scope>test</scope>
+      </dependency>
+
+     <!-- ArcSDE -->
+      <dependency>
+        <groupId>com.ibm.icu</groupId>
+        <artifactId>icu4j</artifactId>
+        <version>3.4.4</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -915,6 +952,11 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
           <version>1.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>1.4.3</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1168,9 +1210,9 @@
   <distributionManagement>
     <repository>
       <uniqueVersion>false</uniqueVersion>
-      <id>refractions</id>
-      <name>Refractions Research - Maven 2 repo</name>
-      <url>dav:http://lists.refractions.net/m2</url>
+      <id>osgeo</id>
+      <name>Open Source Geospatial Foundation - Maven 2 repo</name>
+      <url>dav:http://download.osgeo.org/webdav/geotools/</url>
     </repository>
   </distributionManagement>
 
@@ -1188,10 +1230,16 @@
     </repository>
 
     <repository>
+      <id>osgeo</id>
+      <name>Open Source Geospatial Foundation Repository</name>
+      <url>http://download.osgeo.org/webdav/geotools/</url>
+    </repository>
+
+    <!--repository>
       <id>refractions</id>
       <name>Refractions Research Maven 2 Repository</name>
       <url>http://lists.refractions.net/m2</url>
-    </repository>
+    </repository-->
 
     <repository>
       <snapshots>
@@ -1216,7 +1264,6 @@
 
   </repositories>
 
-
   <!-- =========================================================== -->
   <!--     Plugin repositories.                                    -->
   <!--     This is where Maven looks for plugin dependencies.      -->
@@ -1234,6 +1281,17 @@
       </releases>
     </pluginRepository>
     <pluginRepository>
+      <id>osgeo</id>
+      <name>Open Source Geospatial Foundation Maven 2 Repository</name>
+      <url>http://download.osgeo.org/webdav/geotools/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository> 
+   <!--pluginRepository>
       <id>refractions</id>
       <name>Refractions Research Maven 2 Repository</name>
       <url>http://lists.refractions.net/m2</url>
@@ -1243,7 +1301,7 @@
       <releases>
         <enabled>true</enabled>
       </releases>
-    </pluginRepository>
+    </pluginRepository-->
   </pluginRepositories>
 
 
@@ -1257,4 +1315,3 @@
     <module>demo</module>
   </modules>
 </project>
-

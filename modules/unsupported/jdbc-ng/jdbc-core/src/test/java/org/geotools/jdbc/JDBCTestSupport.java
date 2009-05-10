@@ -25,11 +25,8 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
-import org.geotools.data.DataStoreFactorySpi;
-import org.geotools.feature.LenientFeatureFactoryImpl;
 import org.geotools.feature.NameImpl;
-import org.geotools.feature.type.FeatureTypeFactoryImpl;
-import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -37,7 +34,6 @@ import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
@@ -58,17 +54,16 @@ public abstract class JDBCTestSupport extends TestCase {
     static Map dataSourceAvailable = new HashMap();
     
     static {
-        //uncomment to turn up logging
+        // uncomment to turn up logging
                 
-        java.util.logging.ConsoleHandler handler = new java.util.logging.ConsoleHandler();
-        handler.setLevel(java.util.logging.Level.FINE);
-        
-        org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").setLevel(java.util.logging.Level.FINE);
-        org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").addHandler(handler);
-        
-        org.geotools.util.logging.Logging.getLogger("org.geotools.jdbc").setLevel(java.util.logging.Level.FINE);
-        org.geotools.util.logging.Logging.getLogger("org.geotools.jdbc").addHandler(handler);
-         
+//        java.util.logging.ConsoleHandler handler = new java.util.logging.ConsoleHandler();
+//        handler.setLevel(java.util.logging.Level.FINE);
+//        
+//        org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").setLevel(java.util.logging.Level.FINE);
+//        org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").addHandler(handler);
+//        
+//        org.geotools.util.logging.Logging.getLogger("org.geotools.jdbc").setLevel(java.util.logging.Level.FINE);
+//        org.geotools.util.logging.Logging.getLogger("org.geotools.jdbc").addHandler(handler);
     }
 
     protected JDBCTestSetup setup;
@@ -88,13 +83,20 @@ public abstract class JDBCTestSupport extends TestCase {
         if ( available == null || available.booleanValue() ) {
             //test the connection
             try {
-                DataSource dataSource = setup.createDataSource();
+                DataSource dataSource = setup.getDataSource();
                 Connection cx = dataSource.getConnection();
                 cx.close();
+                dataSourceAvailable.put( setup.getClass(), Boolean.TRUE );
             } catch (Throwable t) {
                 System.out.println("Skipping tests " + getClass().getName() + " since data souce is not available: " + t.getMessage());
                 dataSourceAvailable.put( setup.getClass(), Boolean.FALSE );
                 return;
+            } finally {
+                try {
+                    setup.tearDown();
+                } catch(Exception e) {
+                    System.out.println("Error occurred tearing down the test setup");
+                }
             }
             
             super.run(result);
@@ -122,7 +124,7 @@ public abstract class JDBCTestSupport extends TestCase {
         HashMap params = new HashMap();
         params.put( JDBCDataStoreFactory.NAMESPACE.key, "http://www.geotools.org/test" );
         params.put( JDBCDataStoreFactory.SCHEMA.key, "geotools" );
-        params.put( JDBCDataStoreFactory.DATASOURCE.key, setup.createDataSource() );
+        params.put( JDBCDataStoreFactory.DATASOURCE.key, setup.getDataSource() );
         
         JDBCDataStoreFactory factory = setup.createDataStoreFactory();
         dataStore = factory.createDataStore( params );
@@ -134,8 +136,8 @@ public abstract class JDBCTestSupport extends TestCase {
     protected abstract JDBCTestSetup createTestSetup();
 
     protected void tearDown() throws Exception {
-        dataStore.dispose();
         setup.tearDown();
+        dataStore.dispose();
         super.tearDown();
     }
     
@@ -218,5 +220,20 @@ public abstract class JDBCTestSupport extends TestCase {
     		
     	return crs1.equals(crs2); 
    	}
+
+	protected boolean areReferencedEnvelopesEuqal(ReferencedEnvelope e1, ReferencedEnvelope e2) {
+		
+		if (e1==null && e2 ==null) return true;
+		if (e1==null || e2 == null) return false;
+		
+		boolean equal = 
+			Math.round(e1.getMinX())==Math.round(e2.getMinX()) &&
+			Math.round(e1.getMinY())==Math.round(e2.getMinY()) &&
+			Math.round(e1.getMaxX())==Math.round(e2.getMaxX()) &&
+			Math.round(e1.getMaxY())==Math.round(e2.getMaxY());
+		
+		if (!equal) return false;
+		return areCRSEqual(e1.getCoordinateReferenceSystem(), e2.getCoordinateReferenceSystem());
+	}
 
 }

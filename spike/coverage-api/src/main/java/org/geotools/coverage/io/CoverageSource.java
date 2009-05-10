@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import javax.media.jai.ImageLayout;
-
 import org.geotools.coverage.io.impl.DefaultCoverageRequest;
 import org.geotools.coverage.io.range.RangeType;
 import org.geotools.data.Parameter;
@@ -135,18 +133,21 @@ public interface CoverageSource {
 
 	/**
 	 * The first {@link Rectangle} should describe the overall bidimensional
-	 * raster range for the underlying coverage. However, by setting the
-	 * <code>overall</code> param to true we can request additional raster
-	 * ranges in case the area covered by the mentioned coverage is poorly
-	 * approximated by a single {@link Rectangle}, like it could happen for a
-	 * mosaic which has some holes.
+	 * raster range for the underlying coverage. However, by setting the <code>
+	 * overall</code> param to true we can request additional raster ranges in
+	 * case the area covered by the mentioned coverage is poorly approximated by
+	 * a single {@link Rectangle}, like it could happen for a mosaic which has
+	 * some holes.
 	 * 
 	 * @param overall
 	 * @param listener
 	 * @return
 	 * @throws IOException
 	 * 
-	 * @todo should we consider {@link GridEnvelope}?? or {@link ImageLayout} which also contains tiling information???
+	 * @todo should we consider {@link GridEnvelope}?? or ImageLayout which also
+	 *       contains tiling information??? This has also an impact on the
+	 *       {@link #getOptimalDataBlockSizes()} method, which may become
+	 *       useless
 	 */
 	public List<Rectangle> getRasterDomain(final boolean overall,
 			final ProgressListener listener) throws IOException;
@@ -161,6 +162,7 @@ public interface CoverageSource {
 	 * 
 	 * @return The optimal size to use for each dimension when accessing grid
 	 *         values, or <code>null</code> if none.
+	 * @see CoverageSource#getRasterDomain(boolean, ProgressListener)
 	 */
 	public int[] getOptimalDataBlockSizes();
 
@@ -197,7 +199,7 @@ public interface CoverageSource {
 	
 	/**
 	 * Describes the {@link CoordinateReferenceSystem} for the underlying coverage.
-	 * It can be a {@link CompoundCRS} in case we have an xD coverage where x>2.
+	 * It can be a {@link CompoundCRS} in case we have an nD coverage where n>2.
 	 *  
 	 * @param listener
 	 * @return
@@ -274,7 +276,7 @@ public interface CoverageSource {
 //	 * @return
 //	 * @throws IOException
 //	 */
-//	public Object getStaticsManager(final ProgressListener listener)throws IOException;
+//	public Object getStatisticsManager(final ProgressListener listener)throws IOException;
 //	
 //	
 //	
@@ -284,7 +286,7 @@ public interface CoverageSource {
 //	 * @return
 //	 * @throws IOException
 //	 */
-//	public Object getOverviesManager(final ProgressListener listener)throws IOException;
+//	public Object getOverviewsManager(final ProgressListener listener)throws IOException;
 	
 
 }

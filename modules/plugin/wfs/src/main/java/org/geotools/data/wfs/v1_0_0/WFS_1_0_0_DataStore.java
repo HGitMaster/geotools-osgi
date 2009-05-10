@@ -34,7 +34,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,6 +48,7 @@ import java.util.zip.GZIPInputStream;
 
 import javax.naming.OperationNotSupportedException;
 import javax.swing.Icon;
+import javax.xml.namespace.QName;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
@@ -105,7 +105,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author dzwiers
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_0_0/data/WFSDataStore.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
+ *         /wfs/v_1_0_0/data/WFSDataStore.java $
  */
 public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataStore {
     public static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs.1.1.0");
@@ -135,23 +136,23 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     /**
      * Construct <code>WFSDataStore</code>.
      * 
-     * @param host -
-     *            may not yet be a capabilities url
-     * @param protocol -
-     *            true,false,null (post,get,auto)
-     * @param username -
-     *            iff password
-     * @param password -
-     *            iff username
-     * @param timeout -
-     *            default 3000 (ms)
-     * @param buffer -
-     *            default 10 (features)
-     * @param tryGZIP -
-     *            indicates to use GZIP if server supports it.
-     * @param lenient -
-     *            if true the parsing will be very forgiving to bad data. Errors
-     *            will be logged rather than exceptions.
+     * @param host
+     *            - may not yet be a capabilities url
+     * @param protocol
+     *            - true,false,null (post,get,auto)
+     * @param username
+     *            - iff password
+     * @param password
+     *            - iff username
+     * @param timeout
+     *            - default 3000 (ms)
+     * @param buffer
+     *            - default 10 (features)
+     * @param tryGZIP
+     *            - indicates to use GZIP if server supports it.
+     * @param lenient
+     *            - if true the parsing will be very forgiving to bad data. Errors will be logged
+     *            rather than exceptions.
      * 
      * @throws SAXException
      * @throws IOException
@@ -171,7 +172,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     }
 
     public WFSServiceInfo getInfo() {
-        return new WFSServiceInfo(){
+        return new WFSServiceInfo() {
             public String getDescription() {
                 return capabilities.getService().get_abstract();
             }
@@ -179,6 +180,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             public Icon getIcon() {
                 return null; // talk to Eclesia the icons are in renderer?
             }
+
             public Set<String> getKeywords() {
                 String[] keywordList = capabilities.getService().getKeywordList();
                 if (keywordList == null) {
@@ -213,7 +215,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
             public String getVersion() {
                 return "1.0.0";
-            }            
+            }
         };
     }
 
@@ -221,18 +223,15 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
         URL host = capabilities.getGetCapabilities().getGet();
         if (host == null) {
             host = capabilities.getGetCapabilities().getPost();
-        }        
-        if( host.toString().indexOf("mapserv")!=-1 ){
-            strategy=new MapServerWFSStrategy(this);
         }
-        else if( host.toString().indexOf("geoserver")!=-1 ){
-            strategy=new NonStrictWFSStrategy(this);
-        }
-        else if( lenient ){
-            strategy=new NonStrictWFSStrategy(this);
-        }
-        else {
-            strategy=new StrictWFSStrategy(this);
+        if (host.toString().indexOf("mapserv") != -1) {
+            strategy = new MapServerWFSStrategy(this);
+        } else if (host.toString().indexOf("geoserver") != -1) {
+            strategy = new NonStrictWFSStrategy(this);
+        } else if (lenient) {
+            strategy = new NonStrictWFSStrategy(this);
+        } else {
+            strategy = new StrictWFSStrategy(this);
         }
     }
 
@@ -451,8 +450,8 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     }
 
     // protected for testing
-    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReaderGet(Query request, Transaction transaction)
-            throws UnsupportedEncodingException, IOException, SAXException {
+    protected FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReaderGet(Query request,
+            Transaction transaction) throws UnsupportedEncodingException, IOException, SAXException {
         URL getUrl = capabilities.getGetFeature().getGet();
 
         if (getUrl == null) {
@@ -576,9 +575,8 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     }
 
     /**
-     * If the field useGZIP is true Adds gzip to the connection accept-encoding
-     * property and creates a gzip inputstream (if server supports it).
-     * Otherwise returns a normal buffered input stream.
+     * If the field useGZIP is true Adds gzip to the connection accept-encoding property and creates
+     * a gzip inputstream (if server supports it). Otherwise returns a normal buffered input stream.
      * 
      * @param hc
      *            the connection to use to create the stream
@@ -647,21 +645,19 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
         /*
          * // find layer's bbox Envelope lbb = null; if(capabilities != null &&
-         * capabilities.getFeatureTypes() != null && typename!=null &&
-         * !"".equals(typename)){ List fts = capabilities.getFeatureTypes();
-         * if(!fts.isEmpty()){ for(Iterator i=fts.iterator();i.hasNext() && lbb ==
-         * null;){ FeatureSetDescription fsd = (FeatureSetDescription)i.next();
-         * if(fsd!=null && typename.equals(fsd.getName())){ lbb =
-         * fsd.getLatLongBoundingBox(); } } } } if(lbb == null ||
-         * lbb.contains(e))
+         * capabilities.getFeatureTypes() != null && typename!=null && !"".equals(typename)){ List
+         * fts = capabilities.getFeatureTypes(); if(!fts.isEmpty()){ for(Iterator
+         * i=fts.iterator();i.hasNext() && lbb == null;){ FeatureSetDescription fsd =
+         * (FeatureSetDescription)i.next(); if(fsd!=null && typename.equals(fsd.getName())){ lbb =
+         * fsd.getLatLongBoundingBox(); } } } } if(lbb == null || lbb.contains(e))
          */
         return e.getMinX() + "," + e.getMinY() + "," + e.getMaxX() + "," + e.getMaxY();
         // return null;
     }
 
     // protected for testing
-    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReaderPost(Query query, Transaction transaction)
-            throws SAXException, IOException {
+    protected FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReaderPost(Query query,
+            Transaction transaction) throws SAXException, IOException {
         URL postUrl = capabilities.getGetFeature().getPost();
 
         if (postUrl == null) {
@@ -718,11 +714,13 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             return ft;
     }
 
-    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName) throws IOException {
+    protected FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName)
+            throws IOException {
         return getFeatureReader(typeName, new DefaultQuery(typeName));
     }
 
-    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName, Query query) throws IOException {
+    protected FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName,
+            Query query) throws IOException {
         if ((query.getTypeName() == null) || !query.getTypeName().equals(typeName)) {
             Query q = new DefaultQuery(query);
             ((DefaultQuery) q).setTypeName(typeName);
@@ -737,7 +735,8 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query,
      *      org.geotools.data.Transaction)
      */
-    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query, Transaction transaction) throws IOException {
+    public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query,
+            Transaction transaction) throws IOException {
         return strategy.getFeatureReader(query, transaction);
     }
 
@@ -857,17 +856,17 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     }
 
     /**
-     * Runs {@link FidFilterVisitor} on the filter and returns the result as
-     * long as transaction is not AUTO_COMMIT or null.
+     * Runs {@link FidFilterVisitor} on the filter and returns the result as long as transaction is
+     * not AUTO_COMMIT or null.
      * 
      * @param filter
      *            filter to process.
-     * @return Runs {@link FidFilterVisitor} on the filter and returns the
-     *         result as long as transaction is not AUTO_COMMIT or null.
+     * @return Runs {@link FidFilterVisitor} on the filter and returns the result as long as
+     *         transaction is not AUTO_COMMIT or null.
      */
     public Filter processFilter(Filter filter) {
         FidFilterVisitor visitor = new FidFilterVisitor(fidMap);
-        return (Filter) filter.accept( visitor, null );
+        return (Filter) filter.accept(visitor, null);
     }
 
     /**
@@ -975,12 +974,63 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
      * @see WFSDataStore#getFeatureTypeWGS84Bounds(String)
      */
     public ReferencedEnvelope getFeatureTypeWGS84Bounds(String typeName) {
-        FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(capabilities, typeName);
+        FeatureSetDescription fsd = WFSCapabilities
+                .getFeatureSetDescription(capabilities, typeName);
         Envelope latLongBoundingBox = fsd.getLatLongBoundingBox();
         return new ReferencedEnvelope(latLongBoundingBox, DefaultGeographicCRS.WGS84);
     }
 
-    public void setMaxFeatures( Integer maxFeatures ) {
-        //ignored... this class needs to move to the new arch
+    public void setMaxFeatures(Integer maxFeatures) {
+        // ignored... this class needs to move to the new arch
+    }
+
+    public URL getCapabilitiesURL() {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
+    }
+
+    public QName getFeatureTypeName(String typeName) {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
+    }
+
+    public Integer getMaxFeatures() {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
+    }
+
+    public String getServiceAbstract() {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
+    }
+
+    public Set<String> getServiceKeywords() {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
+    }
+
+    public URI getServiceProviderUri() {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
+    }
+
+    public String getServiceTitle() {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
+    }
+
+    public String getServiceVersion() {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
+    }
+
+    public boolean isPreferPostOverGet() {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
+    }
+
+    public void setPreferPostOverGet(Boolean booleanValue) {
+        throw new UnsupportedOperationException(
+                "Not used, this class needs to be adapted to the new architecture in the wfs.v_1_1_0 package");
     }
 }

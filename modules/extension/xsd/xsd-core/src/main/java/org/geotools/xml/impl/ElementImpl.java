@@ -54,4 +54,24 @@ public class ElementImpl extends InstanceComponentImpl implements ElementInstanc
     public void setAttributes(AttributeInstance[] atts) {
         this.atts = atts;
     }
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(name);
+        buf.append(" ");
+        buf.append(namespace);        
+        if( atts != null ){
+            for( AttributeInstance att : atts ){
+                buf.append(" ");
+                buf.append( att.getName() );
+                buf.append( "=");
+                buf.append( att.getText() );
+            }
+        }
+        if( text != null ){
+            buf.append("\n\t");
+            buf.append( text );
+        }
+        return buf.toString();
+    }
 }

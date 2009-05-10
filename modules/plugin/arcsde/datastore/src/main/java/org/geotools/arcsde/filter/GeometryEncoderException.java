@@ -23,8 +23,9 @@ package org.geotools.arcsde.filter;
  * 
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/filter/GeometryEncoderException.java $
- * @version $Id: GeometryEncoderException.java 30722 2008-06-13 18:15:42Z acuster $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/filter/GeometryEncoderException.java $
+ * @version $Id: GeometryEncoderException.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class GeometryEncoderException extends Exception {
     /**
@@ -35,7 +36,8 @@ public class GeometryEncoderException extends Exception {
     /**
      * Creates a new GeometryEncoderException object.
      * 
-     * @param msg DOCUMENT ME!
+     * @param msg
+     *            DOCUMENT ME!
      */
     public GeometryEncoderException(String msg) {
         this(msg, null);
@@ -44,8 +46,10 @@ public class GeometryEncoderException extends Exception {
     /**
      * Creates a new GeometryEncoderException object.
      * 
-     * @param msg DOCUMENT ME!
-     * @param cause DOCUMENT ME!
+     * @param msg
+     *            DOCUMENT ME!
+     * @param cause
+     *            DOCUMENT ME!
      */
     public GeometryEncoderException(String msg, Throwable cause) {
         super(msg, cause);

@@ -28,7 +28,7 @@ package org.geotools.caching.spatialindex;
 public interface Visitor {
     public void visitNode(final Node n);
 
-    public void visitData(final Data d);
+    public void visitData(final Data<?> d);
 
     public boolean isDataVisitor();
 } // IVisitor

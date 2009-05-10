@@ -16,20 +16,16 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ISession;
-import org.geotools.arcsde.pool.SessionPool;
-import org.geotools.arcsde.pool.SessionPoolFactory;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -41,6 +37,9 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.util.logging.Logging;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -51,16 +50,15 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.WKTReader;
 
 /**
- * Functional tests for {@link ArcSdeFeatureStore} when working with versioned
- * tables
+ * Functional tests for {@link ArcSdeFeatureStore} when working with versioned tables
  * 
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/da/src/test/java/org/geotools/arcsde/data/ArcSDEFeatureStoreTest.java $
- * @version $Id: ArcSDEFeatureStoreVersionedTest.java 30807 2008-06-25 17:02:40Z
- *          groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/da/src/test/java/org
+ *         /geotools/arcsde/data/ArcSDEFeatureStoreTest.java $
+ * @version $Id: ArcSDEFeatureStoreVersionedTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
-public class ArcSDEFeatureStoreVersionedTest extends TestCase {
+public class ArcSDEFeatureStoreVersionedTest {
     /** package logger */
     private static Logger LOGGER = Logging.getLogger(" org.geotools.arcsde.data");
 
@@ -84,15 +82,14 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
     private static boolean databaseIsMsSqlServer;
 
     /**
-     * loads {@code test-data/testparams.properties} into a Properties object,
-     * wich is used to obtain test tables names and is used as parameter to find
-     * the DataStore
+     * loads {@code test-data/testparams.properties} into a Properties object, wich is used to
+     * obtain test tables names and is used as parameter to find the DataStore
      * 
      * @throws Exception
      *             DOCUMENT ME!
      */
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         testData = new TestData();
         testData.setUp();
         {
@@ -115,12 +112,12 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
         }
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         testData.tearDown(false, true);
     }
 
+    @Test
     public void testEditVersionedTableAutoCommit() throws Exception {
         final ArcSDEDataStore dataStore = testData.getDataStore();
         final FeatureSource<SimpleFeatureType, SimpleFeature> source;
@@ -167,6 +164,7 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
         assertEquals(2, source.getCount(Query.ALL));
     }
 
+    @Test
     public void testEditVersionedTableTransaction() throws Exception {
         try {
             final String tableName;
@@ -214,7 +212,7 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
 
             count = store.getCount(Query.ALL);
             assertEquals(1, count);
-            
+
             assertEquals(0, source.getCount(Query.ALL));
 
             {
@@ -267,6 +265,7 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
         }
     }
 
+    @Test
     public void testEditVersionedTableTransactionConcurrently() throws Exception {
         Properties conProps = testData.getConProps();
 
@@ -281,7 +280,7 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
                 .getFeatureSource(tableName);
 
         store2 = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore2
-        .getFeatureSource(tableName);
+                .getFeatureSource(tableName);
 
         Transaction transaction1 = new DefaultTransaction();
         store1.setTransaction(transaction1);
@@ -299,38 +298,38 @@ public class ArcSDEFeatureStoreVersionedTest extends TestCase {
         SimpleFeature feature;
         FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
 
-        //add a feature to store1
+        // add a feature to store1
         content[0] = "Feature name 1";
         content[1] = reader.read("POINT (10 10)");
         feature = SimpleFeatureBuilder.build(schema, content, (String) null);
         collection = DataUtilities.collection(feature);
         store1.addFeatures(collection);
-                
-        //transaction not committed, store1 expects a count of 1, store2 still 0
+
+        // transaction not committed, store1 expects a count of 1, store2 still 0
         assertEquals(1, store1.getCount(Query.ALL));
-        
+
         assertEquals(0, store2.getCount(Query.ALL));
 
-        //add a feature to store2
+        // add a feature to store2
         content[0] = "Feature name 2";
         content[1] = reader.read("POINT (20 20)");
         feature = SimpleFeatureBuilder.build(schema, content, (String) null);
         collection = DataUtilities.collection(feature);
         store2.addFeatures(collection);
 
-        //neither transaction committed, both stores expect a count of 1
+        // neither transaction committed, both stores expect a count of 1
         assertEquals(1, store1.getCount(Query.ALL));
 
         assertEquals(1, store2.getCount(Query.ALL));
 
-        //commit t1, store1 still counts 1, store2 counts 2
+        // commit t1, store1 still counts 1, store2 counts 2
         transaction1.commit();
         assertEquals(1, store1.getCount(Query.ALL));
 
-        ///assertEquals(2, store2.getCount(Query.ALL));
+        // /assertEquals(2, store2.getCount(Query.ALL));
         assertEquals(1, store2.getCount(Query.ALL));
 
-        //commit t2, overrides the state commited by t1
+        // commit t2, overrides the state commited by t1
         transaction2.commit();
         assertEquals(1, store1.getCount(Query.ALL));
         assertEquals(1, store2.getCount(Query.ALL));

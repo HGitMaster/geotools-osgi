@@ -68,6 +68,14 @@ public class H2PrimaryKeyTestSetup extends JDBCPrimaryKeyTestSetup {
         run( "INSERT INTO \"multi\" VALUES (2, 'y', 'two', NULL)");
         run( "INSERT INTO \"multi\" VALUES (3, 'z', 'three', NULL)");
     }
+    
+    @Override
+    protected void createNullPrimaryKeyTable() throws Exception {
+        run( "CREATE TABLE \"nokey\" (\"name\" VARCHAR)");
+        run( "INSERT INTO \"nokey\" VALUES ('one')");
+        run( "INSERT INTO \"nokey\" VALUES ('two')");
+        run( "INSERT INTO \"nokey\" VALUES ('trhee')");
+    }
 
     
     @Override
@@ -89,6 +97,11 @@ public class H2PrimaryKeyTestSetup extends JDBCPrimaryKeyTestSetup {
     @Override
     protected void dropMultiColumnPrimaryKeyTable() throws Exception {
         run( "DROP TABLE \"multi\"" );
+    }
+    
+    @Override
+    protected void dropNullPrimaryKeyTable() throws Exception {
+        run( "DROP TABLE \"nokey\"");
     }
 
     

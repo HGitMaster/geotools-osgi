@@ -199,4 +199,30 @@ public interface FIDMapper extends Serializable {
      *
      */
     public boolean isVolatile();
+
+    /**
+     * Provides a simple means of assessing if a feature id is structurally valid with respect to
+     * the fids this FIDMapper creates.
+     * <p>
+     * The primary purpose of this method is to help in filtering out fids from filters that are not
+     * appropriate for a given FeatureType but that may otherwise being treated as valid if they get
+     * down to the actual SQL query.
+     * </p>
+     * <p>
+     * The validity check may be as strict or as loose as the concrete FIDMapper wishes, since there
+     * may be cases where whether a fid in a filter is valid or not is not that important, or where
+     * it may result in deleting a Feature that was not expected to be deleted.
+     * </p>
+     * <p>
+     * An example of such a need for validation may be a feature id composed like {@code
+     * <featureTypeName>.<number>}, where the actual table PK is just the {@code <number>} part. If
+     * a request over the FeatureType "ft1" is made with a fid filter like {@code ft2.1}, this
+     * method can ensure the number {@code 1} is not send out in the SQL query at all.
+     * </p>
+     * 
+     * @param fid a feature id to check for structural validity
+     * @return {@code true} if the structure {@code fid} indicates it is a valid feature id for the
+     *         FeatureType this FIDMapper works for, {@code false} otherwise.
+     */
+    public boolean isValid(String fid);
 }

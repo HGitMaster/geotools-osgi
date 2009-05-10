@@ -1,5 +1,3 @@
-package org.geotools.data.complex.config;
-
 /*
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
@@ -17,12 +15,21 @@ package org.geotools.data.complex.config;
  *    Lesser General Public License for more details.
  */
 
+package org.geotools.data.complex.config;
+
 import org.apache.xml.resolver.Catalog;
 import org.geotools.gml3.ApplicationSchemaXSD;
 import org.geotools.xml.SchemaLocationResolver;
 
 /**
  * Schema with support for resolution in OASIS catalog.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: CatalogApplicationSchemaXSD.java 32055 2008-12-22 02:03:01Z bencaradocdavies $
+ * @source $URL:
+ *         http://svn.geotools.org/trunk/modules/unsupported/app-schema/app-schema/src/main/java
+ *         /org/geotools/data/complex/config/CatalogApplicationSchemaXSD.java $
+ * @since 2.6
  */
 public class CatalogApplicationSchemaXSD extends ApplicationSchemaXSD {
 
@@ -30,11 +37,11 @@ public class CatalogApplicationSchemaXSD extends ApplicationSchemaXSD {
 
     /**
      * @param namespaceURI
-     *                namespace of the schema
+     *            namespace of the schema
      * @param schemaLocation
-     *                the schema location
+     *            the schema location
      * @param catalog
-     *                OASIS Catalog for lookup, or null if none
+     *            OASIS Catalog for lookup, or null if none
      */
     public CatalogApplicationSchemaXSD(String namespaceURI, String schemaLocation, Catalog catalog) {
         super(namespaceURI, resolveSchemaLocation(catalog, schemaLocation));
@@ -45,7 +52,7 @@ public class CatalogApplicationSchemaXSD extends ApplicationSchemaXSD {
      * @see org.geotools.gml3.ApplicationSchemaXSD#createSchemaLocationResolver()
      */
     @Override
-    protected SchemaLocationResolver createSchemaLocationResolver() {
+    public SchemaLocationResolver createSchemaLocationResolver() {
         return new CatalogSchemaLocationResolverWrapper(catalog, super
                 .createSchemaLocationResolver());
     }

@@ -32,14 +32,15 @@ import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.Union;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.util.logging.Logging;
 
 /**
  * Utility class to help DataStoreFactories for {@linkplain org.geotools.data.sql.SqlDataStore}s
  * register the views provided in a <code>java.util.Map</code> in the call to the factory's
  * <code>createDataStore(Map)</code> method.
  * <p>
- * <b>NOTE</b> this class is a rough copy of the one in the sql-datastore unsupported module. We
- * are incorporating it here as don't want to depend on sql-datastore. Thus, it's expected to be
+ * <b>NOTE</b> this class is a rough copy of the one in the sql-datastore unsupported module. We are
+ * incorporating it here as don't want to depend on sql-datastore. Thus, it's expected to be
  * replaced by the original once we work out what to do with the sql-datastore module.
  * </p>
  * <p>
@@ -51,7 +52,8 @@ import org.geotools.data.DataSourceException;
  * in-process feature type by defining the following structure for a Map&lt;String,String&gt; passed
  * to createDataStore. Example .properties file:
  * 
- * <pre><code>
+ * <pre>
+ * &lt;code&gt;
  *      dbtype=...
  *      &lt;usual datastore's parameters&gt;...
  *      sqlView.1.typeName = ViewType1
@@ -61,22 +63,23 @@ import org.geotools.data.DataSourceException;
  *     
  *      sqlView.2.typeName = ViewType2
  *      sqlView.2.sqlQuery = select ...
- * </code></pre>
+ * &lt;/code&gt;
+ * </pre>
  * 
  * This way, this class' utility method {@linkplain #registerSqlViews(SqlDataStore, Map)} will
  * receive a {@linkplain org.geotools.data.sql.SqlDataStore} and the Map of datastore factory
  * parameters and call {@linkplain org.geotools.data.sql.SqlDataStore#registerView(String, String)}
- * for each pair of <code>sqlView.N.typeName, sqlView.N.sqlQuery</code>
- * </p>
+ * for each pair of <code>sqlView.N.typeName, sqlView.N.sqlQuery</code> </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ViewRegisteringFactoryHelper.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: ViewRegisteringFactoryHelper.java 32195 2009-01-09 19:00:35Z groldan $
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ViewRegisteringFactoryHelper.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/ViewRegisteringFactoryHelper.java $
  */
 public class ViewRegisteringFactoryHelper {
-    private static final Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger(ViewRegisteringFactoryHelper.class.getPackage().getName());
+    private static final Logger LOGGER = Logging.getLogger(ViewRegisteringFactoryHelper.class
+            .getName());
 
     private ViewRegisteringFactoryHelper() {
         // no-op

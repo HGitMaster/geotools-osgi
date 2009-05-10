@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.geotools.gml2.GML;
 import org.geotools.ows.v1_1.OWS;
+import org.geotools.xml.SchemaLocationResolver;
 import org.geotools.xml.XSD;
 
 /**
@@ -51,7 +52,6 @@ public final class WPS extends XSD {
     
     protected void addDependencies(Set dependencies) {
        dependencies.add( OWS.getInstance() );
-       dependencies.add( GML.getInstance() );
     }
     
     /**
@@ -66,6 +66,11 @@ public final class WPS extends XSD {
      */
     public String getSchemaLocation() {
        return getClass().getResource("wpsAll.xsd").toString();
+    }
+    
+    @Override
+    public SchemaLocationResolver createSchemaLocationResolver() {
+        return new SchemaLocationResolver(this,"common");
     }
     
     /** @generated */
@@ -198,6 +203,11 @@ public final class WPS extends XSD {
     /** @generated */
     public static final QName _Languages = 
         new QName("http://www.opengis.net/wps/1.0.0","_Languages");
+
+    /** @generated NOT */
+    public static final QName _Languages_Default = 
+        new QName("http://www.opengis.net/wps/1.0.0","_Languages_Default");
+    
     /** @generated */
     public static final QName _ProcessDescriptions = 
         new QName("http://www.opengis.net/wps/1.0.0","_ProcessDescriptions");

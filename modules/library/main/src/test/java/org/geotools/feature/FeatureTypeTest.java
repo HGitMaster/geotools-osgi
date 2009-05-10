@@ -21,6 +21,7 @@ package org.geotools.feature;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,15 +35,15 @@ import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.feature.type.BasicFeatureTypes;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 
@@ -50,7 +51,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  *
  * @author  en
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/feature/FeatureTypeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/feature/FeatureTypeTest.java $
  */
 public class FeatureTypeTest extends DataTestCase {
   
@@ -67,7 +68,7 @@ public class FeatureTypeTest extends DataTestCase {
     return suite;
   }
   
-  public void XtestAbstractType() throws Exception {
+  public void testAbstractType() throws Exception {
     
     SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
     tb.setName("AbstractThing");
@@ -83,26 +84,23 @@ public class FeatureTypeTest extends DataTestCase {
     assertTrue(abstractType.isAbstract());
     assertTrue(abstractType2.isAbstract());
     
-    assertTrue(FeatureTypes.isDecendedFrom(abstractType, new URI("http://www.opengis.net/gml"),"Feature"));
-    assertTrue(FeatureTypes.isDecendedFrom(abstractType2, new URI("http://www.opengis.net/gml"),"Feature"));
-    assertTrue(FeatureTypes.isDecendedFrom(abstractType2, abstractType));
-    assertFalse(FeatureTypes.isDecendedFrom(abstractType,abstractType2));
+    //assertTrue("extends gml feature", FeatureTypes.isDecendedFrom(abstractType, new URI("http://www.opengis.net/gml"),"Feature"));
+    //assertTrue("extends gml feature", FeatureTypes.isDecendedFrom(abstractType2, new URI("http://www.opengis.net/gml"),"Feature"));
+    assertTrue("abstractType2 --|> abstractType", FeatureTypes.isDecendedFrom(abstractType2, abstractType));
+    assertFalse("abstractType2 !--|> abstractType", FeatureTypes.isDecendedFrom(abstractType,abstractType2));
     
     try {
       SimpleFeatureBuilder.build(abstractType, new Object[0], null);
       fail("abstract type allowed create");
-    } catch (IllegalAttributeException iae) {
-      
-    } catch (UnsupportedOperationException uoe) {
-      
+    } catch (IllegalArgumentException iae) {      
+    } catch (UnsupportedOperationException uoe) {      
     }
+    
     try {
       SimpleFeatureBuilder.build(abstractType2, new Object[0], null);
       fail("abstract type allowed create");
-    } catch (IllegalAttributeException iae) {
-      
-    } catch (UnsupportedOperationException uoe) {
-      
+    } catch (IllegalArgumentException iae) {      
+    } catch (UnsupportedOperationException uoe) {      
     }
     
   }
@@ -136,6 +134,66 @@ public class FeatureTypeTest extends DataTestCase {
         SimpleFeature feature = lakeFeatures[0];
         assertDuplicate( "feature", feature, SimpleFeatureBuilder.copy( feature  ) );        
      }
+
+    /**
+     * Test FeatureTypes.getAncestors() by constructing three levels of derived types and testing
+     * that the expected ancestors are returned at each level in reverse order.
+     * 
+     * <p>
+     * 
+     * UML type hierarchy of test types: Feature <|-- A <|-- B <|-- C
+     * 
+     * @throws Exception
+     */
+    @SuppressWarnings("serial")
+    public void testAncestors() throws Exception {
+        URI uri = new URI("http://www.geotools.org/example");
+        SimpleFeatureTypeBuilder tb;
+
+        tb = new SimpleFeatureTypeBuilder();
+        tb.setName("A");
+        tb.setNamespaceURI(uri);
+        final SimpleFeatureType typeA = tb.buildFeatureType();
+
+        tb = new SimpleFeatureTypeBuilder();
+        tb.setName("B");
+        tb.setNamespaceURI(uri);
+        tb.setSuperType(typeA);
+        tb.add("b", String.class);
+        final SimpleFeatureType typeB = tb.buildFeatureType();
+
+        tb = new SimpleFeatureTypeBuilder();
+        tb.setName("C");
+        tb.setNamespaceURI(uri);
+        tb.setSuperType(typeB);
+        tb.add("c", Integer.class);
+        final SimpleFeatureType typeC = tb.buildFeatureType();
+
+        // base type should have no ancestors
+        assertEquals("Ancestors of Feature, nearest first", Collections.<FeatureType> emptyList(),
+                FeatureTypes.getAncestors(BasicFeatureTypes.FEATURE));
+
+        assertEquals("Ancestors of A, nearest first", new ArrayList<FeatureType>() {
+            {
+                add(BasicFeatureTypes.FEATURE);
+            }
+        }, FeatureTypes.getAncestors(typeA));
+
+        assertEquals("Ancestors of B, nearest first", new ArrayList<FeatureType>() {
+            {
+                add(typeA);
+                add(BasicFeatureTypes.FEATURE);
+            }
+        }, FeatureTypes.getAncestors(typeB));
+
+        assertEquals("Ancestors of C, nearest first", new ArrayList<FeatureType>() {
+            {
+                add(typeB);
+                add(typeA);
+                add(BasicFeatureTypes.FEATURE);
+            }
+        }, FeatureTypes.getAncestors(typeC));
+    }
      
     public void testDeepCopy() throws Exception {
         // primative        

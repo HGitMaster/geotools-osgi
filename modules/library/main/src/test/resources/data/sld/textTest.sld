@@ -15,6 +15,9 @@ A styling layer used for the unit tests of sldstyler
         <FeatureTypeName>testPoint</FeatureTypeName>
         <rule>
             <PointSymbolizer>
+                <geometry>
+                   <PropertyName>the_geom</PropertyName>
+                </geometry>
                 <graphic>
                     <mark>
                     <!-- since cross is not implemented yet should draw next mark -->

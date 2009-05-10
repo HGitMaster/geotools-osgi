@@ -17,12 +17,11 @@
  */
 package org.geotools.arcsde.pool;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import org.geotools.data.DataSourceException;
 
 /**
  * Singleton factory that maintains a single {@link SessionPool connection pool} per set of
@@ -30,8 +29,9 @@ import org.geotools.data.DataSourceException;
  * 
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/datastore/src/main/java/org/geotools/arcsde/pool/SessionPoolFactory.java $
- * @version $Id: SessionPoolFactory.java 30722 2008-06-13 18:15:42Z acuster $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/datastore/src/main
+ *         /java/org/geotools/arcsde/pool/SessionPoolFactory.java $
+ * @version $Id: SessionPoolFactory.java 32195 2009-01-09 19:00:35Z groldan $
  */
 public class SessionPoolFactory {
     /** package logger */
@@ -66,13 +66,15 @@ public class SessionPoolFactory {
      * Creates a connection pool factory for the given connection parameters, or returns the
      * existing one if there already exists one for that set of connection params.
      * 
-     * @param config  contains the connection parameters and pool preferences
+     * @param config
+     *             contains the connection parameters and pool preferences
      * @return a pool for the given connection parameters, wether it already existed or had to be
      *         created.
-     * @throws DataSourceException if the pool needs but can't be created
+     * @throws IOException
+     *             if the pool needs but can't be created
      */
     public synchronized SessionPool createSharedPool(ArcSDEConnectionConfig config)
-            throws DataSourceException {
+            throws IOException {
         SessionPool pool = (SessionPool) this.currentPools.get(config);
 
         if (pool == null) {
@@ -95,9 +97,9 @@ public class SessionPoolFactory {
      * 
      * @param config
      * @return
-     * @throws DataSourceException
+     * @throws IOException
      */
-    public SessionPool createPool(ArcSDEConnectionConfig config) throws DataSourceException {
+    public SessionPool createPool(ArcSDEConnectionConfig config) throws IOException {
         return new SessionPool(config);
     }
 

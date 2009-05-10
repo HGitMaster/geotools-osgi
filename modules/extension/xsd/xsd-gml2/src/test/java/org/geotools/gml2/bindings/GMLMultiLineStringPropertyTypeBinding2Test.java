@@ -29,7 +29,7 @@ public class GMLMultiLineStringPropertyTypeBinding2Test extends GMLTestSupport {
     }
 
     public void testExecutionMode() {
-        assertEquals(Binding.AFTER, binding(GML.MultiLineStringPropertyType).getExecutionMode());
+        assertEquals(Binding.OVERRIDE, binding(GML.MultiLineStringPropertyType).getExecutionMode());
     }
 
     public void testParse() throws Exception {

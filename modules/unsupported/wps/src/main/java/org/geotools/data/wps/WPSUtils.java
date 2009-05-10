@@ -22,33 +22,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.opengis.wps10.ComplexDataCombinationsType;
+import net.opengis.wps10.ComplexDataDescriptionType;
+import net.opengis.wps10.ComplexDataType;
+import net.opengis.wps10.DataInputsType;
+import net.opengis.wps10.DataType;
+import net.opengis.wps10.ExecuteResponseType;
+import net.opengis.wps10.InputDescriptionType;
+import net.opengis.wps10.LiteralDataType;
+import net.opengis.wps10.LiteralInputType;
+import net.opengis.wps10.LiteralOutputType;
+import net.opengis.wps10.OutputDataType;
+import net.opengis.wps10.OutputDescriptionType;
+import net.opengis.wps10.ProcessDescriptionType;
+import net.opengis.wps10.ProcessOutputsType;
+import net.opengis.wps10.SupportedComplexDataInputType;
+import net.opengis.wps10.SupportedComplexDataType;
+import net.opengis.wps10.Wps10Factory;
+
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.util.FeatureMapUtil;
-import org.eclipse.emf.ecore.util.FeatureMap.Entry;
 import org.geotools.data.Parameter;
 import org.geotools.text.Text;
 import org.geotools.util.Converters;
 
 import com.vividsolutions.jts.geom.Geometry;
-
-import net.opengis.wps.ComplexDataCombinationsType;
-import net.opengis.wps.ComplexDataDescriptionType;
-import net.opengis.wps.ComplexDataType;
-import net.opengis.wps.DataInputsType;
-import net.opengis.wps.DataType;
-import net.opengis.wps.ExecuteResponseType;
-import net.opengis.wps.InputDescriptionType;
-import net.opengis.wps.LiteralDataType;
-import net.opengis.wps.LiteralInputType;
-import net.opengis.wps.LiteralOutputType;
-import net.opengis.wps.OutputDataType;
-import net.opengis.wps.OutputDescriptionType;
-import net.opengis.wps.ProcessDescriptionType;
-import net.opengis.wps.ProcessOutputsType;
-import net.opengis.wps.SupportedComplexDataInputType;
-import net.opengis.wps.SupportedComplexDataType;
-import net.opengis.wps.WpsFactory;
 
 /**
  * Contains helpful static util methods for the WPS module
@@ -121,17 +118,17 @@ public class WPSUtils {
 	 * @return the created DataType input object
      */
     public static DataType createInputDataType(Object obj, int type, String schema) {
-    	DataType dt = WpsFactory.eINSTANCE.createDataType();
+    	DataType dt = Wps10Factory.eINSTANCE.createDataType();
     	
     	if (type == INPUTTYPE_LITERAL) {
 			
-			LiteralDataType ldt = WpsFactory.eINSTANCE.createLiteralDataType();
+			LiteralDataType ldt = Wps10Factory.eINSTANCE.createLiteralDataType();
 			ldt.setValue(obj.toString());
 			dt.setLiteralData(ldt);
 		}
 		else {
 			// assume complex data
-			ComplexDataType cdt = WpsFactory.eINSTANCE.createComplexDataType();
+			ComplexDataType cdt = Wps10Factory.eINSTANCE.createComplexDataType();
 			
 			// do I need to add a FeatureMap object, or Entry object, or what?
 			//EStructuralFeature eStructuralFeature = null;

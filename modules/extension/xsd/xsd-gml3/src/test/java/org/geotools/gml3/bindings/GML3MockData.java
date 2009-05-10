@@ -23,6 +23,8 @@ import java.util.Date;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -85,6 +87,14 @@ public class GML3MockData {
 
     static Element lineString(Document document, Node parent) {
         return lineStringWithPos(document, parent);
+    }
+    
+    static Element lineStringProperty(Document document, Node parent) {
+        Element property = element(GML.lineStringProperty, document, parent);
+
+        lineString(document, property);
+
+        return property;
     }
 
     static Element lineStringWithPos(Document document, Node parent) {
@@ -213,6 +223,25 @@ public class GML3MockData {
 
         return multiPolygon;
     }
+    
+    static GeometryCollection multiGeometry() {
+        return gf.createGeometryCollection(new Geometry[]{point(),lineString(),polygon()});
+    }
+    
+    static Element multiGeometry(Document document, Node parent ) {
+        Element multiGeometry = element(GML.MultiGeometry, document, parent );
+        
+        Element geometryMember = element(GML.geometryMember, document, multiGeometry);
+        point(document,geometryMember);
+        
+        geometryMember = element(GML.geometryMember, document, multiGeometry);
+        lineString(document,geometryMember);
+        
+        geometryMember = element(GML.geometryMember, document, multiGeometry);
+        polygon(document,geometryMember);
+        
+        return multiGeometry;
+    }
 
     static Element feature(Document document, Node parent) {
         Element feature = element(TEST.TestFeature, document, parent);
@@ -225,7 +254,7 @@ public class GML3MockData {
         return feature;
     }
 
-    static SimpleFeature feature() throws Exception {
+    public static SimpleFeature feature() throws Exception {
         SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
         typeBuilder.setName(TEST.TestFeature.getLocalPart());
         typeBuilder.setNamespaceURI(TEST.TestFeature.getNamespaceURI());

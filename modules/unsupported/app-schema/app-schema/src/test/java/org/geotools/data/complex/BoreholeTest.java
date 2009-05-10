@@ -64,7 +64,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: BoreholeTest.java 31787 2008-11-06 07:12:25Z bencd $
+ * @version $Id: BoreholeTest.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
  * @since 2.4
@@ -275,6 +275,7 @@ public class BoreholeTest extends TestCase {
         DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
         assertNotNull(mappingDataStore);
         assertNotNull(mappingDataStore.getSchema(typeName));
+        mappingDataStore.dispose();
     }
 
     public void testDataStore() throws Exception {
@@ -304,6 +305,7 @@ public class BoreholeTest extends TestCase {
             count++;
         }
         features.close(it);
+        mappingDataStore.dispose();
         assertEquals(EXPECTED_RESULT_COUNT, count);
     }
 
@@ -343,6 +345,8 @@ public class BoreholeTest extends TestCase {
         // String obtainedValue = (String) propertyName.evaluate(feature);
         // assertNotNull(obtainedValue);
         // assertEquals(queryLiteral, obtainedValue);
+
+        mappingDataStore.dispose();
     }
 
     /**
@@ -366,6 +370,7 @@ public class BoreholeTest extends TestCase {
                 .getFeatures();
         Feature f = (Feature) features.iterator().next();
         traverse(f);
+        mappingDataStore.dispose();
     }
 
     private void traverse(Attribute f) {

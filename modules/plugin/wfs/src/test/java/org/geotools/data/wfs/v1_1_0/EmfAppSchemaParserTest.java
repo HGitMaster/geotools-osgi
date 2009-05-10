@@ -16,6 +16,10 @@
  */
 package org.geotools.data.wfs.v1_1_0;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,13 +27,12 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.TestCase;
-
 import org.geotools.data.wfs.v1_1_0.parsers.EmfAppSchemaParser;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.test.TestData;
-import org.geotools.wfs.WFSConfiguration;
+import org.geotools.wfs.v1_1.WFSConfiguration;
 import org.geotools.xml.Configuration;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -38,20 +41,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Unit test suite for {@link EmfAppSchemaParser}
  * 
  * @author Gabriel Roldan
- * @version $Id: EmfAppSchemaParserTest.java 31792 2008-11-06 19:17:35Z groldan $
+ * @version $Id: EmfAppSchemaParserTest.java 32043 2008-12-19 03:23:35Z jdeolive $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/EmfAppSchemaParserTest.java $
  */
-public class EmfAppSchemaParserTest extends TestCase {
-
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
+public class EmfAppSchemaParserTest {
 
     /**
      * Test method for
@@ -59,6 +54,7 @@ public class EmfAppSchemaParserTest extends TestCase {
      * 
      * @throws IOException
      */
+	@Test
     public void testParseGeoServerSimpleFeatureType() throws IOException {
         final QName featureTypeName = DataTestSupport.GEOS_STATES.TYPENAME;
         final String schemaFileName = DataTestSupport.GEOS_STATES.SCHEMA;
@@ -72,6 +68,7 @@ public class EmfAppSchemaParserTest extends TestCase {
         assertEquals("the_geom", ftype.getGeometryDescriptor().getLocalName());
     }
 
+	@Test
     public void testParseCubeWerx_GML_Level1_FeatureType() throws IOException {
         final QName featureTypeName = DataTestSupport.CUBEWERX_GOVUNITCE.TYPENAME;
         final String schemaFileName = DataTestSupport.CUBEWERX_GOVUNITCE.SCHEMA;

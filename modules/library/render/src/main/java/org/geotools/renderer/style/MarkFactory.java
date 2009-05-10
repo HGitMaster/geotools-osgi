@@ -30,6 +30,10 @@ public interface MarkFactory {
      * Turns the specified URL into an Shape, eventually using the Feature
      * attributes to evaluate the expression, or returns <code>null</code> if
      * the factory cannot evaluate this symbolUrl.
+     * <p>
+     * The returned Shape must not exceed the [-0.5, -0.5, 0.5, 0.5] bounds
+     * (will be rescaled according to the <size> parameter given in graphics
+     * on the fly</p>
      * 
      * @param symbolUrl
      *            the expression that will return the symbol name. Once

@@ -17,7 +17,6 @@
 package org.geotools.feature;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.opengis.feature.Attribute;

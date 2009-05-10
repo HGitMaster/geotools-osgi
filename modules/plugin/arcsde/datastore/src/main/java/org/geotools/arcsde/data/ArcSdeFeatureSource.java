@@ -27,10 +27,12 @@ import org.geotools.arcsde.pool.ISession;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
+import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
 import org.geotools.data.Transaction;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
@@ -171,7 +173,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
             if (defaultGeometry == null) {
                 envelope = ReferencedEnvelope.reference(ev);
             } else {
-                envelope = new ReferencedEnvelope(ev, defaultGeometry.getCoordinateReferenceSystem());
+                envelope = new ReferencedEnvelope(ev, defaultGeometry
+                        .getCoordinateReferenceSystem());
             }
             return envelope;
         }
@@ -212,8 +215,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      * Returns a session appropriate for the current transaction
      * <p>
      * This is convenient way to get a connection for {@link #getBounds()} and
-     * {@link #getCount(Query)}. {@link ArcSdeFeatureStore} overrides to get the connection from
-     * the transaction instead of the pool.
+     * {@link #getCount(Query)}. {@link ArcSdeFeatureStore} overrides to get the connection from the
+     * transaction instead of the pool.
      * </p>
      * 
      * @return
@@ -249,7 +252,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
             throws IOException {
         final Query namedQuery = namedQuery(query);
         FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
-        collection = new ArcSdeFeatureCollection(this, namedQuery);
+        SimpleFeatureType queryType = dataStore.getQueryType(namedQuery);
+        collection = new ArcSdeFeatureCollection(this, queryType, namedQuery);
         return collection;
     }
 
@@ -278,14 +282,23 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     }
 
     /**
-     * @return empty set
+     * ArcSDE features are always "detached", so we return the FEATURE_DETACHED hint here.
+     * 
+     * @return singleton with {@link Hints#FEATURE_DETACHED}
      * @see FeatureSource#getSupportedHints()
      */
     public final Set getSupportedHints() {
-        return Collections.EMPTY_SET;
+        return Collections.singleton(Hints.FEATURE_DETACHED);
     }
 
     public ArcSdeVersionHandler getVersionHandler() throws IOException {
         return dataStore.getVersionHandler(typeInfo.getFeatureTypeName(), transaction);
+    }
+
+    public FeatureReader<SimpleFeatureType, SimpleFeature> getfeatureReader(
+            SimpleFeatureType targetSchema, Query query) throws IOException {
+        FeatureReader<SimpleFeatureType, SimpleFeature> featureReader;
+        featureReader = dataStore.getFeatureReader(query, transaction, targetSchema);
+        return featureReader;
     }
 }

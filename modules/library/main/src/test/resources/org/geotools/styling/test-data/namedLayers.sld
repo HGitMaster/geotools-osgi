@@ -5,6 +5,17 @@
 -->
 <StyledLayerDescriptor version="1.0.0">
 	<NamedLayer>
+		<LayerFeatureConstraints>
+			<FeatureTypeConstraint>
+				<FeatureTypeName>SomeFeatureName</FeatureTypeName>
+				<Filter>
+					<PropertyIsEqualTo>
+						<PropertyName>SomeProperty</PropertyName>
+						<Literal>100</Literal>
+					</PropertyIsEqualTo>
+				</Filter>
+			</FeatureTypeConstraint>
+		</LayerFeatureConstraints>
 		<Name>Rivers</Name>
 		<NamedStyle>
 			<Name>CenterLine</Name>

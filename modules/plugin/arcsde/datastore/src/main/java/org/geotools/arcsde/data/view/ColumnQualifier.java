@@ -29,17 +29,20 @@ import org.geotools.arcsde.pool.ISession;
  * to not get confused when using joined tables.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ColumnQualifier.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: ColumnQualifier.java 32195 2009-01-09 19:00:35Z groldan $
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/ColumnQualifier.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/view/ColumnQualifier.java $
  * @since 2.3.x
  */
 class ColumnQualifier {
     /**
      * DOCUMENT ME!
      * 
-     * @param session DOCUMENT ME!
-     * @param column DOCUMENT ME!
+     * @param session
+     *            DOCUMENT ME!
+     * @param column
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
      */
     public static Column qualify(ISession session, Map tableAliases, Column column) {

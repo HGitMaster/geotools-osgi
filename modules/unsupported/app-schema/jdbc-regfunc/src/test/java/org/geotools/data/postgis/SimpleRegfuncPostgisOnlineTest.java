@@ -27,6 +27,11 @@ import java.sql.Statement;
  * <p>
  * 
  * See {@link AbstractRegfuncPostgisOnlineTestCase} for a description of this test fixture.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: SimpleRegfuncPostgisOnlineTest.java 31819 2008-11-11 02:31:21Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/jdbc-regfunc/src/test/java/org/geotools/data/postgis/SimpleRegfuncPostgisOnlineTest.java $
+ * @since 2.4
  */
 public class SimpleRegfuncPostgisOnlineTest extends AbstractRegfuncPostgisOnlineTestCase {
 

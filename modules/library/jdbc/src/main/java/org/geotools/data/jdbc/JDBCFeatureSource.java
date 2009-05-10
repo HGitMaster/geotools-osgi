@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -36,6 +37,9 @@ import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
+import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -80,7 +84,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureSource.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureSource.java $
  */
 public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
     /** The logger for the filter module. */
@@ -98,13 +102,13 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
      * </p>
      * 
      * @author Gabriel Roldan (TOPP)
-     * @version $Id: JDBCFeatureSource.java 30921 2008-07-05 07:51:23Z jgarnett $
+     * @version $Id: JDBCFeatureSource.java 32235 2009-01-16 13:08:22Z mcr $
      * @since 2.4.3
      * @see #supportsNaturalOrderSorting()
      * @see #supportsReverseOrderSorting()
      * @see #supportsPropertySorting(PropertyName, SortOrder)
      */
-    protected static class JDBCQueryCapabilities extends QueryCapabilities {
+    protected class JDBCQueryCapabilities extends QueryCapabilities {
 
         private SimpleFeatureType featureType;
 
@@ -189,6 +193,36 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
             String attName = propertyName.getPropertyName();
             AttributeDescriptor attribute = featureType.getDescriptor(attName);
             return attribute != null;
+        }
+        
+        /**
+         * Consults the fid mapper for the feature source, if the null feature map reliable fids
+         * not supported. 
+         */
+        @Override
+        public boolean isReliableFIDSupported() {
+            FIDMapper mapper;
+            try {
+                mapper = JDBCFeatureSource.this.dataStore.getFIDMapper(featureType.getTypeName());
+            } 
+            catch (IOException e) {
+                LOGGER.warning( "Unable to access fid mapper" );
+                LOGGER.log( Level.FINE, "", e );
+                return super.isReliableFIDSupported();
+            }
+            
+            return !isNullFidMapper( mapper );
+        }
+        
+        /**
+         * Helper method to test if a fid mapper is a null fid mapper.
+         */
+        protected boolean isNullFidMapper( FIDMapper mapper ) {
+            if ( mapper instanceof TypedFIDMapper ) {
+                mapper = ((TypedFIDMapper)mapper).getWrappedMapper();
+            }
+            
+            return mapper instanceof NullFIDMapper;
         }
     }
     
@@ -485,6 +519,7 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
         JDBC1DataStore jdbc = getJDBCDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(featureType.getTypeName());
 
+        Filter preFilter = (Filter) sqlBuilder.getPreQueryFilter(filter); 
         Filter postFilter = (Filter) sqlBuilder.getPostQueryFilter(filter); 
         if (postFilter != null && !Filter.INCLUDE.equals(postFilter)) {
             // this would require postprocessing the filter
@@ -502,7 +537,7 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
             //chorner: we should hit an indexed column, * will likely tablescan
             sql.append("SELECT COUNT(*) as cnt");
             sqlBuilder.sqlFrom(sql, typeName);
-            sqlBuilder.sqlWhere(sql, filter); //safe to assume filter = prefilter
+            sqlBuilder.sqlWhere(sql, preFilter); 
             
             LOGGER.finer("SQL: " + sql);
 

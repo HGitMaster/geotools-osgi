@@ -26,7 +26,6 @@ import java.util.Set;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
-import org.geotools.filter.FidFilter;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LiteralExpression;
 import org.opengis.feature.Feature;
@@ -34,6 +33,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Contains;
 import org.opengis.filter.spatial.Crosses;
@@ -66,7 +67,7 @@ public class DiffFeatureReader<T extends FeatureType, F extends Feature> impleme
 
 	private Iterator<F> addedIterator;
 	private Iterator<F> modifiedIterator;
-	private int fidIndex=0;
+	private Iterator<Identifier> fids;
 	private Iterator<F> spatialIndexIterator;
 	
 	private boolean indexedGeometryFilter = false;
@@ -102,7 +103,7 @@ public class DiffFeatureReader<T extends FeatureType, F extends Feature> impleme
         this.filter = filter;
         encounteredFids=new HashSet();
 
-        if( filter instanceof FidFilter ){
+        if( filter instanceof Id){
         	fidFilter=true;
         }else if( isSubsetOfBboxFilter(filter) ){
         	indexedGeometryFilter=true;
@@ -238,21 +239,18 @@ public class DiffFeatureReader<T extends FeatureType, F extends Feature> impleme
 	}
 	
 	protected void queryFidFilter() {
-		FidFilter fidFilter = (FidFilter) filter;
-		if (fidIndex == -1) {
-		    fidIndex = 0;
+		Id fidFilter = (Id) filter;
+		if (fids == null) {
+		    fids = fidFilter.getIdentifiers().iterator();
 		}
-		while( fidIndex < fidFilter.getFids().length && next == null ) {
-		    String fid = fidFilter.getFids()[fidIndex];
-		    if( encounteredFids.contains(fid) ){
-		    	fidIndex++;
-		    	continue;
+        while( fids.hasNext() && next == null ) {
+		    String fid = fids.next().toString();
+		    if( !encounteredFids.contains(fid) ){
+    			next = (F) diff.modified2.get(fid);
+    		    if( next==null ){
+    		    	next = (F) diff.added.get(fid);
+    		    }
 		    }
-			next = (F) diff.modified2.get(fid);
-		    if( next==null ){
-		    	next = (F) diff.added.get(fid);
-		    }
-		    fidIndex++;
 		}
 	}
     

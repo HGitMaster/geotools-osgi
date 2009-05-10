@@ -19,7 +19,7 @@ package org.geotools.coverage.io;
 import org.geotools.coverage.io.CoverageAccess.AccessType;
 
 /**
- * Describes the capabilities of this {@link CoverageSource}
+ * Describes the capabilities of a {@link CoverageSource}.
  * 
  * @author Simone Giannecchini, GeoSolutions SAS
  *

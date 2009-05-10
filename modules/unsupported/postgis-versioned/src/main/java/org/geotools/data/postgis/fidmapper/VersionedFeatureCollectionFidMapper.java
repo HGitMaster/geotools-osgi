@@ -98,4 +98,8 @@ class VersionedFeatureCollectionFidMapper implements VersionedFIDMapper {
         return wrapped.getUnversionedPKAttributes(FID);
     }
 
+    public boolean isValid(String fid) {
+        return wrapped.isValid(fid);
+    }
+
 }

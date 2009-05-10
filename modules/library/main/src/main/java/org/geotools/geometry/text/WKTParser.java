@@ -46,7 +46,7 @@ import java.util.Set;
 
 /**
  * This class is used to parse well known text (WKT) which describes an
- * ISO 19107 Geometry. The grammar described omes from the ISO 19125-1
+ * ISO 19107 Geometry. The grammar described comes from the ISO 19125-1
  * spec which describes feature geometry. It doesn't seem to exactly mesh up
  * with the geometry as described in 19107 so not all of the grammar is supported.
  * <p/>
@@ -86,7 +86,7 @@ import java.util.Set;
  * @author Jody Garnett
  * @author Joel Skelton
  * @since 2.5
- * @version $Id: WKTParser.java 30648 2008-06-12 19:22:35Z acuster $
+ * @version $Id: WKTParser.java 32621 2009-03-10 10:26:23Z jive $
  */
 public class WKTParser {
 

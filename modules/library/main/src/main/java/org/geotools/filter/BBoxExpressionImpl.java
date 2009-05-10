@@ -17,10 +17,14 @@
 package org.geotools.filter;
 
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.TopologyException;
 
 
@@ -33,8 +37,8 @@ import com.vividsolutions.jts.geom.TopologyException;
  * </code>
  * 
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/BBoxExpressionImpl.java $
- * @version $Id: BBoxExpressionImpl.java 30648 2008-06-12 19:22:35Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/BBoxExpressionImpl.java $
+ * @version $Id: BBoxExpressionImpl.java 32203 2009-01-12 12:51:24Z jesseeichar $
  */
 public class BBoxExpressionImpl
     extends org.geotools.filter.LiteralExpressionImpl implements BBoxExpression {
@@ -60,6 +64,7 @@ public class BBoxExpressionImpl
     protected BBoxExpressionImpl(Envelope env) throws IllegalFilterException {
         expressionType = DefaultExpression.LITERAL_GEOMETRY;
         setBounds(env);
+        
     }
 
     /**
@@ -88,6 +93,11 @@ public class BBoxExpressionImpl
             throw new IllegalFilterException(tex.toString());
         }
 
-        super.setLiteral(gfac.createPolygon(ring, null));
+        Polygon polygon = gfac.createPolygon(ring, null);
+        if (env instanceof ReferencedEnvelope) {
+            ReferencedEnvelope refEnv = (ReferencedEnvelope) env;
+            polygon.setUserData(refEnv.getCoordinateReferenceSystem());
+        }
+        super.setValue(polygon);
     }
 }

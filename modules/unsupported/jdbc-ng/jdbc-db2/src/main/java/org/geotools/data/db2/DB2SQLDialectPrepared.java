@@ -60,7 +60,7 @@ public class DB2SQLDialectPrepared extends PreparedStatementSQLDialect {
   
 	@Override
 	public PreparedFilterToSQL createPreparedFilterToSQL() {
-		return new DB2FilterToSQL();
+		return new DB2FilterToSQL(this);
 	}
 
 	@Override
@@ -127,6 +127,16 @@ public class DB2SQLDialectPrepared extends PreparedStatementSQLDialect {
     	delegate.registerSqlTypeNameToClassMappings(mappings);
 
     }
+	
+	@Override
+    public void prepareFunctionArgument(Class clazz, StringBuffer sql) {
+		String castExpression = DB2Util.getCastExpression(clazz);
+		
+		if (castExpression!=null)
+			sql.append(castExpression);
+		else
+			super.prepareFunctionArgument(clazz, sql);        
+    }
 
 
 	@Override
@@ -139,7 +149,8 @@ public class DB2SQLDialectPrepared extends PreparedStatementSQLDialect {
 	@Override
 	public void setGeometryValue(Geometry g, int srid, Class binding, PreparedStatement ps, int column) throws SQLException {
 		if (g ==null) {
-			ps.setNull(column, Types.OTHER);
+			//ps.setNull(column, Types.OTHER);
+			ps.setBytes(column, null);
 			return;
 		}
 		WKBWriter w = new WKBWriter();
@@ -166,5 +177,13 @@ public class DB2SQLDialectPrepared extends PreparedStatementSQLDialect {
 	public void prepareGeometryValue(Geometry geom, int srid, Class binding, StringBuffer sql) {
 		DB2Util.prepareGeometryValue(geom, srid, binding, sql);
 	}
+	
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
+    }
+
 
 }

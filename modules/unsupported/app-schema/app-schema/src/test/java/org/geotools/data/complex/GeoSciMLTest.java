@@ -18,6 +18,8 @@
 package org.geotools.data.complex;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,6 +33,7 @@ import org.apache.xml.resolver.Catalog;
 import org.apache.xml.resolver.tools.ResolvingXMLReader;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
 import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
@@ -47,9 +50,10 @@ import org.opengis.feature.type.Name;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: GeoSciMLTest.java 31787 2008-11-06 07:12:25Z bencd $
+ * @version $Id: GeoSciMLTest.java 32633 2009-03-16 01:44:12Z ang05a $
  * @source $URL:
- *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
+ *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas
+ *         /community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
  * @since 2.4
  */
 public class GeoSciMLTest extends TestCase {
@@ -70,7 +74,7 @@ public class GeoSciMLTest extends TestCase {
      * DOCUMENT ME!
      * 
      * @throws Exception
-     *                 DOCUMENT ME!
+     *             DOCUMENT ME!
      */
     protected void setUp() throws Exception {
         super.setUp();
@@ -82,7 +86,7 @@ public class GeoSciMLTest extends TestCase {
      * DOCUMENT ME!
      * 
      * @throws Exception
-     *                 DOCUMENT ME!
+     *             DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -91,7 +95,7 @@ public class GeoSciMLTest extends TestCase {
     /**
      * 
      * @param location
-     *                schema location path discoverable through getClass().getResource()
+     *            schema location path discoverable through getClass().getResource()
      */
     private void loadSchema(String location) throws IOException {
         // load needed GML types directly from the gml schemas
@@ -225,11 +229,37 @@ public class GeoSciMLTest extends TestCase {
                 count++;
             }
             features.close(it);
+
+            mappingDataStore.dispose();
+
             assertEquals(EXPECTED_RESULT_COUNT, count);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    /**
+     * Test that getting features from a feature source with a query honours the namespace.
+     * 
+     * @throws Exception
+     */
+    public void testFeatureSourceHonoursQueryNamespace() throws Exception {
+        final Map<String, Serializable> dsParams = new HashMap<String, Serializable>();
+        final URL url = getClass().getResource(schemaBase + "mappedPolygons.xml");
+        dsParams.put("dbtype", "app-schema");
+        dsParams.put("url", url.toExternalForm());
+        final Name typeName = Types.typeName(GSMLNS, "MappedFeature");
+        DataAccess<FeatureType, Feature> mappingDataStore = DataAccessFinder.getDataStore(dsParams);
+        FeatureSource<FeatureType, Feature> source = mappingDataStore.getFeatureSource(typeName);
+        DefaultQuery query = new DefaultQuery();
+        query.setNamespace(new URI(typeName.getNamespaceURI()));
+        query.setTypeName(typeName.getLocalPart());
+        FeatureCollection<FeatureType, Feature> features = source.getFeatures(query);
+        assertNotNull(features);
+        assertEquals(2, features.size());
+        
+        mappingDataStore.dispose();
     }
 
     private int getCount(FeatureCollection features) {

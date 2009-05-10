@@ -16,12 +16,9 @@
  */
 package org.geotools.xml;
 
-import org.apache.xerces.parsers.SAXParser;
-import org.eclipse.xsd.XSDSchema;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.NamespaceSupport;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,10 +28,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.xerces.parsers.SAXParser;
+import org.eclipse.xsd.XSDSchema;
 import org.geotools.xml.impl.ParserHandler;
 import org.geotools.xs.XS;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.NamespaceSupport;
 
 
 /**
@@ -159,6 +168,38 @@ public class Parser {
     }
 
     /**
+     * Parses an instance document defined by a transformer source.
+     * <p>
+     * Note: Currently this method reads the entire source into memory in order to validate
+     * it. If large documents must be parsed one of {@link #
+     * </p>
+     * @param source THe source of the instance document.
+     *
+     * @return @return The object representation of the root element of the document.
+     * 
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws TransformerException
+     * 
+     * @since 2.6
+     */
+    public Object parse(Source source) throws IOException, SAXException, ParserConfigurationException, TransformerException {
+        //TODO: use SAXResult to stream, need to figure out how to enable 
+        // validation with transformer api
+        //SAXResult result = new SAXResult( handler );
+        StreamResult result = new StreamResult( new ByteArrayOutputStream() );
+        
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer tx = tf.newTransformer();
+        
+        tx.transform( source, result );
+        
+        return parse( new ByteArrayInputStream( ((ByteArrayOutputStream)result.getOutputStream()).toByteArray() ) );
+    }
+    
+
+    /**
      * Parses an instance documented defined by a sax input source.
      * <p>
      * The object returned from the parse is the object which has been bound to the root
@@ -254,6 +295,69 @@ public class Parser {
     }
 
     /**
+     * Validates an instance document defined by a input stream.
+     * <p>
+     * Clients should call {@link #getValidationErrors()} after this method to 
+     * retrieve any validation errors that occurred. Clients do not need to call 
+     * {@link #setValidating(boolean)} when using this method to validate. 
+     * </p>
+     * <p>
+     * This method does not do any of the work done by {@link #parse(InputSource)}, it
+     * only validates. 
+     * </p>
+     *
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
+    public void validate( InputStream in ) throws IOException, SAXException, ParserConfigurationException {
+        validate( new InputSource( in ) );
+    }
+
+    /**
+     * Validates an instance document defined by a reader.
+     * <p>
+     * Clients should call {@link #getValidationErrors()} after this method to 
+     * retrieve any validation errors that occurred. Clients do not need to call 
+     * {@link #setValidating(boolean)} when using this method to validate. 
+     * </p>
+     * <p>
+     * This method does not do any of the work done by {@link #parse(InputSource)}, it
+     * only validates. 
+     * </p>
+     *
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
+    public void validate( Reader reader ) throws IOException, SAXException, ParserConfigurationException {
+        validate( new InputSource( reader ) );
+    }
+    
+    /**
+     * Validates an instance document defined by a input source.
+     * <p>
+     * Clients should call {@link #getValidationErrors()} after this method to 
+     * retrieve any validation errors that occurred. Clients do not need to call 
+     * {@link #setValidating(boolean)} when using this method to validate. 
+     * </p>
+     * <p>
+     * This method does not do any of the work done by {@link #parse(InputSource)}, it
+     * only validates. 
+     * </p>
+     *
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
+    public void validate( InputSource source ) throws IOException, SAXException, ParserConfigurationException {
+        SAXParser parser = parser( true );
+        parser.setContentHandler( handler.getValidator() );
+        parser.setErrorHandler( handler.getValidator() );
+        parser.parse( source );
+    }
+
+    /**
      * Returns the schema objects referenced by the instance document being
      * parsed. This method can only be called after a successful parse has
      * begun.
@@ -293,6 +397,10 @@ public class Parser {
     }
 
     protected SAXParser parser() throws ParserConfigurationException, SAXException {
+        return parser( isValidating() );
+    }
+    
+    protected SAXParser parser(boolean validate) throws ParserConfigurationException, SAXException {
         //JD: we use xerces directly here because jaxp does seem to allow use to 
         // override all the namespaces to validate against
         SAXParser parser = new SAXParser();
@@ -300,7 +408,7 @@ public class Parser {
         //set the appropriate features
         parser.setFeature("http://xml.org/sax/features/namespaces", true);
 
-        if (handler.isValidating()) {
+        if (validate) {
             parser.setFeature("http://xml.org/sax/features/validation", true);
             parser.setFeature("http://apache.org/xml/features/validation/schema", true);
             parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);

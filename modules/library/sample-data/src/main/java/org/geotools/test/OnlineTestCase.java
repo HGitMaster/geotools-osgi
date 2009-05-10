@@ -44,26 +44,59 @@ import junit.framework.TestCase;
  * methods.
  * </p>
  *
+ * <p>
+ * The default behaviour of this class is that if {@link #connect()} throws an exception, the test
+ * suite is disabled, causing each test to pass without being run. In addition, exceptions thrown by
+ * {@link #disconnect()} are ignored. This behaviour allows tests to be robust against transient
+ * outages of online resources, but also means that local software failures in {@link #connect()} or
+ * {@link #disconnect()} will be silent.
+ * </p>
+ * 
+ * <p>
+ * To have exceptions thrown by {@link #connect()} and {@link #disconnect()} cause tests to fail,
+ * set <code>skip.on.failure=false</code> in the fixture property file. This restores the
+ * traditional behaviour of unit tests, that is, that exceptions cause unit tests to fail.
+ * </p>
+ *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/sample-data/src/main/java/org/geotools/test/OnlineTestCase.java $
- * @version $Id: OnlineTestCase.java 30651 2008-06-12 20:06:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/sample-data/src/main/java/org/geotools/test/OnlineTestCase.java $
+ * @version $Id: OnlineTestCase.java 32476 2009-02-12 03:36:13Z bencaradocdavies $
  * @author Justin Deoliveira, The Open Planning Project
  */
 public abstract class OnlineTestCase extends TestCase {
+
+    /**
+     * The key in the test fixture property file used to set the behaviour of the online test if
+     * {@link #connect()} fails.
+     */
+    public static final String SKIP_ON_FAILURE_KEY = "skip.on.failure";
+
+    /**
+     * The default value used for {@link #SKIP_ON_FAILURE_KEY} if it is not present.
+     */
+    public static final String SKIP_ON_FAILURE_DEFAULT = "true";
+
     /**
      * The test fixture, {@code null} if the fixture is not available.
      */
     protected Properties fixture;
 
     /**
+     * Flag that determines effect of exceptions in connect/disconnect. If true (the default),
+     * exceptions in connect cause the the test to be disabled, and exceptions in disconnect to be
+     * ignored. If false, exceptions will be rethrown, and cause the test to fail.
+     */
+    protected boolean skipOnFailure = true;
+
+    /**
      * Loads the test fixture for the test case.
      * <p>
-     * The fixture is obtained via {@link #getFixtureId()}.
+     * The fixture id is obtained via {@link #getFixtureId()}.
      * </p>
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
-
         // load the fixture
         File base = new File(System.getProperty("user.home") + File.separator + ".geotools");
         String fixtureId = getFixtureId();
@@ -82,35 +115,41 @@ public abstract class OnlineTestCase extends TestCase {
             } finally {
                 input.close();
             }
-
+            skipOnFailure = Boolean.parseBoolean(fixture.getProperty(SKIP_ON_FAILURE_KEY,
+                    SKIP_ON_FAILURE_DEFAULT));
             // call the setUp template method
             try {
                 connect();
-            } catch (Throwable t) {
-                // abort the test
-                fixture = null;
-                
-                if( once ) {
-                    // print out connection failure message once
-                    // (for people debugging a single test case)
-                    t.printStackTrace();
-                    once = false;
-                }                  
+            } catch (Exception e) {
+                if (skipOnFailure) {
+                    // disable the test
+                    fixture = null;
+                    // leave some trace of the swallowed exception
+                    e.printStackTrace();
+                } else {
+                    // do not swallow the exception
+                    throw e;
+                }
             }
+
         }
     }
 
-    static boolean once = true;
     /**
      * Tear down method for test, calls through to {@link #disconnect()} if the
      * test is active.
      */
+    @Override
     protected void tearDown() throws Exception {
         if (fixture != null) {
             try {
                 disconnect();
-            } catch (Throwable t) {
-                // do nothing
+            } catch (Exception e) {
+                if (skipOnFailure) {
+                    // do nothing
+                } else {
+                    throw e;
+                }
             }
         }
     }
@@ -143,19 +182,19 @@ public abstract class OnlineTestCase extends TestCase {
      * Override which checks if the fixture is available. If not the test is not
      * executed.
      */
+    @Override
     protected void runTest() throws Throwable {
         // if the fixture was loaded, run
         if (fixture != null) {
             super.runTest();
         }
-
         // otherwise do nothing
     }
 
     /**
      * The fixture id for the test case.
      * <p>
-     * This name is hierachical, similar to a java package name. Example:
+     * This name is hierarchical, similar to a java package name. Example:
      * {@code "postgis.demo_bc"}.
      * </p>
      * 

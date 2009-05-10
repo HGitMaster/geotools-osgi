@@ -17,18 +17,16 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.pool.ISession;
 import org.geotools.arcsde.pool.SessionPool;
 import org.geotools.data.DataStore;
@@ -37,6 +35,12 @@ import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -52,10 +56,11 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
- * @version $Id: ArcSDEDataStoreTest.java 30921 2008-07-05 07:51:23Z jgarnett $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
+ * @version $Id: ArcSDEDataStoreTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
-public class ArcSDEDataStoreTest extends TestCase {
+public class ArcSDEDataStoreTest {
     /** package logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(ArcSDEDataStoreTest.class.getPackage().getName());
@@ -69,54 +74,16 @@ public class ArcSDEDataStoreTest extends TestCase {
     /** a filter factory for testing */
     FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
-    /**
-     * Creates a new ArcSDEDataStoreTest object.
-     */
-    public ArcSDEDataStoreTest() {
-        this("ArcSDE DataStore unit tests");
-    }
-
-    /**
-     * Creates a new ArcSDEDataStoreTest object.
-     * 
-     * @param name a name for the junit test
-     */
-    public ArcSDEDataStoreTest(String name) {
-        super(name);
-    }
-
-    /**
-     * Builds a test suite for all this class' tests with per suite initialization directed to
-     * {@link #oneTimeSetUp()} and per suite clean up directed to {@link #oneTimeTearDown()}
-     * 
-     * @return
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(ArcSDEDataStoreTest.class);
-
-        TestSetup wrapper = new TestSetup(suite) {
-            @Override
-            protected void setUp() throws Exception {
-                oneTimeSetUp();
-            }
-
-            @Override
-            protected void tearDown() {
-                oneTimeTearDown();
-            }
-        };
-        return wrapper;
-    }
-
-    private static void oneTimeSetUp() throws Exception {
+    @BeforeClass
+    public static void oneTimeSetUp() throws Exception {
         testData = new TestData();
         testData.setUp();
         final boolean insertTestData = true;
         testData.createTempTable(insertTestData);
     }
 
-    private static void oneTimeTearDown() {
+    @AfterClass
+    public static void oneTimeTearDown() {
         boolean cleanTestTable = false;
         boolean cleanPool = true;
         testData.tearDown(cleanTestTable, cleanPool);
@@ -126,35 +93,23 @@ public class ArcSDEDataStoreTest extends TestCase {
      * loads {@code testData/testparams.properties} into a Properties object, wich is used to obtain
      * test tables names and is used as parameter to find the DataStore
      * 
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        // facilitates running a single test at a time (eclipse lets you do this
-        // and it's very useful)
+    @Before
+    public void setUp() throws Exception {
         if (testData == null) {
             oneTimeSetUp();
         }
         this.store = testData.getDataStore();
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         this.store = null;
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws IOException DOCUMENT ME!
-     */
+    @Test
     public void testFinder() throws IOException {
         DataStore sdeDs = null;
 
@@ -172,11 +127,13 @@ public class ArcSDEDataStoreTest extends TestCase {
      * 
      * @throws Throwable
      */
-    public void _testAutoFillSRS() throws Throwable {
+    @Test
+    @Ignore
+    public void testAutoFillSRS() throws Throwable {
 
         ArcSDEDataStore ds = testData.getDataStore();
-        CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getGeometryDescriptor()
-                .getCoordinateReferenceSystem();
+        CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY")
+                .getGeometryDescriptor().getCoordinateReferenceSystem();
 
         LOGGER.info(sdeCRS.toWKT().replaceAll(" ", "").replaceAll("\n", "")
                 .replaceAll("\"", "\\\""));
@@ -217,15 +174,17 @@ public class ArcSDEDataStoreTest extends TestCase {
 
     }
 
-    public void testDispose() throws IOException{
+    @Test
+    public void testDispose() throws IOException {
         store.dispose();
-        try{
-            ((ArcSDEDataStore)store).getSession(Transaction.AUTO_COMMIT);
+        try {
+            ((ArcSDEDataStore) store).getSession(Transaction.AUTO_COMMIT);
             fail("Expected IllegalStateException when the datastore has been disposed");
-        }catch(IllegalStateException e){
+        } catch (IllegalStateException e) {
             assertTrue(true);
-        }finally{
-            //dispose test data so next test does not fail due to pool being closed
+        } finally {
+            // dispose test data so next test does not fail due to pool being
+            // closed
             testData.tearDown(false, true);
             testData = null;
         }
@@ -240,23 +199,26 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException
      * @throws SeException
      */
+    @Test
     public void testGetTypeNames() throws IOException, SeException {
         String[] featureTypes = store.getTypeNames();
         assertNotNull(featureTypes);
 
-        if (LOGGER.isLoggable(Level.FINE)) {
-            for (int i = 0; i < featureTypes.length; i++)
-                System.out.println(featureTypes[i]);
-        }
+        // if (LOGGER.isLoggable(Level.FINE)) {
+        // for (int i = 0; i < featureTypes.length; i++)
+        // System.out.println(featureTypes[i]);
+        // }
         testTypeExists(featureTypes, testData.getTempTableName());
     }
 
     /**
      * tests that the schema for the defined tests tables are returned.
      * 
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
      * @throws SeException
      */
+    @Test
     public void testGetSchema() throws IOException, SeException {
         SimpleFeatureType schema;
 
@@ -277,10 +239,13 @@ public class ArcSDEDataStoreTest extends TestCase {
      * So, this test ensures the datastore correctly works arround this limitation.
      * </p>
      * 
-     * @throws IOException DOCUMENT ME!
-     * @throws SchemaException DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws SchemaException
+     *             DOCUMENT ME!
      * @throws SeException
      */
+    @Test
     public void testCreateSchema() throws IOException, SchemaException, SeException {
         final String typeName;
         {
@@ -319,8 +284,10 @@ public class ArcSDEDataStoreTest extends TestCase {
      * <code>table</code> must be a full qualified sde feature type name. (i.e "TEST_POINT" ==
      * "SDE.SDE.TEST_POINT")
      * 
-     * @param featureTypes DOCUMENT ME!
-     * @param table DOCUMENT ME!
+     * @param featureTypes
+     *            DOCUMENT ME!
+     * @param table
+     *            DOCUMENT ME!
      */
     private void testTypeExists(String[] featureTypes, String table) {
         for (int i = 0; i < featureTypes.length; i++) {

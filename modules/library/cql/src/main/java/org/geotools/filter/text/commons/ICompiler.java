@@ -22,6 +22,17 @@ import org.geotools.filter.text.cql2.CQLException;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 
+/**
+ * This interface presents the methods which will be implemented by the different compiles.
+ * 
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
+ *
+ * @author Mauricio Pazos (Axios Engineering)
+ * @since 2.6
+ */
 public interface ICompiler {
 
 

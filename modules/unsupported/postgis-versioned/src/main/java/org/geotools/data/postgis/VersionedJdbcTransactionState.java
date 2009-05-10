@@ -174,8 +174,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
             try {
                 // build filter to extract the appropriate changeset record
                 FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-                Filter revisionFilter = ff.id(Collections.singleton(ff.featureId(String
-                        .valueOf(getRevision()))));
+                Filter revisionFilter = ff.id(Collections.singleton(ff.featureId(VersionedPostgisDataStore.TBL_CHANGESETS + "." + getRevision())));
 
                 // get a writer for the changeset record we want to update
                 writer = wrapped.getFeatureWriter(VersionedPostgisDataStore.TBL_CHANGESETS,

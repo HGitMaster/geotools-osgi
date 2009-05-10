@@ -114,12 +114,12 @@ public class EqualIntervalFunction extends ClassificationFunction {
     private RangedClassifier calculateNonNumerical(int classNum, FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection) throws IOException {
         //obtain of list of unique values, so we can enumerate
         UniqueVisitor uniqueVisit = new UniqueVisitor(getExpression());
-        featureCollection.accepts(uniqueVisit, null);
+        featureCollection.accepts(uniqueVisit, new NullProgressListener());
         List result = uniqueVisit.getResult().toList();
         //sort the results and put them in an array
         Collections.sort(result);
         
-        Comparable[] values = (Comparable[]) result.toArray( new Comparable[ result.size()]);
+        Comparable[] values = (Comparable[]) result.toArray(new Comparable[result.size()]);
         
         //size arrays
         Comparable[] localMin = new Comparable[classNum];
@@ -142,13 +142,22 @@ public class EqualIntervalFunction extends ClassificationFunction {
         //for each bin
         for (int binIndex = 0; binIndex < classNum; binIndex++) {
             //store min
-            localMin[binIndex] = values[itemIndex];
+            if (binIndex < localMin.length)
+              localMin[binIndex] = (itemIndex < values.length ? values[itemIndex] : values[values.length-1]);
+            else
+            	localMin[localMin.length-1] = (itemIndex < values.length ? values[itemIndex] : values[values.length-1]);
             itemIndex+=binPop;
             //store max
             if (binIndex == classNum - 1) {
-                localMax[binIndex] = values[itemIndex];                
+            	 if (binIndex < localMax.length)
+                 localMax[binIndex] = (itemIndex < values.length ? values[itemIndex] : values[values.length-1]);
+               else
+                 localMax[localMax.length-1] = (itemIndex < values.length ? values[itemIndex] : values[values.length-1]);
             } else {
-                localMax[binIndex] = values[itemIndex+1];                
+            	 if (binIndex < localMax.length)
+                 localMax[binIndex] = (itemIndex+1 < values.length ? values[itemIndex+1] : values[values.length-1]);
+               else
+                 localMax[localMax.length-1] = (itemIndex+1 < values.length ? values[itemIndex+1] : values[values.length-1]);
             }
             if (lastBigBin == binIndex)
                 binPop--; // decrease the number of items in a bin for the

@@ -33,7 +33,6 @@ import org.geotools.util.Comparators;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-import com.sun.org.apache.xpath.internal.axes.ReverseAxesWalker;
 
 public class IndexedFidReaderTest extends FIDTestCase {
     public IndexedFidReaderTest(  ) throws IOException {
@@ -64,21 +63,27 @@ public class IndexedFidReaderTest extends FIDTestCase {
      * Test method for 'org.geotools.index.fid.IndexedFidReader.findFid(String)'
      */
     public void testFindFid() throws Exception {
-        long offset = reader.findFid("roads.4");
+        long offset = reader.findFid(TYPE_NAME + ".4");
         assertEquals(3, offset);
 
-        offset = reader.findFid("roads.1");
+        offset = reader.findFid(TYPE_NAME + ".1");
         assertEquals(0, offset);
 
         // test if the fid is too high
-        offset = reader.findFid("roads.10000000");
+        offset = reader.findFid(TYPE_NAME + ".10000000");
         assertEquals(-1, offset);
 
         // test if the fid is negative
-        offset = reader.findFid("roads.-1");
+        offset = reader.findFid(TYPE_NAME + ".-1");
         assertEquals(-1, offset);
 
-    }
+        // test if the fid does not match the <typeName>.<long> pattern
+        offset = reader.findFid(TYPE_NAME + ".1ABC");
+        assertEquals(-1, offset);
+
+        offset = reader.findFid("prefix" + TYPE_NAME + ".1");
+        assertEquals(-1, offset);
+   }
 
     public void testFindAllFids() throws Exception {
         int expectedCount = 0;

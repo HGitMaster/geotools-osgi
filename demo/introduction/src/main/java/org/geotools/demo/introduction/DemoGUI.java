@@ -18,9 +18,9 @@ import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,15 +28,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
 
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.PanAction;
-import org.geotools.gui.swing.ResetAction;
-import org.geotools.gui.swing.SelectAction;
-import org.geotools.gui.swing.ZoomInAction;
-import org.geotools.gui.swing.ZoomOutAction;
+import org.geotools.gui.swing.action.PanAction;
+import org.geotools.gui.swing.action.ResetAction;
+import org.geotools.gui.swing.action.ZoomInAction;
+import org.geotools.gui.swing.action.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
@@ -337,7 +337,7 @@ public class DemoGUI {
         
         /* Context */
         context = new DefaultMapContext(DefaultGeographicCRS.WGS84); 
-        context.setAreaOfInterest(demoBase.envlp_NoEdges2);
+        context.setAreaOfInterest(demoBase.envNoEdges);
         
         /* Add to JMapPane */
         jmp.setRenderer(renderer);
@@ -347,39 +347,50 @@ public class DemoGUI {
         
         /* The toolbar */
         jtb = new JToolBar();
-        Action zoomIn = new ZoomInAction(jmp);
-        Action zoomOut = new ZoomOutAction(jmp);
-        Action pan = new PanAction(jmp);
-        Action select = new SelectAction(jmp);
-        Action reset = new ResetAction(jmp);
-        jtb.add(zoomIn);
-        jtb.add(zoomOut);
-        jtb.add(pan);
+
         jtb.addSeparator();
-        jtb.add(reset);
+        
+        JButton resetBtn = new JButton(new ResetAction(jmp));
+        jtb.add(resetBtn);
+        
         jtb.addSeparator();
-        jtb.add(select);
-        final JButton button= new JButton();
-        button.setText("CRS");
-        button.setToolTipText("Change map prjection");
-        button.addActionListener(new ActionListener() {
+        
+        ButtonGroup cursorGrp = new ButtonGroup();
+        JToggleButton zoomInBtn = new JToggleButton(new ZoomInAction(jmp));
+        jtb.add(zoomInBtn);
+        cursorGrp.add(zoomInBtn);
+        
+        JToggleButton zoomOutBtn = new JToggleButton(new ZoomOutAction(jmp));
+        jtb.add(zoomOutBtn);
+        cursorGrp.add(zoomOutBtn);
+
+        JToggleButton panBtn = new JToggleButton(new PanAction(jmp));
+        jtb.add(panBtn);
+        cursorGrp.add(panBtn);
+
+        jtb.addSeparator();
+        
+        final JButton crsBtn = new JButton("CRS");
+        crsBtn.setToolTipText("Change map prjection");
+        crsBtn.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-              
-              String code = JOptionPane.showInputDialog( button, "Coordinate Reference System:", "EPSG:4326" ); 
+
+              String code = JOptionPane.showInputDialog( crsBtn, "Coordinate Reference System:", "EPSG:4326" ); 
               try{
                  CoordinateReferenceSystem crs = CRS.decode( code );
                  jmp.getContext().setAreaOfInterest(jmp.getContext().getAreaOfInterest(),crs);
-                 jmp.setReset(true);
-                 jmp.repaint();       
+                 jmp.reset();
                    
                 }
                 catch(FactoryException fe){
-                 JOptionPane.showMessageDialog( button, fe.getMessage(), fe.getClass().toString(), JOptionPane.ERROR_MESSAGE );
+                 JOptionPane.showMessageDialog( crsBtn, fe.getMessage(), fe.getClass().toString(), JOptionPane.ERROR_MESSAGE );
                  return;
                 }
             }
         });
-        jtb.add(button);
+        jtb.add(crsBtn);
+
         mapGUI.add(jtb,BorderLayout.NORTH);
         mapGUI.add(jmp);
         

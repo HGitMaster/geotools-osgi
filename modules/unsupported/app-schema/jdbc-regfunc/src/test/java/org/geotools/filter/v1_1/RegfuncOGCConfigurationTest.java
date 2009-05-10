@@ -26,6 +26,11 @@ import org.picocontainer.defaults.DefaultPicoContainer;
 
 /**
  * Test for {@link RegfuncOGCConfiguration}.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: RegfuncOGCConfigurationTest.java 31819 2008-11-11 02:31:21Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/jdbc-regfunc/src/test/java/org/geotools/filter/v1_1/RegfuncOGCConfigurationTest.java $
+ * @since 2.4
  */
 public class RegfuncOGCConfigurationTest extends TestCase {
 

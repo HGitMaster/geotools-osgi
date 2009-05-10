@@ -16,6 +16,7 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -30,7 +31,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -77,6 +77,7 @@ import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
+import org.geotools.renderer.label.LabelCacheImpl;
 import org.geotools.renderer.lite.gridcoverage2d.GridCoverageRenderer;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
@@ -137,7 +138,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 31767 2008-11-04 16:19:04Z aaime $
+ * @version $Id: StreamingRenderer.java 32725 2009-03-30 14:58:39Z aaime $
  */
 public final class StreamingRenderer implements GTRenderer {
 
@@ -176,7 +177,7 @@ public final class StreamingRenderer implements GTRenderer {
 	
 	private final static PropertyName paramsPropertyName = filterFactory.property("params");
 	
-  private final static PropertyName defaultGeometryPropertyName = filterFactory.property("");
+	private final static PropertyName defaultGeometryPropertyName = filterFactory.property("");
 	
 
 	/**
@@ -227,7 +228,7 @@ public final class StreamingRenderer implements GTRenderer {
 	/** Factory that will resolve symbolizers into rendered styles */
 	private SLDStyleFactory styleFactory = new SLDStyleFactory();
 
-	protected LabelCache labelCache = new LabelCacheDefault();
+	protected LabelCache labelCache = new LabelCacheImpl();
 
 	/** The painter class we use to depict shapes onto the screen */
 	private StyledShapePainter painter = new StyledShapePainter(labelCache);
@@ -265,6 +266,32 @@ public final class StreamingRenderer implements GTRenderer {
      */
     public static final String TEXT_RENDERING_KEY = "textRenderingMethod";
     private String textRenderingModeDEFAULT = TEXT_RENDERING_STRING;
+    
+    /**
+     * Whether the thin line width optimization should be used, or not.
+     * <p>When rendering non antialiased lines adopting a width of 0 makes the
+     * java2d renderer get into a fast path that generates the same output
+     * as a 1 pixel wide line<p>
+     * Unfortunately for antialiased rendering that optimization does not help,
+     * and disallows controlling the width of thin lines. It is provided as
+     * an explicit option as the optimization has been hard coded for years,
+     * removing it when antialiasing is on by default will invalidate lots
+     * of existing styles (making lines appear thicker).
+     */
+    public static final String LINE_WIDTH_OPTIMIZATION_KEY = "lineWidthOptimization";
+    
+    /**
+     * Boolean flag controlling a memory/speed trade off related to how
+     * multiple feature type styles are rendered.
+     * <p>When enabled (by default) multiple feature type styles against the
+     * same data source will be rendered in separate memory back buffers
+     * in a way that allows the source to be scanned only once (each back buffer
+     * is as big as the image being rendered).</p> 
+     * <p>When disabled no memory back buffers will be used but the
+     * feature source will be scanned once for every feature type style
+     * declared against it</p>
+     */
+    public static final String OPTIMIZE_FTS_RENDERING_KEY = "optimizeFTSRendering";
 
 	public static final String LABEL_CACHE_KEY = "labelCache";
 	public static final String FORCE_CRS_KEY = "forceCRS";
@@ -617,9 +644,9 @@ public final class StreamingRenderer implements GTRenderer {
 		// ////////////////////////////////////////////////////////////////////
 		final MapLayer[] layers = context.getLayers();
 		labelCache.start();
-		if(labelCache instanceof LabelCacheDefault) {
+		if(labelCache instanceof LabelCacheImpl) {
 		    boolean outlineEnabled = TEXT_RENDERING_OUTLINE.equals(getTextRenderingMethod());
-            ((LabelCacheDefault) labelCache).setOutlineRenderingEnabled(outlineEnabled);
+            ((LabelCacheImpl) labelCache).setOutlineRenderingEnabled(outlineEnabled);
 		}
 		final int layersNumber = layers.length;
 		MapLayer currLayer;
@@ -965,60 +992,34 @@ public final class StreamingRenderer implements GTRenderer {
 			// filter2 OR filter3);
 
 			final int maxFilters = getMaxFiltersToSendToDatastore();
-			final ArrayList filtersToDS = new ArrayList();
-			final int actualFilters = 0;
-			final int stylesLength = styles.length;
-			int styleElseRulesLength;
-			int styleRulesLength;
-			LiteFeatureTypeStyle style;
-			int u = 0;
-			Rule r;
-			if (stylesLength > maxFilters) // there's at least one per
-				return;
-			for (int t = 0; t < stylesLength; t++) // look at each
-			// featuretypestyle
-			{
-				style = styles[t];
-				styleElseRulesLength = style.elseRules.length;
-				styleRulesLength = style.ruleList.length;
-				if (styleElseRulesLength > 0) // uh-oh has elseRule
+			final List<Filter> filtersToDS = new ArrayList<Filter>();
+			// look at each featuretypestyle
+			for(LiteFeatureTypeStyle style : styles) {
+				if (style.elseRules.length > 0) // uh-oh has elseRule
 					return;
-				for (u = 0; u < styleRulesLength; u++) // look at each
-				// rule in the
-				// featuretypestyle
-				{
-					r = style.ruleList[u];
+				// look at each rule in the featuretypestyle
+				for(Rule r : style.ruleList) {
 					if (r.getFilter() == null)
 						return; // uh-oh has no filter (want all rows)
 					filtersToDS.add(r.getFilter());
 				}
 			}
-			if (actualFilters > maxFilters)
+			
+			// if too many bail out
+			if (filtersToDS.size() > maxFilters)
 				return;
 
+			// or together all the filters
 			org.opengis.filter.Filter ruleFiltersCombined;
-			Filter newFilter;
-			// We're GOLD -- OR together all the Rule's Filters
-			if (filtersToDS.size() == 1) // special case of 1 filter
-			{
+			if (filtersToDS.size() == 1) {
 				ruleFiltersCombined = (Filter) filtersToDS.get(0);
 			} else {
-				// build it up
-				ruleFiltersCombined = (Filter) filtersToDS.get(0);
-				final int size = filtersToDS.size();
-				for (int t = 1; t < size; t++) // NOTE: dont
-				// redo 1st one
-				{
-					newFilter = (Filter) filtersToDS.get(t);
-					ruleFiltersCombined = filterFactory.or(
-							ruleFiltersCombined, newFilter );
-				}
+			    ruleFiltersCombined = filterFactory.or(filtersToDS); 
 			}
-			// combine with the geometry filter (preexisting)
+			
+			// combine with the pre-existing filter
 			ruleFiltersCombined = filterFactory.and(
 					q.getFilter(), ruleFiltersCombined);
-
-			// set the actual filter
 			q.setFilter(ruleFiltersCombined);
 		} catch (Exception e) {
 			if (LOGGER.isLoggable(Level.WARNING))
@@ -1063,6 +1064,19 @@ public final class StreamingRenderer implements GTRenderer {
 			return memoryPreloadingEnabledDEFAULT;
 		return ((Boolean)result).booleanValue();
 	}
+	
+	/**
+     * Checks if optimized feature type style rendering is enabled, or not.
+     * See {@link #OPTIMIZE_FTS_RENDERING_KEY} description for a full explanation.
+     */
+    private boolean isOptimizedFTSRenderingEnabled() {
+        if (rendererHints == null)
+            return true;
+        Object result = rendererHints.get(OPTIMIZE_FTS_RENDERING_KEY);
+        if (result == null)
+            return true;
+        return Boolean.TRUE.equals(result);
+    }
     
     /**
      * Returns an estimate of the rendering buffer needed to properly display this
@@ -1316,7 +1330,7 @@ public final class StreamingRenderer implements GTRenderer {
 				continue; // DJB: optimization - nothing to render, dont
 			// do anything!!
 
-			if (itemNumber == 0) // we can optimize this one!
+			if (itemNumber == 0 || !isOptimizedFTSRenderingEnabled()) // we can optimize this one!
 			{
 				lfts = new LiteFeatureTypeStyle(graphics, ruleList,
 						elseRuleList);
@@ -1401,7 +1415,7 @@ public final class StreamingRenderer implements GTRenderer {
 					continue; // DJB: optimization - nothing to render, dont
 				// do anything!!
 
-				if (itemNumber == 0) // we can optimize this one!
+				if (itemNumber == 0 || !isOptimizedFTSRenderingEnabled()) // we can optimize this one!
 				{
 					lfts = new LiteFeatureTypeStyle(graphics, ruleList,
 							elseRuleList);
@@ -1421,11 +1435,6 @@ public final class StreamingRenderer implements GTRenderer {
 		}
 
 		return result;
-	}
-
-	private Collection prepCollection(Collection collection,
-			CoordinateReferenceSystem sourceCrs) throws IOException {
-        return collection;
 	}
 
     /**
@@ -1452,7 +1461,7 @@ public final class StreamingRenderer implements GTRenderer {
         // this is the reader's CRS
         CoordinateReferenceSystem rCS = null;
         try {
-            features.getSchema().getGeometryDescriptor().getType().getCoordinateReferenceSystem();
+            rCS = features.getSchema().getGeometryDescriptor().getType().getCoordinateReferenceSystem();
         } catch(NullPointerException e) {
             // life sucks sometimes
         }
@@ -1556,8 +1565,8 @@ public final class StreamingRenderer implements GTRenderer {
 			}
 			// transformMap = new HashMap();
 			lfts = createLiteFeatureTypeStyles(featureStylers,schema, graphics);
-                        if(lfts.size() == 0)
-                            return;
+            if(lfts.size() == 0)
+                return;
 	
 	        LiteFeatureTypeStyle[] featureTypeStyleArray = (LiteFeatureTypeStyle[]) lfts.toArray(new LiteFeatureTypeStyle[lfts.size()]);
 	        // /////////////////////////////////////////////////////////////////////
@@ -1579,39 +1588,99 @@ public final class StreamingRenderer implements GTRenderer {
             
         	sourceCrs = null;
         	lfts = createLiteFeatureTypeStyles( featureStylers, source.describe(), graphics );
-        	
-            collection = prepCollection( collection, sourceCrs);
         }
 
 		if (lfts.size() == 0) return; // nothing to do
 
-		Iterator iterator = null;
+		
+		if(isOptimizedFTSRenderingEnabled())
+		    drawOptimized(graphics, currLayer, at, destinationCrs, layerId, collection, features,
+                scaleRange, lfts);
+		else
+		    drawPlain(graphics, currLayer, at, destinationCrs, layerId, collection, features,
+	                scaleRange, lfts);
+
+	}
+	
+	    /**
+     * Performs all rendering on the user provided graphics object by scanning
+     * the collection multiple times, one for each feature type style provided
+     */
+    private void drawPlain(final Graphics2D graphics, MapLayer currLayer, AffineTransform at,
+            CoordinateReferenceSystem destinationCrs, String layerId, Collection collection,
+            FeatureCollection features, final NumberRange scaleRange, final ArrayList lfts) {
+        final LiteFeatureTypeStyle[] fts_array = (LiteFeatureTypeStyle[]) lfts
+                .toArray(new LiteFeatureTypeStyle[lfts.size()]);
+
+        // for each lite feature type style, scan the whole collection and draw
+        for (LiteFeatureTypeStyle liteFeatureTypeStyle : fts_array) {
+            Iterator iterator = null;
+            if (collection != null)
+                iterator = collection.iterator();
+            if (features != null)
+                iterator = features.iterator();
+
+            if (iterator == null)
+                return; // nothing to do
+
+            try {
+                RenderableFeature rf = new RenderableFeature(currLayer);
+                // loop exit condition tested inside try catch
+                // make sure we test hasNext() outside of the try/cath that follows, as that
+                // one is there to make sure a single feature error does not ruin the rendering
+                // (best effort) whilst an exception in hasNext() + ignoring catch results in
+                // an infinite loop
+                while (iterator.hasNext() && !renderingStopRequested) {
+                    try {
+                        rf.setFeature(iterator.next());
+                        process(rf, liteFeatureTypeStyle, scaleRange, at, destinationCrs, layerId);
+                    } catch (Throwable tr) {
+                        LOGGER.log(Level.SEVERE, tr.getLocalizedMessage(), tr);
+                        fireErrorEvent(new Exception("Error rendering feature", tr));
+                    }
+                }
+            } finally {
+                if (collection instanceof FeatureCollection) {
+                    FeatureCollection resource = (FeatureCollection) collection;
+                    resource.close(iterator);
+                } else if (features != null) {
+                    features.close(iterator);
+                }
+            }
+        }
+	    }
+
+	/**
+	 * Performs rendering so that the collection is scanned only once even in presence
+	 * of multiple feature type styles, using the in memory buffer for each feature type
+	 * style other than the first one (that uses the graphics provided by the user)s 
+	 */
+    private void drawOptimized(final Graphics2D graphics, MapLayer currLayer, AffineTransform at,
+            CoordinateReferenceSystem destinationCrs, String layerId, Collection collection,
+            FeatureCollection features, final NumberRange scaleRange, final ArrayList lfts) {
+        Iterator iterator = null;
 		if( collection != null ) iterator = collection.iterator();        
 		if( features != null ) iterator = features.iterator();
 		
 		if( iterator == null ) return; // nothing to do
 		
-		int n_lfts = lfts.size();
 		final LiteFeatureTypeStyle[] fts_array = (LiteFeatureTypeStyle[]) lfts
-				.toArray(new LiteFeatureTypeStyle[n_lfts]);
+				.toArray(new LiteFeatureTypeStyle[lfts.size()]);
 
 		try {
-			RenderableFeature rf = new RenderableFeature(fts_array.length > 1);
-			rf.setLayer(currLayer);
-			int t = 0;
-			while (!renderingStopRequested) { // loop exit condition tested inside try catch
-			    // make sure we test hasNext() outside of the try/cath that follows, as that
-			    // one is there to make sure a single feature error does not ruin the rendering
-			    // (best effort) whilst an exception in hasNext() + ignoring catch results in
-			    // an infinite loop
-				if (!iterator.hasNext()) {
-					break;
-				}
+			RenderableFeature rf = new RenderableFeature(currLayer);
+			// loop exit condition tested inside try catch
+            // make sure we test hasNext() outside of the try/cath that follows, as that
+            // one is there to make sure a single feature error does not ruin the rendering
+            // (best effort) whilst an exception in hasNext() + ignoring catch results in
+            // an infinite loop
+			while (iterator.hasNext() && !renderingStopRequested) { 
 				try {
 					rf.setFeature(iterator.next());
-					for (t = 0; t < n_lfts; t++) {
-						process(rf, fts_array[t], scaleRange, at, destinationCrs, layerId);
-                        // draw the content on the image(s)
+					// draw the feature on the main graphics and on the eventual extra image buffers
+					for (LiteFeatureTypeStyle liteFeatureTypeStyle : fts_array) {
+					    process(rf, liteFeatureTypeStyle, scaleRange, at, destinationCrs, layerId);
+                        
 					}
 				} catch (Throwable tr) {
 					LOGGER.log(Level.SEVERE, tr.getLocalizedMessage(), tr);
@@ -1628,11 +1697,11 @@ public final class StreamingRenderer implements GTRenderer {
 		}
 		// have to re-form the image now.
 		// graphics.setTransform( new AffineTransform() );
-		for (int t = 0; t < n_lfts; t++) {
-			if (fts_array[t].myImage != null) // this is the case for the
-			// first one (ie.
-			// fts_array[t].graphics ==
-			// graphics)
+		graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+		for (int t = 0; t < fts_array.length; t++) {
+			// first fts won't have an image, it's using the user provided graphics
+			// straight, so we don't need to compose it back in.
+			if (fts_array[t].myImage != null) 
 			{
 				graphics.drawImage(fts_array[t].myImage, 0, 0, null);
 				fts_array[t].myImage.flush();
@@ -2138,7 +2207,7 @@ public final class StreamingRenderer implements GTRenderer {
             return textRenderingModeDEFAULT;
         return result;
     }
-
+    
 	/**
 	 * Returns the generalization distance in the screen space.
 	 * 
@@ -2172,6 +2241,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	public void setJava2DHints(RenderingHints hints) {
 		this.java2dHints = hints;
+		styleFactory.setRenderingHints(hints);
 	}
 
 	/*
@@ -2191,6 +2261,9 @@ public final class StreamingRenderer implements GTRenderer {
     		
     		this.labelCache=cache;
     		this.painter=new StyledShapePainter(cache);
+    	}
+    	if(hints != null && hints.containsKey(LINE_WIDTH_OPTIMIZATION_KEY)) {
+    	    styleFactory.setLineOptimizationEnabled(Boolean.TRUE.equals(hints.get(LINE_WIDTH_OPTIMIZATION_KEY)));
     	}
         rendererHints = hints;
     }
@@ -2246,15 +2319,10 @@ public final class StreamingRenderer implements GTRenderer {
 		private IdentityHashMap symbolizerAssociationHT = new IdentityHashMap(); // associate a value
 		private List geometries = new ArrayList();
 		private List shapes = new ArrayList();
-		private boolean multiLayerRendering;
 		private boolean clone;
 		private IdentityHashMap decimators = new IdentityHashMap();
 		
-		public RenderableFeature(boolean multiLayerRendering) {
-			this.multiLayerRendering = multiLayerRendering;
-		}
-		
-		public void setLayer(MapLayer layer) {
+		public RenderableFeature(MapLayer layer) {
 			this.layer = layer;
 			this.clone = !layer.getFeatureSource().getSupportedHints().contains(Hints.FEATURE_DETACHED);
 		}

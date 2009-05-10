@@ -26,11 +26,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import org.geotools.caching.firstdraft.util.FeatureMarshaller;
-import org.geotools.caching.firstdraft.util.Generator;
-import org.geotools.feature.DefaultFeature;
-import org.geotools.feature.Feature;
-import org.geotools.feature.IllegalAttributeException;
+import org.geotools.caching.util.Generator;
+import org.geotools.caching.util.SimpleFeatureMarshaller;
+import org.opengis.feature.Feature;
+import org.opengis.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 public class MarshallerXest extends TestCase {
@@ -47,8 +47,8 @@ public class MarshallerXest extends TestCase {
     public void testMarshall()
         throws IOException, ClassNotFoundException, IllegalAttributeException {
         Generator gen = new Generator(1000, 1000);
-        Feature f = gen.createFeature(0);
-        FeatureMarshaller m = new FeatureMarshaller(gen.getFeatureType());
+        SimpleFeature f = gen.createFeature(0);
+        SimpleFeatureMarshaller m = new SimpleFeatureMarshaller();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         m.marshall(f, oos);
@@ -76,8 +76,9 @@ public class MarshallerXest extends TestCase {
     public void ztestComplexMarshall()
         throws IOException, ClassNotFoundException, IllegalAttributeException {
         Generator gen = new Generator(1000, 1000);
-        Feature f = ((DefaultFeature) gen.createFeature(0)).toComplex();
-        FeatureMarshaller m = new FeatureMarshaller(gen.getFeatureType());
+        SimpleFeature f = gen.createFeature(0);
+        SimpleFeatureMarshaller m = new SimpleFeatureMarshaller();
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         m.marshall(f, oos);
@@ -104,15 +105,15 @@ public class MarshallerXest extends TestCase {
         List features = new ArrayList();
 
         for (int i = 0; i < 10000; i++) {
-            Feature f = gen.createFeature(i);
+            SimpleFeature f = gen.createFeature(i);
             features.add(f);
         }
 
         long start = System.currentTimeMillis();
 
         for (int i = 0; i < 10000; i++) {
-            Feature f = (Feature) features.get(i);
-            FeatureMarshaller marsh = new FeatureMarshaller(gen.getFeatureType());
+            SimpleFeature f = (SimpleFeature) features.get(i);
+            SimpleFeatureMarshaller marsh = new SimpleFeatureMarshaller();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             try {

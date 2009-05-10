@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: FeatureTypeType.java 31719 2008-10-24 22:55:22Z groldan $
+ * $Id: FeatureTypeType.java 31894 2008-11-20 20:35:38Z jdeolive $
  */
 package net.opengis.wfs;
 
@@ -197,7 +197,7 @@ public interface FeatureTypeType extends EObject {
      * <!-- end-model-doc -->
      * @return the value of the '<em>Other SRS</em>' attribute list.
      * @see net.opengis.wfs.WfsPackage#getFeatureTypeType_OtherSRS()
-     * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.AnyURI"
+     * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.AnyURI" many="true"
      *        extendedMetaData="kind='element' name='OtherSRS' namespace='##targetNamespace'"
      * @generated
      */

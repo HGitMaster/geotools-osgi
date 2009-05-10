@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.geotools.jdbc.BasicSQLDialect;
 import org.geotools.jdbc.JDBCDataStore;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -50,6 +52,11 @@ public class H2DialectBasic extends BasicSQLDialect {
     }
 
     @Override
+    public void initializeConnection(Connection cx) throws SQLException {
+        delegate.initializeConnection(cx);
+    }
+    
+    @Override
     public String getNameEscape() {
         return delegate.getNameEscape();
     }
@@ -63,7 +70,30 @@ public class H2DialectBasic extends BasicSQLDialect {
     public void registerClassToSqlMappings(Map<Class<?>, Integer> mappings) {
         delegate.registerClassToSqlMappings(mappings);
     }
+    
+    @Override
+    public Class<?> getMapping(ResultSet columnMetaData, Connection cx)
+            throws SQLException {
+        return delegate.getMapping(columnMetaData, cx);
+    }
 
+    @Override
+    public void encodePostColumnCreateTable(AttributeDescriptor att,
+            StringBuffer sql) {
+        delegate.encodePostColumnCreateTable(att, sql);
+    }
+    
+    @Override
+    public void encodePostCreateTable(String tableName, StringBuffer sql) {
+        delegate.encodePostCreateTable(tableName, sql);
+    }
+    
+    @Override
+    public void postCreateTable(String schemaName,
+            SimpleFeatureType featureType, Connection cx) throws SQLException {
+        delegate.postCreateTable(schemaName, featureType, cx);
+    }
+    
     @Override
     public Integer getGeometrySRID(String schemaName, String tableName, String columnName,
         Connection cx) throws SQLException {
@@ -137,5 +167,15 @@ public class H2DialectBasic extends BasicSQLDialect {
             throw (IOException) new IOException().initCause(e);
         }
 
+    }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
     }
 }
