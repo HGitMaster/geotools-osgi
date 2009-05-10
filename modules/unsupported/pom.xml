@@ -143,6 +143,7 @@
          <module>gml</module>    
          <module>jts-wrapper</module>
          <module>mappane</module>
+         <module>mif</module>
          <module>oracle-spatial</module>
          <module>process</module>
          <module>repository</module>
