@@ -228,6 +228,9 @@ public class ContentState {
         listeners.remove(listener);
     }
 
+    public BatchFeatureEvent getBatchFeatureEvent() {
+        return batchFeatureEvent;
+    }
     /**
      * Used to quickly test if any listeners are available.
      * @return

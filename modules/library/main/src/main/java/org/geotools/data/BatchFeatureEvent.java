@@ -44,15 +44,18 @@ import org.opengis.filter.identity.Identifier;
  * @author Jody Garnett
  */
 public class BatchFeatureEvent extends FeatureEvent {
-	private static final long serialVersionUID = 3154238322369916486L;
-	
-	public BatchFeatureEvent(FeatureSource<? extends FeatureType, ? extends Feature> featureSource ) {
-		this(featureSource, new ReferencedEnvelope(), Filter.EXCLUDE ); 
-	}
-	public BatchFeatureEvent(FeatureSource<? extends FeatureType, ? extends Feature> featureSource, ReferencedEnvelope bounds, Filter filter) {
-		super(featureSource, Type.COMMIT, bounds, filter);
-	}
-	/**
+    private static final long serialVersionUID = 3154238322369916486L;
+
+    public BatchFeatureEvent(FeatureSource<? extends FeatureType, ? extends Feature> featureSource) {
+        this(featureSource, new ReferencedEnvelope(), Filter.EXCLUDE);
+    }
+
+    public BatchFeatureEvent(FeatureSource<? extends FeatureType, ? extends Feature> featureSource,
+            ReferencedEnvelope bounds, Filter filter) {
+        super(featureSource, Type.COMMIT, bounds, filter);
+    }
+
+    /**
      * This is a weak hash set as we don't need to track
      * changes on FeatureIds that are not being used
      * by the client to track selection.
@@ -76,60 +79,58 @@ public class BatchFeatureEvent extends FeatureEvent {
      * is only required for a *commit* event).
      */
     public void add( FeatureEvent change ){    	
-    	if( change.getType() == Type.ADDED ){
-    		if( change.getFilter() instanceof Id){
-        		// store these feature Ids for later    			
-    			Id newFeatureIds = (Id) change.getFilter();
-    			fids.addAll( newFeatureIds.getIdentifiers());
-    		}
-    		else {
-    			// warning? how can you add features and not know
-    			// what you are adding?
-    		}
-    	}
+    	if (change.getType() == Type.ADDED) {
+            if (change.getFilter() instanceof Id) {
+                // store these feature Ids for later
+                Id newFeatureIds = (Id) change.getFilter();
+                fids.addAll(newFeatureIds.getIdentifiers());
+            } else {
+                // warning? how can you add features and not know
+                // what you are adding?
+            }
+        }
     	
-    	if( filter == Filter.INCLUDE || bounds ==  ReferencedEnvelope.EVERYTHING ){
-    		// someone already gave as "generic" something has changed event
-    		// so we are never going to be able to be more specific
-    		return;
-    	}
-    	if( change.getFilter() == Filter.INCLUDE || change.getBounds() == ReferencedEnvelope.EVERYTHING){
-    		// something has changed but we are not sure what...
-			filter = Filter.INCLUDE;
-			bounds = ReferencedEnvelope.EVERYTHING;
-			return;
-		}    	    	
-		bounds.expandToInclude( change.getBounds() );
-		
-		if( filter == Filter.EXCLUDE){
-			// we are just starting out
-			filter = change.getFilter();
-		}
-		else if (filter instanceof And ){
-			And and = (And) filter;
-			List<Filter> children = and.getChildren();
-			children.add( change.getFilter() );
-		}
-		else {
-			FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-			filter = ff.and( filter, change.getFilter() );
-		}
+    	if (filter == Filter.INCLUDE || bounds == ReferencedEnvelope.EVERYTHING) {
+            // someone already gave as "generic" something has changed event
+            // so we are never going to be able to be more specific
+            return;
+        }
+        if (change.getFilter() == Filter.INCLUDE
+                || change.getBounds() == ReferencedEnvelope.EVERYTHING) {
+            // something has changed but we are not sure what...
+            filter = Filter.INCLUDE;
+            bounds = ReferencedEnvelope.EVERYTHING;
+            return;
+        }
+        bounds.expandToInclude(change.getBounds());
+
+        if (filter == Filter.EXCLUDE) {
+            // we are just starting out
+            filter = change.getFilter();
+        } else if (filter instanceof And) {
+            And and = (And) filter;
+            List<Filter> children = and.getChildren();
+            children.add(change.getFilter());
+        } else {
+            FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+            filter = ff.and(filter, change.getFilter());
+        }
     }
 
     /**
      * Used to update any FeatureId during a commit.
      */
-    public void replaceFid( String tempFid, String actualFid ){
-    	for( Identifier id : fids ){
-    		if( tempFid.equals(id.getID()) ){
-    			// we have a match!
-    			if( id instanceof FeatureIdImpl ){
-	    			FeatureIdImpl featureId = (FeatureIdImpl) id;
-	    			// update internal structure!
-	    			featureId.setID( actualFid );
-    			}
-    		}
-    	}
+    public void replaceFid(String tempFid, String actualFid) {
+        for (Identifier id : fids) {
+            if (tempFid.equals(id.getID())) {
+                // we have a match!
+                if (id instanceof FeatureIdImpl) {
+                    FeatureIdImpl featureId = (FeatureIdImpl) id;
+                    // update internal structure!
+                    featureId.setID(actualFid);
+                }
+            }
+        }
     }
     /**
      * This is the set of Identifiers that have been created
@@ -142,7 +143,7 @@ public class BatchFeatureEvent extends FeatureEvent {
      * @return Set of Identifiers created during this commit
      */
     @SuppressWarnings("unchecked")
-	public WeakHashSet<Identifier> getCreatedFeatureIds(){
+    public WeakHashSet<Identifier> getCreatedFeatureIds(){
     	return fids;
     }
 }
