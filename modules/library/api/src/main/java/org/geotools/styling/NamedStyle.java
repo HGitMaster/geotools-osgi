@@ -43,93 +43,56 @@ package org.geotools.styling;
  * </code></pre>
  *
  * @author James Macgill
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/NamedStyle.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/NamedStyle.java $
  */
 public interface NamedStyle extends Style {
-    public String getName();
+    
+    // public String getName();
 
-    public void setName(String name);
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @deprecated Not supported
-     */
-    public String getTitle();
+    // public void setName(String name);
 
     /**
-     * DOCUMENT ME!
+     * Human readible title.
+     * 
+     * @return getDescription().getTitle().toString()
      *
-     * @param title DOCUMENT ME!
-     *
-     * @deprecated Not supported
+     * @deprecated Use getDescription().getTitle().toString()
      */
-    public void setTitle(String title);
+    //public String getTitle();
 
     /**
-     * DOCUMENT ME!
+     * @param title Human readible title
      *
-     * @return DOCUMENT ME!
-     *
-     * @deprecated Not supported
+     * @deprecated Use getDescription().setTitle()
      */
-    public String getAbstract();
+    //public void setTitle(String title);
 
     /**
-     * DOCUMENT ME!
+     * @return getDescription().getAbstract()
      *
-     * @param abstractStr DOCUMENT ME!
-     *
-     * @deprecated Not supported
+     * @deprecated Use getDescription().getAbstract()
      */
-    public void setAbstract(String abstractStr);
+    //public String getAbstract();
 
     /**
-     * DOCUMENT ME!
+     * @param abstractStr Description of this style
      *
-     * @return DOCUMENT ME!
-     *
-     * @deprecated Not supported
+     * @deprecated Use getDescription().setAbstract()
      */
-    public boolean isDefault();
+    //public void setAbstract(String abstractStr);
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param isDefault DOCUMENT ME!
-     *
-     * @deprecated Not supported
+     * @return true if this is the default style to use
      */
-    public void setDefault(boolean isDefault);
+    //public boolean isDefault();
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @deprecated Not supported
-     */
-    public FeatureTypeStyle[] getFeatureTypeStyles();
+    //public void setDefault(boolean isDefault);
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param types DOCUMENT ME!
-     *
-     * @deprecated Not supported
-     */
-    public void setFeatureTypeStyles(FeatureTypeStyle[] types);
+    //public FeatureTypeStyle[] getFeatureTypeStyles();
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param type DOCUMENT ME!
-     *
-     * @deprecated Not supported
-     */
-    public void addFeatureTypeStyle(FeatureTypeStyle type);
+    //public void setFeatureTypeStyles(FeatureTypeStyle[] types);
 
-    public void accept(org.geotools.styling.StyleVisitor visitor);
+    //public void addFeatureTypeStyle(FeatureTypeStyle type);
+
+    //public void accept(org.geotools.styling.StyleVisitor visitor);
 }

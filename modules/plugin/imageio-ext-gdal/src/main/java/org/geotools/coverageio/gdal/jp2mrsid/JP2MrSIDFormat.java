@@ -65,9 +65,9 @@ public final class JP2MrSIDFormat extends BaseGDALGridFormat implements Format {
      * Sets the metadata information.
      */
     protected void setInfo() {
-        HashMap info = new HashMap();
+        HashMap<String, String> info = new HashMap<String, String>();
 
-        info.put("name", "JP2K (MrSID)");
+        info.put("name", "JP2MrSID");
         info.put("description", "JP2K (MrSID) Coverage Format");
         info.put("vendor", "Geotools");
         info.put("docURL", ""); // TODO: set something

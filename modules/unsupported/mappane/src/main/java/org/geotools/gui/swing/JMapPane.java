@@ -23,6 +23,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
@@ -34,12 +36,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Rectangle2D;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gui.swing.event.MapMouseListener;
 import org.geotools.gui.swing.tool.CursorTool;
-import org.geotools.gui.swing.tool.MapTool;
 import org.geotools.gui.swing.tool.MapToolManager;
 import org.geotools.map.MapContext;
 import org.geotools.map.event.MapLayerListEvent;
@@ -69,6 +71,8 @@ public class JMapPane extends JPanel implements MapLayerListListener {
      * map pane and the drawing area
      */
     public static final int DEFAULT_BORDER_WIDTH = 10;
+    public static final int DEFAULT_RESIZING_PAINT_DELAY = 200;  // delay in milliseconds
+    private int resizingPaintDelay;
     
     /**
      * Encapsulates XOR box drawing logic used with mouse dragging
@@ -126,7 +130,9 @@ public class JMapPane extends JPanel implements MapLayerListListener {
     boolean redrawBaseImage;
     private boolean needNewBaseImage;
     private boolean baseImageMoved;
-    
+
+    private boolean resizing;
+    private Timer resizeTimer;
 
     /** 
      * Constructor - creates an instance of JMapPane with no map 
@@ -148,6 +154,24 @@ public class JMapPane extends JPanel implements MapLayerListListener {
         imageOrigin = new Point(margin, margin);
         redrawBaseImage = true;
         baseImageMoved = false;
+
+        /*
+         * We use a Timer object to avoid rendering delays and
+         * flickering when the user is drag-resizing the parent
+         * container of this map pane.
+         *
+         * Using a ComponentListener doesn't work because, unlike
+         * a JFrame, the pane receives a stream of events during
+         * drag-resizing.
+         */
+        resizingPaintDelay = DEFAULT_RESIZING_PAINT_DELAY;
+        resizeTimer = new Timer(resizingPaintDelay, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onResizingCompleted();
+            }
+        });
+        resizeTimer.setRepeats(false);
+        resizing = false;
         
         setRenderer(renderer);
         setContext(context);
@@ -164,9 +188,21 @@ public class JMapPane extends JPanel implements MapLayerListListener {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent ev) {
-                needNewBaseImage = true;
+                resizing = true;
+                resizeTimer.restart();
             }
         });
+    }
+
+    /**
+     * Repaint the map when resizing has finished. This method will
+     * also be called if the user pauses drag-resizing for a period
+     * longer than resizingPaintDelay milliseconds
+     */
+    private void onResizingCompleted() {
+        resizing = false;
+        needNewBaseImage = true;
+        repaint();
     }
 
     /**
@@ -178,49 +214,38 @@ public class JMapPane extends JPanel implements MapLayerListListener {
         if (tool == null) {
             toolManager.setNoCursorTool();
             this.setCursor(Cursor.getDefaultCursor());
+        } else {
+            //tool.setMapPane(this);
+            this.setCursor(tool.getCursor());
+            toolManager.setCursorTool(tool);
         }
-        
-        tool.setMapPane(this);
-        this.setCursor(tool.getCursor());
-        toolManager.setCursorTool(tool);
     }
     
     /**
-     * Add a general (non-cursor) tool to the map pane's set
-     * of active tools
-     * 
-     * @todo this is an idea that might be going nowhere !
-     * 
-     */
-    public void addTool(MapTool tool) {
-        if (tool == null) {
-            throw new IllegalArgumentException("tool must not be null");
-        }
-        
-        tool.setMapPane(this);
-        toolManager.addTool(tool);
-    }
-    
-    /**
-     * Add an object that wants to receive JMapPaneMouseEvents
-     * from this pane
+     * Register an object that wishes to receive MapMouseEvents
+     * such as a {@linkplain org.geotools.gui.swing.StatusBar}
      */
     public void addMouseListener(MapMouseListener listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("argument must not be null");
+        }
+        
+        //listener.setMapPane(this);
         toolManager.addMouseListener(listener);
     }
-
+    
     /**
-     * Getet the current renderer
+     * Get the current renderer used by this map pane
      */
     public GTRenderer getRenderer() {
         return renderer;
     }
 
     /**
-     * Set the renderer
+     * Set the renderer for this map pane
      */
     public void setRenderer(GTRenderer renderer) {
-        Map hints = new HashMap();
+        Map hints;
         if (renderer instanceof StreamingRenderer) {
             hints = renderer.getRendererHints();
             if (hints == null) {
@@ -401,43 +426,46 @@ public class JMapPane extends JPanel implements MapLayerListListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
-        if (context == null || renderer == null) {
-            return;
-        }
 
-        Rectangle paintArea = this.getVisibleRect();
-        paintArea.grow(-margin, -margin);
-        
-        if (needNewBaseImage) {
-            baseImage = new BufferedImage(paintArea.width, paintArea.height, BufferedImage.TYPE_INT_ARGB);
-            curPaintArea = paintArea;
-            needNewBaseImage = false;
-            redrawBaseImage = true;
-            setTransforms(context.getAreaOfInterest(), curPaintArea);
-            labelCache.clear(); 
-        }
-        
+        if (!resizing) {
 
-        ReferencedEnvelope mapAOI = context.getAreaOfInterest();
-        if (mapAOI == null) {
-            return;
-        }
+            if (context == null || renderer == null) {
+                return;
+            }
 
-        if (redrawBaseImage) {
-            if (baseImageMoved) {
-                afterImageMove(mapAOI, paintArea);
-                baseImageMoved = false;
+            Rectangle paintArea = this.getVisibleRect();
+            paintArea.grow(-margin, -margin);
+
+            if (needNewBaseImage) {
+                baseImage = new BufferedImage(paintArea.width, paintArea.height, BufferedImage.TYPE_INT_ARGB);
+                curPaintArea = paintArea;
+                needNewBaseImage = false;
+                redrawBaseImage = true;
+                setTransforms(context.getAreaOfInterest(), curPaintArea);
                 labelCache.clear();
             }
-            clearBaseImage();
-            Graphics2D baseGr = baseImage.createGraphics();
-            renderer.paint(baseGr, paintArea, mapAOI, worldToScreen);
-            imageOrigin.setLocation(margin, margin);
-        } 
-        
-        ((Graphics2D) g).drawImage(baseImage, imageOrigin.x, imageOrigin.y, this);
-        redrawBaseImage = true;
+
+
+            ReferencedEnvelope mapAOI = context.getAreaOfInterest();
+            if (mapAOI == null) {
+                return;
+            }
+
+            if (redrawBaseImage) {
+                if (baseImageMoved) {
+                    afterImageMove(mapAOI, paintArea);
+                    baseImageMoved = false;
+                    labelCache.clear();
+                }
+                clearBaseImage();
+                Graphics2D baseGr = baseImage.createGraphics();
+                renderer.paint(baseGr, paintArea, mapAOI, worldToScreen);
+                imageOrigin.setLocation(margin, margin);
+            }
+
+            ((Graphics2D) g).drawImage(baseImage, imageOrigin.x, imageOrigin.y, this);
+            redrawBaseImage = true;
+        }
     }
 
     /**

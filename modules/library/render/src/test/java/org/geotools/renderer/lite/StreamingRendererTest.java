@@ -142,7 +142,7 @@ public class StreamingRendererTest extends TestCase {
         FeatureSource fs = createNiceMock(FeatureSource.class);
         expect(fs.getFeatures((Query) anyObject())).andReturn(fc);
         expect(fs.getSchema()).andReturn(testFeatureType).anyTimes();
-        expect(fs.getSupportedHints()).andReturn(new HashSet());
+        expect(fs.getSupportedHints()).andReturn(new HashSet()).anyTimes();
         replay(fs);
         
         // build map context

@@ -639,7 +639,8 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     protected LabelPlacement copy(LabelPlacement placement) {
         if( placement == null ) return null;
         placement.accept(this);
-        return (LabelPlacement) getCopy();
+        LabelPlacement copy = (LabelPlacement) getCopy();
+        return copy;
     }
 
     protected Symbol copy(Symbol symbol) {

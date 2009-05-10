@@ -132,7 +132,7 @@ public class DirectoryDataStore implements DataStore {
         info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );
         info.setSource( cache.directory.toURI() );
         try {
-            info.setPublisher( new URI(System.getenv("user.name")) );
+            info.setPublisher( new URI(System.getProperty("user.name")) );
         } catch (URISyntaxException e) {
         }
         return info;

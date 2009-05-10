@@ -39,14 +39,12 @@ import javax.media.jai.RasterFactory;
 import javax.media.jai.RenderedOp;
 
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.geotools.TestData;
-import org.geotools.renderer.lite.gridcoverage2d.LinearColorMap;
-import org.geotools.renderer.lite.gridcoverage2d.LinearColorMapElement;
-import org.geotools.renderer.lite.gridcoverage2d.RasterClassifier;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.NumberRange;
+import org.junit.Before;
+import org.junit.Test;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -56,8 +54,8 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class TestLinearClassifier extends TestCase {
 
+	@Before
 	protected void setUp() throws Exception {
-		super.setUp();
 
 		// check that it exisits
 		File file = TestData.copy(this, "arcgrid/arcgrid.zip");
@@ -74,25 +72,19 @@ public class TestLinearClassifier extends TestCase {
 		RasterClassifier.register(JAI.getDefaultInstance());
 	}
 
-	public TestLinearClassifier(String string) {
-		super(string);
-	}
+//
+//	public static TestSuite suite() {
+//		TestSuite suite = new TestSuite();
+////		suite.addTest(new TestLinearClassifier("testSWAN"));
+////		suite.addTest(new TestLinearClassifier("testSWANGAP"));
+////		suite.addTest(new TestLinearClassifier("testSynthetic_Double"));
+////		suite.addTest(new TestLinearClassifier("testSynthetic_Float"));
+//		suite.addTest(new TestLinearClassifier("testSpearfish"));
+////		suite.addTest(new TestLinearClassifier("testNoDataOnly"));
+//
+//		return suite;
+//	}
 
-	public static TestSuite suite() {
-		TestSuite suite = new TestSuite();
-//		suite.addTest(new TestLinearClassifier("testSWAN"));
-//		suite.addTest(new TestLinearClassifier("testSWANGAP"));
-//		suite.addTest(new TestLinearClassifier("testSynthetic_Double"));
-//		suite.addTest(new TestLinearClassifier("testSynthetic_Float"));
-		suite.addTest(new TestLinearClassifier("testSpearfish"));
-//		suite.addTest(new TestLinearClassifier("testNoDataOnly"));
-
-		return suite;
-	}
-
-	public static void main(java.lang.String[] args) {
-		junit.textui.TestRunner.run(suite());
-	}
 
 //
 //	/**
@@ -168,7 +160,8 @@ public class TestLinearClassifier extends TestCase {
 	 * 
 	 * @throws IOException
 	 */
-	public void testSynthetic_Double() throws IOException {
+	@Test
+	public void Synthetic_Double() throws IOException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -271,7 +264,8 @@ public class TestLinearClassifier extends TestCase {
 	 * @return {@linkplain BufferedImage}
 	 * @throws IOException
 	 */
-	public void testSynthetic_Float() throws IOException {
+	@Test
+	public void Synthetic_Float() throws IOException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -373,7 +367,8 @@ public class TestLinearClassifier extends TestCase {
 	 * 
 	 * @throws IOException
 	 */
-	public void testSpearfish() throws IOException {
+	@Test
+	public void spearfish() throws IOException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -455,7 +450,8 @@ public class TestLinearClassifier extends TestCase {
 	 * 
 	 * @throws IOException
 	 */
-	public void testSWAN() throws IOException {
+	@Test
+	public void SWAN() throws IOException {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// This test is interesting since it can be used to simulate the
@@ -556,7 +552,8 @@ public class TestLinearClassifier extends TestCase {
 	 * 
 	 * @throws IOException
 	 */
-	public void testSWANGAP() throws IOException {
+	@Test
+	public void SWANGAP() throws IOException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -665,7 +662,8 @@ public class TestLinearClassifier extends TestCase {
 	 * @throws IOException
 	 * @throws TransformException
 	 */
-	public void testNoDataOnly() throws IOException, TransformException {
+	@Test
+	public void noDataOnly() throws IOException, TransformException {
 	
 		// /////////////////////////////////////////////////////////////////////
 		//

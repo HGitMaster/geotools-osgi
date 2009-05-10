@@ -18,12 +18,11 @@ package org.geotools.coverageio.gdal.jp2kak;
 
 import it.geosolutions.imageio.plugins.jp2kakadu.JP2GDALKakaduImageReaderSpi;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverageio.BaseGridFormatFactorySPI;
 import org.opengis.coverage.grid.Format;
 
 
@@ -36,7 +35,7 @@ import org.opengis.coverage.grid.Format;
  * @since 2.5.x
  */
 @SuppressWarnings("deprecation")
-public final class JP2KFormatFactory implements GridFormatFactorySpi {
+public final class JP2KFormatFactory extends BaseGridFormatFactorySPI implements GridFormatFactorySpi {
     /** Logger. */
     private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.coverageio.gdal.jp2k");
@@ -52,8 +51,6 @@ public final class JP2KFormatFactory implements GridFormatFactorySpi {
         // if these classes are here, then the runtime environment has
         // access to JAI and the JAI ImageI/O toolbox.
         try {
-            Class.forName("javax.media.jai.JAI");
-            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
 
             Class.forName("it.geosolutions.imageio.plugins.jp2kakadu.JP2GDALKakaduImageReaderSpi");
             available = new JP2GDALKakaduImageReaderSpi().isAvailable();
@@ -83,15 +80,5 @@ public final class JP2KFormatFactory implements GridFormatFactorySpi {
      */
     public Format createFormat() {
         return new JP2KFormat();
-    }
-
-    /**
-     * Returns the implementation hints. The default implementation returns en
-     * empty map.
-     *
-     * @return DOCUMENT ME!
-     */
-    public Map getImplementationHints() {
-        return Collections.EMPTY_MAP;
     }
 }

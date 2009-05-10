@@ -65,9 +65,9 @@ public final class JP2ECWFormat extends BaseGDALGridFormat implements Format {
      * Sets the metadata information.
      */
     protected void setInfo() {
-        HashMap info = new HashMap();
+        HashMap<String, String> info = new HashMap<String, String>();
 
-        info.put("name", "JP2K (ECW)");
+        info.put("name", "JP2ECW");
         info.put("description", "JP2K (ECW) Coverage Format");
         info.put("vendor", "Geotools");
         info.put("docURL", ""); // TODO: set something

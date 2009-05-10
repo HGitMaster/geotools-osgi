@@ -112,11 +112,11 @@ import org.opengis.filter.expression.Expression;
  *   &lt;/ContrastEnhancement&gt;
  * &lt;/RasterSymbolizer&gt;
  * </PRE>
- * $Id: RasterSymbolizer.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * $Id: RasterSymbolizer.java 32919 2009-05-03 14:18:31Z jive $
  * </p>
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/RasterSymbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/RasterSymbolizer.java $
  */
 public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Symbolizer {
     /**
@@ -127,20 +127,14 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      * capability will be little used.
      *
      * @param geometryPropertyName the name of the Geometry
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setGeometryPropertyName(String geometryPropertyName);
 
     /**
      * sets the opacity for the coverage, it has the usual meaning.
      *
      * @param opacity An expression which evaluates to the the opacity (0-1)
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setOpacity(Expression opacity);
 
     /**
@@ -155,10 +149,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      * identifier.  Commonly, channels will be labelled as ?1?, ?2?, etc.
      *
      * @param channel the channel selected
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setChannelSelection(ChannelSelection channel);
 
     /**
@@ -190,10 +181,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      *
      * @param overlap the expression which evaluates to LATEST_ON_TOP,
      *        EARLIEST_ON_TOP, AVERAGE or RANDOM
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setOverlap(Expression overlap);
 
     /**
@@ -210,10 +198,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      *
      * @return The expression which evaluates to LATEST_ON_TOP,
      *         EARLIEST_ON_TOP, AVERAGE or RANDOM
-     * 
-     * @deprecated replaced by method getOverlapBehavior
      */
-    @Deprecated
     Expression getOverlap();
 
     /**
@@ -231,10 +216,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      * system-dependent.
      *
      * @param colorMap the ColorMap for the raster
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setColorMap(ColorMap colorMap);
 
     /**
@@ -272,10 +254,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      * ContrastEnhancement, then no enhancement is performed.
      *
      * @param ce the contrastEnhancement
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setContrastEnhancement(ContrastEnhancement ce);
 
     /**
@@ -313,10 +292,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      * Earth-based DEMs. The default value is system-dependent.
      *
      * @param relief the shadedrelief object
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setShadedRelief(ShadedRelief relief);
 
     /**
@@ -360,10 +336,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      * @param symbolizer the symbolizer to be used. If this is <B>not</B> a
      *        polygon or a line symbolizer an unexpected argument exception
      *        may be thrown by an implementing class.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setImageOutline(Symbolizer symbolizer);
 
     /**

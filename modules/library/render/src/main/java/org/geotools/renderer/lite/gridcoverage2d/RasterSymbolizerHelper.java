@@ -20,7 +20,6 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
-import java.util.logging.Logger;
 
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -36,7 +35,6 @@ import org.geotools.styling.ContrastEnhancement;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.StyleVisitor;
 import org.geotools.util.SimpleInternationalString;
-import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
 
 /**
@@ -113,9 +111,6 @@ public class RasterSymbolizerHelper extends
 		return this.getCoverageFactory().create(output.getName(), outputImage,(GridGeometry2D)output.getGridGeometry(),sd, new GridCoverage[]{output},output.getProperties());
 	}
 
-	/** Logger for this class. */
-	private final static Logger LOGGER = Logging
-			.getLogger(RasterSymbolizerHelper.class.getName());
 
 	/**
 	 * 
@@ -154,9 +149,8 @@ public class RasterSymbolizerHelper extends
 		// hints);
 		final ChannelSelectionNode csNode = new ChannelSelectionNode();
 		final ColorMapNode cmNode = new ColorMapNode(this.getHints());
-		final ContrastEnhancementNode subChainSink = new ContrastEnhancementNode(
-				this.getHints());
-		setSink(subChainSink);
+		final ContrastEnhancementNode ceNode = new ContrastEnhancementNode(this.getHints());
+		setSink(ceNode);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -184,9 +178,9 @@ public class RasterSymbolizerHelper extends
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final ContrastEnhancement ce = rs.getContrastEnhancement();
-		subChainSink.addSource(cmNode);
-		cmNode.addSink(subChainSink);
-		subChainSink.visit(ce);
+		ceNode.addSource(cmNode);
+		cmNode.addSink(ceNode);
+		ceNode.visit(ce);
 
 		//
 		// //

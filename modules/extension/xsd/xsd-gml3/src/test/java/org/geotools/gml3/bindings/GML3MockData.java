@@ -162,10 +162,19 @@ public class GML3MockData {
     }
 
     static Element polygon(Document document, Node parent) {
-        Element polygon = element(GML.Polygon, document, parent);
+        return polygon(document,parent,GML.Polygon,false); 
+    }
+    
+    static Element polygon(Document document, Node parent, QName name, boolean withInterior) {
+        Element polygon = element(name, document, parent);
 
         Element exterior = element(GML.exterior, document, polygon);
         linearRing(document, exterior);
+        
+        if ( withInterior ) {
+            Element interior = element(GML.interior, document, polygon);
+            linearRing(document,interior);
+        }
 
         return polygon;
     }
@@ -243,6 +252,15 @@ public class GML3MockData {
         return multiGeometry;
     }
 
+    static Element surface(Document document, Node parent) {
+        Element surface = element(GML.Surface, document ,parent);
+        Element patches = element(GML.patches, document, surface);
+        
+        polygon(document,patches,GML.PolygonPatch,true);
+        
+        return surface;
+    }
+    
     static Element feature(Document document, Node parent) {
         Element feature = element(TEST.TestFeature, document, parent);
         Element geom = element(new QName(TEST.NAMESPACE, "geom"), document, feature);

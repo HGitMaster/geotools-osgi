@@ -394,7 +394,7 @@ public abstract class BaseCoverageProcessingNode implements
 		if (maximumNumberOfSources != -1)
 			if (this.sources.size() + sourcesToAdd > maximumNumberOfSources)
 				throw new IllegalStateException(Errors.format(
-						ErrorKeys.TOO_MANY_SOURCES_$1, new Integer(
+						ErrorKeys.TOO_MANY_SOURCES_$1, Integer.valueOf(
 								maximumNumberOfSources)));
 	}
 

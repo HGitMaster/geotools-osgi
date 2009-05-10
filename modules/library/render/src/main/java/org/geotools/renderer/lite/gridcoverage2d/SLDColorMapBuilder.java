@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
-import java.util.logging.Logger;
 
 import org.geotools.renderer.i18n.ErrorKeys;
 import org.geotools.renderer.i18n.Errors;
@@ -36,7 +35,6 @@ import org.opengis.filter.expression.Expression;
  * @author        Simone Giannecchini, GeoSolutions
  */
 public class SLDColorMapBuilder {
-	private final static Logger LOGGER = Logger.getLogger(SLDColorMapBuilder.class.toString());
 	
 	public final static Color defaultColorForValuesToPreserve= new Color(0,0,0,0);
 	
@@ -268,7 +266,7 @@ public class SLDColorMapBuilder {
 								ErrorKeys.ILLEGAL_ARGUMENT_$2,
 								"ColorMapTransform.type",
 								Double.toString(opacityValue),
-								new Integer(linearColorMapType)));
+								Integer.valueOf(linearColorMapType)));
 			}
 
 
@@ -313,7 +311,7 @@ public class SLDColorMapBuilder {
 			default:
 				throw new IllegalArgumentException(Errors.format(
 						ErrorKeys.ILLEGAL_ARGUMENT_$2, "ColorMapTransform.type", Double
-								.toString(opacityValue), new Integer(
+								.toString(opacityValue), Integer.valueOf(
 								linearColorMapType)));
 
 			}

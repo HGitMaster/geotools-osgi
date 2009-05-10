@@ -18,12 +18,11 @@ package org.geotools.coverageio.gdal.dted;
 
 import it.geosolutions.imageio.plugins.dted.DTEDImageReaderSpi;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverageio.BaseGridFormatFactorySPI;
 import org.opengis.coverage.grid.Format;
 
 
@@ -36,7 +35,7 @@ import org.opengis.coverage.grid.Format;
  * @since 2.5.x
  */
 @SuppressWarnings("deprecation")
-public final class DTEDFormatFactory implements GridFormatFactorySpi {
+public final class DTEDFormatFactory extends BaseGridFormatFactorySPI implements GridFormatFactorySpi {
     /** Logger. */
     private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.coverageio.gdal.dted");
@@ -52,8 +51,6 @@ public final class DTEDFormatFactory implements GridFormatFactorySpi {
         // if these classes are here, then the runtime environment has
         // access to JAI and the JAI ImageI/O toolbox.
         try {
-            Class.forName("javax.media.jai.JAI");
-            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
             Class.forName("it.geosolutions.imageio.plugins.dted.DTEDImageReaderSpi");
             available = new DTEDImageReaderSpi().isAvailable();
 
@@ -84,11 +81,4 @@ public final class DTEDFormatFactory implements GridFormatFactorySpi {
         return new DTEDFormat();
     }
 
-    /**
-     * Returns the implementation hints. The default implementation returns en
-     * empty map.
-     */
-    public Map getImplementationHints() {
-        return Collections.EMPTY_MAP;
-    }
 }

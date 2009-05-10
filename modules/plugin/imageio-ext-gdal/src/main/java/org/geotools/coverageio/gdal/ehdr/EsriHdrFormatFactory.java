@@ -53,8 +53,6 @@ public final class EsriHdrFormatFactory implements GridFormatFactorySpi {
         // if these classes are here, then the runtime environment has
         // access to JAI and the JAI ImageI/O toolbox.
         try {
-            Class.forName("javax.media.jai.JAI");
-            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
             Class.forName("it.geosolutions.imageio.plugins.ehdr.EsriHdrImageReaderSpi");
             available = new EsriHdrImageReaderSpi().isAvailable();
 

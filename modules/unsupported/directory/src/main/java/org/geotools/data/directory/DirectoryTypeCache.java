@@ -185,15 +185,17 @@ class DirectoryTypeCache {
             lock.readLock().unlock();
             lock.writeLock().lock();
             
-            // still stale?
-            if(watcher.isStale()) {
-                watcher.mark();
-                refreshCacheContents();
+            try {
+                // still stale?
+                if(watcher.isStale()) {
+                    watcher.mark();
+                    refreshCacheContents();
+                }
+            } finally {
+                // downgrade lock
+                lock.readLock().lock();
+                lock.writeLock().unlock();
             }
-            
-            // downgrade lock
-            lock.readLock().lock();
-            lock.writeLock().unlock();
         }
     }
 

@@ -26,10 +26,17 @@ import org.opengis.style.StyleVisitor;
  * "anchor" for positioning it relative to a point geometry.
  *
  * @author Ian Turton
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/AnchorPoint.java $
- * @version $Id: AnchorPoint.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/AnchorPoint.java $
+ * @version $Id: AnchorPoint.java 32919 2009-05-03 14:18:31Z jive $
  */
 public interface AnchorPoint extends org.opengis.style.AnchorPoint{
+    //TODO: add AnchorPoint to GeoAPI
+    /**
+     * get the x coordinate of the anchor point
+     *
+     * @return the expression which represents the X coordinate
+     */
+    Expression getAnchorPointX();
 
     static final AnchorPoint DEFAULT = new AnchorPoint() {
         private void cannotModifyConstant() {
@@ -63,23 +70,17 @@ public interface AnchorPoint extends org.opengis.style.AnchorPoint{
     };
     
     /**
-     * set the X coordinate for the anchor point
+     * Set the X coordinate for the anchor point
      *
      * @param x an expression which represents the X coordinate
-     * 
-     * @deprecated symbolizers and underneath classes are immutable .
      */
-    @Deprecated
     void setAnchorPointX(Expression x);
 
     /**
      * set the Y coordinate for the anchor point
      *
      * @param y an expression which represents the Y coordinate
-     * 
-     * @deprecated symbolizers and underneath classes are immutable .
      */
-    @Deprecated
     void setAnchorPointY(Expression y);
 
     /**

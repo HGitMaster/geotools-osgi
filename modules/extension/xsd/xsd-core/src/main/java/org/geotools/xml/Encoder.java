@@ -791,14 +791,16 @@ public class Encoder {
                                         Binding b1 = (Binding) match1[1];
                                         Binding b2 = (Binding) match2[1];
 
-                                        if (b2.getType().isAssignableFrom(b1.getType())) {
-                                            return -1;
+                                        if ( b1.getType() != b2.getType() ) {
+                                            if (b2.getType().isAssignableFrom(b1.getType())) {
+                                                return -1;
+                                            }
+    
+                                            if (b1.getType().isAssignableFrom(b2.getType())) {
+                                                return 1;
+                                            }
                                         }
-
-                                        if (b1.getType().isAssignableFrom(b2.getType())) {
-                                            return 1;
-                                        }
-
+                                        
                                         //use binding comparability
                                         if (b1 instanceof Comparable) {
                                             return ((Comparable) b1).compareTo(b2);

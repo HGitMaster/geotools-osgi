@@ -30,7 +30,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * 
  * @author Simone Giannecchini, GeoSolutions
  */
-public class GridCoverageUtilities {
+class GridCoverageUtilities {
 
     // ////////////////////////////////////////////////////////////////////////
     //    

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * $Id: GeometryImpl.java 28267 2007-12-06 02:11:00Z desruisseaux $
+ * $Id: GeometryImpl.java 32736 2009-04-04 06:51:02Z jive $
  * $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/GeometryImpl.java,v $
  * Copyright (C) 2003 Open GIS Consortium, Inc. All Rights Reserved.
  * http://www.opengis.org/Legal/
@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.opengis.go.CommonFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
@@ -383,7 +382,7 @@ public abstract class GeometryImpl
      */
     public final Geometry transform(final CoordinateReferenceSystem newCRS) throws TransformException {
         try {
-            CommonFactory commonFactory = BasicFactories.getDefault(); 
+            BasicFactories commonFactory = BasicFactories.getDefault(); 
             CoordinateOperationFactory cof = commonFactory.getCoordinateOperationFactory();
             CoordinateReferenceSystem oldCRS = getCoordinateReferenceSystem();
             CoordinateOperation coordOp = cof.createOperation(oldCRS, newCRS);

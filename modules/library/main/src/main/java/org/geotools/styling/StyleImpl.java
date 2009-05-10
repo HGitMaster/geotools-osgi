@@ -16,7 +16,6 @@
  */
 package org.geotools.styling;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,133 +23,126 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.util.Utilities;
-
-import org.opengis.style.FeatureTypeStyle;
-import org.opengis.style.StyleVisitor;
-import org.opengis.style.Symbolizer;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.Cloneable;
-import org.opengis.util.InternationalString;
-import org.opengis.style.Description;
 
 /**
- * DOCUMENT ME!
+ * Implementation of style.
  *
  * @author James Macgill, CCG
- * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleImpl.java $
- * @version $Id: StyleImpl.java 31138 2008-08-06 00:41:17Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleImpl.java $
+ * @version $Id: StyleImpl.java 32919 2009-05-03 14:18:31Z jive $
  */
 public class StyleImpl implements org.geotools.styling.Style, Cloneable {
-    
     /** The logger for the default core module. */
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.styling");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
+            "org.geotools.styling");
     
-    private final List<FeatureTypeStyle> featureTypeStyles = new ArrayList<FeatureTypeStyle>();
-    
-    private final DescriptionImpl description = new DescriptionImpl(
-            new SimpleInternationalString("Default Styler"), 
-            new SimpleInternationalString(""));
-    
+    private List<FeatureTypeStyle> featureTypeStyles = new ArrayList<FeatureTypeStyle>();
+    private Description description = new DescriptionImpl();
     private String name = "Default Styler";
     private boolean defaultB = false;
-    private Symbolizer defaultSpecification = null;
+
+    private Symbolizer defaultSymbolizer;
 
     /**
      * Creates a new instance of StyleImpl
      */
     protected StyleImpl() {
     }
-
-    public List<org.opengis.style.FeatureTypeStyle> featureTypeStyles() {
-        return featureTypeStyles;
-    }
     
-    @Deprecated
-    public org.geotools.styling.FeatureTypeStyle[] getFeatureTypeStyles() {
-        final org.geotools.styling.FeatureTypeStyle[] ret;
-
-        if ( !featureTypeStyles.isEmpty() ) {
-            if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.fine("number of fts set " + featureTypeStyles.size());
-            }
-            ret = new org.geotools.styling.FeatureTypeStyle[featureTypeStyles.size()];
-            for(int i=0, n=featureTypeStyles.size(); i<n; i++){
-                ret[i] = (org.geotools.styling.FeatureTypeStyle) featureTypeStyles.get(i);
-            }
-            
-        }else{
-            // we return a single featureTypeStyle array
-            ret = new org.geotools.styling.FeatureTypeStyle[1];
-            ret[0] = new FeatureTypeStyleImpl();
-        }
-        
-        return ret;
-    }
-
-    @Deprecated
-    public void setFeatureTypeStyles(org.geotools.styling.FeatureTypeStyle[] styles) {
-        List<org.geotools.styling.FeatureTypeStyle> newStyles = Arrays.asList(styles);
-
-        this.featureTypeStyles.clear();
-        this.featureTypeStyles.addAll(newStyles);
-
-        LOGGER.fine("StyleImpl added " + featureTypeStyles.size() + " feature types");
-    }
-
-    @Deprecated
-    public void addFeatureTypeStyle(org.geotools.styling.FeatureTypeStyle type) {
-        featureTypeStyles.add(type);
-    }
-
     public Description getDescription() {
         return description;
     }
     
+    public String getAbstract() {
+        if( description == null || description.getAbstract() == null ){
+                return null;
+        }
+        return description.getAbstract().toString();
+    }
+
+    public FeatureTypeStyle[] getFeatureTypeStyles() {
+        FeatureTypeStyle[] ret = new FeatureTypeStyleImpl[] { new FeatureTypeStyleImpl() };
+
+        if ((featureTypeStyles != null) && (featureTypeStyles.size() != 0)) {
+            if (LOGGER.isLoggable(Level.FINE))
+                LOGGER.fine("number of fts set " + featureTypeStyles.size());
+
+            ret = (FeatureTypeStyle[]) featureTypeStyles.toArray(new FeatureTypeStyle[] {
+
+            });
+        }
+
+        return ret;
+    }
+
+    public List<FeatureTypeStyle> featureTypeStyles() {
+        return featureTypeStyles;
+    }
+
+    public Symbolizer getDefaultSpecification() {
+        return defaultSymbolizer;
+    }
+    public void setDefaultSpecification(org.geotools.styling.Symbolizer defaultSymbolizer) {
+        this.defaultSymbolizer = defaultSymbolizer;
+    }
+   
+    public void setFeatureTypeStyles(FeatureTypeStyle[] styles) {
+        List<FeatureTypeStyle> newStyles = Arrays.asList(styles);
+
+        this.featureTypeStyles.clear();
+        this.featureTypeStyles.addAll(newStyles);
+
+        LOGGER.fine("StyleImpl added " + featureTypeStyles.size()
+            + " feature types");
+    }
+
+    public void addFeatureTypeStyle(FeatureTypeStyle type) {
+        featureTypeStyles.add(type);
+    }
+
     public String getName() {
         return name;
     }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    @Deprecated
-    public String getAbstract() {
-        return description.getAbstract().toString();
-    }
-    
-    @Deprecated
-    public void setAbstract(String abstractStr) {
-        description.setAbstract(new SimpleInternationalString(abstractStr));
-    }
-    
-    @Deprecated
     public String getTitle() {
+        if( description == null || description.getTitle() == null ){
+                return null;
+        }
         return description.getTitle().toString();
     }
 
-    @Deprecated
-    public void setTitle(String title) {
-        description.setTitle(new SimpleInternationalString(title));
-    }
-    
     public boolean isDefault() {
         return defaultB;
+    }
+
+    public void setAbstract(String abstractStr) {
+        if( description == null ){
+             description = new DescriptionImpl();
+        }
+        description.setAbstract( abstractStr == null ? null :new SimpleInternationalString( abstractStr ));        
     }
 
     public void setDefault(boolean isDefault) {
         defaultB = isDefault;
     }
 
-    public Object accept(StyleVisitor visitor, Object data) {
-        return visitor.visit(this,data);
+    public void setName(String name) {
+        this.name = name;
     }
-    
-    public void accept(org.geotools.styling.StyleVisitor visitor) {
+
+    public void setTitle(String title) {
+        if( description == null ){
+                description = new DescriptionImpl();
+        }
+        description.setTitle( title == null ? null : new SimpleInternationalString( title));
+    }
+
+    public void accept(StyleVisitor visitor) {
         visitor.visit(this);
     }
-    
+
     /**
      * Clones the Style.  Creates deep copy clone of the style.
      *
@@ -169,15 +161,15 @@ public class StyleImpl implements org.geotools.styling.Style, Cloneable {
             throw new RuntimeException(e); // this should never happen since we implement Cloneable
         }
 
-        final List<FeatureTypeStyle> ftsCopy = new ArrayList<FeatureTypeStyle>();
-        
-        
-        for(FeatureTypeStyle fts : featureTypeStyles){
-            ftsCopy.add( (FeatureTypeStyle) ((Cloneable) fts).clone() );
+        FeatureTypeStyle[] ftsArray = new FeatureTypeStyle[featureTypeStyles
+            .size()];
+
+        for (int i = 0; i < ftsArray.length; i++) {
+            FeatureTypeStyle fts = (FeatureTypeStyle) featureTypeStyles.get(i);
+            ftsArray[i] = (FeatureTypeStyle) ((Cloneable) fts).clone();
         }
-        
-        clone.featureTypeStyles().clear();
-        ((List<FeatureTypeStyle>)clone.featureTypeStyles()).addAll(ftsCopy);
+
+        clone.setFeatureTypeStyles(ftsArray);
 
         return clone;
     }
@@ -195,18 +187,12 @@ public class StyleImpl implements org.geotools.styling.Style, Cloneable {
             result = (PRIME * result) + featureTypeStyles.hashCode();
         }
 
-        final String abstractText = description.getAbstract().toString();
-        if (abstractText != null) {
-            result = (PRIME * result) + abstractText.hashCode();
+        if (description != null) {
+            result = (PRIME * result) + description.hashCode();
         }
 
         if (name != null) {
             result = (PRIME * result) + name.hashCode();
-        }
-
-        final String title = description.getTitle().toString();
-        if (title != null) {
-            result = (PRIME * result) + title.hashCode();
         }
 
         result = (PRIME * result) + (defaultB ? 1 : 0);
@@ -241,32 +227,29 @@ public class StyleImpl implements org.geotools.styling.Style, Cloneable {
 
         return false;
     }
-    
     public String toString() {
-    	StringBuffer buf = new StringBuffer();
-    	buf.append( "StyleImpl");
+        StringBuffer buf = new StringBuffer();
+        buf.append( "StyleImpl");
         buf.append( "[");
-    	if( name != null ) {
-    		buf.append(" name=");
-    		buf.append( name );
-    	}
-    	else {
-    		buf.append( " UNNAMED");
-    	}
-    	if( defaultB ) {
-    		buf.append( ", DEFAULT");
-    	}
-        buf.append( ", "+description.toString());
-    	buf.append("]");
-    	return buf.toString();
+        if( name != null ) {
+                buf.append(" name=");
+                buf.append( name );
+        }
+        else {
+                buf.append( " UNNAMED");
+        }
+        if( defaultB ) {
+                buf.append( ", DEFAULT");
+        }
+//      if( title != null && title.length() != 0 ){
+//              buf.append(", title=");
+//              buf.append( title );
+//      }
+        buf.append("]");
+        return buf.toString();
     }
 
-    public Symbolizer getDefaultSpecification() {
-        return defaultSpecification;
+    public Object accept(org.opengis.style.StyleVisitor visitor, Object extraData) {
+        return visitor.visit( this, extraData );
     }
-
-    public void setDefaultSpecification(Symbolizer symbolizer){
-        this.defaultSpecification = symbolizer;
-    }
-
 }

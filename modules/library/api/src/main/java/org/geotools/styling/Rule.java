@@ -21,6 +21,7 @@ import java.util.List;
 import org.opengis.filter.Filter;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.style.Description;
+import org.opengis.style.GraphicLegend;
 
 /**
  * A rule is used to attach a condition to, and group, the individual
@@ -76,9 +77,9 @@ import org.opengis.style.Description;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/Rule.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Rule.java $
  */
-public interface Rule extends org.opengis.style.Rule{
+public interface Rule extends org.opengis.style.Rule {
 
     /**
      * Sets the name of the rule.
@@ -102,7 +103,6 @@ public interface Rule extends org.opengis.style.Rule{
      *         description of the rule.
      * @deprecated use getDescription().getTitle().getString()
      */
-    @Deprecated
     String getTitle();
 
     /**
@@ -111,7 +111,6 @@ public interface Rule extends org.opengis.style.Rule{
      * @param title The title of the rule.  This is a brief, human readable,
      *        description of the rule.
      */
-    @Deprecated
     void setTitle(String title);
 
     /**
@@ -120,7 +119,6 @@ public interface Rule extends org.opengis.style.Rule{
      * @return The abstract text, a more detailed description of the rule.
      * @deprecated use getDescription().getAbstract().getString()
      */
-    @Deprecated
     String getAbstract();
 
     /**
@@ -128,8 +126,8 @@ public interface Rule extends org.opengis.style.Rule{
      *
      * @param abstractStr The abstract text, a more detailed description of the
      *        rule.
+     * @deprecated use getDescription().setAbstract()
      */
-    @Deprecated
     void setAbstract(String abstractStr);
 
     /**
@@ -150,38 +148,65 @@ public interface Rule extends org.opengis.style.Rule{
      */
     void setMaxScaleDenominator(double scale);
 
+    /**
+     * This is the filter used to select content for this rule to display
+     * <p>
+     * @return Filter use to select content for this rule to display, Filter.INCLUDES to include all content; of isElseFilter for null
+     */
+    Filter getFilter();
+
+    /**
+     * Filter used to select content for this rule to display.
+     * <p>
+     * This filter is only consulted if isElseFilter is false.
+     * 
+     * @param filter
+     */
     void setFilter(Filter filter);
 
     /**
-     * @deprecated renamed in isElseFilter
+     * @deprecated Please use isElseFilter
      */
-    @Deprecated
     boolean hasElseFilter();
 
-    void setIsElseFilter(boolean defaultb);
+    /**
+     * 
+     * @param isElse if this rule should accept any features not already rendered
+     */
+    void setElseFilter(boolean isElse);
+
+    /**
+     * @param isElse
+     * @deprecaated Please use setElseFilter( isElse );
+     */
+    void setIsElseFilter( boolean isElse );
+    /**
+     * 
+     */
+    public GraphicLegend getLegend();
+
+    /**
+     * @param legend
+     */
+    void setLegend( GraphicLegend legend);
 
     /**
      * A set of equivalent Graphics in different formats which can be used as a
      * legend against features stylized by the symbolizers in this rule.
      *
-     * @return An array of Graphic objects, any of which can be used as the
-     *         legend.
-     * 
-     * @deprecated there is only one legend graphic
+     * @return A single Graphic matching the getLegend()
+     * @deprecated Please use getLegend
      */
-    @Deprecated
     Graphic[] getLegendGraphic();
-
+    
+    
     /**
      * A set of equivalent Graphics in different formats which can be used as a
      * legend against features stylized by the symbolizers in this rule.
      *
-     * @param graphics An array of Graphic objects, any of which can be used as
-     *        the legend.
-     * 
-     * @deprecated there wis only one graphic legend
+     * @param graphics Graphic objects; the first one will be used to configure getGraphicLenged
+     * @deprecated Please use setLegend
      */
-    @Deprecated
     void setLegendGraphic(Graphic[] graphics);
 
     /**
@@ -200,12 +225,15 @@ public interface Rule extends org.opengis.style.Rule{
      * @return An array of symbolizers to be applied, in sequence, to all of
      *         the features addressed by the FeatureTypeStyler which contains
      *         this rule.
-     * 
-     * @deprecated replaced by a live list symbolizers()
+     * @param Please use symbolizers().toArray( new Symbolizer[0] )
      */
-    @Deprecated    
     Symbolizer[] getSymbolizers();
-    
+
+    /**
+     * Symbolizers used, in order, to portray the features selected by this rule.
+     * <p>
+     * Please note that this list may be modified direct.
+     */
     List<org.geotools.styling.Symbolizer> symbolizers();
 
     /**
@@ -224,13 +252,23 @@ public interface Rule extends org.opengis.style.Rule{
      * @param symbolizers An array of symbolizers to be applied, in sequence,
      *        to all of the features addressed by the FeatureTypeStyler which
      *        contains this rule.
-     * 
-     * @deprecated replaced by a live list
+     * @deprecated please use symbolizers().addAll()
      */
-    @Deprecated
     void setSymbolizers(Symbolizer[] symbolizers);
 
+    /**
+     * @return Location where this style is defined; file or server; or null if unknown
+     */
+    public OnLineResource getOnlineResource();
+    
+    /**
+     * @param resource Indicates where this style is defined
+     */
     void setOnlineResource(OnLineResource online);
 
+    /**
+     * Used to traverse the style data structure.
+     * @param visitor
+     */
     void accept(org.geotools.styling.StyleVisitor visitor);
 }

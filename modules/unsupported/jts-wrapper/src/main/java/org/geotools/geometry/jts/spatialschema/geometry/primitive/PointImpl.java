@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: PointImpl.java 30497 2008-06-03 16:24:54Z desruisseaux $
+ ** $Id: PointImpl.java 32736 2009-04-04 06:51:02Z jive $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/PointImpl.java,v $
  **
@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.Set;
 
 // OpenGIS direct dependencies
-import org.opengis.go.CommonFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
@@ -127,7 +126,7 @@ public class PointImpl extends GeometryImpl implements Point {
             if ((myCRS != null) && (pointCRS != null) && (!myCRS.equals(pointCRS))) {
                 // Do the conversion.
                 try {
-                    CommonFactory commonFactory = BasicFactories.getDefault(); 
+                	BasicFactories commonFactory = BasicFactories.getDefault(); 
                     CoordinateOperationFactory cof = commonFactory.getCoordinateOperationFactory();
                     CoordinateOperation coordOp = cof.createOperation(pointCRS, myCRS);
                     MathTransform mt = coordOp.getMathTransform();

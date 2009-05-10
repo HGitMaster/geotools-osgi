@@ -27,20 +27,9 @@ import java.util.logging.Logger;
 
 /**
  * Utility class for generating ddl scripts for a specific spatial extension.
- * The generated scrips should be used as a base for db setup. Manual verification
- * for performance issues is neccessairy.
+ * The generated scripts should be used as a base for db setup. Manual verification
+ * for performance issues is necessary.
  * 
- * The following scripts are generated
- * 
- * createmeta.sql		create meta table statement
- * createtables.sql		create tile/spatial tables
- * createindexes.sql	create spatial indexwes
- * fillmeta.sql			insert statements to fill meta table
- * register.sql			register spatial columns
- * unregister.sql		unregister spatial columns
- * dropmeta.sql			drop meta table
- * droptables.sql		drop tile/spatial tables
- * dropindexes.sql		drop spatial indexes
  *  
  * 
  * @author mcr

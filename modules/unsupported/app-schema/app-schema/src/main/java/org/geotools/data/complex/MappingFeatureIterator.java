@@ -36,11 +36,13 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AppSchemaFeatureFactoryImpl;
 import org.geotools.feature.AttributeBuilder;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureImpl;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.GeometryAttributeImpl;
 import org.geotools.feature.Types;
 import org.geotools.feature.type.GeometryDescriptorImpl;
 import org.geotools.feature.type.GeometryTypeImpl;
+import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
@@ -73,7 +75,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: MappingFeatureIterator.java 32690 2009-03-25 02:58:59Z ang05a $
+ * @version $Id: MappingFeatureIterator.java 32923 2009-05-04 02:13:34Z ang05a $
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureIterator.java $
  * @since 2.4
  */
@@ -244,6 +246,64 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         return value;
     }
 
+    protected Object getValues(Expression expression, Object sourceFeature, boolean isNestedFeature) {
+        if (sourceFeature instanceof FeatureImpl && isNestedFeature) {
+            // RA: Feature Chaining HACK
+            // complex features can have multiple nodes of the same attribute.. and if they are used
+            // as input to an app-schema data access to be nested inside another feature type of a
+            // different XML type, it has to be mapped like this:
+            // <AttributeMapping>
+            // <targetAttribute>
+            // gsml:composition
+            // </targetAttribute>
+            // <sourceExpression>
+            // <inputAttribute>mo:composition</inputAttribute>
+            // <linkElement>gsml:CompositionPart</linkElement>
+            // <linkField>gml:name</linkField>
+            // </sourceExpression>
+            // <isMultiple>true</isMultiple>
+            // </AttributeMapping>
+            // As there can be multiple nodes of mo:composition in this case, we need to retrieve
+            // all
+            // of them.. modifying FeaturePropertyAccessorFactory.get() to use
+            // JXPathContext.iterate()
+            // instead of JXPathContext.getValue() to get all matching nodes returns the same node
+            // multiple times.
+            // Even successfully, it could result in getting the children nodes that we don't want,
+            // eg. mo:form/.../.../mo:form/....
+            assert expression instanceof AttributeExpressionImpl;
+            AttributeExpressionImpl attribExpression = ((AttributeExpressionImpl) expression);
+            ArrayList valueList = new ArrayList();
+            String xpath = attribExpression.getPropertyName();
+            if (xpath.endsWith("]")) {
+                // get a particularly indexed path
+                return getValue(expression, sourceFeature);
+            }
+            Object value = getValue(expression, sourceFeature);
+            // starts with 2, since the first would've been returned above
+            int i = 2;
+            while (value != null) {
+                if (value instanceof Collection) {
+                    valueList.addAll((Collection) value);
+                } else {
+                    valueList.add(value);
+                }
+                attribExpression.setPropertyName(xpath + "[" + i + "]");
+                try {
+                    value = getValue(attribExpression, sourceFeature);
+                } finally {
+                    // there's no clone method and there's no getter for hints
+                    // so use original attributeExpression and set the value back
+                    // to original after use
+                    attribExpression.setPropertyName(xpath);
+                }
+                i++;
+            }
+            return valueList;
+        }
+        return getValue(expression, sourceFeature);
+    }
+
     /**
      * Sets the values of grouping attributes.
      * 
@@ -260,14 +320,15 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         final AttributeType targetNodeType = attMapping.getTargetNodeInstance();
         final StepList xpath = attMapping.getTargetXPath();
 
-        Object value = getValue(sourceExpression, source);
-        if (attMapping.isNestedAttribute()) {
+        boolean isNestedFeature = attMapping.isNestedAttribute();
+        Object value = getValues(sourceExpression, source, isNestedFeature);
+        if (isNestedFeature) {
             // get built feature based on link value
             if (value instanceof Collection) {
                 ArrayList<Feature> nestedFeatures = new ArrayList<Feature>(((Collection) value)
                         .size());
                 for (Object val : (Collection) value) {
-                    if (val instanceof Attribute) {
+                    while (val instanceof Attribute) {
                         val = ((Attribute) val).getValue();
                     }
                     nestedFeatures.addAll(((NestedAttributeMapping) attMapping).getFeatures(val));
@@ -281,10 +342,24 @@ public class MappingFeatureIterator implements Iterator<Feature>, FeatureIterato
         if (Expression.NIL != attMapping.getIdentifierExpression()) {
             id = extractIdForAttribute(attMapping.getIdentifierExpression(), source);
         }
-        Attribute instance = xpathAttributeBuilder.set(target, xpath, value, id, targetNodeType,
-                attMapping.isMultiValued());
-        Map<Name, Expression> clientPropsMappings = attMapping.getClientProperties();
-        setClientProperties(instance, source, clientPropsMappings);
+        if (isNestedFeature) {
+            assert (value instanceof Collection);
+            // nested feature type could have multiple instances as the whole purpose
+            // of feature chaining is to cater for multi-valued properties
+            for (Object singleVal : (Collection) value) {
+                ArrayList<Feature> valueList = new ArrayList<Feature>();
+                valueList.add((Feature) singleVal);
+                Attribute instance = xpathAttributeBuilder.set(target, xpath, valueList, id,
+                        targetNodeType);
+                Map<Name, Expression> clientPropsMappings = attMapping.getClientProperties();
+                setClientProperties(instance, source, clientPropsMappings);
+            }
+        } else {
+            Attribute instance = xpathAttributeBuilder
+                    .set(target, xpath, value, id, targetNodeType);
+            Map<Name, Expression> clientPropsMappings = attMapping.getClientProperties();
+            setClientProperties(instance, source, clientPropsMappings);
+        }
     }
 
     private void setClientProperties(final Attribute target, final Object source,

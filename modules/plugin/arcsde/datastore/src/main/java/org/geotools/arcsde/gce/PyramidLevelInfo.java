@@ -18,7 +18,9 @@
 package org.geotools.arcsde.gce;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 
 import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -32,7 +34,11 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * 
  */
 class PyramidLevelInfo {
-    private int pyramidLevel, xOffset, yOffset, xTiles, yTiles;
+    private int pyramidLevel, xTiles, yTiles;
+
+    Point2D extentOffset;
+
+    Point imageOffset;
 
     private double xRes, yRes;
 
@@ -46,23 +52,23 @@ class PyramidLevelInfo {
      *            the level index
      * @param extent
      *            the geographical extent the level covers
-     * @param xOffset
-     *            the offset of the image at this level on the x axis, >= 0
-     * @param yOffset
-     *            the offset of the image at this level on the y axis, >= 0
+     * @param imgOffset
+     *            the offset of the image at this level
+     * @param extOffset
+     *            the offset of the image extent at this level
      * @param numTilesWide
      * @param numTilesHigh
      * @param levelSize
      *            the size of the actual image inside the tiled pixel range
      */
-    PyramidLevelInfo(int level, ReferencedEnvelope extent, int xOffset, int yOffset,
+    PyramidLevelInfo(int level, ReferencedEnvelope extent, Point imgOffset, Point2D extOffset,
             int numTilesWide, int numTilesHigh, Dimension levelSize) {
         this.pyramidLevel = level;
         this.xRes = extent.getWidth() / levelSize.width;
         this.yRes = extent.getHeight() / levelSize.height;
         this.envelope = extent;
-        this.xOffset = xOffset;
-        this.yOffset = yOffset;
+        this.imageOffset = imgOffset;
+        this.extentOffset = extOffset;
         this.xTiles = numTilesWide;
         this.yTiles = numTilesHigh;
         this.size = levelSize;
@@ -93,14 +99,14 @@ class PyramidLevelInfo {
      * @return DOCUMENT ME!!!
      */
     public int getXOffset() {
-        return xOffset;
+        return imageOffset.x;
     }
 
     /**
      * @return DOCUMENT ME!!!
      */
     public int getYOffset() {
-        return yOffset;
+        return imageOffset.y;
     }
 
     /**
@@ -151,7 +157,7 @@ class PyramidLevelInfo {
     @Override
     public String toString() {
         return "[level: " + pyramidLevel + " size: " + size.width + "x" + size.height + "  xRes: "
-                + xRes + "  yRes: " + yRes + "  xOffset: " + xOffset + "  yOffset: " + yOffset
+                + xRes + "  yRes: " + yRes + "  xOffset: " + getXOffset() + "  yOffset: " + getYOffset()
                 + "  extent: " + envelope + "  tilesWide: " + xTiles + "  tilesHigh: " + yTiles
                 + "]";
     }

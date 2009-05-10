@@ -433,7 +433,9 @@ public class PostGISDialect extends BasicSQLDialect {
     @Override
     public void postCreateTable(String schemaName,
             SimpleFeatureType featureType, Connection cx) throws SQLException {
+        schemaName = schemaName != null ? schemaName : "public"; 
         String tableName = featureType.getName().getLocalPart();
+        
         Statement st = null;
         try {
             st = cx.createStatement();
@@ -473,56 +475,73 @@ public class PostGISDialect extends BasicSQLDialect {
 
                     // register the geometry type, first remove and eventual
                     // leftover, then write out the real one
-                    st.execute("DELETE FROM GEOMETRY_COLUMNS"
+                    String sql = 
+                    "DELETE FROM GEOMETRY_COLUMNS"
                             + " WHERE f_table_catalog=''" //
                             + " AND f_table_schema = '" + schemaName + "'" //
-                            + " AND f_table_name = '" + tableName + "'");
-                    st.execute("INSERT INTO GEOMETRY_COLUMNS VALUES (''," //
+                            + " AND f_table_name = '" + tableName + "'" // 
+                            + " AND f_geometry_column = '" + gd.getLocalName() + "'";
+                    
+                    LOGGER.fine( sql );
+                    st.execute( sql );
+                    
+                    sql = "INSERT INTO GEOMETRY_COLUMNS VALUES (''," //
                             + "'" + schemaName + "'," //
                             + "'" + tableName + "'," //
                             + "'" + gd.getLocalName() + "'," //
                             + dimensions + "," //
                             + srid + "," //
-                            + "'" + geomType + "')");
+                            + "'" + geomType + "')";
+                    LOGGER.fine( sql );
+                    st.execute( sql );
 
                     // add srid checks
                     if (srid > -1) {
-                        st.execute("ALTER TABLE \"" + tableName + "\"" //
-                                + " ADD CONSTRAINT enforce_srid_" // 
-                                + gd.getLocalName() // 
+                        sql = "ALTER TABLE \"" + tableName + "\"" //
+                                + " ADD CONSTRAINT \"enforce_srid_" // 
+                                + gd.getLocalName() + "\""// 
                                 + " CHECK (SRID(" //
                                 + "\"" + gd.getLocalName() + "\"" //
-                                + ") = " + srid + ")");
+                                + ") = " + srid + ")";
+                        LOGGER.fine( sql );
+                        st.execute(sql);
                     }
 
                     // add dimension checks
-                    st.execute("ALTER TABLE \"" + tableName + "\"" //
-                            + " ADD CONSTRAINT enforce_dims_" // 
-                            + gd.getLocalName() // 
+                    sql = "ALTER TABLE \"" + tableName + "\"" //
+                            + " ADD CONSTRAINT \"enforce_dims_" // 
+                            + gd.getLocalName() + "\""// 
                             + " CHECK (ndims(\"" + gd.getLocalName() + "\")" //
-                            + " = 2)");
+                            + " = 2)";
+                    LOGGER.fine(sql);
+                    st.execute(sql);
 
                     // add geometry type checks
                     if (!geomType.equals("GEOMETRY")) {
-                        st.execute("ALTER TABLE \"" + tableName
+                        sql = "ALTER TABLE \"" + tableName
                                 + "\"" //
-                                + " ADD CONSTRAINT enforce_geotype_" //
-                                + gd.getLocalName() //
+                                + " ADD CONSTRAINT \"enforce_geotype_" //
+                                + gd.getLocalName() + "\""//
                                 + " CHECK (geometrytype(" //
                                 + "\"" + gd.getLocalName() + "\"" //
                                 + ") = '" + geomType + "'::text " + "OR \""
                                 + gd.getLocalName() + "\"" //
-                                + " IS NULL)");
+                                + " IS NULL)";
+                        LOGGER.fine(sql);
+                        st.execute(sql);
                     }
                     
                     // add the spatial index
-                    st.execute("CREATE INDEX spatial_" + tableName // 
-                            + "_" + gd.getLocalName().toLowerCase() // 
+                    sql = 
+                    "CREATE INDEX \"spatial_" + tableName // 
+                            + "_" + gd.getLocalName().toLowerCase() + "\""// 
                             + " ON " //
                             + "\"" + tableName + "\"" //
                             + " USING GIST (" //
                             + "\"" + gd.getLocalName() + "\"" //
-                            + ")");
+                            + ")";
+                    LOGGER.fine(sql);
+                    st.execute(sql);
                 }
             }
             cx.commit();

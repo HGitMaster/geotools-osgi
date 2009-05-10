@@ -61,7 +61,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * to add your own.
  *
  * @author rgould
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wms/src/main/java/org/geotools/data/ows/Layer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/wms/src/main/java/org/geotools/data/ows/Layer.java $
  */
 public class Layer implements Comparable<Layer> {
     
@@ -94,7 +94,7 @@ public class Layer implements Comparable<Layer> {
     private CRSEnvelope latLonBoundingBox = null;
 
     /** A list of type org.opengis.layer.Style */
-    private List<org.opengis.layer.Style> styles;
+    private List<StyleImpl> styles;
     private Boolean queryable = null;
     
     private double scaleHintMin = Double.NaN;
@@ -224,12 +224,12 @@ public class Layer implements Comparable<Layer> {
      * 
      * @return List of all styles for this layer and its ancestors
      */
-    public List getStyles() {
-       ArrayList allStyles = new ArrayList();
+    public List<StyleImpl> getStyles() {
+       ArrayList<StyleImpl> allStyles = new ArrayList<StyleImpl>();
        // Get my ancestor's styles
        Layer parent = this.getParent();
        if (parent != null) {
-          List parentStyles = parent.getStyles();
+          List<StyleImpl> parentStyles = parent.getStyles();
           if (parentStyles != null)  //got something, add to accumulation
              allStyles.addAll(parentStyles);
        }
@@ -239,8 +239,8 @@ public class Layer implements Comparable<Layer> {
        // inherited from a parent. A child may define a new Style with a new Name that is 
        // not available for the parent Layer."
        if ((styles != null) && !styles.isEmpty()) {
-          for (Iterator iter = styles.iterator(); iter.hasNext();) {
-             Object style = iter.next();
+          for (Iterator<StyleImpl> iter = styles.iterator(); iter.hasNext();) {
+             StyleImpl style = iter.next();
             if (!allStyles.contains(style))
                 allStyles.add(style);
           }

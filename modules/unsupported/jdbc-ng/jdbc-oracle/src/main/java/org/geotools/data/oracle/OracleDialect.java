@@ -332,7 +332,7 @@ public class OracleDialect extends PreparedStatementSQLDialect {
 
         if (LOGGER.isLoggable(Level.FINE)) {
             String sdo = SDOSqlDumper.toSDOGeom(g, srid);
-            LOGGER.fine("Setting paramtetr " + column + " as " + sdo);
+            LOGGER.fine("Setting parameter " + column + " as " + sdo);
         }
     }
     
@@ -367,8 +367,9 @@ public class OracleDialect extends PreparedStatementSQLDialect {
     
     @Override
     public PreparedFilterToSQL createPreparedFilterToSQL() {
-        OracleFilterToSQL sql = new OracleFilterToSQL();
+        OracleFilterToSQL sql = new OracleFilterToSQL(this);
         sql.setLooseBBOXEnabled(looseBBOXEnabled);
+        
         return sql;
     }
     
@@ -599,8 +600,26 @@ public class OracleDialect extends PreparedStatementSQLDialect {
         }
         
     }
-    
-    protected boolean isGeodeticSrid(int srid, Connection cx) throws SQLException {
+
+    protected boolean isGeodeticSrid(Integer srid) {
+        Connection cx = null;
+        try {
+            cx = dataStore.getDataSource().getConnection();
+            return isGeodeticSrid(srid, cx);
+        } catch (SQLException e) {
+            LOGGER.warning("Could not evaluate if SRID is Geodetic. Wrong results may occur.");
+        } finally {
+            if (cx != null)
+                dataStore.closeSafe(cx);
+        }
+        
+        return false;
+    }
+
+    protected boolean isGeodeticSrid(Integer srid, Connection cx) throws SQLException {
+        if (srid == null)
+            return false;
+        
         Boolean geodetic = geodeticCache.get(srid); 
         
         if(geodetic == null) { 
@@ -669,4 +688,5 @@ public class OracleDialect extends PreparedStatementSQLDialect {
     	overrides.put(Types.DOUBLE, "DOUBLE PRECISION");
     	overrides.put(Types.FLOAT, "FLOAT");
     }
+
 }

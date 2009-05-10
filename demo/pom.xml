@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32587 2009-03-03 13:24:56Z jive $              
+        Version: $Id: pom.xml 32912 2009-05-02 10:00:36Z aaime $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -97,20 +97,34 @@
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
+
+  <profiles>
+    <profile>
+      <id>introduction</id>
+        <activation> 
+          <property><name>all</name></property>
+       </activation>
+       <modules>
+         <module>introduction</module>
+       </modules>
+    </profile>
+
+    <profile>
+      <id>mappane-use</id>
+        <activation>
+          <property><name>all</name></property>
+       </activation>
+       <modules>
+         <module>mappane-use</module>
+       </modules>
+    </profile>
+  </profiles>
+
   <modules>
-    <!-- Adrian's Demos -->
-    <module>introduction</module>
     <module>libraryJTS</module>
-
-    <!--module>metadata</module-->
-    <!-- Unvetted. -->
-    <module>mappane-use</module>
-
-    <!-- Sample code from the User Guide -->
     <module>example</module>
-
     <module>svgsupport</module>
-    <!--module>xml-po</module-->
+    <!--module>xml-po</module--> <!-- what is this? -->
   </modules>
   
 </project>

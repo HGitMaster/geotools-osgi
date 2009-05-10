@@ -127,8 +127,8 @@ import static java.lang.Math.*;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/random_issues.html#stereographic">Some Random Stereographic Issues</A>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Stereographic.java $
- * @version $Id: Stereographic.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Stereographic.java $
+ * @version $Id: Stereographic.java 32866 2009-04-25 20:56:09Z aaime $
  * @author André Gosselin
  * @author Martin Desruisseaux (PMO, IRD)
  * @author Rueben Schulz
@@ -211,7 +211,7 @@ public abstract class Stereographic extends MapProjection {
      * {@link ObliqueStereographic.Provider} instead.
      *
      * @since 2.4
-     * @version $Id: Stereographic.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: Stereographic.java 32866 2009-04-25 20:56:09Z aaime $
      * @author Rueben Schulz
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
@@ -279,7 +279,7 @@ public abstract class Stereographic extends MapProjection {
                 throws ParameterNotFoundException
         {
             // Values here are in radians (the standard units for the map projection package)
-            final double latitudeOfOrigin = abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
+            final double latitudeOfOrigin = abs(AbstractProvider.doubleValue(LATITUDE_OF_ORIGIN, parameters));
             final boolean     isSpherical = isSpherical(parameters);
             final ParameterDescriptorGroup descriptor = getParameters();
             // Polar case.

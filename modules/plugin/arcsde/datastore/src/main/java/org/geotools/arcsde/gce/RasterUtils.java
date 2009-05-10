@@ -74,7 +74,7 @@ import com.sun.imageio.plugins.common.BogusColorSpace;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterUtils.java 32720 2009-03-30 06:39:37Z groldan $
+ * @version $Id: RasterUtils.java 32773 2009-04-10 17:38:40Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "nls", "deprecation" })
@@ -223,6 +223,11 @@ class RasterUtils {
 
         private int rasterIndex;
 
+        /**
+         * The full tile range for the matching pyramid level
+         */
+        private Rectangle levelTileRange;
+
         public QueryInfo() {
             setResultDimensionInsideTiledImage(new Rectangle(0, 0, 0, 0));
             setMatchingTiles(new Rectangle(0, 0, 0, 0));
@@ -238,7 +243,14 @@ class RasterUtils {
                     getResolution()[0] + "," + getResolution()[1]);
             s.append("\n\tRequested envelope   : ").append(getRequestedEnvelope());
             s.append("\n\tRequested dimension  : ").append(getRequestedDim());
-            s.append("\n\tMatching tiles       : ").append(getMatchingTiles());
+            Rectangle mt = getMatchingTiles();
+            Rectangle ltr = getLevelTileRange();
+            String matching = "x=" + mt.x + "-" + (mt.width - 1) + ", y=" + mt.y + "-"
+                    + (mt.height - 1);
+            String level = "x=" + ltr.x + "-" + (ltr.width - 1) + ", y=" + ltr.y + "-"
+                    + (ltr.height - 1);
+            s.append("\n\tMatching tiles       : ").append(matching).append(" out of ").append(
+                    level);
             s.append("\n\tTiled image size     : ").append(getTiledImageSize());
             s.append("\n\tResult dimension     : ").append(getResultDimensionInsideTiledImage());
             s.append("\n\tMosaiced dimension   : ").append(getMosaicLocation());
@@ -351,6 +363,14 @@ class RasterUtils {
 
         public int getRasterIndex() {
             return rasterIndex;
+        }
+
+        void setLevelTileRange(Rectangle levelTileRange) {
+            this.levelTileRange = levelTileRange;
+        }
+
+        public Rectangle getLevelTileRange() {
+            return levelTileRange;
         }
     }
 
@@ -789,8 +809,12 @@ class RasterUtils {
             optimalPyramidLevel = rasterInfo.getOptimalPyramidLevel(rasterN, overviewPolicy,
                     requestedEnvelope, requestedDim);
             gridEnvelope = rasterInfo.getGridEnvelope(rasterN, optimalPyramidLevel);
-            if (requestedEnvelope.intersects(gridEnvelope, true)) {
+            final boolean edgesInclusive = true;
+            if (requestedEnvelope.intersects(gridEnvelope, edgesInclusive)) {
                 QueryInfo match = new QueryInfo();
+                match.setRequestedEnvelope(requestedEnvelope);
+                match.setRequestedDim(requestedDim);
+
                 match.setRasterId(rasterInfo.getRasterId(rasterN));
                 match.setRasterIndex(rasterN);
                 match.setPyramidLevel(optimalPyramidLevel);
@@ -854,16 +878,18 @@ class RasterUtils {
         }
 
         final Rectangle matchingTiles;
+        final Rectangle levelTileRange;
         final Rectangle tiledImageGridRange;
         {
             final Dimension tileSize = rasterInfo.getTileDimension(rasterIndex);
             final int numTilesWide = rasterInfo.getNumTilesWide(rasterIndex, pyramidLevel);
             final int numTilesHigh = rasterInfo.getNumTilesHigh(rasterIndex, pyramidLevel);
             final Point tileOffset = rasterInfo.getTileOffset(rasterIndex, pyramidLevel);
+            levelTileRange = new Rectangle(0, 0, numTilesWide, numTilesHigh);
             matchingTiles = findMatchingTiles(tileSize, numTilesWide, numTilesHigh, resultGridRange);
 
-            int tiledImageMinX = tileOffset.x + (matchingTiles.x * tileSize.width);
-            int tiledImageMinY = tileOffset.y + (matchingTiles.y * tileSize.height);
+            int tiledImageMinX = (matchingTiles.x * tileSize.width);
+            int tiledImageMinY = (matchingTiles.y * tileSize.height);
 
             int tiledWidth = (matchingTiles.width * tileSize.width);
             int tiledHeight = (matchingTiles.height * tileSize.height);
@@ -883,6 +909,7 @@ class RasterUtils {
         query.setResultEnvelope(resultEnvelope);
         query.setResultDimensionInsideTiledImage(resultDimensionInsideTiledImage);
         query.setTiledImageSize(tiledImageGridRange);
+        query.setLevelTileRange(levelTileRange);
         query.setMatchingTiles(matchingTiles);
     }
 }

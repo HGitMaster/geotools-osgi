@@ -61,11 +61,12 @@ class SingleConnectionDataSource implements DataSource {
         throw new UnsupportedOperationException();
     }
 
-    public boolean isWrapperFor(java.lang.Class<?> cls) throws SQLException {
-        throw new UnsupportedOperationException();
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return false;
     }
 
-    public  <T> T unwrap(java.lang.Class<T> iface) throws java.sql.SQLException {
-        throw new UnsupportedOperationException();
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        throw new SQLException("Not wrapping an object implementing "+ iface.getClass().getName() );
     }
+
 }

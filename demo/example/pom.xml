@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
+        Version: $Id: pom.xml 32912 2009-05-02 10:00:36Z aaime $              
      ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -95,6 +95,12 @@
       <artifactId>gt-cql</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_core</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>provided</scope>  <!-- Users should execute JAI installer. -->
+    </dependency>
     <!--  GeoTools Plugins -->
     <dependency>
       <groupId>org.geotools</groupId>
@@ -137,20 +143,6 @@
       <artifactId>gt-xsd-filter</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- GeoTools unsupported -->
-    <!--
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-widgets-swing-pending</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-geometry</artifactId>
-      <version>${project.version}</version>
-    </dependency>    
-    -->
   </dependencies>
 
   <!-- =========================================================== -->

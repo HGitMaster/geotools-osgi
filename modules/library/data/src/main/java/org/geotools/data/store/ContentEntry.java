@@ -18,7 +18,10 @@ package org.geotools.data.store;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
+import org.geotools.data.FeatureEvent;
+import org.geotools.data.FeatureListener;
 import org.geotools.data.Transaction;
 import org.opengis.feature.type.Name;
 
@@ -120,9 +123,9 @@ public final class ContentEntry {
      */
     public ContentState getState(Transaction transaction) {
         if (state.containsKey(transaction)) {
-            return (ContentState) state.get(transaction);
+            return state.get(transaction);
         } else {
-            ContentState auto = (ContentState) state.get(Transaction.AUTO_COMMIT);
+            ContentState auto = state.get(Transaction.AUTO_COMMIT);
             ContentState copy = (ContentState) auto.copy();
             copy.setTransaction(transaction);
             state.put(transaction, copy);
@@ -131,6 +134,30 @@ public final class ContentEntry {
         }
     }
 
+    /**
+     * Called by a ContentState to let others transactions know of a modification.
+     * <p>
+     * Transaction.AUTO_COMMIT state will call this method for everything; others
+     * mostly use this to broadcast the BatchFeatureEvents issued during commit
+     * and rollback.
+     */
+    void notifiyFeatureEvent( ContentState source, FeatureEvent notification){
+        for(ContentState entry : state.values() ){
+           if( entry == source ) {
+               continue;  // no notificaiton required               
+           }
+           for( FeatureListener listener : source.listeners ){
+               try {
+                   listener.changed( notification );
+               }
+               catch (Throwable t ){
+                   // problem issuing notification to an interested party
+                   dataStore.LOGGER.log( Level.WARNING, "Problem issuing feature event "+notification, t );
+               }
+           }
+        }
+    }
+    
     /**
      * Disposes the entry by disposing all maintained state.
      */

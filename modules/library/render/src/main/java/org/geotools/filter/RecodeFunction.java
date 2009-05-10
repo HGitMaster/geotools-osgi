@@ -40,10 +40,10 @@ import org.opengis.filter.expression.Literal;
  * <ol>
  * <li>PropertyName; use "Rasterdata" to indicate this is a colour map
  * <li>Literal: lookup value
- * <li>Literal: MapItem : data 1
- * <li>Literal: MapItem : value 1
- * <li>Literal: MapItem : data 2
- * <li>Literal: MapItem : value 2
+ * <li>Literal: data 1
+ * <li>Literal: value 1
+ * <li>Literal: data 2
+ * <li>Literal: value 2
  * </ol>
  * In reality any expression will do.
  * 

@@ -39,42 +39,32 @@ package org.geotools.styling;
  * may be used in the future to match character values.   Not all systems can
  * support opacity in colormaps.  The default opacity is 1.0 (fully opaque).
  * Defaults for quantity and label are system-dependent.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/ColorMap.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/ColorMap.java $
  */
 public interface ColorMap extends org.opengis.style.ColorMap{
     
-    @Deprecated
     public static final int TYPE_RAMP = 1;
     
-    @Deprecated
     public static final int TYPE_INTERVALS = 2;
     
-    @Deprecated
     public static final int TYPE_VALUES = 3;
 
-    /**
-     * @deprecated symbolizers and underneath classes are immutable.
-     */
-    @Deprecated
     public void addColorMapEntry(ColorMapEntry entry);
 
-    /**
-     * 
-     * @deprecated colormap parameters will are replaced by a Filter Function
-     */
-    @Deprecated
     public ColorMapEntry[] getColorMapEntries();
 
-    @Deprecated
     public ColorMapEntry getColorMapEntry(int i);
 
-    @Deprecated
+    /**
+     * Type of color map; matchinges the function returned by getFunction().getName()
+     * 
+     * @return One of TYPE_RAMP, TYPE_INTERVALS, or TYPE_VALUE
+     */
     public int getType();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param type One of TYPE_RAMP, TYPE_INTERVALS, or TYPE_VALUE
      */
-    @Deprecated
     public void setType(int type);
 
     void accept(org.geotools.styling.StyleVisitor visitor);
@@ -85,10 +75,7 @@ public interface ColorMap extends org.opengis.style.ColorMap{
      * @param extended
      *            <code>true</code> for using 65536 colors, <code>false</code>
      *            for using 256.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     public void setExtendedColors(boolean extended);
 
     public boolean getExtendedColors();

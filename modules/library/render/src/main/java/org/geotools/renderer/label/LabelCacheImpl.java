@@ -112,11 +112,6 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
  */
 public final class LabelCacheImpl implements LabelCache {
 
-    /**
-     * labels that aren't this good will not be shown
-     */
-    public double MIN_GOODNESS_FIT = 0.7;
-
     public double DEFAULT_PRIORITY = 1000.0;
 
     /** Map<label, LabelCacheItem> the label cache */
@@ -173,6 +168,12 @@ public final class LabelCacheImpl implements LabelCache {
     
     // Force labels to a readable orientation (so that they don't look "upside down")
     static final boolean DEFAULT_FORCE_LEFT_TO_RIGHT = true;
+    
+    // By default, put each label in the conflict resolution map
+    static final boolean DEFAULT_CONFLICT_RESOLUTION = true;
+    
+    // Default value for the goodness of fit threshold
+    static final double DEFAULT_GOODNESS_OF_FIT = 0.7;
 
     /**
      * When true, the text is rendered as its GlyphVector outline (as a
@@ -391,6 +392,8 @@ public final class LabelCacheImpl implements LabelCache {
         item.setMaxAngleDelta(Math.toRadians(maxAngleDelta));
         item.setAutoWrap(getIntOption(symbolizer, "autoWrap", DEFAULT_AUTO_WRAP));
         item.setForceLeftToRightEnabled(getBooleanOption(symbolizer, "forceLeftToRight", DEFAULT_FORCE_LEFT_TO_RIGHT));
+        item.setConflictResolutionEnabled(getBooleanOption(symbolizer, "conflictResolution", DEFAULT_CONFLICT_RESOLUTION));
+        item.setGoodnessOfFit(getDoubleOption(symbolizer, "goodnessOfFit", DEFAULT_GOODNESS_OF_FIT));
         return item;
     }
 
@@ -686,7 +689,7 @@ public final class LabelCacheImpl implements LabelCache {
 
         // pre compute some labelling params
         final Rectangle2D textBounds = painter.getFullLabelBounds();
-        final double step = painter.getLineHeight();
+        final double step = painter.getAscent();
         int space = labelItem.getSpaceAround();
         int haloRadius = Math.round(labelItem.getTextStyle().getHaloFill() != null ? labelItem
                 .getTextStyle().getHaloRadius() : 0);
@@ -827,7 +830,8 @@ public final class LabelCacheImpl implements LabelCache {
                     if (painted) {
                         labelCount++;
                         groupLabels.addLabel(labelItem, labelEnvelope);
-                        paintedBounds.addLabel(labelItem, labelEnvelope);
+                        if(labelItem.isConflictResolutionEnabled())
+                            paintedBounds.addLabel(labelItem, labelEnvelope);
                     } else {
                         // this will generate a sequence like s, -2s, 3s, -4s,
                         // ...
@@ -992,7 +996,8 @@ public final class LabelCacheImpl implements LabelCache {
             // painter.graphics.setColor(Color.BLACK);
             // painter.graphics.draw(transformed);
             painter.paintStraightLabel(tempTransform);
-            glyphs.addLabel(labelItem, transformed);
+            if(labelItem.isConflictResolutionEnabled())
+                glyphs.addLabel(labelItem, transformed);
             return true;
         }
     }
@@ -1036,7 +1041,7 @@ public final class LabelCacheImpl implements LabelCache {
                 .createTransformedShape(painter.getFullLabelBounds()).getBounds2D();
         if (!displayArea.contains(transformed)
                 || glyphs.labelsWithinDistance(transformed, labelItem.getSpaceAround())
-                || goodnessOfFit(painter, transformed, geom) < MIN_GOODNESS_FIT)
+                || goodnessOfFit(painter, transformed, geom) < painter.getLabel().getGoodnessOfFit())
             return false;
 
         // painter.graphics.setStroke(new BasicStroke(2));
@@ -1046,7 +1051,8 @@ public final class LabelCacheImpl implements LabelCache {
         // painter.graphics.draw(new Line2D.Double(centroid.getX(),
         // centroid.getY(), centroid.getX(), centroid.getY()));
         painter.paintStraightLabel(tempTransform);
-        glyphs.addLabel(labelItem, transformed);
+        if(labelItem.isConflictResolutionEnabled())
+            glyphs.addLabel(labelItem, transformed);
         return true;
     }
 

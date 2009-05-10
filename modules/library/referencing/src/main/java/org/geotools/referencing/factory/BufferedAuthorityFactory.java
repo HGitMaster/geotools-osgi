@@ -69,8 +69,8 @@ import org.geotools.resources.i18n.LoggingKeys;
  * (and recreated on the fly if needed) otherwise.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/BufferedAuthorityFactory.java $
- * @version $Id: BufferedAuthorityFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/BufferedAuthorityFactory.java $
+ * @version $Id: BufferedAuthorityFactory.java 32864 2009-04-25 20:37:10Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class BufferedAuthorityFactory extends AbstractAuthorityFactory implements BufferedFactory {
@@ -1199,6 +1199,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
             backingStore = null;
         }
         pool.clear();
+        findPool.clear();
         super.dispose();
     }
 

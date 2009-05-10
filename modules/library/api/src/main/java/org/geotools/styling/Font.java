@@ -18,7 +18,13 @@ package org.geotools.styling;
 
 import java.util.List;
 
+import org.geotools.util.ConverterFactory;
+import org.geotools.util.Utilities;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Literal;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -27,8 +33,8 @@ import org.opengis.filter.expression.Expression;
  * font-style, font-weight and font-size.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/Font.java $
- * @version $Id: Font.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Font.java $
+ * @version $Id: Font.java 32919 2009-05-03 14:18:31Z jive $
  */
 public interface Font extends org.opengis.style.Font{
     /** default font-size value **/
@@ -37,7 +43,6 @@ public interface Font extends org.opengis.style.Font{
     /**
      * @deprecated use getFamilly().get(0) for the preferred font
      */
-    @Deprecated
     Expression getFontFamily();
     
     /**
@@ -47,16 +52,10 @@ public interface Font extends org.opengis.style.Font{
     List<Expression> getFamily();
 
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param family Expression indicating the font fact to use
+     * @deprecated Please use getFontFamilly.set( 0, expression )
      */
-    @Deprecated
     void setFontFamily(Expression family);
-
-    /**
-     * @deprecated this method is replaced by getStyle
-     */
-    @Deprecated
-    Expression getFontStyle();
 
     /**
      * The "font-style" SVG parameter should be "normal", "italic", or "oblique".
@@ -65,16 +64,10 @@ public interface Font extends org.opengis.style.Font{
     Expression getStyle();
     
     /**
-     * @deprecated symbolizers and underneath classes will be immutable in 2.6.x
+     * @param style The "font-style" SVG parameter (one of "normal", "italic", or "oblique"
      */
-    @Deprecated
-    void setFontStyle(Expression style);
-
-    /**
-     * @deprecated use getWeight
-     */
-    @Deprecated
-    Expression getFontWeight();
+    void setStyle( Expression style );
+    
 
     /**
      * The "font-weight" SVG parameter should be "normal" or "bold".
@@ -83,17 +76,10 @@ public interface Font extends org.opengis.style.Font{
     Expression getWeight();
     
     /**
-     * @deprecated symbolizers and underneath classes will be immutable in 2.6.x
+     * @param weight The "font-weight" SVG parameter (one of "normal", "bold")
      */
-    @Deprecated
-    void setFontWeight(Expression weight);
-
-    /**
-     * @deprecated use getSize
-     */
-    @Deprecated
-    Expression getFontSize();
-
+    void setWeight(Expression weight);
+    
     /**
      * Font size.
      * @return font size
@@ -101,14 +87,79 @@ public interface Font extends org.opengis.style.Font{
     Expression getSize();
     
     /**
+     * @param size the font size
+     */
+    void setSize(Expression size);
+    
+    //
+    // Deprecated names used from GeoTools 2.0-2.5
+    //
+    /**
+     * @deprecated Please use getStyle in 2.6.x
+     */
+    Expression getFontStyle();
+
+    
+    /**
+     * @deprecated Please use setStyle( style )
+     */
+    void setFontStyle(Expression style);
+
+    /**
+     * @deprecated use getWeight
+     */
+    Expression getFontWeight();
+
+    /**
+     * @deprecated Please use setWeight( weight )
+     */
+    void setFontWeight(Expression weight);
+
+
+    /**
+     * @deprecated use getSize
+     */
+    Expression getFontSize();
+
+    /**
      * @deprecated symbolizers and underneath classes will be immutable in 2.6.x
      */
-    @Deprecated
     void setFontSize(Expression size);
 
     /**
      * Enumeration of allow font-style values.
-     */
+     * <p>
+     * This is a way to document the constants allowable for the setStyle method
+     *
+    enum Style2 implements Literal {
+        NORMAL("normal"),
+        ITALIC("italic"),
+        OBLIQUE("oblique");
+        
+        final String literal;
+        final static int count=0;
+        private Style2(String constant) {
+            literal = constant;
+        }
+        public Object accept(ExpressionVisitor visitor, Object extraData) {
+            return visitor.visit( this, extraData );
+        }
+        public Object evaluate(Object object) {
+            return literal;
+        }
+        public <T> T evaluate(Object object, Class<T> context) {
+            // return Converters.convert(literal, context);
+            if( context.isInstance( literal) ){
+                return context.cast(literal);                
+            }
+            return null;
+        }
+        public Object getValue() {
+            return literal;
+        }
+    }
+    */
+    
     interface Style {
         static final String NORMAL = "normal";
         static final String ITALIC = "italic";

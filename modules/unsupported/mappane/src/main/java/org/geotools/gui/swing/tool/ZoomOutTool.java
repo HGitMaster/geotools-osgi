@@ -25,6 +25,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.event.MapMouseEvent;
 
 /**
@@ -55,8 +56,11 @@ public class ZoomOutTool extends AbstractZoomTool {
     
     /**
      * Constructor
+     *
+     * @param pane the map pane that this tool is to work with
      */
-    public ZoomOutTool() {
+    public ZoomOutTool(JMapPane pane) {
+        super(pane);
         iconLarge = new ImageIcon(getClass().getResource(ICON_IMAGE_LARGE));
         iconSmall = new ImageIcon(getClass().getResource(ICON_IMAGE_SMALL));
 

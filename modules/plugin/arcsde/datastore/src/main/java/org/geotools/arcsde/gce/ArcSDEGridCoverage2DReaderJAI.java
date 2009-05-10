@@ -75,6 +75,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.operation.MathTransform;
 
+import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRaster;
@@ -89,7 +90,7 @@ import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32540 2009-02-23 06:36:00Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 32774 2009-04-10 17:39:13Z groldan $
  * @source $URL$
  */
 @SuppressWarnings( { "deprecation", "nls" })
@@ -408,16 +409,10 @@ final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         }
         for (QueryInfo query : queries) {
             RenderedImage image = query.getResultImage();
-            if (DEBUG) {
-                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
-                        + "_01_original.tiff"));
-            }
+            _log(image, query.getRasterId(), "01_original");
 
             image = cropToRequiredDimension(image, query.getResultDimensionInsideTiledImage());
-            if (DEBUG) {
-                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
-                        + "_02_crop.tiff"));
-            }
+            _log(image, query.getRasterId(), "02_crop");
 
             final Rectangle mosaicLocation = query.getMosaicLocation();
             // scale
@@ -435,11 +430,7 @@ final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(new InterpolationNearest());
 
             image = JAI.create("scale", pb);
-
-            if (DEBUG) {
-                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
-                        + "_03_scale.tiff"));
-            }
+            _log(image, query.getRasterId(), "03_scale");
 
             int width = image.getWidth();
             int height = image.getHeight();
@@ -455,10 +446,7 @@ final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             pb.add(null);
 
             image = JAI.create("translate", pb);
-            if (DEBUG) {
-                ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
-                        + "_04_translate.tiff"));
-            }
+            _log(image, query.getRasterId(), "04_translate");
 
             assert image.getMinX() == mosaicLocation.x : image.getMinX() + " != "
                     + mosaicLocation.x;
@@ -481,8 +469,7 @@ final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
                 image = FormatDescriptor.create(image, Integer.valueOf(DataBuffer.TYPE_BYTE), null);
 
                 if (DEBUG) {
-                    ImageIO.write(image, "TIFF", new File(debugDir, query.getRasterId()
-                            + "_04_1_colorExpanded.tiff"));
+                    _log(image, query.getRasterId(), "04_1_colorExpanded");
                 }
             }
 
@@ -506,11 +493,7 @@ final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
 
         LOGGER.fine("Creating mosaic out of " + queries.size() + " raster tiles");
         RenderedImage mosaic = JAI.create("Mosaic", mosaicParams);
-
-        if (DEBUG) {
-            ImageIO.write(mosaic, "TIFF",
-                    new File(debugDir, coverageName + "_05_mosaicResult.tiff"));
-        }
+        _log(mosaic, 0L, "05_mosaic_result");
 
         // if (expandThenContractCM) {
         // if (LOGGER.isLoggable(Level.FINE)) {
@@ -526,6 +509,14 @@ final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
         // }
         // }
         return mosaic;
+    }
+
+    private void _log(RenderedImage image, Long rasterId, String fileName) throws IOException {
+        if (DEBUG) {
+            ImageIO.write(FormatDescriptor.create(image, Integer.valueOf(DataBuffer.TYPE_BYTE),
+                    null), "TIFF", new File(debugDir, rasterId.longValue() + fileName + ".tiff"));
+        }
+
     }
 
     private RenderedImage getRasterMatchingTileRange(int pyramidLevelChoice,
@@ -648,9 +639,14 @@ final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DReader {
             int minTileY = matchingTiles.y;
             int maxTileX = minTileX + matchingTiles.width - 1;
             int maxTileY = minTileY + matchingTiles.height - 1;
-            LOGGER.fine("Requesting tiles [" + minTileX + "," + minTileY + ":" + maxTileX + ","
-                    + maxTileY + "]");
-
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("Requesting tiles [x=" + minTileX + "-" + maxTileX + ", y=" + minTileY
+                        + "-" + maxTileY + "] from tile range [x=0-"
+                        + (rAttr.getTilesPerRowByLevel(pyramidLevel) - 1) + ", y=0-"
+                        + (rAttr.getTilesPerColByLevel(pyramidLevel) - 1) + "]");
+            }
+            SDEPoint tileOrigin = rAttr.getTileOrigin();
+            System.out.println("tileOrigin = " + tileOrigin);
             Rectangle tiledImageSize = new Rectangle(0, 0, tileWidth * matchingTiles.width,
                     tileHeight * matchingTiles.height);
 

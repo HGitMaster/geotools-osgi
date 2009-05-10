@@ -46,21 +46,28 @@ import org.opengis.filter.expression.Expression;
  * </p>
  *
  * <p>
- * $Id: LinePlacement.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * $Id: LinePlacement.java 32919 2009-05-03 14:18:31Z jive $
  * </p>
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/LinePlacement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/LinePlacement.java $
  */
-public interface LinePlacement extends org.opengis.style.LinePlacement,LabelPlacement {
+public interface LinePlacement extends org.opengis.style.LinePlacement, LabelPlacement {
+    /**
+     * Returns the expression that is used to compute how far from the lines
+     * the text will be drawn.  The distance must evaluate to a non-negative
+     * number.
+     *
+     * @return compute how far from the line the text will be drawn
+     */
+    Expression getPerpendicularOffset();
 
     /**
      * Sets the expression that is used to compute how far from the lines the
      * text will be drawn. See {@link #getPerpendicularOffset} for details.
      *
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param offset 
      */
-    @Deprecated
     void setPerpendicularOffset(Expression offset);
     
 }

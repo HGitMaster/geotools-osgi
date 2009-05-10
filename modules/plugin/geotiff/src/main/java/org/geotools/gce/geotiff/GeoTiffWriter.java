@@ -16,6 +16,9 @@
  */
 package org.geotools.gce.geotiff;
 
+import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageMetadata;
+import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
+
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.List;
 
 import javax.imageio.IIOException;
 import javax.imageio.IIOImage;
@@ -33,9 +37,10 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 
+import org.geotools.coverage.Category;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -43,11 +48,13 @@ import org.geotools.coverage.grid.io.AbstractGridCoverageWriter;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.factory.Hints;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataEncoder;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
-import org.geotools.gce.geotiff.crs_adapters.CRS2GeoTiffMetadataAdapter;
+import org.geotools.gce.geotiff.adapters.CRS2GeoTiffMetadataAdapter;
+import org.geotools.gce.geotiff.adapters.GeoTiffConstants;
+import org.geotools.gce.geotiff.adapters.GeoTiffIIOMetadataEncoder;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -57,16 +64,12 @@ import org.jdom.output.DOMOutputter;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
-import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.operation.TransformException;
-
-import com.sun.media.imageioimpl.plugins.tiff.TIFFImageMetadata;
-import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
 
 /**
  * @author Simone Giannecchini
@@ -195,6 +198,8 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		final CoordinateReferenceSystem crs = gg
 				.getCoordinateReferenceSystem2D();
 
+		final double inNoData = getCandidateNoData(gc);
+		
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// we handle just projected andgeographic crs
@@ -208,6 +213,9 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 			final GeoTiffIIOMetadataEncoder metadata = adapter
 					.parseCoordinateReferenceSystem();
 
+                        if (!Double.isNaN(inNoData)) 
+		                metadata.setNoData(inNoData);
+			
 			// setting georeferencing
 			setGeoReference(crs, metadata, tr, range);
 
@@ -449,4 +457,26 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 
 		return imageMetadata;
 	}
+	
+	static double getCandidateNoData(GridCoverage gc) {
+	        // no data management
+	        final GridSampleDimension sd = (GridSampleDimension) gc
+	                .getSampleDimension(0);
+	        final List<Category> categories = sd.getCategories();
+	        double inNoData = Double.NaN;
+	        if (categories != null) {
+	            Category candidate;
+	            final String noDataName = Vocabulary.format(VocabularyKeys.NODATA);
+	            for (Category category : categories) {
+	                candidate = category;
+	                final String name = candidate.getName().toString();
+	                if (name.equalsIgnoreCase("No Data")
+	                        || name.equalsIgnoreCase(noDataName)) {
+	                    inNoData = candidate.getRange().getMaximum();
+	                    break;
+	                }
+	            }
+	        }
+	        return inNoData;
+	    }
 }

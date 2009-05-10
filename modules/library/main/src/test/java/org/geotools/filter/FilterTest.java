@@ -215,19 +215,19 @@ public class FilterTest extends TestCase {
     
     public void testLikeToSQL()
     {
-    	assertTrue("BroadWay%".equals( LikeFilterImpl.convertToSQL92('!','*','.',"BroadWay*")));
-		assertTrue("broad#ay".equals(  LikeFilterImpl.convertToSQL92('!','*','.',"broad#ay")));
-		assertTrue("broadway".equals(  LikeFilterImpl.convertToSQL92('!','*','.',"broadway")));
+    	assertTrue("BroadWay%".equals( LikeFilterImpl.convertToSQL92('!','*','.',true,"BroadWay*")));
+		assertTrue("broad#ay".equals(  LikeFilterImpl.convertToSQL92('!','*','.',true,"broad#ay")));
+		assertTrue("broadway".equals(  LikeFilterImpl.convertToSQL92('!','*','.',true,"broadway")));
 		 
-		assertTrue("broad_ay".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broad.ay")));
-		assertTrue("broad.ay".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broad!.ay")));
+		assertTrue("broad_ay".equals(LikeFilterImpl.convertToSQL92('!','*','.',true,"broad.ay")));
+		assertTrue("broad.ay".equals(LikeFilterImpl.convertToSQL92('!','*','.',true,"broad!.ay")));
 				 
-		assertTrue("broa''dway".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broa'dway")));
-		assertTrue("broa''''dway".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broa''dway")));
+		assertTrue("broa''dway".equals(LikeFilterImpl.convertToSQL92('!','*','.',true,"broa'dway")));
+		assertTrue("broa''''dway".equals(LikeFilterImpl.convertToSQL92('!','*','.',true,"broa''dway")));
 				 
-		assertTrue("broadway_".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broadway.")));
-		assertTrue("broadway".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broadway!")));
-		assertTrue("broadway!".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broadway!!")));
+		assertTrue("broadway_".equals(LikeFilterImpl.convertToSQL92('!','*','.',true,"broadway.")));
+		assertTrue("broadway".equals(LikeFilterImpl.convertToSQL92('!','*','.',true,"broadway!")));
+		assertTrue("broadway!".equals(LikeFilterImpl.convertToSQL92('!','*','.',true,"broadway!!")));
     }
     
     /**

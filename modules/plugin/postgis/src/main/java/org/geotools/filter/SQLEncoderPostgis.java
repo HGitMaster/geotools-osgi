@@ -58,7 +58,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  *       reason to have two different classes.  We just need to do testing to
  *       make sure both handle everything.  At the very least have the geos
  *       one extend more intelligently.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/filter/SQLEncoderPostgis.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/postgis/src/main/java/org/geotools/filter/SQLEncoderPostgis.java $
  */
 public class SQLEncoderPostgis extends SQLEncoder implements
         org.geotools.filter.FilterVisitor {
@@ -421,15 +421,27 @@ public class SQLEncoderPostgis extends SQLEncoder implements
     	char esc = filter.getEscape().charAt(0);
     	char multi = filter.getWildcardMulti().charAt(0);
     	char single = filter.getWildcardSingle().charAt(0);
-    	String pattern = LikeFilterImpl.convertToSQL92(esc,multi,single,filter.getPattern());
+        boolean matchCase = filter.isMatchingCase();
+    	String pattern = LikeFilterImpl.convertToSQL92(esc, multi, single, matchCase, 
+	        filter.getPattern());
     	
     	DefaultExpression att = (DefaultExpression) filter.getValue();
     	
     	try {
     		out.write( " ( " );
+
+                if (!matchCase) {
+                    out.write("UPPER( ");
+                }
+
 	    	att.accept(this);
-	    	
-	    	out.write(" LIKE '");
+
+                if (!matchCase) {
+                    out.write(" ) LIKE '"); 
+                } else { 
+                    out.write(" LIKE '");
+                }
+
 	    	out.write(pattern);
 	    	out.write("' ");	
 	    	
@@ -441,13 +453,33 @@ public class SQLEncoderPostgis extends SQLEncoder implements
 	    		//if it is a date, add additional logic for a timestamp, or a timestamp with 
 	    		// timezone
 	    		out.write( " OR " );
-	    		att.accept( this );
-	    		out.write( " LIKE '" );
+                        if (!matchCase) {
+                            out.write("UPPER( ");
+                        }
+                        
+                        att.accept( this );
+
+                        if (!matchCase) {
+                            out.write(" ) LIKE '"); 
+                        } else { 
+                            out.write(" LIKE '");
+                        }
+
 	    		out.write(pattern + " __:__:__'" );	//timestamp
 	    		
 	    		out.write( " OR " );
-	    		att.accept( this );
-	    		out.write( " LIKE '" );
+                        if (!matchCase) {
+                            out.write("UPPER( ");
+                        }
+
+                        att.accept( this );
+
+                        if (!matchCase) {
+                            out.write(" ) LIKE '"); 
+                        } else { 
+                            out.write(" LIKE '");
+                        }
+
 	    		out.write(pattern + " __:__:_____'" );	//timestamp with time zone
 		    }
 	    	

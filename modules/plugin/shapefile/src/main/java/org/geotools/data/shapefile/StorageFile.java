@@ -181,13 +181,14 @@ public final class StorageFile implements Comparable<StorageFile>, FileWriter {
      * Just groups together files that have the same ShpFiles instance
      */
     public int compareTo( StorageFile o ) {
+        // group togheter files that have the same shpefile instance
         if (this == o) {
             return 0;
         }
-        if (!shpFiles.equals(o.shpFiles)) {
-            return 1;
-        }
-        return -1;
+        
+        // assume two StorageFile that do not share the same ShpFiles
+        // are not given the same temp file
+        return getFile().compareTo(o.getFile());
     }
 
     @Override

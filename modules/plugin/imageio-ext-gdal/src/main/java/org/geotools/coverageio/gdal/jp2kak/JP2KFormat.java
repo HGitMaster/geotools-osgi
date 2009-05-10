@@ -64,9 +64,9 @@ public final class JP2KFormat extends BaseGDALGridFormat implements Format {
      * Sets the metadata information.
      */
     protected void setInfo() {
-        HashMap info = new HashMap();
+        HashMap<String, String> info = new HashMap<String, String>();
 
-        info.put("name", "JP2K (Kakadu)");
+        info.put("name", "JP2KAK");
         info.put("description", "JP2K (Kakadu) Coverage Format");
         info.put("vendor", "Geotools");
         info.put("docURL", ""); // TODO: set something

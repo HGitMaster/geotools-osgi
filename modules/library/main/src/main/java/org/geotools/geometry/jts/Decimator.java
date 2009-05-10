@@ -38,13 +38,37 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/Decimator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/Decimator.java $
  */
 public final class Decimator {
 
 	private double spanx = -1;
 
 	private double spany = -1;
+	
+	/**
+     * Builds a decimator that will generalize geometries so that two subsequent points
+     * will be at least pixelDistance away from each other when painted on the screen.
+     * Set pixelDistance to 0 if you don't want any generalization (but just a transformation)
+     * 
+     * @param screenToWorld
+     * @param paintArea
+     * @param pixelDistance 
+     */
+    public Decimator(MathTransform screenToWorld, Rectangle paintArea, double pixelDistance) {
+        if (screenToWorld != null && pixelDistance > 0) {
+            try {
+                double[] spans = computeGeneralizationDistances(screenToWorld, paintArea, pixelDistance);
+                this.spanx = spans[0];
+                this.spany = spans[1];
+            } catch(TransformException e) {
+                throw new RuntimeException("Could not perform the generalization spans computation", e);
+            }
+        } else {
+            this.spanx = 1;
+            this.spany = 1;
+        }
+    }
 
 	/**
 	 * djb - noticed that the old way of finding out the decimation is based on
@@ -71,27 +95,34 @@ public final class Decimator {
 	 * @param paintArea
 	 */
 	public Decimator(MathTransform screenToWorld, Rectangle paintArea) {
-		if (screenToWorld != null) {
-			double[] original = new double[] {
-					paintArea.x + paintArea.width / 2.0,
-					paintArea.y + paintArea.height / 2.0,
-					paintArea.x + paintArea.width / 2.0 + 1,
-					paintArea.y + paintArea.height / 2.0 + 1, };
-			double[] coords = new double[4];
-			try {
-				screenToWorld.transform(original, 0, coords, 0, 2);
-			} catch (TransformException e) {
-				return;
-			}
-			this.spanx = Math.abs(coords[0] - coords[2]) * 0.8;
-			// 0.8 is just so you dont decimate "too much". magic
-			// number.
-			this.spany = Math.abs(coords[1] - coords[3]) * 0.8;
-		} else {
-			this.spanx = 1;
-			this.spany = 1;
-		}
+	    // 0.8 is just so you don't decimate "too much". magic number.
+		this(screenToWorld, paintArea, 0.8);
 	}
+
+	/**
+	 * Given a full transformation from screen to world and the paint area computes a best
+	 * guess of the maxium generalization distance that won't make the transformations induced
+	 * by the generalization visible on screen. <p>In other words, it computes how long a pixel
+	 * is in the native spatial reference system of the data</p>
+	 * @param screenToWorld
+	 * @param paintArea
+	 * @return
+	 * @throws TransformException
+	 */
+    public static double[] computeGeneralizationDistances(MathTransform screenToWorld, Rectangle paintArea, double pixelDistance)
+            throws TransformException {
+        double[] original = new double[] {
+        		paintArea.x + paintArea.width / 2.0,
+        		paintArea.y + paintArea.height / 2.0,
+        		paintArea.x + paintArea.width / 2.0 + 1,
+        		paintArea.y + paintArea.height / 2.0 + 1, };
+        double[] coords = new double[4];
+        	screenToWorld.transform(original, 0, coords, 0, 2);
+        double[] spans = new double[2]; 
+        spans[0] = Math.abs(coords[0] - coords[2]) * pixelDistance;
+        spans[1] = Math.abs(coords[1] - coords[3]) * pixelDistance;
+        return spans;
+    }
 
 	/**
 	 * @throws TransformException
@@ -250,6 +281,18 @@ public final class Decimator {
 			} else
 				return; // ncoords =0
 		}
+		
+		// if spanx/spany is -1, then no generalization should be done and all
+        // coordinates can just be transformed directly
+        if (spanx == -1 && spany == -1) {
+            // do the xform if needed
+            if ((transform != null) && (!transform.isIdentity())) {
+                transform.transform(coords, 0, coords, 0, ncoords);
+                seq.setArray(coords);
+            }
+            return;
+        }
+
 
 		int actualCoords = 1;
 		double lastX = coords[0];

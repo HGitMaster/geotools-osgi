@@ -17,6 +17,7 @@
 package org.geotools.filter.v1_0;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.BinarySpatialOperator;
@@ -50,6 +51,7 @@ public class BinarySpatialOpTypeBindingTest extends FilterTestSupport {
         assertNotNull(beyond.getExpression1());
         assertNotNull(beyond.getExpression2());
         assertEquals(1.0, beyond.getDistance(), 0.1);
+        assertEquals("m",beyond.getDistanceUnits());
     }
 
     public void testBeyondEncode() throws Exception {
@@ -63,6 +65,7 @@ public class BinarySpatialOpTypeBindingTest extends FilterTestSupport {
         assertEquals("1.0",
             dom.getElementsByTagNameNS(OGC.NAMESPACE, "Distance").item(0).getFirstChild()
                .getNodeValue());
+        //assertEquals( "m",((Element)dom.getElementsByTagNameNS(OGC.NAMESPACE, "Distance").item(0)).getAttribute("units"));
     }
 
     public void testDWithinType() {
@@ -77,6 +80,7 @@ public class BinarySpatialOpTypeBindingTest extends FilterTestSupport {
         assertNotNull(dwithin.getExpression1());
         assertNotNull(dwithin.getExpression2());
         assertEquals(1.0, dwithin.getDistance(), 0.1);
+        assertEquals("m",dwithin.getDistanceUnits());
     }
 
     public void testDWithinEncode() throws Exception {

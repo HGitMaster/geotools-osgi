@@ -294,12 +294,23 @@ class FilterToCQL implements FilterVisitor, ExpressionVisitor {
         char esc = filter.getEscape().charAt(0);
         char multi = filter.getWildCard().charAt(0);
         char single = filter.getSingleChar().charAt(0);
-        String pattern = LikeFilterImpl.convertToSQL92(esc, multi, single, filter.getLiteral());
+        boolean matchCase = filter.isMatchingCase();
+        String pattern = LikeFilterImpl.convertToSQL92(esc, multi, single, matchCase, 
+            filter.getLiteral());
 
+        if (!matchCase) {
+            output.append(" UPPER(");
+        }
 
         PropertyName propertyName = (PropertyName) filter.getExpression();
         propertyName.accept(this, output);
-        output.append(" LIKE '");
+
+        if (!matchCase){
+            output.append(") LIKE '");
+        } else {
+            output.append(" LIKE '");
+        }
+
         output.append(pattern);
         output.append("' ");
         

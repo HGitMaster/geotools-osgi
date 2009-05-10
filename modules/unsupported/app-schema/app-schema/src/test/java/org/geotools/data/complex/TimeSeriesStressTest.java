@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
-
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.DataStore;
@@ -44,6 +42,7 @@ import org.geotools.feature.NameImpl;
 import org.geotools.feature.Types;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.filter.text.cql2.CQL;
+import org.geotools.test.OnlineTestCase;
 import org.geotools.xlink.XLINK;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
@@ -63,15 +62,17 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
- * DOCUMENT ME!
+ * FIXME: This class has never worked. It has been ported to OnlineTestCase so it fails silently in
+ * Eclipse. Port is incomplete. Fix it if you care about it.
  * 
  * @author Rob Atkinson
- * @version $Id: TimeSeriesStressTest.java 31742 2008-10-31 06:00:25Z bencd $
+ * @version $Id: TimeSeriesStressTest.java 32935 2009-05-04 04:35:04Z bencaradocdavies $
  * @source $URL:
- *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
+ *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas
+ *         /community-schema-ds/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
  * @since 2.4
  */
-public class TimeSeriesStressTest extends TestCase {
+public class TimeSeriesStressTest extends OnlineTestCase {
     private static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(TimeSeriesStressTest.class.getPackage().getName());
 
@@ -95,6 +96,11 @@ public class TimeSeriesStressTest extends TestCase {
 
     private FeatureSource<FeatureType, Feature> source;
 
+    @Override
+    protected String getFixtureId() {
+        return "app-schema.TimeSeriesStressTest";
+    }
+    
     /**
      * DOCUMENT ME!
      * 
@@ -425,4 +431,5 @@ public class TimeSeriesStressTest extends TestCase {
             e.printStackTrace();
         }
     }
+
 }

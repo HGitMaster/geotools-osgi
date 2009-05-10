@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataSourceException;
@@ -73,6 +74,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.Classes;
 import org.opengis.feature.simple.SimpleFeature;
@@ -81,6 +83,8 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
+import org.opengis.geometry.BoundingBox;
+import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -780,11 +784,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         shpFiles.delete();
         schema = featureType;
 
-        CoordinateReferenceSystem cs = featureType.getGeometryDescriptor()
-                .getCoordinateReferenceSystem();
-        Class geomType = featureType.getGeometryDescriptor().getType()
+        CoordinateReferenceSystem crs = featureType.getGeometryDescriptor()
+        		.getCoordinateReferenceSystem();
+        final Class<?> geomType = featureType.getGeometryDescriptor().getType()
                 .getBinding();
-        ShapeType shapeType;
+        final ShapeType shapeType;
 
         if (Point.class.isAssignableFrom(geomType)) {
             shapeType = ShapeType.POINT;
@@ -812,22 +816,31 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
         ShapefileWriter writer = new ShapefileWriter(shpChannel, shxChannel);
         try {
-            ReferencedEnvelope env = new ReferencedEnvelope(new Envelope(-179,
-                    179, -89, 89), DefaultGeographicCRS.WGS84);
-            ReferencedEnvelope transformedBounds;
-
-            if (cs != null) {
-                try {
-                    transformedBounds = env.transform(cs, true);
-                } catch (Exception e) {
-                    cs = null;
-                    transformedBounds = env;
-                }
-            } else {
-                transformedBounds = env;
-            }
-
-            writer.writeHeaders(transformedBounds, shapeType, 0, 100);
+        	// try to get the domain first
+        	final org.opengis.geometry.Envelope domain=CRS.getEnvelope(crs); 
+        	if(domain!=null)
+        		writer.writeHeaders(new ReferencedEnvelope(domain), shapeType, 0, 100);
+        	else
+        	{
+        		// try to reproject the single overall envelope keeping poles out of the way
+        		ReferencedEnvelope env = new ReferencedEnvelope(new Envelope(-179,179, -89, 89), DefaultGeographicCRS.WGS84);
+        		ReferencedEnvelope transformedBounds;
+	            if (crs != null) {
+	                try {
+	                    transformedBounds = env.transform(crs, true);
+	                } catch (Throwable t) {
+	                	if(LOGGER.isLoggable(Level.WARNING))
+	                		LOGGER.log(Level.WARNING,t.getLocalizedMessage(),t);
+	                    transformedBounds = env;
+	                    crs=null;
+	                }
+	            } else {
+	                transformedBounds = env;
+	            }
+	            
+	            writer.writeHeaders(transformedBounds, shapeType, 0, 100);
+	            
+        	}
         } finally {
             writer.close();
             assert !shpChannel.isOpen();
@@ -846,8 +859,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             dbfChannel.close();
         }
 
-        if (cs != null) {
-            String s = cs.toWKT();
+        if (crs != null) {
+            String s = crs.toWKT();
             // .prj files should have no carriage returns in them, this
             // messes up
             // ESRI's ArcXXX software, so we'll be compatible

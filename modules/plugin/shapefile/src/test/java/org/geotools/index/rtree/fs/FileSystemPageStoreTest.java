@@ -109,8 +109,13 @@ public class FileSystemPageStoreTest extends TestCase {
                 FileSystemPageStore.SPLIT_QUADRATIC);
         fps.close();
 
+        // write garbage into the file
         OutputStream out = new FileOutputStream(file);
-        out.write(SecureRandom.getSeed(50));
+        byte[] bytes = new byte[50];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) i;
+        }
+        out.write(bytes);
         out.close();
 
         try {

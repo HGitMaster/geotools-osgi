@@ -338,7 +338,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
             this.parentPath = sourceFile.getParent();
             coverageName = sourceFile.getName();
 
-            final int dotIndex = coverageName.indexOf(".");
+            final int dotIndex = coverageName.lastIndexOf(".");
             coverageName = (dotIndex == -1) ? coverageName : coverageName
                     .substring(0, dotIndex);
 

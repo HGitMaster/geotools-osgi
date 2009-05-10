@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32711 2009-03-26 16:18:07Z danieleromagnoli $              
+        Version: $Id: pom.xml 32884 2009-04-30 14:00:09Z simonegiannecchini $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -59,19 +59,19 @@
     <developer>
       <name>Jesse Eichar</name>
       <id>jeichar</id>
-      <email>jeichar@refractions.net</email>
-      <organization>Refraction Research Inc.</organization>
+      <email>jeichar@users.sourceforge.net</email>
+      <organization>CampToCamp</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
       <name>Andrea Aime</name>
       <id>aaime</id>
-      <email>andrea.aime@alice.it</email>
+      <email>aaime@users.sourceforge.net</email>
       <roles>
         <role>Java Developer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
     <developer>
@@ -122,7 +122,7 @@
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-arcgrid</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -17,9 +17,7 @@
 package org.geotools.renderer.lite.gridcoverage2d;
 
 import java.util.List;
-import java.util.logging.Logger;
 
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.factory.Hints;
 import org.geotools.renderer.i18n.ErrorKeys;
@@ -27,7 +25,6 @@ import org.geotools.renderer.i18n.Errors;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleVisitor;
-import org.geotools.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.util.InternationalString;
 
@@ -38,11 +35,6 @@ import org.opengis.util.InternationalString;
 public abstract class StyleVisitorCoverageProcessingNodeAdapter extends
 		StyleVisitorAdapter implements StyleVisitor, CoverageProcessingNode {
 
-	/**
-	 * Logger for this class. 
-	 */
-	private final static Logger LOGGER = Logging.getLogger(StyleVisitorCoverageProcessingNodeAdapter.class
-			.getName());
 
 	/**
 	 * Checks whether the provided source object is null or not. If it is null

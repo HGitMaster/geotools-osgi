@@ -108,8 +108,7 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
     public void tearDown() throws Exception {
         try {
             LOGGER.info("tearDown: deleting " + tableName);
-            // wait I may delete an actual business table, comment out until this suite is fully
-            // based on fake data rasterTestData.deleteTable(tableName);
+            rasterTestData.deleteTable(tableName);
         } catch (Exception e) {
             LOGGER.log(Level.INFO, "Error deleting test table " + tableName, e);
         }
@@ -261,69 +260,6 @@ public class ArcSDEGridCoverage2DReaderJAIOnlineTest {
         testReadFullLevel0(TYPE_8BIT_U, 3, "sampleRGB");
     }
 
-    @Test
-    public void testReadRasterCatalogOnline() throws Exception {
-        tableName = "SDE.IMG_USGSQUAD_SGBASE";
-        final AbstractGridCoverage2DReader reader = getReader();
-        assertNotNull("Couldn't obtain a reader for " + tableName, reader);
-
-        final GeneralEnvelope originalEnvelope = reader.getOriginalEnvelope();
-        final GeneralGridRange originalGridRange = reader.getOriginalGridRange();
-
-        final int reqWidth = originalGridRange.getLength(0) / 50;
-        final int reqHeight = originalGridRange.getLength(1) / 50;
-
-        GeneralEnvelope reqEnvelope = new GeneralEnvelope(originalEnvelope
-                .getCoordinateReferenceSystem());
-        double deltaX = originalEnvelope.getSpan(0) / 1;
-        double deltaY = originalEnvelope.getSpan(1) / 1;
-
-        double minx = originalEnvelope.getMedian(0) - deltaX;
-        double miny = originalEnvelope.getMedian(1) - deltaY;
-        double maxx = minx + 2 * deltaX;
-        double maxy = miny + 2 * deltaY;
-        reqEnvelope.setEnvelope(minx, miny, maxx, maxy);
-
-        assertTrue(originalEnvelope.intersects(reqEnvelope, true));
-
-        final GridCoverage2D coverage = readCoverage(reader, reqWidth, reqHeight, reqEnvelope);
-        assertNotNull("read coverage returned null", coverage);
-
-        RenderedImage image = coverage.getRenderedImage();
-        writeToDisk(image, "testReadRasterCatalogOnline");
-    }
-
-    @Test
-    public void testReadRasterCatalogOnline2() throws Exception {
-        tableName = "SDE.IMG_USGSQUAD_SGBASE";
-        final AbstractGridCoverage2DReader reader = getReader();
-        assertNotNull("Couldn't obtain a reader for " + tableName, reader);
-
-        final GeneralEnvelope originalEnvelope = reader.getOriginalEnvelope();
-        final GeneralGridRange originalGridRange = reader.getOriginalGridRange();
-
-        final int reqWidth = originalGridRange.getLength(0) / 20;
-        final int reqHeight = originalGridRange.getLength(1) / 20;
-
-        GeneralEnvelope reqEnvelope = new GeneralEnvelope(originalEnvelope
-                .getCoordinateReferenceSystem());
-        double deltaX = originalEnvelope.getSpan(0) / 20;
-        double deltaY = originalEnvelope.getSpan(1) / 20;
-
-        double minx = originalEnvelope.getMedian(0) - deltaX;
-        double miny = originalEnvelope.getMedian(1) - deltaY;
-        double maxx = minx + 2 * deltaX;
-        double maxy = miny + 2 * deltaY;
-        reqEnvelope.setEnvelope(minx, miny, maxx, maxy);
-
-        assertTrue(originalEnvelope.intersects(reqEnvelope, true));
-
-        final GridCoverage2D coverage = readCoverage(reader, reqWidth, reqHeight, reqEnvelope);
-        assertNotNull("read coverage returned null", coverage);
-
-        RenderedImage image = coverage.getRenderedImage();
-        writeToDisk(image, "testReadRasterCatalogOnline2");
-    }
 
     @Test
     public void testReadRasterCatalogFull() throws Exception {

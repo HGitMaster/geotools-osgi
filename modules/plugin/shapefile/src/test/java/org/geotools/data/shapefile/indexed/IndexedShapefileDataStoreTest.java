@@ -83,7 +83,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/shpLazyLoadingIndex/ext/shape/test/org/geotools/data/shapefile/indexed/ShapefileDataStoreTest.java $
- * @version $Id: IndexedShapefileDataStoreTest.java 32544 2009-02-25 05:21:59Z aaime $
+ * @version $Id: IndexedShapefileDataStoreTest.java 32760 2009-04-08 16:32:28Z aaime $
  * @author Ian Schneider
  */
 public class IndexedShapefileDataStoreTest extends TestCaseSupport {
@@ -403,51 +403,39 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
      * remaining. Test for removal and proper update after reloading...
      */
     public void testUpdating() throws Throwable {
+        IndexedShapefileDataStore sds = createDataStore();
+        loadFeatures(sds);
+
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
+
         try {
-            IndexedShapefileDataStore sds = createDataStore();
-            loadFeatures(sds);
+            writer = sds.getFeatureWriter(sds.getTypeNames()[0],
+                    Filter.INCLUDE, Transaction.AUTO_COMMIT);
 
-            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
+            while (writer.hasNext()) {
+                SimpleFeature feat = writer.next();
+                Byte b = (Byte) feat.getAttribute(1);
 
-            try {
-                writer = sds.getFeatureWriter(sds.getTypeNames()[0],
-                        Filter.INCLUDE, Transaction.AUTO_COMMIT);
-
-                while (writer.hasNext()) {
-                    SimpleFeature feat = writer.next();
-                    Byte b = (Byte) feat.getAttribute(1);
-
-                    if ((b.byteValue() % 2) == 0) {
-                        writer.remove();
-                    } else {
-                        feat.setAttribute(1, new Byte((byte) -1));
-                    }
-                }
-            } finally {
-                if (writer != null) {
-                    writer.close();
+                if ((b.byteValue() % 2) == 0) {
+                    writer.remove();
+                } else {
+                    feat.setAttribute(1, new Byte((byte) -1));
                 }
             }
-
-            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = loadFeatures(sds);
-
-            assertEquals(10, fc.size());
-
-            for (FeatureIterator<SimpleFeature> i = fc.features(); i.hasNext();) {
-                assertEquals(-1, ((Byte) i.next().getAttribute(1)).byteValue());
-            }
-            sds.dispose();
-        } catch (Throwable t) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                System.out.println("Ignore " + t
-                        + " because you are on windows");
-
-                return;
-            } else {
-                throw t;
+        } finally {
+            if (writer != null) {
+                writer.close();
             }
         }
-        
+
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = loadFeatures(sds);
+
+        assertEquals(10, fc.size());
+
+        for (FeatureIterator<SimpleFeature> i = fc.features(); i.hasNext();) {
+            assertEquals(-1, ((Byte) i.next().getAttribute(1)).byteValue());
+        }
+        sds.dispose();
     }
 
     /**
@@ -455,38 +443,57 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
      * are no features left.
      */
     public void testRemoveFromFrontAndClose() throws Throwable {
-        try {
-            IndexedShapefileDataStore sds = createDataStore();
+        IndexedShapefileDataStore sds = createDataStore();
 
-            int idx = loadFeatures(sds).size();
+        int idx = loadFeatures(sds).size();
 
-            while (idx > 0) {
-                FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
+        while (idx > 0) {
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
 
-                try {
-                    writer = sds.getFeatureWriter(sds.getTypeNames()[0],
-                            Filter.INCLUDE, Transaction.AUTO_COMMIT);
-                    writer.next();
-                    writer.remove();
-                } finally {
-                    if (writer != null) {
-                        writer.close();
-                        writer = null;
-                    }
+            try {
+                writer = sds.getFeatureWriter(sds.getTypeNames()[0],
+                        Filter.INCLUDE, Transaction.AUTO_COMMIT);
+                writer.next();
+                writer.remove();
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                    writer = null;
                 }
-
-                assertEquals(--idx, loadFeatures(sds).size());
             }
-            sds.dispose();
-        } catch (Throwable t) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                System.out.println("Ignore " + t
-                        + " because you are on windows");
 
-                return;
-            } else {
-                throw t;
+            assertEquals(--idx, loadFeatures(sds).size());
+        }
+        sds.dispose();
+    }
+    
+    /**
+     * Create a test file, then continue removing the first entry until there
+     * are no features left.
+     */
+    public void testRemoveFromFrontAndCloseTransaction() throws Throwable {
+        IndexedShapefileDataStore sds = createDataStore();
+
+        int idx = loadFeatures(sds).size();
+
+        while (idx > 0) {
+            Transaction t = new DefaultTransaction();
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
+
+            try {
+                writer = sds.getFeatureWriter(sds.getTypeNames()[0],
+                        Filter.INCLUDE, t);
+                writer.next();
+                writer.remove();
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                    writer = null;
+                }
             }
+            t.commit();
+            t.close();
+            assertEquals(--idx, loadFeatures(sds).size());
         }
     }
 
@@ -495,43 +502,32 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
      * no features left.
      */
     public void testRemoveFromBackAndClose() throws Throwable {
-        try {
-            IndexedShapefileDataStore sds = createDataStore();
+        IndexedShapefileDataStore sds = createDataStore();
 
-            int idx = loadFeatures(sds).size();
+        int idx = loadFeatures(sds).size();
 
-            while (idx > 0) {
-                FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
+        while (idx > 0) {
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
 
-                try {
-                    writer = sds.getFeatureWriter(sds.getTypeNames()[0],
-                            Filter.INCLUDE, Transaction.AUTO_COMMIT);
+            try {
+                writer = sds.getFeatureWriter(sds.getTypeNames()[0],
+                        Filter.INCLUDE, Transaction.AUTO_COMMIT);
 
-                    while (writer.hasNext()) {
-                        writer.next();
-                    }
-
-                    writer.remove();
-                } finally {
-                    if (writer != null) {
-                        writer.close();
-                        writer = null;
-                    }
+                while (writer.hasNext()) {
+                    writer.next();
                 }
 
-                assertEquals(--idx, loadFeatures(sds).size());
+                writer.remove();
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                    writer = null;
+                }
             }
-            sds.dispose();
-        } catch (Throwable t) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                System.out.println("Ignore " + t
-                        + " because you are on windows");
 
-                return;
-            } else {
-                throw t;
-            }
+            assertEquals(--idx, loadFeatures(sds).size());
         }
+        sds.dispose();
     }
 
     public void testTestTransaction() throws Exception {

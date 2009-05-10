@@ -805,7 +805,7 @@ public class SLDParser {
                 Filter filter = parseFilter(child);
                 rule.setFilter(filter);
             } else if (childName.equalsIgnoreCase("ElseFilter")) {
-                rule.setIsElseFilter(true);
+                rule.setElseFilter(true);
             } else if (childName.equalsIgnoreCase("LegendGraphic")) {
                 findElements(((Element) child), graphicSt);
                 NodeList g = findElements(((Element) child), graphicSt);

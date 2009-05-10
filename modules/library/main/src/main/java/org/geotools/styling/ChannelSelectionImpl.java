@@ -20,7 +20,7 @@ import org.opengis.style.StyleVisitor;
 
 
 /**
- * DOCUMENT ME!
+ * ChannelSelectionImpl
  *
  * @author iant
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/ChannelSelectionImpl.java $
@@ -73,7 +73,6 @@ public class ChannelSelectionImpl
                 "Three channels are required in setRGBChannels, got "
                 + channels.length);
         }
-
         red = channels[0];
         green = channels[1];
         blue = channels[2];
@@ -84,6 +83,11 @@ public class ChannelSelectionImpl
         this.red = red;
         this.green = green;
         this.blue = blue;
+    }
+    public void setRGBChannels(org.opengis.style.SelectedChannelType red, org.opengis.style.SelectedChannelType green, org.opengis.style.SelectedChannelType blue ){
+        this.red = new SelectedChannelTypeImpl( red );
+        this.green = new SelectedChannelTypeImpl( green );
+        this.blue = new SelectedChannelTypeImpl( blue );
     }
 
     public void setSelectedChannels(SelectedChannelType[] channels) {
@@ -108,4 +112,8 @@ public class ChannelSelectionImpl
     public void accept(org.geotools.styling.StyleVisitor visitor) {
         visitor.visit(this);
     }
+
+	public void accept(org.opengis.style.StyleVisitor visitor) {
+		visitor.visit( this,null );
+	}
 }

@@ -27,12 +27,12 @@ import org.opengis.style.StyleVisitor;
  *
  *
  * @author Ian Turton, CCG
- * @version $Id: Displacement.java 31133 2008-08-05 15:20:33Z johann.sorel $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/Displacement.java $
+ * @version $Id: Displacement.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Displacement.java $
  */
 public interface Displacement extends org.opengis.style.Displacement{
     /**
-     * Default Displacment instance.
+     * Default Displacement instance.
      */
     static final Displacement DEFAULT = new ConstantDisplacement() {
             private void cannotModifyConstant() {
@@ -77,21 +77,25 @@ public interface Displacement extends org.opengis.style.Displacement{
         };
 
     /**
+     * Returns an expression that computes a pixel offset from the geometry
+     * point.  This offset point is where the text's anchor point gets
+     * located. If this expression is null, the default offset of zero is
+     * used.
+     *
+     * @return Horizontal offeset
+     */
+    Expression getDisplacementX();
+
+    /**
      * Sets the expression that computes a pixel offset from the geometry
      * point.
-     *
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setDisplacementX(Expression x);
 
     /**
      * Sets the expression that computes a pixel offset from the geometry
      * point.
-     *
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setDisplacementY(Expression y);
 
     void accept(org.geotools.styling.StyleVisitor visitor);
@@ -118,5 +122,4 @@ abstract class ConstantDisplacement implements Displacement {
     public void accept(StyleVisitor visitor) {
         cannotModifyConstant();
     }
-}
-;
+};

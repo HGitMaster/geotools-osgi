@@ -19,13 +19,14 @@ package org.geotools.factory;
 // J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
-//import org.opengis.display.FeatureDisplayFactory;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.filter.FilterFactory;
-import org.opengis.go.CommonCapabilities;
-import org.opengis.go.CommonFactory;
-import org.opengis.go.display.DisplayFactory;
+import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.metadata.citation.CitationFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
@@ -36,16 +37,7 @@ import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.sld.FeatureStyleFactory;
-import org.opengis.geometry.coordinate.GeometryFactory;
-import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.util.NameFactory;
-
-// Geotools dependencies
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.Utilities;
-import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
@@ -56,11 +48,11 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  * in a subclass.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/factory/BasicFactories.java $
- * @version $Id: BasicFactories.java 30648 2008-06-12 19:22:35Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/factory/BasicFactories.java $
+ * @version $Id: BasicFactories.java 32736 2009-04-04 06:51:02Z jive $
  * @author Martin Desruisseaux
  */
-public class BasicFactories implements CommonFactory {
+public class BasicFactories {
     
     /**
      * The default authority name for authority factories.
@@ -72,7 +64,7 @@ public class BasicFactories implements CommonFactory {
      *
      * @see #getDefault
      */
-    private static CommonFactory DEFAULT;
+    private static BasicFactories DEFAULT;
 
     /**
      * The hints to be used for all factory creation.
@@ -93,7 +85,7 @@ public class BasicFactories implements CommonFactory {
     /**
      * Returns a default common factory instance.
      */
-    public static synchronized CommonFactory getDefault() {
+    public static synchronized BasicFactories getDefault() {
         if (DEFAULT == null) {
             DEFAULT = new BasicFactories(new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
         }
@@ -109,18 +101,6 @@ public class BasicFactories implements CommonFactory {
     private static String unsupportedFactory(final Class type) {
         return Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1, Utilities.getShortName(type));
     }
-
-    /**
-     * Returns an object that represents the capabilities of this common factory and its
-     * associated canvas.
-     * <p>
-     * <strong>NOTE:</strong> This method is not yet supported in Geotools.
-     * The default implementation thrown an exception in all case.
-     */
-    public CommonCapabilities getCapabilities() {
-        throw new FactoryRegistryException(unsupportedFactory(CommonCapabilities.class));
-    }
-
 
     /**
      * Returns the {@linkplain FeatureTypeFactory feature type factory} singleton.
@@ -164,19 +144,6 @@ public class BasicFactories implements CommonFactory {
      */
     public FilterFactory getFilterFactory() throws FactoryRegistryException {
         throw new FactoryNotFoundException(unsupportedFactory(FilterFactory.class));
-    }
-
-    /**
-     * Returns the {@linkplain DisplayFactory display factory} singleton.
-     * <p>
-     * <strong>NOTE:</strong> This method is not yet supported in Geotools.
-     * The default implementation thrown an exception in all case.
-     *
-     * @throws FactoryNotFoundException if no factory was found for the requested type.
-     * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
-     */
-    public DisplayFactory getDisplayFactory() throws FactoryRegistryException {
-        throw new FactoryNotFoundException(unsupportedFactory(DisplayFactory.class));
     }
 
     /**
@@ -288,19 +255,6 @@ public class BasicFactories implements CommonFactory {
             throws FactoryRegistryException
     {
         return ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
-    }
-
-    /**
-     * Returns the {@linkplain FeatureStyleFactory feature style factory} singleton.
-     * <p>
-     * <strong>NOTE:</strong> This method is not yet supported in Geotools.
-     * The default implementation thrown an exception in all case.
-     *
-     * @throws FactoryNotFoundException if no factory was found for the requested type.
-     * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
-     */
-    public FeatureStyleFactory getFeatureStyleFactory() throws FactoryRegistryException {
-        throw new FactoryNotFoundException(unsupportedFactory(FeatureStyleFactory.class));
     }
 
     /**

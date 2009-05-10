@@ -67,7 +67,7 @@ public class PropertyDataStore extends AbstractDataStore {
         info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );
         info.setSource( directory.toURI() );
         try {
-            info.setPublisher( new URI(System.getenv("user.name")) );
+            info.setPublisher( new URI(System.getProperty("user.name")) );
         } catch (URISyntaxException e) {
         }
         return info;

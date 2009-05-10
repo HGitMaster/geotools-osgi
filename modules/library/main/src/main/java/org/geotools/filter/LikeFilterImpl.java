@@ -30,7 +30,7 @@ import org.opengis.filter.PropertyIsLike;
  *
  * @author Rob Hranac, Vision for New York
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/LikeFilterImpl.java $
- * @version $Id: LikeFilterImpl.java 32673 2009-03-23 20:10:39Z jive $
+ * @version $Id: LikeFilterImpl.java 32755 2009-04-07 14:37:10Z jdeolive $
  */
 public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 
@@ -94,9 +94,8 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 	 * @param pattern
 	 * 
 	 */
-	public static String convertToSQL92(char escape, char multi,char single, String pattern)
-	   throws IllegalArgumentException
-	{
+	public static String convertToSQL92(char escape, char multi, char single, boolean matchCase, 
+	        String pattern ) throws IllegalArgumentException {
 		if ( (escape == '\'') || (multi  == '\'') || (single  == '\'')  )
 			throw new IllegalArgumentException("do not use single quote (') as special char!");
 		
@@ -125,8 +124,8 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
             	result.append('\'');
             }
             else 
-            {
-            	result.append(chr);
+            { 
+            	result.append(matchCase ? chr : Character.toUpperCase(chr));
             }
 		 }
             
@@ -156,6 +155,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
     				escape.charAt(0),
 					wildcardMulti.charAt(0), 
 					wildcardSingle.charAt(0),
+                    matchingCase,
 					pattern);
     }
 	
@@ -173,6 +173,11 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 		this.escape = escape;
 		match = null;
 	}
+
+    public void setMatchCase(boolean matchingCase){
+        this.matchingCase = matchingCase;
+        match = null;
+    }
 	
 	public boolean isMatchingCase() {
             return matchingCase;
@@ -272,7 +277,9 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 
             pattern1 = tmp.toString();
             LOGGER.finer("final pattern " + pattern1);
-            compPattern = java.util.regex.Pattern.compile(pattern1);
+            compPattern = isMatchingCase()  
+                ? Pattern.compile(pattern1)
+                : Pattern.compile(pattern1, Pattern.CASE_INSENSITIVE);
             match = compPattern.matcher("");
         }
         return match;
@@ -305,8 +312,6 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      */
     public final void setValue(Expression attribute) throws IllegalFilterException {
     	setExpression(attribute);
-    	
-        
     }
 
      /**
@@ -448,7 +453,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
             }
 
             Matcher matcher = getMatcher();
-            matcher.reset(attribute.evaluate(feature).toString());
+            matcher.reset(value.toString());
 
             return matcher.matches();
     }

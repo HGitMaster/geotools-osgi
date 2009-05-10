@@ -27,7 +27,7 @@ public interface MapMouseListener {
     /**
      * Set the JMapPane instance for this tool
      */
-    public void setMapPane(JMapPane pane);
+    //public void setMapPane(JMapPane pane);
     
     /**
      * Respond to a mouse click event received from the map pane

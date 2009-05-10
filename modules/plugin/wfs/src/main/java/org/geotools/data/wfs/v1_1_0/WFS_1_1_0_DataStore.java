@@ -92,7 +92,7 @@ import org.opengis.referencing.operation.TransformException;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: WFS_1_1_0_DataStore.java 32553 2009-02-27 19:14:36Z jdeolive $
+ * @version $Id: WFS_1_1_0_DataStore.java 32879 2009-04-27 21:12:44Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -720,7 +720,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
     public int getCount(final Query query) throws IOException {
         Filter[] filters = wfs.splitFilters(query.getFilter());
         Filter postFilter = filters[1];
-        if (!Filter.EXCLUDE.equals(postFilter)) {
+        if (!Filter.INCLUDE.equals(postFilter)) {
             // Filter not fully supported, can't know without a full scan of the results
             return -1;
         }
@@ -792,7 +792,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         final String defaultCrs = wfs.getDefaultCRS(typeName);
 
         if (queryCrs == null) {
-            LOGGER.warning("Query does not provides a CRS, using default: " + query);
+            LOGGER.warning("Query does not provide a CRS, using default: " + query);
             return defaultCrs;
         }
 

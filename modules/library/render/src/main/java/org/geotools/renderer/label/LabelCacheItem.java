@@ -68,6 +68,23 @@ public class LabelCacheItem implements Comparable<LabelCacheItem> {
     int autoWrap = 100;
     
     boolean forceLeftToRightEnabled = true;
+    
+    boolean conflictResolutionEnabled = true;
+    
+    double goodnessOfFit = 0;
+
+    public double getGoodnessOfFit() {
+        return goodnessOfFit;
+    }
+
+    /**
+     * A value between 0 and 1 representing the portion of the label
+     * that overlaps with the geometry (atm used only for polygons)
+     * @param goodnessOfFit
+     */
+    public void setGoodnessOfFit(double goodnessOfFit) {
+        this.goodnessOfFit = goodnessOfFit;
+    }
 
     public String getLabel() {
         return label;
@@ -307,6 +324,24 @@ public class LabelCacheItem implements Comparable<LabelCacheItem> {
 
     public void setForceLeftToRightEnabled(boolean forceLeftToRight) {
         this.forceLeftToRightEnabled = forceLeftToRight;
+    }
+    
+    /**
+     * Checks if conflict resolution has been enabled for this label
+     * @return
+     */
+    public boolean isConflictResolutionEnabled() {
+        return conflictResolutionEnabled;
+    }
+    
+    /**
+     * Sets conflict resolution for this label. When on, this label outline/bbox will
+     * be stored in the conflict resolution map and will prevent every other label
+     * to be drawn in the same area
+     * @param conflictResolutionEnabled
+     */
+    public void setConflictResolutionEnabled(boolean conflictResolutionEnabled) {
+        this.conflictResolutionEnabled = conflictResolutionEnabled;
     }
 
 }
