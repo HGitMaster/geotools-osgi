@@ -16,9 +16,10 @@
  */
 package org.geotools.caching.spatialindex.store;
 
+import org.geotools.caching.grid.spatialindex.GridSpatialIndex;
+import org.geotools.caching.grid.spatialindex.GridNode;
 import org.geotools.caching.spatialindex.Region;
-import org.geotools.caching.spatialindex.grid.Grid;
-import org.geotools.caching.spatialindex.grid.GridNode;
+import org.geotools.caching.spatialindex.RegionNodeIdentifier;
 
 
 class TestNode extends GridNode {
@@ -31,7 +32,7 @@ class TestNode extends GridNode {
         super();
     }
 
-    TestNode(Grid grid, Region mbr) {
-        super(grid, mbr);
+    TestNode(GridSpatialIndex grid, Region mbr) {
+        super(new RegionNodeIdentifier(mbr));
     }
 }

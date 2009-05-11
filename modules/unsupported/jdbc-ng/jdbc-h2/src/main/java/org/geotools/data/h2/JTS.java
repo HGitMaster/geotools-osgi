@@ -23,6 +23,13 @@ import com.vividsolutions.jts.io.WKTReader;
 public class JTS {
     
     /**
+     * Returns the current GeoTools version.
+     */
+    public static String GeoToolsVersion() {
+        return "2.6-SNAPSHOT";
+    }
+    
+    /**
      * Returns the Well Known Text of the geometry.
      */
     public static String AsWKT( byte[] wkb ) {

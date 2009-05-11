@@ -40,12 +40,13 @@ public class DefaultOrdinalPositionTest {
 
     private OrdinalPosition ordinalPosition1;
     private OrdinalPosition ordinalPosition2;
+    private Calendar cal = Calendar.getInstance();
 
     @Before
     public void setUp() {
         NamedIdentifier name = new NamedIdentifier(Citations.CRS, "Gregorian calendar");
         TemporalReferenceSystem frame = new DefaultTemporalReferenceSystem(name, null);
-        Calendar cal = Calendar.getInstance();
+        
         cal.set(500, 0, 1);
         Date beginning1 = cal.getTime();
         cal.set(1000, 0, 1);
@@ -81,7 +82,6 @@ public class DefaultOrdinalPositionTest {
     @Test
     public void testSetOrdinalPosition() {
         OrdinalEra result = ordinalPosition1.getOrdinalPosition();
-        Calendar cal = Calendar.getInstance();
         cal.set(10, 0, 0);
         Date beginning = cal.getTime();
         cal.set(2012, 12, 23);

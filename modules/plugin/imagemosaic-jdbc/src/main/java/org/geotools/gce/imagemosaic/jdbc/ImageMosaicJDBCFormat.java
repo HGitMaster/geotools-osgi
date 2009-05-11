@@ -92,14 +92,14 @@ public class ImageMosaicJDBCFormat extends AbstractGridFormat implements Format 
 
         try {
             if (source instanceof File) {
-                sourceURL = ((File) source).toURL();
+                sourceURL = ((File) source).toURI().toURL();
             } else if (source instanceof URL) {
                 sourceURL = (URL) source;
             } else if (source instanceof String) {
                 final File tempFile = new File((String) source);
 
                 if (tempFile.exists()) {
-                    sourceURL = tempFile.toURL();
+                    sourceURL = tempFile.toURI().toURL();
                 } else {
                     sourceURL = new URL(URLDecoder.decode((String) source,
                                 "UTF8"));

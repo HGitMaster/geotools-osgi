@@ -17,27 +17,27 @@
 package org.geotools.jdbc;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.data.jdbc.FilterToSQL;
+import org.geotools.data.Query;
+import org.geotools.factory.Hints;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.referencing.CRS;
-import org.geotools.util.Converters;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Id;
@@ -47,7 +47,6 @@ import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Divide;
-import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.Multiply;
 import org.opengis.filter.expression.Subtract;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -148,6 +147,18 @@ public abstract class SQLDialect {
         this.dataStore = dataStore;
     }
     
+    /**
+     * Initializes a newly created database connection.
+     * <p>
+     * Subclasses should override this method if there is some additional action 
+     * that needs to be taken when a new connection to the database is created. The
+     * default implementation does nothing.
+     * </p>
+     * @param cx The new database connection.
+     */
+    public void initializeConnection( Connection cx ) throws SQLException {
+        
+    }
     /**
      * Determines if the specified table should be included in those published
      * by the datastore.
@@ -278,6 +289,21 @@ public abstract class SQLDialect {
     }
 
     /**
+     * Registers any overrides that should occur when mapping an integer sql type 
+     * value to an underlying sql type name.
+     * <p>
+     * The default implementation of this method does nothing. Subclasses should override
+     * in cases where:
+     * <ul>
+     * <li>database type metadata does not provide enough information to properly map
+     * <li>to support custom types (those not in {@link Types})
+     * </ul>
+     * </p>
+     */
+    public void registerSqlTypeToSqlTypeNameOverrides(Map<Integer,String> overrides) {
+    }
+    
+    /**
      * Returns the java class mapping for a particular column.
      * <p>
      * This method is used as a "last resort" when the mappings specified by the
@@ -377,6 +403,18 @@ public abstract class SQLDialect {
         sql.append(" as ");
         encodeColumnName(raw, sql);
     }
+    
+    /**
+     * Encodes the alias of a table in an sql query.
+     * <p>
+     * This default implementation uses the syntax: <pre>as "alias"</pre>.
+     * Subclasses should override to provide a different syntax.
+     * </p>
+     */
+    public void encodeTableAlias(String raw, StringBuffer sql) {
+        sql.append(" as ");
+        encodeColumnName(raw, sql);
+    }
 
     /**
      * Encodes the name of a table in an SQL statement.
@@ -440,8 +478,14 @@ public abstract class SQLDialect {
     
     /**
      * Turns the specified srid into a {@link CoordinateReferenceSystem}, or returns <code>null</code> if not possible.
+     * <p>
      * The implementation might just use <code>CRS.decode("EPSG:" + srid)</code>, but most spatial databases will have 
-     * their own SRS database that can be queried as well.
+     * their own SRS database that can be queried as well.</p>
+     * <p>As a rule of thumb you should override this method if your spatial database uses codes that are 
+     * not part of the EPSG standard database, of if for some reason you deem it preferable to use
+     * your database definition instead of an official EPSG one.</p>
+     * <p>Most overrides will try out to decode the official EPSG code first, and fall back on
+     * the custom database definition otherwise</p>
      * @param srid
      * @return
      */
@@ -516,6 +560,45 @@ public abstract class SQLDialect {
     public void encodeGeometryColumn(GeometryDescriptor gatt, int srid, StringBuffer sql) {
         encodeColumnName(gatt.getLocalName(), sql);
     }
+    
+    /**
+     * Encodes a generalized geometry using a DB provided SQL function if available
+     * If not supported, subclasses should not implement
+     * Only called if {@link Hints#GEOMETRY_GENERALIZATION is supported}  
+     * 
+     * Example:
+     * </p>
+     * <pre>
+     *   <code>
+     *   sql.append( "asText(generalize(" );
+     *   column( gatt.getLocalName(), sql );
+     *   sql.append( "," );
+	 *   sql.append(distance);
+     *   sql.append( "))" );
+     *   </code>
+     * </pre>
+     * </p>
+     * <p>
+     * 
+     */
+    
+    public void encodeGeometryColumnGeneralized(GeometryDescriptor gatt, int srid,StringBuffer sql, Double distance) {
+        throw new UnsupportedOperationException("Geometry generalization not supported");
+    }
+    
+    
+    /**
+     * 
+     * Encodes a simplified geometry using a DB provided SQL function if available
+     * If not supported, subclasses should not implement
+     * Only called if {@link Hints#GEOMETRY_SIMPLIFICATION is supported}  
+     * @see SQLDialect#encodeGeometryColumnGeneralized(GeometryDescriptor, StringBuffer, Double)
+     * 
+     */
+    public void encodeGeometryColumnSimplified(GeometryDescriptor gatt, int srid,StringBuffer sql, Double distance) {
+        throw new UnsupportedOperationException("Geometry simplification not supported");
+    }
+
 
     /**
      * Decodes a geometry value from the result of a query.
@@ -546,6 +629,7 @@ public abstract class SQLDialect {
      */
     public abstract Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs,
         String column, GeometryFactory factory, Connection cx ) throws IOException, SQLException;
+    
     /**
      * Decodes a geometry value from the result of a query specifying the column 
      * as an index.
@@ -555,7 +639,7 @@ public abstract class SQLDialect {
      * </p>
      * @see {@link #decodeGeometryValue(GeometryDescriptor, ResultSet, String, GeometryFactory)}.
      */
-    public final Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs,
+    public Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs,
         int column, GeometryFactory factory, Connection cx ) throws IOException, SQLException {
         
         String columnName = rs.getMetaData().getColumnName( column );
@@ -581,6 +665,18 @@ public abstract class SQLDialect {
         sql.append( " INTEGER PRIMARY KEY" );
     }
 
+    /**
+     * Encodes anything post a column in a CREATE TABLE statement.
+     * <p>
+     * This is appended after the column name and type. Subclasses may choose to override
+     * this method, the default implementation does nothing.
+     * </p>
+     * @param att The attribute corresponding to the column.
+     */
+    public void encodePostColumnCreateTable(AttributeDescriptor att, StringBuffer sql) {
+        
+    }
+    
     /**
      * Encodes anything post a CREATE TABLE statement.
      * <p>
@@ -697,4 +793,38 @@ public abstract class SQLDialect {
         throws SQLException {
         return null;
     }
+    
+    /**
+     * Returns true if this dialect can encode both {@linkplain Query#getStartIndex()}
+     * and {@linkplain Query#getMaxFeatures()} into native SQL. 
+     * @return
+     */
+    public boolean isLimitOffsetSupported() {
+        return false;
+    }
+    
+    /**
+     * Alters the query provided so that limit and offset are natively dealt with. This might mean
+     * simply appending some extra directive to the query, or wrapping it into a bigger one.
+     * @param sql
+     * @param limit
+     * @param offset
+     */
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        throw new UnsupportedOperationException("Ovveride this method when isLimitOffsetSupported returns true");
+    }
+    /**
+     * Add hints to the JDBC Feature Source. A subclass 
+     * can override
+     * 
+     * possible hints (but not limited to)
+     *  
+     * {@link Hints#GEOMETRY_GENERALIZATION}
+     * {@link Hints#GEOMETRY_SIMPLIFICATION}
+     *  
+     * @param hints
+     */
+    protected void addSupportedHints(Set<Hints.Key> hints) {       	
+    }
+
 }

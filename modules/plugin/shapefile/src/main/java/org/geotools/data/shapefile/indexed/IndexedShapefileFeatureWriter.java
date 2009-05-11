@@ -16,11 +16,12 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import static org.geotools.data.shapefile.ShpFileType.FIX;
+import static org.geotools.data.shapefile.ShpFileType.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 
 import org.geotools.data.DataUtilities;
@@ -51,9 +52,10 @@ class IndexedShapefileFeatureWriter extends ShapefileFeatureWriter implements
 
     public IndexedShapefileFeatureWriter(String typeName, ShpFiles shpFiles,
             IndexedShapefileAttributeReader attsReader,
-             FeatureReader<SimpleFeatureType, SimpleFeature> featureReader, IndexedShapefileDataStore datastore)
+             FeatureReader<SimpleFeatureType, SimpleFeature> featureReader, IndexedShapefileDataStore datastore,
+             Charset charset)
             throws IOException {
-        super(typeName, shpFiles, attsReader, featureReader);
+        super(typeName, shpFiles, attsReader, featureReader, charset);
         this.indexedShapefileDataStore = datastore;
         if (!datastore.indexUseable(FIX)) {
             this.fidWriter = IndexedFidWriter.EMPTY_WRITER;

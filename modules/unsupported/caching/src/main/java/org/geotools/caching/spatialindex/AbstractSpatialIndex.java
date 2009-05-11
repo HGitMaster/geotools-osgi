@@ -16,8 +16,6 @@
  */
 package org.geotools.caching.spatialindex;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Stack;
 
 
@@ -46,21 +44,12 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      */
     protected int dimension;
     protected Region infiniteRegion;
-    protected ArrayList<NodeCommand> writeNodeCommands = new ArrayList<NodeCommand>();
-    protected ArrayList<NodeCommand> readNodeCommands = new ArrayList<NodeCommand>();
-    protected ArrayList<NodeCommand> deleteNodeCommands = new ArrayList<NodeCommand>();
-    protected ThisStatistics stats = new ThisStatistics();
 
-    public void addDeleteNodeCommand(NodeCommand nc) {
-        deleteNodeCommands.add(nc);
-    }
+    protected SpatialIndexStatistics stats = new SpatialIndexStatistics();
 
-    public void addReadNodeCommand(NodeCommand nc) {
-        readNodeCommands.add(nc);
-    }
-
-    public void addWriteNodeCommand(NodeCommand nc) {
-        writeNodeCommands.add(nc);
+    
+    public Storage getStorage(){
+        return this.store;
     }
 
     public void intersectionQuery(Shape query, Visitor v) {
@@ -118,14 +107,14 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
             current = new NodePointer(readNode(this.root));
             notYetVisitedNodes.push(current);
         }
-
+        
         while (!notYetVisitedNodes.isEmpty() || !visitedNodes.isEmpty()) {
             if (!notYetVisitedNodes.isEmpty()) {
                 current = notYetVisitedNodes.pop();
                 v.visitNode(current.node);
 
                 if (v.isDataVisitor()) { // skip if visitor does nothing with data
-                                         // visitData check for actual containement or intersection
+                                         // visitData check for actual containment or intersection
                     visitData(current.node, v, query, type);
                 }
             } else {
@@ -136,9 +125,10 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
                 NodeIdentifier child = current.next();
 
                 if (query.intersects(child.getShape())) {
-                    notYetVisitedNodes.push(new NodePointer(readNode(child)));
+                    Node n = readNode(child);
+                    NodePointer np = new NodePointer(n);
+                    notYetVisitedNodes.push(np);
                     visitedNodes.push(current);
-
                     break;
                 }
             }
@@ -164,56 +154,32 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
 
     public void nearestNeighborQuery(int k, Shape query, Visitor v) {
         // TODO Auto-generated method stub
-    }
-
-    public void queryStrategy(QueryStrategy qs) {
-        NodeIdentifier current = this.root;
-        Node currentNode = null;
-
-        while (true) {
-            boolean[] hasNext = new boolean[] { false };
-            currentNode = readNode(current);
-            current = qs.getNextNode(currentNode, hasNext);
-
-            if (hasNext[0] == false) {
-                break;
-            }
-        }
-    }
-
-    public boolean deleteData(Shape shape, int id) {
-        if (shape.getDimension() != dimension) {
-            throw new IllegalArgumentException(
-                "deleteData: Shape has the wrong number of dimensions.");
-        }
-
-        if (this.root.getShape().intersects(shape)) {
-            return deleteData(this.root, shape, id);
-        } else {
-            return false;
-        }
-    }
-
-    /** Try to delete data from the specified node,
-     * or its children.
-     *
-     * @param node
-     * @param shape of data to delete
-     * @param id of data to delete
-     * @return true if some data has been found and deleted.
+    } 
+    
+    /**
+     * Inserts data into the spatial index.
+     * 
+     * <p>Items with the same "data" and  "shape" 
+     * will be considered equal and only one copy of them will be added to the
+     * cache.
+     * </p>
+     * 
+     * @param data to insert
+     * @param shape associated with data
+     * @param id the id of the data
+     * 
+     * 
      */
-    protected abstract boolean deleteData(NodeIdentifier n, Shape shape, int id);
-
-    public void insertData(Object data, Shape shape, int id) {
+    public void insertData(Object data, Shape shape) {
         if (shape.getDimension() != dimension) {
             throw new IllegalArgumentException(
                 "insertData: Shape has the wrong number of dimensions.");
         }
 
         if (this.root.getShape().contains(shape)) {
-            insertData(this.root, data, shape, id);
+            insertData(this.root, data, shape);
         } else {
-            insertDataOutOfBounds(data, shape, id);
+            insertDataOutOfBounds(data, shape);
         }
     }
 
@@ -227,7 +193,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * @param shape of data
      * @param id of data
      */
-    protected abstract void insertData(NodeIdentifier n, Object data, Shape shape, int id);
+    protected abstract void insertData(NodeIdentifier n, Object data, Shape shape);
 
     /** Insert new data with shape not contained in the current index.
      * Some indexes may require to recreate the root or the index,
@@ -237,7 +203,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * @param shape
      * @param id
      */
-    protected abstract void insertDataOutOfBounds(Object data, Shape shape, int id);
+    protected abstract void insertDataOutOfBounds(Object data, Shape shape);
 
     public Statistics getStatistics() {
         return stats;
@@ -245,47 +211,38 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
 
     protected Node readNode(NodeIdentifier id) {
         Node ret;
-
         if ((rootNode != null) && (id.equals(this.root))) {
             return rootNode;
         }
 
+        ret = id.getNode();
+        if (ret != null){
+            return ret;
+        }
         ret = store.get(id);
         stats.stats_reads++;
 
-        for (Iterator it = readNodeCommands.iterator(); it.hasNext();) {
-            NodeCommand next = (NodeCommand) it.next();
-            next.execute(ret);
-        }
-
+        id.setNode(ret);
         return ret;
     }
 
     protected void writeNode(Node node) {
         if (node.getIdentifier().equals(this.root)) {
             this.rootNode = node;
-
             return;
         }
-
         store.put(node);
         stats.stats_writes++;
-
-        for (Iterator it = writeNodeCommands.iterator(); it.hasNext();) {
-            NodeCommand next = (NodeCommand) it.next();
-            next.execute(node);
-        }
     }
 
     protected void deleteNode(NodeIdentifier id) {
         store.remove(id);
     }
 
-    public void flush() {
+    public synchronized void flush() {
         if (this.rootNode != null) {
             store.put(this.rootNode);
         }
-
         store.flush();
     }
 
@@ -313,64 +270,5 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
         }
     }
 
-    /** Data structure to store statistics about the index.
-     *
-     * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
-     *
-     */
-    public class ThisStatistics implements Statistics {
-        int stats_reads = 0;
-        int stats_writes = 0;
-        int stats_nodes = 0;
-        int stats_data = 0;
-
-        public long getNumberOfData() {
-            return stats_data;
-        }
-
-        public long getNumberOfNodes() {
-            return stats_nodes;
-        }
-
-        public long getReads() {
-            return stats_reads;
-        }
-
-        public long getWrites() {
-            return stats_writes;
-        }
-
-        public void addToReadsCounter(int count) {
-            stats_reads += count;
-        }
-
-        public void addToWritesCounter(int count) {
-            stats_writes += count;
-        }
-
-        public void addToNodesCounter(int count) {
-            stats_nodes += count;
-        }
-
-        public void addToDataCounter(int count) {
-            stats_data += count;
-        }
-
-        public void reset() {
-            stats_reads = 0;
-            stats_writes = 0;
-            stats_nodes = 0;
-            stats_data = 0;
-        }
-
-        public String toString() {
-            StringBuffer sb = new StringBuffer();
-            sb.append("Reads = " + stats_reads);
-            sb.append(" ; Writes = " + stats_writes);
-            sb.append(" ; Nodes = " + stats_nodes);
-            sb.append(" ; Data = " + stats_data);
-
-            return sb.toString();
-        }
-    }
+    
 }

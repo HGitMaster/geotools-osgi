@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools EPSG Authority Service using WKT
 Bundle-SymbolicName: org.geotools.epsg.wkt
-Bundle-Version: 2.6.0.osgi1
+Bundle-Version: 2.6.0.osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.metadata;bundle-version="2.6.0",

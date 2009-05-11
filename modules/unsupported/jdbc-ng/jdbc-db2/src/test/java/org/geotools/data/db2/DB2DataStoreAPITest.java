@@ -58,10 +58,5 @@ public class DB2DataStoreAPITest extends JDBCDataStoreAPITest {
     		name2.contains("WGS") && name2.contains("84"));
    	}
 
-	@Override
-	public void testGetFeaturesWriterAdd() throws IOException, IllegalAttributeException {
-		// TODO skip, because of GEOT-2130
-		
-	}
 
 }

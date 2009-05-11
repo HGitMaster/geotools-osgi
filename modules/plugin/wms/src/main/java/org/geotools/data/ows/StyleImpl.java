@@ -16,11 +16,9 @@
  */
 package org.geotools.data.ows;
 
+import java.net.URL;
 import java.util.List;
 
-import org.opengis.layer.Style;
-import org.opengis.layer.StyleSheetURL;
-import org.opengis.layer.StyleURL;
 import org.opengis.util.InternationalString;
 
 /**
@@ -28,14 +26,14 @@ import org.opengis.util.InternationalString;
  * @author Richard Gould
  *
  */
-public class StyleImpl implements Style {
+public class StyleImpl {
 
 	private String name;
 	private InternationalString title;
 	private InternationalString _abstract;
 	private List legendURLs;
-	private StyleSheetURL styleSheetURL;
-	private StyleURL styleURL;
+	private URL styleSheetURL;
+	private URL styleURL;
 	private List featureStyles;
 	private List graphicStyles;
 	
@@ -77,16 +75,16 @@ public class StyleImpl implements Style {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public StyleSheetURL getStyleSheetURL() {
+	public URL getStyleSheetURL() {
 		return styleSheetURL;
 	}
-	public void setStyleSheetURL(StyleSheetURL styleSheetURL) {
+	public void setStyleSheetURL(URL styleSheetURL) {
 		this.styleSheetURL = styleSheetURL;
 	}
-	public StyleURL getStyleURL() {
+	public URL getStyleURL() {
 		return styleURL;
 	}
-	public void setStyleURL(StyleURL styleURL) {
+	public void setStyleURL(URL styleURL) {
 		this.styleURL = styleURL;
 	}
 	public InternationalString getTitle() {

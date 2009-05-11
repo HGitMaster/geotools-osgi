@@ -21,8 +21,6 @@ import java.awt.Color;
 import org.geotools.filter.ConstantExpression;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Expression;
-import org.opengis.style.StyleVisitor;
-
 
 /**
  * The Stroke object encapsulates the graphical-symbolization parameters for
@@ -74,11 +72,11 @@ import org.opengis.style.StyleVisitor;
  * standards with names and semantics which are as close as possible.
  * </ul>
  * </p>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/Stroke.java $
- * @version $Id: Stroke.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Stroke.java $
+ * @version $Id: Stroke.java 32919 2009-05-03 14:18:31Z jive $
  * @author James Macgill
  */
-public interface Stroke extends org.opengis.style.Stroke{
+public interface Stroke extends org.opengis.style.Stroke {
     /**
      * Default Stroke capturing the defaults indicated by the standard.
      * <p>
@@ -203,10 +201,7 @@ public interface Stroke extends org.opengis.style.Stroke{
      * "#ff0000" (with no quotation marks).
      *
      * Note: in CSS this parameter is just called Stroke and not Color.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setColor(Expression color);
 
     /**
@@ -214,10 +209,7 @@ public interface Stroke extends org.opengis.style.Stroke{
      * pixels encoded as a float.
      * Fractional numbers are allowed but negative
      * numbers are not.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setWidth(Expression width);
 
     /**
@@ -228,10 +220,7 @@ public interface Stroke extends org.opengis.style.Stroke{
      * totally opaque.  A linear scale of translucency is used for intermediate
      * values.<br>
      * For example, "0.65" would represent 65% opacity.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setOpacity(Expression opacity);
 
     /**
@@ -241,10 +230,7 @@ public interface Stroke extends org.opengis.style.Stroke{
 
     /**
      * This parameter controls how line strings should be joined together.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setLineJoin(Expression lineJoin);
 
     /**
@@ -254,10 +240,7 @@ public interface Stroke extends org.opengis.style.Stroke{
 
     /**
      * This parameter controls how line strings should be capped.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setLineCap(Expression lineCap);
 
     /**
@@ -283,10 +266,7 @@ public interface Stroke extends org.opengis.style.Stroke{
      * For example, "2 1 3 2" would produce:<br>
      * <code>--&nbsp;---&nbsp;&nbsp;--&nbsp;---&nbsp;&nbsp;--&nbsp;---&nbsp;&nbsp;
      * --&nbsp;---&nbsp;&nbsp;--&nbsp;---&nbsp;&nbsp;--</code>
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setDashArray(float[] dashArray);
 
     /**
@@ -298,10 +278,7 @@ public interface Stroke extends org.opengis.style.Stroke{
     /**
      * A dash array need not start from the beginning.  This method allows for
      * an offset into the dash array before starting it.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setDashOffset(Expression dashOffset);
 
     /**
@@ -316,10 +293,7 @@ public interface Stroke extends org.opengis.style.Stroke{
     /**
      * This parameter indicates that a stipple-fill repeated graphic will be
      * used and specifies the fill graphic to use.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setGraphicFill(Graphic graphicFill);
 
     /**
@@ -348,16 +322,12 @@ public interface Stroke extends org.opengis.style.Stroke{
      * In the case of raster images with no special mark-up, this line will
      * be assumed to be the middle pixel row of the image, starting from the
      * first pixel column and ending at the last pixel column.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setGraphicStroke(Graphic graphicStroke);
 
     void accept(org.geotools.styling.StyleVisitor visitor);
 
 }
-
 
 abstract class ConstantStroke implements Stroke {
     private void cannotModifyConstant() {
@@ -411,47 +381,3 @@ abstract class ConstantStroke implements Stroke {
     }
     
 }
-;
-/*
- * $Log: Stroke.java,v $
- * Revision 1.13  2003/08/10 08:33:39  seangeo
- * Added clone methods
- *
- * Revision 1.12  2003/08/03 03:28:15  seangeo
- * Removed unneeded imports.
- *
- * Revision 1.11  2003/08/01 16:54:21  ianturton
- * implemented visitor pattern
- *
- * Revision 1.10  2003/05/12 22:07:57  jmacgill
- * added getColor method which returns an actual Color object.
- *
- * Revision 1.9  2002/10/14 17:08:01  ianturton
- * expanded interfaces to include set methods
- *
- * Revision 1.8  2002/07/12 15:35:13  loxnard
- *
- * Removed redundant public modifiers
- *
- * Revision 1.7  2002/06/04 16:08:34  loxnard
- *
- * Misc JavaDoc
- *
- * Revision 1.6  2002/05/30 18:10:49  ianturton
- * added expressions to stroke
- *
- * Revision 1.5  2002/05/27 09:07:40  jmacgill
- * fixed a number of checkstyle errors
- * improved javadoc comments
- *
- * Revision 1.4  2002/05/01 16:51:53  jmacgill
- * dash array is now returned as a float array and not a string of space
- * separated floats
- *
- * Revision 1.3  2002/03/28 10:54:10  jmacgill
- * work in progress
- *
- * Revision 1.2  2002/03/25 22:14:41  jmacgill
- * Updated JavaDocs
- *
- */

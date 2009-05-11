@@ -32,8 +32,7 @@ import javax.media.jai.ROI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.ExtremaDescriptor;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import junit.framework.Assert;
 
 import org.geotools.TestData;
 import org.geotools.geometry.DirectPosition1D;
@@ -42,6 +41,8 @@ import org.geotools.image.ImageWorker;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.renderer.lite.gridcoverage2d.RasterSymbolizerTest;
 import org.geotools.util.NumberRange;
+import org.junit.Before;
+import org.junit.Test;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -53,35 +54,9 @@ import org.opengis.referencing.operation.TransformException;
  * @author Simone Giannecchini, GeoSolutions.
  * 
  */
-public class TestPiecewise extends TestCase {
-
-	/**
-	 * @param name
-	 */
-	public TestPiecewise(String name) {
-		super(name);
-	}
-
-	public static void main(java.lang.String[] args) {
-		junit.textui.TestRunner.run(suite());
-	}
-
-	public static TestSuite suite() {
-		TestSuite suite = new TestSuite();
-		suite.addTest(new TestPiecewise("testLookupByte"));
-		suite.addTest(new TestPiecewise("testSWANLOGARITHMIC"));
-		suite.addTest(new TestPiecewise("testPiecewiseLogarithm"));
-		suite.addTest(new TestPiecewise("testDefaultTransform"));
-		suite.addTest(new TestPiecewise("testPassthroughTransform"));
-		suite.addTest(new TestPiecewise("testConstantTransform"));
-		suite.addTest(new TestPiecewise("testLinearTransform"));
-		suite.addTest(new TestPiecewise("testMathTransform1DAdapter"));
-		
+public class TestPiecewise  {
 
 
-
-		return suite;
-	}
 
 	/**
 	 * Testing {@link DefaultConstantPiecewiseTransformElement}.
@@ -89,7 +64,8 @@ public class TestPiecewise extends TestCase {
 	 * @throws IOException
 	 * @throws TransformException
 	 */
-	public void testLinearTransform() throws IOException, TransformException {
+	@Test
+	public void linearTransform() throws IOException, TransformException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -98,19 +74,19 @@ public class TestPiecewise extends TestCase {
 		// /////////////////////////////////////////////////////////////////////
 		DefaultPiecewiseTransform1DElement e0 = DefaultPiecewiseTransform1DElement
 				.create("zero", NumberRange.create(0,100),NumberRange.create(0,200));
-		assertTrue(e0 instanceof DefaultLinearPiecewiseTransform1DElement);
+		Assert.assertTrue(e0 instanceof DefaultLinearPiecewiseTransform1DElement);
 		// checks
-		assertEquals(((DefaultLinearPiecewiseTransform1DElement)e0).getOutputMinimum(), e0.transform(0),0.0);
-		assertEquals(((DefaultLinearPiecewiseTransform1DElement)e0).getOutputMaximum(), e0.transform(e0.getInputMaximum()),0.0);
-		assertEquals(0.0, ((DefaultLinearPiecewiseTransform1DElement)e0).getOffset(),0.0);
-		assertEquals(2.0, ((DefaultLinearPiecewiseTransform1DElement)e0).getScale(),0.0);
-		assertFalse(e0.isIdentity());
-		assertEquals(1, e0.getSourceDimensions());
-		assertEquals(1, e0.getTargetDimensions());
+		Assert.assertEquals(((DefaultLinearPiecewiseTransform1DElement)e0).getOutputMinimum(), e0.transform(0),0.0);
+		Assert.assertEquals(((DefaultLinearPiecewiseTransform1DElement)e0).getOutputMaximum(), e0.transform(e0.getInputMaximum()),0.0);
+		Assert.assertEquals(0.0, ((DefaultLinearPiecewiseTransform1DElement)e0).getOffset(),0.0);
+		Assert.assertEquals(2.0, ((DefaultLinearPiecewiseTransform1DElement)e0).getScale(),0.0);
+		Assert.assertFalse(e0.isIdentity());
+		Assert.assertEquals(1, e0.getSourceDimensions());
+		Assert.assertEquals(1, e0.getTargetDimensions());
 
 		try{
-			assertEquals(e0.transform(Double.POSITIVE_INFINITY),0.0,0.0);
-			assertTrue(false);
+			Assert.assertEquals(e0.transform(Double.POSITIVE_INFINITY),0.0,0.0);
+			Assert.assertTrue(false);
 		}catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -120,15 +96,15 @@ public class TestPiecewise extends TestCase {
 		    new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {e0});
 
 		// checks
-		assertEquals(0.0, transform.transform(0),0);
+		Assert.assertEquals(0.0, transform.transform(0),0);
 		try{
-			assertFalse(transform.isIdentity());
-			assertTrue(false);
+			Assert.assertFalse(transform.isIdentity());
+			Assert.assertTrue(false);
 		}catch (Exception e) {
 			// TODO: handle exception
 		}
-		assertEquals(1, transform.getSourceDimensions());
-		assertEquals(1, transform.getTargetDimensions());
+		Assert.assertEquals(1, transform.getSourceDimensions());
+		Assert.assertEquals(1, transform.getTargetDimensions());
 		
 
 
@@ -139,30 +115,31 @@ public class TestPiecewise extends TestCase {
 	 * @throws IOException
 	 * @throws TransformException
 	 */
-	public void testMathTransform1DAdapter() throws IOException, TransformException {
+	@Test
+	public void mathTransform1DAdapter() throws IOException, TransformException {
 		//default adapter
 		final MathTransform1DAdapter defaultAdapter = new MathTransform1DAdapter();
-		assertEquals(defaultAdapter.getSourceDimensions(), 1);
-		assertEquals(defaultAdapter.getTargetDimensions(), 1);
+		Assert.assertEquals(defaultAdapter.getSourceDimensions(), 1);
+		Assert.assertEquals(defaultAdapter.getTargetDimensions(), 1);
 
 
 		try{
 			defaultAdapter.inverse();
-			assertFalse(true);
+			Assert.assertFalse(true);
 		}catch (UnsupportedOperationException e) {
 			
 		}
 		
 		try{
 			defaultAdapter.transform(0.0);
-			assertFalse(true);
+			Assert.assertFalse(true);
 		}catch (UnsupportedOperationException e) {
 			
 		}
 		
 		try{
 			defaultAdapter.transform(new double[]{0},0,(double[])null,0,1);
-			assertFalse(true);
+			Assert.assertFalse(true);
 		}catch (UnsupportedOperationException e) {
 			
 		}
@@ -170,21 +147,21 @@ public class TestPiecewise extends TestCase {
 		
 		try{
 			defaultAdapter.transform(new float[]{0},0,(float[])null,0,1);
-			assertFalse(true);
+			Assert.assertFalse(true);
 		}catch (UnsupportedOperationException e) {
 			
 		}
 		
 		try{
 			defaultAdapter.derivative(0.0);
-			assertFalse(true);
+			Assert.assertFalse(true);
 		}catch (UnsupportedOperationException e) {
 			
 		}
 		
 		try{
 			defaultAdapter.derivative(new DirectPosition1D(0));
-			assertFalse(true);
+			Assert.assertFalse(true);
 		}catch (UnsupportedOperationException e) {
 			
 		}
@@ -192,14 +169,14 @@ public class TestPiecewise extends TestCase {
 		
 		try{
 			defaultAdapter.toWKT();
-			assertFalse(true);
+			Assert.assertFalse(true);
 		}catch (UnsupportedOperationException e) {
 			
 		}
 		
 		try{
 			defaultAdapter.isIdentity();
-			assertFalse(true);
+			Assert.assertFalse(true);
 		}catch (UnsupportedOperationException e) {
 			
 		}
@@ -210,7 +187,8 @@ public class TestPiecewise extends TestCase {
 	 * @throws IOException
 	 * @throws TransformException
 	 */
-	public void testConstantTransform() throws IOException, TransformException {
+	@Test
+	public void constantTransform() throws IOException, TransformException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -222,13 +200,13 @@ public class TestPiecewise extends TestCase {
 		            "zero", 
 		            NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),
 		            ((byte) 0));
-		assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
+		Assert.assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
 		// checks
-		assertEquals(0.0, e0.transform(0),0.0);
-		assertEquals(e0.transform(Double.POSITIVE_INFINITY),0.0,0.0);
+		Assert.assertEquals(0.0, e0.transform(0),0.0);
+		Assert.assertEquals(e0.transform(Double.POSITIVE_INFINITY),0.0,0.0);
 		try{
 			e0.inverse();
-			assertTrue(false);
+			Assert.assertTrue(false);
 		}catch (Exception e) {
 			
 		}
@@ -237,11 +215,11 @@ public class TestPiecewise extends TestCase {
 		DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement> transform = 
 		    new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {e0});
 		// checks
-		assertEquals(0.0, transform.transform(0),0);
-		assertEquals( transform.transform(Double.POSITIVE_INFINITY),0.0,0.0);
+		Assert.assertEquals(0.0, transform.transform(0),0);
+		Assert.assertEquals( transform.transform(Double.POSITIVE_INFINITY),0.0,0.0);
 		try{
 			transform.inverse();
-			assertTrue(false);
+			Assert.assertTrue(false);
 		}catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -255,13 +233,13 @@ public class TestPiecewise extends TestCase {
 		        "zero", 
 		        NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),
 		        0);
-		assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
+		Assert.assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
 		// checks
-		assertEquals(0.0, e0.transform(0),0.0);
-		assertEquals(e0.transform(Double.POSITIVE_INFINITY),0.0,0.0);
+		Assert.assertEquals(0.0, e0.transform(0),0.0);
+		Assert.assertEquals(e0.transform(Double.POSITIVE_INFINITY),0.0,0.0);
 		try{
 			e0.inverse();
-			assertTrue(false);
+			Assert.assertTrue(false);
 		}catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -270,21 +248,21 @@ public class TestPiecewise extends TestCase {
 		DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement> transform1 = new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {e0});
 
 		// checks
-		assertEquals(0.0, transform1.transform(0),0);
-		assertEquals( transform1.transform(Double.POSITIVE_INFINITY),0.0,0.0);
+		Assert.assertEquals(0.0, transform1.transform(0),0);
+		Assert.assertEquals( transform1.transform(Double.POSITIVE_INFINITY),0.0,0.0);
 		try{
 			transform1.inverse();
-			assertTrue(false);
+			Assert.assertTrue(false);
 		}catch (Exception e) {
 			// TODO: handle exception
 		}
 		
 		//hashcode and equals
-		assertFalse(transform.equals(transform1));
-		assertFalse(transform1.equals(transform));
-		assertFalse(transform.equals(transform));
-		assertFalse(transform1.equals(transform1));
-		assertEquals(transform1.hashCode(), transform.hashCode());
+		Assert.assertFalse(transform.equals(transform1));
+		Assert.assertFalse(transform1.equals(transform));
+		Assert.assertFalse(transform.equals(transform));
+		Assert.assertFalse(transform1.equals(transform1));
+		Assert.assertEquals(transform1.hashCode(), transform.hashCode());
 		
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -295,13 +273,13 @@ public class TestPiecewise extends TestCase {
 		        "zero", 
 		        NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY), 
 		        0.0);
-		assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
+		Assert.assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
 		// checks
-		assertEquals(0.0, e0.transform(0),0.0);
-		assertEquals(e0.transform(Double.POSITIVE_INFINITY),0.0,0.0);
+		Assert.assertEquals(0.0, e0.transform(0),0.0);
+		Assert.assertEquals(e0.transform(Double.POSITIVE_INFINITY),0.0,0.0);
 		try{
 			e0.inverse();
-			assertTrue(false);
+			Assert.assertTrue(false);
 		}catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -310,11 +288,11 @@ public class TestPiecewise extends TestCase {
 		transform = new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {e0});
 
 		// checks
-		assertEquals(0.0, transform.transform(0),0);
-		assertEquals( transform.transform(Double.POSITIVE_INFINITY),0.0,0.0);
+		Assert.assertEquals(0.0, transform.transform(0),0);
+		Assert.assertEquals( transform.transform(Double.POSITIVE_INFINITY),0.0,0.0);
 		try{
 			transform.inverse();
-			assertTrue(false);
+			Assert.assertTrue(false);
 		}catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -327,17 +305,17 @@ public class TestPiecewise extends TestCase {
 		// /////////////////////////////////////////////////////////////////////
 		e0 = DefaultPiecewiseTransform1DElement
 				.create("zero", NumberRange.create(3, 3), 0.0);
-		assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
+		Assert.assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
 		// checks
-		assertEquals(0.0, e0.transform(3),0.0);
-		assertEquals(3, e0.inverse().transform(new DirectPosition1D(0),null).getOrdinate(0),0);
+		Assert.assertEquals(0.0, e0.transform(3),0.0);
+		Assert.assertEquals(3, e0.inverse().transform(new DirectPosition1D(0),null).getOrdinate(0),0);
 		
 		
 		transform = new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {e0});
 
 		// checks
-		assertEquals(0.0, e0.transform(3),0);
-		assertEquals( transform.transform(3),0.0,0.0);
+		Assert.assertEquals(0.0, e0.transform(3),0);
+		Assert.assertEquals( transform.transform(3),0.0,0.0);
 
 
 
@@ -349,7 +327,8 @@ public class TestPiecewise extends TestCase {
 	 * @throws IOException
 	 * @throws TransformException
 	 */
-	public void testPiecewiseLogarithm() throws IOException, TransformException {
+	@Test
+	public void piecewiseLogarithm() throws IOException, TransformException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -443,13 +422,13 @@ public class TestPiecewise extends TestCase {
 		    new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {zero,mainElement});
 
 		// checks
-		assertEquals(0.0, transform.transform(0),0);
-		assertEquals(0.0, transform.transform(1),0);
-		assertEquals(Math.log(255.0), transform.transform(255),0);
-		assertEquals(Math.log(124.0), transform.transform(124),0);
+		Assert.assertEquals(0.0, transform.transform(0),0);
+		Assert.assertEquals(0.0, transform.transform(1),0);
+		Assert.assertEquals(Math.log(255.0), transform.transform(255),0);
+		Assert.assertEquals(Math.log(124.0), transform.transform(124),0);
 		try {
-			assertEquals(Math.log(255.0), transform.transform(256),0);
-			assertTrue(false);
+			Assert.assertEquals(Math.log(255.0), transform.transform(256),0);
+			Assert.assertTrue(false);
 		} catch (TransformException e) {
 			
 		}
@@ -467,15 +446,15 @@ public class TestPiecewise extends TestCase {
 		    new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {zero,mainElement,nodata});
 
 		// checks
-		assertEquals(0.0, transform.transform(0),0);
-		assertEquals(0.0, transform.transform(1),0);
-		assertEquals(Math.log(255.0), transform.transform(255),0);
-		assertEquals(Math.log(124.0), transform.transform(124),0);
+		Assert.assertEquals(0.0, transform.transform(0),0);
+		Assert.assertEquals(0.0, transform.transform(1),0);
+		Assert.assertEquals(Math.log(255.0), transform.transform(255),0);
+		Assert.assertEquals(Math.log(124.0), transform.transform(124),0);
 		try {
-			assertTrue(Double.isNaN(transform.transform(256)));
-			assertTrue(false);
+			Assert.assertTrue(Double.isNaN(transform.transform(256)));
+			Assert.assertTrue(false);
 		} catch (TransformException e) {
-			assertTrue(true);
+			Assert.assertTrue(true);
 		}
 		
 		// /////////////////////////////////////////////////////////////////////
@@ -488,9 +467,9 @@ public class TestPiecewise extends TestCase {
 		try {
 		transform = 
 		    new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {zero,mainElement,overlap,nodata});
-				assertTrue(false);
+				Assert.assertTrue(false);
 		} catch (Throwable e) {
-			assertTrue(true);
+			Assert.assertTrue(true);
 		}
 
 
@@ -504,7 +483,8 @@ public class TestPiecewise extends TestCase {
 		 * @throws IOException
 		 * @throws TransformException
 		 */
-		public void testDefaultTransform() throws IOException,
+	@Test
+		public void defaultTransform() throws IOException,
 				TransformException {
 			////
 			//
@@ -515,30 +495,30 @@ public class TestPiecewise extends TestCase {
 					"t0", NumberRange.create(0.0, true, 1.0, true), PiecewiseUtilities
 							.createLinearTransform1D(NumberRange.create(0.0, true, 1.0,
 									true), NumberRange.create(200, 201)));
-			assertEquals(t0.transform(0.5), 200.5, 0.0);
-			assertTrue(t0.contains(0.5));
-			assertTrue(t0.contains(NumberRange.create(0.1,0.9)));
-			assertFalse(t0.contains(1.5));
-			assertFalse(t0.contains(NumberRange.create(0.1,1.9)));
-			assertTrue(t0.equals(t0));
-			assertEquals(t0.transform(
+			Assert.assertEquals(t0.transform(0.5), 200.5, 0.0);
+			Assert.assertTrue(t0.contains(0.5));
+			Assert.assertTrue(t0.contains(NumberRange.create(0.1,0.9)));
+			Assert.assertFalse(t0.contains(1.5));
+			Assert.assertFalse(t0.contains(NumberRange.create(0.1,1.9)));
+			Assert.assertTrue(t0.equals(t0));
+			Assert.assertEquals(t0.transform(
 					new GeneralDirectPosition(new double[] { 0.5 }), null)
 					.getOrdinate(0), 200.5, 0.0);
-			assertEquals(t0.inverse().transform(
+			Assert.assertEquals(t0.inverse().transform(
 					new GeneralDirectPosition(new double[] { 200.5 }), null)
 					.getOrdinate(0), 0.5, 0.0);
-			assertEquals(t0.derivative(1.0), 1.0, 0.0);
+			Assert.assertEquals(t0.derivative(1.0), 1.0, 0.0);
 			
 			t0 = DefaultPiecewiseTransform1DElement.create("t0", NumberRange.create(0.0, true, 1.0, true),  NumberRange.create(200, 201));
-			assertFalse(t0.equals(DefaultPiecewiseTransform1DElement.create("t0", NumberRange.create(0.0, true, 1.0, true),  NumberRange.create(200, 202))));
-			assertEquals(t0.transform(0.5), 200.5, 0.0);
-			assertEquals(t0.transform(
+			Assert.assertFalse(t0.equals(DefaultPiecewiseTransform1DElement.create("t0", NumberRange.create(0.0, true, 1.0, true),  NumberRange.create(200, 202))));
+			Assert.assertEquals(t0.transform(0.5), 200.5, 0.0);
+			Assert.assertEquals(t0.transform(
 					new GeneralDirectPosition(new double[] { 0.5 }), null)
 					.getOrdinate(0), 200.5, 0.0);
-			assertEquals(t0.inverse().transform(
+			Assert.assertEquals(t0.inverse().transform(
 					new GeneralDirectPosition(new double[] { 200.5 }), null)
 					.getOrdinate(0), 0.5, 0.0);
-			assertEquals(t0.derivative(1.0), 1.0, 0.0);
+			Assert.assertEquals(t0.derivative(1.0), 1.0, 0.0);
 			
 			////
 			//
@@ -547,50 +527,50 @@ public class TestPiecewise extends TestCase {
 			/////
 			DefaultPiecewiseTransform1DElement t1 = DefaultPiecewiseTransform1DElement.create(
 					"t1", NumberRange.create(1.0, false, 2.0, true), 201);
-			assertEquals(t1.transform(1.5), 201, 0.0);
-			assertEquals(t1.transform(1.6), 201, 0.0);
-			assertFalse(t0.equals(t1));
-			assertEquals(t1.transform(
+			Assert.assertEquals(t1.transform(1.5), 201, 0.0);
+			Assert.assertEquals(t1.transform(1.6), 201, 0.0);
+			Assert.assertFalse(t0.equals(t1));
+			Assert.assertEquals(t1.transform(
 					new GeneralDirectPosition(new double[] { 1.8 }), null)
 					.getOrdinate(0), 201, 0.0);
 			try{
-				assertEquals(t1.inverse().transform(
+				Assert.assertEquals(t1.inverse().transform(
 						new GeneralDirectPosition(new double[] { 201 }), null)
 						.getOrdinate(0), 0.5, 0.0);
-				assertTrue(false);
+				Assert.assertTrue(false);
 			}catch (UnsupportedOperationException e) {
 			}
-			assertEquals(t1.derivative(2.0), 0.0, 0.0);
+			Assert.assertEquals(t1.derivative(2.0), 0.0, 0.0);
 			
 			t1 = new DefaultConstantPiecewiseTransformElement(
 					"t1", NumberRange.create(1.0, false, 2.0, true), 201);
-			assertEquals(t1.transform(1.5), 201, 0.0);
-			assertEquals(t1.transform(1.6), 201, 0.0);
-			assertEquals(t1.transform(
+			Assert.assertEquals(t1.transform(1.5), 201, 0.0);
+			Assert.assertEquals(t1.transform(1.6), 201, 0.0);
+			Assert.assertEquals(t1.transform(
 					new GeneralDirectPosition(new double[] { 1.8 }), null)
 					.getOrdinate(0), 201, 0.0);
 			try{
-				assertEquals(t1.inverse().transform(
+				Assert.assertEquals(t1.inverse().transform(
 						new GeneralDirectPosition(new double[] { 201 }), null)
 						.getOrdinate(0), 0.5, 0.0);
-				assertTrue(false);
+				Assert.assertTrue(false);
 			}catch (UnsupportedOperationException e) {
 				// TODO: handle exception
 			}
-			assertEquals(t1.derivative(2.0), 0.0, 0.0);
+			Assert.assertEquals(t1.derivative(2.0), 0.0, 0.0);
 	
 
 	
 			DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement> transform = 
 			    new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] { t1 },12);
-			assertEquals(transform.getName().toString(),t1.getName().toString());
-			assertEquals(transform.getApproximateDomainRange().getMinimum(), 1.0, 0.0);
-			assertEquals(transform.getApproximateDomainRange().getMaximum(), 2.0, 0.0);
-			assertEquals(transform.transform(1.5), 201, 0.0);
-			assertEquals(transform.transform(
+			Assert.assertEquals(transform.getName().toString(),t1.getName().toString());
+			Assert.assertEquals(transform.getApproximateDomainRange().getMinimum(), 1.0, 0.0);
+			Assert.assertEquals(transform.getApproximateDomainRange().getMaximum(), 2.0, 0.0);
+			Assert.assertEquals(transform.transform(1.5), 201, 0.0);
+			Assert.assertEquals(transform.transform(
 					new GeneralDirectPosition(new double[] { 1.5 }), null)
 					.getOrdinate(0), 201, 0.0);
-			assertEquals(transform.transform(2.5), 0.0, 12.0);
+			Assert.assertEquals(transform.transform(2.5), 0.0, 12.0);
 			
 			
 			////
@@ -604,7 +584,7 @@ public class TestPiecewise extends TestCase {
 				DefaultLinearPiecewiseTransform1DElement.create("",
 						NumberRange.create(0, 100),
 						NumberRange.create(Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY))});
-				assertTrue(false);
+				Assert.assertTrue(false);
 			}
 			catch (IllegalArgumentException e) {
 				
@@ -618,7 +598,8 @@ public class TestPiecewise extends TestCase {
 		 * @throws IOException
 		 * @throws TransformException
 		 */
-		public void testPassthroughTransform() throws IOException,
+		@Test
+		public void passthroughTransform() throws IOException,
 				TransformException {
 			////
 			//
@@ -627,25 +608,25 @@ public class TestPiecewise extends TestCase {
 			////
 			final DefaultPassthroughPiecewiseTransform1DElement p0 = new DefaultPassthroughPiecewiseTransform1DElement(
 					"p0", NumberRange.create(0.0, true, 1.0, true));
-			assertEquals(p0.getTargetDimensions(), 1);
-			assertEquals(p0.getSourceDimensions(), 1);
-			assertTrue(p0.isIdentity());
-			assertEquals(p0.inverse(), LinearTransform1D.IDENTITY);
-			assertEquals(p0.transform(0.5), 0.5, 0.0);
-			assertEquals(p0.transform(
+			Assert.assertEquals(p0.getTargetDimensions(), 1);
+			Assert.assertEquals(p0.getSourceDimensions(), 1);
+			Assert.assertTrue(p0.isIdentity());
+			Assert.assertEquals(p0.inverse(), LinearTransform1D.IDENTITY);
+			Assert.assertEquals(p0.transform(0.5), 0.5, 0.0);
+			Assert.assertEquals(p0.transform(
 					new GeneralDirectPosition(new double[] { 0.5 }), null)
 					.getOrdinate(0), 0.5, 0.0);
-			assertEquals(p0.inverse().transform(
+			Assert.assertEquals(p0.inverse().transform(
 					new GeneralDirectPosition(new double[] { 0.5 }), null)
 					.getOrdinate(0), 0.5, 0.0);
-			assertEquals(p0.derivative(1.0), 1.0, 0.0);
+			Assert.assertEquals(p0.derivative(1.0), 1.0, 0.0);
 			final DirectPosition1D inDP = new DirectPosition1D(0.6);
 			final DirectPosition outDP= p0.transform(inDP, null);
-			assertTrue(outDP.getOrdinate(0)==0.6);
+			Assert.assertTrue(outDP.getOrdinate(0)==0.6);
 			try{
 		
 				p0.transform(new double[]{0.5},0,(double[])null,0,0);
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
@@ -654,7 +635,7 @@ public class TestPiecewise extends TestCase {
 			try{
 		
 				p0.transform(new float[]{0.5f},0,(float[])null,0,0);
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
@@ -663,15 +644,15 @@ public class TestPiecewise extends TestCase {
 			
 			try{
 				p0.toWKT();
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
 			}
 			Matrix m= p0.derivative(inDP);
-			assertTrue(m.getNumCol()==1);
-			assertTrue(m.getNumRow()==1);
-			assertTrue(m.getElement(0, 0)==1);
+			Assert.assertTrue(m.getNumCol()==1);
+			Assert.assertTrue(m.getNumRow()==1);
+			Assert.assertTrue(m.getElement(0, 0)==1);
 			
 			////
 			//
@@ -681,18 +662,18 @@ public class TestPiecewise extends TestCase {
 			final DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement> piecewise = 
 			    new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] { p0 },11);
 		
-			assertEquals(piecewise.getApproximateDomainRange().getMinimum(), 0.0, 0.0);
-			assertEquals(piecewise.getApproximateDomainRange().getMaximum(), 1.0, 0.0);
-			assertEquals(piecewise.transform(0.5), 0.5, 0.0);
-			assertEquals(piecewise.transform(
+			Assert.assertEquals(piecewise.getApproximateDomainRange().getMinimum(), 0.0, 0.0);
+			Assert.assertEquals(piecewise.getApproximateDomainRange().getMaximum(), 1.0, 0.0);
+			Assert.assertEquals(piecewise.transform(0.5), 0.5, 0.0);
+			Assert.assertEquals(piecewise.transform(
 					new GeneralDirectPosition(new double[] { 0.5 }), null)
 					.getOrdinate(0), 0.5, 0.0);
-			assertEquals(piecewise.transform(1.5), 0.0, 11.0);
+			Assert.assertEquals(piecewise.transform(1.5), 0.0, 11.0);
 			
 			try{
 		
 				piecewise.transform(new double[]{0.5},0,(double[])null,0,0);
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
@@ -701,7 +682,7 @@ public class TestPiecewise extends TestCase {
 			try{
 		
 				piecewise.transform(new float[]{0.5f},0,(float[])null,0,0);
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
@@ -710,7 +691,7 @@ public class TestPiecewise extends TestCase {
 			
 			try{
 				piecewise.toWKT();
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
@@ -718,7 +699,7 @@ public class TestPiecewise extends TestCase {
 			
 			try{
 				m= piecewise.derivative(inDP);
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
@@ -731,26 +712,26 @@ public class TestPiecewise extends TestCase {
 			////
 			final DefaultPassthroughPiecewiseTransform1DElement p1 = new DefaultPassthroughPiecewiseTransform1DElement(
 					"p1");
-			assertEquals(p1.getTargetDimensions(), 1);
-			assertEquals(p1.getSourceDimensions(), 1);
-			assertTrue(p1.isIdentity());
-			assertEquals(p1.inverse(), LinearTransform1D.IDENTITY);
-			assertEquals(p1.transform(0.5), 0.5, 0.0);
-			assertEquals(p1.transform(111.5), 111.5, 0.0);
-			assertEquals(p1.transform(
+			Assert.assertEquals(p1.getTargetDimensions(), 1);
+			Assert.assertEquals(p1.getSourceDimensions(), 1);
+			Assert.assertTrue(p1.isIdentity());
+			Assert.assertEquals(p1.inverse(), LinearTransform1D.IDENTITY);
+			Assert.assertEquals(p1.transform(0.5), 0.5, 0.0);
+			Assert.assertEquals(p1.transform(111.5), 111.5, 0.0);
+			Assert.assertEquals(p1.transform(
 					new GeneralDirectPosition(new double[] { 123.5 }), null)
 					.getOrdinate(0), 123.5, 0.0);
-			assertEquals(p1.inverse().transform(
+			Assert.assertEquals(p1.inverse().transform(
 					new GeneralDirectPosition(new double[] { 657.5 }), null)
 					.getOrdinate(0), 657.5, 0.0);
-			assertEquals(p1.derivative(1.0), 1.0, 0.0);
+			Assert.assertEquals(p1.derivative(1.0), 1.0, 0.0);
 			final DirectPosition1D inDP1 = new DirectPosition1D(0.6);
 			final DirectPosition outDP1= p1.transform(inDP1, null);
-			assertTrue(outDP1.getOrdinate(0)==0.6);
+			Assert.assertTrue(outDP1.getOrdinate(0)==0.6);
 			try{
 		
 				p1.transform(new double[]{1233444.5},0,(double[])null,0,0);
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
@@ -759,7 +740,7 @@ public class TestPiecewise extends TestCase {
 			try{
 		
 				p1.transform(new float[]{6595.5f},0,(float[])null,0,0);
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
@@ -768,15 +749,15 @@ public class TestPiecewise extends TestCase {
 			
 			try{
 				p1.toWKT();
-				assertFalse(true);
+				Assert.assertFalse(true);
 			}
 			catch (UnsupportedOperationException e) {
 				// TODO: handle exception
 			}
 			Matrix m1= p1.derivative(inDP1);
-			assertTrue(m1.getNumCol()==1);
-			assertTrue(m1.getNumRow()==1);
-			assertTrue(m1.getElement(0, 0)==1);
+			Assert.assertTrue(m1.getNumCol()==1);
+			Assert.assertTrue(m1.getNumRow()==1);
+			Assert.assertTrue(m1.getElement(0, 0)==1);
 		
 		}
 
@@ -786,7 +767,8 @@ public class TestPiecewise extends TestCase {
 			 * @throws IOException
 			 * @throws TransformException
 			 */
-			public void testLookupByte() throws IOException, TransformException {
+		@Test
+			public void lookupByte() throws IOException, TransformException {
 		
 				// /////////////////////////////////////////////////////////////////////
 				//
@@ -831,7 +813,8 @@ public class TestPiecewise extends TestCase {
 		 * 
 		 * @throws IOException
 		 */
-		public void testSWANLOGARITHMIC() throws IOException {
+		@Test
+		public void SWANLOGARITHMIC() throws IOException {
 			// /////////////////////////////////////////////////////////////////////
 			//
 			//
@@ -889,7 +872,7 @@ public class TestPiecewise extends TestCase {
 							GenericPiecewise.OPERATION_NAME, pbj);
 					d.getTiles();
 					// we should not be here!
-					assertTrue(false);
+					Assert.assertTrue(false);
 				} catch (Exception e) {
 					// //
 					// ... ok, Exception wanted!
@@ -925,7 +908,8 @@ public class TestPiecewise extends TestCase {
 			return image;
 		}
 
-		protected void setUp() throws Exception {
+		@Before
+		public void setUp() throws Exception {
 			try{
 				new ParameterBlockJAI(GenericPiecewise.OPERATION_NAME);
 				
@@ -935,13 +919,13 @@ public class TestPiecewise extends TestCase {
 			
 			// check that it exisits
 			File file = TestData.copy(this, "arcgrid/arcgrid.zip");
-			assertTrue(file.exists());
+			Assert.assertTrue(file.exists());
 
 			// unzip it
 			TestData.unzipFile(this, "arcgrid/arcgrid.zip");
 
 			
-			super.setUp();
+		
 		}
 
 }

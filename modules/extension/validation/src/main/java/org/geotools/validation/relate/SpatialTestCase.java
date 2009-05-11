@@ -21,12 +21,12 @@ import junit.framework.TestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.LineString;
  * SpatialTestCase<br>
  * @author bowens<br>
  * Created Apr 29, 2004<br>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/SpatialTestCase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/SpatialTestCase.java $
  * @version <br>
  *
  * <b>Puropse:</b><br>

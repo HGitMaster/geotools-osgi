@@ -23,6 +23,11 @@ import junit.framework.TestCase;
 
 /**
  * Tests for {@link RegfuncFilterFactoryImpl}.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: RegfuncFilterFactoryImplTest.java 31819 2008-11-11 02:31:21Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/jdbc-regfunc/src/test/java/org/geotools/filter/RegfuncFilterFactoryImplTest.java $
+ * @since 2.4
  */
 public class RegfuncFilterFactoryImplTest extends TestCase {
 

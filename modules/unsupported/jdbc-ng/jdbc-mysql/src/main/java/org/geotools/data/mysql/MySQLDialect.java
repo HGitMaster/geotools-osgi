@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Map;
 
 import org.geotools.jdbc.JDBCDataStore;
@@ -141,14 +142,6 @@ public class MySQLDialect extends SQLDialect {
         }
     }
 
-    public void encodeColumnType(String sqlTypeName, StringBuffer sql) {
-        if ("VARCHAR".equalsIgnoreCase(sqlTypeName)) {
-            sql.append("VARCHAR(255)");
-        } else {
-            super.encodeColumnType(sqlTypeName, sql);
-        }
-    }
-
     public void encodeGeometryColumn(GeometryDescriptor gatt, int srid, StringBuffer sql) {
         sql.append("asWKB(");
         encodeColumnName(gatt.getLocalName(), sql);
@@ -229,6 +222,12 @@ public class MySQLDialect extends SQLDialect {
         mappings.put("GEOMETRYCOLLETION", GeometryCollection.class);
     }
 
+    @Override
+    public void registerSqlTypeToSqlTypeNameOverrides(
+            Map<Integer, String> overrides) {
+        overrides.put( Types.BOOLEAN, "BOOL");
+    }
+    
     public void encodePostCreateTable(String tableName, StringBuffer sql) {
         //TODO: make this configurable
         sql.append("ENGINE=InnoDB");
@@ -262,6 +261,24 @@ public class MySQLDialect extends SQLDialect {
             }
         } finally {
             dataStore.closeSafe(st);
+        }
+    }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return true;
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        if(limit > 0 && limit < Integer.MAX_VALUE) {
+            if(offset > 0)
+                sql.append(" LIMIT " + offset + ", " + limit);
+            else 
+                sql.append(" LIMIT " + limit);
+        } else if(offset > 0) {
+            // MySql pretends to have limit specified along with offset
+            sql.append(" LIMIT " + offset + ", " + Long.MAX_VALUE);
         }
     }
 

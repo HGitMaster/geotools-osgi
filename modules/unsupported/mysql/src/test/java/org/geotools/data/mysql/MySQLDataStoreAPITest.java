@@ -425,9 +425,9 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         try {
             Statement s = conn.createStatement();
 
-            //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
+            // force a binary collation otherwise MySql will do case insensitive comparisons by default
             s.execute(
-                "CREATE TABLE river(fid varchar(255) PRIMARY KEY, id int, geom MULTILINESTRING, river varchar(255), flow double)");
+                "CREATE TABLE river(fid varchar(255) PRIMARY KEY, id int, geom MULTILINESTRING, river varchar(255) collate latin1_bin, flow double)");
 
             for (int i = 0; i < riverFeatures.length; i++) {
                 SimpleFeature f = riverFeatures[i];
@@ -1421,6 +1421,15 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(riverFeatures);
         assertCovers("all", expected, all);
         assertEquals(riverBounds, all.getBounds());
+    }
+    
+    public void testCaseInsensitiveFilter() throws Exception {
+        final String riverName = riverType.getName().getLocalPart();
+        FeatureSource<SimpleFeatureType, SimpleFeature> rivers = data.getFeatureSource(riverName);
+        org.opengis.filter.Filter caseSensitive = ff.equal(ff.property("river"), ff.literal("Rv1"), true);
+        assertEquals(0, rivers.getCount(new DefaultQuery(riverName, caseSensitive)));
+        org.opengis.filter.Filter caseInsensitive = ff.equal(ff.property("river"), ff.literal("Rv1"), false);
+        assertEquals(1, rivers.getCount(new DefaultQuery(riverName, caseInsensitive)));
     }
 
     //

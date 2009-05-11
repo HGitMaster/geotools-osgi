@@ -28,4 +28,9 @@ public class SeConnection {
     public SeDBMSInfo getDBMSInfo() throws SeException{
         return null;
     }
+
+    public String getSdeDbaName() throws SeException{
+        return null;
+    }
+
 }

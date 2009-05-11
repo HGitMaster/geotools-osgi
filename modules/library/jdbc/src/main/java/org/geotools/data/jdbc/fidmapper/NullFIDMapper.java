@@ -88,4 +88,12 @@ public class NullFIDMapper extends AbstractFIDMapper {
     public boolean isVolatile() {
         return true;
     }
+
+    /**
+     * @return {@code true} always
+     * @see FIDMapper#isValid(String)
+     */
+    public boolean isValid(String fid) {
+        return true;
+    }
 }

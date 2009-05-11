@@ -57,8 +57,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </p>
  *
  * @author aaime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemFeatureResults.java $
- * @version $Id: ForceCoordinateSystemFeatureResults.java 31085 2008-07-28 07:58:00Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemFeatureResults.java $
+ * @version $Id: ForceCoordinateSystemFeatureResults.java 32769 2009-04-10 17:06:07Z aaime $
  */
 public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollection {
     
@@ -125,7 +125,9 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
      * @see org.geotools.data.FeatureResults#getBounds()
      */
     public ReferencedEnvelope getBounds() {
-        return results.getBounds();
+        ReferencedEnvelope env = results.getBounds();
+        env = new ReferencedEnvelope(env, getSchema().getCoordinateReferenceSystem());
+        return env;
     }
 
    

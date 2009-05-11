@@ -17,6 +17,9 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,12 +30,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -40,6 +37,12 @@ import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.IllegalAttributeException;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -56,16 +59,17 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * This test case does not still use the ArcSDEDataStore testing data supplied with in
- * {@code test-data/import}, so it is excluded in project.xml.
+ * This test case does not still use the ArcSDEDataStore testing data supplied with in {@code
+ * test-data/import}, so it is excluded in project.xml.
  * 
  * @author cdillard
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/FilterTest.java.fixme $
- * @version $Id: FilterTest.java 31059 2008-07-23 20:04:21Z jgarnett $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/FilterTest.java.fixme $
+ * @version $Id: FilterTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
-public class FilterTest extends TestCase {
+public class FilterTest {
     private static final Comparator<SimpleFeature> FEATURE_COMPARATOR = new Comparator<SimpleFeature>() {
         public int compare(SimpleFeature f1, SimpleFeature f2) {
             return f1.getID().compareTo(f2.getID());
@@ -80,31 +84,8 @@ public class FilterTest extends TestCase {
 
     private FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
 
-    /**
-     * Builds a test suite for all this class' tests with per suite initialization directed to
-     * {@link #oneTimeSetUp()} and per suite clean up directed to {@link #oneTimeTearDown()}
-     * 
-     * @return
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(FilterTest.class);
-
-        TestSetup wrapper = new TestSetup(suite) {
-            @Override
-            protected void setUp() throws Exception {
-                oneTimeSetUp();
-            }
-
-            @Override
-            protected void tearDown() {
-                oneTimeTearDown();
-            }
-        };
-        return wrapper;
-    }
-
-    private static void oneTimeSetUp() throws Exception {
+    @BeforeClass
+    public static void oneTimeSetUp() throws Exception {
         testData = new TestData();
         testData.setUp();
 
@@ -112,15 +93,15 @@ public class FilterTest extends TestCase {
         testData.createTempTable(insertTestData);
     }
 
-    private static void oneTimeTearDown() {
+    @AfterClass
+    public static void oneTimeTearDown() {
         boolean cleanTestTable = false;
         boolean cleanPool = true;
         testData.tearDown(cleanTestTable, cleanPool);
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
         // facilitates running a single test at a time (eclipse lets you do this
         // and it's very useful)
         if (testData == null) {
@@ -129,20 +110,11 @@ public class FilterTest extends TestCase {
         this.dataStore = testData.getDataStore();
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
-        super.tearDown();
+
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param fr DOCUMENT ME!
-     * @param c DOCUMENT ME!
-     * @throws NoSuchElementException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     * @throws IllegalAttributeException DOCUMENT ME!
-     */
     private static void collectResults(FeatureReader<SimpleFeatureType, SimpleFeature> fr,
             Collection c) throws NoSuchElementException, IOException, IllegalAttributeException {
         while (fr.hasNext()) {
@@ -153,8 +125,10 @@ public class FilterTest extends TestCase {
     /**
      * Are the two collections similar?
      * 
-     * @param c1 Collection first
-     * @param c2 Collection second
+     * @param c1
+     *            Collection first
+     * @param c2
+     *            Collection second
      * @return true if they have the same content
      */
     private void assertFeatureListsSimilar(Collection<SimpleFeature> c1,
@@ -174,7 +148,8 @@ public class FilterTest extends TestCase {
             if (i == 0) {
                 assertEquals("Feature Type", f1.getType(), f2.getType());
             }
-            assertEquals("Feature[" + i + "] identifiers Equal", f1.getIdentifier().getID(), f2.getIdentifier().getID());
+            assertEquals("Feature[" + i + "] identifiers Equal", f1.getIdentifier().getID(), f2
+                    .getIdentifier().getID());
             if (!f1.equals(f2)) {
                 // go through properties and figure out differneces...
                 for (PropertyDescriptor property : f1.getType().getDescriptors()) {
@@ -203,8 +178,10 @@ public class FilterTest extends TestCase {
     /**
      * Are the two collections similar?
      * 
-     * @param c1 Collection first
-     * @param c2 Collection second
+     * @param c1
+     *            Collection first
+     * @param c2
+     *            Collection second
      * @return true if they have the same content
      */
     private boolean compareFeatureLists2(Collection<SimpleFeature> c1, Collection<SimpleFeature> c2) {
@@ -240,15 +217,6 @@ public class FilterTest extends TestCase {
         return true;
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param x1 DOCUMENT ME!
-     * @param y1 DOCUMENT ME!
-     * @param x2 DOCUMENT ME!
-     * @param y2 DOCUMENT ME!
-     * @return DOCUMENT ME!
-     */
     private static LineString buildSegment(double x1, double y1, double x2, double y2) {
         Coordinate[] coordArray = new Coordinate[] { new Coordinate(x1, y1), new Coordinate(x2, y2) };
         LineString result = gf.createLineString(coordArray);
@@ -256,15 +224,6 @@ public class FilterTest extends TestCase {
         return result;
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param minx DOCUMENT ME!
-     * @param miny DOCUMENT ME!
-     * @param maxx DOCUMENT ME!
-     * @param maxy DOCUMENT ME!
-     * @return DOCUMENT ME!
-     */
     private static Polygon buildPolygon(double minx, double miny, double maxx, double maxy) {
         Coordinate[] coordArray = new Coordinate[] { new Coordinate(minx, miny),
                 new Coordinate(minx, maxy), new Coordinate(maxx, maxy), new Coordinate(maxx, miny),
@@ -276,10 +235,10 @@ public class FilterTest extends TestCase {
 
     /**
      * TODO: resurrect testDisjointFilter
-     * 
-     * @throws Exception DOCUMENT ME!
      */
-    public void _testDisjointFilter() throws Exception {
+    @Test
+    @Ignore
+    public void testDisjointFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema(testData.getTempTableName());
 
         // Build the filter
@@ -295,11 +254,7 @@ public class FilterTest extends TestCase {
         runTestWithFilter(ft, filter);
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
+    @Test
     public void testContainsFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema(testData.getTempTableName());
 
@@ -315,11 +270,7 @@ public class FilterTest extends TestCase {
         runTestWithFilter(ft, filter);
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
+    @Test
     public void testBBoxFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema(testData.getTempTableName());
 
@@ -333,11 +284,7 @@ public class FilterTest extends TestCase {
         runTestWithFilter(ft, filter);
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
+    @Test
     public void testIntersectsFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema(testData.getTempTableName());
 
@@ -352,11 +299,7 @@ public class FilterTest extends TestCase {
         runTestWithFilter(ft, filter);
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
+    @Test
     public void testOverlapsFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema(testData.getTempTableName());
 
@@ -371,11 +314,7 @@ public class FilterTest extends TestCase {
         runTestWithFilter(ft, filter);
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
+    @Test
     public void testWithinFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema(testData.getTempTableName());
 
@@ -390,11 +329,7 @@ public class FilterTest extends TestCase {
         runTestWithFilter(ft, filter);
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
+    @Test
     public void testCrossesFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema(testData.getTempTableName());
 
@@ -411,10 +346,10 @@ public class FilterTest extends TestCase {
 
     /**
      * TODO: resurrect testEqualFilter
-     * 
-     * @throws Exception DOCUMENT ME!
      */
-    public void _testEqualFilter() throws Exception {
+    @Test
+    @Ignore
+    public void testEqualFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema(testData.getTempTableName());
 
         // Get a geometry for equality comparison
@@ -435,13 +370,6 @@ public class FilterTest extends TestCase {
         runTestWithFilter(ft, filter);
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param ft DOCUMENT ME!
-     * @param filter DOCUMENT ME!
-     * @throws Exception DOCUMENT ME!
-     */
     private void runTestWithFilter(FeatureType ft, Filter filter) throws Exception {
         System.err.println("****************");
         System.err.println("**");

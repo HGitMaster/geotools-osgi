@@ -31,8 +31,8 @@ import java.util.logging.Logger;
  * DataStore factory that creates {@linkplain org.geotools.data.property.PropertyDataStore}s
  *
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyDataStoreFactory.java $
- * @version $Id: PropertyDataStoreFactory.java 31208 2008-08-21 15:47:56Z groldan $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyDataStoreFactory.java $
+ * @version $Id: PropertyDataStoreFactory.java 32332 2009-01-26 18:54:59Z aaime $
  */
 public class PropertyDataStoreFactory implements DataStoreFactorySpi {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(PropertyDataStoreFactory.class.getPackage().getName());
@@ -125,7 +125,7 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
      * @return DOCUMENT ME!
      */
     public Param[] getParametersInfo() {
-        return new Param[] { DIRECTORY, };
+        return new Param[] { DIRECTORY, NAMESPACE };
     }
 
     /**
@@ -193,6 +193,8 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
     		if(!directory.isDirectory()){
     			throw new IllegalArgumentException(directory.getAbsolutePath() + " is not a directory");
     		}
+    	} else if(!directory.isDirectory()) {
+    	        throw new IllegalArgumentException(directory.getAbsolutePath() + " is not a directory");
     	}
     	return directory;
     }

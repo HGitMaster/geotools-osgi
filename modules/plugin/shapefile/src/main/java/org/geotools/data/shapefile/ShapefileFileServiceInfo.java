@@ -49,7 +49,7 @@ public class ShapefileFileServiceInfo implements ServiceInfo {
     }
     
     public URI getPublisher() {    
-        String user = System.getenv("user.name");
+        String user = System.getProperty("user.name");
         try {
             return new URI( user );
         } catch (URISyntaxException e) {

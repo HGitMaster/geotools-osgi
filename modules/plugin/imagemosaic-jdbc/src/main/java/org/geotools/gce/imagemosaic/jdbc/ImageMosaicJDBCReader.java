@@ -30,7 +30,6 @@ import org.geotools.data.DataSourceException;
 
 import org.geotools.factory.Hints;
 
-import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralEnvelope;
 
 import org.geotools.parameter.Parameter;
@@ -40,7 +39,6 @@ import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.geometry.DirectPosition;
 
 import org.opengis.parameter.GeneralParameterValue;
 
@@ -105,6 +103,8 @@ public class ImageMosaicJDBCReader extends AbstractGridCoverage2DReader {
     
     private static Set<AxisDirection> UPDirections;
     private static Set<AxisDirection> LEFTDirections;
+    
+    protected static int DEFAULT_IMAGE_TYPE=BufferedImage.TYPE_3BYTE_BGR;
 
     // class initializer 
     {
@@ -532,7 +532,7 @@ public class ImageMosaicJDBCReader extends AbstractGridCoverage2DReader {
     private BufferedImage getEmptyImage(int width, int height,
         Color outputTransparentColor) {
         BufferedImage emptyImage = new BufferedImage(width, height,
-                BufferedImage.TYPE_INT_ARGB);
+                DEFAULT_IMAGE_TYPE);
         Graphics2D g2D = (Graphics2D) emptyImage.getGraphics();
         Color save = g2D.getColor();
         g2D.setColor(outputTransparentColor);

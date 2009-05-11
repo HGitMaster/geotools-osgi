@@ -40,25 +40,26 @@ import org.opengis.feature.type.FeatureType;
  * Instead, we're directly using DataAccessFactory
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessFactory.java 31784 2008-11-06 06:20:21Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/ComplexDataStoreFactory.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: AppSchemaDataAccessFactory.java 32633 2009-03-16 01:44:12Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccessFactory.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessFactory implements DataAccessFactory {
 
-    public static final DataStoreFactorySpi.Param DBTYPE = new DataStoreFactorySpi.Param("dbtype",
-            String.class, "Fixed value 'app-schema'", true, "app-schema");
+    public static final String DBTYPE_STRING = "app-schema";
 
-    public static final DataStoreFactorySpi.Param URL = new DataStoreFactorySpi.Param("url",
-            URL.class, "URL to an application schema datastore XML configuration file", true);
+    public static final DataAccessFactory.Param DBTYPE = new DataAccessFactory.Param("dbtype",
+            String.class, "Fixed value '" + DBTYPE_STRING + "'", true, DBTYPE_STRING);
+
+    public static final DataAccessFactory.Param URL = new DataAccessFactory.Param("url", URL.class,
+            "URL to an application schema datastore XML configuration file", true);
 
     public AppSchemaDataAccessFactory() {
-        // no-op
     }
 
     public DataAccess<FeatureType, Feature> createDataStore(Map params) throws IOException {
-        Set/* <FeatureTypeMapping> */mappings;
+        Set<FeatureTypeMapping> mappings;
         AppSchemaDataAccess dataStore;
 
         URL configFileUrl = (URL) AppSchemaDataAccessFactory.URL.lookUp(params);
@@ -67,6 +68,8 @@ public class AppSchemaDataAccessFactory implements DataAccessFactory {
         mappings = AppSchemaDataAccessConfigurator.buildMappings(config);
 
         dataStore = new AppSchemaDataAccess(mappings);
+
+        dataStore.register();
 
         return dataStore;
     }
@@ -92,7 +95,7 @@ public class AppSchemaDataAccessFactory implements DataAccessFactory {
         try {
             Object dbType = AppSchemaDataAccessFactory.DBTYPE.lookUp(params);
             Object configUrl = AppSchemaDataAccessFactory.URL.lookUp(params);
-            return "app-schema".equals(dbType) && configUrl != null;
+            return DBTYPE_STRING.equals(dbType) && configUrl != null;
         } catch (Exception e) {
             // e.printStackTrace();
         }

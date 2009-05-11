@@ -77,8 +77,8 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/PolygonSymbolizer.java $
- * @version $Id: PolygonSymbolizer.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/PolygonSymbolizer.java $
+ * @version $Id: PolygonSymbolizer.java 32919 2009-05-03 14:18:31Z jive $
  */
 public interface PolygonSymbolizer extends org.opengis.style.PolygonSymbolizer,Symbolizer {
     /**
@@ -96,10 +96,7 @@ public interface PolygonSymbolizer extends org.opengis.style.PolygonSymbolizer,S
      * outline  is rendered.
      *
      * @param fill The Fill style to use when rendering the area.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setFill(Fill fill);
 
     /**
@@ -115,10 +112,7 @@ public interface PolygonSymbolizer extends org.opengis.style.PolygonSymbolizer,S
      * the Polygon.
      *
      * @param stroke The Stroke style to use when rendering lines.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setStroke(Stroke stroke);
 
     /**
@@ -136,9 +130,6 @@ public interface PolygonSymbolizer extends org.opengis.style.PolygonSymbolizer,S
      * @param geometryPropertyName The name of the attribute in the feature
      *        being styled  that should be used.  If null then the default
      *        geometry should be used.
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setGeometryPropertyName(String geometryPropertyName);
 }

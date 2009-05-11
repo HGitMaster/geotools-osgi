@@ -17,25 +17,23 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
 
 public class PostgisNGDataStoreFactory extends JDBCDataStoreFactory {
-private static final String JDBC_PATH = "jdbc:oracle:thin:@";
-    
     /** parameter for namespace of the datastore */
     public static final Param LOOSEBBOX = new Param("Loose bbox", Boolean.class, "Perform only primary filter on bbox", false, Boolean.TRUE);
     
-    /** verify the connection is alive and well before using it   */
-    public static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
-            "check connection is alive before using it", false, Boolean.FALSE);
+    /** parameter for database port */
+    public static final Param PORT = new Param("port", Integer.class, "Port", true, 5432);
+
+    /**
+     * Wheter a prepared statements based dialect should be used, or not
+     */
+    public static final Param PREPARED_STATEMENTS = new Param("preparedStatements", Boolean.class, "Use prepared statements", false, Boolean.FALSE);
     
     @Override
     protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
@@ -44,7 +42,7 @@ private static final String JDBC_PATH = "jdbc:oracle:thin:@";
 
     @Override
     protected String getDatabaseID() {
-        return "PostGIS";
+        return "postgisng";
     }
     
     @Override
@@ -69,67 +67,34 @@ private static final String JDBC_PATH = "jdbc:oracle:thin:@";
         Boolean loose = (Boolean) LOOSEBBOX.lookUp(params);
         dialect.setLooseBBOXEnabled(loose == null || Boolean.TRUE.equals(loose));
         
-        // setup proper fetch size
-        dataStore.setFetchSize(200);
+        // setup the ps dialect if need be
+        Boolean usePs = (Boolean) PREPARED_STATEMENTS.lookUp(params);
+        if(Boolean.TRUE.equals(usePs)) {
+            dataStore.setSQLDialect(new PostGISPSDialect(dataStore, dialect));
+        }
         
         return dataStore;
-    }
-    
-    @Override
-    protected DataSource createDataSource(Map params) throws IOException {
-        BasicDataSource dataSource = new BasicDataSource();
-
-        //driver
-        dataSource.setDriverClassName(getDriverClassName());
-
-        //jdbc url
-        String host = (String) HOST.lookUp(params);
-        String db = (String) DATABASE.lookUp(params);
-        int port = (Integer) PORT.lookUp(params);
-        String dbUrl = null;
-        if( db.startsWith("(") )
-            dbUrl = JDBC_PATH + db;
-        else if( db.startsWith("/") )
-            dbUrl = JDBC_PATH + "//" + host + ":" + port + db;
-        else
-            dbUrl = JDBC_PATH + host + ":" + port + ":" + db;
-        dataSource.setUrl(dbUrl);
-
-        //username
-        String user = (String) USER.lookUp(params);
-        dataSource.setUsername(user);
-
-        //password
-        String passwd = (String) PASSWD.lookUp(params);
-
-        if (passwd != null) {
-            dataSource.setPassword(passwd);
-        }
-
-        // setup pooling
-        dataSource.setMinIdle(4);
-        dataSource.setMaxActive(20);
-        dataSource.setAccessToUnderlyingConnectionAllowed(true);
-        dataSource.setPoolPreparedStatements(true);
-        dataSource.setDefaultTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        
-        // check connections?
-        Boolean validate = (Boolean) VALIDATECONN.lookUp(params);
-        if(Boolean.TRUE.equals(validate))
-            dataSource.setValidationQuery("select sysdate from dual");
-        
-        // pool eviction settings
-        dataSource.setMinEvictableIdleTimeMillis(1000 * 60);
-        dataSource.setTimeBetweenEvictionRunsMillis(1000 * 10);
-        
-        return dataSource;
     }
     
     @Override
     protected void setupParameters(Map parameters) {
         super.setupParameters(parameters);
         parameters.put(LOOSEBBOX.key, LOOSEBBOX);
-        parameters.put(VALIDATECONN.key, VALIDATECONN);
+        parameters.put(PORT.key, PORT);
+        parameters.put(PREPARED_STATEMENTS.key, PREPARED_STATEMENTS);
+    }
+    
+    @Override
+    protected String getValidationQuery() {
+        return "select now()";
+    }
+    
+    @Override
+    protected String getJDBCUrl(Map params) throws IOException {
+        String host = (String) HOST.lookUp(params);
+        String db = (String) DATABASE.lookUp(params);
+        int port = (Integer) PORT.lookUp(params);
+        return "jdbc:postgresql" + "://" + host + ":" + port + "/" + db;
     }
 
 }

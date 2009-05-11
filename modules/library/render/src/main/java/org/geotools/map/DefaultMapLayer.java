@@ -34,11 +34,13 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.event.MapLayerEvent;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.coverage.FeatureUtilities;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -47,7 +49,7 @@ import org.opengis.referencing.operation.TransformException;
  * Default implementation of the MapLayer implementation
  * 
  * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/map/DefaultMapLayer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/map/DefaultMapLayer.java $
  */
 public class DefaultMapLayer implements MapLayer {
     
@@ -69,6 +71,9 @@ public class DefaultMapLayer implements MapLayer {
 
 	/** Whether this layer is visible or not. */
 	protected boolean visible;
+
+    /** Whether this layer is selected or not. */
+    protected boolean selected;
 
 	/** Utility field used by event firing mechanism. */
 	protected javax.swing.event.EventListenerList listenerList = null;
@@ -107,6 +112,7 @@ public class DefaultMapLayer implements MapLayer {
 		this.style = style;
 		this.title = title;
 		this.visible = true;
+        this.selected = false;
 	}
 
     public DefaultMapLayer(CollectionSource source, Style style, String title) {
@@ -118,6 +124,7 @@ public class DefaultMapLayer implements MapLayer {
         this.style = style;
         this.title = title;
         this.visible = true;
+        this.selected = false;
     }
     
     
@@ -321,7 +328,7 @@ public class DefaultMapLayer implements MapLayer {
 
 	/**
 	 * Getter for property visible.
-	 * 
+	 *
 	 * @return Value of property visible.
 	 */
 	public boolean isVisible() {
@@ -330,7 +337,7 @@ public class DefaultMapLayer implements MapLayer {
 
 	/**
 	 * Setter for property visible.
-	 * 
+	 *
 	 * @param visible
 	 *            New value of property visible.
 	 */
@@ -349,6 +356,38 @@ public class DefaultMapLayer implements MapLayer {
 			fireMapLayerListenerLayerShown(event);
 		} else {
 			fireMapLayerListenerLayerHidden(event);
+		}
+	}
+
+	/**
+	 * Getter for property selected.
+	 *
+	 * @return Value of property selected.
+	 */
+	public boolean isSelected() {
+		return this.selected;
+	}
+
+	/**
+	 * Setter for property selected.
+	 *
+	 * @param selected new value of property selected.
+	 */
+	public void setSelected(boolean selected) {
+		if (this.selected == selected) {
+			return;
+		}
+
+		// change selection status and fire events
+		this.selected = selected;
+
+		MapLayerEvent event = new MapLayerEvent(this,
+				MapLayerEvent.SELECTION_CHANGED);
+
+		if (selected) {
+			fireMapLayerListenerLayerSelected(event);
+		} else {
+			fireMapLayerListenerLayerDeselected(event);
 		}
 	}
 
@@ -399,21 +438,34 @@ public class DefaultMapLayer implements MapLayer {
 				MapLayerEvent.FILTER_CHANGED));
 	}
 	public ReferencedEnvelope getBounds() {
-		
-		CoordinateReferenceSystem sourceCrs = featureSource.getSchema().getCoordinateReferenceSystem();
-		ReferencedEnvelope env;
-		try {
-			env = new ReferencedEnvelope(featureSource.getBounds(), sourceCrs);
-			return env;
-		} catch (MismatchedDimensionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+            // CRS could also be null, depends on FeatureType
+            CoordinateReferenceSystem sourceCrs = featureSource.getSchema()
+                    .getCoordinateReferenceSystem();
+    
+            try {
+                ReferencedEnvelope bounds = featureSource.getBounds();
+                if (null != bounds) {
+                    // returns the bounds based on features
+                    return bounds;
+                }
+    
+                if (sourceCrs != null) {
+                    // returns the envelope based on the CoordinateReferenceSystem
+                    Envelope envelope = CRS.getEnvelope(sourceCrs);
+                    if (envelope != null) {
+                        return new ReferencedEnvelope(envelope); // nice!
+                    }
+                }
+    
+            } catch (MismatchedDimensionException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // return a default ReferencedEnvelope
+            return new ReferencedEnvelope(sourceCrs);
+        }
+	
 	// ------------------------------------------------------------------------
 	// EVENT HANDLING CODE
 	// ------------------------------------------------------------------------
@@ -519,6 +571,50 @@ public class DefaultMapLayer implements MapLayer {
 		}
 	}
 
+	/**
+	 * Notifies all registered listeners about the selection event.
+	 *
+	 * @param event
+	 *            The event to be fired
+	 */
+    protected void fireMapLayerListenerLayerSelected(
+			org.geotools.map.event.MapLayerEvent event) {
+		if (listenerList == null) {
+			return;
+		}
+
+		Object[] listeners = listenerList.getListenerList();
+		final int length=listeners.length;
+		for (int i = length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
+				((org.geotools.map.event.MapLayerListener) listeners[i + 1])
+						.layerSelected(event);
+			}
+		}
+	}
+
+	/**
+	 * Notifies all registered listeners about the deselection event.
+	 *
+	 * @param event
+	 *            The event to be fired
+	 */
+    protected void fireMapLayerListenerLayerDeselected(
+			org.geotools.map.event.MapLayerEvent event) {
+		if (listenerList == null) {
+			return;
+		}
+
+		Object[] listeners = listenerList.getListenerList();
+		final int length=listeners.length;
+		for (int i = length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
+				((org.geotools.map.event.MapLayerListener) listeners[i + 1])
+						.layerDeselected(event);
+			}
+		}
+	}
+
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
 		buf.append("DefaultMapLayer[ ");
@@ -532,6 +628,11 @@ public class DefaultMapLayer implements MapLayer {
 		} else {
 			buf.append(", HIDDEN");
 		}
+        if (selected) {
+            buf.append(", SELECTED");
+        } else {
+            buf.append(", UNSELECTED");
+        }
 		buf.append(", style=");
 		buf.append(style);
 		buf.append(", data=");

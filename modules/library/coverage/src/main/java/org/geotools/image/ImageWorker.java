@@ -69,8 +69,8 @@ import org.geotools.resources.image.ImageUtilities;
  * is left in an undetermined state and should not be used anymore.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
- * @version $Id: ImageWorker.java 31735 2008-10-30 01:55:57Z simboss $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
+ * @version $Id: ImageWorker.java 32888 2009-04-30 16:16:22Z simonegiannecchini $
  * @author Simone Giannecchini
  * @author Bryce Nordgren
  * @author Martin Desruisseaux
@@ -1056,7 +1056,7 @@ public class ImageWorker {
      * @see FormatDescriptor
      */
     public final ImageWorker forceComponentColorModel(boolean checkTransparent) {
-        final ColorModel cm = image.getColorModel();
+    	final ColorModel cm = image.getColorModel();
         if (cm instanceof ComponentColorModel) {
             // Already an component color model - nothing to do.
             return this;
@@ -1064,29 +1064,76 @@ public class ImageWorker {
         // shortcut for index color model
         if (cm instanceof IndexColorModel) {
             final IndexColorModel icm = (IndexColorModel) cm;
+            final SampleModel sm=this.image.getSampleModel();
+            final int datatype =sm.getDataType();
             final boolean gray     = ColorUtilities.isGrayPalette(icm, checkTransparent);
             final boolean alpha    = icm.hasAlpha();
-            final int     numSourceBands = icm.getNumComponents();
             /*
-             * If the image is grayscale, retain only the first band.
+             * If the image is grayscale, retain only the needed bands.
              *
              */            
             final int     numDestinationBands = gray?(alpha?2:1):(alpha?4:3);
-            
-            final byte    data[][] = new byte[numDestinationBands][icm.getMapSize()];
-            icm.getReds  (data[0]);
-            if(numDestinationBands>=2)
-            	icm.getGreens(data[1]);
-            if(numDestinationBands>=3)
-            	icm.getBlues (data[2]);
-            if (numDestinationBands == 4) {
-                icm.getAlphas(data[3]);
-            }
-            final LookupTableJAI lut = new LookupTableJAI(data);
+            LookupTableJAI lut = null;
+
+            switch (datatype) {
+			case DataBuffer.TYPE_BYTE:
+				{
+		            final byte    data[][] = new byte[numDestinationBands][icm.getMapSize()];
+		            icm.getReds  (data[0]);
+		            if(numDestinationBands>=2)
+		            	// remember to optimize for grayscale images
+		            	if(!gray)
+		            		icm.getGreens(data[1]);
+		            	else
+		            		icm.getAlphas(data[1]);
+		            if(numDestinationBands>=3)
+		            	icm.getBlues (data[2]);
+		            if (numDestinationBands == 4) {
+		                icm.getAlphas(data[3]);
+		            }		
+		            lut = new LookupTableJAI(data);
+
+				}
+				break;
+				
+			case DataBuffer.TYPE_USHORT:
+			{
+				final int mapSize=icm.getMapSize();
+				final short    data[][] = new short[numDestinationBands][mapSize];
+				for(int i=0;i<mapSize;i++)
+				{
+					data[0][i]=(short) icm.getRed(i);
+					if(numDestinationBands>=2)
+		            	// remember to optimize for grayscale images
+		            	if(!gray)
+		            		data[1][i]=(short)icm.getGreen(i);
+		            	else
+		            		data[1][i]=(short)icm.getAlpha(i);
+		            if(numDestinationBands>=3)
+		            	data[2][i]=(short)icm.getBlue(i);
+		            if (numDestinationBands == 4) {
+		            	data[3][i]=(short)icm.getAlpha(i);
+		            }
+				}
+				lut = new LookupTableJAI(data,datatype==DataBuffer.TYPE_USHORT);	
+	            
+	            				
+			}				
+				break;				
+
+			default:
+				throw new IllegalArgumentException(
+								Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,"datatype", datatype));
+			}
+
+            //did we initialized the LUT?
+            if(lut==null)
+            	throw new IllegalStateException(
+						Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"lut"));
             /*
              * Get the default hints, which usually contains only informations
              * about tiling. If the user overrode the rendering hints with an
-             * explict color model, keep the user's choice.
+             * explicit color model, keep the user's choice.
              */
             final RenderingHints hints = (RenderingHints) getRenderingHints();
             final ImageLayout layout;
@@ -1099,12 +1146,18 @@ public class ImageWorker {
             	layout= new ImageLayout(image);
             	hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT,layout));
             }
+            
+            int[] bits= new int[numDestinationBands];
+            //bits per component
+            for(int i=0;i<numDestinationBands;i++)
+            	bits[i]=sm.getSampleSize(i);            
             final ComponentColorModel destinationColorModel=new ComponentColorModel(
             		numDestinationBands>=3?ColorSpace.getInstance(ColorSpace.CS_sRGB):ColorSpace.getInstance(ColorSpace.CS_GRAY),
+            				bits,
                     		alpha,
                     		cm.isAlphaPremultiplied(),
                     		cm.getTransparency(),
-                    		cm.getTransferType());
+                    		datatype);
             final SampleModel destinationSampleModel=destinationColorModel.createCompatibleSampleModel(image.getWidth(), image.getHeight());
             layout.setColorModel(destinationColorModel);
             layout.setSampleModel(destinationSampleModel);
@@ -1581,14 +1634,14 @@ public class ImageWorker {
         int       transparency      = cm.getTransparency();
         int       transparencyIndex = cm.getTransparentPixel();
         final int mapSize           = cm.getMapSize();
-        final int transparentRGB    = transparentColor.getRGB() & 0xFFFFFF;
+        final int transparentRGB    = transparentColor.getRGB() & 0x00FFFFFF;
         /*
          * Optimization in case of Transparency.BITMASK.
          * If the color we want to use as the fully transparent one is the same
          * that is actually used as the transparent color, we leave doing nothing.
          */
         if (transparency == Transparency.BITMASK && transparencyIndex != -1) {
-            int transpColor = cm.getRGB(transparencyIndex) & 0xFFFFFF;
+            int transpColor = cm.getRGB(transparencyIndex) & 0x00FFFFFF;
             if (transpColor == transparentRGB) {
                 return this;
             }
@@ -1712,19 +1765,20 @@ public class ImageWorker {
          * we need first to interact with the single bands then to combine the
          * result into a single band that will provide us with the alpha band.
          */
-        final int numBands = image.getSampleModel().getNumBands();
+        int numBands = image.getSampleModel().getNumBands();
         final int numColorBands = image.getColorModel().getNumColorComponents();
         final RenderingHints hints = getRenderingHints();
-        RenderedImage transparentBand = null;
         if (numColorBands != numBands) {
             // Typically, numColorBands will be equals to numBands-1.
-            transparentBand = BandSelectDescriptor.create(image, new int[] {numColorBands}, hints);
             final int[] opaqueBands = new int[numColorBands];
             for (int i=0; i<opaqueBands.length; i++) {
                 opaqueBands[i] = i;
             }
             image = BandSelectDescriptor.create(image, opaqueBands, hints);
+            numBands=numColorBands;
         }
+        
+        // now prepare the lookups
         final byte[][] tableData = new byte[numColorBands][256];
         final boolean singleStep = (numColorBands == 1);
         if (singleStep) {
@@ -1732,24 +1786,19 @@ public class ImageWorker {
             Arrays.fill(data, (byte) 255);
             data[transparentColor.getRed()] = 0;
         } else {
-            for (int j=0; j<numColorBands; j++) {
-                final byte[] data = tableData[j];
-                for (int i=0; i<data.length; i++) {
-                    data[i] = (byte) i;
-                }
-            }
-            if (true) {
-                // TODO: BUG ???????????????
-                // The previous code was written in an other way with an end result as below, which
-                // sound like a bug to me. But I'm dont understand well enough what the code tries
-                // to do, so I reproduce here what the old code did.
-                Arrays.fill(tableData[1], (byte)   0);
-                Arrays.fill(tableData[2], (byte) 255);
-            }
             switch (numColorBands) {
-                case 3: tableData[2][transparentColor.getBlue() ] = 0; // fall through
-                case 2: tableData[1][transparentColor.getGreen()] = 0; // fall through
-                case 1: tableData[0][transparentColor.getRed()  ] = 0; // fall through
+                case 3: 
+                	Arrays.fill(tableData[2], (byte) 255);
+                	tableData[2][transparentColor.getBlue() ] = 0; // fall through
+                	
+                case 2: 
+                	Arrays.fill(tableData[1], (byte) 255);
+                	tableData[1][transparentColor.getGreen()] = 0; // fall through
+                	
+                case 1: 
+                	Arrays.fill(tableData[0], (byte)   255);
+                	tableData[0][transparentColor.getRed()  ] = 0; // fall through
+                	
                 case 0: break;
             }
         }
@@ -1757,16 +1806,17 @@ public class ImageWorker {
         LookupTableJAI table = new LookupTableJAI(tableData);
         // Do the lookup operation.
         PlanarImage luImage = LookupDescriptor.create(image, table, hints);
+        
         /*
          * Now that we have performed the lookup operation we have to remember
          * what we stated here above.
          *
-         * If the input image is multibanded we will get a multiband image as
+         * If the input image is multiband we will get a multiband image as
          * the output of the lookup operation hence we need to perform some form
          * of band combination to get the alpha band out of the lookup image.
          *
          * The way we wanted things to be done is by exploiting the clamping
-         * behaviour that kicks in when we do sums and the like on pixels and
+         * behavior that kicks in when we do sums and the like on pixels and
          * we overcome the maximum value allowed by the DataBufer DataType.
          */
         if (!singleStep) {
@@ -1775,11 +1825,6 @@ public class ImageWorker {
             // Values at index 0,1,2 are set to 1.0, value at index 3 is left to 0.
             Arrays.fill(matrix[0], 0, 3, 1.0);
             luImage = BandCombineDescriptor.create(luImage, matrix, hints);
-            if (transparentBand != null) {
-                luImage = fork(luImage).binarize(254)
-                            .forceComponentColorModel().retainFirstBand().getPlanarImage();
-                luImage = MultiplyDescriptor.create(transparentBand, luImage, hints);
-            }
         }
         image = BandMergeDescriptor.create(image, luImage, hints);
         

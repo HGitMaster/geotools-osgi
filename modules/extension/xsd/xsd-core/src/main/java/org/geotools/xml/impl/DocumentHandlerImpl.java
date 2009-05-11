@@ -99,4 +99,10 @@ public class DocumentHandlerImpl extends HandlerImpl implements DocumentHandler 
     //    public ElementHandler getDocumentElementHandler() {
     //        return handler;
     //    }
+    
+    public void startDocument() {
+    }
+    
+    public void endDocument() {
+    }
 }

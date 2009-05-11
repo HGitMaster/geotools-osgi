@@ -22,34 +22,30 @@ import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.visitor.DuplicatingFilterVisitor;
-import org.geotools.util.Utilities;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.Utilities;
 import org.opengis.filter.Filter;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.style.GraphicLegend;
+import org.opengis.style.Rule;
 import org.opengis.style.StyleVisitor;
 import org.opengis.util.Cloneable;
-import org.opengis.util.InternationalString;
-import org.opengis.style.Description;
 
 /**
  * Provides the default implementation of Rule.
  *
  * @author James Macgill
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/RuleImpl.java $
- * @version $Id: RuleImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/RuleImpl.java $
+ * @version $Id: RuleImpl.java 32919 2009-05-03 14:18:31Z jive $
  */
 public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
     private List<Symbolizer> symbolizers = new ArrayList<Symbolizer>();
     
-    private final DescriptionImpl description = new DescriptionImpl(
-            new SimpleInternationalString("title"), 
-            new SimpleInternationalString("abstract"));
-    
     private List<org.geotools.styling.Graphic> legends = new ArrayList<org.geotools.styling.Graphic>();
     
     private String name;
+    private Description description = new DescriptionImpl();
     private Filter filter = null;
     private boolean hasElseFilter = false;
     private double maxScaleDenominator = Double.POSITIVE_INFINITY;
@@ -72,7 +68,7 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
     }
     
     protected RuleImpl(org.geotools.styling.Symbolizer[] symbolizers, 
-                        Description desc, 
+                        org.opengis.style.Description desc, 
                         org.geotools.styling.Graphic[] legends,
                         String name,
                         Filter filter,
@@ -91,6 +87,30 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
         
     }
     
+    /** Copy constructor */
+    public RuleImpl(Rule rule) {
+        this.symbolizers = new ArrayList<Symbolizer>();
+        for( org.opengis.style.Symbolizer sym : rule.symbolizers() ){
+            if( sym instanceof Symbolizer ){
+                this.symbolizers.add( (Symbolizer) sym );
+            }
+        }
+        if( rule.getDescription() != null && rule.getDescription().getTitle() != null ){
+            this.description.setTitle( rule.getDescription().getTitle() );
+        }
+        if( rule.getDescription() != null && rule.getDescription().getAbstract() != null ){
+            this.description.setTitle( rule.getDescription().getAbstract() );        
+        }
+        if( rule.getLegend() instanceof org.geotools.styling.Graphic ){
+            org.geotools.styling.Graphic graphic = (org.geotools.styling.Graphic) rule.getLegend();
+            setLegendGraphic( new org.geotools.styling.Graphic[]{ graphic } );
+        }        
+        this.name = rule.getName();
+        this.filter = rule.getFilter();
+        this.hasElseFilter = rule.isElseFilter();
+        this.maxScaleDenominator = rule.getMaxScaleDenominator();
+        this.minScaleDenominator = rule.getMinScaleDenominator();
+    }
 
     public org.geotools.styling.Graphic[] getLegendGraphic() {
         return legends.toArray(new org.geotools.styling.Graphic[0]);
@@ -120,6 +140,9 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
         if(legends.isEmpty()) return null;
         else return legends.get(0);
     }
+    public void setLegend(GraphicLegend legend) {
+        legends.set(0, (Graphic) legend );
+    }
 
     public List<Symbolizer> symbolizers() {
         return symbolizers;
@@ -145,7 +168,7 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
 
         ret = new org.geotools.styling.Symbolizer[symbolizers.size()];
         for(int i=0, n=symbolizers.size(); i<n; i++){
-            ret[i] = (org.geotools.styling.Symbolizer) symbolizers.get(i);
+            ret[i] = symbolizers.get(i);
         }
         
         return ret;
@@ -158,29 +181,49 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
     public String getName() {
         return name;
     }
+    /**
+     * Getter for property abstractStr.
+     *
+     * @return Value of property abstractStr.
+     */
+    public java.lang.String getAbstract() {
+    	if( description == null || description.getAbstract() == null ){
+    		return null;
+    	}
+        return description.getAbstract().toString();
+    }
     
     public void setName(String name) {
         this.name = name;
     }
-
-    @Deprecated
-    public String getAbstract() {
-        return description.getAbstract().toString();
+    /**
+     * Setter for property abstractStr.
+     *
+     * @param abstractStr New value of property abstractStr.
+     */
+    public void setAbstract(java.lang.String abstractStr) {
+    	description.setAbstract( abstractStr != null ? new SimpleInternationalString( abstractStr ) : null );
     }
     
-    @Deprecated
-    public void setAbstract(String abstractStr) {
-        description.setAbstract(new SimpleInternationalString(abstractStr));
-    }
-    
-    @Deprecated
-    public String getTitle() {
-        return description.getTitle().toString();
+    /**
+     * Getter for property title.
+     *
+     * @return Value of property title.
+     */
+    public java.lang.String getTitle() {
+    	if( description == null || description.getTitle() == null ){
+    		return null;
+    	}
+    	return description.getTitle().toString();
     }
 
-    @Deprecated
-    public void setTitle(String title) {
-        description.setTitle(new SimpleInternationalString(title));
+    /**
+     * Setter for property title.
+     *
+     * @param title New value of property title.
+     */
+    public void setTitle(java.lang.String title) {
+        this.description.setTitle( title != null ? new SimpleInternationalString(title) : null );        
     }
 
     public Filter getFilter() {
@@ -206,7 +249,9 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
     public void setIsElseFilter(boolean flag) {
         hasElseFilter = flag;        
     }
-
+    public void setElseFilter(boolean defaultb) {
+        hasElseFilter = defaultb;
+    }
     /**
      * 
      * @deprecated use setIsElseFilter(true)
@@ -314,8 +359,10 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
             result = (PRIME * result) + name.hashCode();
         }
 
-        result = (PRIME * result) + description.hashCode();
-        
+        if (description != null) {
+            result = (PRIME * result) + description.hashCode();
+        }
+
         if (filter != null) {
             result = (PRIME * result) + filter.hashCode();
         }

@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
@@ -31,21 +30,20 @@ import junit.framework.TestSuite;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.function.math.FilterFunction_abs;
+import org.geotools.filter.IsEqualsToImpl;
 import org.geotools.test.TestData;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 import org.opengis.filter.Not;
+import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.opengis.filter.spatial.Disjoint;
-import org.xml.sax.InputSource;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -56,7 +54,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Try out our SLD parser and see how well it does.
  *
  * @author jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/styling/SLDStyleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/styling/SLDStyleTest.java $
  */
 public class SLDStyleTest extends TestCase {
     StyleFactory sf = CommonFactoryFinder.getStyleFactory( GeoTools.getDefaultHints() );
@@ -138,7 +136,7 @@ public class SLDStyleTest extends TestCase {
         //TODO: convert the buffer/resource to a string and compare
     }
 
-    public void testSLDParserWithWhitespace() throws Exception {
+    public void testSLDParserWithWhitespaceIsTrimmed() throws Exception {
     	java.net.URL surl = TestData.getResource(this, "whitespace.sld");
     	 SLDParser stylereader = new SLDParser(sf, surl);
          StyledLayerDescriptor sld = stylereader.parseSLD();
@@ -174,6 +172,40 @@ public class SLDStyleTest extends TestCase {
          assertEquals("this is a prefix; this is an expression; this is a postfix", labelValue);
     }
     
+    public void testSLDParserWithhMixedContentCDATA() throws Exception {
+        java.net.URL surl = TestData.getResource(this, "mixedContentWithCDATA.xml");
+         SLDParser stylereader = new SLDParser(sf, surl);
+         StyledLayerDescriptor sld = stylereader.parseSLD();
+         
+         Symbolizer[] symbolizers = ((NamedLayer) sld.getStyledLayers()[0]).getStyles()[0]
+                .getFeatureTypeStyles()[0].getRules()[0].getSymbolizers();
+
+         TextSymbolizer text = (TextSymbolizer) symbolizers[0];
+         
+         Expression label = text.getLabel();
+         
+         String labelValue = (String) label.evaluate(null, String.class);
+
+         assertEquals("literal_1\n cdata literal_2", labelValue);
+    }
+    
+    public void testSLDParserWithhMixedContentCDATASpaces() throws Exception {
+        java.net.URL surl = TestData.getResource(this, "mixedContentWithCDATASpaces.xml");
+         SLDParser stylereader = new SLDParser(sf, surl);
+         StyledLayerDescriptor sld = stylereader.parseSLD();
+         
+         Symbolizer[] symbolizers = ((NamedLayer) sld.getStyledLayers()[0]).getStyles()[0]
+                .getFeatureTypeStyles()[0].getRules()[0].getSymbolizers();
+
+         TextSymbolizer text = (TextSymbolizer) symbolizers[0];
+         
+         Expression label = text.getLabel();
+         
+         String labelValue = (String) label.evaluate(null, String.class);
+
+         assertEquals("literal_1\nliteral_2", labelValue);
+    }
+
     /**
 	 * SLD --> XML --> SLD
 	 * @throws Exception
@@ -303,6 +335,22 @@ public class SLDStyleTest extends TestCase {
             assertTrue(layer.getStyles()[0] instanceof NamedStyle);
             assertEquals(namedStyleNames[i], layer.getStyles()[0].getName());
         }
+        
+        // find the rivers layers and test the LayerFeatureConstraints
+        for (int i = 0; i < expectedLayerCount; i++) {
+        	NamedLayer layer = (NamedLayer) layers[i];
+        	if (layer.getName().equals("Rivers")) {
+        		FeatureTypeConstraint[] featureTypeConstraints = layer.getLayerFeatureConstraints();
+    	        final int featureTypeConstraintCount = 1;
+    	        assertEquals(featureTypeConstraintCount, featureTypeConstraints.length);
+    	        Filter filter = featureTypeConstraints[0].getFilter();
+    	        assertTrue(filter instanceof PropertyIsEqualTo);
+    	        PropertyIsEqualTo equal = (PropertyIsEqualTo) filter;
+    	        assertTrue(equal.getExpression1() instanceof PropertyName);
+    	        assertTrue(equal.getExpression2() instanceof Literal);
+        	}
+        }
+        
     }
 
     /**

@@ -188,4 +188,34 @@ public class TemporalConverterFactoryTest extends TestCase {
             assertEquals( calendar.get( Calendar.MILLISECOND ), actual.get( Calendar.MILLISECOND) );
         }
 	
+	public void testXMLGregorianCalendarToDate() throws Exception {
+	    XMLGregorianCalendar gc = DatatypeFactory.newInstance().newXMLGregorianCalendar("1981-06-20T12:00:00");
+	    assertNotNull( factory.createConverter( XMLGregorianCalendar.class, Date.class, null));
+            
+            Date date =  factory.createConverter( XMLGregorianCalendar.class, Date.class, null)
+                .convert( gc, Date.class );
+            assertNotNull(date);
+            
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime( date );
+            
+            assertEquals( 1981, calendar.get( Calendar.YEAR ) );
+            assertEquals( 5, calendar.get( Calendar.MONTH ) );
+            assertEquals( 20, calendar.get( Calendar.DATE ) );
+            assertEquals( 12, calendar.get( Calendar.HOUR_OF_DAY ) );
+            assertEquals( 0, calendar.get( Calendar.MINUTE ) );
+            assertEquals( 0, calendar.get( Calendar.SECOND ) );
+	}
+	
+	public void testDateToXMLGregorianCalendar() throws Exception {
+	    Date date = new Date();
+            assertNotNull( factory.createConverter(  Date.class, XMLGregorianCalendar.class, null ) );
+            
+            XMLGregorianCalendar gc = factory.createConverter( Date.class, XMLGregorianCalendar.class, null )
+                    .convert( date, XMLGregorianCalendar.class );
+            
+            assertNotNull( gc );
+            
+            assertEquals( date, gc.toGregorianCalendar().getTime() );
+	}
 }

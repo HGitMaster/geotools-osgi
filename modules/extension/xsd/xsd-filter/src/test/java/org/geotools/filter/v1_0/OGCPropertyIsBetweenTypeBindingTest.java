@@ -61,6 +61,14 @@ public class OGCPropertyIsBetweenTypeBindingTest extends FilterTestSupport {
 
     public void testEncode() throws Exception {
         Document doc = encode(FilterMockData.propertyIsBetween(), OGC.PropertyIsBetween);
+        assertEquals(1,
+            doc.getElementsByTagNameNS(OGC.NAMESPACE, OGC.PropertyName.getLocalPart()).getLength());
+        assertEquals(1, doc.getElementsByTagNameNS(OGC.NAMESPACE, "LowerBoundary").getLength());
+        assertEquals(1, doc.getElementsByTagNameNS(OGC.NAMESPACE, "UpperBoundary").getLength());
+    }
+    
+    public void testEncodeAsFilter() throws Exception {
+        Document doc = encode(FilterMockData.propertyIsBetween(), OGC.Filter);
 
         assertEquals(1,
             doc.getElementsByTagNameNS(OGC.NAMESPACE, OGC.PropertyName.getLocalPart()).getLength());

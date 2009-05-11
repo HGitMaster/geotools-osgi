@@ -24,7 +24,6 @@ import java.util.List;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.Command;
 import org.geotools.arcsde.pool.ISession;
-import org.geotools.data.DataSourceException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 
@@ -37,23 +36,22 @@ import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeTable;
 
 /**
- * Strategy object used to manage the different ways an ArcSDE server handles
- * row identity.
+ * Strategy object used to manage the different ways an ArcSDE server handles row identity.
  * <p>
  * The supported strategies are:
  * <ul>
- * <li>SDE managed mode: a column is assigned by the sde engine to be the
- * feature id (it uses to be called OBJECTID)
+ * <li>SDE managed mode: a column is assigned by the sde engine to be the feature id (it uses to be
+ * called OBJECTID)
  * <li>User managed: a user specified row is used as the fid column.
- * <li>Shape fid: if none of the above, the fid happens to be the identifier of
- * the geometry column
+ * <li>Shape fid: if none of the above, the fid happens to be the identifier of the geometry column
  * </ul>
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: FIDReader.java 31197 2008-08-20 20:56:42Z groldan $
+ * @version $Id: FIDReader.java 32195 2009-01-09 19:00:35Z groldan $
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/FIDReader.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/FIDReader.java $
  */
 public abstract class FIDReader {
 
@@ -96,13 +94,11 @@ public abstract class FIDReader {
      * Returns the attribute names of the FeatureType passed to the constructor.
      * 
      * @param the
-     *            feature type containing the properties the client code is
-     *            interested in. May well be a subset of the full set of
-     *            attributes in the SeLayer
-     * @return the list of property names to actually fetch for a given feature
-     *         type, taking into account the ones that possibly need to be
-     *         fetched to generate the feature id, even if they're not part of
-     *         the schema.
+     *            feature type containing the properties the client code is interested in. May well
+     *            be a subset of the full set of attributes in the SeLayer
+     * @return the list of property names to actually fetch for a given feature type, taking into
+     *         account the ones that possibly need to be fetched to generate the feature id, even if
+     *         they're not part of the schema.
      * @throws IOException
      *             if an arcsde exception is thrown somehow.
      */
@@ -193,15 +189,13 @@ public abstract class FIDReader {
 
     public static class ShapeFidReader extends FIDReader {
         /**
-         * Name of the Shape, populated as a side effect of
-         * getPropertiesToFetch()
+         * Name of the Shape, populated as a side effect of getPropertiesToFetch()
          */
 
         private final String shapeColName;
 
         /**
-         * Index of the Shape, populated as a side effect of
-         * getPropertiesToFetch()
+         * Index of the Shape, populated as a side effect of getPropertiesToFetch()
          */
         private int shapeIndex;
 
@@ -237,9 +231,8 @@ public abstract class FIDReader {
         }
 
         /**
-         * Overrides to include the geometry column whether it is required by
-         * the {@code schema} or not, since we need to get the fid from the
-         * geometry id.
+         * Overrides to include the geometry column whether it is required by the {@code schema} or
+         * not, since we need to get the fid from the geometry id.
          */
         @Override
         public String[] getPropertiesToFetch(SimpleFeatureType schema) throws IOException {

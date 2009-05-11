@@ -16,6 +16,8 @@
  */
 package org.geotools.xml;
 
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDParticle;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -170,8 +172,44 @@ public interface ComplexBinding extends Binding {
      * @param object the object being encoded.
      *
      * @return A list of the properties for the object.
-     *
+     * @deprecated use {@link #getProperties(Object, XSDElementDeclaration)}.
      */
     List /*Object[QName,Object]*/ getProperties(Object object)
+        throws Exception;
+    
+    /**
+     * Returns a list of properties of the specified object.
+     * <p>
+     * The return list contains a set of tuples (two element object array) which represent the 
+     * properties of the object. The second value is an object which respresents the value. The first
+     * value of the tuple can one of two things:
+     *   <ol>
+     *     <li>A {@link QName} identifying an element. This name will be used to locate the schema
+     *     element for the property.
+     *     <li>A {@link XSDParticle} representing the element itself. 
+     *   </ol>
+     * </p>
+     * <p>
+     * This method should only be implemented in the case where the encoder
+     * can not determine what the properties of the object are from the schema.
+     * </p>
+     * <p>
+     * An example would be an object which corresponds to an element in the
+     * schema which has a the type <code>xs:anyType</code>. Since the content
+     * of this type can be anything the schema has no way to determine what
+     * the properties are. So in this case this method must specify the
+     * properties manually as a set of name, object tuples.
+     * </p>
+     * <p>
+     * In the case of a multi-valued property, this method must return a tuple
+     * for each instance of the property, and not a list, iterator, or array
+     * containing all of the instances.
+     * </p>
+     * @param object the object being encoded.
+     * @param element 
+     *
+     * @return A list of the properties for the object.
+     */
+    List /*Object[QName,Object]*/ getProperties(Object object, XSDElementDeclaration element )
         throws Exception;
 }

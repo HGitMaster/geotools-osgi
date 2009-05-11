@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $
+        Version: $Id: pom.xml 32884 2009-04-30 14:00:09Z simonegiannecchini $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>plugin</artifactId>
-    <version>2.6.0.osgi1</version>
+    <version>2.6.0.osgi2</version>
   </parent>
 
 
@@ -31,9 +31,10 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/plugin/arcgrid/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/plugin/arcgrid/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/plugin/arcgrid/</url>
+    <developerConnection>Simone Giannecchini</developerConnection>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/plugin/arcgrid/</url>
   </scm>
 
   <description>
@@ -89,7 +90,7 @@
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
   	  <artifactId>imageio-ext-arcgrid</artifactId>
-  	  <version>1.0-SNAPSHOT</version>
+  	  <version>1.0.2</version>
     </dependency>
     <dependency>
       <groupId>javax.media</groupId>

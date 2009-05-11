@@ -25,6 +25,10 @@
 //    marioh@cs.ucr.edu
 package org.geotools.caching.spatialindex;
 
+/**
+ * For tracking spatial index statistics.
+ *
+ */
 public interface Statistics {
     public long getReads();
 

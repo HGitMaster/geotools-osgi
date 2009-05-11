@@ -20,6 +20,8 @@ package org.geotools.referencing.factory.epsg;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
+import javax.sql.DataSource;
+
 // Geotools dependencies
 import org.geotools.factory.Hints;
 
@@ -28,8 +30,8 @@ import org.geotools.factory.Hints;
  * Please use {@link AccessDialectEpsgFactory}.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingSQL.java $
- * @version $Id: FactoryUsingSQL.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingSQL.java $
+ * @version $Id: FactoryUsingSQL.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Jody Garnett
  *
  * @deprecated Please use {@link AccessDialectEpsgFactory}.
@@ -45,6 +47,18 @@ public class FactoryUsingSQL extends DirectEpsgFactory {
      */
     public FactoryUsingSQL(final Hints userHints, final Connection connection) {
         super(userHints, connection );
+    }
+    
+    /**
+     * Constructs an authority factory using the specified connection.
+     *
+     * @param userHints The underlying factories used for objects creation.
+     * @param dataSource The connection to the underlying EPSG database.
+     *
+     * @since 2.5
+     */
+    public FactoryUsingSQL(final Hints userHints, final DataSource dataSource) {
+        super(userHints, dataSource);
     }
 
     /**

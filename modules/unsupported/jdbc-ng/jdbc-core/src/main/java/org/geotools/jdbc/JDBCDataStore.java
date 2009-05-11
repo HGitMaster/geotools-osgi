@@ -17,6 +17,7 @@
 package org.geotools.jdbc;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URLDecoder;
@@ -24,10 +25,12 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,10 +44,13 @@ import javax.sql.DataSource;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.GmlObjectStore;
+import org.geotools.data.InProcessLockingManager;
+import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
+import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.store.ContentDataStore;
@@ -59,12 +65,16 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.GmlObjectId;
 import org.opengis.filter.sort.SortBy;
@@ -73,6 +83,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -181,6 +192,11 @@ public final class JDBCDataStore extends ContentDataStore
      * java class to sql type mappings;
      */
     protected HashMap<Class<?>, Integer> classToSqlTypeMappings;
+
+    /**
+     * sql type to sql type name overrides
+     */
+    protected HashMap<Integer,String> sqlTypeToSqlTypeNameOverrides;
 
     /**
      * flag controlling if the datastore is supporting feature and geometry
@@ -359,6 +375,23 @@ public final class JDBCDataStore extends ContentDataStore
 
         return classToSqlTypeMappings;
     }
+
+    /**
+     * Returns any ovverides which map integer constants for database types (from {@link Types})
+     * to database type names.
+     * <p>
+     * This method will return an empty map when there are no overrides.
+     * </p>
+     */
+    public Map<Integer,String> getSqlTypeToSqlTypeNameOverrides() {
+        if ( sqlTypeToSqlTypeNameOverrides == null ) {
+            sqlTypeToSqlTypeNameOverrides = new HashMap<Integer,String>();
+            dialect.registerSqlTypeToSqlTypeNameOverrides(sqlTypeToSqlTypeNameOverrides);
+        }
+
+        return sqlTypeToSqlTypeNameOverrides;
+    }
+
 
     /**
      * Returns the java type mapped to the specified sql type.
@@ -555,7 +588,11 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected ContentFeatureSource createFeatureSource(ContentEntry entry)
         throws IOException {
-        //TODO: read only access
+        //check primary key to figure out if we must return a read only (feature source)
+        PrimaryKey pkey = getPrimaryKey(entry);
+        if ( pkey == null || pkey instanceof NullPrimaryKey ) {
+            return new JDBCFeatureSource(entry,null);
+        }
         return new JDBCFeatureStore(entry,null);
     }
 
@@ -784,10 +821,10 @@ public final class JDBCDataStore extends ContentDataStore
      * Returns the bounds of the features for a particular feature type / table.
      * 
      * @param featureType The feature type / table.
-     //* @param types The columns to include in the bounds calculation, may be <code>null<code>.
-     * @param filter Filter specifying rows to include in bounds calculation.
+     * @param query Specifies rows to include in bounds calculation, as well as how many 
+     *              features and the offset if needed
      */
-    protected ReferencedEnvelope getBounds(SimpleFeatureType featureType, /*Set types,*/ Filter filter,
+    protected ReferencedEnvelope getBounds(SimpleFeatureType featureType, Query query,
         Connection cx) throws IOException {
         
         // handle geometryless case by returning an emtpy envelope
@@ -798,11 +835,11 @@ public final class JDBCDataStore extends ContentDataStore
         ResultSet rs = null;
         try {
             if ( dialect instanceof PreparedStatementSQLDialect ) {
-                st = selectBoundsSQLPS(featureType, filter, cx);
+                st = selectBoundsSQLPS(featureType, query, cx);
                 rs = ((PreparedStatement)st).executeQuery();
             }
             else {
-                String sql = selectBoundsSQL(featureType,/* types,*/ filter);
+                String sql = selectBoundsSQL(featureType, query);
                 LOGGER.log(Level.FINE, "Retriving bounding box: {0}", sql);
         
                 st = cx.createStatement();
@@ -810,25 +847,40 @@ public final class JDBCDataStore extends ContentDataStore
             }
                         
             try {
-                rs.next();
-
                 ReferencedEnvelope bounds = null;
-                Envelope e = dialect.decodeGeometryEnvelope(rs, 1, st.getConnection());
-
+                Envelope e = null;
+                if( rs.next() ) {
+                    e = dialect.decodeGeometryEnvelope(rs, 1, st.getConnection());
+                }
+                
+                if ( e == null ) {
+                    e = new Envelope();
+                    e.setToNull();
+                }
+               
                 if (e instanceof ReferencedEnvelope) {
                     bounds = (ReferencedEnvelope) e;
                 } else {
                     //set the crs to be the crs of the feature type
                     // grab the 2d part of the crs 
                     CoordinateReferenceSystem flatCRS = CRS.getHorizontalCRS(featureType.getCoordinateReferenceSystem());
-                    bounds = new ReferencedEnvelope(e, flatCRS);
+                    
+                    if ( e != null ) {
+                        bounds = new ReferencedEnvelope(e, flatCRS);
+                    }
+                    else {
+                        bounds = new ReferencedEnvelope( flatCRS );
+                        bounds.setToNull();
+                    }
                 }
 
                 //keep going to handle case where envelope is not calculated
                 // as aggregate function
-                while (rs.next()) {
-                    bounds.expandToInclude(dialect.decodeGeometryEnvelope(rs, 1, st.getConnection()));
-                }
+		if (e.isNull()==false) { // featuretype not empty
+		  while (rs.next()) {
+		      bounds.expandToInclude(dialect.decodeGeometryEnvelope(rs, 1, st.getConnection()));
+		  }
+		}
 
                 return bounds;
             }
@@ -845,18 +897,18 @@ public final class JDBCDataStore extends ContentDataStore
     /**
      * Returns the count of the features for a particular feature type / table.
      */
-    protected int getCount(SimpleFeatureType featureType, Filter filter, Connection cx)
+    protected int getCount(SimpleFeatureType featureType, Query query, Connection cx)
         throws IOException {
         
         Statement st = null;
         ResultSet rs = null;
         try {
             if ( dialect instanceof PreparedStatementSQLDialect ) {
-                st = selectCountSQLPS(featureType, filter, cx);
+                st = selectCountSQLPS(featureType, query, cx);
                 rs = ((PreparedStatement)st).executeQuery();
             }
             else {
-                String sql = selectCountSQL(featureType, filter);
+                String sql = selectCountSQL(featureType, query);
                 LOGGER.log(Level.FINE, "Counting features: {0}", sql);
                 
                 st = cx.createStatement();
@@ -1089,6 +1141,8 @@ public final class JDBCDataStore extends ContentDataStore
             // isolation level is not set in the datastore, see 
             // http://jira.codehaus.org/browse/GEOT-2021 
 
+            //call dialect callback to iniitalie the connection
+            dialect.initializeConnection( cx );
             return cx;
         } catch (SQLException e) {
             throw new RuntimeException("Unable to obtain connection", e);
@@ -1111,9 +1165,19 @@ public final class JDBCDataStore extends ContentDataStore
      * Encodes a feature id from a primary key and result set values. 
      */
     protected String encodeFID( PrimaryKey pkey, ResultSet rs ) throws SQLException, IOException {
-        List<Object> keyValues = new ArrayList();
-        for( PrimaryKeyColumn col : pkey.getColumns() ) {
-            Object o = rs.getObject( col.getName() );
+        // no pk columns
+        if(pkey.getColumns().isEmpty()) {
+            return SimpleFeatureBuilder.createDefaultFeatureId();
+        } 
+        
+        // just one, no need to build support structures
+        if(pkey.getColumns().size() == 1)
+            return rs.getString(1);
+
+        // more than one
+        List<Object> keyValues = new ArrayList<Object>();
+        for(int i = 0; i < pkey.getColumns().size(); i++) {
+            String o = rs.getString(i+1);
             keyValues.add( o );
         }
         return encodeFID( keyValues );
@@ -1126,6 +1190,67 @@ public final class JDBCDataStore extends ContentDataStore
         }
         fid.setLength(fid.length()-1);
         return fid.toString();
+    }
+    
+    /**
+     * Decodes a fid into its components based on a primary key.
+     * 
+     * @param strict If set to true the value of the fid will be validated against
+     *   the type of the key columns. If a conversion can not be made, an exception will be thrown. 
+     */
+    protected List<Object> decodeFID( PrimaryKey key, String FID, boolean strict) {
+        //strip off the feature type name
+        if (FID.startsWith(key.getTableName() + ".")) {
+            FID = FID.substring(key.getTableName().length() + 1);
+        }
+
+        try {
+            FID = URLDecoder.decode(FID,"UTF-8");
+        } 
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException( e );
+        }
+
+        //check for case of multi column primary key and try to backwards map using
+        // "." as a seperator of values
+        List values = null;
+        if ( key.getColumns().size() > 1 ) {
+            String[] split = FID.split( "\\." );
+
+            //copy over to avoid array store exception
+            values = new ArrayList(split.length);
+            for ( int i = 0; i < split.length; i++ ) {
+                values.add(split[i]);
+            }
+        }
+        else {
+            //single value case
+            values = new ArrayList();
+            values.add( FID );
+        }
+        if ( values.size() != key.getColumns().size() ) {
+            throw new IllegalArgumentException( "Illegal fid: " + FID + ". Expected "
+                + key.getColumns().size() + " values but got " + values.size() );
+        }
+
+        //convert to the type of the key
+        //JD: usually this would be done by the dialect directly when the value
+        // actually gets set but the FIDMapper interface does not report types
+        for ( int i = 0; i < values.size(); i++ ) {
+            Object value = values.get( i );
+            if ( value != null ) {
+                Class type = key.getColumns().get( i ).getType();
+                Object converted = Converters.convert( value, type );
+                if ( converted != null ) {
+                    values.set(i, converted);
+                }
+                if (strict && !type.isInstance( values.get( i ) ) ) {
+                    throw new IllegalArgumentException( "Value " + values.get( i ) + " illegal for type " + type.getName() );
+                }
+            }
+        }
+
+        return values;
     }
     
     /**
@@ -1227,10 +1352,13 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected String createTableSQL(SimpleFeatureType featureType, Connection cx)
         throws Exception {
-        //figure out the names of the columns
+        //figure out the names and types of the columns
         String[] columnNames = new String[featureType.getAttributeCount()];
         String[] sqlTypeNames = null;
         Class[] classes = new Class[featureType.getAttributeCount()];
+
+        //figure out which columns can not be null
+        boolean[] nillable = new boolean[featureType.getAttributeCount()];
 
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
             AttributeDescriptor attributeType = featureType.getDescriptor(i);
@@ -1240,6 +1368,9 @@ public final class JDBCDataStore extends ContentDataStore
 
             //column type 
             classes[i] = attributeType.getType().getBinding();
+            
+            //can be null?
+            nillable[i] = attributeType.getMinOccurs() <= 0 || attributeType.isNillable();
         }
 
         sqlTypeNames = getSQLTypeNames(classes, cx);
@@ -1250,9 +1381,56 @@ public final class JDBCDataStore extends ContentDataStore
             }
         }
         
-        return createTableSQL(featureType.getTypeName(), columnNames, sqlTypeNames, "fid");
+        return createTableSQL(featureType.getTypeName(), columnNames, sqlTypeNames, nillable, "fid", featureType);
     }
 
+    /**
+     * Ensures that that the specified transaction has access to features specified by a filter.
+     * <p>
+     * If any features matching the filter are locked, and the transaction does not have authorization
+     * with respect to the lock, an exception is thrown.
+     * </p>
+     * @param featureType The feature type / table.
+     * @param filter The filters.
+     * @param tx The transaction.
+     * @param cx The database connection.
+     */
+    protected void ensureAuthorization(SimpleFeatureType featureType, Filter filter, Transaction tx, Connection cx) 
+        throws IOException, SQLException {
+        
+        Query query = new DefaultQuery(featureType.getTypeName(), filter, Query.NO_NAMES);
+
+        Statement st = null;
+        try {
+            ResultSet rs = null;
+            if ( getSQLDialect() instanceof PreparedStatementSQLDialect ) {
+                st = selectSQLPS(featureType, query, cx);
+                rs = ((PreparedStatement)st).executeQuery();
+            }
+            else {
+                String sql = selectSQL(featureType, query);
+                LOGGER.fine( sql );
+                st = cx.createStatement();
+                rs = st.executeQuery( sql );
+            }
+            
+            try {
+                PrimaryKey key = getPrimaryKey( featureType );
+                InProcessLockingManager lm = (InProcessLockingManager) getLockingManager();
+                while( rs.next() ) {
+                    String fid = featureType.getTypeName() + "." + encodeFID( key, rs );
+                    lm.assertAccess(featureType.getTypeName(), fid, tx );
+                }
+            }
+            finally {
+                closeSafe( rs );
+            }
+        }
+        finally {
+            closeSafe( st );
+        }
+    }
+    
     /**
      * Helper method for creating geometry association table if it does not
      * exist.
@@ -1378,7 +1556,7 @@ public final class JDBCDataStore extends ContentDataStore
         String[] sqlTypeNames = getSQLTypeNames(new Class[] { String.class, String.class }, cx);
         String[] columnNames = new String[] { "table", "col" };
 
-        return createTableSQL(FEATURE_RELATIONSHIP_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(FEATURE_RELATIONSHIP_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1395,7 +1573,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }, cx);
         String[] columnNames = new String[] { "fid", "rtable", "rcol", "rfid" };
 
-        return createTableSQL(FEATURE_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(FEATURE_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1413,7 +1591,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }, cx);
         String[] columnNames = new String[] { "id", "name", "description", "type", "geometry" };
 
-        return createTableSQL(GEOMETRY_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(GEOMETRY_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1428,7 +1606,7 @@ public final class JDBCDataStore extends ContentDataStore
         String[] sqlTypeNames = getSQLTypeNames(new Class[] { String.class, String.class, Boolean.class }, cx);
         String[] columnNames = new String[] { "id", "mgid", "ref" };
 
-        return createTableSQL(MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1769,7 +1947,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }, cx);
         String[] columnNames = new String[] { "fid", "gname", "gid", "ref" };
 
-        return createTableSQL(GEOMETRY_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null);
+        return createTableSQL(GEOMETRY_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null, null, null);
     }
 
     /**
@@ -1903,7 +2081,7 @@ public final class JDBCDataStore extends ContentDataStore
      * Helper method for building a 'CREATE TABLE' sql statement.
      */
     private String createTableSQL(String tableName, String[] columnNames, String[] sqlTypeNames,
-        String pkeyColumn) {
+        boolean[] nillable, String pkeyColumn, SimpleFeatureType featureType ) {
         //build the create table sql
         StringBuffer sql = new StringBuffer();
         sql.append("CREATE TABLE ");
@@ -1926,14 +2104,33 @@ public final class JDBCDataStore extends ContentDataStore
             //sql type name
             //JD: some sql dialects require strings / varchars to have an 
             // associated size with them
-            if ( sqlTypeNames[i].startsWith( "VARCHAR" ) ) {
-                dialect.encodeColumnType(sqlTypeNames[i] + "(255)", sql);
+            if ( sqlTypeNames[i].toUpperCase().startsWith( "VARCHAR" ) ) {
+                Integer length = null;
+                if ( featureType != null ) {
+                    AttributeDescriptor att = featureType.getDescriptor(columnNames[i]);
+                    length = findVarcharColumnLength( att );
+                }
+                if ( length == null || length < 0 ) {
+                    length = 255;
+                }
+
+                dialect.encodeColumnType(sqlTypeNames[i] + "("+ length + ")", sql);
             }
             else {
                 dialect.encodeColumnType(sqlTypeNames[i], sql);    
             }
-            
 
+            //nullable
+            if ( nillable != null && !nillable[i] ) {
+                sql.append( " NOT NULL ");
+            }
+
+            //delegate to dialect to encode column postamble
+            if (featureType != null) {
+                AttributeDescriptor att = featureType.getDescriptor(columnNames[i]);
+                dialect.encodePostColumnCreateTable(att, sql);
+            }
+            
             //sql.append(sqlTypeNames[i]);
             if (i < (sqlTypeNames.length - 1)) {
                 sql.append(", ");
@@ -1946,6 +2143,29 @@ public final class JDBCDataStore extends ContentDataStore
         dialect.encodePostCreateTable(tableName, sql);
 
         return sql.toString();
+    }
+
+    /**
+     * Searches the attribute descriptor restrictions in an attempt to determine
+     * the length of the specified varchar column.
+     */
+    private Integer findVarcharColumnLength(AttributeDescriptor att) {
+        for ( Filter r : att.getType().getRestrictions() ) {
+            if( r instanceof PropertyIsLessThanOrEqualTo ) {
+                PropertyIsLessThanOrEqualTo c = (PropertyIsLessThanOrEqualTo) r;
+                if ( c.getExpression1() instanceof Function &&
+                    ((Function) c.getExpression1()).getName().toLowerCase().endsWith( "length") ) {
+                    if ( c.getExpression2() instanceof Literal ) {
+                        Integer length = c.getExpression2().evaluate(null,Integer.class);
+                        if ( length != null ) {
+                            return length;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -1983,6 +2203,13 @@ public final class JDBCDataStore extends ContentDataStore
                     sqlTypeNames[i] = sqlTypeName;
                 }
             }
+            
+            //check the overrides
+            String sqlTypeName = getSqlTypeToSqlTypeNameOverrides().get( sqlType );
+            if ( sqlTypeName != null ) {
+                sqlTypeNames[i] = sqlTypeName;
+            }
+
         }
 
         //figure out the type names that correspond to the sql types from 
@@ -2046,6 +2273,14 @@ public final class JDBCDataStore extends ContentDataStore
         } finally {
             closeSafe(types);
         }
+        
+        // apply the overrides specified by the dialect
+        Map<Integer, String> overrides = getSqlTypeToSqlTypeNameOverrides();
+        for (int i = 0; i < sqlTypes.length; i++) {
+            String override = overrides.get(sqlTypes[i]);
+            if(override != null)
+                sqlTypeNames[i] = override;
+        }
 
         return sqlTypeNames;
     }
@@ -2059,13 +2294,13 @@ public final class JDBCDataStore extends ContentDataStore
      * @param attributes
      *            the properties queried, or {@link Query#ALL_NAMES} to gather
      *            all of them
-     * @param filter
-     *            an encodable filter (filter splitting should already have
-     *            occurred)
+     * @param query
+     *            the query to be run. The type name and property will be ignored, as they are
+     *            supposed to have been already embedded into the provided feature type
      * @param sort
      *            sort conditions
      */
-    protected String selectSQL(SimpleFeatureType featureType, Filter filter, SortBy[] sort) {
+    protected String selectSQL(SimpleFeatureType featureType, Query query) throws IOException {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
 
@@ -2089,7 +2324,7 @@ public final class JDBCDataStore extends ContentDataStore
         for (AttributeDescriptor att : featureType.getAttributeDescriptors()) {
             if (att instanceof GeometryDescriptor) {
                 //encode as geometry
-                dialect.encodeGeometryColumn((GeometryDescriptor) att, getDescriptorSRID(att), sql);
+            	encodeGeometryColumn((GeometryDescriptor) att, sql, query.getHints());
 
                 //alias it to be the name of the original geometry
                 dialect.encodeColumnAlias(att.getLocalName(), sql);
@@ -2106,10 +2341,14 @@ public final class JDBCDataStore extends ContentDataStore
         encodeTableName(featureType.getTypeName(), sql);
 
         //filtering
+        Filter filter = query.getFilter();
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
-                FilterToSQL toSQL = createFilterToSQL(featureType);
+                // grab the full feature type, as we might be encoding a filter
+                // that uses attributes that aren't returned in the results
+                SimpleFeatureType fullSchema = getSchema(featureType.getTypeName());
+                FilterToSQL toSQL = createFilterToSQL(fullSchema);
                 sql.append(" ").append(toSQL.encodeToString(filter));
             } catch (FilterToSQLException e) {
                 throw new RuntimeException(e);
@@ -2117,26 +2356,54 @@ public final class JDBCDataStore extends ContentDataStore
         }
 
         //sorting
+        sort(featureType, query.getSortBy(), key, sql);
+        
+        // finally encode limit/offset, if necessary
+        applyLimitOffset(sql, query);
+
+        return sql.toString();
+    }
+
+    /**
+     * Encodes the sort-by portion of an sql query
+     * @param featureType
+     * @param sort
+     * @param key
+     * @param sql
+     * @throws IOException
+     */
+    void sort(SimpleFeatureType featureType, SortBy[] sort,
+            PrimaryKey key, StringBuffer sql) throws IOException {
         if ((sort != null) && (sort.length > 0)) {
             sql.append(" ORDER BY ");
 
             for (int i = 0; i < sort.length; i++) {
-                dialect.encodeColumnName(getPropertyName(featureType, sort[i].getPropertyName()),
-                    sql);
-
+                String order;
                 if (sort[i].getSortOrder() == SortOrder.DESCENDING) {
-                    sql.append(" DESC");
+                    order = " DESC";
                 } else {
-                    sql.append(" ASC");
+                    order = " ASC";
                 }
-
-                sql.append(",");
+                
+                if(SortBy.NATURAL_ORDER.equals(sort[i])|| SortBy.REVERSE_ORDER.equals(sort[i])) {
+                    if(key instanceof NullPrimaryKey)
+                        throw new IOException("Cannot do natural order without a primary key");
+                    
+                    for ( PrimaryKeyColumn col : key.getColumns() ) {
+                        dialect.encodeColumnName(col.getName(), sql);
+                        sql.append(order);
+                        sql.append(",");
+                    }
+                } else {
+                    dialect.encodeColumnName(getPropertyName(featureType, sort[i].getPropertyName()),
+                            sql);
+                    sql.append(order);
+                    sql.append(",");
+                }
             }
 
             sql.setLength(sql.length() - 1);
         }
-
-        return sql.toString();
     }
 
     /**
@@ -2148,17 +2415,15 @@ public final class JDBCDataStore extends ContentDataStore
      * @param attributes
      *            the properties queried, or {@link Query#ALL_NAMES} to gather
      *            all of them
-     * @param filter
-     *            an encodable filter (filter splitting should already have
-     *            occurred)
-     * @param sort
-     *            sort conditions
+     * @param query
+     *            the query to be run. The type name and property will be ignored, as they are
+     *            supposed to have been already embedded into the provided feature type
      * @param cx
      *            The database connection to be used to create the prepared
      *            statement
      */
-    protected PreparedStatement selectSQLPS( SimpleFeatureType featureType, Filter filter, SortBy[] sort, Connection cx )
-        throws SQLException {
+    protected PreparedStatement selectSQLPS( SimpleFeatureType featureType, Query query, Connection cx )
+        throws SQLException, IOException {
         
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT ");
@@ -2181,7 +2446,7 @@ public final class JDBCDataStore extends ContentDataStore
         for (AttributeDescriptor att : featureType.getAttributeDescriptors()) {
             if (att instanceof GeometryDescriptor) {
                 //encode as geometry
-                dialect.encodeGeometryColumn((GeometryDescriptor) att, getDescriptorSRID(att), sql);
+            	encodeGeometryColumn((GeometryDescriptor) att, sql, query.getHints());
 
                 //alias it to be the name of the original geometry
                 dialect.encodeColumnAlias(att.getLocalName(), sql);
@@ -2199,10 +2464,14 @@ public final class JDBCDataStore extends ContentDataStore
 
         //filtering
         PreparedFilterToSQL toSQL = null;
+        Filter filter = query.getFilter();
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
-                toSQL = createPreparedFilterToSQL(featureType);
+                // grab the full feature type, as we might be encoding a filter
+                // that uses attributes that aren't returned in the results
+                SimpleFeatureType fullSchema = getSchema(featureType.getTypeName());
+                toSQL = createPreparedFilterToSQL(fullSchema);
                 sql.append(" ").append(toSQL.encodeToString(filter));
             } catch (FilterToSQLException e) {
                 throw new RuntimeException(e);
@@ -2210,24 +2479,10 @@ public final class JDBCDataStore extends ContentDataStore
         }
 
         //sorting
-        if ((sort != null) && (sort.length > 0)) {
-            sql.append(" ORDER BY ");
-
-            for (int i = 0; i < sort.length; i++) {
-                dialect.encodeColumnName(getPropertyName(featureType, sort[i].getPropertyName()),
-                    sql);
-
-                if (sort[i].getSortOrder() == SortOrder.DESCENDING) {
-                    sql.append(" DESC");
-                } else {
-                    sql.append(" ASC");
-                }
-
-                sql.append(",");
-            }
-
-            sql.setLength(sql.length() - 1);
-        }
+        sort(featureType, query.getSortBy(), key, sql);
+        
+        // finally encode limit/offset, if necessary
+        applyLimitOffset(sql, query);
 
         LOGGER.fine( sql.toString() );
         PreparedStatement ps = cx.prepareStatement(sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -2286,31 +2541,26 @@ public final class JDBCDataStore extends ContentDataStore
      * Generates a 'SELECT' sql statement which selects bounds.
      * 
      * @param featureType The feature type / table.
-     * @param filter Filter specifying rows to include in bounds calculation.
+     * @param query Specifies which features are to be used for the bounds computation
+     *              (and in particular uses filter, start index and max features)
      */
-    protected String selectBoundsSQL(SimpleFeatureType featureType, /*Set types,*/ Filter filter) {
+    protected String selectBoundsSQL(SimpleFeatureType featureType, Query query) {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT ");
-
-        //walk through all geometry attributes and build the query
-        for (Iterator a = featureType.getAttributeDescriptors().iterator(); a.hasNext();) {
-            AttributeDescriptor attribute = (AttributeDescriptor) a.next();
-            //if (types != null && !types.contains( attribute.getLocalName() ) ) {
-            //    continue;
-            //}
-            if (attribute instanceof GeometryDescriptor) {
-                String geometryColumn = featureType.getGeometryDescriptor().getLocalName();
-                dialect.encodeGeometryEnvelope(featureType.getTypeName(), geometryColumn, sql);
-                sql.append(",");
-            }
+        boolean offsetLimit = checkLimitOffset(query);
+        if(offsetLimit) {
+            // envelopes are aggregates, just like count, so we must first isolate
+            // the rows against which the aggregate will work in a subquery
+            sql.append(" SELECT *");
+        } else {
+            sql.append("SELECT ");
+            buildEnvelopeAggregates(featureType, sql);
         }
-
-        sql.setLength(sql.length() - 1);
 
         sql.append(" FROM ");
         encodeTableName(featureType.getTypeName(), sql);
 
+        Filter filter = query.getFilter();
         if (filter != null  && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2320,6 +2570,20 @@ public final class JDBCDataStore extends ContentDataStore
                 throw new RuntimeException(e);
             }
         }
+        
+        // finally encode limit/offset, if necessary
+        if(offsetLimit) {
+            applyLimitOffset(sql, query);
+            // build the prologue
+            StringBuffer sb = new StringBuffer();
+            sb.append("SELECT ");
+            buildEnvelopeAggregates(featureType, sb);
+            sb.append("FROM (");
+            // wrap the existing query
+            sql.insert(0, sb.toString());
+            sql.append(")");
+            dialect.encodeTableAlias("GT2_BOUNDS_", sql);
+        }
 
         return sql.toString();
     }
@@ -2328,35 +2592,31 @@ public final class JDBCDataStore extends ContentDataStore
      * Generates a 'SELECT' prepared statement which selects bounds.
      * 
      * @param featureType The feature type / table.
-     * @param filter Filter specifying rows to include in bounds calculation.
+     * @param query Specifies which features are to be used for the bounds computation
+     *              (and in particular uses filter, start index and max features)
      * @param cx A database connection.
      */
-    protected PreparedStatement selectBoundsSQLPS(SimpleFeatureType featureType, Filter filter, Connection cx)
+    protected PreparedStatement selectBoundsSQLPS(SimpleFeatureType featureType, Query query, Connection cx)
         throws SQLException {
         
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT ");
-
-        //walk through all geometry attributes and build the query
-        for (Iterator a = featureType.getAttributeDescriptors().iterator(); a.hasNext();) {
-            AttributeDescriptor attribute = (AttributeDescriptor) a.next();
-            //if (types != null && !types.contains( attribute.getLocalName() ) ) {
-            //    continue;
-            //}
-            if (attribute instanceof GeometryDescriptor) {
-                String geometryColumn = featureType.getGeometryDescriptor().getLocalName();
-                dialect.encodeGeometryEnvelope(featureType.getTypeName(), geometryColumn, sql);
-                sql.append(",");
-            }
+        boolean offsetLimit = checkLimitOffset(query);
+        if(offsetLimit) {
+            // envelopes are aggregates, just like count, so we must first isolate
+            // the rows against which the aggregate will work in a subquery
+            sql.append(" SELECT *");
+        } else {
+            sql.append("SELECT ");
+            buildEnvelopeAggregates(featureType, sql);
         }
-
-        sql.setLength(sql.length() - 1);
 
         sql.append(" FROM ");
         encodeTableName(featureType.getTypeName(), sql);
 
+        // encode the filter
         PreparedFilterToSQL toSQL = null;
+        Filter filter = query.getFilter();
         if (filter != null  && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2366,6 +2626,21 @@ public final class JDBCDataStore extends ContentDataStore
                 throw new RuntimeException(e);
             }
         }
+        
+        // finally encode limit/offset, if necessary
+        if(offsetLimit) {
+            applyLimitOffset(sql, query);
+            // build the prologue
+            StringBuffer sb = new StringBuffer();
+            sb.append("SELECT ");
+            buildEnvelopeAggregates(featureType, sb);
+            sb.append("FROM (");
+            // wrap the existing query
+            sql.insert(0, sb.toString());
+            sql.append(")");
+            dialect.encodeTableAlias("GT2_BOUNDS_", sql);
+        }
+        
 
         LOGGER.fine( sql.toString() );
         PreparedStatement ps = cx.prepareStatement(sql.toString());
@@ -2376,16 +2651,44 @@ public final class JDBCDataStore extends ContentDataStore
         
         return ps;
     }
+
+    /**
+     * Builds a list of the aggregate function calls necesary to compute each geometry
+     * column bounds
+     * @param featureType
+     * @param sql
+     */
+    void buildEnvelopeAggregates(SimpleFeatureType featureType, StringBuffer sql) {
+        //walk through all geometry attributes and build the query
+        for (Iterator a = featureType.getAttributeDescriptors().iterator(); a.hasNext();) {
+            AttributeDescriptor attribute = (AttributeDescriptor) a.next();
+            if (attribute instanceof GeometryDescriptor) {
+                String geometryColumn = featureType.getGeometryDescriptor().getLocalName();
+                dialect.encodeGeometryEnvelope(featureType.getTypeName(), geometryColumn, sql);
+                sql.append(",");
+            }
+        }
+        sql.setLength(sql.length() - 1);
+    }
     
     /**
-     * Generates a 'SELECT count(*) FROM' sql statement.
+     * Generates a 'SELECT count(*) FROM' sql statement. In case limit/offset is 
+     * used, we'll need to apply them on a <code>select *<code>
+     * as limit/offset usually alters the number of returned rows 
+     * (and a count returns just one), and then count on the result of that first select
      */
-    protected String selectCountSQL(SimpleFeatureType featureType, Filter filter) {
+    protected String selectCountSQL(SimpleFeatureType featureType, Query query) {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT count(*) FROM ");
+        boolean limitOffset = checkLimitOffset(query);
+        if(limitOffset) {
+            sql.append("SELECT * FROM ");
+        } else {
+            sql.append("SELECT count(*) FROM ");
+        }
         encodeTableName(featureType.getTypeName(), sql);
 
+        Filter filter = query.getFilter();
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2395,6 +2698,13 @@ public final class JDBCDataStore extends ContentDataStore
                 throw new RuntimeException(e);
             }
         }
+        
+        if(limitOffset) {
+            applyLimitOffset(sql, query);
+            sql.insert(0, "SELECT COUNT(*) FROM (");
+            sql.append(") AS GT_COUNT_ ");
+            
+        }
 
         return sql.toString();
     }
@@ -2402,14 +2712,20 @@ public final class JDBCDataStore extends ContentDataStore
     /**
      * Generates a 'SELECT count(*) FROM' prepared statement.
      */
-    protected PreparedStatement selectCountSQLPS(SimpleFeatureType featureType, Filter filter, Connection cx ) 
+    protected PreparedStatement selectCountSQLPS(SimpleFeatureType featureType, Query query, Connection cx ) 
         throws SQLException {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT count(*) FROM ");
+        boolean limitOffset = checkLimitOffset(query);
+        if(limitOffset) {
+            sql.append("SELECT * FROM ");
+        } else {
+            sql.append("SELECT count(*) FROM ");
+        }
         encodeTableName(featureType.getTypeName(), sql);
 
         PreparedFilterToSQL toSQL = null;
+        Filter filter = query.getFilter();
         if (filter != null && !Filter.INCLUDE.equals(filter)) {
             //encode filter
             try {
@@ -2418,6 +2734,13 @@ public final class JDBCDataStore extends ContentDataStore
             } catch (FilterToSQLException e) {
                 throw new RuntimeException(e);
             }
+        }
+        
+        if(limitOffset) {
+            applyLimitOffset(sql, query);
+            sql.insert(0, "SELECT COUNT(*) FROM (");
+            sql.append(")");
+            dialect.encodeTableAlias("GT_COUNT_", sql);
         }
 
         LOGGER.fine( sql.toString() );
@@ -2686,6 +3009,10 @@ public final class JDBCDataStore extends ContentDataStore
     protected int getGeometrySRID(Geometry g, AttributeDescriptor descriptor) throws IOException {
         int srid = getDescriptorSRID(descriptor);
         
+        if ( g == null ) {
+            return srid;
+        }
+        
         // check for srid in the jts geometry then
         if (srid <= 0 && g.getSRID() > 0) {
             srid = g.getSRID();
@@ -2822,10 +3149,11 @@ public final class JDBCDataStore extends ContentDataStore
         
         int i =0;
         for (; i < attributes.length; i++) {
-            Class binding = attributes[i].getType().getBinding();
+            AttributeDescriptor att = attributes[i];
+			Class binding = att.getType().getBinding();
             if (Geometry.class.isAssignableFrom( binding ) ) {
                 Geometry g = (Geometry) values[i];
-                dialect.setGeometryValue(g, -1, binding, ps, i+1);
+                dialect.setGeometryValue(g, getDescriptorSRID(att), binding, ps, i+1);
             }
             else {
                 dialect.setValue( values[i], binding, ps, i+1, cx);    
@@ -2895,7 +3223,7 @@ public final class JDBCDataStore extends ContentDataStore
                     }
 
                     public int getColumnCount() {
-                        return 1;
+                        return key.getColumns().size();
                     }
 
                     public int getColumnDecimalDigits(int colIndex) {
@@ -2920,12 +3248,7 @@ public final class JDBCDataStore extends ContentDataStore
 
                     public Object[] getPKAttributes(String FID)
                         throws IOException {
-                        //strip off the feature type name
-                        if (FID.startsWith(featureType.getTypeName() + ".")) {
-                            FID = FID.substring(featureType.getTypeName().length() + 1);
-                        }
-
-                        return new Object[]{URLDecoder.decode(FID,"UTF-8")};
+                        return decodeFID(key,FID,false).toArray();
                     }
 
                     public boolean hasAutoIncrementColumns() {
@@ -2946,6 +3269,10 @@ public final class JDBCDataStore extends ContentDataStore
                     public boolean returnFIDColumnsAsAttributes() {
                         return false;
                     }
+
+                    public boolean isValid(String fid) {
+                        return true;
+                    }
                 };
             toSQL.setFeatureType(featureType);    
             toSQL.setFIDMapper(mapper);
@@ -2960,11 +3287,11 @@ public final class JDBCDataStore extends ContentDataStore
      */
     protected void encodeTableName(String tableName, StringBuffer sql) {
         if (databaseSchema != null) {
-            dialect.encodeTableName(databaseSchema, sql);
+            dialect.encodeSchemaName(databaseSchema, sql);
             sql.append(".");
         }
 
-        dialect.encodeSchemaName(tableName, sql);
+        dialect.encodeTableName(tableName, sql);
     }
 
     /**
@@ -2998,6 +3325,36 @@ public final class JDBCDataStore extends ContentDataStore
         }
 
         g.setUserData(userData);
+    }
+    
+    /**
+     * Applies the limit/offset elements to the query if they are specified
+     * and if the dialect supports them
+     * @param sql The sql to be modified
+     * @param the query that holds the limit and offset parameters
+     */
+    void applyLimitOffset(StringBuffer sql, Query query) {
+        if(checkLimitOffset(query)) {
+            final Integer offset = query.getStartIndex();
+            final int limit = query.getMaxFeatures();
+            dialect.applyLimitOffset(sql, limit, offset != null ? offset : 0);
+        }
+    }
+    
+    /**
+     * Checks if the query needs limit/offset treatment
+     * @param query
+     * @return true if the query needs limit/offset treatment and if the sql dialect can do that natively
+     */
+    boolean checkLimitOffset(Query query) {
+        // if we cannot, don't bother checking the query
+        if(!dialect.isLimitOffsetSupported())
+            return false;
+        
+        // the check the query has at least a non default value for limit/offset
+        final Integer offset = query.getStartIndex();
+        final int limit = query.getMaxFeatures();
+        return limit != Integer.MAX_VALUE || (offset != null && offset > 0);
     }
     
     /**
@@ -3100,4 +3457,67 @@ public final class JDBCDataStore extends ContentDataStore
             }
         }
     }
+    /**
+     * Checks if geometry generalization required and makes sense
+     * 
+     * @param hints 	hints hints passed in
+     * @param gatt 		Geometry attribute descriptor
+     * @return			true to indicate generalization 
+     */    
+    protected boolean isGeneralizationRequired(Hints hints,GeometryDescriptor gatt) {
+    	return isGeometryReduceRequired(hints, gatt, Hints.GEOMETRY_GENERALIZATION);
+    }
+    
+    /**
+     * Checks if geometry simplification required and makes sense
+     * 
+     * @param hints 	hints hints passed in
+     * @param gatt 		Geometry attribute descriptor
+     * @return			true to indicate simplification 
+     */
+    protected boolean isSimplificationRequired(Hints hints, GeometryDescriptor gatt) {
+    	return isGeometryReduceRequired(hints, gatt, Hints.GEOMETRY_SIMPLIFICATION);    	
+    }
+    /**
+     * Checks if reduction required and makes sense
+     *       
+     * @param hints	  hints passed in 
+     * @param gatt   Geometry attribute descriptor
+     * @param param  {@link Hints#GEOMETRY_GENERALIZATION} or {@link Hints#GEOMETRY_SIMPLIFICATION}
+     * @return true to indicate reducing the geometry, false otherwise
+     */
+    protected boolean isGeometryReduceRequired(Hints hints, GeometryDescriptor gatt, Hints.Key param) {
+    	if (hints==null) return false;
+    	if (hints.containsKey(param)==false) return false;
+    	if (gatt.getType().getBinding() == Point.class)  
+    		return false;
+    	return true;    		
+    }
+
+    /**
+     * Encoding a geometry column with respect to hints
+     * Supported Hints are provided by {@link SQLDialect#addSupportedHints(Set)}
+     * 
+     * @param gatt
+     * @param sql
+     * @param hints , may be null 
+     */
+    protected void encodeGeometryColumn(GeometryDescriptor gatt, StringBuffer sql,Hints hints) {
+    	
+    	int srid = getDescriptorSRID(gatt);
+    	if (isGeneralizationRequired(hints, gatt)==true) {
+    		Double distance = (Double) hints.get(Hints.GEOMETRY_GENERALIZATION);
+    		dialect.encodeGeometryColumnGeneralized(gatt, srid,sql,distance);
+    		return;    		
+    	}
+    		     	
+    	if (isSimplificationRequired(hints, gatt)==true) {
+    		Double distance = (Double) hints.get(Hints.GEOMETRY_SIMPLIFICATION);
+    		dialect.encodeGeometryColumnSimplified(gatt,srid, sql,distance);
+    		return;    		
+    	}
+    	   	    	
+    	dialect.encodeGeometryColumn(gatt,srid, sql);        
+    }
+
 }

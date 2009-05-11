@@ -32,14 +32,14 @@ public class JDBCInsertFeatureWriter extends JDBCFeatureReader implements Featur
     ResultSetFeature last;
     
     public JDBCInsertFeatureWriter(String sql, Connection cx,
-            JDBCFeatureStore featureStore, Hints hints) throws SQLException, IOException {
-        super(sql, cx, featureStore, featureStore.getSchema(), hints);
+            JDBCFeatureSource featureSource, Hints hints) throws SQLException, IOException {
+        super(sql, cx, featureSource, featureSource.getSchema(), hints);
         last = new ResultSetFeature( rs, cx );
     }
 
-    public JDBCInsertFeatureWriter(PreparedStatement ps, Connection cx, JDBCFeatureStore featureStore, Hints hints)
+    public JDBCInsertFeatureWriter(PreparedStatement ps, Connection cx, JDBCFeatureSource featureSource, Hints hints)
         throws SQLException, IOException {
-        super( ps, cx, featureStore, featureStore.getSchema(), hints );
+        super( ps, cx, featureSource, featureSource.getSchema(), hints );
         last = new ResultSetFeature( rs, ps.getConnection() );
     }
     

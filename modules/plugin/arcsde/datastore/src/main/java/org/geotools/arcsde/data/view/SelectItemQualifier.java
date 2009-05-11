@@ -43,9 +43,10 @@ import com.esri.sde.sdk.client.SeColumnDefinition;
  * produce more items than the visited.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: SelectItemQualifier.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: SelectItemQualifier.java 32195 2009-01-09 19:00:35Z groldan $
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/SelectItemQualifier.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/view/SelectItemQualifier.java $
  * @since 2.3.x
  */
 class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectItemVisitor {
@@ -60,7 +61,8 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
     /**
      * Creates a new SelectItemQualifier object.
      * 
-     * @param session DOCUMENT ME!
+     * @param session
+     *            DOCUMENT ME!
      */
     private SelectItemQualifier(ISession session, Map tableAliases) {
         this.session = session;
@@ -70,8 +72,10 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
     /**
      * DOCUMENT ME!
      * 
-     * @param session DOCUMENT ME!
-     * @param item DOCUMENT ME!
+     * @param session
+     *            DOCUMENT ME!
+     * @param item
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
      */
     public static List qualify(ISession session, Map tableAliases, SelectItem item) {
@@ -88,7 +92,8 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
     /**
      * DOCUMENT ME!
      * 
-     * @param allColumns DOCUMENT ME!
+     * @param allColumns
+     *            DOCUMENT ME!
      */
     public void visit(AllColumns allColumns) {
         this.qualifiedItems = Collections.singletonList(allColumns);
@@ -97,7 +102,8 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
     /**
      * DOCUMENT ME!
      * 
-     * @param allTableColumns DOCUMENT ME!
+     * @param allTableColumns
+     *            DOCUMENT ME!
      */
     public void visit(AllTableColumns allTableColumns) {
         AllTableColumns qualified = new AllTableColumns();
@@ -144,7 +150,8 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
     /**
      * DOCUMENT ME!
      * 
-     * @param selectExpressionItem DOCUMENT ME!
+     * @param selectExpressionItem
+     *            DOCUMENT ME!
      */
     public void visit(SelectExpressionItem selectExpressionItem) {
 

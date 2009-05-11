@@ -25,10 +25,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MediaTracker;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
@@ -42,6 +44,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -121,7 +124,7 @@ labeling code.
 
 This change could affect the j2d renderer as it appears to use the
 "AbsoluteLineDisplacement" flag.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/SLDStyleFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/SLDStyleFactory.java $
 */
 
 public class SLDStyleFactory {
@@ -177,7 +180,15 @@ public class SLDStyleFactory {
     /** Symbolizers that do not depend on attributes */
     Map staticSymbolizers = new SoftValueHashMap(); 
 
+    /**
+     * Build a default rendering hint to avoid NPE
+     */
+    RenderingHints renderingHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
     
+    /**
+     * Whether to turn all line widths less than 1.5 pixels to 0 to speed up line rendering.
+     */
+    private boolean lineOptimizationEnabled = true;
 
     private long hits;
 
@@ -187,6 +198,35 @@ public class SLDStyleFactory {
      * Holds value of property mapScaleDenominator.
      */
     private double mapScaleDenominator = Double.NaN;;
+
+    /**
+     * The factory builds a fair number of buffered images to deal with
+     * external graphics that need resizing and the like. This hints will
+     * be used in those drawing operations.
+     */
+    public RenderingHints getRenderingHints() {
+        return renderingHints;
+    }
+
+    public void setRenderingHints(RenderingHints renderingHints) {
+        this.renderingHints = renderingHints;
+    }
+    
+    /**
+     * Enabled by default, this optimization speeds up line rendering when
+     * the line width is less than 1.5 pixels when antialiasing is disblaed.
+     * Unfortunately it also prevents fine line width control when antialiasing
+     * is enabled. Given that the optimization has been hard coded for more than
+     * six years, we give the user control on this one since turning this off
+     * will change the rendering of all existing styles using thin line widths. 
+     */
+    public boolean isLineOptimizationEnabled() {
+        return lineOptimizationEnabled;
+    }
+
+    public void setLineOptimizationEnabled(boolean lineOptimizationEnabled) {
+        this.lineOptimizationEnabled = lineOptimizationEnabled;
+    }
 
 
     public double getHitRatio() {
@@ -508,12 +548,7 @@ public class SLDStyleFactory {
         }
 
         // extract label (from ows5 extensions, we could have the label element empty)
-        String label = "";
-        if(symbolizer.getLabel() != null) {
-            Object obj = symbolizer.getLabel().evaluate(feature);
-            if(obj != null)
-                label = obj.toString();
-        }
+        String label = evalToString(symbolizer.getLabel(), feature, "");
 
         if (LOGGER.isLoggable(Level.FINER)) {
             LOGGER.finer("label is " + label);
@@ -542,11 +577,11 @@ public class SLDStyleFactory {
 
             // compute anchor point and displacement
             PointPlacement p = (PointPlacement) placement;
-            anchorX = ((Number) p.getAnchorPoint().getAnchorPointX().evaluate(feature)).doubleValue();
-            anchorY = ((Number) p.getAnchorPoint().getAnchorPointY().evaluate(feature)).doubleValue();
+            anchorX = evalToDouble(p.getAnchorPoint().getAnchorPointX(), feature, 0);
+            anchorY = evalToDouble(p.getAnchorPoint().getAnchorPointY(), feature, 0.5);
 
-            dispX = ((Number) p.getDisplacement().getDisplacementX().evaluate(feature)).doubleValue();
-            dispY = ((Number) p.getDisplacement().getDisplacementY().evaluate(feature)).doubleValue();
+            dispX =  evalToDouble(p.getDisplacement().getDisplacementX(), feature, 0);
+            dispY = evalToDouble(p.getDisplacement().getDisplacementY(), feature, 0);;
 
             // rotation
             if  ( (symbolizer instanceof TextSymbolizer2)  && (((TextSymbolizer2)symbolizer).getGraphic() != null) )
@@ -554,7 +589,7 @@ public class SLDStyleFactory {
                 // don't rotate labels that are being placed on shields.
                 rotation = 0.0;
             } else {
-                rotation = ((Number) p.getRotation().evaluate(feature)).doubleValue();
+                rotation = evalToDouble(p.getRotation(), feature, 0);
                 rotation *= (Math.PI / 180.0);
             }
 
@@ -568,7 +603,7 @@ public class SLDStyleFactory {
             }
             ts2d.setPointPlacement(false);
             LinePlacement p = (LinePlacement) placement;
-            int displace =  ((Number) p.getPerpendicularOffset().evaluate(feature)).intValue();
+            int displace =  evalToInt(p.getPerpendicularOffset(), feature, 0);
             ts2d.setPerpendicularOffset( displace );
         }
 
@@ -588,7 +623,7 @@ public class SLDStyleFactory {
         if (halo != null) {
             ts2d.setHaloFill(getPaint(halo.getFill(), feature));
             ts2d.setHaloComposite(getComposite(halo.getFill(), feature));
-            ts2d.setHaloRadius(((Number) halo.getRadius().evaluate(feature)).floatValue());
+            ts2d.setHaloRadius(evalToFloat(halo.getRadius(), feature, 1));
         }
 
         Graphic graphicShield = null;
@@ -640,11 +675,11 @@ public class SLDStyleFactory {
      */
     private java.awt.Font getFont(Object feature, Font[] fonts) {
         for (int k = 0; k < fonts.length; k++) {
-            String requestedFont = fonts[k].getFontFamily().evaluate(feature).toString();
+            String requestedFont = evalToString(fonts[k].getFontFamily(), feature, null);
             java.awt.Font javaFont = FontCache.getDefaultInsance().getFont(requestedFont);
             
             if(javaFont != null) {
-                String reqStyle = (String) fonts[k].getFontStyle().evaluate(feature);
+                String reqStyle = evalToString(fonts[k].getFontStyle(), feature, null);
 
                 int styleCode;
                 if (fontStyleLookup.containsKey(reqStyle)) {
@@ -653,20 +688,21 @@ public class SLDStyleFactory {
                     styleCode = java.awt.Font.PLAIN;
                 }
 
-                String reqWeight = (String) fonts[k].getFontWeight().evaluate(feature);
+                String reqWeight = evalToString(fonts[k].getFontWeight(), feature, null);
 
-                if (reqWeight.equalsIgnoreCase("Bold")) {
+                if ("Bold".equalsIgnoreCase(reqWeight)) {
                     styleCode = styleCode | java.awt.Font.BOLD;
                 }
 
-                int size = ((Number) fonts[k].getFontSize().evaluate(feature)).intValue();
+                int size = evalToInt(fonts[k].getFontSize(), feature, 10);
 
                 return javaFont.deriveFont(styleCode, size);
             }
         }
 
         // if everything else fails fall back on a default font distributed
-        // along with the jdk
+        // along with the jdk (default font size is 10 pixels by spec... here we
+        // are using points thoughts)
         return new java.awt.Font("Serif",java.awt.Font.PLAIN,12);
     }
 
@@ -684,7 +720,8 @@ public class SLDStyleFactory {
         }
 
         Graphic graphicStroke = stroke.getGraphicStroke();
-        int size = ((Number) graphicStroke.getSize().evaluate(feature)).intValue();
+        // default stroke size is 1 by spec
+        int size = evalToInt(graphicStroke.getSize(), feature, 1);
 
         // lets see if an external image is to be used
         BufferedImage image = getImage(graphicStroke, (Feature) feature, size);
@@ -698,8 +735,9 @@ public class SLDStyleFactory {
             image = new BufferedImage((int) size, (int) size, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D ig2d = image.createGraphics();
+            ig2d.setRenderingHints(renderingHints);
             double rotation = 0.0;
-            rotation = ((Number) graphicStroke.getRotation().evaluate(feature)).doubleValue();
+            rotation = evalToDouble(graphicStroke.getRotation(), feature, 0.0);
             rotation *= (Math.PI / 180.0);
             fillDrawMark(ig2d, size / 2, size / 2, mark, (int) size, rotation, feature);
 
@@ -725,7 +763,7 @@ public class SLDStyleFactory {
         String joinType;
         int joinCode;
 
-        joinType = evaluateExpression(stroke.getLineJoin(), feature, "miter");
+        joinType = evalToString(stroke.getLineJoin(), feature, "miter");
 
         if (joinLookup.containsKey(joinType)) {
             joinCode = ((Integer) joinLookup.get(joinType)).intValue();
@@ -737,7 +775,7 @@ public class SLDStyleFactory {
         String capType;
         int capCode;
 
-        capType = evaluateExpression(stroke.getLineCap(), feature, "square");
+        capType = evalToString(stroke.getLineCap(), feature, "square");
 
         if (capLookup.containsKey(capType)) {
             capCode = ((Integer) capLookup.get(capType)).intValue();
@@ -752,7 +790,7 @@ public class SLDStyleFactory {
 
         // Simple optimization: let java2d use the fast drawing path if the line width
         // is small enough...
-        if (width < 1.5) {
+        if (width < 1.5 & lineOptimizationEnabled) {
             width = 0;
         }
 
@@ -804,14 +842,7 @@ public class SLDStyleFactory {
         }
         
         // get fill color
-        Paint fillPaint = null;
-        if (fill.getColor() != null) {
-            Color color = fill.getColor().evaluate( feature,Color.class );
-            fillPaint = color;
-            if (LOGGER.isLoggable(Level.FINER)) {
-                LOGGER.finer("Setting fill: " + fillPaint.toString());
-            }
-        }
+        Paint fillPaint = evalToColor(fill.getColor(), feature, null);
 
         // if a graphic fill is to be used, prepare the paint accordingly....
         org.geotools.styling.Graphic gr = fill.getGraphicFill();
@@ -854,8 +885,10 @@ public class SLDStyleFactory {
         BufferedImage image = getImage(gr, feature, -1);
         boolean isImage = false;
 
+        int size;
         if (image != null) {
             isImage = true;
+            size = image.getWidth();
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("got an image in graphic fill");
             }
@@ -870,53 +903,36 @@ public class SLDStyleFactory {
                 return null;
             }
 
-            int size = 200;
-
-            image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-
+            size = evalToInt(gr.getSize(), feature, 16);
+            image = new BufferedImage(size * 3, size * 3, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = image.createGraphics();
-            double rotation = 0.0;
-
-            rotation = ((Number) gr.getRotation().evaluate(feature)).doubleValue();
-            rotation *= (Math.PI / 180.0);
-
-            fillDrawMark(g2d, 100, 100, mark, (int) (size * .9), rotation, feature);
-
-            java.awt.MediaTracker track = new java.awt.MediaTracker(obs);
-            track.addImage(image, 1);
-
-            try {
-                track.waitForID(1);
-            } catch (InterruptedException e) {
-                // TODO: what should we do with this?
-                LOGGER.warning("An unterupptedException occurred while drawing a local image..."
-                    + e);
+            g2d.setRenderingHints(renderingHints);
+            double rotation = evalToDouble(gr.getRotation(), feature, 0.0);
+            for(int i = -1; i < 2; i++) {
+                for(int j = -1; j < 2; j++) {
+                    double tx = size * 1.5 + size * i;
+                    double ty = size * 1.5 + size * j;
+                    fillDrawMark(g2d, tx, ty, mark, size, rotation, feature);
+                }
             }
+            g2d.dispose();
+            
+//            try {
+//                ImageIO.write(image, "png", new java.io.File("c:/temp/sampler.png"));
+//            } catch(Exception e) {
+//                System.out.println(e);
+//            }
+            
+            image = image.getSubimage(size, size, size, size);
+            
+//            try {
+//                ImageIO.write(image, "png", new java.io.File("c:/temp/texture.png"));
+//            } catch(Exception e) {
+//                System.out.println(e);
+//            }
         }
 
-        int size;
-        if(gr.getSize() == null || gr.getSize().evaluate(feature) == null) {
-            if(isImage)
-                size = image.getWidth();
-            else
-                size = 16;
-        } else {
-            size = ((Number) gr.getSize().evaluate(feature)).intValue();
-        }
-        double width = image.getWidth();
-        double height = image.getHeight();
-
-        double unitSize = Math.max(width, height);
-        double drawSize = (double) size / unitSize;
-
-        width *= drawSize;
-        height *= -drawSize;
-
-        if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer("size = " + size + " unitsize " + unitSize + " drawSize " + drawSize);
-        }
-
-        Rectangle2D.Double rect = new Rectangle2D.Double(0.0, 0.0, width, height);
+        Rectangle2D.Double rect = new Rectangle2D.Double(0.0, 0.0, size, size);
         TexturePaint imagePaint = new TexturePaint(image, rect);
 
         if (LOGGER.isLoggable(Level.FINER)) {
@@ -1046,7 +1062,7 @@ public class SLDStyleFactory {
         Expression name = mark.getWellKnownName();
         // expand eventual cql expressions embedded in the name
         if(name instanceof Literal) {
-            String expression = name.evaluate(null, String.class);
+            String expression = evalToString(name, null, null);
             if(expression != null)
                 name = ExpressionExtractor.extractCqlExpressions(expression);
         }
@@ -1069,31 +1085,19 @@ public class SLDStyleFactory {
 
     private void fillDrawMark(Graphics2D g2d, double tx, double ty, Mark mark, int size,
         double rotation, Object feature) {
-        AffineTransform temp = g2d.getTransform();
+        Shape originalShape = getShape(mark, feature);
+
+        // rescale and reposition the original shape so it's centered at tx, ty
+        // and has the desired size
         AffineTransform markAT = new AffineTransform();
-        Shape shape = getShape(mark, feature);
-
-        Point2D mapCentre = new Point2D.Double(tx, ty);
-        Point2D graphicCentre = new Point2D.Double();
-        temp.transform(mapCentre, graphicCentre);
-        markAT.translate(graphicCentre.getX(), graphicCentre.getY());
-
-        double shearY = temp.getShearY();
-        double scaleY = temp.getScaleY();
-
-        double originalRotation = Math.atan(shearY / scaleY);
-
-        if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer("originalRotation " + originalRotation);
-        }
-
-        markAT.rotate(rotation - originalRotation);
-
-        double unitSize = 1.0; // getbounds is broken !!!
-        double drawSize = (double) size / unitSize;
+        markAT.translate(tx, ty);
+        markAT.rotate(rotation);
+        double unitSize = 1.0;
+        double drawSize = (double) (size) / unitSize;
         markAT.scale(drawSize, -drawSize);
 
-        g2d.setTransform(markAT);
+        // resize/rotate/rescale the shape
+        Shape shape = markAT.createTransformedShape(originalShape);
 
         if (mark.getFill() != null) {
             if (LOGGER.isLoggable(Level.FINER)) {
@@ -1116,36 +1120,9 @@ public class SLDStyleFactory {
             g2d.draw(shape);
         }
 
-        g2d.setTransform(temp);
-
         if (mark.getFill() != null) {
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         }
-
-        return;
-    }
-
-    /**
-     * Evaluates an expression over the passed feature, if the expression or the result is null,
-     * the default value will be returned
-     *
-     * @param e
-     * @param drawMe
-     * @param defaultValue
-     *
-     */
-    private String evaluateExpression(org.opengis.filter.expression.Expression e, Object drawMe, String defaultValue) {
-        String result = defaultValue;
-
-        if (e != null) {
-            result = (String) e.evaluate(drawMe);
-
-            if (result == null) {
-                result = defaultValue;
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -1241,11 +1218,28 @@ public class SLDStyleFactory {
             return (int) (bits ^ (bits >>> 32));
         }
     }
-
-     private float evalToFloat(Expression exp, Object f, float fallback){
+    
+    private String evalToString(Expression exp, Object f, String fallback){
         if(exp == null){
             return fallback;
         }
+        Object o = exp.evaluate(f);
+        if(o instanceof String)
+            return (String) o;
+        String s = (String) exp.evaluate( f, String.class );
+        if( s != null ){
+            return s;
+        }
+        return fallback;  
+    }
+
+    private float evalToFloat(Expression exp, Object f, float fallback){
+        if(exp == null){
+            return fallback;
+        }
+        Object o = exp.evaluate(f);
+        if(o instanceof Number)
+            return ((Number) o).floatValue();
         Float fo = (Float) exp.evaluate( f, Float.class );
         if( fo != null ){
             return fo.floatValue();
@@ -1260,9 +1254,23 @@ public class SLDStyleFactory {
         Object o = exp.evaluate(f);
         if(o instanceof Number)
             return ((Number) o).doubleValue();
-        Double d = (Double) exp.evaluate( f, Double.class );
+        Double d = exp.evaluate( f, Double.class );
         if( d != null ){
             return d.doubleValue();
+        }
+        return fallback;        
+    }
+    
+    private int evalToInt(Expression exp, Object f, int fallback){
+        if(exp == null){
+            return fallback;
+        }
+        Object o = exp.evaluate(f);
+        if(o instanceof Number)
+            return ((Number) o).intValue();
+        Integer i = exp.evaluate( f, Integer.class );
+        if( i != null ){
+            return i.intValue();
         }
         return fallback;        
     }
@@ -1281,5 +1289,7 @@ public class SLDStyleFactory {
     private float evalOpacity(Expression e, Object f){
         return evalToFloat(e,f,1);
     }
+
+   
 
 }

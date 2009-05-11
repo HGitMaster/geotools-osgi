@@ -21,6 +21,14 @@ import java.util.List;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.IsNullImpl;
 import org.geotools.filter.function.PropertyExistsFunction;
+import org.geotools.filter.text.ecql.ECQLBetweenPredicateTest;
+import org.geotools.filter.text.ecql.ECQLBooleanValueExpressionTest;
+import org.geotools.filter.text.ecql.ECQLComparisonPredicateTest;
+import org.geotools.filter.text.ecql.ECQLExistenceTest;
+import org.geotools.filter.text.ecql.ECQLGeoOperationTest;
+import org.geotools.filter.text.ecql.ECQLLikePredicateTest;
+import org.geotools.filter.text.ecql.ECQLNullPredicateTest;
+import org.geotools.filter.text.ecql.ECQLTemporalPredicateTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opengis.filter.And;
@@ -39,8 +47,6 @@ import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.Disjoint;
 import org.opengis.filter.spatial.DistanceBufferOperator;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
-
 
 
 /**
@@ -58,7 +64,7 @@ public class CQLTest {
     /**
      * Between predicate sample
      * 
-     * @see TXTBetweenPredicateTest
+     * @see ECQLBetweenPredicateTest
      * 
      * @throws CQLException
      */
@@ -73,7 +79,7 @@ public class CQLTest {
     /**
      * Equals predicate sample
      * 
-     * @see TXTComparisonPredicateTest
+     * @see ECQLComparisonPredicateTest
      * 
      * @throws Exception
      */
@@ -90,7 +96,7 @@ public class CQLTest {
     /**
      * GeoOperation predicate sample
      * 
-     * @see TXTGeoOperationTest
+     * @see ECQLGeoOperationTest
      * 
      * @throws CQLException
      */
@@ -118,7 +124,7 @@ public class CQLTest {
     /**
      * Temporal predicate sample
      * 
-     * @see TXTTemporalPredicateTest
+     * @see ECQLTemporalPredicateTest
      * 
      * @throws Exception
      */
@@ -134,7 +140,7 @@ public class CQLTest {
      * And / Or / Not predicate
      * @throws Exception 
      * 
-     * @see TXTBooleanValueExpressionTest
+     * @see ECQLBooleanValueExpressionTest
      */
     @Test
     public void booleanPredicate() throws Exception{
@@ -160,7 +166,7 @@ public class CQLTest {
     /**
      * Like predicate sample
      * 
-     * @see TXTLikePredicateTest
+     * @see ECQLLikePredicateTest
      * 
      * @throws Exception
      */
@@ -175,7 +181,7 @@ public class CQLTest {
     /**
      * Null predicate sample
      * 
-     * @see TXTNullPredicateTest
+     * @see ECQLNullPredicateTest
      * 
      * @throws Exception
      */
@@ -192,7 +198,7 @@ public class CQLTest {
     /**
      * Exist property predicate sample
      * 
-     * @see TXTExistenceTest
+     * @see ECQLExistenceTest
      * @throws Exception 
      */
     @Test
@@ -269,6 +275,4 @@ public class CQLTest {
         CQL.toExpression("attName", ff);
         Assert.assertTrue("Provided FilterFactory was not called", called[0]);
     }
-    
-    
 }

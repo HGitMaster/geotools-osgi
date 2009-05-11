@@ -58,8 +58,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * retarget the geotools library for their needs.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
- * @version $Id: Hints.java 31627 2008-10-06 20:14:55Z egouge $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+ * @version $Id: Hints.java 32750 2009-04-07 09:45:05Z aaime $
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
@@ -550,6 +550,31 @@ public class Hints extends RenderingHints {
      * @since 2.4.1
      */
     public static final Key FEATURE_2D = new Key(Boolean.class);
+    
+    /**
+     * Asks a datastore having a vector pyramid (pre-generalized geometries)
+     * to return the geometry version whose points have been generalized
+     * less than the spefiedi distance (further generalization might be
+     * performed by the client in memory).<p>
+     * The geometries returned are supposed to be topologically valid.
+     */
+    public static final Key GEOMETRY_DISTANCE = new Key(Double.class);
+    
+    /**
+     * Asks a datastore to perform a topology preserving on the fly
+     * generalization of the geometries. The datastore will return 
+     * geometries generalized at the specified distance.
+     */
+    public static final Key GEOMETRY_GENERALIZATION = new Key(Double.class);
+    
+    /**
+     * Asks a datastore to perform a non topology preserving on the fly
+     * generalization of the geometries (e.g., returning self crossing
+     * polygons as a result of the geoneralization is considered valid).
+
+     */
+    public static final Key GEOMETRY_SIMPLIFICATION = new Key(Double.class);
+
 
     /**
      * The {@link org.geotools.styling.StyleFactory} instance to use.
@@ -1316,8 +1341,8 @@ public class Hints extends RenderingHints {
      * non-sense), but may impact other aspects of an application as well.
      *
      * @since 2.1
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 31627 2008-10-06 20:14:55Z egouge $
+     * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 32750 2009-04-07 09:45:05Z aaime $
      * @author Martin Desruisseaux
      */
     public static class Key extends RenderingHints.Key {
@@ -1438,8 +1463,8 @@ public class Hints extends RenderingHints {
      * {@code Class<T>}.
      *
      * @since 2.4
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 31627 2008-10-06 20:14:55Z egouge $
+     * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 32750 2009-04-07 09:45:05Z aaime $
      * @author Martin Desruisseaux
      */
     public static final class ClassKey extends Key {
@@ -1524,8 +1549,8 @@ public class Hints extends RenderingHints {
      * The file may also be specified as a {@link String} object.
      *
      * @since 2.4
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 31627 2008-10-06 20:14:55Z egouge $
+     * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 32750 2009-04-07 09:45:05Z aaime $
      * @author Jody Garnett
      * @author Martin Desruisseaux
      */
@@ -1571,8 +1596,8 @@ public class Hints extends RenderingHints {
      * A default value is provided and may be checked with {@link #getDefault()}.
      *
      * @since 2.4
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 31627 2008-10-06 20:14:55Z egouge $
+     * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 32750 2009-04-07 09:45:05Z aaime $
      * @author Jody Garnett
      */
     public static final class IntegerKey extends Key {
@@ -1645,8 +1670,8 @@ public class Hints extends RenderingHints {
      * may be supported (but there is no assurances - {@link Hints#DATUM_SHIFT_METHOD}).
      *
      * @since 2.4
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 31627 2008-10-06 20:14:55Z egouge $
+     * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 32750 2009-04-07 09:45:05Z aaime $
      * @author Jody Garnett
      */
     public static final class OptionKey extends Key {
@@ -1702,8 +1727,8 @@ public class Hints extends RenderingHints {
      * your nam
      *
      * @since 2.4
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 31627 2008-10-06 20:14:55Z egouge $
+     * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 32750 2009-04-07 09:45:05Z aaime $
      * @author Martin Desruisseaux
      */
     static final class DataSourceKey extends Key {

@@ -63,6 +63,11 @@ public class MySQLDialectPrepared extends PreparedStatementSQLDialect {
         Connection cx) throws SQLException {
         return delegate.getGeometrySRID(schemaName, tableName, columnName, cx); 
     }
+    
+    @Override
+    public void encodeColumnName(String raw, StringBuffer sql) {
+        delegate.encodeColumnName(raw, sql);
+    }
 
     @Override
     public void encodeColumnType(String sqlTypeName, StringBuffer sql) {
@@ -88,6 +93,12 @@ public class MySQLDialectPrepared extends PreparedStatementSQLDialect {
     @Override
     public void registerSqlTypeNameToClassMappings(Map<String, Class<?>> mappings) {
         delegate.registerSqlTypeNameToClassMappings(mappings);
+    }
+    
+    @Override
+    public void registerSqlTypeToSqlTypeNameOverrides(
+            Map<Integer, String> overrides) {
+        delegate.registerSqlTypeToSqlTypeNameOverrides(overrides);
     }
 
     @Override
@@ -154,5 +165,14 @@ public class MySQLDialectPrepared extends PreparedStatementSQLDialect {
         
     }
 
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
+    }
    
 }

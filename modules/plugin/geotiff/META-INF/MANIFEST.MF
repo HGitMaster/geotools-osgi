@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools GeoTIFF Data Source
 Bundle-SymbolicName: org.geotools.geotiff
-Bundle-Version: 2.6.0.osgi1
+Bundle-Version: 2.6.0.osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.coverage;bundle-version="2.6.0",

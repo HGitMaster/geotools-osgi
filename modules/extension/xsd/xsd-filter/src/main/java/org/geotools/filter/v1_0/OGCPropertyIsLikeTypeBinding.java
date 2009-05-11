@@ -16,16 +16,15 @@
  */
 package org.geotools.filter.v1_0;
 
-import org.picocontainer.MutablePicoContainer;
 import javax.xml.namespace.QName;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.PropertyIsBetween;
-import org.opengis.filter.PropertyIsLike;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
+
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 
 
 /**
@@ -92,13 +91,18 @@ public class OGCPropertyIsLikeTypeBinding extends AbstractComplexBinding {
         String wildcard = (String) node.getAttributeValue("wildCard");
         String single = (String) node.getAttributeValue("singleChar");
         String escape = (String) node.getAttributeValue("escape");
+        boolean matchCase = true;
+
+        if (node.getAttributeValue("matchCase") != null){
+            matchCase = Boolean.valueOf((String)node.getAttributeValue("matchCase"));
+        }
 
         if (escape == null) {
             //1.1 uses "escapeChar", suppot that too
             escape = (String) node.getAttributeValue("escapeChar");
         }
 
-        return factory.like(name, literal.toString(), wildcard, single, escape);
+        return factory.like(name, literal.toString(), wildcard, single, escape, matchCase);
     }
 
     public Object getProperty(Object object, QName name)
@@ -110,7 +114,7 @@ public class OGCPropertyIsLikeTypeBinding extends AbstractComplexBinding {
         }
 
         if (OGC.Literal.equals(name)) {
-            return isLike.getLiteral();
+            return isLike.getLiteral() != null ? factory.literal( isLike.getLiteral() ) : null; 
         }
 
         if ("wildCard".equals(name.getLocalPart())) {

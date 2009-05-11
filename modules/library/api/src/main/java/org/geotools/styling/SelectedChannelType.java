@@ -16,6 +16,7 @@
  */
 package org.geotools.styling;
 
+import org.opengis.annotation.XmlElement;
 import org.opengis.filter.expression.Expression;
 
 
@@ -32,26 +33,28 @@ import org.opengis.filter.expression.Expression;
  *  </pre>
  *
  * @author iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/SelectedChannelType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/SelectedChannelType.java $
  */
-public interface SelectedChannelType extends org.opengis.style.SelectedChannelType{
+public interface SelectedChannelType extends org.opengis.style.SelectedChannelType {
     
     /**
-     * @deprecated symbolizers and underneath classes are immutable
+     * Set the source channel name.
+     * @param name name of the source channel
      */
-    @Deprecated
     public void setChannelName(String name);
+
+    /**
+     * Returns the channel's name.
+     *
+     * @return Source channel name
+     */
+    public String getChannelName();
 
     /**
      * @deprecated Use {@link #setContrastEnhancement(ContrastEnhancement))} instead.
      */
-    @Deprecated
     public void setContrastEnhancement(Expression gammaValue);
 
-    /**
-     * @deprecated symbolizers and underneath classes are immutable
-     */
-    @Deprecated
     public void setContrastEnhancement(ContrastEnhancement enhancement);
 
     public ContrastEnhancement getContrastEnhancement();

@@ -16,28 +16,34 @@
  */
 package org.geotools.data.h2;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import junit.framework.TestCase;
 
+import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 
 
 public class H2DataStoreFactoryTest extends TestCase {
     H2DataStoreFactory factory;
-
+    HashMap params;
+    
     protected void setUp() throws Exception {
         factory = new H2DataStoreFactory();
-    }
-
-    public void testCanProcess() throws Exception {
-        HashMap params = new HashMap();
-        assertFalse(factory.canProcess(params));
-
+        params = new HashMap();
         params.put(JDBCDataStoreFactory.NAMESPACE.key, "http://www.geotools.org/test");
         params.put(JDBCDataStoreFactory.DATABASE.key, "geotools");
         params.put(JDBCDataStoreFactory.DBTYPE.key, "h2");
+    }
 
+    public void testCanProcess() throws Exception {
+        assertFalse(factory.canProcess(Collections.EMPTY_MAP));
         assertTrue(factory.canProcess(params));
+    }
+    
+    public void testCreateDataStore() throws Exception {
+        JDBCDataStore ds = factory.createDataStore( params );
+        assertNotNull( ds );
     }
 }

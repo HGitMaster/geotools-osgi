@@ -30,15 +30,15 @@ public class JDBCUpdateInsertFeatureWriter extends JDBCUpdateFeatureWriter {
     JDBCInsertFeatureWriter inserter;
     
     public JDBCUpdateInsertFeatureWriter(String sql, Connection cx,
-            JDBCFeatureStore featureStore, Hints hints) throws SQLException,
+            JDBCFeatureSource featureSource, Hints hints) throws SQLException,
             IOException {
-        super(sql, cx, featureStore, hints);
+        super(sql, cx, featureSource, hints);
     }
     
     public JDBCUpdateInsertFeatureWriter(PreparedStatement ps, Connection cx,
-            JDBCFeatureStore featureStore, String[] attributeNames, Hints hints) throws SQLException,
+            JDBCFeatureSource featureSource, String[] attributeNames, Hints hints) throws SQLException,
             IOException {
-        super(ps, cx, featureStore, hints);
+        super(ps, cx, featureSource, hints);
     }
     
     public boolean hasNext() throws IOException {
@@ -88,8 +88,10 @@ public class JDBCUpdateInsertFeatureWriter extends JDBCUpdateFeatureWriter {
         if ( inserter != null ) {
             //JD: do not call close because the inserter borrowed all of its state
             // from this reader... super will deal with it.
+            // AA: yet, make it throw away all references so that we won't get
+            // false positive information about connection leaks
+            inserter.cleanup();
             inserter = null;
-            //inserter.close();
         }
         
         super.close();

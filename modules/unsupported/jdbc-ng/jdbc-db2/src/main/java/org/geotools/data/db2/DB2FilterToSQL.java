@@ -24,11 +24,11 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTWriter;
 
 
-import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.filter.DefaultExpression;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.PreparedFilterToSQL;
+import org.geotools.jdbc.PreparedStatementSQLDialect;
 
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -37,7 +37,6 @@ import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Literal;
-import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.BinarySpatialOperator;
@@ -52,11 +51,9 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 
 import java.io.IOException;
-import java.sql.Types;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -119,10 +116,19 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 
 	    // The escaped version of the multiple wildcard for the REGEXP pattern.
 	    private static String escapedWildcardMulti = "\\.\\*";
-	    private static String INSPATIALOP = "InSpatialOP";
 	    
 	    static private HashMap<Class<?>,String> DB2_SPATIAL_PREDICATES = new HashMap<Class<?>,String>();
-	    // Only intended for test purposes
+	    public DB2FilterToSQL(PreparedStatementSQLDialect dialect) {
+			super(dialect);
+			// TODO Auto-generated constructor stub
+		}
+
+		public DB2FilterToSQL(Writer out) {
+			super(out);
+			// TODO Auto-generated constructor stub
+		}
+
+		// Only intended for test purposes
 	    public HashMap getPredicateMap() {
 	    	return DB2_SPATIAL_PREDICATES;
 	    }
@@ -159,12 +165,6 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 	            "ST_Distance");
 	    }
 
-	    /**
-	     * Construct an SQLEncoderDB2
-	     */
-	    public DB2FilterToSQL() {
-	        super();
-	    }
 
 	    /** HashMap<Class,String> example [BBOX.class,"EnvelopesIntersect"] */ 
 	    static private HashMap getPredicateTable() {
@@ -259,73 +259,6 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 	    
 
 	    /**
-	     * Encodes an FidFilter.
-	     *
-	     * @param filter
-	     *
-	     * @throws RuntimeException DOCUMENT ME!
-	     *
-	     * @see org.geotools.filter.SQLEncoder#visit(org.geotools.filter.FidFilter)
-	     */
-	    public Object visit(Id filter, Object extraData) {
-	        if (mapper == null) {
-	            throw new RuntimeException(
-	                "Must set a fid mapper before trying to encode FIDFilters");
-	        }
-
-	        Set fids = filter.getIdentifiers();
-	        LOGGER.finer("Exporting FID=" + fids);
-
-	        // prepare column name array
-	        String[] colNames = new String[mapper.getColumnCount()];
-	        String[] colDelimiters = new String[mapper.getColumnCount()];
-
-	        for (int i = 0; i < colNames.length; i++) {
-	            colNames[i] = mapper.getColumnName(i);
-	            int dataType = mapper.getColumnType(i);
-	            if ((dataType == Types.VARCHAR) || (dataType == Types.CHAR)
-	            || (dataType == Types.CLOB)) {
-	            	colDelimiters[i] = "'";
-	            } else {
-	            	colDelimiters[i] = "";
-	            }
-	        }
-
-	        Iterator it = fids.iterator();
-	        int i = 0;
-	        while (it.hasNext()) {
-	            try {
-	            	FeatureId fid = (FeatureId)it.next();
-	                Object[] attValues = mapper.getPKAttributes(fid.getID());
-
-	                out.write("(");
-
-	                for (int j = 0; j < attValues.length; j++) {
-	                	int colType = mapper.getColumnType(j);
-	                    out.write( escapeName(colNames[j]) );
-	                    out.write(" = ");
-	                    out.write(colDelimiters[j]);
-	                    out.write(attValues[j].toString()); 
-	                    out.write(colDelimiters[j]);
-
-	                    if (j < (attValues.length - 1)) {
-	                        out.write(" AND ");
-	                    }
-	                }
-
-	                out.write(")");
-
-	                if (i < (fids.size() - 1)) {
-	                    out.write(" OR ");
-	                }
-	                i++;
-	            } catch (java.io.IOException e) {
-	                LOGGER.warning("IO Error exporting FID Filter.");
-	            }
-	        }
-	        return extraData;
-	    }
-	    /**
 	     * Encode BEYOND and DWITHIN filters using ST_Distance function.
 	     *
 	     * @param filter a BinarySpatialOperator (should be DWithin or Beyond subclass)
@@ -389,6 +322,8 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 	    protected Object visitBinarySpatialOperator(BinarySpatialOperator filter, Object extraData, String db2Predicate) {
 	        LOGGER.finer("Generating GeometryFilter WHERE clause for " + filter);
 
+	        currentSRID=getSRID();
+	        
 	        DefaultExpression left = (DefaultExpression) filter.getExpression1();
 	        DefaultExpression right = (DefaultExpression) filter.getExpression2();
 
@@ -400,9 +335,9 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 	        }
 	        try {
 	            this.out.write("db2gse." + db2Predicate + "(");
-	            left.accept(this, INSPATIALOP);
+	            left.accept(this, extraData);
 	            this.out.write(", ");
-	            right.accept(this, INSPATIALOP);
+	            right.accept(this, extraData);
 	            this.out.write(") = 1");
 	
 	            addSelectivity();  // add selectivity clause if needed
@@ -566,32 +501,6 @@ public class DB2FilterToSQL extends PreparedFilterToSQL{
 		   return result; 
 		}
 
-		@Override
-		public Object visit(Literal expression, Object context) throws RuntimeException {
-			
-			if (isPrepareEnabled()==false)				
-				return super.visit(expression, context);
-			if (INSPATIALOP.equals(context)==false) {
-				return super.visit(expression, context);
-			}
-			
-	        Geometry   literalValue = (Geometry) expression.getValue();
-	        literalValues.add(literalValue);
-	        SRIDs.add(currentSRID);   
-	        Class dbType = literalValue==null ? Geometry.class : literalValue.getClass();
-	        literalTypes.add(dbType);
-	        
-	        try {
-	        	StringBuffer buff = new StringBuffer();
-	        	DB2Util.prepareGeometryValue(literalValue, getSRID(), dbType, buff);
-	            out.write( buff.toString() );
-	        } 
-	        catch (IOException e) {
-	            throw new RuntimeException( e );
-	        }
-	        
-	        return context;
-    }
 
     public boolean isLooseBBOXEnabled() {
         return looseBBOXEnabled;

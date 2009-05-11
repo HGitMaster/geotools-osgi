@@ -21,15 +21,17 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.referencing.JDBCAuthorityFactory;
 import org.geotools.referencing.CRS;
+import org.geotools.util.logging.Logging;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -37,9 +39,11 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Access CRS informationj from the PostGIS SPATIAL_REF_SYS table.
  * 
  * @author Jesse Eichar
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/referencing/PostgisAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/referencing/PostgisAuthorityFactory.java $
  */
 public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
+    
+    private static final Logger LOGGER = Logging.getLogger(PostgisAuthorityFactory.class);
 
     private String TABLE_NAME = "SPATIAL_REF_SYS";
     private String WKT_COLUMN = "SRTEXT";
@@ -78,7 +82,9 @@ public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
             if (result.next()) {
                 CoordinateReferenceSystem crs = null;
                 try {
-                    crs = createFromAuthority(result);
+                    String name = result.getString(AUTH_NAME);
+                    int id = result.getInt(AUTH_SRID);
+                    crs = createFromAuthority(name, id);
                 } catch (Exception e) {
                     // do nothing
                 }
@@ -93,9 +99,8 @@ public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
                 throw new FactoryException(mesg);
             }
         } catch (SQLException sqle) {
-            String message = sqle.getMessage();
-
-            throw new DataSourceException(message, sqle);
+            LOGGER.log(Level.FINE, "Error occurred while accessing the {0} table, switching to direct EPSG factory decode", TABLE_NAME);
+            return createFromAuthority("EPSG", srid); 
         } finally {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
         }
@@ -115,18 +120,9 @@ public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
         }
     }
 
-    protected CoordinateReferenceSystem createFromAuthority( ResultSet result )
+    protected CoordinateReferenceSystem createFromAuthority( String authName, int srid )
             throws DataSourceException, FactoryException {
-        try {
-            String name = result.getString(AUTH_NAME);
-            int id = result.getInt(AUTH_SRID);
-
-            return CRS.decode(name + ":" + id);
-        } catch (SQLException sqle) {
-            String message = sqle.getMessage();
-
-            throw new DataSourceException(message, sqle);
-        }
+        return CRS.decode(authName + ":" + srid);
     }
 
 }

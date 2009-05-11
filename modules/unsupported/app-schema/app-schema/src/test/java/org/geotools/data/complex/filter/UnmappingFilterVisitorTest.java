@@ -82,7 +82,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: UnmappingFilterVisitorTest.java 31787 2008-11-06 07:12:25Z bencd $
+ * @version $Id: UnmappingFilterVisitorTest.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/filter/UnmappingFilterVisitorTest.java $
  * @since 2.4
@@ -322,6 +322,8 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertNotNull(unrolled);
         assertEquals(1, unrolled.size());
         assertTrue(unrolled.get(0) instanceof Expression);
+
+        mappingDataStore.dispose();
     }
 
     public void testBetweenFilter() throws Exception {
@@ -436,7 +438,9 @@ public class UnmappingFilterVisitorTest extends TestCase {
 
         assertEquals("BGS_ID", ((PropertyName) filter2.getExpression1()).getPropertyName());
         assertEquals("NAME", ((PropertyName) filter3.getExpression1()).getPropertyName());
-        assertEquals("ORIGINAL_N", ((PropertyName) filter4.getExpression1()).getPropertyName());
+        assertEquals("ORIGINAL_N", ((PropertyName) filter4.getExpression1()).getPropertyName());        
+
+        mappingDataStore.dispose();
     }
 
     /**

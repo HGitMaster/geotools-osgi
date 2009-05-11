@@ -17,7 +17,9 @@
             </Fill>
           </PolygonSymbolizer>
           <TextSymbolizer>
-            <Label>this is a prefix; <ogc:Literal>this is an expression</ogc:Literal>; this is a postfix</Label>
+            <Label>   
+            this is a prefix; <ogc:Literal>this is an expression</ogc:Literal>; this is a postfix
+            </Label>
           </TextSymbolizer>
         </Rule>
       </FeatureTypeStyle>

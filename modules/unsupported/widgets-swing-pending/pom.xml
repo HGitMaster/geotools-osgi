@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $
+        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>unsupported</artifactId>
-    <version>2.6.0.osgi1</version>
+    <version>2.6.0.osgi2</version>
   </parent>
 
 
@@ -31,9 +31,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/widgets-swing-pending/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/widgets-swing-pending/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/widgets-swing-pending/</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/widgets-swing-pending/</url>
   </scm>
 
   <description>Swing widgets, coming from project AlterSIG. Will be added in module swing widgets once cleaned up.</description>
@@ -89,28 +89,28 @@
       </exclusions>
     </dependency>
 
-    <!-- api-2.6.0.osgi1.jar -->
+    <!-- api-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- coverage-2.6.0.osgi1.jar -->
+    <!-- coverage-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-<!-- epsg-hsql-2.6.0.osgi1.jar -->
+<!-- epsg-hsql-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- geotiff-2.6.0.osgi1.jar -->
+    <!-- geotiff-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-geotiff</artifactId>
@@ -129,21 +129,21 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- main-2.6.0.osgi1.jar -->
+    <!-- main-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- mappane-2.6.0.osgi1.jar -->
+    <!-- mappane-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-mappane</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- metadata-2.6.0.osgi1.jar -->
+    <!-- metadata-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-metadata</artifactId>
@@ -168,49 +168,49 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- referencing-2.6.0.osgi1.jar -->
+    <!-- referencing-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- render-2.6.0.osgi1.jar -->
+    <!-- render-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-render</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- shapefile-2.6.0.osgi1.jar -->
+    <!-- shapefile-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- shapefile-renderer-2.6.0.osgi1.jar -->
+    <!-- shapefile-renderer-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-shapefile-renderer</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- xml-2.6.0.osgi1.jar -->
+    <!-- xml-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- xml-filter-2.6.0.osgi1.jar -->
+    <!-- xml-filter-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools.xsd</groupId>
       <artifactId>gt-xsd-filter</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- xml-gml2-2.6.0.osgi1.jar -->
+    <!-- xml-gml2-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools.xsd</groupId>
       <artifactId>gt-xsd-gml2</artifactId>
@@ -223,7 +223,7 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- xml-sld-2.6.0.osgi1.jar -->
+    <!-- xml-sld-2.6.0.osgi2.jar -->
     <dependency>
       <groupId>org.geotools.xsd</groupId>
       <artifactId>gt-xsd-sld</artifactId>

@@ -24,6 +24,7 @@ import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
@@ -42,12 +43,6 @@ import org.opengis.filter.expression.Expression;
  * be expressed in decimal, hexadecimal (e.g. <code>0x10</code>) octal (e.g.
  * <code>045</code>) form, as well as Unicode codes (e.g. <code>U+F054</code>
  * or <code>\uF054</code>).
- * <p>
- * When using the Windows CharMap to pick up the font codes, beware that the
- * reported code for symbol fonts are most of the time incomplete, for example,
- * the filled drop symbol in Wingdings is reported as having code
- * <code>0x53</code> whilst the real code is <code>0xF053</code> (as a rule
- * of thumb, try prefixing the reported code with <code>F0</code>).
  * 
  * @author Andrea Aime - TOPP
  * 
@@ -89,20 +84,37 @@ public class TTFMarkFactory implements MarkFactory {
         char character;
         try {
             // see if a unicode escape sequence has been used
-            if (code.startsWith("U+") || code.startsWith("\\u"))
+            if (code.startsWith("U+") || code.startsWith("\\u")) 
                 code = "0x" + code.substring(2);
+            
             // this will handle most numeric formats like decimal, hex and octal
             character = (char) Integer.decode(code).intValue();
+            
+            // handle charmap code reporting issues 
+            if(!font.canDisplay(character))
+                character = (char) (0xF000 | character);
+            
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
                     "Invalid character specification " + fontElements[1], e);
         }
 
         // build the shape out of the font
-        Font unitSizeFont = font.deriveFont(1.0f);
-        GlyphVector textGlyphVector = unitSizeFont.createGlyphVector(FONT_RENDER_CONTEXT,
+        GlyphVector textGlyphVector = font.createGlyphVector(FONT_RENDER_CONTEXT,
                 new char[] { (char) character });
-        return textGlyphVector.getOutline();
+        Shape s = textGlyphVector.getOutline();
+        
+        // have the shape be centered in the origin, and sitting in a square of side 1
+        Rectangle2D bounds = s.getBounds2D();
+        AffineTransform tx = new AffineTransform();
+        double max = Math.max(bounds.getWidth(), bounds.getHeight());
+        // all shapes are defined looking "upwards" (see ShapeMarkFactory or WellKnownMarkFactory)
+        // but the fonts ones are flipped to compensate for the fact the y coords grow from top
+        // to bottom on the screen. We have to flip the symbol so that it conforms to the
+        // other marks convention
+        tx.scale(1 / max, -1 / max);
+        tx.translate(-bounds.getCenterX(), -bounds.getCenterY());
+        return tx.createTransformedShape(s);
     }
 
     public static void main(String[] args) {

@@ -30,7 +30,7 @@ import org.opengis.util.InternationalString;
 import org.opengis.util.ProgressListener;
 
 /**
- * A driver adding the ability to work with a new coverage format or service.
+ * A driver adds the ability to work with a coverage format or service.
  * <p>
  * Classes implementing this interface basically act as factory for creating
  * connections to coverage sources like files, WCS services, WMS services,
@@ -67,7 +67,7 @@ public interface Driver extends Factory, OptionalFactory {
      * </p>
      * Please note that a given file may be readable by several Drivers (the
      * description of each implementation should be provided to the user so they
-     * can make an intellegent choice in the matter).
+     * can make an intelligent choice in the matter).
      * 
      * @return name of this {@link Driver}
      */
@@ -101,8 +101,8 @@ public interface Driver extends Factory, OptionalFactory {
      * basically available can be used by finder mechanisms to list available
      * {@link Driver}s.
      * 
-     * @return <tt>true</tt> if and only if this factory has all the
-     *         appropriate dependencies on the classpath to create DataStores.
+     * @return <code>true</code> if and only if this factory has all the
+     *         appropriate dependencies on the classpath.
      */
     public boolean isAvailable();
 
@@ -286,7 +286,7 @@ public interface Driver extends Factory, OptionalFactory {
      *                target {@link CoverageAccess}.
      * @param hints
      *                map of <key,value> pairs which can be used to control the
-     *                behaviour of the entire library.
+     *                behavior of the entire library.
      * @param listener
      *                which can be used to listen for progresses on this
      *                operation. It can be <code>null</code>.

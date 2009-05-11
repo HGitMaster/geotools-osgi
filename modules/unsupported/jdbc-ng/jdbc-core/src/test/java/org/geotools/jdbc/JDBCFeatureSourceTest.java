@@ -19,13 +19,14 @@ package org.geotools.jdbc;
 import java.util.Iterator;
 
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
-import org.geotools.data.Transaction;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
@@ -36,7 +37,7 @@ import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.spatial.BBOX;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 
 
 public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
@@ -154,6 +155,14 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         features.close(iterator);
         
     }
+    
+    public void testCaseInsensitiveFilter() throws Exception {
+        FilterFactory ff = dataStore.getFilterFactory();
+        PropertyIsEqualTo sensitive = ff.equal(ff.property(aname("stringProperty")), ff.literal("OnE"), true);
+        PropertyIsEqualTo insensitive = ff.equal(ff.property(aname("stringProperty")), ff.literal("OnE"), false);
+        assertEquals(0, featureSource.getCount(new DefaultQuery(null, sensitive)));
+        assertEquals(1, featureSource.getCount(new DefaultQuery(null, insensitive)));
+    }
 
     public void testGetFeaturesWithQuery() throws Exception {
         FilterFactory ff = dataStore.getFilterFactory();
@@ -248,12 +257,121 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         // check actual iteration
         Iterator<SimpleFeature> it = features.iterator();
         int count = 0;
+        ReferencedEnvelope env = new ReferencedEnvelope(features.getSchema().getCoordinateReferenceSystem());
         while(it.hasNext()) {
-            it.next();
+            SimpleFeature f = it.next();
+            env.expandToInclude(ReferencedEnvelope.reference(f.getBounds()));
             count++;
         }
         assertEquals(2, count);
         features.close(it);
+        
+        //assertEquals(env, features.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(env, features.getBounds()));
     }
     
+    public void testGetFeaturesWithOffset() throws Exception {
+        DefaultQuery q = new DefaultQuery(featureSource.getSchema().getTypeName());
+        q.setSortBy(new SortBy[] {dataStore.getFilterFactory().sort(aname("intProperty"), SortOrder.ASCENDING)});
+        q.setStartIndex(2);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures(q);
+        
+        // check size
+        assertEquals(1, features.size());
+        
+        // check actual iteration
+        Iterator<SimpleFeature> it = features.iterator();
+        assertTrue(it.hasNext());
+        SimpleFeature f = it.next();
+        ReferencedEnvelope fe = ReferencedEnvelope.reference(f.getBounds());
+        assertEquals(2, ((Number) f.getAttribute(aname("intProperty"))).intValue());
+        assertFalse(it.hasNext());
+        features.close(it);
+        //assertEquals(fe, features.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(fe, features.getBounds()));
+    }
+    
+    public void testGetFeaturesWithOffsetLimit() throws Exception {
+        DefaultQuery q = new DefaultQuery(featureSource.getSchema().getTypeName());
+        // no sorting, let's see if the database can use native one
+        q.setStartIndex(1);
+        q.setMaxFeatures(1);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures(q);
+        
+        // check size
+        assertEquals(1, features.size());
+        
+        // check actual iteration
+        Iterator<SimpleFeature> it = features.iterator();
+        assertTrue(it.hasNext());
+        SimpleFeature f = it.next();
+        ReferencedEnvelope fe = ReferencedEnvelope.reference(f.getBounds());
+        assertEquals(1, ((Number) f.getAttribute(aname("intProperty"))).intValue());
+        assertFalse(it.hasNext());
+        features.close(it);
+        //assertEquals(fe, features.getBounds());
+        assertTrue(areReferencedEnvelopesEuqal(fe, features.getBounds()));
+    }
+    
+    /**
+     * Makes sure the datastore works when the renderer uses the typical rendering hints
+     * @throws Exception
+     */
+    public void testRendererBehaviour() throws Exception {
+        DefaultQuery query = new DefaultQuery(featureSource.getSchema().getTypeName());
+        query.setHints(new Hints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory())));
+        FeatureCollection fc = featureSource.getFeatures(query);
+        FeatureIterator fi = fc.features();
+        while(fi.hasNext()) {
+            fi.next();
+        }
+        fi.close();
+    }
+    
+    public void testQueryCapabilitiesSort() throws Exception {
+        FilterFactory ff = dataStore.getFilterFactory();
+        QueryCapabilities caps = featureSource.getQueryCapabilities();
+        
+        // check we advertise support for sorting on basic attributes 
+        assertTrue(caps.supportsSorting(new SortBy[] {ff.sort(aname("intProperty"), SortOrder.ASCENDING)}));
+        assertTrue(caps.supportsSorting(new SortBy[] {ff.sort(aname("stringProperty"), SortOrder.DESCENDING)}));
+        assertTrue(caps.supportsSorting(new SortBy[] {ff.sort(aname("doubleProperty"), SortOrder.ASCENDING)}));
+        
+        // but we cannot sort geometries
+        assertFalse(caps.supportsSorting(new SortBy[] {ff.sort(aname("geometry"), SortOrder.ASCENDING)}));
+    }
+    
+    public void testQueryCapabilitiesReliableFid() throws Exception {
+        QueryCapabilities caps = featureSource.getQueryCapabilities();
+        // we have a primary key, right?
+        assertTrue(caps.isReliableFIDSupported());
+    }
+    
+    public void testNaturalSortingAsc() throws Exception {
+        DefaultQuery q = new DefaultQuery(featureSource.getSchema().getTypeName());
+        q.setSortBy(new SortBy[] {SortBy.NATURAL_ORDER});
+        FeatureIterator<SimpleFeature> features = featureSource.getFeatures(q).features();
+        String prevId = null;
+        while(features.hasNext()) {
+            String currId = features.next().getID();
+            if(prevId != null)
+                assertTrue(prevId.compareTo(currId) <= 0);
+            prevId = currId;
+        }
+        features.close();
+    }
+    
+    public void testNaturalSortingdesc() throws Exception {
+        DefaultQuery q = new DefaultQuery(featureSource.getSchema().getTypeName());
+        q.setSortBy(new SortBy[] {SortBy.REVERSE_ORDER});
+        FeatureIterator<SimpleFeature> features = featureSource.getFeatures(q).features();
+        String prevId = null;
+        while(features.hasNext()) {
+            String currId = features.next().getID();
+            if(prevId != null)
+                assertTrue(prevId.compareTo(currId) >= 0);
+            prevId = currId;
+        }
+        features.close();
+    }
 }

@@ -17,16 +17,22 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
-
 import org.geotools.arcsde.pool.ISession;
 import org.geotools.data.DataSourceException;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeCoordinateReference;
@@ -52,10 +58,11 @@ import com.vividsolutions.jts.io.WKTReader;
  * 
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/GeometryBuilderTest.java $
- * @version $Id: GeometryBuilderTest.java 30722 2008-06-13 18:15:42Z acuster $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/GeometryBuilderTest.java $
+ * @version $Id: GeometryBuilderTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
-public class GeometryBuilderTest extends TestCase {
+public class GeometryBuilderTest {
 
     static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(GeometryBuilderTest.class
             .getPackage().getName());
@@ -74,23 +81,8 @@ public class GeometryBuilderTest extends TestCase {
 
     private Geometry[] testMultiPolygons;
 
-    /**
-     * Creates a new GeometryBuilderTest object.
-     * 
-     * @param name DOCUMENT ME!
-     */
-    public GeometryBuilderTest(String name) {
-        super(name);
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception DOCUMENT ME!
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         wktReader = new WKTReader();
         testPoints = new Geometry[] { wktReader.read("POINT (-0.055 99.999)"),
                 wktReader.read("POINT (120.324 89.999)"), wktReader.read("POINT (-79.9 75.55)"),
@@ -139,18 +131,17 @@ public class GeometryBuilderTest extends TestCase {
         };
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         this.wktReader = null;
-        super.tearDown();
     }
 
     /**
      * TODO: resurrect testInsertGeometries
-     * 
-     * @throws Exception
      */
-    public void _testInsertGeometries() throws Exception {
+    @Test
+    @Ignore
+    public void testInsertGeometries() throws Exception {
         TestData testData = new TestData();
         testData.setUp();
         try {
@@ -212,12 +203,12 @@ public class GeometryBuilderTest extends TestCase {
     private void assertEquals(Geometry g1, Geometry g2, double tolerance) {
         g1.normalize();
         g2.normalize();
-        assertEquals("geometry dimension", g1.getDimension(), g2.getDimension());
-        assertEquals("number of geometries", g1.getNumGeometries(), g2.getNumGeometries());
-        assertEquals("number of points", g1.getNumPoints(), g2.getNumPoints());
-
+        Assert.assertEquals("geometry dimension", g1.getDimension(), g2.getDimension());
+        Assert.assertEquals("number of geometries", g1.getNumGeometries(), g2.getNumGeometries());
+        Assert.assertEquals("number of points", g1.getNumPoints(), g2.getNumPoints());
     }
 
+    @Test
     public void testGetDefaultValues() {
         testGetDefaultValue(Point.class);
         testGetDefaultValue(MultiPoint.class);
@@ -227,59 +218,71 @@ public class GeometryBuilderTest extends TestCase {
         testGetDefaultValue(MultiPolygon.class);
     }
 
+    @Test
     public void testPointBuilder() throws Exception {
         testBuildJTSGeometries(testPoints);
     }
 
+    @Test
     public void testMultiPointBuilder() throws Exception {
         testBuildJTSGeometries(testMultiPoints);
     }
 
+    @Test
     public void testLineStringBuilder() throws Exception {
         testBuildJTSGeometries(testLineStrings);
     }
 
+    @Test
     public void testMultiLineStringBuilder() throws Exception {
         testBuildJTSGeometries(testMultiLineStrings);
     }
 
+    @Test
     public void testPolygonBuilder() throws Exception {
         testBuildJTSGeometries(testPolygons);
     }
 
+    @Test
     public void testMultiPolygonBuilder() throws Exception {
         testBuildJTSGeometries(testMultiPolygons);
     }
 
+    @Test
     public void testConstructShapePoint() throws Exception {
         testBuildSeShapes(testPoints);
     }
 
+    @Test
     public void testConstructShapeMultiPoint() throws Exception {
         testBuildSeShapes(testMultiPoints);
     }
 
+    @Test
     public void testConstructShapeLineString() throws Exception {
         testBuildSeShapes(testLineStrings);
     }
 
+    @Test
     public void testConstructShapeMultiLineString() throws Exception {
         testBuildSeShapes(testMultiLineStrings);
     }
 
     /**
      * TODO: resurrect testConstructShapePolygon
-     * 
-     * @throws Exception
      */
-    public void _testConstructShapePolygon() throws Exception {
+    @Test
+    @Ignore
+    public void testConstructShapePolygon() throws Exception {
         testBuildSeShapes(testPolygons);
     }
 
+    @Test
     public void testConstructShapeMultiPolygon() throws Exception {
         testBuildSeShapes(testMultiPolygons);
     }
 
+    @Test
     public void testConstructShapeEmpty() throws Exception {
         Geometry[] testEmptys = new Geometry[6];
         testEmptys[0] = ArcSDEGeometryBuilder.builderFor(Point.class).getEmpty();
@@ -295,8 +298,10 @@ public class GeometryBuilderTest extends TestCase {
      * tests each geometry in <code>geometries</code> using
      * <code>testConstructShape(Geometry)</code>
      * 
-     * @param geometries DOCUMENT ME!
-     * @throws Exception DOCUMENT ME!
+     * @param geometries
+     *            DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
     private static void testBuildSeShapes(Geometry[] geometries) throws Exception {
         for (int i = 0; i < geometries.length; i++) {
@@ -311,8 +316,10 @@ public class GeometryBuilderTest extends TestCase {
      * number of points in <code>geometry</code>, and then creates an equivalent Geometry object,
      * wich in turn is checked for equality against <code>geometry</code>.
      * 
-     * @param geometry DOCUMENT ME!
-     * @throws Exception DOCUMENT ME!
+     * @param geometry
+     *            DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
     private static void testConstructShape(Geometry geometry) throws Exception {
         LOGGER.finer("testConstructShape: testing " + geometry);
@@ -329,8 +336,8 @@ public class GeometryBuilderTest extends TestCase {
         SeShape equivalentShape = builder.constructShape(geometry, cr);
         int expectedNumOfPoints = geometry.getNumPoints();
 
-        assertEquals(geometry + " - " + equivalentShape, expectedNumOfPoints, equivalentShape
-                .getNumOfPoints());
+        Assert.assertEquals(geometry + " - " + equivalentShape, expectedNumOfPoints,
+                equivalentShape.getNumOfPoints());
         LOGGER.fine("geometry and SeShape contains the same number of points: "
                 + equivalentShape.getNumOfPoints());
 
@@ -343,15 +350,15 @@ public class GeometryBuilderTest extends TestCase {
         if (geometry instanceof Polygon) {
             int expectedNumInteriorRing = ((Polygon) geometry).getNumInteriorRing();
             int numInteriorRing = ((Polygon) equivalentGeometry).getNumInteriorRing();
-            assertEquals(geometry.toString(), expectedNumInteriorRing, numInteriorRing);
+            Assert.assertEquals(geometry.toString(), expectedNumInteriorRing, numInteriorRing);
         }
-        assertEquals(geometry.getDimension(), equivalentGeometry.getDimension());
+        Assert.assertEquals(geometry.getDimension(), equivalentGeometry.getDimension());
         LOGGER.fine("dimension test passed");
 
-        assertEquals(geometry.getGeometryType(), equivalentGeometry.getGeometryType());
+        Assert.assertEquals(geometry.getGeometryType(), equivalentGeometry.getGeometryType());
         LOGGER.fine("geometry type test passed");
 
-        assertEquals(geometry + " - " + equivalentGeometry, geometry.getNumPoints(),
+        Assert.assertEquals(geometry + " - " + equivalentGeometry, geometry.getNumPoints(),
                 equivalentGeometry.getNumPoints());
         LOGGER.fine("numPoints test passed");
 
@@ -361,7 +368,7 @@ public class GeometryBuilderTest extends TestCase {
         /*
          * assertEquals(geometry.getEnvelopeInternal(), equivalentGeometry.getEnvelopeInternal());
          */
-        assertEquals(geometry.getArea(), equivalentGeometry.getArea(), 0.1);
+        Assert.assertEquals(geometry.getArea(), equivalentGeometry.getArea(), 0.1);
         LOGGER.fine("area test passed");
     }
 
@@ -375,9 +382,11 @@ public class GeometryBuilderTest extends TestCase {
      * geometries back, which are tested for equality against the original ones.
      * </p>
      * 
-     * @param expectedGeometries the list of geometries (of the same type) to assert the building
-     *            from their corresponding arcsde representation.
-     * @throws Exception for any problem that could arise
+     * @param expectedGeometries
+     *            the list of geometries (of the same type) to assert the building from their
+     *            corresponding arcsde representation.
+     * @throws Exception
+     *             for any problem that could arise
      */
     private void testBuildJTSGeometries(final Geometry[] expectedGeometries) throws Exception {
 
@@ -403,19 +412,24 @@ public class GeometryBuilderTest extends TestCase {
             // geometryBuilder.construct(SeShape)
             // must be used
             createdGeometry = geometryBuilder.newGeometry(sdeCoords);
-            assertEquals(expectedGeometry.getClass(), createdGeometry.getClass());
+            Assert.assertEquals(expectedGeometry.getClass(), createdGeometry.getClass());
         }
     }
 
     /**
      * DOCUMENT ME!
      * 
-     * @param jtsGeom DOCUMENT ME!
-     * @param seCRS DOCUMENT ME!
+     * @param jtsGeom
+     *            DOCUMENT ME!
+     * @param seCRS
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
-     * @throws SeException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws SeException
+     *             DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws DataSourceException
+     *             DOCUMENT ME!
      */
     private double[][][] geometryToSdeCoords(final Geometry jtsGeom,
             final SeCoordinateReference seCRS) throws SeException, IOException {
@@ -476,7 +490,8 @@ public class GeometryBuilderTest extends TestCase {
      * given a geometry class, tests that ArcSDEGeometryBuilder.defaultValueFor that class returns
      * an empty geometry of the same geometry class
      * 
-     * @param geometryClass DOCUMENT ME!
+     * @param geometryClass
+     *            DOCUMENT ME!
      */
     private void testGetDefaultValue(Class geometryClass) {
         Geometry geom = ArcSDEGeometryBuilder.defaultValueFor(geometryClass);

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Ows10Package.java 31717 2008-10-24 22:50:25Z groldan $
+ * $Id: Ows10Package.java 32447 2009-02-09 13:34:55Z aaime $
  */
 package net.opengis.ows10;
 
@@ -993,13 +993,22 @@ public interface Ows10Package extends EPackage {
 	int GET_CAPABILITIES_TYPE__BASE_URL = 4;
 
 	/**
+     * The feature id for the '<em><b>Namespace</b></em>' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int GET_CAPABILITIES_TYPE__NAMESPACE = 5;
+
+    /**
      * The number of structural features of the '<em>Get Capabilities Type</em>' class.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
      * @generated
      * @ordered
      */
-	int GET_CAPABILITIES_TYPE_FEATURE_COUNT = 5;
+	int GET_CAPABILITIES_TYPE_FEATURE_COUNT = 6;
 
 	/**
      * The meta object id for the '{@link net.opengis.ows10.impl.HTTPTypeImpl <em>HTTP Type</em>}' class.
@@ -2797,6 +2806,17 @@ public interface Ows10Package extends EPackage {
 	EAttribute getGetCapabilitiesType_BaseUrl();
 
 	/**
+     * Returns the meta object for the attribute '{@link net.opengis.ows10.GetCapabilitiesType#getNamespace <em>Namespace</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for the attribute '<em>Namespace</em>'.
+     * @see net.opengis.ows10.GetCapabilitiesType#getNamespace()
+     * @see #getGetCapabilitiesType()
+     * @generated
+     */
+    EAttribute getGetCapabilitiesType_Namespace();
+
+    /**
      * Returns the meta object for class '{@link net.opengis.ows10.HTTPType <em>HTTP Type</em>}'.
      * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

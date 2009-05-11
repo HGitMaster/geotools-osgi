@@ -71,8 +71,10 @@ public class PostGISDialog extends JDialog implements ActionListener {
 		schema = new JParamField( PostgisDataStoreFactory.SCHEMA, config );
 		database = new JParamField( PostgisDataStoreFactory.DATABASE, config );
 		user = new JParamField( PostgisDataStoreFactory.USER, config );
-		password = new JPasswordField( (String) config.get( PostgisDataStoreFactory.USER.key ));			
-		password.setToolTipText( PostgisDataStoreFactory.PASSWD.description.toString() );
+		password = new JPasswordField( (String) config.get( PostgisDataStoreFactory.USER.key ));
+		
+		String description = PostgisDataStoreFactory.PASSWD.description == null ? null : PostgisDataStoreFactory.PASSWD.description.toString();
+		password.setToolTipText( description );
 
 		okay = new JButton("OK");
 		cancel = new JButton("Cancel");
@@ -152,7 +154,8 @@ public class PostGISDialog extends JDialog implements ActionListener {
 					refresh();
 				}
 			});
-			setToolTipText( param.description.toString() );
+			String description = param.description == null ? null : param.description.toString();
+			setToolTipText( description );
 		}
 		public void refresh(){
 			try {

@@ -31,6 +31,7 @@ import oracle.sql.StructDescriptor;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateList;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -47,7 +48,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * JTS Geometries with additional ordinates beyond xyz.
  * </p>
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/jdbc-ng/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/GeometryConverter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/jdbc-ng/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/GeometryConverter.java $
  */
 public class GeometryConverter {
 	protected OracleConnection connection;
@@ -164,15 +165,32 @@ public class GeometryConverter {
         ARRAY SDO_ELEM_INFO;
         ARRAY SDO_ORDINATES;
         
-        if( point == null ){
-            int elemInfo[] = SDO.elemInfo( geom );
-            double ordinates[] = SDO.ordinates( geom );
-            
-            SDO_POINT = null;
-            SDO_ELEM_INFO = toARRAY( elemInfo, "MDSYS.SDO_ELEM_INFO_ARRAY" );
-            SDO_ORDINATES = toARRAY( ordinates, "MDSYS.SDO_ORDINATE_ARRAY" );                        
-        }
-        else { // Point Optimization
+        if( point == null ) {
+            final Envelope env = geom.getEnvelopeInternal();
+            if(env.getWidth() > 0 && env.getHeight() > 0 && geom.getEnvelope().equals(geom)) {
+                // rectangle optimization. Actually, more than an optimization. A few operators
+                // do not work properly if they don't get rectangular geoms encoded as rectangles
+                // SDO_FILTER is an example of this silly situation
+                SDO_POINT = null;
+                int elemInfo[] = new int[] {1, 1003, 3};
+                double ordinates[];
+                if(SDO.D(geom) == 2)
+                    ordinates = new double[] {env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY()};
+                else
+                    ordinates = new double[] {env.getMinX(), env.getMinY(), 0, env.getMaxX(), env.getMaxY(), 0};
+                
+                SDO_POINT = null;
+                SDO_ELEM_INFO = toARRAY( elemInfo, "MDSYS.SDO_ELEM_INFO_ARRAY" );
+                SDO_ORDINATES = toARRAY( ordinates, "MDSYS.SDO_ORDINATE_ARRAY" );
+            } else {
+                int elemInfo[] = SDO.elemInfo( geom );
+                double ordinates[] = SDO.ordinates( geom );
+                
+                SDO_POINT = null;
+                SDO_ELEM_INFO = toARRAY( elemInfo, "MDSYS.SDO_ELEM_INFO_ARRAY" );
+                SDO_ORDINATES = toARRAY( ordinates, "MDSYS.SDO_ORDINATE_ARRAY" );                        
+            }
+        } else { // Point Optimization
             Datum data[] = new Datum[]{
                 toNUMBER( point[0] ),
                 toNUMBER( point[1] ),
@@ -191,6 +209,8 @@ public class GeometryConverter {
         };
         return toSTRUCT( attributes, DATATYPE );        
     }
+    
+    
     
     /**
      * Representation of <code>null</code> as an Empty <code>SDO_GEOMETRY</code>.

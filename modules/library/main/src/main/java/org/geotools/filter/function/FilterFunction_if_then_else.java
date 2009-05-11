@@ -45,23 +45,25 @@ public class FilterFunction_if_then_else extends FunctionExpressionImpl
             throw new IllegalArgumentException(
                     "Filter Function problem for function if_then_else argument #0 - expected type boolean");
         }
-
-        try { // attempt to get value and perform conversion
-            arg1 = (Object) getExpression(1).evaluate(feature);
-        } catch (Exception e) // probably a type error
-        {
-            throw new IllegalArgumentException(
-                    "Filter Function problem for function if_then_else argument #1 - expected type Object");
+        if( arg0 ){
+            try { // attempt to get value and perform conversion
+                arg1 = (Object) getExpression(1).evaluate(feature);
+                return arg1;
+            } catch (Exception e) // probably a type error
+            {
+                throw new IllegalArgumentException(
+                        "Filter Function problem for function if_then_else argument #1 - expected type Object");
+            }
         }
-
-        try { // attempt to get value and perform conversion
-            arg2 = (Object) getExpression(2).evaluate(feature);
-        } catch (Exception e) // probably a type error
-        {
-            throw new IllegalArgumentException(
-                    "Filter Function problem for function if_then_else argument #2 - expected type Object");
+        else {
+            try { // attempt to get value and perform conversion
+                arg2 = (Object) getExpression(2).evaluate(feature);
+                return arg2;
+            } catch (Exception e) // probably a type error
+            {
+                throw new IllegalArgumentException(
+                        "Filter Function problem for function if_then_else argument #2 - expected type Object");
+            }
         }
-
-        return (StaticGeometry.if_then_else(arg0, arg1, arg2));
     }
 }

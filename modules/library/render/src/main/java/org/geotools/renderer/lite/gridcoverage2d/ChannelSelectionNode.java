@@ -17,6 +17,7 @@
 package org.geotools.renderer.lite.gridcoverage2d;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -43,8 +44,7 @@ import org.opengis.util.InternationalString;
 class ChannelSelectionNode extends SubchainStyleVisitorCoverageProcessingAdapter
 		implements StyleVisitor, CoverageProcessingNode {
 	/** Logger for this class. */
-	private final static Logger LOGGER = Logger
-			.getLogger(ChannelSelectionNode.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(ChannelSelectionNode.class.getName());
 
 	/*
 	 * (non-Javadoc)
@@ -72,8 +72,7 @@ class ChannelSelectionNode extends SubchainStyleVisitorCoverageProcessingAdapter
 				3,
 				hints,
 				SimpleInternationalString.wrap("ChannelSelectionNode"),
-				SimpleInternationalString
-						.wrap("Node which applies a ChannelSelection following SLD 1.0 spec."));
+				SimpleInternationalString.wrap("Node which applies a ChannelSelection following SLD 1.0 spec."));
 	}
 
 	/*
@@ -81,7 +80,7 @@ class ChannelSelectionNode extends SubchainStyleVisitorCoverageProcessingAdapter
 	 * 
 	 * @see org.geotools.renderer.lite.gridcoverage2d.StyleVisitorAdapter#visit(org.geotools.styling.ChannelSelection)
 	 */
-	public synchronized void visit(ChannelSelection cs) {
+	public synchronized void visit(final ChannelSelection cs) {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Ensure that the ChannelSelection is not null and that the source is
@@ -105,10 +104,20 @@ class ChannelSelectionNode extends SubchainStyleVisitorCoverageProcessingAdapter
 		//creating a new separate chain
 		final RootNode chainSource = new RootNode(source, getHints());
 		final BandMergeNode subChainSink = new BandMergeNode(getHints());
-		//anchoring the chain for later diposal
+		//anchoring the chain for later disposal
 		setSink(subChainSink);
-		final SelectedChannelType[] sc = cs.getSelectedChannels();
-		if (sc != null && sc.length > 0) {
+		final SelectedChannelType[] rgb=cs.getRGBChannels();
+		final SelectedChannelType gray=cs.getGrayChannel();
+		// both of them are set?
+		if((rgb!=null&&rgb[0]!=null&&rgb[1]!=null&&rgb[2]!=null)&&(gray!=null))
+			throw new IllegalArgumentException(Errors.format(
+					ErrorKeys.ILLEGAL_ARGUMENT_$1, "Both gray and rgb channel selection are valid!"));
+		final SelectedChannelType[] sc = gray==null?rgb:new SelectedChannelType[]{gray};
+		
+		// If we do not really select any bands from the original coverage, we try to entirely skip this operation
+		// this means that either we have to select 1 real band, or we have to select 3 real bands
+		// Notice that we also try to be as resilient as possible since 
+		if (sc != null && ((sc.length ==1 &&sc[0]!=null)||(sc.length ==3 &&sc[0]!=null&&sc[1]!=null&&sc[2]!=null))) {
 			// //
 			//
 			// Note that we can either select 1 (GRAY) or 3 (RGB) bands.
@@ -116,15 +125,18 @@ class ChannelSelectionNode extends SubchainStyleVisitorCoverageProcessingAdapter
 			// //
 			if (sc.length != 3 && sc.length != 1)
 				throw new IllegalArgumentException(Errors.format(
-						ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(sc.length)));
+						ErrorKeys.BAD_BAND_NUMBER_$1, Integer.valueOf(sc.length)));
 			for (int i = 0; i < sc.length; i++) {
 
 				// get the channel element
 				final SelectedChannelType channel = sc[i];
-
+				if(LOGGER.isLoggable(Level.FINE))
+						LOGGER.fine("Channel "+i+" was "+ channel.getChannelName());
+	
 				// //
 				//
 				// BAND SELECTION
+				
 				//
 				// //
 				final BandSelectionNode bandSelectionNode = new BandSelectionNode();
@@ -139,8 +151,7 @@ class ChannelSelectionNode extends SubchainStyleVisitorCoverageProcessingAdapter
 				final ContrastEnhancementNode contrastenhancementNode = new ContrastEnhancementNode();
 				contrastenhancementNode.addSource(bandSelectionNode);
 				bandSelectionNode.addSink(contrastenhancementNode);
-				contrastenhancementNode.visit(channel != null ? channel
-						.getContrastEnhancement() : null);
+				contrastenhancementNode.visit(channel != null ? channel.getContrastEnhancement() : null);
 
 				// //
 				//
@@ -149,10 +160,13 @@ class ChannelSelectionNode extends SubchainStyleVisitorCoverageProcessingAdapter
 				// //
 				contrastenhancementNode.addSink(subChainSink);
 				subChainSink.addSource(contrastenhancementNode);
+
+				
 			}
-		} else
-			// no band selection, just forward this node
-			subChainSink.addSource(chainSource);
+			return;
+		} 
+		// no band selection, just forward this node
+		subChainSink.addSource(chainSource);
 
 	}
 

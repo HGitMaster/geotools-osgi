@@ -21,26 +21,22 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.opengis.wps.ProcessOfferingsType;
-import net.opengis.wps.WPSCapabilitiesType;
+import net.opengis.ows11.DCPType;
+import net.opengis.ows11.HTTPType;
+import net.opengis.ows11.OperationType;
+import net.opengis.ows11.RequestMethodType;
+import net.opengis.wps10.ProcessOfferingsType;
+import net.opengis.wps10.WPSCapabilitiesType;
 
-import org.geotools.wps.WPS;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.ServiceInfo;
 import org.geotools.data.ows.AbstractWPS;
 import org.geotools.data.ows.AbstractWPSGetCapabilitiesResponse;
 import org.geotools.data.ows.GetCapabilitiesRequest;
-
-import net.opengis.ows11.HTTPType;
-import net.opengis.ows11.OperationType;
-import net.opengis.ows11.DCPType;
-import net.opengis.ows11.RequestMethodType;
-
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.Specification;
 import org.geotools.data.wps.request.DescribeProcessRequest;
@@ -48,6 +44,7 @@ import org.geotools.data.wps.request.ExecuteProcessRequest;
 import org.geotools.data.wps.response.DescribeProcessResponse;
 import org.geotools.data.wps.response.ExecuteProcessResponse;
 import org.geotools.ows.ServiceException;
+import org.geotools.wps.WPS;
 
 /**
  * WebProcessingService is a class representing a WPS. It is used to access the 
@@ -83,12 +80,6 @@ public class WebProcessingService extends AbstractWPS<WPSCapabilitiesType,Object
 
         WPSInfo() {
             keywords = new HashSet<String>();
-            if( capabilities.getService() != null ){
-              String array[] = ((Service)capabilities.getService()).getKeywordList();
-              if( array != null ){
-                  keywords.addAll( Arrays.asList( array ));                  
-              }
-            }
             keywords.add("WPS");
             keywords.add( serverURL.toString() );
             
@@ -96,9 +87,6 @@ public class WebProcessingService extends AbstractWPS<WPSCapabilitiesType,Object
         
         public String getDescription() {
             String description = null;
-            if (capabilities != null && capabilities.getService() != null) {
-                description = ((Service)capabilities.getService()).get_abstract();
-            }
             if( description == null && serverURL != null) {
                 description = "Web Processing Service "+serverURL;
             }
@@ -110,11 +98,6 @@ public class WebProcessingService extends AbstractWPS<WPSCapabilitiesType,Object
         }
 
         public URI getPublisher() {
-            try {
-                return ((Service)capabilities.getService()).getContactInformation().getContactInfo().getOnLineResource().getLinkage();
-            }
-            catch( NullPointerException publisherNotAvailable ){               
-            }
             try {
                 return new URI( serverURL.getProtocol()+":"+serverURL.getHost() );
             } catch (URISyntaxException e) {
@@ -154,9 +137,7 @@ public class WebProcessingService extends AbstractWPS<WPSCapabilitiesType,Object
         }
 
         public String getTitle() {
-            if (capabilities != null && capabilities.getService() != null) {
-                return ((Service)capabilities.getService()).getTitle();
-            } else if (serverURL == null) {
+            if (serverURL == null) {
                 return "Unavailable";
             } else {
                 return serverURL.toString();

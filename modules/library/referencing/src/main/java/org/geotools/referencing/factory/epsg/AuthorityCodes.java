@@ -32,7 +32,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.Projection;
 
 import org.geotools.util.logging.Logging;
@@ -49,8 +48,8 @@ import org.geotools.resources.i18n.LoggingKeys;
  * do not preserve any connection to the database.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AuthorityCodes.java $
- * @version $Id: AuthorityCodes.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AuthorityCodes.java $
+ * @version $Id: AuthorityCodes.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 final class AuthorityCodes extends AbstractSet<String> implements Serializable {
@@ -109,10 +108,10 @@ final class AuthorityCodes extends AbstractSet<String> implements Serializable {
     private transient PreparedStatement querySingle;
 
     /**
-     * The connection to the underlying database. This set should never close
-     * this connection. Closing it is {@link DirectEpsgFactory}'s job.
+     * The connection to the underlying database.
      */
-    private final Connection connection;
+    private Connection connection;
+    
 
     /**
      * The collection's size, or a negative value if not yet computed. The records will be counted
@@ -124,16 +123,15 @@ final class AuthorityCodes extends AbstractSet<String> implements Serializable {
     /**
      * Creates a new set of authority codes for the specified type.
      *
-     * @param  connection The connection to the EPSG database.
+     * @param  connection The provider of connection to the EPSG database.
      * @param  table      The table to query.
      * @param  type       The type to query.
      * @param  factory    The factory originator.
      */
-    public AuthorityCodes(final Connection connection, final TableInfo table,
+    public AuthorityCodes(final TableInfo table,
                           final Class<?> type, final DirectEpsgFactory factory)
     {
         this.factory    = factory;
-        this.connection = connection;
         final StringBuilder buffer = new StringBuilder("SELECT ");
         buffer.append(table.codeColumn);
         if (table.nameColumn != null) {
@@ -172,7 +170,7 @@ final class AuthorityCodes extends AbstractSet<String> implements Serializable {
      */
     private ResultSet getAll() throws SQLException {
         assert Thread.holdsLock(this);
-        if (queryAll != null) {
+        if (queryAll != null && factory.isConnectionValid(queryAll.getConnection())) {
             try {
                 return queryAll.executeQuery();
             } catch (SQLException ignore) {
@@ -189,7 +187,7 @@ final class AuthorityCodes extends AbstractSet<String> implements Serializable {
                 recoverableException("getAll", ignore);
             }
         }
-        queryAll = connection.prepareStatement(sqlAll);
+        queryAll = factory.getConnection().prepareStatement(sqlAll);
         return queryAll.executeQuery();
     }
 
@@ -198,8 +196,8 @@ final class AuthorityCodes extends AbstractSet<String> implements Serializable {
      */
     private ResultSet getSingle(final Object code) throws SQLException {
         assert Thread.holdsLock(this);
-        if (querySingle == null) {
-            querySingle = connection.prepareStatement(sqlSingle);
+        if (querySingle == null || !factory.isConnectionValid(querySingle.getConnection())) {
+            querySingle = factory.getConnection().prepareStatement(sqlSingle);
         }
         querySingle.setString(1, code.toString());
         return querySingle.executeQuery();

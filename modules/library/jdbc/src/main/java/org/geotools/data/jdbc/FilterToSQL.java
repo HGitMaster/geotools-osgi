@@ -19,8 +19,10 @@ package org.geotools.data.jdbc;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +30,7 @@ import java.util.logging.Logger;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.FunctionImpl;
 import org.geotools.filter.LikeFilterImpl;
 import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -37,6 +40,7 @@ import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
@@ -141,6 +145,9 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     /** the schmema the encoder will be used to be encode sql for */
     protected SimpleFeatureType featureType;
 
+    /** flag which indicates that the encoder is currently encoding a function */
+    protected boolean encodingFunction = false;
+     
     /**
      * Default constructor
      */
@@ -260,6 +267,10 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
      */
     public void setFIDMapper(FIDMapper mapper) {
         this.mapper = mapper;
+    }
+
+    public FIDMapper getFIDMapper() {
+        return this.mapper;
     }
 
     /**
@@ -397,6 +408,7 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     	char esc = filter.getEscape().charAt(0);
     	char multi = filter.getWildCard().charAt(0);
     	char single = filter.getSingleChar().charAt(0);
+        boolean matchCase = filter.isMatchingCase();
         
         String literal = filter.getLiteral();
         Expression att = filter.getExpression();
@@ -408,11 +420,21 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
             literal += multi;
         }
         
-    	String pattern = LikeFilterImpl.convertToSQL92(esc,multi,single,literal);
+    	String pattern = LikeFilterImpl.convertToSQL92(esc, multi, single, matchCase, literal);
         
         try {
+            if (!matchCase){
+                out.write(" UPPER(");
+            }
+
 	    	att.accept(this, extraData);
-	    	out.write(" LIKE '");
+
+            if (!matchCase){
+                out.write(") LIKE '");
+            } else {
+                out.write(" LIKE '");
+            }
+
 	    	out.write(pattern);
 	    	out.write("' ");
     	} catch (java.io.IOException ioe) {
@@ -627,13 +649,16 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
             }
             else {
                 //wrap both sides in "lower"
-                out.write( " lower("); 
-                left.accept(this, leftContext);
-                out.write( ")");
+                FunctionImpl f = new FunctionImpl(); 
+                f.setName( "lower" );
+                
+                f.setParameters(Arrays.asList(left));
+                f.accept(this, Arrays.asList(leftContext));
+                
                 out.write(" " + type + " ");
-                out.write( " lower("); 
-                right.accept(this, rightContext);
-                out.write( ")");
+                
+                f.setParameters(Arrays.asList(right));
+                f.accept(this, Arrays.asList(rightContext));
             }
             
         } catch (java.io.IOException ioe) {
@@ -826,7 +851,10 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         LOGGER.finer("exporting LiteralExpression");
 
         // type to convert the literal to
-        Class target = (Class) context;
+        Class target = null;
+        if ( context instanceof Class ) {
+            target = (Class) context;
+        }
 
         try {
             //evaluate the expression
@@ -948,16 +976,51 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     }
 
     /**
-     * Writes sql for a function expression.  Not currently supported.
+     * Writes sql for a function expression.
      *
      * @param expression a function expression
      *
-     * @throws UnsupportedOperationException every time, this isn't supported.
+     * @throws RuntimeException If an IO error occurs. 
      */
-    public Object visit(Function expression, Object extraData)
-        throws UnsupportedOperationException {
-        String message = "Function expression support not yet added.";
-        throw new UnsupportedOperationException(message);
+    public Object visit(Function function, Object extraData) throws RuntimeException {
+        try {
+            List<Expression> parameters = function.getParameters();
+            List contexts = null;
+            //check context, if a list which patches parameter size list assume its context
+            // to pass along to each Expression for encoding
+            if( extraData instanceof List && ((List)extraData).size() == parameters.size() ) {
+                contexts = (List) extraData;
+            }
+            
+            //set the encoding function flag to signal we are inside a function
+            encodingFunction = true;
+            
+            //write the name
+            out.write( function.getName() );
+            
+            //write the arguments
+            out.write( "(");
+            for ( int i = 0; i < parameters.size(); i++ ) {
+                Expression e = parameters.get( i );
+                
+                Object context = contexts != null ? contexts.get( i ) : extraData; 
+                e.accept(this, context);
+                
+                if ( i < parameters.size()-1 ) {
+                    out.write( ",");    
+                }
+                
+            }
+            out.write( ")");
+            
+            //reset the encoding function flag
+            encodingFunction = false;
+        } 
+        catch (IOException e) {
+            throw new RuntimeException( e );
+        }
+        
+        return extraData;
     }
     
     public Object visit(NilExpression expression, Object extraData) {

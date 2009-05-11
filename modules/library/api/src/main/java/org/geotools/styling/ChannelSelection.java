@@ -49,31 +49,26 @@ package org.geotools.styling;
  * etc.
  *
  * @author iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/ChannelSelection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/ChannelSelection.java $
  */
-public interface ChannelSelection extends org.opengis.style.ChannelSelection{
+public interface ChannelSelection extends org.opengis.style.ChannelSelection {
     /**
-     * set the RGB channels to be used
+     * Set the RGB channels to be used
      *
      * @param red the red channel
      * @param green the green channel
      * @param blue the blue channel
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setRGBChannels(SelectedChannelType red, SelectedChannelType green, SelectedChannelType blue);
 
     /**
-     * set the RGB channels to be used
+     * Set the RGB channels to be used
      *
      * @param channels array of channels in RGB order
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setRGBChannels(SelectedChannelType[] channels);
 
+    
     /**
      * get the RGB channels to be used
      *
@@ -85,10 +80,7 @@ public interface ChannelSelection extends org.opengis.style.ChannelSelection{
      * Set the gray channel to be used
      *
      * @param gray the gray channel
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setGrayChannel(SelectedChannelType gray);
 
     /**
@@ -102,19 +94,16 @@ public interface ChannelSelection extends org.opengis.style.ChannelSelection{
      * set the channels to be used
      *
      * @param channels array of channels
-     * 
-     * @deprecated symbolizers and underneath classes are immutable
+     * @deprecated Please use setRGBChannels
      */
-    @Deprecated
     void setSelectedChannels(SelectedChannelType[] channels);
 
     /**
      * get the channels to be used
      *
      * @return array of channels
-     * 
+     * @deprecated Please use getRGBChannels
      */
-    @Deprecated
     SelectedChannelType[] getSelectedChannels();
 
     public void accept(org.geotools.styling.StyleVisitor visitor);

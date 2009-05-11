@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.opengis.ows11.ExceptionReportType;
-import net.opengis.wps.WPSCapabilitiesType;
+import net.opengis.wps10.WPSCapabilitiesType;
 
 import org.geotools.ows.ServiceException;
 

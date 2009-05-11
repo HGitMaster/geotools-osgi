@@ -17,7 +17,6 @@
 package org.geotools.data.wfs.v1_1_0;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,8 +25,8 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.DataFeatureCollection;
+import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureReaderIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
@@ -37,10 +36,10 @@ import org.opengis.geometry.BoundingBox;
 
 /**
  * A {@link FeatureCollection} whose iterators are based on the FeatureReaders returned by a
- * {@link WFS110ProtocolHandler}.
+ * {@link WFSDataStore}.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: WFSFeatureCollection.java 31805 2008-11-07 19:23:45Z groldan $
+ * @version $Id: WFSFeatureCollection.java 31928 2008-11-28 19:08:35Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0
@@ -69,10 +68,11 @@ class WFSFeatureCollection extends DataFeatureCollection {
 
     /**
      * @param dataStore
-     * @param query properly named query
+     * @param query
+     *            properly named query
      * @throws IOException
      */
-    public WFSFeatureCollection( WFS_1_1_0_DataStore dataStore, Query query ) throws IOException {
+    public WFSFeatureCollection(WFS_1_1_0_DataStore dataStore, Query query) throws IOException {
         this.dataStore = dataStore;
         this.query = query;
         this.contentType = dataStore.getQueryType(query);
@@ -106,7 +106,7 @@ class WFSFeatureCollection extends DataFeatureCollection {
                 // bad luck, do a full scan
                 final Name defaultgeom = contentType.getGeometryDescriptor().getName();
                 final DefaultQuery geomQuery = new DefaultQuery(this.query);
-                geomQuery.setPropertyNames(new String[]{defaultgeom.getLocalPart()});
+                geomQuery.setPropertyNames(new String[] { defaultgeom.getLocalPart() });
 
                 FeatureReader<SimpleFeatureType, SimpleFeature> reader;
                 reader = dataStore.getFeatureReader(geomQuery, Transaction.AUTO_COMMIT);
@@ -115,7 +115,7 @@ class WFSFeatureCollection extends DataFeatureCollection {
                     BoundingBox featureBounds;
                     // collect size to alleviate #getCount if needed
                     int collectionSize = 0;
-                    while( reader.hasNext() ) {
+                    while (reader.hasNext()) {
                         featureBounds = reader.next().getBounds();
                         bounds.expandToInclude(featureBounds.getMinX(), featureBounds.getMinY());
                         bounds.expandToInclude(featureBounds.getMaxX(), featureBounds.getMaxY());
@@ -142,13 +142,12 @@ class WFSFeatureCollection extends DataFeatureCollection {
      * Calculates the feature collection size, doing a full scan if needed.
      * <p>
      * <b>WARN</b>: this method could be very inefficient if the size cannot be efficiently
-     * calculated. That is, it is not cached and {@link WFS110ProtocolHandler#getCount(Query)}
-     * returns {@code -1}.
+     * calculated. That is, it is not cached and {@link WFSDataStore#getCount(Query)} returns
+     * {@code -1}.
      * </p>
      * 
      * @return the FeatureCollection<SimpleFeatureType, SimpleFeature> size.
      * @see DataFeatureCollection#getCount()
-     * @see WFS110ProtocolHandler#getCount(Query)
      */
     @Override
     public int getCount() throws IOException {
@@ -163,14 +162,10 @@ class WFSFeatureCollection extends DataFeatureCollection {
         return cachedSize;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected Iterator<SimpleFeature> openIterator() throws IOException {
+    public FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-        // System.err.println("Opening FC iterator for " + getSchema().getName() + " and query "
-        // + query);
         reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
-        // System.err.println("Got FeatureReader to open FC iterator for " + getSchema().getName());
-        return new FeatureReaderIterator<SimpleFeature>(reader);
+        return reader;
     }
 }

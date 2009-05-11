@@ -17,8 +17,6 @@
 package org.geotools.data.wps;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -26,17 +24,13 @@ import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.opengis.wps.ExecuteResponseType;
-import net.opengis.wps.OutputDataType;
-import net.opengis.wps.ProcessDescriptionsType;
+import junit.framework.TestCase;
+import net.opengis.wps10.ProcessDescriptionsType;
 
-import org.geotools.test.TestData;
 import org.geotools.wps.WPSConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
 import org.xml.sax.SAXException;
-
-import junit.framework.TestCase;
 
 public class ParsingTest extends TestCase {
 

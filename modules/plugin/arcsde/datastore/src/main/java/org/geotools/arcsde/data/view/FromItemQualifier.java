@@ -36,9 +36,10 @@ import org.geotools.arcsde.pool.ISession;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: FromItemQualifier.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: FromItemQualifier.java 32195 2009-01-09 19:00:35Z groldan $
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/FromItemQualifier.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/view/FromItemQualifier.java $
  * @since 2.3.x
  */
 class FromItemQualifier implements FromItemVisitor {
@@ -51,8 +52,10 @@ class FromItemQualifier implements FromItemVisitor {
     /**
      * Creates a new FromItemQualifier object.
      * 
-     * @param session DOCUMENT ME!
-     * @throws IllegalStateException DOCUMENT ME!
+     * @param session
+     *            DOCUMENT ME!
+     * @throws IllegalStateException
+     *             DOCUMENT ME!
      */
     private FromItemQualifier(ISession session) throws IllegalStateException {
         this.session = session;
@@ -61,8 +64,10 @@ class FromItemQualifier implements FromItemVisitor {
     /**
      * DOCUMENT ME!
      * 
-     * @param session DOCUMENT ME!
-     * @param fromItem DOCUMENT ME!
+     * @param session
+     *            DOCUMENT ME!
+     * @param fromItem
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
      */
     public static FromItem qualify(ISession session, FromItem fromItem) {
@@ -79,7 +84,8 @@ class FromItemQualifier implements FromItemVisitor {
     /**
      * DOCUMENT ME!
      * 
-     * @param tableName DOCUMENT ME!
+     * @param tableName
+     *            DOCUMENT ME!
      */
     public void visit(Table tableName) {
         qualifiedFromItem = TableQualifier.qualify(session, tableName);
@@ -88,7 +94,8 @@ class FromItemQualifier implements FromItemVisitor {
     /**
      * DOCUMENT ME!
      * 
-     * @param subSelect DOCUMENT ME!
+     * @param subSelect
+     *            DOCUMENT ME!
      */
     public void visit(SubSelect subSelect) {
         this.qualifiedFromItem = SubSelectQualifier.qualify(session, subSelect);

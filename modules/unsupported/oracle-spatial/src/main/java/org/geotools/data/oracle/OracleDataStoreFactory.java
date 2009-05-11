@@ -31,7 +31,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 
 /**
- * Creates a PostgisDataStore baed on the correct params.
+ * Creates an OracleDataStore based on the correct params.
  * <p>
  * This factory should be registered in the META-INF/ folder, under services/
  * in the DataStoreFactorySpi file.
@@ -39,7 +39,7 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
  *
  * @author Jody Garnett, Refractions Research
  * @author Sean Geoghegan, Defence Science and Technology Organisation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleDataStoreFactory.java $
  */
 public class OracleDataStoreFactory implements DataStoreFactorySpi {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.oracle");     

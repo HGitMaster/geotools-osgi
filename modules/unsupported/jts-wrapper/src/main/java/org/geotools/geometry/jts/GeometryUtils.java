@@ -37,7 +37,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 //openGIS dependencies
-import org.opengis.go.CommonFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -93,7 +92,7 @@ public final class GeometryUtils {
                 getLog().warn("could not get crs for EPSG:4326");
             }
             
-            final CommonFactory commonFactory = BasicFactories.getDefault();
+            final BasicFactories commonFactory = BasicFactories.getDefault();
             final GeometryFactory geometryFactory = commonFactory.getGeometryFactory(crs);
             
             final DirectPosition lowerCorner = geometryFactory.createDirectPosition(new double[] { -90, -180 });
@@ -146,7 +145,7 @@ public final class GeometryUtils {
             final double miny,
             final double maxx,
             final double maxy) {
-        final CommonFactory commonFactory = BasicFactories.getDefault();
+        final BasicFactories commonFactory = BasicFactories.getDefault();
         final GeometryFactory geometryFactory = commonFactory.getGeometryFactory(crs);
         
         final DirectPosition lowerCorner = geometryFactory.createDirectPosition();
@@ -177,7 +176,7 @@ public final class GeometryUtils {
             final double maxx,
             final double maxy,
             final Unit unit) {
-        final CommonFactory commonFactory = BasicFactories.getDefault();
+        final BasicFactories commonFactory = BasicFactories.getDefault();
         final GeometryFactory geometryFactory = commonFactory.getGeometryFactory(crs);
         
         final CoordinateSystem cs = crs.getCoordinateSystem();
@@ -699,7 +698,7 @@ public final class GeometryUtils {
     public static PolyhedralSurface createPolyhedralSurface(final DirectPosition[][] patchPoints) {
         // get the crs and factories
         final CoordinateReferenceSystem crs = patchPoints[0][0].getCoordinateReferenceSystem();
-        final CommonFactory commonFactory = BasicFactories.getDefault();
+        final BasicFactories commonFactory = BasicFactories.getDefault();
         final GeometryFactory geometryFactory = commonFactory.getGeometryFactory(crs);
         
         // create polygons from each of the arrays of directPositions
@@ -721,7 +720,7 @@ public final class GeometryUtils {
             final DirectPosition[][] interiorRingsPoints) {
         
         final CoordinateReferenceSystem crs = exteriorRingPoints[0].getCoordinateReferenceSystem();
-        final CommonFactory commonFactory = BasicFactories.getDefault();
+        final BasicFactories commonFactory = BasicFactories.getDefault();
         final GeometryFactory geometryFactory = commonFactory.getGeometryFactory(crs);
         final PrimitiveFactory primitiveFactory = commonFactory.getPrimitiveFactory(crs);
         
@@ -745,7 +744,7 @@ public final class GeometryUtils {
             final DirectPosition[] exteriorRingPoints,
             final DirectPosition[][] interiorRingsPoints) {
         final CoordinateReferenceSystem crs = exteriorRingPoints[0].getCoordinateReferenceSystem();
-        final CommonFactory commonFactory = BasicFactories.getDefault();
+        final BasicFactories commonFactory = BasicFactories.getDefault();
         final PrimitiveFactory primitiveFactory = commonFactory.getPrimitiveFactory(crs);
         return createSurfaceBoundary(primitiveFactory, exteriorRingPoints, interiorRingsPoints);
     }
@@ -771,7 +770,7 @@ public final class GeometryUtils {
     
     public static Ring createRing(final DirectPosition[] points) {
         final CoordinateReferenceSystem crs = points[0].getCoordinateReferenceSystem();
-        final CommonFactory commonFactory = BasicFactories.getDefault();
+        final BasicFactories commonFactory = BasicFactories.getDefault();
         final PrimitiveFactory primitiveFactory = commonFactory.getPrimitiveFactory(crs);
         return createRing(primitiveFactory, points);
     }
@@ -788,7 +787,7 @@ public final class GeometryUtils {
     
     public static Curve createCurve(final DirectPosition[] points) {
         final CoordinateReferenceSystem crs = points[0].getCoordinateReferenceSystem();
-        final CommonFactory commonFactory = BasicFactories.getDefault();
+        final BasicFactories commonFactory = BasicFactories.getDefault();
         final PrimitiveFactory primitiveFactory = commonFactory.getPrimitiveFactory(crs);
         return createCurve(primitiveFactory, points);
     }
@@ -797,7 +796,7 @@ public final class GeometryUtils {
             final PrimitiveFactory primitiveFactory, 
             final DirectPosition[] points) {
         
-        final CommonFactory commonFactory = BasicFactories.getDefault();
+        final BasicFactories commonFactory = BasicFactories.getDefault();
         final GeometryFactory geometryFactory = commonFactory.getGeometryFactory(primitiveFactory.getCoordinateReferenceSystem());
         
         final List curveSegmentList = Collections.singletonList(createLineString(geometryFactory, points));
@@ -808,7 +807,7 @@ public final class GeometryUtils {
 
     public static LineString createLineString(final DirectPosition[] points) {
         final CoordinateReferenceSystem crs = points[0].getCoordinateReferenceSystem();
-        final CommonFactory commonFactory = BasicFactories.getDefault();
+        final BasicFactories commonFactory = BasicFactories.getDefault();
         final GeometryFactory geometryFactory = commonFactory.getGeometryFactory(crs);
         return createLineString(geometryFactory, points);
     }

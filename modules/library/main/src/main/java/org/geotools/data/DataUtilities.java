@@ -140,7 +140,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * TODO: Move FeatureType manipulation to feature package
  * </p>
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/DataUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/DataUtilities.java $
  */
 public class DataUtilities {
     
@@ -1324,7 +1324,42 @@ public class DataUtilities {
                                          : identification.substring(0, split);
         String typeName = (split == -1) ? identification
                                         : identification.substring(split + 1);
-
+        
+        return createType(namespace, typeName, typeSpec);
+    }
+    
+    /**
+     * Utility method for FeatureType construction.
+     * <p>
+     * Will parse a String of the form: <i>"name:Type,name2:Type2,..."</i>
+     * </p>
+     * 
+     * <p>
+     * Where <i>Type</i> is defined by createAttribute.
+     * </p>
+     * 
+     * <p>
+     * You may indicate the default Geometry with an astrix: "*geom:Geometry". You
+     * may also indicate the srid (used to look up a EPSG code).
+     * </p>
+     * 
+     * <p>
+     * Examples:
+     * <ul>
+     * <li><code>name:"",age:0,geom:Geometry,centroid:Point,url:java.io.URL"</code>
+     * <li><code>id:String,polygonProperty:Polygon:srid=32615</code>
+     * </ul>
+     * </p>
+     *
+     * @param identification identification of FeatureType:
+     *        (<i>namesapce</i>).<i>typeName</i>
+     * @param typeSpec Specification for FeatureType
+     *
+     *
+     * @throws SchemaException
+     */
+    public static SimpleFeatureType createType(String namespace, String typeName, String typeSpec)
+        throws SchemaException {
         SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.setName( typeName );
         tb.setNamespaceURI(namespace);
@@ -1349,6 +1384,9 @@ public class DataUtilities {
 
         return tb.buildFeatureType();
     }
+
+    
+    
 
     /**
      * DOCUMENT ME!

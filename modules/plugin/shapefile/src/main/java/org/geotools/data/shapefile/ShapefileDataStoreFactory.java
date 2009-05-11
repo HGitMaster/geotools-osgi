@@ -107,26 +107,6 @@ public class ShapefileDataStoreFactory implements FileDataStoreFactorySpi {
     };
 
     /**
-     * It is the users responsibility to prevent the creation of duplicate
-     * DataStore instances (they should hold the results in a Map, Repository or
-     * Catalog as described in the documenation).
-     * <p>
-     * However in the real world we are patching the problem, this Map is used
-     * to store previously created DataStores so we can hand them out again.
-     * There are two problems with this approach:
-     * <ul>
-     * <li>The ShapefileDataStoreFactory may be created more than once with
-     * different Hints, for example when used to read a shapefile into alternate
-     * Feature or Geometry representations.
-     * <li>It flys in the face of a DataStore lifecycle, the JDBC DataStore
-     * implementations have taken to support a dispose operation.
-     * </ul>
-     * As such I expect this "feature" to disappear, I am keeping it now only so
-     * we can produce good warnings.
-     */
-    private static Map liveStores = Collections.synchronizedMap(new HashMap());
-
-    /**
      * Takes a map of parameters which describes how to access a DataStore and
      * determines if it can be read by the ShapefileDataStore or
      * IndexedShapefileDataStore implementations.
@@ -182,120 +162,6 @@ public class ShapefileDataStoreFactory implements FileDataStoreFactorySpi {
      *                 attached to the restore specified in params.
      */
     public ShapefileDataStore createDataStore(Map params) throws IOException {
-        DataStore ds = null;
-        synchronized (liveStores) {
-            if (!liveStores.containsKey(params)) {
-                URL url = null;
-                try {
-                    ds = createDataStoreInstance(params);
-                    liveStores.put(params, ds);
-                } catch (MalformedURLException mue) {
-                    throw new DataSourceException(
-                            "Unable to attatch datastore to " + url, mue);
-                }
-            } else {
-                ds = (DataStore) liveStores.get(params);
-            }
-        }
-        return (ShapefileDataStore) ds;
-    }
-
-    /**
-     * Creates a new DataStore - for a file that does not exist yet.
-     * <p>
-     * This method has different logic than createDataStore. It is willing to be
-     * memory mapped, and generate an index for a local file that does not exist
-     * yet.
-     * 
-     */
-    public DataStore createNewDataStore(Map params) throws IOException {
-        DataStore ds = null;
-        synchronized (liveStores) {
-            if (!liveStores.containsKey(params)) {
-                URL url = null;
-                try {
-                    ds = createNewShapefile(params);
-                    liveStores.put(params, ds);
-                } catch (MalformedURLException mue) {
-                    throw new DataSourceException(
-                            "Unable to attatch datastore to " + url, mue);
-                }
-            } else {
-                ds = (DataStore) liveStores.get(params);
-            }
-        }
-        return ds;
-    }
-
-    /**
-     * Will create a new shapefile baed on the provided parameters.
-     * 
-     * @param params
-     *                Map of parameters
-     * @throws IOException
-     *                 If the filename is not valid.
-     * @throws UnsupportedOperationException
-     */
-    DataStore createNewShapefile(Map params) throws IOException {
-        URL url = (URL) URLP.lookUp(params);
-        Boolean isMemoryMapped = (Boolean) MEMORY_MAPPED.lookUp(params);
-        URI namespace = (URI) NAMESPACEP.lookUp(params);
-        Charset dbfCharset = (Charset) DBFCHARSET.lookUp(params);
-        Boolean isCreateSpatialIndex = (Boolean) CREATE_SPATIAL_INDEX
-                .lookUp(params);
-
-        if (isCreateSpatialIndex == null) {
-            // should not be needed as default is TRUE
-            assert (true);
-            isCreateSpatialIndex = Boolean.TRUE;
-        }
-        if (dbfCharset == null) {
-            assert (true);
-            // this should not happen as Charset.forName("ISO-8859-1") was used
-            // as the param default?
-            dbfCharset = Charset.forName("ISO-8859-1");
-        }
-        if (isMemoryMapped == null) {
-            assert (true);
-            // this should not happen as false was the default
-            isMemoryMapped = Boolean.FALSE;
-        }
-        ShpFiles shpFiles = new ShpFiles(url);
-
-        boolean isLocal = shpFiles.isLocal();
-        if (!isLocal || shpFiles.exists(ShpFileType.SHP)) {
-            LOGGER.warning("File already exists: "
-                    + shpFiles.get(ShpFileType.SHP));
-        }
-        boolean useMemoryMappedBuffer = isLocal
-                && isMemoryMapped.booleanValue();
-        boolean createIndex = isCreateSpatialIndex.booleanValue() && isLocal;
-
-        try {
-            if (createIndex) {
-                return new IndexedShapefileDataStore(url, namespace,
-                        useMemoryMappedBuffer, true, IndexType.QIX, dbfCharset);
-            } else {
-                return new ShapefileDataStore(url, namespace,
-                        useMemoryMappedBuffer, dbfCharset);
-            }
-        } catch (MalformedURLException mue) {
-            throw new DataSourceException(
-                    "Url for shapefile malformed: " + url, mue);
-        }
-    }
-
-    /**
-     * Will create the correct implementation of ShapefileDataStore for the
-     * provided parameters.
-     * 
-     * @param params
-     *                Map of parameters
-     * @throws IOException
-     *                 If the specified shapefle could not be accessed
-     * @throws UnsupportedOperationException
-     */
-    DataStore createDataStoreInstance(Map params) throws IOException {
         URL url = (URL) URLP.lookUp(params);
         Boolean isMemoryMapped = (Boolean) MEMORY_MAPPED.lookUp(params);
         URI namespace = (URI) NAMESPACEP.lookUp(params);
@@ -350,6 +216,63 @@ public class ShapefileDataStoreFactory implements FileDataStoreFactorySpi {
             } else if (treeIndex != IndexType.NONE) {
                 return new IndexedShapefileDataStore(url, namespace,
                         useMemoryMappedBuffer, false, treeIndex, dbfCharset);
+            } else {
+                return new ShapefileDataStore(url, namespace,
+                        useMemoryMappedBuffer, dbfCharset);
+            }
+        } catch (MalformedURLException mue) {
+            throw new DataSourceException(
+                    "Url for shapefile malformed: " + url, mue);
+        }
+    }
+
+    /**
+     * Creates a new DataStore - for a file that does not exist yet.
+     * <p>
+     * This method has different logic than createDataStore. It is willing to be
+     * memory mapped, and generate an index for a local file that does not exist
+     * yet.
+     * 
+     */
+    public DataStore createNewDataStore(Map params) throws IOException {
+        URL url = (URL) URLP.lookUp(params);
+        Boolean isMemoryMapped = (Boolean) MEMORY_MAPPED.lookUp(params);
+        URI namespace = (URI) NAMESPACEP.lookUp(params);
+        Charset dbfCharset = (Charset) DBFCHARSET.lookUp(params);
+        Boolean isCreateSpatialIndex = (Boolean) CREATE_SPATIAL_INDEX
+                .lookUp(params);
+
+        if (isCreateSpatialIndex == null) {
+            // should not be needed as default is TRUE
+            assert (true);
+            isCreateSpatialIndex = Boolean.TRUE;
+        }
+        if (dbfCharset == null) {
+            assert (true);
+            // this should not happen as Charset.forName("ISO-8859-1") was used
+            // as the param default?
+            dbfCharset = Charset.forName("ISO-8859-1");
+        }
+        if (isMemoryMapped == null) {
+            assert (true);
+            // this should not happen as false was the default
+            isMemoryMapped = Boolean.FALSE;
+        }
+        ShpFiles shpFiles = new ShpFiles(url);
+
+        boolean isLocal = shpFiles.isLocal();
+        if (!isLocal || shpFiles.exists(ShpFileType.SHP)) {
+            LOGGER.warning("File already exists: "
+                    + shpFiles.get(ShpFileType.SHP));
+        }
+        boolean useMemoryMappedBuffer = isLocal
+                && isMemoryMapped.booleanValue();
+        boolean createIndex = isCreateSpatialIndex.booleanValue() && isLocal;
+
+        try {
+            if (createIndex) {
+                return new IndexedShapefileDataStore(url, namespace,
+                        useMemoryMappedBuffer, true, IndexType.QIX, dbfCharset);
             } else {
                 return new ShapefileDataStore(url, namespace,
                         useMemoryMappedBuffer, dbfCharset);

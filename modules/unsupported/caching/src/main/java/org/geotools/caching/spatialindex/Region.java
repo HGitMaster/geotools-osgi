@@ -82,20 +82,16 @@ public class Region implements Shape, Serializable {
 
         if (o instanceof Region) {
             Region r = (Region) o;
-
             if (r.m_pLow.length != m_pLow.length) {
                 return false;
             }
-
             for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) {
                 if ((m_pLow[cIndex] != r.m_pLow[cIndex]) || (m_pHigh[cIndex] != r.m_pHigh[cIndex])) {
                     return false;
                 }
             }
-
             return true;
         }
-
         return false;
     }
 

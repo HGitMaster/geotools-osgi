@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 31557 2008-09-19 20:02:35Z desruisseaux $
+        Version: $Id: pom.xml 32631 2009-03-15 17:06:15Z aaime $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>library</artifactId>
-    <version>2.6.0.osgi1</version>
+    <version>2.6.0.osgi2</version>
   </parent>
 
 
@@ -31,9 +31,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/library/metadata/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/library/metadata/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/library/metadata/</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/library/metadata/</url>
   </scm>
 
   <description>
@@ -113,6 +113,17 @@
     <dependency>
       <groupId>org.opengis</groupId>
       <artifactId>geoapi</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.opengis</groupId>
+          <artifactId>geoapi-dummy-pending</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.opengis</groupId>
+      <artifactId>geoapi-pending</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
 

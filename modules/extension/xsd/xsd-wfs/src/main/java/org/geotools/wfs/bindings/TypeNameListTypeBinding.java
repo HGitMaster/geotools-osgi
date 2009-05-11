@@ -53,6 +53,7 @@ import org.geotools.xml.InstanceComponent;
  * </p>
  *
  * @generated
+ * @deprecated this binding is not used, there's no emf object for TypeNameListType
  */
 public class TypeNameListTypeBinding extends AbstractSimpleBinding {
     public TypeNameListTypeBinding(WfsFactory factory) {
@@ -85,5 +86,10 @@ public class TypeNameListTypeBinding extends AbstractSimpleBinding {
         throws Exception {
         //TODO: implement and remove call to super
         return super.parse(instance, value);
+    }
+    
+    public String encode(Object object, String value) throws Exception {
+        //just return the value passed in, subclasses should override to provide new value
+        return value;
     }
 }

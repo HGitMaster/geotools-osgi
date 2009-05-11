@@ -86,4 +86,12 @@ public class GMLFeatureAssociationTypeBinding extends AbstractComplexBinding {
 
         //TODO: xlink and remoteSchema attributes, hard to do because of streaming
     }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        if( GML._Feature.equals( name ) ) {
+            return object;    
+        }
+        return null;
+    }
 }

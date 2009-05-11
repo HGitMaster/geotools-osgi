@@ -38,10 +38,14 @@ public class DB2DataStoreFactoryTest extends TestCase {
         params.put(JDBCDataStoreFactory.DATABASE.key, "geotools");
         params.put(JDBCDataStoreFactory.DBTYPE.key, "db2");
 
-        params.put(JDBCDataStoreFactory.HOST.key, "localhost");
-        params.put(JDBCDataStoreFactory.PORT.key, "50001");
         params.put(JDBCDataStoreFactory.USER.key, "db2inst1");
         params.put(JDBCDataStoreFactory.PASSWD.key, "db2inst1");
+        assertEquals("jdbc:db2:geotools",factory.getJDBCUrl(params) );
+        
+        params.put(JDBCDataStoreFactory.HOST.key, "localhost");
+        params.put(JDBCDataStoreFactory.PORT.key, "50001");                
+        assertEquals("jdbc:db2://localhost:50001/geotools",factory.getJDBCUrl(params) );
+        
         assertTrue(factory.canProcess(params));
     }
 }

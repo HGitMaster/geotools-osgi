@@ -21,8 +21,7 @@ import java.util.Properties;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.Request;
-import org.opengis.layer.Style;
-
+import org.geotools.data.ows.StyleImpl;
 
 /**
  * Construct a WMS getMap request.
@@ -78,7 +77,7 @@ import org.opengis.layer.Style;
  * </p>
  *
  * @author Richard Gould, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wms/src/main/java/org/geotools/data/wms/request/GetMapRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/wms/src/main/java/org/geotools/data/wms/request/GetMapRequest.java $
  */
 public interface GetMapRequest extends Request{
     /** Represents the ELEVATION parameter */
@@ -147,7 +146,7 @@ public interface GetMapRequest extends Request{
      * @param layer the Layer to use
      * @param style the style to use. If it is null, the default style is used.
      */
-    public void addLayer(Layer layer, Style style);
+    public void addLayer(Layer layer, StyleImpl style);
     
     /**
      * Adds a Layer to the list of layers to be requested. This layer will be drawn
@@ -156,7 +155,7 @@ public interface GetMapRequest extends Request{
      * @param layerName the Layer to use
      * @param style     the style to use. If it is null, the default style is used.
      */
-    public void addLayer(String layerName, Style style);
+    public void addLayer(String layerName, StyleImpl style);
 
     /**
      * Adds a Layer to the list of layers to be requested. This layer will be drawn

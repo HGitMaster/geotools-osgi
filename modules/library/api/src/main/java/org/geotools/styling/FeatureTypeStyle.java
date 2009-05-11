@@ -19,8 +19,6 @@ package org.geotools.styling;
 import java.util.List;
 
 import org.opengis.metadata.citation.OnLineResource;
-import org.opengis.style.Description;
-
 
 /**
  * How to style a feature type.  This is introduced as a convenient package
@@ -57,8 +55,8 @@ import org.opengis.style.Description;
  * &lt;/xsd:element&gt;
  * </code></pre>
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/FeatureTypeStyle.java $
- * @version $Id: FeatureTypeStyle.java 31136 2008-08-05 20:00:42Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/FeatureTypeStyle.java $
+ * @version $Id: FeatureTypeStyle.java 32919 2009-05-03 14:18:31Z jive $
  * @author James Macgill, CCG
  */
 public interface FeatureTypeStyle extends org.opengis.style.FeatureTypeStyle{
@@ -68,14 +66,12 @@ public interface FeatureTypeStyle extends org.opengis.style.FeatureTypeStyle{
     /**
      * @deprecated use getDescription.getTitle().toString()
      */
-    @Deprecated
     public String getTitle();
 
     /**
-     * @deprecated Must use a style visitor to make a copy 
      * @param title
+     * @deprecated please use getDescription.setTitle( new SimpleInternationalString( title ))
      */
-    @Deprecated
     void setTitle(String title);
 
     /**
@@ -86,12 +82,14 @@ public interface FeatureTypeStyle extends org.opengis.style.FeatureTypeStyle{
     Description getDescription();
     
     /**
-     * @deprecated use getDescription.getAbstract().toString()
+     * @deprecated use getDescription().getAbstract().toString()
      */
-    @Deprecated
     public String getAbstract();
 
-    @Deprecated
+    /**
+     * @param abstractStr
+     * @deprecated Please use getDescription().setAbstract( new SimpleInternationalString( abstractStr ))
+     */
     void setAbstract(String abstractStr);
 
     /**
@@ -101,7 +99,6 @@ public interface FeatureTypeStyle extends org.opengis.style.FeatureTypeStyle{
      * 
      * @deprecated this method is replaced by a live set featureTypeNames()
      */
-    @Deprecated
     String getFeatureTypeName();
 
     /**
@@ -109,10 +106,8 @@ public interface FeatureTypeStyle extends org.opengis.style.FeatureTypeStyle{
      * applied to.
      * @task REVISIT: should a set method be declared in this interface at all?
      * @param name The TypeName of the features to be styled by this instance.
-     * 
      * @deprecated Use featureTypeNames().clear() and featureTypeNames.add( new NameImpl( name ))
      */
-    @Deprecated
     void setFeatureTypeName(String name);
 
     /**
@@ -153,10 +148,8 @@ public interface FeatureTypeStyle extends org.opengis.style.FeatureTypeStyle{
      *
      * @param types An array of strings representing systematic types which
      *         could be styled by this instance.
-     * 
-     * @deprecated this method is replaced by a live set semanticIdentifiers()
+     * @deprecated Please use semanticIdentifiers().addAll()
      */
-    @Deprecated
     void setSemanticTypeIdentifiers(String[] types);
 
     /**
@@ -169,9 +162,8 @@ public interface FeatureTypeStyle extends org.opengis.style.FeatureTypeStyle{
      * @version SLD 1.0.20 TODO: GeoAPI getRules(): List<Rule>
      * @return The full set of rules contained in this styler.
      * 
-     * @deprecated use rules(), this method will be removed in 2.6.
+     * @deprecated use rules().toArray( new Rule[0] )
      */
-    @Deprecated
     Rule[] getRules();
 
     /**
@@ -182,15 +174,13 @@ public interface FeatureTypeStyle extends org.opengis.style.FeatureTypeStyle{
      *
      * @param rules The set of rules to be set for this styler.
      * 
-     * @deprecated this method is replaced by a live list rules()
+     * @deprecated Please use rules().clear(); rules.addAll( rules )
      */
-    @Deprecated
     void setRules(Rule[] rules);
 
     /**
-     * @deprecated this method is replaced by a live list rules()
+     * @deprecated Please use rules().add( rule )
      */
-    @Deprecated
     void addRule(Rule rule);
 
     /**
@@ -202,7 +192,13 @@ public interface FeatureTypeStyle extends org.opengis.style.FeatureTypeStyle{
      * @since GeoTools 2.2.M3, GeoAPI 2.0
      */
     List<Rule> rules();
-
+    
+    /**
+     * It is common to have a style coming from a external xml file, this method
+     * provide a way to get the original source if there is one.
+     *    
+     * @param online location external file defining this style, or null if not available
+     */
     void setOnlineResource(OnLineResource online);
 
     void accept(org.geotools.styling.StyleVisitor visitor);

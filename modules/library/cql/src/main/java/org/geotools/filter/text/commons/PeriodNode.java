@@ -26,11 +26,15 @@ import org.opengis.filter.expression.Literal;
  * Period is constructed in the parsing process. this has convenient method to
  * deliver begin and end date of period. a period can be created from
  * date-time/date-time or date-time/duration or duration/date-time
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
  *
  * @since 2.4
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
- * @version $Id: PeriodNode.java 31632 2008-10-07 19:32:57Z mauricio.pazos $
+ * @version $Id: PeriodNode.java 31937 2008-12-01 13:54:45Z mauricio.pazos $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/PeriodNode.java $
  *

@@ -37,19 +37,24 @@ public class ReTypingIterator implements Iterator {
 	 * The delegate iterator
 	 */
 	Iterator delegate;
+	
 	/**
 	 * The target feature type
 	 */
 	SimpleFeatureType target;
+	
 	/**
 	 * The matching types from target 
 	 */
 	AttributeDescriptor[] types;
 	
+	SimpleFeatureBuilder builder;
+	
 	public ReTypingIterator( Iterator delegate, SimpleFeatureType source, SimpleFeatureType target ) {
 		this.delegate = delegate;
 		this.target = target;
 		types = typeAttributes( source, target );
+		this.builder = new SimpleFeatureBuilder(target);
 	}
 	
 	public Iterator getDelegate() {
@@ -68,17 +73,13 @@ public class ReTypingIterator implements Iterator {
 		SimpleFeature next = (SimpleFeature) delegate.next();
         String id = next.getID();
 
-        Object[] attributes = new Object[types.length];
-        String xpath;
-
         try {
 			for (int i = 0; i < types.length; i++) {
-			    xpath = types[i].getLocalName();
-			    //attributes[i] = types[i].duplicate(next.getAttribute(xpath));
-			    attributes[i] = next.getAttribute(xpath);
+			    final String xpath = types[i].getLocalName();
+			    builder.add(next.getAttribute(xpath));
 			}
-
-			return SimpleFeatureBuilder.build(target, attributes, id);
+			
+			return builder.buildFeature(id);
 		} 
         catch (IllegalAttributeException e) {
         	throw new RuntimeException( e );

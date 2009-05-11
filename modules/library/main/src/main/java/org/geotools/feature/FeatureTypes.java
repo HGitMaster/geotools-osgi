@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -64,7 +63,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Jody Garnett, Refractions Research
  * @since 2.1.M3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/FeatureTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/feature/FeatureTypes.java $
  */
 public class FeatureTypes {
 
@@ -374,19 +373,18 @@ public class FeatureTypes {
     }
 
     /**
-     * Walks up the type hierachy of the feature returning all super types of
-     * the specified feature type.
+     * Walks up the type hierachy of the feature returning all super types of the specified feature
+     * type.
      */
-    public static List getAncestors( FeatureType featureType ) {
-        List ancestors = new ArrayList();
-        while ( featureType.getSuper() != null ) {
-            ancestors.add( featureType.getSuper() );
-            if ( featureType.getSuper() instanceof FeatureType ) {
-                ancestors.add( featureType.getSuper() );
-                featureType = (FeatureType) featureType.getSuper();
+    public static List<FeatureType> getAncestors(FeatureType featureType) {
+        List<FeatureType> ancestors = new ArrayList<FeatureType>();
+        while (featureType.getSuper() != null) {
+            if (featureType.getSuper() instanceof FeatureType) {
+                FeatureType superType = (FeatureType) featureType.getSuper();
+                ancestors.add(superType);
+                featureType = superType;
             }
         }
-
         return ancestors;
     }
 
@@ -402,42 +400,40 @@ public class FeatureTypes {
      * This is a proper check, if the provided FeatureType matches the given namespace and typename
      * it is <b>not </b> considered to be decended from itself.
      * </p>
-     *
-     * @param featureType typeName with parentage in question
-     * @param namespace namespace to match against, or null for a "wildcard"
-     * @param typeName typename to match against, or null for a "wildcard"
+     * 
+     * @param featureType
+     *            typeName with parentage in question
+     * @param namespace
+     *            namespace to match against, or null for a "wildcard"
+     * @param typeName
+     *            typename to match against, or null for a "wildcard"
      * @return true if featureType is a decendent of the indicated namespace & typeName
      */
-    public static boolean isDecendedFrom( SimpleFeatureType featureType, URI namespace, String typeName ) {
+    public static boolean isDecendedFrom(FeatureType featureType, URI namespace, String typeName) {
         if (featureType == null)
             return false;
-
-        List ancestors = getAncestors(featureType);
-        for ( Iterator a = ancestors.iterator(); a.hasNext(); ) {
-            FeatureType superType = (FeatureType) a.next();
-            if ( namespace == null ) {
-                //dont match on namespace
-                if ( Utilities.equals(superType.getName().getLocalPart(), typeName) ) {
+        List<FeatureType> ancestors = getAncestors(featureType);
+        for (FeatureType superType : ancestors) {
+            if (namespace == null) {
+                // dont match on namespace
+                if (Utilities.equals(superType.getName().getLocalPart(), typeName)) {
+                    return true;
+                }
+            } else {
+                if (Utilities.equals(superType.getName().getNamespaceURI(), namespace.toString())
+                        && Utilities.equals(superType.getName().getLocalPart(), typeName)) {
                     return true;
                 }
             }
-            else {
-                if ( Utilities.equals(superType.getName().getNamespaceURI(),namespace.toString()) &&
-                        Utilities.equals(superType.getName().getLocalPart(), typeName)) {
-                    return true;
-                }
-            }
-
         }
-
         return false;
     }
 
-    public static boolean isDecendedFrom( SimpleFeatureType featureType, SimpleFeatureType isParentType ) {
+    public static boolean isDecendedFrom(FeatureType featureType, FeatureType isParentType) {
         try {
-            return isDecendedFrom(featureType, new URI(isParentType.getName().getNamespaceURI()), isParentType.getName().getLocalPart() );
-        }
-        catch (URISyntaxException e) {
+            return isDecendedFrom(featureType, new URI(isParentType.getName().getNamespaceURI()),
+                    isParentType.getName().getLocalPart());
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

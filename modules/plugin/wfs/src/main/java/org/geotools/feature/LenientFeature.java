@@ -16,7 +16,6 @@
  */
 package org.geotools.feature;
 
-import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -29,10 +29,12 @@ import org.opengis.filter.expression.Expression;
  * 
  * <p>
  * This is an internal utility class with convenient methods for compiler actions.
- * 
- * This is intended as an internal interface used only in this module. Client modules
- * mustn't use it.
  * </p>
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
+ * 
  *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
@@ -155,4 +157,62 @@ final public class CompilerUtil {
         return results;
     }
     
+    /**
+     * Parses the expression present on source and make an expression object.
+     * @param source
+     * @param compilerFactory   a compiler used to parse the source
+     * @param filterFactory     a filter factory used to make the filter
+     * @return an {@link Expression}
+     * @throws CQLException
+     */
+    public static Expression parseExpression(final String source, final AbstractCompilerFactory compilerFactory, FilterFactory filterFactory ) throws CQLException{
+ 
+        ICompiler compiler = compilerFactory.makeCompiler(source, filterFactory);
+        compiler.compileExpression();
+        Expression expression = compiler.getExpression();
+        
+        return expression;
+    }
+
+
+    /**
+     * Parses the predicate present on source and makes the filter.
+     * @param source    a predicate
+     * @param compilerFactory   a compiler used to parse the source
+     * @param filterFactory     a filter factory used to make the filter
+     * @return a {@link Filter}
+     * @throws CQLException
+     */
+    public static Filter parseFilter(
+            final String source,
+            final AbstractCompilerFactory compilerFactory, 
+            final FilterFactory filterFactory) throws CQLException {
+
+        ICompiler compiler = compilerFactory.makeCompiler(source, filterFactory);
+        compiler.compileFilter();
+        Filter result = compiler.getFilter();
+        
+        return result;
+    }
+
+    /**
+     * Parses the sequence of predicate and makes the filter list
+     * 
+     * @param predicateSequence sequence of predicates
+     * @param compilerFactory   a compiler used to parse the source
+     * @param filterFactory     a filter factory used to make the filter
+     * @return {@link List} of {@link Filter}
+     * @throws CQLException
+     */
+    public static List<Filter> parseFilterList(
+            final String predicateSequence,
+            final AbstractCompilerFactory compilerFactory, 
+            final FilterFactory filterFactory) throws CQLException {
+
+        ICompiler compiler = compilerFactory.makeCompiler(predicateSequence, filterFactory);
+        compiler.compileFilterList();
+        List<Filter> filters = compiler.getFilterList();
+        
+        return filters;
+    }
 }

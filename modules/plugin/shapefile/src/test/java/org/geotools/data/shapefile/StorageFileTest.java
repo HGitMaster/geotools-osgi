@@ -126,17 +126,17 @@ public class StorageFileTest extends TestCase implements FileReader {
         StorageFile storagePRJ2 = shpFiles2.getStorageFile(PRJ);
         StorageFile storageSHP2 = shpFiles2.getStorageFile(SHP);
 
-        assertEquals(-1, storagePRJ1.compareTo(storageSHP1));
-        assertEquals(1, storagePRJ1.compareTo(storagePRJ2));
+        assertFalse(storagePRJ1.compareTo(storageSHP1) == 0);
+        assertFalse(storagePRJ1.compareTo(storagePRJ2) == 0);
 
         StorageFile[] array = new StorageFile[] { storagePRJ1, storagePRJ2,
                 storageSHP1, storageSHP2 };
 
         Arrays.sort(array);
 
-        assertEquals(-1, array[0].compareTo(array[1]));
-        assertEquals(-1, array[2].compareTo(array[3]));
-        assertEquals(1, array[1].compareTo(array[2]));
+        assertFalse(array[0].compareTo(array[1]) == 0);
+        assertFalse(array[2].compareTo(array[3]) == 0);
+        assertFalse(array[1].compareTo(array[2]) == 0);
     }
 
     public String id() {

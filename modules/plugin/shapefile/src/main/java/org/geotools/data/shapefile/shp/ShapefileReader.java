@@ -23,6 +23,8 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.shapefile.FileReader;
@@ -30,6 +32,7 @@ import org.geotools.data.shapefile.ShpFileType;
 import org.geotools.data.shapefile.ShpFiles;
 import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.resources.NIOUtilities;
+import org.geotools.util.logging.Logging;
 
 /**
  * The general use of this class is: <CODE><PRE>
@@ -50,6 +53,13 @@ import org.geotools.resources.NIOUtilities;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/shp/ShapefileReader.java $
  */
 public class ShapefileReader implements FileReader {
+    private static final Logger LOGGER = Logging.getLogger(ShapefileReader.class);
+    
+    /**
+     *  Used to mark the current shape is not known, either because someone moved the reader
+     *  to a specific byte offset manually, or because the .shx could not be opened
+     */
+    private static final int UNKNOWN = Integer.MIN_VALUE;
 
     /**
      * The reader returns only one Record instance in its lifetime. The record
@@ -122,6 +132,11 @@ public class ShapefileReader implements FileReader {
     private boolean useMemoryMappedBuffer;
 
     private long currentOffset = 0L;
+    
+    private int currentShape = 0;
+    
+    private IndexFile shxReader;
+    
     private StreamLogging streamLogger = new StreamLogging("Shapefile Reader");
 
     /**
@@ -143,7 +158,28 @@ public class ShapefileReader implements FileReader {
         this.useMemoryMappedBuffer = useMemoryMapped;
         streamLogger.open();
         randomAccessEnabled = channel instanceof FileChannel;
+        try {
+            shxReader = new IndexFile(shapefileFiles, true);
+        } catch(Exception e) {
+            LOGGER.log(Level.WARNING, "Could not open the .shx file, continuing " +
+            		"assuming the .shp file is not sparse", e);
+            currentShape = UNKNOWN;
+        }
         init(strict);
+    }
+    
+    /**
+     * Disables .shx file usage. By doing so you drop support for sparse shapefiles, the 
+     * .shp will have to be without holes, all the valid shapefile records will have to
+     * be contiguous.
+     * @throws IOException
+     */
+    public void disableShxUsage() throws IOException {
+        if(shxReader != null) {
+            shxReader.close();
+            shxReader = null;
+        }
+        currentShape = UNKNOWN;
     }
 
     // convenience to peak at a header
@@ -274,6 +310,9 @@ public class ShapefileReader implements FileReader {
         if (buffer instanceof MappedByteBuffer) {
             NIOUtilities.clean(buffer);
         }
+        if(shxReader != null)
+            shxReader.close();
+        shxReader = null;
         channel = null;
         header = null;
     }
@@ -307,11 +346,16 @@ public class ShapefileReader implements FileReader {
      * @return True if has next record, false otherwise.
      */
     private boolean hasNext(boolean checkRecno) throws IOException {
+        // don't read past the end of the file (provided currentShape accurately
+        // represents the current position)
+        if(currentShape > UNKNOWN && currentShape > shxReader.getRecordCount() - 1)
+            return false;
+        
         // mark current position
         int position = buffer.position();
 
         // ensure the proper position, regardless of read or handler behavior
-        buffer.position(this.toBufferOffset(record.end));
+        buffer.position(getNextOffset());
 
         // no more data left
         if (buffer.remaining() < 8)
@@ -322,13 +366,22 @@ public class ShapefileReader implements FileReader {
         if (checkRecno) {
             // record headers in big endian
             buffer.order(ByteOrder.BIG_ENDIAN);
-            hasNext = buffer.getInt() == record.number + 1;
+            int declaredRecNo = buffer.getInt();
+            hasNext = declaredRecNo == record.number + 1;
         }
 
         // reset things to as they were
         buffer.position(position);
 
         return hasNext;
+    }
+    
+    private int getNextOffset() throws IOException {
+        if(currentShape >= 0) {
+            return this.toBufferOffset(shxReader.getOffsetInBytes(currentShape));
+        } else {
+            return this.toBufferOffset(record.end);
+        }
     }
 
     /**
@@ -391,7 +444,9 @@ public class ShapefileReader implements FileReader {
     public Record nextRecord() throws IOException {
 
         // need to update position
-        buffer.position(this.toBufferOffset(record.end));
+        buffer.position(getNextOffset());
+        if(currentShape != UNKNOWN)
+            currentShape++;
 
         // record header is big endian
         buffer.order(ByteOrder.BIG_ENDIAN);
@@ -472,7 +527,13 @@ public class ShapefileReader implements FileReader {
     }
 
     /**
-     * Needs better data, what is the requirements for offset?
+     * Moves the reader to the specified byte offset in the file. Mind that:
+     * <ul>
+     * <li>it's your responsibility to ensure the offset corresponds to the
+     * actual beginning of a shape struct</li>
+     * <li>once you call this, reading with hasNext/next on sparse shapefiles
+     * will be broken (we don't know anymore at which shape we are)</li>
+     * </ul>
      * 
      * @param offset
      * @throws IOException
@@ -480,6 +541,7 @@ public class ShapefileReader implements FileReader {
      */
     public void goTo(int offset) throws IOException,
             UnsupportedOperationException {
+        disableShxUsage();
         if (randomAccessEnabled) {
             if (this.useMemoryMappedBuffer) {
                 buffer.position(offset);
@@ -515,7 +577,15 @@ public class ShapefileReader implements FileReader {
     }
 
     /**
-     * TODO needs better java docs!!! What is offset?
+     * Returns the shape at the specified byte distance from the beginning of
+     * the file. Mind that:
+     * <ul>
+     * <li>it's your responsibility to ensure the offset corresponds to the
+     * actual beginning of a shape struct</li>
+     * <li>once you call this, reading with hasNext/next on sparse shapefiles
+     * will be broken (we don't know anymore at which shape we are)</li>
+     * </ul>
+     * 
      * 
      * @param offset
      * @throws IOException
@@ -533,18 +603,25 @@ public class ShapefileReader implements FileReader {
     /**
      * Sets the current location of the byteStream to offset and returns the
      * next record. Usually used in conjuctions with the shx file or some other
-     * index file.
+     * index file. Mind that:
+     * <ul>
+     * <li>it's your responsibility to ensure the offset corresponds to the
+     * actual beginning of a shape struct</li>
+     * <li>once you call this, reading with hasNext/next on sparse shapefiles
+     * will be broken (we don't know anymore at which shape we are)</li>
+     * </ul>
+     * 
+     * 
      * 
      * @param offset
-     *                If using an shx file the offset would be: 2 *
-     *                (index.getOffset(i))
+     *            If using an shx file the offset would be: 2 *
+     *            (index.getOffset(i))
      * @return The record after the offset location in the bytestream
      * @throws IOException
-     *                 thrown in a read error occurs
+     *             thrown in a read error occurs
      * @throws UnsupportedOperationException
-     *                 thrown if not a random access file
+     *             thrown if not a random access file
      */
-
     public Record recordAt(int offset) throws IOException,
             UnsupportedOperationException {
         if (randomAccessEnabled) {

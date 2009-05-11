@@ -26,7 +26,7 @@ import org.opengis.filter.spatial.Disjoint;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DisjointImpl extends GeometryFilterImpl implements Disjoint {
+public class DisjointImpl extends AbstractPreparedGeometryFilter implements Disjoint {
 
 	public DisjointImpl(org.opengis.filter.FilterFactory factory,Expression e1,Expression e2) {
 		super(factory,e1,e2);
@@ -39,9 +39,29 @@ public class DisjointImpl extends GeometryFilterImpl implements Disjoint {
 		if (feature instanceof SimpleFeature && !validate((SimpleFeature)feature))
 			return false;
 		
-		Geometry left = getLeftGeometry(feature);
-		Geometry right = getRightGeometry(feature);
+		Geometry left;
+        Geometry right;
+
+        switch (literals) {
+        case BOTH:
+            return cacheValue;
+        case RIGHT: {
+            return rightPreppedGeom.disjoint(getLeftGeometry(feature));
+        }
+        case LEFT: {
+            return leftPreppedGeom.disjoint(getRightGeometry(feature));
+        }
+        default: {
+            left = getLeftGeometry(feature);
+            right = getRightGeometry(feature);
+            return basicEvaluate(left, right);
+        }
+        }
 		
+	}
+	
+	@Override
+	protected boolean basicEvaluate(Geometry left, Geometry right) {
 		Envelope envLeft = left.getEnvelopeInternal();
 		Envelope envRight = right.getEnvelopeInternal();
 		
@@ -49,7 +69,7 @@ public class DisjointImpl extends GeometryFilterImpl implements Disjoint {
             return left.disjoint(right);
         
          return true;
-	}
+     }
 	
 	public Object accept(FilterVisitor visitor, Object extraData) {
 		return visitor.visit(this,extraData);

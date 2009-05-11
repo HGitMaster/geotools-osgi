@@ -30,9 +30,7 @@ import org.geotools.xml.XSD;
  *
  * @generated
  */
-public final class WFS extends XSD {
-    /** singleton instance */
-    private static final WFS instance = new WFS();
+public abstract class WFS extends XSD {
 
     /** @generated */
     public static final String NAMESPACE = "http://www.opengis.net/wfs";
@@ -283,19 +281,7 @@ public final class WFS extends XSD {
     /**
      * private constructor
      */
-    private WFS() {
-    }
-
-    /**
-     * Returns the singleton instance.
-     */
-    public static final WFS getInstance() {
-        return instance;
-    }
-
-    protected void addDependencies(Set dependencies) {
-        dependencies.add(OWS.getInstance());
-        dependencies.add(OGC.getInstance());
+    protected WFS() {
     }
 
     /**
@@ -304,13 +290,11 @@ public final class WFS extends XSD {
     public String getNamespaceURI() {
         return NAMESPACE;
     }
-
+    
     /**
-     * Returns the location of 'wfs.xsd.'.
+     * Returns the version of WFS.
      */
-    public String getSchemaLocation() {
-        return getClass().getResource("wfs.xsd").toString();
-    }
+    public abstract String getVersion();
 
     /* Attributes */
 }

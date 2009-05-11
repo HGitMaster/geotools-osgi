@@ -72,6 +72,13 @@ public class StyleGroup implements SubNodeGroup {
 
                 public void layerHidden(MapLayerEvent event) {
                 }
+
+                public void layerSelected(MapLayerEvent event) {
+                }
+
+                public void layerDeselected(MapLayerEvent event) {
+                }
+
             });
         }
 

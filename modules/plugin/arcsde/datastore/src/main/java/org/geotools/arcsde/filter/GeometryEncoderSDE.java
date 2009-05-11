@@ -80,7 +80,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author Gabriel Rold?n
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/filter/GeometryEncoderSDE.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/filter/GeometryEncoderSDE.java $
  */
 public class GeometryEncoderSDE implements FilterVisitor {
     /** Standard java logger */
@@ -127,7 +128,8 @@ public class GeometryEncoderSDE implements FilterVisitor {
     /**
      * DOCUMENT ME!
      * 
-     * @param layer DOCUMENT ME!
+     * @param layer
+     *            DOCUMENT ME!
      * @deprecated remove when the old data api dissapear
      */
     @Deprecated
@@ -159,7 +161,8 @@ public class GeometryEncoderSDE implements FilterVisitor {
      * DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
-     * @throws IllegalStateException DOCUMENT ME!
+     * @throws IllegalStateException
+     *             DOCUMENT ME!
      */
     private String getLayerName() throws SeException {
         if (this.sdeLayer == null) {
@@ -171,8 +174,10 @@ public class GeometryEncoderSDE implements FilterVisitor {
     /**
      * overriden just to avoid the "WHERE" keyword
      * 
-     * @param filter DOCUMENT ME!
-     * @throws GeometryEncoderException DOCUMENT ME!
+     * @param filter
+     *            DOCUMENT ME!
+     * @throws GeometryEncoderException
+     *             DOCUMENT ME!
      */
     public void encode(Filter filter) throws GeometryEncoderException {
         this.sdeSpatialFilters = new ArrayList();
@@ -190,15 +195,15 @@ public class GeometryEncoderSDE implements FilterVisitor {
     /**
      * @param filter
      * @param sdeMethod
-     * @param truth de default truth value for <code>sdeMethod</code>
-     * @param extraData if an instanceof java.lang.Boolean, <code>truth</code> is and'ed with its
-     *            boolean value. May have been set by {@link #visit(Not, Object)} to revert the
-     *            logical evaluation criteria.
+     * @param truth
+     *            de default truth value for <code>sdeMethod</code>
+     * @param extraData
+     *            if an instanceof java.lang.Boolean, <code>truth</code> is and'ed with its boolean
+     *            value. May have been set by {@link #visit(Not, Object)} to revert the logical
+     *            evaluation criteria.
      */
-    private void addSpatialFilter(final BinarySpatialOperator filter,
-            final int sdeMethod,
-            final boolean truth,
-            final Object extraData) {
+    private void addSpatialFilter(final BinarySpatialOperator filter, final int sdeMethod,
+            final boolean truth, final Object extraData) {
         boolean appliedTruth = truth;
         if (extraData instanceof Boolean) {
             boolean andValue = ((Boolean) extraData).booleanValue();
@@ -234,6 +239,10 @@ public class GeometryEncoderSDE implements FilterVisitor {
         String localPropName = rawPropName;
         if (rawPropName.indexOf(":") != -1) {
             localPropName = rawPropName.substring(rawPropName.indexOf(":") + 1);
+        }
+        if ("".equals(localPropName)) {
+            log.fine("Empty property name found on filter, using default geometry property");
+            localPropName = spatialCol;
         }
         if (!rawPropName.equalsIgnoreCase(spatialCol)
                 && !localPropName.equalsIgnoreCase(spatialCol)) {
@@ -387,8 +396,8 @@ public class GeometryEncoderSDE implements FilterVisitor {
     }
 
     /**
-     * Sets <code>extraData</code> to Boolean.FALSE to revert the truth value of the spatial
-     * filter contained, if any.
+     * Sets <code>extraData</code> to Boolean.FALSE to revert the truth value of the spatial filter
+     * contained, if any.
      */
     public Object visit(Not filter, Object extraData) {
         Boolean truth = Boolean.FALSE;

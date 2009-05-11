@@ -41,4 +41,10 @@ public class StringFunctionTest extends TestCase {
         s = (String) f.evaluate(null,String.class);
         assertEquals( "fbaro", s );
     }
+    
+    public void testParseLong() {
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        assertEquals(Long.MAX_VALUE , ff.function("parseLong", ff.literal(Long.MAX_VALUE + "")).evaluate(null));
+        assertEquals(5l , ff.function("parseLong", ff.literal("5.0")).evaluate(null));
+    }
 }

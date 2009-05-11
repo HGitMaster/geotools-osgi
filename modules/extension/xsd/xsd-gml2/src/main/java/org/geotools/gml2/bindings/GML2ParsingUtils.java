@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDParticle;
@@ -33,21 +34,22 @@ import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.GML;
 import org.geotools.referencing.CRS;
 import org.geotools.util.Converters;
+import org.geotools.util.logging.Logging;
 import org.geotools.xml.Binding;
 import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xml.Schemas;
 import org.geotools.xml.impl.BindingWalker;
+import org.geotools.xs.bindings.XSAnyTypeBinding;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -60,6 +62,11 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  *
  */
 public class GML2ParsingUtils {
+    /**
+     * logging instance
+     */
+    static Logger LOGGER = Logging.getLogger( "org.geotools.gml" );
+    
     /**
      * Utility method to implement Binding.parse for a binding which parses
      * into A feature.
@@ -82,26 +89,41 @@ public class GML2ParsingUtils {
         // which means we are parsing an elemetn which could not be found in the 
         // schema, so instaed of using the element declaration to build the 
         // type, just use the node given to us
-        SimpleFeatureType fType = null;
-
+        SimpleFeatureType sfType = null;
+        FeatureType fType = null;
+        
         if (!decl.isAbstract()) {
             //first look in cache
             fType = ftCache.get(new NameImpl(decl.getTargetNamespace(), decl.getName()));
 
-            if (fType == null) {
+            if (fType == null || fType instanceof SimpleFeatureType) {
+                sfType = (SimpleFeatureType) fType;
+            } else {
+                // TODO: support parsing of non-simple GML features
+                throw new UnsupportedOperationException("Parsing of non-simple GML features not yet supported.");
+            }
+
+            if (sfType == null) {
                 //build from element declaration
-                fType = GML2ParsingUtils.featureType(decl, bwFactory);
-                ftCache.put(fType);
+                sfType = GML2ParsingUtils.featureType(decl, bwFactory);
+                ftCache.put(sfType);
             }
         } else {
             // first look in cache
-            fType = ftCache.get(new NameImpl(node.getComponent().getNamespace(),
-                        node.getComponent().getName()));
+            fType = ftCache.get(new NameImpl(node.getComponent().getNamespace(), node
+                    .getComponent().getName()));
 
-            if (fType == null) {
+            if (fType == null || fType instanceof SimpleFeatureType) {
+                sfType = (SimpleFeatureType) fType;
+            } else {
+                // TODO: support parsing of non-simple GML features
+                throw new UnsupportedOperationException("Parsing of non-simple GML features not yet supported.");
+            }
+
+            if (sfType == null) {
                 //build from node
-                fType = GML2ParsingUtils.featureType(node);
-                ftCache.put(fType);
+                sfType = GML2ParsingUtils.featureType(node);
+                ftCache.put(sfType);
             }
         }
 
@@ -114,7 +136,7 @@ public class GML2ParsingUtils {
         }
 
         //create feature
-        return GML2ParsingUtils.feature(fType, fid, node);
+        return GML2ParsingUtils.feature(sfType, fid, node);
     }
 
     /**
@@ -201,7 +223,8 @@ public class GML2ParsingUtils {
 
             if (bindings.isEmpty()) {
                 // could not find a binding, use the defaults
-                throw new RuntimeException("Could not find binding for " + property.getQName());
+                LOGGER.warning( "Could not find binding for " + property.getQName() + ", using XSAnyTypeBinding." );
+                bindings.add( new XSAnyTypeBinding() );
             }
 
             // get hte last binding in the chain to execute
@@ -228,9 +251,11 @@ public class GML2ParsingUtils {
             // create the type
             ftBuilder.minOccurs(min).maxOccurs(max).add(property.getName(), theClass);
 
-            //set the default geometry explicitly
+            //set the default geometry explicitly. Note we're comparing the GML namespace
+            //with String.startsWith to catch up on the GML 3.2 namespace too, which is hacky.
+            final String propNamespace = property.getTargetNamespace();
             if (Geometry.class.isAssignableFrom(theClass)
-                    && !GML.NAMESPACE.equals(property.getTargetNamespace())) {
+                    && (propNamespace == null || !propNamespace.startsWith(GML.NAMESPACE))) {
                 //only set if non-gml, we do this because of "gml:location", 
                 // we dont want that to be the default if the user has another
                 // geometry attribute

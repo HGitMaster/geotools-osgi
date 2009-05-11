@@ -18,12 +18,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
-import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
 
@@ -31,11 +32,10 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.PanAction;
-import org.geotools.gui.swing.ResetAction;
-import org.geotools.gui.swing.SelectAction;
-import org.geotools.gui.swing.ZoomInAction;
-import org.geotools.gui.swing.ZoomOutAction;
+import org.geotools.gui.swing.action.PanAction;
+import org.geotools.gui.swing.action.ResetAction;
+import org.geotools.gui.swing.action.ZoomInAction;
+import org.geotools.gui.swing.action.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
@@ -46,19 +46,20 @@ import org.geotools.styling.SLDParser;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Sample application that may be used to try JMapPane from the command line.
  *
  * @author Ian Turton
+ * @author Michael Bedward
  */
-public class MapViewer implements ActionListener{
+public class MapViewer {
     JFrame frame;
     JMapPane mp;
-    JToolBar jtb;
     JLabel text;
-    final JFileChooser jfc = new JFileChooser();
+
     public MapViewer(){
         frame=new JFrame("My Map Viewer");
         frame.setBounds(20,20,450,200);
@@ -67,56 +68,69 @@ public class MapViewer implements ActionListener{
         mp = new JMapPane();
         //mp.addZoomChangeListener(this);
         content.setLayout(new BorderLayout());
-        jtb = new JToolBar();
+        
+        JToolBar jtb = new JToolBar();
 
-        JButton load = new JButton("Load file");
-        load.addActionListener(this);
-        jtb.add(load);
-        Action zoomIn = new ZoomInAction(mp);
-        Action zoomOut = new ZoomOutAction(mp);
-        Action pan = new PanAction(mp);
-        Action select = new SelectAction(mp);
-        Action reset = new ResetAction(mp);
-        jtb.add(zoomIn);
-        jtb.add(zoomOut);
-        jtb.add(pan);
+        JButton loadBtn = new JButton("Load file");
+        loadBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                loadFile();
+            }
+        });
+        jtb.add(loadBtn);
+        
         jtb.addSeparator();
-        jtb.add(reset);
+        
+        JButton resetBtn = new JButton(new ResetAction(mp));
+        jtb.add(resetBtn);
+        
         jtb.addSeparator();
-        jtb.add(select);
-        final JButton button= new JButton();
-        button.setText("CRS");
-        button.setToolTipText("Change map prjection");
-        button.addActionListener(new ActionListener() {
+        
+        ButtonGroup cursorGrp = new ButtonGroup();
+        JToggleButton zoomInBtn = new JToggleButton(new ZoomInAction(mp));
+        jtb.add(zoomInBtn);
+        cursorGrp.add(zoomInBtn);
+        
+        JToggleButton zoomOutBtn = new JToggleButton(new ZoomOutAction(mp));
+        jtb.add(zoomOutBtn);
+        cursorGrp.add(zoomOutBtn);
+
+        JToggleButton panBtn = new JToggleButton(new PanAction(mp));
+        jtb.add(panBtn);
+        cursorGrp.add(panBtn);
+
+        jtb.addSeparator();
+        
+        final JButton crsBtn = new JButton("CRS");
+        crsBtn.setToolTipText("Change map prjection");
+        crsBtn.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
 
-            	String code = JOptionPane.showInputDialog( button, "Coordinate Reference System:", "EPSG:4326" );
-            	if(code==null)return;
-            	try{
-             	   CoordinateReferenceSystem crs = CRS.decode( code );
-                   setCRS( crs );
+                String code = JOptionPane.showInputDialog(crsBtn, "Coordinate Reference System:", "EPSG:4326");
+                if (code == null) {
+                    return;
                 }
-                catch(Exception fe){
-                	fe.printStackTrace();
-             	   JOptionPane.showMessageDialog( button, fe.getMessage(), fe.getClass().toString(), JOptionPane.ERROR_MESSAGE );
-             	   return;
+                try {
+                    CoordinateReferenceSystem crs = CRS.decode(code);
+                    setCRS(crs);
+                } catch (Exception fe) {
+                    fe.printStackTrace();
+                    JOptionPane.showMessageDialog(crsBtn, fe.getMessage(), fe.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
             }
         });
-        jtb.add(button);
+        jtb.add(crsBtn);
 
         content.add(jtb,BorderLayout.NORTH);
-
-
-        //JComponent sp = mp.createScrollPane();
-        mp.setSize(400,200);
         content.add(mp,BorderLayout.CENTER);
 
-        content.doLayout();
+        frame.setSize(500, 500);
         frame.setVisible(true);
 
     }
-
+    
     /**
      * Method used to set the current map projection.
      *
@@ -124,15 +138,14 @@ public class MapViewer implements ActionListener{
      */
     public void setCRS(CoordinateReferenceSystem crs){
     	mp.getContext().setAreaOfInterest(mp.getContext().getAreaOfInterest(),crs);
-    	mp.setReset(true);
-    	mp.repaint();
+    	mp.reset();
    }
 
     public void load(URL shape, URL sld)throws Exception{
         ShapefileDataStore ds = new ShapefileDataStore(shape);
 
         FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource();
-        com.vividsolutions.jts.geom.Envelope env = fs.getBounds();
+        Envelope env = fs.getBounds();
         mp.setMapArea(env);
         StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
 
@@ -144,29 +157,22 @@ public class MapViewer implements ActionListener{
         MapContext context = new DefaultMapContext(crs);
         context.addLayer(fs,style[0]);
         context.getLayerBounds();
-        mp.setHighlightLayer(context.getLayer(0));
-        mp.setSelectionLayer(context.getLayer(0));
+        //mp.setHighlightLayer(context.getLayer(0));
+        //mp.setSelectionLayer(context.getLayer(0));
 
         GTRenderer renderer;
-        if( true ){ 
-        	renderer = new StreamingRenderer();
-        	HashMap hints = new HashMap();
-        	hints.put("memoryPreloadingEnabled", Boolean.TRUE);
-            renderer.setRendererHints( hints );
-        }
-        else {
-        	renderer = new StreamingRenderer();
-        	HashMap hints = new HashMap();
-        	hints.put("memoryPreloadingEnabled", Boolean.FALSE);
-            renderer.setRendererHints( hints );
-        }
+        renderer = new StreamingRenderer();
+        HashMap hints = new HashMap();
+        hints.put("memoryPreloadingEnabled", Boolean.TRUE);
+        renderer.setRendererHints(hints);
+
         mp.setRenderer(renderer);
         mp.setContext(context);
 
 
 //        mp.getRenderer().addLayer(new RenderedMapScale());
         frame.repaint();
-        frame.doLayout();
+        // frame.doLayout();
     }
     public static URL aquireURL( String target ){
     	if( new File( target ).exists() ){
@@ -181,35 +187,37 @@ public class MapViewer implements ActionListener{
         	return null;
         }
     }
-    public void actionPerformed(ActionEvent e) {
-		int returnVal = jfc.showOpenDialog(frame);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-            String pathname = jfc.getSelectedFile().getAbsolutePath();
-            URL shape = aquireURL( pathname );
-            if( shape == null ){
-            	JOptionPane.showMessageDialog( frame, "could not find file \""+pathname+"\"", "Could not find file", JOptionPane.ERROR_MESSAGE );
-        		System.err.println("Could not find shapefile: "+pathname);
-            	return;
+    
+    public void loadFile() {
+        URL url = getClass().getResource("/data");
+        JFileChooser chooser = new JFileChooser(url.getFile());
+
+        int returnVal = chooser.showOpenDialog(frame);
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String pathname = chooser.getSelectedFile().getAbsolutePath();
+            URL shape = aquireURL(pathname);
+            if (shape == null) {
+                JOptionPane.showMessageDialog(frame, "could not find file \"" + pathname + "\"", "Could not find file", JOptionPane.ERROR_MESSAGE);
+                System.err.println("Could not find shapefile: " + pathname);
+                return;
             }
             String filepart = pathname.substring(0, pathname.lastIndexOf("."));
-            URL sld = aquireURL( filepart+".sld" );
-            if( sld == null){
-            	JOptionPane.showMessageDialog( frame, "could not find SLD file \""+filepart+".sld\"", "Could not find SLD file", JOptionPane.ERROR_MESSAGE );
-            	System.err.println("Could not find sld file: "+filepart+".sld");
-            	return;
+            URL sld = aquireURL(filepart + ".sld");
+            if (sld == null) {
+                JOptionPane.showMessageDialog(frame, "could not find SLD file \"" + filepart + ".sld\"", "Could not find SLD file", JOptionPane.ERROR_MESSAGE);
+                System.err.println("Could not find sld file: " + filepart + ".sld");
+                return;
             }
             try {
-				this.load( shape, sld );
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
+                this.load(shape, sld);
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+    }
 
-	}
-    /**
-     * @param args
-     */
     public static void main(String[] args) throws Exception {
     	MapViewer mapV = new MapViewer();
         if( args.length==0 || !args[0].toLowerCase().endsWith(".shp")){

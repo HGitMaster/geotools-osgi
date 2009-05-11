@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import org.geotools.data.wfs.protocol.http.HttpMethod;
 import org.geotools.data.wfs.protocol.wfs.Version;
 import org.geotools.data.wfs.protocol.wfs.WFSOperationType;
+import org.geotools.data.wfs.protocol.wfs.WFSProtocol;
 import org.geotools.util.logging.Logging;
 
 /**
@@ -35,10 +36,11 @@ import org.geotools.util.logging.Logging;
  * taking care of GZIP and authentication.
  * 
  * @author Gabriel Roldan
- * @version $Id: WFSProtocolHandler.java 31731 2008-10-29 13:51:20Z groldan $
+ * @version $Id: WFSProtocolHandler.java 31823 2008-11-11 16:11:49Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/io/WFSConnectionFactory.java $
+ * @deprecated use {@link WFSProtocol}
  */
 public abstract class WFSProtocolHandler {
 

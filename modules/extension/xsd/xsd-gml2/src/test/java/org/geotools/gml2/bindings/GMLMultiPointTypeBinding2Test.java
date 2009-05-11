@@ -44,5 +44,9 @@ public class GMLMultiPointTypeBinding2Test extends GMLTestSupport {
 
         assertEquals(2,
             doc.getElementsByTagNameNS(GML.NAMESPACE, GML.pointMember.getLocalPart()).getLength());
+        assertEquals(2,
+                doc.getElementsByTagNameNS(GML.NAMESPACE, GML.Point.getLocalPart()).getLength());
+        
+        assertEquals("http://www.opengis.net/gml/srs/epsg.xml#4326", doc.getDocumentElement().getAttribute("srsName"));
     }
 }

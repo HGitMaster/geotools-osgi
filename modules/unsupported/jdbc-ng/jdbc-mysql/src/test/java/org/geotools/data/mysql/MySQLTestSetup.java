@@ -64,9 +64,10 @@ public class MySQLTestSetup extends JDBCTestSetup {
 
         //create some data
         StringBuffer sb = new StringBuffer();
+        //JD: COLLATE latin1_general_cs is neccesary to ensure case-sensitive string comparisons
         sb.append("CREATE TABLE geotools.ft1 ").append("(id int AUTO_INCREMENT PRIMARY KEY , ")
           .append("geometry POINT, intProperty int, ")
-          .append("doubleProperty double, stringProperty varchar(255)) ENGINE=InnoDB;");
+          .append("doubleProperty double, stringProperty varchar(255) COLLATE latin1_general_cs) ENGINE=InnoDB;");
         run(sb.toString());
 
         sb = new StringBuffer();

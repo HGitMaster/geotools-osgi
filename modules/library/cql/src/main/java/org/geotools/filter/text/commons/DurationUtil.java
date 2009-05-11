@@ -25,11 +25,12 @@ import java.util.Date;
  * <p>
  * Maintains convenient methods to manipulate the duration information.
  * </p>
+ * 
  * @since 2.5
  * 
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
- * @version $Id: DurationUtil.java 31632 2008-10-07 19:32:57Z mauricio.pazos $
+ * @version $Id: DurationUtil.java 31937 2008-12-01 13:54:45Z mauricio.pazos $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/cql2/DurationUtil.java $
  */
@@ -39,8 +40,6 @@ final class DurationUtil {
     private static final int MONTHS = 1;
     private static final int DAYS = 2;
 
-    /** Y,M,D */
-    private static int[] DURATION_DATE = new int[3];
     private static final int HOURS = 0;
     private static final int MINUTES = 1;
     private static final int SECONDS = 2;
@@ -60,16 +59,19 @@ final class DurationUtil {
      *         will be returned.
      */
     private static int[] extractDurationDate(final String duration) {
-        // initializa duration date container
-        for (int i = 0; i < DURATION_DATE.length; i++) {
-            DURATION_DATE[i] = -1;
+        // initializes duration date container
+        /** Y,M,D */
+        int[] durationDate = new int[3];
+        
+        for (int i = 0; i < durationDate.length; i++) {
+            durationDate[i] = -1;
         }
 
         // if has not duration date return array with -1 values
         int cursor = duration.indexOf("P");
 
         if (cursor == -1) {
-            return DURATION_DATE;
+            return durationDate;
         }
 
         // extracts duration date and set duration array
@@ -81,7 +83,7 @@ final class DurationUtil {
         if (endYears >= 0) {
             String strYears = duration.substring(cursor, endYears);
             int years = Integer.parseInt(strYears);
-            DURATION_DATE[YEARS] = years;
+            durationDate[YEARS] = years;
 
             cursor = endYears + 1;
         }
@@ -92,7 +94,7 @@ final class DurationUtil {
         if (endMonths >= 0) {
             String strMonths = duration.substring(cursor, endMonths);
             int months = Integer.parseInt(strMonths);
-            DURATION_DATE[MONTHS] = months;
+            durationDate[MONTHS] = months;
 
             cursor = endMonths + 1;
         }
@@ -103,10 +105,10 @@ final class DurationUtil {
         if (endDays >= 0) {
             String strDays = duration.substring(cursor, endDays);
             int days = Integer.parseInt(strDays);
-            DURATION_DATE[DAYS] = days;
+            durationDate[DAYS] = days;
         }
 
-        return DURATION_DATE;
+        return durationDate;
     }
 
     /**
@@ -199,27 +201,29 @@ final class DurationUtil {
      *
      */
     private static Date computeDateFromDurationDate(final Date date, final String duration, int sign) {
-        DURATION_DATE = extractDurationDate(duration);
 
-        if (isNull(DURATION_DATE)) {
+        int[] durationDate = new int[3];
+        durationDate = extractDurationDate(duration);
+
+        if (isNull(durationDate)) {
             return date;
         }
 
         CALENDAR.setTime(date);
 
         // years
-        if (DURATION_DATE[YEARS] >= 0) {
-            CALENDAR.add(Calendar.YEAR, sign * DURATION_DATE[YEARS]);
+        if (durationDate[YEARS] >= 0) {
+            CALENDAR.add(Calendar.YEAR, sign * durationDate[YEARS]);
         }
 
         // months
-        if (DURATION_DATE[MONTHS] >= 0) {
-            CALENDAR.add(Calendar.MONTH, sign * DURATION_DATE[MONTHS]);
+        if (durationDate[MONTHS] >= 0) {
+            CALENDAR.add(Calendar.MONTH, sign * durationDate[MONTHS]);
         }
 
         // days
-        if (DURATION_DATE[DAYS] >= 0) {
-            CALENDAR.add(Calendar.DATE, sign * DURATION_DATE[DAYS]);
+        if (durationDate[DAYS] >= 0) {
+            CALENDAR.add(Calendar.DATE, sign * durationDate[DAYS]);
         }
 
         Date lastDate = CALENDAR.getTime();

@@ -16,7 +16,9 @@
  */
 package org.geotools.renderer.shape;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.GRX;
+import static org.geotools.data.shapefile.ShpFileType.QIX;
+import static org.geotools.data.shapefile.ShpFileType.SHX;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -78,6 +80,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
+import org.geotools.renderer.label.LabelCacheImpl;
 import org.geotools.renderer.lite.LabelCache;
 import org.geotools.renderer.lite.LabelCacheDefault;
 import org.geotools.renderer.lite.ListenerList;
@@ -191,7 +194,7 @@ public class ShapefileRenderer implements GTRenderer {
     private boolean renderingStopRequested;
     private boolean concatTransforms;
     private MapContext context;
-    LabelCache labelCache = new LabelCacheDefault();
+    LabelCache labelCache = new LabelCacheImpl();
     private ListenerList renderListeners = new ListenerList();
     /** If we are caching styles; by default this is false */
     boolean caching = false;
@@ -1218,6 +1221,9 @@ public class ShapefileRenderer implements GTRenderer {
     		this.labelCache=cache;
     		this.painter=new StyledShapePainter(cache);
     	}
+    	if(hints != null && hints.containsKey(StreamingRenderer.LINE_WIDTH_OPTIMIZATION_KEY)) {
+            styleFactory.setLineOptimizationEnabled(Boolean.TRUE.equals(hints.get(StreamingRenderer.LINE_WIDTH_OPTIMIZATION_KEY)));
+        }
         rendererHints = hints;
     }
     
@@ -1394,7 +1400,7 @@ public class ShapefileRenderer implements GTRenderer {
                 DefaultQuery query = new DefaultQuery(currLayer.getQuery());
                 if( query.getFilter() !=null ){
                     // now reproject the geometries in filter because geoms are retrieved projected to screen space
-                    FilterTransformer transformer= new  FilterTransformer(dataCRS, destinationCrs, mt);
+                    FilterTransformer transformer= new  FilterTransformer(mt);
                     Filter transformedFilter = (Filter) query.getFilter().accept(transformer, null);
                     query.setFilter(transformedFilter);
                 }

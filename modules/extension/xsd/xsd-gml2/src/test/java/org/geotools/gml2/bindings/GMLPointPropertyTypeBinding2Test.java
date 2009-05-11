@@ -29,7 +29,7 @@ public class GMLPointPropertyTypeBinding2Test extends GMLTestSupport {
     }
 
     public void testExecutionMode() {
-        assertEquals(Binding.AFTER, binding(GML.PointPropertyType).getExecutionMode());
+        assertEquals(Binding.OVERRIDE, binding(GML.PointPropertyType).getExecutionMode());
     }
 
     public void testParse() throws Exception {

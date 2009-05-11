@@ -36,15 +36,16 @@ import com.esri.sde.sdk.client.SeVersion;
  * Handles a versioned table when in transaction mode
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: TransactionDefaultVersionHandler.java 30808 2008-06-25
- *          17:03:07Z groldan $
+ * @version $Id: TransactionDefaultVersionHandler.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5.x
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/versioning/TransactionDefaultVersionHandler.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/versioning/TransactionDefaultVersionHandler.java $
  */
 public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
 
-    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data.versioning");
+    private static final Logger LOGGER = Logging.getLogger(TransactionDefaultVersionHandler.class
+            .getName());
 
     private final ISession session;
 

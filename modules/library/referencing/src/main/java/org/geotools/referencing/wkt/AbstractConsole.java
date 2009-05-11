@@ -39,8 +39,8 @@ import org.geotools.resources.Classes;
  * be redirected. The set of allowed instructions depends on the subclass used.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/AbstractConsole.java $
- * @version $Id: AbstractConsole.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/AbstractConsole.java $
+ * @version $Id: AbstractConsole.java 32866 2009-04-25 20:56:09Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public abstract class AbstractConsole implements Runnable {
@@ -285,8 +285,13 @@ public abstract class AbstractConsole implements Runnable {
      */
     public void executeAll() throws Exception {
         while ((line=readLine(in)) != null) {
-            execute(line);
-            out.flush();
+            try {
+                execute(line);
+                out.flush();
+            } catch(Exception e) {
+                reportError(e);
+                throw e;
+            }
         }
     }
 

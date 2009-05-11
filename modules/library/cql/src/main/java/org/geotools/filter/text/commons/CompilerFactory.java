@@ -20,11 +20,12 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.filter.text.cql2.CQLCompiler;
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.filter.text.txt.TXTCompiler;
+import org.geotools.filter.text.ecql.ECQLCompiler;
 import org.opengis.filter.FilterFactory;
 
 /**
  * Creates the compiler required for the specific language.
+ * 
  *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
@@ -52,8 +53,8 @@ final class CompilerFactory {
             ff = CommonFactoryFinder.getFilterFactory((Hints) null);
         }
         ICompiler compiler;
-        if(language == Language.TXT){
-            compiler  = new TXTCompiler(predicate, ff);
+        if(language == Language.ECQL){
+            compiler  = new ECQLCompiler(predicate, ff);
         }else{
             compiler = new CQLCompiler(predicate, ff);
         }

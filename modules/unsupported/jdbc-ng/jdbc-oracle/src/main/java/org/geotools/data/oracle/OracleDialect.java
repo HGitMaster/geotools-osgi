@@ -40,7 +40,6 @@ import org.geotools.data.oracle.sdo.TT;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.PreparedFilterToSQL;
 import org.geotools.jdbc.PreparedStatementSQLDialect;
-import org.geotools.jdbc.SQLDialect;
 import org.geotools.referencing.CRS;
 import org.geotools.util.SoftValueHashMap;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -93,6 +92,15 @@ public class OracleDialect extends PreparedStatementSQLDialect {
         }
     }
     
+    static final Map<String, Class> TYPES_TO_CLASSES = new HashMap<String, Class>() {
+    	{
+    		put("CHAR", String.class);
+    		put("NCHAR", String.class);
+    		put("NVARCHAR", String.class);
+    		put("NVARCHAR2", String.class);
+    	}
+    };
+    
     /**
      * Whether to use only primary filters for BBOX filters 
      */
@@ -123,45 +131,51 @@ public class OracleDialect extends PreparedStatementSQLDialect {
         final int TABLE_NAME = 3;
         final int COLUMN_NAME = 4;
         final int TYPE_NAME = 6;
-        if (!columnMetaData.getString(TYPE_NAME).equals("SDO_GEOMETRY")) {
-            return null;
-        }
-
-        Connection conn = null;
-        Statement statement = null;
-        ResultSet result = null;
-        try {
-            String tableName = columnMetaData.getString(TABLE_NAME);
-            String columnName = columnMetaData.getString(COLUMN_NAME);
-            
-            String sqlStatement = "SELECT META.SDO_LAYER_GTYPE \n" // 
-                + "FROM MDSYS.ALL_SDO_INDEX_INFO INFO \n" //
-               + "INNER JOIN MDSYS.USER_SDO_INDEX_METADATA META \n"
-                    + " ON INFO.INDEX_NAME = META.SDO_INDEX_NAME \n" //
-                    + "WHERE INFO.TABLE_NAME = '" + tableName + "' \n" //
-                    + "AND INFO.COLUMN_NAME = '" + columnName + "'";
-            String schema = dataStore.getDatabaseSchema();
-            if(schema != null && !"".equals(schema)) {
-                sqlStatement += " AND INFO.TABLE_OWNER = '" + schema + "'";
-            }
-            LOGGER.log(Level.FINE, "Geometry type check; {0} ", sqlStatement);
-            statement = cx.createStatement();
-            result = statement.executeQuery(sqlStatement);
-
-            if (result.next()) {
-                String gType = result.getString(1);
-                Class geometryClass = (Class) TT.GEOM_CLASSES.get(gType);
-                if(geometryClass == null)
-                    geometryClass = Geometry.class;
-
-                return geometryClass;
-            } else {
-                return Geometry.class;
-            }
-        }  finally {
-            dataStore.closeSafe(result);
-            dataStore.closeSafe(statement);
-        }
+        String typeName = columnMetaData.getString(TYPE_NAME);
+		if (typeName.equals("SDO_GEOMETRY")) {
+	        Connection conn = null;
+	        Statement statement = null;
+	        ResultSet result = null;
+	        try {
+	            String tableName = columnMetaData.getString(TABLE_NAME);
+	            String columnName = columnMetaData.getString(COLUMN_NAME);
+	            
+	            // Oracle 9 compatible query
+                String sqlStatement = "SELECT META.SDO_LAYER_GTYPE\n" + 
+                		"FROM ALL_INDEXES INFO\n" + 
+                		"INNER JOIN MDSYS.USER_SDO_INDEX_METADATA META\n" + 
+                		"ON INFO.INDEX_NAME = META.SDO_INDEX_NAME\n" + 
+                		"WHERE INFO.TABLE_NAME = '" + tableName + "'\n" + 
+                		"AND REPLACE(meta.sdo_column_name, '\"') = '" + columnName + "'\n"; 
+                String schema = dataStore.getDatabaseSchema();
+                if(schema != null && !"".equals(schema)) {
+                    sqlStatement += " AND INFO.TABLE_OWNER = '" + schema + "'";
+                }
+	            
+	            LOGGER.log(Level.FINE, "Geometry type check; {0} ", sqlStatement);
+	            statement = cx.createStatement();
+	            result = statement.executeQuery(sqlStatement);
+	
+	            if (result.next()) {
+	                String gType = result.getString(1);
+	                Class geometryClass = (Class) TT.GEOM_CLASSES.get(gType);
+	                if(geometryClass == null)
+	                    geometryClass = Geometry.class;
+	
+	                return geometryClass;
+	            } else {
+	                return Geometry.class;
+	            }
+	        }  finally {
+	            dataStore.closeSafe(result);
+	            dataStore.closeSafe(statement);
+	        }
+		} else {
+			// if we know, return non null value, otherwise returning
+			// null will force the datatore to figure it out using 
+			// jdbc metadata
+			return TYPES_TO_CLASSES.get(typeName);
+		}
     }
 
     
@@ -318,7 +332,7 @@ public class OracleDialect extends PreparedStatementSQLDialect {
 
         if (LOGGER.isLoggable(Level.FINE)) {
             String sdo = SDOSqlDumper.toSDOGeom(g, srid);
-            LOGGER.fine("Setting paramtetr " + column + " as " + sdo);
+            LOGGER.fine("Setting parameter " + column + " as " + sdo);
         }
     }
     
@@ -353,8 +367,9 @@ public class OracleDialect extends PreparedStatementSQLDialect {
     
     @Override
     public PreparedFilterToSQL createPreparedFilterToSQL() {
-        OracleFilterToSQL sql = new OracleFilterToSQL();
+        OracleFilterToSQL sql = new OracleFilterToSQL(this);
         sql.setLooseBBOXEnabled(looseBBOXEnabled);
+        
         return sql;
     }
     
@@ -485,7 +500,9 @@ public class OracleDialect extends PreparedStatementSQLDialect {
                     }
     
                     int srid = -1;
-                    if(geom.getCoordinateReferenceSystem() != null) {
+                    if(geom.getUserData().get(JDBCDataStore.JDBC_NATIVE_SRID) != null) {
+                        srid = (Integer) geom.getUserData().get(JDBCDataStore.JDBC_NATIVE_SRID);
+                    } else if(geom.getCoordinateReferenceSystem() != null) {
                         try {
                             Integer result = CRS.lookupEpsgCode(geom.getCoordinateReferenceSystem(), true);
                             if(result != null)
@@ -583,8 +600,26 @@ public class OracleDialect extends PreparedStatementSQLDialect {
         }
         
     }
-    
-    protected boolean isGeodeticSrid(int srid, Connection cx) throws SQLException {
+
+    protected boolean isGeodeticSrid(Integer srid) {
+        Connection cx = null;
+        try {
+            cx = dataStore.getDataSource().getConnection();
+            return isGeodeticSrid(srid, cx);
+        } catch (SQLException e) {
+            LOGGER.warning("Could not evaluate if SRID is Geodetic. Wrong results may occur.");
+        } finally {
+            if (cx != null)
+                dataStore.closeSafe(cx);
+        }
+        
+        return false;
+    }
+
+    protected boolean isGeodeticSrid(Integer srid, Connection cx) throws SQLException {
+        if (srid == null)
+            return false;
+        
         Boolean geodetic = geodeticCache.get(srid); 
         
         if(geodetic == null) { 
@@ -608,4 +643,50 @@ public class OracleDialect extends PreparedStatementSQLDialect {
         
         return geodetic;
     }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return true;
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        // see http://progcookbook.blogspot.com/2006/02/using-rownum-properly-for-pagination.html
+        // and http://www.oracle.com/technology/oramag/oracle/07-jan/o17asktom.html
+        // to understand why we are going thru such hoops in order to get it working
+        // The same techinique is used in Hibernate to support pagination
+        
+        if(offset == 0) {
+            // top-n query: select * from (your_query) where rownum <= n;
+            sql.insert(0, "SELECT * FROM (");
+            sql.append(") WHERE ROWNUM <= " + limit);
+        } else {
+            // find results between N and M
+            // select * from 
+            // ( select rownum rnum, a.*
+            //    from (your_query) a
+            //   where rownum <= :M )
+            // where rnum >= :N;
+            long max = (limit == Integer.MAX_VALUE ? Long.MAX_VALUE : limit + offset);
+            sql.insert(0, "SELECT * FROM (SELECT A.*, ROWNUM RNUM FROM ( ");
+            sql.append(") A WHERE ROWNUM <= " + max + ")");
+            sql.append("WHERE RNUM > " + offset);
+        }
+    }
+    
+    @Override
+    public void encodeTableAlias(String raw, StringBuffer sql) {
+        sql.append(" ");
+        encodeTableName(raw, sql);
+    }
+    
+    @Override
+    public void registerSqlTypeToSqlTypeNameOverrides(
+    		Map<Integer, String> overrides) {
+    	super.registerSqlTypeToSqlTypeNameOverrides(overrides);
+    	overrides.put(Types.REAL, "DOUBLE PRECISION");
+    	overrides.put(Types.DOUBLE, "DOUBLE PRECISION");
+    	overrides.put(Types.FLOAT, "FLOAT");
+    }
+
 }

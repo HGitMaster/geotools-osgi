@@ -59,7 +59,7 @@ import org.opengis.util.Cloneable;
  * Unit test for DuplicatorStyleVisitor.
  *
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/styling/visitor/DuplicatorStyleVisitorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/styling/visitor/DuplicatorStyleVisitorTest.java $
  */
 public class DuplicatorStyleVisitorTest extends TestCase {
     StyleBuilder sb;
@@ -131,6 +131,7 @@ public class DuplicatorStyleVisitorTest extends TestCase {
         }
         catch (TransformerException te)
         {
+            te.printStackTrace();
             return false;
         }
     }

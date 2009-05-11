@@ -124,11 +124,6 @@ public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisito
 	}
 
 	public Object visit(Id filter, Object extraData) {
-		
-		if (filter instanceof FeatureId) {
-			FeatureId featureId = (FeatureId) filter;
-			return getFactory(extraData).featureId(featureId.getID());
-		}
 		return getFactory(extraData).id(filter.getIdentifiers());
 	}
 
@@ -198,7 +193,8 @@ public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisito
 		String wildcard=filter.getWildCard();
 		String singleChar=filter.getSingleChar();
 		String escape=filter.getEscape();
-		return getFactory(extraData).like(expr, pattern, wildcard, singleChar, escape);
+                boolean matchCase = filter.isMatchingCase();
+		return getFactory(extraData).like(expr, pattern, wildcard, singleChar, escape, matchCase);
 	}
 
 	public Object visit(PropertyIsNull filter, Object extraData) {

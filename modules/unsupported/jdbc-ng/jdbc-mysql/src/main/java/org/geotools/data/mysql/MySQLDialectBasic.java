@@ -66,6 +66,11 @@ public class MySQLDialectBasic extends BasicSQLDialect {
     }
 
     @Override
+    public void encodeColumnName(String raw, StringBuffer sql) {
+        delegate.encodeColumnName(raw, sql);
+    }
+    
+    @Override
     public void encodeColumnType(String sqlTypeName, StringBuffer sql) {
         delegate.encodeColumnType(sqlTypeName, sql);
     }
@@ -85,6 +90,12 @@ public class MySQLDialectBasic extends BasicSQLDialect {
         delegate.registerSqlTypeNameToClassMappings(mappings);
     }
 
+    @Override
+    public void registerSqlTypeToSqlTypeNameOverrides(
+            Map<Integer, String> overrides) {
+        delegate.registerSqlTypeToSqlTypeNameOverrides(overrides);
+    }
+    
     @Override
     public void encodePostCreateTable(String tableName, StringBuffer sql) {
         delegate.encodePostCreateTable(tableName, sql);
@@ -115,7 +126,10 @@ public class MySQLDialectBasic extends BasicSQLDialect {
             ResultSet rs, String column, GeometryFactory factory, Connection cx)
             throws IOException, SQLException {
         byte[] bytes = rs.getBytes(column);
-
+        if ( bytes == null ) {
+            return null;
+        }
+        
         try {
             return new WKBReader(factory).read(bytes);
         } catch (ParseException e) {
@@ -147,6 +161,16 @@ public class MySQLDialectBasic extends BasicSQLDialect {
             String msg = "Error decoding wkb for envelope";
             throw (IOException) new IOException(msg).initCause(e);
         }
+    }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
     }
 
 }

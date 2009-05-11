@@ -73,8 +73,8 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * An XMLEncoder for Filters and Expressions.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterTransformer.java $
- * @version $Id: FilterTransformer.java 31599 2008-09-29 07:32:48Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterTransformer.java $
+ * @version $Id: FilterTransformer.java 32245 2009-01-17 04:44:34Z jive $
  * @author Ian Schneider
  *
  */
@@ -92,49 +92,6 @@ public class FilterTransformer extends TransformerBase {
     /** Map of logical types to sql representation */
     private static Map logical = new HashMap();
     
-    /** Map of expression types to sql representation */
-    //private static Map expressions = new HashMap();
-    /*
-    static {
-        comparisions.put(new Integer(FilterType.COMPARE_EQUALS),
-        "PropertyIsEqualTo");
-        comparisions.put(new Integer(FilterType.COMPARE_GREATER_THAN),
-        "PropertyIsGreaterThan");
-        comparisions.put(new Integer(FilterType.COMPARE_GREATER_THAN_EQUAL),
-        "PropertyIsGreaterThanOrEqualTo");
-        comparisions.put(new Integer(FilterType.COMPARE_LESS_THAN),
-        "PropertyIsLessThan");
-        comparisions.put(new Integer(FilterType.COMPARE_LESS_THAN_EQUAL),
-        "PropertyIsLessThanOrEqualTo");
-        comparisions.put(new Integer(AbstractFilter.LIKE), "PropertyIsLike");
-        comparisions.put(new Integer(AbstractFilter.NULL), "PropertyIsNull");
-        comparisions.put(new Integer(AbstractFilter.BETWEEN),
-        "PropertyIsBetween");
-        
-        expressions.put(new Integer(DefaultExpression.MATH_ADD), "Add");
-        expressions.put(new Integer(DefaultExpression.MATH_DIVIDE), "Div");
-        expressions.put(new Integer(DefaultExpression.MATH_MULTIPLY), "Mul");
-        expressions.put(new Integer(DefaultExpression.MATH_SUBTRACT), "Sub");
-        expressions.put(new Integer(DefaultExpression.FUNCTION), "Function");
-        
-        //more to come
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_EQUALS), "Equals");
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_DISJOINT), "Disjoint");
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_INTERSECTS),
-        "Intersects");
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_TOUCHES), "Touches");
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_CROSSES), "Crosses");
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_WITHIN), "Within");
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_CONTAINS), "Contains");
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_OVERLAPS), "Overlaps");
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_BEYOND), "Beyond");
-        spatial.put(new Integer(AbstractFilter.GEOMETRY_BBOX), "BBOX");
-        
-        logical.put(new Integer(AbstractFilter.LOGIC_AND), "And");
-        logical.put(new Integer(AbstractFilter.LOGIC_OR), "Or");
-        logical.put(new Integer(AbstractFilter.LOGIC_NOT), "Not");
-    }
-    */
     /**
      * A typed convenience method for converting a Filter into XML.
      */
@@ -529,7 +486,7 @@ public class FilterTransformer extends TransformerBase {
         }
 
         public Object visit(Divide expression, Object extraData) {
-            String type = "Divide";
+            String type = "Div";
             start(type);
             expression.getExpression1().accept(this, extraData);
             expression.getExpression2().accept(this, extraData);
@@ -570,7 +527,7 @@ public class FilterTransformer extends TransformerBase {
         }
 
         public Object visit(Multiply expression, Object extraData) {
-            String type = "Multiply";
+            String type = "Mul";
             start(type);
             expression.getExpression1().accept(this, extraData);
             expression.getExpression2().accept(this, extraData);
@@ -584,7 +541,7 @@ public class FilterTransformer extends TransformerBase {
         }
 
         public Object visit(Subtract expression, Object extraData) {
-            String type = "Subtract";
+            String type = "Sub";
             start(type);
             expression.getExpression1().accept(this, extraData);
             expression.getExpression2().accept(this, extraData);

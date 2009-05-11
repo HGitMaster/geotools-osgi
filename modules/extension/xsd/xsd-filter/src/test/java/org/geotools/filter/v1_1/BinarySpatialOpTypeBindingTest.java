@@ -49,6 +49,7 @@ public class BinarySpatialOpTypeBindingTest extends FilterTestSupport {
         assertNotNull(beyond.getExpression1());
         assertNotNull(beyond.getExpression2());
         assertEquals(1.0, beyond.getDistance(), 0.1);
+        assertEquals("m",beyond.getDistanceUnits());
     }
 
     public void testBeyondEncode() throws Exception {
@@ -76,6 +77,7 @@ public class BinarySpatialOpTypeBindingTest extends FilterTestSupport {
         assertNotNull(dwithin.getExpression1());
         assertNotNull(dwithin.getExpression2());
         assertEquals(1.0, dwithin.getDistance(), 0.1);
+        assertEquals("m", dwithin.getDistanceUnits());
     }
 
     public void testDWithinEncode() throws Exception {

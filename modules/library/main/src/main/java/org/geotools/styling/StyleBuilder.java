@@ -37,7 +37,7 @@ import org.opengis.filter.expression.PropertyName;
  * An utility class designed to ease style building by convinience methods.
  *
  * @author aaime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleBuilder.java $
  */
 public class StyleBuilder {
     private static final java.util.logging.Logger LOGGER =
@@ -1798,7 +1798,7 @@ public class StyleBuilder {
 
         PolygonSymbolizer elsePoly = createPolygonSymbolizer(Color.black, 1.0);
         rules[colors.length].setSymbolizers(new Symbolizer[] { elsePoly });
-        rules[colors.length].setIsElseFilter(true);
+        rules[colors.length].setElseFilter(true);
 
         FeatureTypeStyle ft = sf.createFeatureTypeStyle(rules);
         ft.setFeatureTypeName("Feature");

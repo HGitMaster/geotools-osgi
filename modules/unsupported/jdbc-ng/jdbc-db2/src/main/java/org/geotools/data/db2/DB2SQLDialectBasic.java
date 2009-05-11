@@ -17,6 +17,7 @@
 package org.geotools.data.db2;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -54,7 +55,7 @@ public class DB2SQLDialectBasic extends BasicSQLDialect {
     
     @Override
     public FilterToSQL createFilterToSQL() {
-    	return new DB2FilterToSQL();
+    	return new DB2FilterToSQL((Writer) null);
     }
 
     
@@ -148,6 +149,14 @@ public class DB2SQLDialectBasic extends BasicSQLDialect {
             Connection cx) throws SQLException {
     	return delegate.getNextSequenceValue(schemaName, sequenceName, cx);
         
+    }
+
+    
+    public boolean isLimitOffsetSupported() {
+        return delegate.isLimitOffsetSupported();
+    }
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        delegate.applyLimitOffset(sql, limit, offset);
     }
 
 }

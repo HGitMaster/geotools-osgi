@@ -36,10 +36,11 @@ public class DefaultOrdinalEraTest {
 
     private OrdinalEra ordinalEra1;
     private OrdinalEra ordinalEra2;
-
+    private Calendar cal = Calendar.getInstance();
+    
     @Before
     public void setUp() {
-        Calendar cal = Calendar.getInstance();
+        
         cal.set(1900, 1, 1);
         Date beginning1 = cal.getTime();
         cal.set(2000, 1, 1);
@@ -139,7 +140,6 @@ public class DefaultOrdinalEraTest {
     @Test
     public void testSetGroup() {
         DefaultOrdinalEra result = ((DefaultOrdinalEra) ordinalEra1).getGroup();
-        Calendar cal = Calendar.getInstance();
         cal.set(1900, 0, 0);
         ((DefaultOrdinalEra) ordinalEra1).setGroup(new DefaultOrdinalEra(new SimpleInternationalString(""), cal.getTime(), new Date()));
         assertFalse(((DefaultOrdinalEra) ordinalEra1).getGroup().equals(result));

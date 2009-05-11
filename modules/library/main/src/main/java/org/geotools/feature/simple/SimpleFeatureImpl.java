@@ -36,6 +36,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.identity.Identifier;
@@ -152,16 +153,24 @@ public class SimpleFeatureImpl implements SimpleFeature {
         // should be specified in the index as the default key (null)
         Object defaultGeometry = 
             index.get( null ) != null ? getAttribute( index.get( null ) ) : null;
-            
-        // not found? Ok, let's do a lookup then...
-        if ( defaultGeometry == null ) {
-            for ( Object o : values ) {
-                if ( o instanceof Geometry ) {
-                    defaultGeometry = o;
-                    break;
-                }
-            }
-        }
+           
+       // not found? do we have a default geometry at all?
+       if(defaultGeometry == null){
+           GeometryDescriptor geometryDescriptor = featureType.getGeometryDescriptor();
+           if(geometryDescriptor != null){
+               Integer defaultGeomIndex = index.get(geometryDescriptor.getName().getLocalPart());
+               defaultGeometry = getAttribute(defaultGeomIndex.intValue());
+           }
+       }
+//        // not found? Ok, let's do a lookup then...
+//        if ( defaultGeometry == null ) {
+//            for ( Object o : values ) {
+//                if ( o instanceof Geometry ) {
+//                    defaultGeometry = o;
+//                    break;
+//                }
+//            }
+//        }
         
         return defaultGeometry;
     }
@@ -234,7 +243,13 @@ public class SimpleFeatureImpl implements SimpleFeature {
     }
 
     public GeometryAttribute getDefaultGeometryProperty() {
-        return new GeometryAttributeImpl(getDefaultGeometry(), getFeatureType().getGeometryDescriptor(), null);
+        GeometryDescriptor geometryDescriptor = featureType.getGeometryDescriptor();
+        GeometryAttribute geometryAttribute = null;
+        if(geometryDescriptor != null){
+            Object defaultGeometry = getDefaultGeometry();
+            geometryAttribute = new GeometryAttributeImpl(defaultGeometry, geometryDescriptor, null);            
+        }
+        return geometryAttribute;
     }
 
     public void setDefaultGeometryProperty(GeometryAttribute geometryAttribute) {
@@ -269,10 +284,17 @@ public class SimpleFeatureImpl implements SimpleFeature {
 
     public Property getProperty(String name) {
         final Integer idx = index.get(name);
-        if(idx == null)
+        if(idx == null){
             return null;
-        else
-            return new Attribute( idx );
+        }else{
+            int index = idx.intValue();
+            AttributeDescriptor descriptor = featureType.getDescriptor(index);
+            if(descriptor instanceof GeometryDescriptor){
+                return new GeometryAttributeImpl(values[index], (GeometryDescriptor) descriptor, null); 
+            }else{
+                return new Attribute( index );
+            }
+        }
     }
 
     public Collection<? extends Property> getValue() {

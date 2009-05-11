@@ -21,17 +21,16 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.geotools.data.complex.filter.XPath.StepList;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.expression.Expression;
 
 /**
- * DOCUMENT ME!
- * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AttributeMapping.java 31514 2008-09-15 08:36:50Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/AttributeMapping.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: AttributeMapping.java 32469 2009-02-11 07:53:06Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AttributeMapping.java $
  * @since 2.4
  */
 public class AttributeMapping {
@@ -39,11 +38,8 @@ public class AttributeMapping {
     /** Expression to set the Attribute's ID from, or {@linkplain Expression#NIL} */
     private Expression identifierExpression;
 
-    /** DOCUMENT ME! */
     private Expression sourceExpression;
 
-    /** DOCUMENT ME! */
-    // private String targetXPath;
     private StepList targetXPath;
 
     private boolean isMultiValued;
@@ -54,7 +50,7 @@ public class AttributeMapping {
      */
     AttributeType targetNodeInstance;
 
-    private Map /* <Name,Expression> */clientProperties;
+    private Map<Name, Expression> clientProperties;
 
     /**
      * Creates a new AttributeMapping object.
@@ -71,7 +67,7 @@ public class AttributeMapping {
 
     public AttributeMapping(Expression idExpression, Expression sourceExpression,
             StepList targetXPath, AttributeType targetNodeInstance, boolean isMultiValued,
-            Map clientProperties) {
+            Map<Name, Expression> clientProperties) {
 
         this.identifierExpression = idExpression == null ? Expression.NIL : idExpression;
         this.sourceExpression = sourceExpression == null ? Expression.NIL : sourceExpression;
@@ -81,27 +77,18 @@ public class AttributeMapping {
         }
         this.targetXPath = targetXPath;
         this.targetNodeInstance = targetNodeInstance;
-        this.clientProperties = clientProperties == null ? Collections.EMPTY_MAP : clientProperties;
+        this.clientProperties = clientProperties == null ? Collections
+                .<Name, Expression> emptyMap() : clientProperties;
     }
 
     public boolean isMultiValued() {
         return isMultiValued;
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     */
     public Expression getSourceExpression() {
         return sourceExpression;
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     */
     public StepList getTargetXPath() {
         return targetXPath;
     }
@@ -111,13 +98,15 @@ public class AttributeMapping {
     }
 
     /**
-     * DOCUMENT ME!
+     * This is overridden by NestedAttributeMapping
      * 
-     * @param o
-     *                DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
+     * @return always return false
      */
+    public boolean isNestedAttribute() {
+        return false;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -135,21 +124,11 @@ public class AttributeMapping {
                 && Utilities.equals(targetNodeInstance, other.targetNodeInstance);
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     */
     public int hashCode() {
         return (37 * identifierExpression.hashCode() + 37 * sourceExpression.hashCode())
                 ^ targetXPath.hashCode();
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     */
     public String toString() {
         StringBuffer sb = new StringBuffer("AttributeMapping[");
         sb.append("sourceExpression='").append(sourceExpression).append("', targetXPath='").append(
@@ -162,8 +141,9 @@ public class AttributeMapping {
         return sb.toString();
     }
 
-    public Map getClientProperties() {
-        return clientProperties == null ? Collections.EMPTY_MAP : clientProperties;
+    public Map<Name, Expression> getClientProperties() {
+        return clientProperties == null ? Collections.<Name, Expression> emptyMap()
+                : clientProperties;
     }
 
     public Expression getIdentifierExpression() {
@@ -173,4 +153,5 @@ public class AttributeMapping {
     public void setIdentifierExpression(Expression identifierExpression) {
         this.identifierExpression = identifierExpression;
     }
+
 }

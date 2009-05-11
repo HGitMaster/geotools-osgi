@@ -45,7 +45,7 @@ public class OracleDataStoreAPITestSetup extends JDBCDataStoreAPITestSetup {
         //insert data
         run("INSERT INTO lake (id,geom,name) VALUES ( 0,"
             + "MDSYS.SDO_GEOMETRY( 2003, 4326, NULL, SDO_ELEM_INFO_ARRAY(1,1003,1), "
-            + "SDO_ORDINATE_ARRAY(2,6, 14,8, 16,6, 16,4, 14,4, 12,6)), 'muddy')");
+            + "SDO_ORDINATE_ARRAY(12,6, 14,8, 16,6, 16,4, 14,4, 12,6)), 'muddy')");
     }
     
 

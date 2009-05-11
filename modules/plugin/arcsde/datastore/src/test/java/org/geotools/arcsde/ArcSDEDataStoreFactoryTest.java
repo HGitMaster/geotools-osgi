@@ -17,12 +17,16 @@
  */
 package org.geotools.arcsde;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.geotools.arcsde.data.ArcSDEDataStore;
 import org.geotools.arcsde.data.InProcessViewSupportTestData;
@@ -32,6 +36,9 @@ import org.geotools.arcsde.pool.ISession;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.esri.sde.sdk.client.SeException;
@@ -41,11 +48,12 @@ import com.esri.sde.sdk.client.SeException;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/ArcSDEDataStoreFactoryTest.java $
- * @version $Id: ArcSDEDataStoreFactoryTest.java 30722 2008-06-13 18:15:42Z acuster $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/ArcSDEDataStoreFactoryTest.java $
+ * @version $Id: ArcSDEDataStoreFactoryTest.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.4.x
  */
-public class ArcSDEDataStoreFactoryTest extends TestCase {
+public class ArcSDEDataStoreFactoryTest {
 
     /**
      * A datastore factory set up with the {@link #workingParams}
@@ -71,21 +79,8 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
 
     private TestData testData;
 
-    /**
-     * @param name
-     */
-    public ArcSDEDataStoreFactoryTest(String name) {
-        super(name);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         this.testData = new TestData();
         testData.setUp();
 
@@ -100,17 +95,12 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
         dsFactory = new ArcSDEDataStoreFactory();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see junit.framework.TestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         this.testData.tearDown(true, true);
     }
 
+    @Test
     public void testLookUp() throws IOException {
         DataStore dataStore;
 
@@ -129,6 +119,7 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
      * Test method for
      * {@link org.geotools.arcsde.ArcSDEDataStoreFactory#createNewDataStore(java.util.Map)}.
      */
+    @Test
     public void testCreateNewDataStore() {
         try {
             dsFactory.createNewDataStore(Collections.EMPTY_MAP);
@@ -141,6 +132,7 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
     /**
      * Test method for {@link org.geotools.arcsde.ArcSDEDataStoreFactory#canProcess(java.util.Map)}.
      */
+    @Test
     public void testCanProcess() {
         assertFalse(dsFactory.canProcess(illegalParams));
         assertTrue(dsFactory.canProcess(nonWorkingParams));
@@ -153,6 +145,7 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
      * 
      * @throws IOException
      */
+    @Test
     public void testCreateDataStore() throws IOException {
         try {
             dsFactory.createDataStore(nonWorkingParams);
@@ -172,6 +165,7 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
      * @throws IOException
      * @throws SeException
      */
+    @Test
     public void testCreateDataStoreWithInProcessViews() throws IOException, SeException {
         ISession session = testData.getConnectionPool().getSession();
         try {

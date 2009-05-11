@@ -34,6 +34,7 @@ import java.util.Map;
 import org.geotools.TestData;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
@@ -69,7 +70,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/ShapefileDataStoreTest.java $
- * @version $Id: ShapefileDataStoreTest.java 31746 2008-10-31 14:03:55Z aaime $
+ * @version $Id: ShapefileDataStoreTest.java 32760 2009-04-08 16:32:28Z aaime $
  * @author Ian Schneider
  */
 public class ShapefileDataStoreTest extends TestCaseSupport {
@@ -332,7 +333,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      * remaining. Test for removal and proper update after reloading...
      */
     public void testUpdating() throws Throwable {
-        try {
             ShapefileDataStore sds = createDataStore();
             loadFeatures(sds);
 
@@ -359,15 +359,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             for (FeatureIterator<SimpleFeature> i = fc.features(); i.hasNext();) {
                 assertEquals(-1, ((Byte) i.next().getAttribute(1)).byteValue());
             }
-        } catch (Throwable t) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                System.out.println("Ignore " + t
-                        + " because you are on windows");
-                return;
-            } else {
-                throw t;
-            }
-        }
     }
 
     /**
@@ -375,37 +366,56 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      * are no features left.
      */
     public void testRemoveFromFrontAndClose() throws Throwable {
-        try {
-            ShapefileDataStore sds = createDataStore();
+        ShapefileDataStore sds = createDataStore();
 
-            int idx = loadFeatures(sds).size();
+        int idx = loadFeatures(sds).size();
 
-            while (idx > 0) {
-                FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
+        while (idx > 0) {
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
 
-                try {
-                    writer = sds.getFeatureWriter(sds.getTypeNames()[0],
-                            Filter.INCLUDE, Transaction.AUTO_COMMIT);
-                    writer.next();
-                    writer.remove();
-                } finally {
-                    if (writer != null) {
-                        writer.close();
-                        writer = null;
-                    }
+            try {
+                writer = sds.getFeatureWriter(sds.getTypeNames()[0],
+                        Filter.INCLUDE, Transaction.AUTO_COMMIT);
+                writer.next();
+                writer.remove();
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                    writer = null;
                 }
-                assertEquals(--idx, loadFeatures(sds).size());
             }
-        } catch (Throwable t) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                System.out.println("Ignore " + t
-                        + " because you are on windows");
-                return;
-            } else {
-                throw t;
-            }
+            assertEquals(--idx, loadFeatures(sds).size());
         }
+    }
+    
+    /**
+     * Create a test file, then continue removing the first entry until there
+     * are no features left.
+     */
+    public void testRemoveFromFrontAndCloseTransaction() throws Throwable {
+        ShapefileDataStore sds = createDataStore();
 
+        int idx = loadFeatures(sds).size();
+
+        while (idx > 0) {
+            Transaction t = new DefaultTransaction();
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
+
+            try {
+                writer = sds.getFeatureWriter(sds.getTypeNames()[0],
+                        Filter.INCLUDE, t);
+                writer.next();
+                writer.remove();
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                    writer = null;
+                }
+            }
+            t.commit();
+            t.close();
+            assertEquals(--idx, loadFeatures(sds).size());
+        }
     }
 
     /**
@@ -413,7 +423,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      * no features left.
      */
     public void testRemoveFromBackAndClose() throws Throwable {
-        try {
             ShapefileDataStore sds = createDataStore();
 
             int idx = loadFeatures(sds).size();
@@ -435,17 +444,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 }
                 assertEquals(--idx, loadFeatures(sds).size());
             }
-        } catch (Throwable t) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                System.out.println("Ignore " + t
-                        + " because you are on windows");
-                return;
-            } else {
-                throw t;
-            }
-        }
     }
-
+    
     public void testWriteShapefileWithNoRecords() throws Exception {
         SimpleFeatureType featureType = DataUtilities.createType("whatever",
                 "a:Polygon,b:String");
@@ -745,6 +745,35 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         reader = s.getFeatureReader(s.getSchema().getTypeName(), query);
         assertEquals(s.getSchema(), reader.getFeatureType());
         reader.close();
+    }
+    
+    public void testWrite() throws Exception {
+        // create feature type
+        SimpleFeatureType type = DataUtilities.createType("junk","a:Point,b:java.math.BigDecimal,c:java.math.BigInteger");
+
+        BigInteger bigInteger = new BigInteger("1234567890123456789");
+        BigDecimal bigDecimal = new BigDecimal(bigInteger, 2);
+
+        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
+        builder.add(new GeometryFactory().createPoint(new Coordinate(1, -1)));
+        builder.add(bigDecimal);
+        builder.add(bigInteger);
+        
+        
+        SimpleFeature feature = builder.buildFeature(null);;
+
+        // store features
+        File tmpFile = getTempFile();
+        tmpFile.createNewFile();
+        ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURL());
+        s.createSchema(type);
+        
+        // was failing in GEOT-2427
+        Transaction t= new DefaultTransaction();
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = s.getFeatureWriter(s.getTypeNames()[0], t);
+        SimpleFeature feature1 = writer.next();
+        
+        
     }
 
     /**

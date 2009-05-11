@@ -16,32 +16,40 @@
  */
 package org.geotools.image;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Color;
 import java.awt.Transparency;
 import java.awt.image.ColorModel;
-import java.awt.image.RenderedImage;
-import java.awt.image.IndexColorModel;
 import java.awt.image.ComponentColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.FileOutputStream;
+
 import javax.imageio.ImageIO;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Viewer;
 import org.geotools.test.TestData;
-
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
  * Tests the {@link ImageWorker} implementation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/image/ImageWorkerTest.java $
- * @version $Id: ImageWorkerTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/test/java/org/geotools/image/ImageWorkerTest.java $
+ * @version $Id: ImageWorkerTest.java 32940 2009-05-05 06:18:23Z simonegiannecchini $
  * @author Simone Giannecchini (GeoSolutions)
  * @author Martin Desruisseaux (Geomatys)
  */
@@ -49,7 +57,7 @@ public final class ImageWorkerTest {
     /**
      * Image to use for testing purpose.
      */
-    private static RenderedImage sstImage, worldImage;
+    private static RenderedImage sstImage, worldImage, chlImage, bathy, smallWorld, gray, grayAlpha;
 
     /**
      * {@code true} if the image should be visualized.
@@ -73,48 +81,34 @@ public final class ImageWorkerTest {
             worldImage = ImageIO.read(input);
             input.close();
         }
-    }
+        if (chlImage == null) {
+            final InputStream input = TestData.openStream(GridCoverage2D.class, "CHL01195.png");
+            chlImage = ImageIO.read(input);
+            input.close();
+        }
+        if (bathy == null) {
+            final InputStream input = TestData.openStream(GridCoverage2D.class, "BATHY.png");
+            bathy = ImageIO.read(input);
+            input.close();
+        }
+        
+        if (smallWorld == null) {
+            final InputStream input = TestData.openStream(GridCoverage2D.class, "small_world.png");
+            smallWorld = ImageIO.read(input);
+            input.close();
+        }        
 
-    /**
-     * Tests the {@link ImageWorker#makeColorTransparent} methods.
-     * Some trivial tests are performed before.
-     */
-    @Test
-    public void testMakeColorTransparent() {
-        assertTrue("Assertions should be enabled.", ImageWorker.class.desiredAssertionStatus());
-        final ImageWorker worker = new ImageWorker(sstImage);
-
-        assertSame(sstImage, worker.getRenderedImage());
-        assertEquals(  1, worker.getNumBands());
-        assertEquals( -1, worker.getTransparentPixel());
-        assertTrue  (     worker.isBytes());
-        assertFalse (     worker.isBinary());
-        assertTrue  (     worker.isIndexed());
-        assertTrue  (     worker.isColorSpaceRGB());
-        assertFalse (     worker.isColorSpaceGRAYScale());
-        assertFalse (     worker.isTranslucent());
-
-        assertSame("Expected no operation.", sstImage, worker.rescaleToBytes()           .getRenderedImage());
-        assertSame("Expected no operation.", sstImage, worker.forceIndexColorModel(false).getRenderedImage());
-        assertSame("Expected no operation.", sstImage, worker.forceIndexColorModel(true ).getRenderedImage());
-        assertSame("Expected no operation.", sstImage, worker.forceColorSpaceRGB()       .getRenderedImage());
-        assertSame("Expected no operation.", sstImage, worker.retainFirstBand()          .getRenderedImage());
-        assertSame("Expected no operation.", sstImage, worker.retainLastBand()           .getRenderedImage());
-
-        // Following will change image, so we need to test after the above assertions.
-        assertEquals(  0, worker.getMinimums()[0], 0);
-        assertEquals(255, worker.getMaximums()[0], 0);
-        assertNotSame(sstImage, worker.getRenderedImage());
-        assertSame("Expected same databuffer, i.e. pixels should not be duplicated.",
-                   sstImage.getTile(0,0).getDataBuffer(),
-                   worker.getRenderedImage().getTile(0,0).getDataBuffer());
-
-        assertSame(worker, worker.makeColorTransparent(Color.WHITE));
-        assertEquals(255,  worker.getTransparentPixel());
-        assertFalse (      worker.isTranslucent());
-        assertSame("Expected same databuffer, i.e. pixels should not be duplicated.",
-                   sstImage.getTile(0,0).getDataBuffer(),
-                   worker.getRenderedImage().getTile(0,0).getDataBuffer());
+        if (gray == null) {
+            final InputStream input = TestData.openStream(GridCoverage2D.class, "gray.png");
+            gray = ImageIO.read(input);
+            input.close();
+        }   
+        
+        if (grayAlpha == null) {
+            final InputStream input = TestData.openStream(GridCoverage2D.class, "gray-alpha.png");
+            grayAlpha = ImageIO.read(input);
+            input.close();
+        }          
     }
 
     /**
@@ -281,7 +275,141 @@ public final class ImageWorkerTest {
         }
         show(worker, "RGB translucent");
     }
+    /**
+     * Tests the {@link ImageWorker#makeColorTransparent} methods.
+     * Some trivial tests are performed before.
+     * @throws IOException 
+     * @throws FileNotFoundException 
+     * @throws IllegalStateException 
+     */
+    @Test
+    public void testMakeColorTransparent() throws IllegalStateException, FileNotFoundException, IOException {
+        assertTrue("Assertions should be enabled.", ImageWorker.class.desiredAssertionStatus());
+        ImageWorker worker = new ImageWorker(sstImage);
+        
+        assertSame(sstImage, worker.getRenderedImage());
+        assertEquals(  1, worker.getNumBands());
+        assertEquals( -1, worker.getTransparentPixel());
+        assertTrue  (     worker.isBytes());
+        assertFalse (     worker.isBinary());
+        assertTrue  (     worker.isIndexed());
+        assertTrue  (     worker.isColorSpaceRGB());
+        assertFalse (     worker.isColorSpaceGRAYScale());
+        assertFalse (     worker.isTranslucent());
 
+        assertSame("Expected no operation.", sstImage, worker.rescaleToBytes()           .getRenderedImage());
+        assertSame("Expected no operation.", sstImage, worker.forceIndexColorModel(false).getRenderedImage());
+        assertSame("Expected no operation.", sstImage, worker.forceIndexColorModel(true ).getRenderedImage());
+        assertSame("Expected no operation.", sstImage, worker.forceColorSpaceRGB()       .getRenderedImage());
+        assertSame("Expected no operation.", sstImage, worker.retainFirstBand()          .getRenderedImage());
+        assertSame("Expected no operation.", sstImage, worker.retainLastBand()           .getRenderedImage());
+
+        // Following will change image, so we need to test after the above assertions.
+        assertEquals(  0, worker.getMinimums()[0], 0);
+        assertEquals(255, worker.getMaximums()[0], 0);
+        assertNotSame(sstImage, worker.getRenderedImage());
+        assertSame("Expected same databuffer, i.e. pixels should not be duplicated.",
+                   sstImage.getTile(0,0).getDataBuffer(),
+                   worker.getRenderedImage().getTile(0,0).getDataBuffer());
+
+        assertSame(worker, worker.makeColorTransparent(Color.WHITE));
+        assertEquals(255,  worker.getTransparentPixel());
+        assertFalse (      worker.isTranslucent());
+        assertSame("Expected same databuffer, i.e. pixels should not be duplicated.",
+                   sstImage.getTile(0,0).getDataBuffer(),
+                   worker.getRenderedImage().getTile(0,0).getDataBuffer());
+        
+
+        // INDEX TO INDEX-ALPHA
+        worker=new ImageWorker(chlImage).makeColorTransparent(Color.black);
+        show(worker,  "CHL01195.png");
+        assertEquals(  1, worker.getNumBands());
+        assertEquals( 0, worker.getTransparentPixel());
+        assertTrue  (     worker.isBytes());
+        assertTrue  (     worker.isIndexed());
+        assertTrue  (     worker.isColorSpaceRGB());
+        assertFalse (     worker.isColorSpaceGRAYScale());
+        assertFalse (     worker.isTranslucent());        
+        RenderedImage image= worker.getRenderedImage();
+        assertTrue  (     image.getColorModel() instanceof IndexColorModel);
+        IndexColorModel iColorModel=(IndexColorModel) image.getColorModel();
+        int transparentColor=iColorModel.getRGB(worker.getTransparentPixel())&0x00ffffff;
+        assertTrue  (     transparentColor==0);
+        
+
+        
+        // INDEX TO INDEX-ALPHA
+        worker=new ImageWorker(bathy).makeColorTransparent(Color.WHITE);
+        show(worker,  "BATHY.png");
+        assertEquals(  1, worker.getNumBands());
+        assertEquals( 206, worker.getTransparentPixel());
+        assertTrue  (     worker.isBytes());
+        assertTrue  (     worker.isIndexed());
+        assertTrue  (     worker.isColorSpaceRGB());
+        assertFalse (     worker.isColorSpaceGRAYScale());
+        assertFalse (     worker.isTranslucent());        
+        image= worker.getRenderedImage();
+        assertTrue  (     image.getColorModel() instanceof IndexColorModel);
+        iColorModel=(IndexColorModel) image.getColorModel();
+        transparentColor=iColorModel.getRGB(worker.getTransparentPixel())&0x00ffffff;
+        assertTrue  (     transparentColor==(Color.WHITE.getRGB()&0x00ffffff));        
+        
+        // RGB TO RGBA
+        worker=new ImageWorker(smallWorld).makeColorTransparent(new Color(11,10,50));
+        show(worker,  "small_world.png");
+        assertEquals(  4, worker.getNumBands());
+        assertEquals( -1, worker.getTransparentPixel());
+        assertTrue  (     worker.isBytes());
+        assertFalse  (     worker.isIndexed());
+        assertTrue  (     worker.isColorSpaceRGB());
+        assertFalse (     worker.isColorSpaceGRAYScale());
+        assertTrue (     worker.isTranslucent());        
+        image= worker.getRenderedImage();
+        assertTrue  (     image.getColorModel() instanceof ComponentColorModel);  
+                
+        
+        // RGBA to RGBA
+        worker=new ImageWorker(worldImage).makeColorTransparent(Color.white);
+        show(worker,  "world.png");
+        assertEquals(  4, worker.getNumBands());
+        assertEquals( -1, worker.getTransparentPixel());
+        assertTrue  (     worker.isBytes());
+        assertFalse  (     worker.isIndexed());
+        assertTrue  (     worker.isColorSpaceRGB());
+        assertFalse (     worker.isColorSpaceGRAYScale());
+        assertTrue (     worker.isTranslucent());        
+        image= worker.getRenderedImage();
+        assertTrue  (     image.getColorModel() instanceof ComponentColorModel);  
+        
+        
+        // GRAY TO GRAY-ALPHA
+        worker=new ImageWorker(gray).makeColorTransparent(Color.black);
+        show(worker,  "gray.png");
+        assertEquals(  2, worker.getNumBands());
+        assertEquals( -1, worker.getTransparentPixel());
+        assertTrue  (     worker.isBytes());
+        assertFalse  (     worker.isIndexed());
+        assertFalse  (     worker.isColorSpaceRGB());
+        assertTrue (     worker.isColorSpaceGRAYScale());
+        assertTrue (     worker.isTranslucent());        
+        image= worker.getRenderedImage();
+        assertTrue  (     image.getColorModel() instanceof ComponentColorModel);  
+        
+        // GRAY-ALPHA TO GRAY-ALPHA.
+        worker=new ImageWorker(grayAlpha).makeColorTransparent(Color.black);
+        show(worker,  "gray-alpha.png");  
+        assertEquals(  2, worker.getNumBands());
+        assertEquals( -1, worker.getTransparentPixel());
+        assertTrue  (     worker.isBytes());
+        assertFalse  (     worker.isIndexed());
+        assertFalse  (     worker.isColorSpaceRGB());
+        assertTrue (     worker.isColorSpaceGRAYScale());
+        assertTrue (     worker.isTranslucent());        
+        image= worker.getRenderedImage();
+        assertTrue  (     image.getColorModel() instanceof ComponentColorModel);         
+        
+        
+    }
     /**
      * Visualize the content of given image if {@link #SHOW} is {@code true}.
      *
@@ -292,7 +420,7 @@ public final class ImageWorkerTest {
         if (SHOW) {
             Viewer.show(worker.getRenderedImage(), title);
         } else {
-            assertNotNull(worker.getBufferedImage()); // Force computation.
+            assertNotNull(worker.getRenderedImage().getTile(worker.getRenderedImage().getMinTileX(), worker.getRenderedImage().getMinTileY())); // Force computation.
         }
     }
 }

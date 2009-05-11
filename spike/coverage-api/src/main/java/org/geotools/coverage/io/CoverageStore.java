@@ -16,35 +16,21 @@
  */
 package org.geotools.coverage.io;
 
-import java.util.EnumSet;
 import java.util.Map;
 
 import org.geotools.data.Parameter;
 import org.opengis.util.ProgressListener;
 
 /**
- * Provided read-write access to a coverage data product.
+ * Provides read-write access to a coverage.
  * 
  * @author Simone Giannecchini, GeoSolutions
  * @author Jody Garnett
+ * 
  * @todo revisit and improve when feedback starts to flow in
  */
 public interface CoverageStore extends CoverageSource {
 
-	/**
-	 * Retrieves a {@link CoverageCapabilities} which can be used to discover
-	 * capabilities of a certain {@link CoverageStore}.
-	 * <p>
-	 * You can use set membership to quickly test abilities:<code><pre>
-	 * if( getCapabilities().contains( CoverageCapabilities.WRITE_SUBSAMPLING ) ){
-	 *     ...
-	 * }
-	 * </code></pre>
-	 * @return a {@link EnumSet} of CoverageCapabilities which can be used to discover
-	 * capabilities of this {@link CoverageStore}.
-	 */
-	public EnumSet<CoverageCapabilities> getCapabilities();
-	
 	/**
 	 * Describes the required (and optional) parameters that
 	 * can be passed to the {@link #update(CoverageReadRequest, ProgressListener)} method.

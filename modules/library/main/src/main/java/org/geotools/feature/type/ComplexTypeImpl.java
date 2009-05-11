@@ -16,17 +16,15 @@
  */
 package org.geotools.feature.type;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.feature.FeatureImplUtils;
 import org.geotools.feature.NameImpl;
 import org.geotools.resources.Classes;
-import org.geotools.resources.Utilities;
 import org.opengis.feature.Property;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -39,31 +37,45 @@ import org.opengis.util.InternationalString;
  * Base class for complex types.
  * 
  * @author gabriel
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  */
 public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 
-	protected Map<Name, PropertyDescriptor> propertyMap = null;
+        /**
+         * Immutable copy of the properties list with which we were constructed.
+         */
+        final private Collection<PropertyDescriptor> properties;
+        
+	/**
+	 * Map to locate properties by name.
+	 */
+	final private Map<Name, PropertyDescriptor> propertyMap;
 	
 	public ComplexTypeImpl(
 		Name name, Collection<PropertyDescriptor> properties, boolean identified, 
 		boolean isAbstract, List<Filter> restrictions, AttributeType superType, 
 		InternationalString description
 	) {
-		
 	super(name, Collection.class, identified, isAbstract, restrictions, superType, description);
-
-        if (properties == null)
-            this.propertyMap = Collections.emptyMap();
-        else {
-            this.propertyMap = new HashMap<Name, PropertyDescriptor>();
+	List<PropertyDescriptor> localProperties;
+	Map<Name, PropertyDescriptor> localPropertyMap;
+	if (properties == null) {
+	    localProperties = Collections.emptyList();
+            localPropertyMap = Collections.emptyMap();
+	} else {
+	    localProperties = new ArrayList<PropertyDescriptor>(properties);
+            localPropertyMap = new HashMap<Name, PropertyDescriptor>();
             for (PropertyDescriptor pd : properties) {
                 if( pd == null ){
                     // descriptor entry may be null if a request was made for a property that does not exist
                     throw new NullPointerException("PropertyDescriptor is null - did you request a property that does not exist?");
                 }
-                this.propertyMap.put(pd.getName(), pd);
+                localPropertyMap.put(pd.getName(), pd);
             }
+            
         }
+	this.properties = Collections.unmodifiableList(localProperties);
+        this.propertyMap = Collections.unmodifiableMap(localPropertyMap);
     }
 
 	public Class<Collection<Property>> getBinding() {
@@ -71,7 +83,7 @@ public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 	}
 	
 	public Collection<PropertyDescriptor> getDescriptors() {
-		return FeatureImplUtils.unmodifiable(propertyMap.values());
+		return properties;
 	}
 	
 	public PropertyDescriptor getDescriptor(Name name) {
@@ -89,27 +101,25 @@ public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 	}
 	
 	public boolean equals(Object o){
-	    if(this == o)
+	    if(this == o) {
 	        return true;
-	    
-    	if(!(o instanceof ComplexTypeImpl)){
-    		return false;
-    	}
-    	if(!super.equals(o)){
-    		return false;
-    	}
-    	
-    	ComplexTypeImpl other = (ComplexTypeImpl)o;
-    	if ( !Utilities.equals( propertyMap, other.propertyMap ) ) {
-    		return false;
-    	}
-    	
-    	return true;
-    }
+	    }
+	    if(!super.equals(o)){
+	        return false;
+	    }
+	    if (getClass() != o.getClass()) {
+	        return false;
+	    }
+	    ComplexTypeImpl other = (ComplexTypeImpl)o;
+	    if ( !properties.equals(other.properties) ) {
+	        return false;
+	    }
+	    return true;
+	}
     
 	public int hashCode(){
-    	return super.hashCode() * propertyMap.hashCode();
-    }
+	    return 59 * super.hashCode() + properties.hashCode();
+	}
     
 	public String toString() {
 		StringBuffer sb = new StringBuffer(Classes.getShortClassName(this));

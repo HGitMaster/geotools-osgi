@@ -38,6 +38,11 @@ import javax.sql.DataSource;
  * 
  * TODO: this class will be obsolete in the future, when enough of its peers functionality is pulled
  * up into core code.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: RegfuncPostgisDataStoreFactory.java 31819 2008-11-11 02:31:21Z bencd $
+ * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/jdbc-regfunc/src/main/java/org/geotools/data/postgis/RegfuncPostgisDataStoreFactory.java $
+ * @since 2.4
  */
 public class RegfuncPostgisDataStoreFactory extends PostgisDataStoreFactory {
 

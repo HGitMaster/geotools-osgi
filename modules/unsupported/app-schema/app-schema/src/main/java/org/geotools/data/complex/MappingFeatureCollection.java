@@ -1,3 +1,20 @@
+/*
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
+ *
+ *    (C) 2004-2008, Open Source Geospatial Foundation (OSGeo)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package org.geotools.data.complex;
 
 import java.io.IOException;
@@ -5,6 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.geotools.data.Query;
+import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -16,6 +34,19 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.util.ProgressListener;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+
+/**
+ * {@link FeatureCollection} for a {@link MappingFeatureIterator}.
+ * 
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @version $Id: MappingFeatureCollection.java 32634 2009-03-16 02:49:51Z bencaradocdavies $
+ * @source $URL:
+ *         http://svn.geotools.org/trunk/modules/unsupported/app-schema/app-schema/src/main/java
+ *         /org/geotools/data/complex/MappingFeatureCollection.java $
+ * @since 2.6
+ */
 public class MappingFeatureCollection implements FeatureCollection<FeatureType, Feature> {
 
     private final AppSchemaDataAccess store;
@@ -31,8 +62,8 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
         this.query = query;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Not a supported operation.
      * 
      * @see org.geotools.feature.FeatureCollection#accepts(org.opengis.feature.FeatureVisitor,
      *      org.opengis.util.ProgressListener)
@@ -41,8 +72,8 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
         throw new UnsupportedOperationException();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Not a supported operation.
      * 
      * @see org.geotools.feature.FeatureCollection#add(org.opengis.feature.Feature)
      */
@@ -71,7 +102,8 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
     /*
      * (non-Javadoc)
      * 
-     * @see org.geotools.feature.FeatureCollection#addListener(org.geotools.feature.CollectionListener)
+     * @see
+     * org.geotools.feature.FeatureCollection#addListener(org.geotools.feature.CollectionListener)
      */
     public void addListener(CollectionListener listener) throws NullPointerException {
         throw new UnsupportedOperationException();
@@ -135,14 +167,33 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
         }
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * 
+     * Stolen from {@link ReprojectFeatureResults}.
      * 
      * @see org.geotools.feature.FeatureCollection#getBounds()
      */
     public ReferencedEnvelope getBounds() {
-        throw new UnsupportedOperationException();
-
+        FeatureIterator<Feature> features = features();
+        try {
+            Envelope newBBox = new Envelope();
+            Envelope internal;
+            Feature feature;
+            while (features.hasNext()) {
+                feature = features.next();
+                final Geometry geometry = ((Geometry) feature.getDefaultGeometryProperty()
+                        .getValue());
+                if (geometry != null) {
+                    internal = geometry.getEnvelopeInternal();
+                    newBBox.expandToInclude(internal);
+                }
+            }
+            return ReferencedEnvelope.reference(newBBox);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception occurred while computing bounds", e);
+        } finally {
+            features.close();
+        }
     }
 
     /*
@@ -216,7 +267,9 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
     /*
      * (non-Javadoc)
      * 
-     * @see org.geotools.feature.FeatureCollection#removeListener(org.geotools.feature.CollectionListener)
+     * @see
+     * org.geotools.feature.FeatureCollection#removeListener(org.geotools.feature.CollectionListener
+     * )
      */
     public void removeListener(CollectionListener listener) throws NullPointerException {
         throw new UnsupportedOperationException();

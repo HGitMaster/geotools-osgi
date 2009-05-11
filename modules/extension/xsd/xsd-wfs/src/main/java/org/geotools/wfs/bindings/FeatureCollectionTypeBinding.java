@@ -16,6 +16,8 @@
  */
 package org.geotools.wfs.bindings;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import net.opengis.wfs.FeatureCollectionType;
@@ -23,6 +25,9 @@ import net.opengis.wfs.WfsFactory;
 
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.gml3.GML;
+import org.geotools.wfs.CompositeFeatureCollection;
 import org.geotools.wfs.WFS;
 import org.geotools.xml.AbstractComplexEMFBinding;
 import org.geotools.xml.ElementInstance;
@@ -102,20 +107,63 @@ public class FeatureCollectionTypeBinding extends AbstractComplexEMFBinding {
         return WFS.FeatureCollectionType;
     }
 
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        FeatureCollectionType fc = (FeatureCollectionType) object;
+        if ( !fc.getFeature().isEmpty() ) {
+            FeatureCollection first = (FeatureCollection) fc.getFeature().get( 0 );
+            
+            if( GML.boundedBy.equals( name ) ) {
+                if ( fc.getFeature().size() == 1 ) {
+                    return first.getBounds();    
+                }
+                else {
+                    //aggregate
+                    ReferencedEnvelope bounds = new ReferencedEnvelope(first.getBounds());
+                    for ( int i = 1; i < fc.getFeature().size(); i++ ) {
+                        FeatureCollection features = (FeatureCollection) fc.getFeature().get( i );
+                        bounds.expandToInclude( features.getBounds() );
+                    }
+                    return bounds;
+                }
+                
+            }
+            
+            if ( GML.featureMember.equals( name ) ) {
+                if (fc.getFeature().size() > 1) {
+                    //wrap in a single
+                    return new CompositeFeatureCollection(fc.getFeature());
+                }
+
+                //just return the single
+                return first;
+            }    
+        }
+        
+        return super.getProperty(object, name);
+    }
+    
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         FeatureCollectionType fct = (FeatureCollectionType) super.parse(instance, node, value);
-
-        SimpleFeature[] features = (SimpleFeature[]) node.getChildValue(SimpleFeature[].class);
-
-        if (features != null) {
-            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = new DefaultFeatureCollection(null, null) {
-                };
-
-            for (int i = 0; i < features.length; i++) {
-                fc.add(features[i]);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = new DefaultFeatureCollection(null, null);
+        
+        //gml:featureMembers
+        SimpleFeature[] featureMembers = (SimpleFeature[]) node.getChildValue(SimpleFeature[].class);
+        if (featureMembers != null) {
+            for (int i = 0; i < featureMembers.length; i++) {
+                fc.add(featureMembers[i]);
             }
-
+        }
+        else {
+            //gml:featureMember
+            List<SimpleFeature> featureMember = node.getChildValues( SimpleFeature.class );
+            for (SimpleFeature f : featureMember ) {
+                fc.add( f );
+            }
+        }
+        
+        if ( !fc.isEmpty() ) {
             fct.getFeature().add(fc);
         }
 

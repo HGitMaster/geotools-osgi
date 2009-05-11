@@ -3,7 +3,7 @@
          Project configuration file for the Geotools 2 project
          http://www.geotools.org/
 
-         Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $
+         Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $
      =========================================================================== -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>unsupported</artifactId>
-    <version>2.6.0.osgi1</version>
+    <version>2.6.0.osgi2</version>
   </parent>
 
   <properties>
@@ -33,9 +33,9 @@
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/trunk/modules/unsupported/jts-wrapper/
+      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/jts-wrapper/
     </connection>
-    <url>http://svn.geotools.org/trunk/modules/unsupported/jts-wrapper/</url>
+    <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/jts-wrapper/</url>
   </scm>
 
   <description>

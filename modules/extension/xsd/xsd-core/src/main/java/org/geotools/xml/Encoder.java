@@ -16,6 +16,8 @@
  */
 package org.geotools.xml;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -24,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +38,11 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
@@ -235,6 +243,9 @@ public class Encoder {
         namespaces = new NamespaceSupport();
         context.registerComponentInstance(namespaces);
         context.registerComponentInstance(new NamespaceSupportWrapper(namespaces));
+
+        //add configuration to context;
+        context.registerComponentInstance(configuration);
 
         //property extractors
         propertyExtractors = Schemas.getComponentInstancesOfType(context, PropertyExtractor.class);
@@ -566,6 +577,15 @@ public class Encoder {
 
         if (namespaceAware) {
             //write out all the namespace prefix value mappings
+            for ( Enumeration e = namespaces.getPrefixes(); e.hasMoreElements(); ) {
+                String prefix = (String) e.nextElement();
+                String uri = namespaces.getURI( prefix );
+                
+                if ( "xml".equals( prefix ) ) {
+                    continue;
+                }
+                serializer.startPrefixMapping( prefix , uri );
+            }
             for (Iterator itr = schema.getQNamePrefixToNamespaceMap().entrySet().iterator();
                     itr.hasNext();) {
                 Map.Entry entry = (Map.Entry) itr.next();
@@ -662,6 +682,16 @@ public class Encoder {
                             encoded.push(new EncodingEntry(next, element,entry));                            
                         }
                     } else {
+                        //iterator done, special case check here for feature collection
+                        // we need to ensure the iterator is closed properly
+                        Object source = child[2];
+                        if ( source instanceof FeatureCollection ) {
+                            //only close the iterator if not just a wrapping one
+                            if ( !( itr instanceof SingleIterator ) ) {
+                                ((FeatureCollection)source).close( itr );    
+                            }
+                        }
+                        
                         //this child is done, remove from child list
                         entry.children.remove(0);
                     }
@@ -761,14 +791,16 @@ public class Encoder {
                                         Binding b1 = (Binding) match1[1];
                                         Binding b2 = (Binding) match2[1];
 
-                                        if (b2.getType().isAssignableFrom(b1.getType())) {
-                                            return -1;
+                                        if ( b1.getType() != b2.getType() ) {
+                                            if (b2.getType().isAssignableFrom(b1.getType())) {
+                                                return -1;
+                                            }
+    
+                                            if (b1.getType().isAssignableFrom(b2.getType())) {
+                                                return 1;
+                                            }
                                         }
-
-                                        if (b1.getType().isAssignableFrom(b2.getType())) {
-                                            return 1;
-                                        }
-
+                                        
                                         //use binding comparability
                                         if (b1 instanceof Comparable) {
                                             return ((Comparable) b1).compareTo(b2);
@@ -965,10 +997,10 @@ O:
                                     iterator = new SingleIterator(obj);
                                 }
 
-                                entry.children.add(new Object[] { child, iterator });
+                                entry.children.add(new Object[] { child, iterator, obj });
                             } else {
                                 //only one, just add the object
-                                entry.children.add(new Object[] { child, new SingleIterator(obj) });
+                                entry.children.add(new Object[] { child, new SingleIterator(obj), obj });
                             }
                         }
                     }
@@ -989,9 +1021,26 @@ O:
             // kill them too
         }
         
-
     }
 
+    /**
+     * Encodes an object directly to a dom.
+     * <p>
+     * Note that this method should be used for testing or convenience since
+     * it does not stream and loads the entire encoded result into memory.
+     * </p>
+     */
+    public Document encodeAsDOM( Object object, QName name ) throws IOException, SAXException, TransformerException  {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        encode( object, name, out );
+        
+        ByteArrayInputStream in = new ByteArrayInputStream( out.toByteArray() );
+        DOMResult result = new DOMResult();
+        Transformer tx = TransformerFactory.newInstance().newTransformer();
+        tx.transform( new StreamSource( in ), result );
+        return (Document) result.getNode();
+    }
+    
     protected Node encode(Object object, XSDNamedComponent component) {
         return encode( object, component, null );
     }

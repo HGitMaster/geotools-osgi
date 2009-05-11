@@ -30,7 +30,6 @@ import java.util.Set;
 
 import javax.measure.unit.NonSI;
 
-import org.opengis.go.CommonFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;

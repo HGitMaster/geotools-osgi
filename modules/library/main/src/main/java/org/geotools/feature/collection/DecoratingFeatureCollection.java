@@ -72,7 +72,8 @@ public class DecoratingFeatureCollection<T extends FeatureType, F extends Featur
     }
 
     public void accepts(org.opengis.feature.FeatureVisitor visitor,
-            org.opengis.util.ProgressListener progress) {
+            org.opengis.util.ProgressListener progress) throws IOException {
+        delegate.accepts(visitor, progress);
     }
     
     public boolean add(F o) {

@@ -67,8 +67,8 @@ import org.hsqldb.jdbc.jdbcDataSource;
  * nammed {@value #DIRECTORY_KEY}.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/ThreadedHsqlEpsgFactory.java $
- * @version $Id: ThreadedHsqlEpsgFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/ThreadedHsqlEpsgFactory.java $
+ * @version $Id: ThreadedHsqlEpsgFactory.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Martin Desruisseaux
  * @author Didier Richard
  */
@@ -394,6 +394,8 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
             connection = source.getConnection();
             assert dataExists(connection);
         }
-        return new FactoryUsingHSQL(hints, connection);
+        FactoryUsingHSQL factory = new FactoryUsingHSQL(hints, connection);
+        factory.setValidationQuery("CALL NOW()");
+        return factory;
     }
 }

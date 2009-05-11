@@ -16,30 +16,48 @@
  */
 package org.geotools.caching;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.geotools.caching.spatialindex.NodeIdentifier;
 
-
+/**
+ * Least-Recently Used Eviction Policy
+ * <p>
+ * Removes the oldest items from the cache.
+ * </p>
+ */
 public class LRUEvictionPolicy implements EvictionPolicy {
-    Map<NodeIdentifier, Object> queue;
-    EvictableTree tree;
+    private Map<NodeIdentifier, Object> queue;
+    private EvictableTree tree;
 
     public LRUEvictionPolicy(EvictableTree tree) {
         this.queue = new LinkedHashMap<NodeIdentifier, Object>(100, .75f, true);
         this.tree = tree;
     }
 
-    public void evict() {
+    public boolean evict() {
         Iterator<NodeIdentifier> it = queue.keySet().iterator();
-
-        if (it.hasNext()) {
+        while(it.hasNext()){
             NodeIdentifier node = it.next();
-            it.remove();
-            tree.evict(node);
+            if (!node.isLocked()){
+                try{
+                    node.writeLock();
+                    try{
+                        tree.evict(node);
+                        queue.remove(node);    
+                    }finally{
+                        node.writeUnLock();
+                    }
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
         }
+        return false;
     }
 
     public void access(NodeIdentifier node) {
@@ -49,4 +67,8 @@ public class LRUEvictionPolicy implements EvictionPolicy {
             queue.put(node, null);
         }
     }
+    
+//    public boolean canEvict(){
+//    	return queue.size() > 0;
+//    }
 }

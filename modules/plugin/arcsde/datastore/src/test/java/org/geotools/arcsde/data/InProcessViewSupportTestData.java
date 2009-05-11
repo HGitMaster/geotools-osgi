@@ -44,8 +44,9 @@ import com.esri.sde.sdk.client.SeTable;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/InProcessViewSupportTestData.java $
- * @version $Id: InProcessViewSupportTestData.java 30722 2008-06-13 18:15:42Z acuster $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
+ *         /org/geotools/arcsde/data/InProcessViewSupportTestData.java $
+ * @version $Id: InProcessViewSupportTestData.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.4.x
  */
 public class InProcessViewSupportTestData {
@@ -179,7 +180,8 @@ public class InProcessViewSupportTestData {
 
         /*
          * SeRegistration tableRegistration = new SeRegistration(conn, CHILD);
-         * tableRegistration.setRowIdColumnType(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER);
+         * tableRegistration.setRowIdColumnType
+         * (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER);
          * tableRegistration.setRowIdColumnName("ID"); tableRegistration.alter();
          */
         insertChildData(session, table);
@@ -189,7 +191,7 @@ public class InProcessViewSupportTestData {
 
     /**
      * <pre>
-     * <code>
+     * &lt;code&gt;
      *  -----------------------------------------------
      *  |            GT_SDE_TEST_MASTER               |
      *  -----------------------------------------------
@@ -201,7 +203,7 @@ public class InProcessViewSupportTestData {
      *  -----------------------------------------------
      *  |     3     |   name3        |  POINT(3, 3)   |
      *  -----------------------------------------------
-     * </code>
+     * &lt;/code&gt;
      * </pre>
      * 
      * @param session
@@ -245,7 +247,7 @@ public class InProcessViewSupportTestData {
 
     /**
      * <pre>
-     * <code>
+     * &lt;code&gt;
      *  ---------------------------------------------------------------------
      *  |                     GT_SDE_TEST_CHILD                             |
      *  ---------------------------------------------------------------------
@@ -265,7 +267,7 @@ public class InProcessViewSupportTestData {
      *  ---------------------------------------------------------------------
      *  |    7      |      3         |   child6       |    description7     | 
      *  ---------------------------------------------------------------------
-     * </code>
+     * &lt;/code&gt;
      * </pre>
      * 
      * Note last row has the same name than child6, for testing group by.

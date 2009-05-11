@@ -27,8 +27,8 @@ import java.util.EventObject;
  * @author Andrea Aime
  * @author Ian Turton
  * @author Martin Desruisseaux
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/map/event/MapLayerEvent.java $
- * @version $Id: MapLayerEvent.java 30649 2008-06-12 19:44:08Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/map/event/MapLayerEvent.java $
+ * @version $Id: MapLayerEvent.java 32675 2009-03-24 00:11:46Z mbedward $
  *
  * @see Layer
  * @see LayerListener
@@ -71,6 +71,13 @@ public class MapLayerEvent extends EventObject {
 
     /** The reason for the change. */
     private final int reason;
+
+    /**
+     * Flag set when the layer selection status is changed.
+     *
+     * @see #getReason
+     */
+    public static final int SELECTION_CHANGED = 6;
 
     /**
      * Creates a new instance of <code>LayerEvent</code> with the specified reason.

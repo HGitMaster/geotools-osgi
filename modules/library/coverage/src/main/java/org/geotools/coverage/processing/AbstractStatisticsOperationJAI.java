@@ -209,6 +209,15 @@ public abstract class AbstractStatisticsOperationJAI extends
 						e);
 				throw ce;
 			}
+			
+			// //
+			//
+			// get the original envelope and the crs
+			//
+			// //
+			final CoordinateReferenceSystem crs = source
+					.getCoordinateReferenceSystem2D();
+			final Envelope2D envelope = source.getEnvelope2D();			
 
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -223,35 +232,28 @@ public abstract class AbstractStatisticsOperationJAI extends
 					.doubleValue();
 			final double yPeriod = parameters.parameter("yPeriod")
 					.doubleValue();
+			if(!Double.isNaN(xPeriod)&&!Double.isNaN(yPeriod)){
 
-			// //
-			//
-			// get the original envelope and the crs
-			//
-			// //
-			final CoordinateReferenceSystem crs = source
-					.getCoordinateReferenceSystem2D();
-			final Envelope2D envelope = source.getEnvelope2D();
-			// build the new one that spans over the requested area
-			// NOTE:
-			final DirectPosition2D LLC = new DirectPosition2D(crs, envelope.x,
-					envelope.y);
-			LLC.setCoordinateReferenceSystem(crs);
-			final DirectPosition2D URC = new DirectPosition2D(crs, envelope.x
-					+ xPeriod, envelope.y + yPeriod);
-			URC.setCoordinateReferenceSystem(crs);
-			final Envelope2D shrinkedEnvelope = new Envelope2D(LLC, URC);
-
-			// transform back into raster space
-			final Rectangle2D transformedEnv = CRS.transform(
-					worldToGridTransform, shrinkedEnvelope).toRectangle2D();
-
-			// block settings
-			block.setParameter("xPeriod", Integer.valueOf((int) transformedEnv
-					.getWidth()));
-			block.setParameter("yPeriod", Integer.valueOf((int) transformedEnv
-					.getHeight()));
-
+				// build the new one that spans over the requested area
+				// NOTE:
+				final DirectPosition2D LLC = new DirectPosition2D(crs, envelope.x,
+						envelope.y);
+				LLC.setCoordinateReferenceSystem(crs);
+				final DirectPosition2D URC = new DirectPosition2D(crs, envelope.x
+						+ xPeriod, envelope.y + yPeriod);
+				URC.setCoordinateReferenceSystem(crs);
+				final Envelope2D shrinkedEnvelope = new Envelope2D(LLC, URC);
+	
+				// transform back into raster space
+				final Rectangle2D transformedEnv = CRS.transform(
+						worldToGridTransform, shrinkedEnvelope).toRectangle2D();
+	
+				// block settings
+				block.setParameter("xPeriod", Integer.valueOf((int) transformedEnv
+						.getWidth()));
+				block.setParameter("yPeriod", Integer.valueOf((int) transformedEnv
+						.getHeight()));
+			}
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// Transcode the polygon parameter into a roi.

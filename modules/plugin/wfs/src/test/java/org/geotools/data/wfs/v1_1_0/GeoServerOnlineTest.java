@@ -16,7 +16,11 @@
  *    Lesser General Public License for more details.
  */
 package org.geotools.data.wfs.v1_1_0;
+
 import static org.geotools.data.wfs.v1_1_0.DataTestSupport.GEOS_STATES;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -26,6 +30,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -39,13 +44,14 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GeoServerOnlineTest extends AbstractWfsDataStoreOnlineTest {
 
-    public static final String SERVER_URL = "http://localhost:8080/geoserver/wfs?service=WFS&request=GetCapabilities&version=1.1.0"; //$NON-NLS-1$
+    public static final String SERVER_URL = "http://sigma.openplans.org:8080/geoserver/wfs?service=WFS&request=GetCapabilities&version=1.1.0"; //$NON-NLS-1$
 
     public GeoServerOnlineTest() {
         super(SERVER_URL, GEOS_STATES, "the_geom", MultiPolygon.class, 49, ff.id(Collections
                 .singleton(ff.featureId("states.1"))));
     }
 
+    @Test
     public void testFeatureSourceGetFeaturesFilter() throws IOException {
         if (Boolean.FALSE.equals(serviceAvailable)) {
             return;
@@ -58,13 +64,14 @@ public class GeoServerOnlineTest extends AbstractWfsDataStoreOnlineTest {
         DefaultQuery query = new DefaultQuery(testType.FEATURETYPENAME);
 
         GeometryFactory gf = new GeometryFactory();
-        Coordinate[] coordinates = { new Coordinate(-107, 39), new Coordinate(-107, 38),
-                new Coordinate(-104, 38), new Coordinate(-104, 39), new Coordinate(-107, 39) };
+        //GEOT-2283: use lat/lon coordinate order, this is a wfs 1.1 instance
+        Coordinate[] coordinates = { new Coordinate(39, -107), new Coordinate(38, -107),
+                new Coordinate(38, -104), new Coordinate(39, -104), new Coordinate(39, -107) };
         LinearRing shell = gf.createLinearRing(coordinates);
         Polygon polygon = gf.createPolygon(shell, null);
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
         Filter filter = ff.intersects(ff.property(defaultGeometryName), ff.literal(polygon));
-        //System.out.println(filter);
+        // System.out.println(filter);
         query.setFilter(filter);
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> features;

@@ -25,13 +25,13 @@ import org.geotools.data.Query;
 
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.filter.Filter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.gml.FCBuffer;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.Filter;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author jeichar
  * 
  * TODO Check for a cleaner way to do
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/gml/src/main/java/org/geotools/data/gml/FileGMLDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/gml/src/main/java/org/geotools/data/gml/FileGMLDataStore.java $
  */
 public class FileGMLDataStore extends AbstractDataStore {
 

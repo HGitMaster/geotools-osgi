@@ -16,6 +16,14 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
@@ -28,13 +36,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import junit.extensions.TestSetup;
 import junit.framework.AssertionFailedError;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.Command;
 import org.geotools.arcsde.pool.ISession;
@@ -61,6 +64,12 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureVisitor;
@@ -99,18 +108,17 @@ import com.vividsolutions.jts.io.WKTReader;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/da/src/test/java/org/geotools/arcsde/data/ArcSDEFeatureStoreTest.java $
- * @version $Id: ArcSDEFeatureStoreTest.java 31060 2008-07-23 20:45:42Z jgarnett $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/da/src/test/java/org
+ *         /geotools/arcsde/data/ArcSDEFeatureStoreTest.java $
+ * @version $Id: ArcSDEFeatureStoreTest.java 32195 2009-01-09 19:00:35Z groldan $
  */
-public class ArcSDEFeatureStoreTest extends TestCase {
+public class ArcSDEFeatureStoreTest {
     /** package logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(ArcSDEFeatureStoreTest.class.getPackage().getName());
 
     /** DOCUMENT ME! */
     private static TestData testData;
-
-    private static boolean forceOneTimeTearDown;
 
     /**
      * Flag that indicates whether the underlying database is MS SQL Server.
@@ -124,32 +132,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      */
     private static boolean databaseIsMsSqlServer;
 
-    /**
-     * Builds a test suite for all this class' tests with per suite initialization directed to
-     * {@link #oneTimeSetUp()} and per suite clean up directed to {@link #oneTimeTearDown()}
-     * 
-     * @return
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(ArcSDEFeatureStoreTest.class);
-
-        TestSetup wrapper = new TestSetup(suite) {
-            @Override
-            protected void setUp() throws Exception {
-                forceOneTimeTearDown = false;
-                oneTimeSetUp();
-            }
-
-            @Override
-            protected void tearDown() {
-                oneTimeTearDown();
-            }
-        };
-        return wrapper;
-    }
-
-    private static void oneTimeSetUp() throws Exception {
+    @BeforeClass
+    public static void oneTimeSetUp() throws Exception {
         testData = new TestData();
         testData.setUp();
 
@@ -166,7 +150,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
-    private static void oneTimeTearDown() {
+    @AfterClass
+    public static void oneTimeTearDown() {
         boolean cleanTestTable = false;
         boolean cleanPool = true;
         testData.tearDown(cleanTestTable, cleanPool);
@@ -176,26 +161,16 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * loads {@code test-data/testparams.properties} into a Properties object, wich is used to
      * obtain test tables names and is used as parameter to find the DataStore
      * 
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        // facilitates running a single test at a time (eclipse lets you do this
-        // and it's very useful)
-        if (testData == null) {
-            forceOneTimeTearDown = true;
-            oneTimeSetUp();
-        }
+    @Before
+    public void setUp() throws Exception {
         testData.truncateTempTable();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        if (forceOneTimeTearDown) {
-            oneTimeTearDown();
-        }
+    @After
+    public void tearDown() throws Exception {
     }
 
     /**
@@ -207,6 +182,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * <li>Do the correct feature event notifications get sent out
      * </ul>
      */
+    @Ignore
+    @Test
     public void testFeatureEventsAndTransactionsForDelete() throws Exception {
         // We are going to start with ...
         testData.insertTestData();
@@ -279,13 +256,13 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
         Filter filterOne = ff.id(Collections.singleton(ff.featureId(featureId)));
 
-        assertEquals("no events on AUTO_COMMIT",0, listener.list.size());
-        assertEquals("no events on transaction1",0, listener1.list.size());
-        assertEquals("no events on transaction2",0, listener2.list.size());
+        assertEquals("no events on AUTO_COMMIT", 0, listener.list.size());
+        assertEquals("no events on transaction1", 0, listener1.list.size());
+        assertEquals("no events on transaction2", 0, listener2.list.size());
         featureStore1.removeFeatures(filterOne);
-        assertEquals("no events on AUTO_COMMIT",0, listener.list.size());
-        assertEquals("single event on transaction2",1, listener1.list.size());
-        assertEquals("no events on AUTO_COMMIT",0, listener2.list.size());
+        assertEquals("no events on AUTO_COMMIT", 0, listener.list.size());
+        assertEquals("single event on transaction2", 1, listener1.list.size());
+        assertEquals("no events on AUTO_COMMIT", 0, listener2.list.size());
 
         FeatureEvent e = listener1.list.get(0);
         assertEquals(featureStore1, e.getFeatureSource());
@@ -298,11 +275,13 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         assertFalse(bounds.isNull());
 
         t1.commit();
-        assertEquals("commit event sent to AUTO_COMMIT",1, listener.list.size());
-        assertEquals("commit event sent to transaction 1",2, listener1.list.size());
+        assertEquals("commit event sent to AUTO_COMMIT", 1, listener.list.size());
+        assertEquals("commit event sent to transaction 1", 2, listener1.list.size());
         assertEquals("commit event sent to transaction 2", listener2.list.size());
     }
 
+    @Test
+    @Ignore
     public void testFeatureEventsAndTransactionsForAdd() throws Exception {
         // We are going to start with ...
         testData.insertTestData();
@@ -333,48 +312,50 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         SimpleFeatureType schema = origional.getSchema();
         SimpleFeatureBuilder build = new SimpleFeatureBuilder(schema);
-        
-        int value = 24;        
-        build.add( Integer.valueOf(value));
-        build.add( Short.valueOf((short) value));
-        build.add( new Float(value / 10.0F));
-        build.add( new Double(value / 10D));
-        build.add( "FEATURE_" + value);
-        
+
+        int value = 24;
+        build.add(Integer.valueOf(value));
+        build.add(Short.valueOf((short) value));
+        build.add(new Float(value / 10.0F));
+        build.add(new Double(value / 10D));
+        build.add("FEATURE_" + value);
+
         Calendar cal = Calendar.getInstance();
-        cal.set(2004, 06, value, 0, 0, 0);        
-        build.add( cal );
-        
-        WKTReader reader = new WKTReader();        
-        build.add( reader.read("POINT(1 1)") );
-        
+        cal.set(2004, 06, value, 0, 0, 0);
+        build.add(cal);
+
+        WKTReader reader = new WKTReader();
+        build.add(reader.read("POINT(1 1)"));
+
         SimpleFeature newFeature = build.buildFeature(null);
-        FeatureCollection newFeatures = DataUtilities.collection( newFeature );
-        
-        List<FeatureId> newFids = featureStore1.addFeatures( newFeatures );
+        FeatureCollection newFeatures = DataUtilities.collection(newFeature);
+
+        List<FeatureId> newFids = featureStore1.addFeatures(newFeatures);
         assertEquals(0, listener.list.size());
-        assertEquals(1, listener1.list.size());        
-        
+        assertEquals(1, listener1.list.size());
+
         FeatureEvent e = listener1.list.get(0);
         Id id = (Id) e.getFilter();
-        assertTrue( id.getIdentifiers().containsAll( newFids ));
+        assertTrue(id.getIdentifiers().containsAll(newFids));
         // remember the FeatureId with a strong reference
         FeatureId tempFeatureId = (FeatureId) id.getIdentifiers().iterator().next();
-        assertTrue( newFids.contains( tempFeatureId ) );
-        
+        assertTrue(newFids.contains(tempFeatureId));
+
         t1.commit();
         assertEquals(1, listener.list.size());
         assertEquals(2, listener1.list.size());
-        
+
         BatchFeatureEvent batch = (BatchFeatureEvent) listener1.list.get(2);
-        assertFalse( "confirm tempFid is not in the commit", id.getIdentifiers().contains( tempFeatureId) );
-        assertNotNull( batch.getFilter() );
-        
+        assertFalse("confirm tempFid is not in the commit", id.getIdentifiers().contains(
+                tempFeatureId));
+        assertNotNull(batch.getFilter());
+
         FeatureId featureId = (FeatureId) batch.getCreatedFeatureIds().iterator().next();
         String fid = featureId.getID();
-        assertSame( "confirm temp feature Id was updated", tempFeatureId, featureId );        
+        assertSame("confirm temp feature Id was updated", tempFeatureId, featureId);
     }
-    
+
+    @Test
     public void testDeleteByFIDAutoCommit() throws Exception {
         testData.insertTestData();
 
@@ -459,6 +440,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testDeleteByAttOnlyFilter() throws Exception {
         testData.insertTestData();
 
@@ -496,6 +478,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
+    @Test
     public void testInsertAutoCommit() throws Exception {
         // the table populated here is test friendly since it can hold
         // any kind of geometries.
@@ -519,6 +502,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testInsertTransaction() throws Exception {
         // start with an empty table
         testData.truncateTempTable();
@@ -593,6 +577,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testInsertTransactionAndQueryByFid() throws Exception {
         // start with an empty table
         final String typeName = testData.getTempTableName();
@@ -627,6 +612,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
+    @Test
     public void testUpdateAutoCommit() throws Exception {
         testData.insertTestData();
 
@@ -667,6 +653,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
+    @Test
     public void testUpdateTransaction() throws Exception {
         testData.insertTestData();
 
@@ -750,6 +737,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
+    @Test
     public void testModifyFeaturesTransaction() throws Exception {
         testData.insertTestData();
 
@@ -812,12 +800,15 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             Attribute actualAtt = actualValues.get(i);
             Name name = originalAtt.getName();
             // bah, date equals does not work, I don't care for this test
-            if (!"INT32_COL".equals(name.getLocalPart()) && !"DATE_COL".equals(name.getLocalPart())) {
-                assertEquals(name + " does not match", originalAtt, actualAtt);
+            String localName = name.getLocalPart();
+            if (!"INT32_COL".equals(localName) && !"SHAPE".equals(localName)
+                    && !"DATE_COL".equals(localName)) {
+                assertEquals(name + " does not match", originalAtt.getValue(), actualAtt.getValue());
             }
         }
     }
 
+    @Test
     public void testUpdateAdjacentPolygonsTransaction() throws Exception {
         final WKTReader reader = new WKTReader();
         final Polygon p1 = (Polygon) reader
@@ -920,9 +911,12 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     /**
      * Tests the writing of features with autocommit transaction.
      * 
-     * @param geometryClass DOCUMENT ME!
-     * @throws Exception DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param geometryClass
+     *            DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
+     * @throws IllegalArgumentException
+     *             DOCUMENT ME!
      */
     private void testInsertAutoCommit(Class<? extends Geometry> geometryClass) throws Exception {
         final String typeName = testData.getTempTableName();
@@ -942,8 +936,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         /*
          * final int[] featureAddedEventCount = { 0 };
          * 
-         * fsource.addFeatureListener(new FeatureListener() { public void changed(FeatureEvent evt) {
-         * if (evt.getEventType() != FeatureEvent.FEATURES_ADDED) { throw new
+         * fsource.addFeatureListener(new FeatureListener() { public void changed(FeatureEvent evt)
+         * { if (evt.getEventType() != FeatureEvent.FEATURES_ADDED) { throw new
          * IllegalArgumentException( "Expected FEATURES_ADDED event, got " + evt.getEventType()); }
          * 
          * ++featureAddedEventCount[0]; } });
@@ -978,6 +972,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
          */
     }
 
+    @Test
     public void testCreateNillableShapeSchema() throws IOException, SchemaException, SeException {
         SimpleFeatureType type;
         final String typeName = "GT_TEST_CREATE";
@@ -999,6 +994,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         testData.deleteTable(typeName);
     }
 
+    @Test
     public void testWriteAndUpdateNullShapes() throws Exception {
         final String typeName = testData.getTempTableName();
         testData.truncateTempTable();
@@ -1084,8 +1080,10 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     /**
      * Tests the writing of features with real transactions
      * 
-     * @throws UnsupportedOperationException DOCUMENT ME!
+     * @throws UnsupportedOperationException
+     *             DOCUMENT ME!
      */
+    @Test
     public void testFeatureWriterTransaction() throws Exception {
         // the table populated here is test friendly since it can hold
         // any kind of geometries.
@@ -1152,8 +1150,10 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     /**
      * DOCUMENT ME!
      * 
-     * @throws UnsupportedOperationException DOCUMENT ME!
+     * @throws UnsupportedOperationException
+     *             DOCUMENT ME!
      */
+    @Test
     public void testFeatureWriterAppend() throws Exception {
         // the table populated here is test friendly since it can hold
         // any kind of geometries.
@@ -1195,6 +1195,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testTransactionStateDiff() throws Exception {
         testData.createTempTable(true);
         // testData.insertTestData();
@@ -1331,6 +1332,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
     }
 
+    @Test
     public void testSetFeaturesAutoCommit() throws Exception {
         testData.insertTestData();
         final FeatureCollection<SimpleFeatureType, SimpleFeature> featuresToSet = testData
@@ -1351,6 +1353,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         assertEquals(5, newCount);
     }
 
+    @Test
     public void testSetFeaturesTransaction() throws Exception {
         testData.insertTestData();
         final FeatureCollection<SimpleFeatureType, SimpleFeature> featuresToSet = testData
@@ -1402,6 +1405,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * another thread accesses the same FeatureStore with a query. Archetypical use case being a
      * udig addFeatures command sends calls addFeatures and the rendering thread does getFeatures.
      */
+    @Test
     public void testTransactionMultithreadAccess() throws Exception {
         testData.insertTestData();
         // start with an empty table
@@ -1521,15 +1525,6 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param args DOCUMENT ME!
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(ArcSDEFeatureStoreTest.class);
-    }
-
     static class Watcher implements FeatureListener {
 
         private Type type;
@@ -1545,7 +1540,6 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
 
     }
-
 
     public void testEditVersionedTableTransactionConcurrently() throws Exception {
         try {

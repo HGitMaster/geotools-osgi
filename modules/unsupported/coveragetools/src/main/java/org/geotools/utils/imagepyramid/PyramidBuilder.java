@@ -16,14 +16,6 @@
  */
 package org.geotools.utils.imagepyramid;
 
-import org.geotools.utils.CoverageToolsConstants;
-import org.geotools.utils.coveragetiler.CoverageTiler;
-import org.geotools.utils.imagemosaic.MosaicIndexBuilder;
-import org.geotools.utils.progress.BaseArgumentsManager;
-import org.geotools.utils.progress.ExceptionEvent;
-import org.geotools.utils.progress.ProcessingEvent;
-import org.geotools.utils.progress.ProcessingEventListener;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,7 +30,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import org.apache.commons.cli2.Option;
 import org.apache.commons.cli2.option.DefaultOption;
 import org.apache.commons.cli2.validation.InvalidArgumentException;
@@ -48,6 +39,13 @@ import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.utils.CoverageToolsConstants;
+import org.geotools.utils.coveragetiler.CoverageTiler;
+import org.geotools.utils.imagemosaic.MosaicIndexBuilder;
+import org.geotools.utils.progress.BaseArgumentsManager;
+import org.geotools.utils.progress.ExceptionEvent;
+import org.geotools.utils.progress.ProcessingEvent;
+import org.geotools.utils.progress.ProcessingEventListener;
 
 /**
  * Given an original image, builds an image pyramid out of it by combining the

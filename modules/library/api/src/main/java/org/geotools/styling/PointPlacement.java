@@ -48,52 +48,54 @@ import org.opengis.filter.expression.Expression;
  * </p>
  *
  * <p>
- * $Id: PointPlacement.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * $Id: PointPlacement.java 32919 2009-05-03 14:18:31Z jive $
  * </p>
  *
  * @author Ian Turton
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/PointPlacement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/PointPlacement.java $
  */
 public interface PointPlacement extends org.opengis.style.PointPlacement,LabelPlacement {
     /**
      * Returns the AnchorPoint which identifies the location inside a textlabel
      * to use as an "anchor" for positioning it relative to a point geometry.
      *
-     * @return DOCUMENT ME!
+     * @return acnchorPoint from the relative to the origional geometry
      */
     AnchorPoint getAnchorPoint();
 
     /**
      * sets the AnchorPoint which identifies the location inside a textlabel to
      * use as an "anchor" for positioning it relative to a point geometry.
-     *
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param anchorPoint relative to the origional geometry
      */
-    @Deprecated
     void setAnchorPoint(AnchorPoint anchorPoint);
 
     /**
      * Returns the Displacement which gives X and Y offset displacements to use
      * for rendering a text label near a point.
      *
-     * @return DOCUMENT ME!
+     * @return Offset to use when rendering text near a point
      */
     Displacement getDisplacement();
 
     /**
      * sets the Displacement which gives X and Y offset displacements to use
      * for rendering a text label near a point.
-     *
-     * @deprecated symbolizers and underneath classes are immutable
      */
-    @Deprecated
     void setDisplacement(Displacement displacement);
+
+    /**
+     * Returns the rotation of the label.
+     *
+     * @return rotation of the label as a dynamic expression
+     */
+    Expression getRotation();
 
     /**
      * sets the rotation of the label.
      *
-     * @deprecated symbolizers and underneath classes are immutable
+     * Sets the rotation of the label.
+     * @param rotation 
      */
-    @Deprecated
     void setRotation(Expression rotation);
 }

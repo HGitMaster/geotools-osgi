@@ -39,10 +39,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoKeyEntry;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.PixelScale;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.TiePoint;
+import org.geotools.gce.geotiff.adapters.GeoKeyEntry;
+import org.geotools.gce.geotiff.adapters.GeoTiffIIOMetadataDecoder;
+import org.geotools.gce.geotiff.adapters.PixelScale;
+import org.geotools.gce.geotiff.adapters.TiePoint;
 
 /**
  * This exception is thrown when the problem with reading the GeoTiff file has

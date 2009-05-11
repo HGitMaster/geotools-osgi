@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *       encoded.
  * @task REVISIT: need to figure out exceptions, we're currently eating io
  *       errors, which is bad. Probably need a generic visitor exception.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/filter/SQLEncoder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/jdbc/src/main/java/org/geotools/filter/SQLEncoder.java $
  */
 public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
     /** error message for exceptions */
@@ -196,6 +196,10 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
      */
     public void setFIDMapper(FIDMapper mapper) {
         this.mapper = mapper;
+    }
+    
+    public FIDMapper getFIDMapper(){
+        return this.mapper;
     }
 
     /**
@@ -376,13 +380,24 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
     	char esc = filter.getEscape().charAt(0);
     	char multi = filter.getWildcardMulti().charAt(0);
     	char single = filter.getWildcardSingle().charAt(0);
-    	String pattern = LikeFilterImpl.convertToSQL92(esc,multi,single,filter.getPattern());
+        boolean matchCase = ((LikeFilterImpl)filter).isMatchingCase();
+    	String pattern = LikeFilterImpl.convertToSQL92(esc, multi, single, matchCase, 
+    	        filter.getPattern());
     	
     	DefaultExpression att = (DefaultExpression) filter.getValue();
     	 
     	try {
+            if (!matchCase){
+                out.write(" UPPER(");
+            }
+
 	    	att.accept(this);
-	    	out.write(" LIKE '");
+            if (!matchCase){
+                out.write(") LIKE '");
+            } else {
+                out.write(" LIKE '");
+            }
+
 	    	out.write(pattern);
 	    	out.write("' ");
     	} catch (java.io.IOException ioe) {

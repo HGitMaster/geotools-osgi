@@ -16,8 +16,11 @@
  */
 package org.geotools.data.wfs;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataStore;
@@ -28,7 +31,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * {@link DataStore} extension interface to provide WFS specific extra information.
  * 
  * @author Gabriel Roldan
- * @version $Id: WFSDataStore.java 31792 2008-11-06 19:17:35Z groldan $
+ * @version $Id: WFSDataStore.java 31823 2008-11-11 16:11:49Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools
@@ -43,7 +46,21 @@ public interface WFSDataStore extends DataStore {
      */
     WFSServiceInfo getInfo();
 
+    public URL getCapabilitiesURL();
+
+    public String getServiceTitle();
+
+    public String getServiceVersion();
+
+    public String getServiceAbstract();
+
+    public Set<String> getServiceKeywords();
+
+    public URI getServiceProviderUri();
+
     public String getFeatureTypeTitle(String typeName);
+
+    public QName getFeatureTypeName(String typeName);
 
     public String getFeatureTypeAbstract(String typeName);
 
@@ -57,6 +74,17 @@ public interface WFSDataStore extends DataStore {
 
     public URL getDescribeFeatureTypeURL(String typeName);
 
-    void setMaxFeatures( Integer maxFeatures );
+    public void setMaxFeatures(Integer maxFeatures);
 
+    public Integer getMaxFeatures();
+
+    /**
+     * 
+     * @param booleanValue
+     *            Boolean.TRUE to prefer POST over GET, Boolean.FALSE for the opposite, {@code null}
+     *            for auto (let the implementation decide)
+     */
+    public void setPreferPostOverGet(Boolean booleanValue);
+
+    public boolean isPreferPostOverGet();
 }

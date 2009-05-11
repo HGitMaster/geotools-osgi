@@ -36,10 +36,10 @@ import org.geotools.test.TestData;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -51,12 +51,12 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 0.9.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/test/java/org/geotools/renderer/lite/LabelingTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/test/java/org/geotools/renderer/lite/LabelingTest.java $
  */
 public class LabelingTest extends TestCase {
 
 	private long timout=3000;
-	private static final int CENTERX = 160;
+	private static final int CENTERX = 130;
 	private static final int CENTERY = 40;
 
 
@@ -109,11 +109,11 @@ public class LabelingTest extends TestCase {
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 
         MemoryDataStore data = new MemoryDataStore();
-        data.addFeature(createPointFeature(0,0,"LongLabel1",crs, geomFac, types));
-        data.addFeature(createPointFeature(2,2,"LongLabel2",crs, geomFac, types));
-        data.addFeature(createPointFeature(0,2,"LongLabel3",crs, geomFac, types));
+        data.addFeature(createPointFeature(2,2,"LongLabel1",crs, geomFac, types));
+        data.addFeature(createPointFeature(4,4,"LongLabel2",crs, geomFac, types));
+        data.addFeature(createPointFeature(0,4,"LongLabel3",crs, geomFac, types));
 //        data.addFeature(createPointFeature(2,0,"Label4",crs, geomFac, types));
-        data.addFeature(createPointFeature(0,4,"LongLabel6",crs, geomFac, types));
+        data.addFeature(createPointFeature(2,6,"LongLabel6",crs, geomFac, types));
 
         return data.getFeatureSource(Rendering2DTest.POINT).getFeatures();
 	}
@@ -135,20 +135,19 @@ public class LabelingTest extends TestCase {
 
    
 	public void testLineLabeling() throws Exception{		
-//		FeatureCollection collection=createLineFeatureCollection();
-//		Style style=loadStyle("LineStyle.sld");
-//		assertNotNull(style);
-//		MapContext map = new DefaultMapContext();
-//        map.addLayer(collection, style);
-//
-//        StreamingRenderer renderer=new StreamingRenderer();
-//        renderer.setContext(map);
-//        Envelope env = map.getLayerBounds();
-//        int boundary=10;
-//        Rendering2DTest.INTERACTIVE=INTERACTIVE;
-//        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
-//        		env.getMinY() - boundary, env.getMaxY() + boundary);
-//        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
+		FeatureCollection collection=createLineFeatureCollection();
+		Style style=loadStyle("LineStyle.sld");
+		assertNotNull(style);
+		MapContext map = new DefaultMapContext();
+        map.addLayer(collection, style);
+
+        StreamingRenderer renderer=new StreamingRenderer();
+        renderer.setContext(map);
+        ReferencedEnvelope env = map.getLayerBounds();
+        int boundary=10;
+        env = new ReferencedEnvelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
+        		env.getMinY() - boundary, env.getMaxY() + boundary, null);
+        RendererBaseTest.showRender("testLineLabeling", renderer, timout, env);
 	}
 
 	private FeatureCollection<SimpleFeatureType, SimpleFeature> createLineFeatureCollection() throws Exception {
@@ -179,24 +178,25 @@ public class LabelingTest extends TestCase {
         	builder.add("line", line.getClass(), crs);
         else
         	builder.add("centre", line.getClass());
+        builder.add("name", String.class);
+        builder.setName(Rendering2DTest.LINE);
         SimpleFeatureType type = builder.buildFeatureType();
         return SimpleFeatureBuilder.build(type, new Object[]{line, name}, null);
 	}
 	
 	public void testPolyLabeling() throws Exception{		
-//		FeatureCollection collection=createPolyFeatureCollection();
-//		Style style=loadStyle("PolyStyle.sld");
-//		assertNotNull(style);
-//		MapContext map = new DefaultMapContext();
-//        map.addLayer(collection, style);
-//        StreamingRenderer renderer=new StreamingRenderer();
-//        renderer.setContext(map);
-//        Envelope env = map.getLayerBounds();
-//        int boundary=10;
-//        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
-//        		env.getMinY() - boundary, env.getMaxY() + boundary);
-//        Rendering2DTest.INTERACTIVE=INTERACTIVE;
-//        Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
+		FeatureCollection collection=createPolyFeatureCollection();
+		Style style=loadStyle("PolyStyle.sld");
+		assertNotNull(style);
+		MapContext map = new DefaultMapContext();
+        map.addLayer(collection, style);
+        StreamingRenderer renderer=new StreamingRenderer();
+        renderer.setContext(map);
+        ReferencedEnvelope env = map.getLayerBounds();
+        int boundary=10;
+        env = new ReferencedEnvelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
+        		env.getMinY() - boundary, env.getMaxY() + boundary, null);
+        RendererBaseTest.showRender("testPolyLabeling", renderer, timout, env);
 	}
 
 	private FeatureCollection<SimpleFeatureType, SimpleFeature> createPolyFeatureCollection() throws Exception {
@@ -226,6 +226,7 @@ public class LabelingTest extends TestCase {
         else
         	builder.add("centre", line.getClass());
         builder.add("name", String.class);
+        builder.setName(Rendering2DTest.POLYGON);
         SimpleFeatureType type = builder.buildFeatureType();
         return SimpleFeatureBuilder.build(type, new Object[]{poly, name}, null);
 	}

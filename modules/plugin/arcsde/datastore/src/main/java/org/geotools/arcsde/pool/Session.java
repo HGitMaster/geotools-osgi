@@ -58,16 +58,17 @@ import com.esri.sde.sdk.client.SeStreamOp;
 import com.esri.sde.sdk.client.SeTable;
 import com.esri.sde.sdk.client.SeUpdate;
 import com.esri.sde.sdk.client.SeVersion;
+import com.esri.sde.sdk.geom.GeometryFactory;
 
 /**
  * Provides thread safe access to an SeConnection.
  * <p>
- * This class has become more and more magic over time! It no longer represents
- * a Connection but provides "safe" access to a connection.
+ * This class has become more and more magic over time! It no longer represents a Connection but
+ * provides "safe" access to a connection.
  * <p>
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: Session.java 31197 2008-08-20 20:56:42Z groldan $
+ * @version $Id: Session.java 32322 2009-01-24 20:11:52Z groldan $
  * @since 2.3.x
  */
 class Session implements ISession {
@@ -100,9 +101,9 @@ class Session implements ISession {
     private Map<String, SeRasterColumn> cachedRasters = new HashMap<String, SeRasterColumn>();
 
     /**
-     * The SeConnection bound task executor, ensures all operations against a
-     * given connection are performed in the same thread regardless of the
-     * thread the {@link #issue(Command)} is being called from.
+     * The SeConnection bound task executor, ensures all operations against a given connection are
+     * performed in the same thread regardless of the thread the {@link #issue(Command)} is being
+     * called from.
      */
     private final ExecutorService taskExecutor;
 
@@ -268,8 +269,7 @@ class Session implements ISession {
     }
 
     /**
-     * Marks the connection as being active (i.e. its out of the pool and ready
-     * to be used).
+     * Marks the connection as being active (i.e. its out of the pool and ready to be used).
      * <p>
      * Shall be called just before being returned from the connection pool
      * </p>
@@ -283,8 +283,7 @@ class Session implements ISession {
     }
 
     /**
-     * Marks the connection as being inactive (i.e. laying on the connection
-     * pool)
+     * Marks the connection as being inactive (i.e. laying on the connection pool)
      * <p>
      * Shall be callled just before sending it back to the pool
      * </p>
@@ -305,12 +304,11 @@ class Session implements ISession {
     }
 
     /**
-     * Sanity check method called before every public operation delegates to the
-     * superclass.
+     * Sanity check method called before every public operation delegates to the superclass.
      * 
      * @throws IllegalStateException
-     *             if {@link #isDisposed() isPassivated() == true} as this is a
-     *             serious workflow breackage.
+     *             if {@link #isDisposed() isPassivated() == true} as this is a serious workflow
+     *             breackage.
      */
     private void checkActive() {
         if (isDisposed()) {
@@ -516,8 +514,7 @@ class Session implements ISession {
     }
 
     /**
-     * Actually closes the connection, called when the session is discarded from
-     * the pool
+     * Actually closes the connection, called when the session is discarded from the pool
      */
     void destroy() {
         LOGGER.fine("Destroying connection " + toString());
@@ -751,20 +748,25 @@ class Session implements ISession {
      * @see ISession#fetch(com.esri.sde.sdk.client.SeQuery)
      */
     public SdeRow fetch(final SeQuery query) throws IOException {
+        return fetch(query, new SdeRow((GeometryFactory)null));
+    }
+
+    public SdeRow fetch(final SeQuery query, final SdeRow currentRow) throws IOException{
         return issue(new Command<SdeRow>() {
             @Override
             public SdeRow execute(final ISession session, final SeConnection connection)
                     throws SeException, IOException {
                 SeRow row = query.fetch();
-                SdeRow populatedRow = null;
-                if (row != null) {
-                    populatedRow = new SdeRow(row);
+                if (row == null) {
+                    return null;
+                }else{
+                    currentRow.setRow(row);
                 }
-                return populatedRow;
+                return currentRow;
             }
         });
     }
-
+    
     /**
      * @see ISession#close(com.esri.sde.sdk.client.SeState)
      */
@@ -820,8 +822,7 @@ class Session implements ISession {
     }
 
     /**
-     * @see ISession#createSeQuery(java.lang.String[],
-     *      com.esri.sde.sdk.client.SeSqlConstruct)
+     * @see ISession#createSeQuery(java.lang.String[], com.esri.sde.sdk.client.SeSqlConstruct)
      */
     public SeQuery createSeQuery(final String[] propertyNames, final SeSqlConstruct sql)
             throws IOException {
@@ -870,9 +871,9 @@ class Session implements ISession {
     }
 
     /**
-     * Creates either a direct child state of parentStateId, or a sibling being
-     * an exact copy of parentStatId if either the state can't be closed because
-     * its in use or parentStateId does not belong to the current user.
+     * Creates either a direct child state of parentStateId, or a sibling being an exact copy of
+     * parentStatId if either the state can't be closed because its in use or parentStateId does not
+     * belong to the current user.
      */
     public SeState createChildState(final long parentStateId) throws IOException {
         return issue(new Command<SeState>() {

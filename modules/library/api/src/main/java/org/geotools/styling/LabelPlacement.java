@@ -48,9 +48,9 @@ package org.geotools.styling;
  * <p></p>
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/LabelPlacement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/LabelPlacement.java $
  */
 public interface LabelPlacement extends org.opengis.style.LabelPlacement{
     
-    void accept(org.geotools.styling.StyleVisitor visitor);
+    void accept(StyleVisitor visitor);
 }

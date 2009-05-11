@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Purpose: these tests ensure the proper operation of feature visitation, with CalcResult merging too!
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/feature/visitor/VisitorCalculationTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/feature/visitor/VisitorCalculationTest.java $
  */
 public class VisitorCalculationTest extends DataTestCase {
     FeatureCollection<SimpleFeatureType, SimpleFeature> fc;
@@ -310,12 +310,14 @@ public class VisitorCalculationTest extends DataTestCase {
         uniqueResult1 = uniqueVisitor.getResult();
         assertEquals(anotherSet, uniqueResult1.toSet());
         //int + double --> ?
-        uniqueResult3 = uniqueResult2.merge(uniqueResult1);
-        List list = uniqueResult3.toList();
-        assertTrue(list.contains(3.0));
-        assertTrue(list.contains(2));
-        assertTrue(list.contains(4));
-        assertTrue(list.contains(4.5));
+        uniqueResult3 = uniqueResult2.merge(uniqueResult1);        
+        Set<Object> set = uniqueResult3.toSet();        
+        assertTrue(set.size()==4);
+        assertTrue(set.contains(3.0));
+        assertTrue(set.contains(4.5));
+        assertTrue(set.contains(2));
+        assertTrue(set.contains(4));
+        assertFalse(set.contains(6));
     }
 
     public void testBounds() throws IOException {

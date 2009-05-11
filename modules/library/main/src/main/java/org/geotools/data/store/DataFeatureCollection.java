@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,6 +50,7 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -74,7 +76,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  * @author jgarnett
  * @since 2.1.RC0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/store/DataFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/store/DataFeatureCollection.java $
  */
 public abstract class DataFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
     
@@ -388,33 +390,10 @@ public abstract class DataFeatureCollection implements FeatureCollection<SimpleF
     }
 
     public boolean containsAll( Collection<?> collection ) {
-        if( collection instanceof FeatureCollection ){
-            return containsAll( (FeatureCollection<?,?>) collection );
-        }
-        try {
-            FeatureReader reader = reader();
-            try {
-               while( reader.hasNext() ){
-                   Feature feature = reader.next();
-                   if( !collection.contains( reader )){
-                       return false;
-                   }
-               }
-            }
-            finally {
-                if( reader != null ) reader.close();
-            }
-        }
-        catch( IOException ignore ){
-        }
-        return true;
-    }
-    
-    public boolean containsAll(FeatureCollection<?,?> resource) {
-        Set<String> fids = new HashSet<String>();
-        
-        // should do something smart with ID here
-        return false;
+    	for (Object o: collection) {
+    		if (contains(o)==false) return false;
+    	}
+    	return true;
     }
 
     /**
@@ -428,8 +407,35 @@ public abstract class DataFeatureCollection implements FeatureCollection<SimpleF
      * </ul>
      * 
      */
-    public boolean addAll(Collection arg0) {
-    	return false;
+    public boolean addAll(Collection collection) {
+        if( collection instanceof FeatureCollection ){
+            return addAll( (FeatureCollection<?,?>) collection );
+        }
+        try {
+            FeatureWriter writer = writer();
+            try {
+                // skip to end
+                 while( writer.hasNext() ){
+                    Feature feature = writer.next();
+                }
+                for( Object obj : collection ){
+                    if( obj instanceof SimpleFeature){
+                        SimpleFeature copy = (SimpleFeature) obj;
+                        SimpleFeature feature = (SimpleFeature) writer.next();
+                        
+                        feature.setAttributes( copy.getAttributes() );
+                        writer.write();
+                    }
+                }
+            }
+            finally {
+                if( writer != null ) writer.close();
+            }
+            return true;
+        }
+        catch( IOException ignore ){
+            return false;
+        }
     }
     public boolean addAll(FeatureCollection resource) {
         return false;

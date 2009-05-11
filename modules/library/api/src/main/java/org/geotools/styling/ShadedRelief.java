@@ -46,7 +46,7 @@ import org.opengis.filter.expression.Expression;
  * results for Earth-based DEMs. The default value is system-dependent.
  *
  * @author iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/ShadedRelief.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/ShadedRelief.java $
  */
 public interface ShadedRelief extends org.opengis.style.ShadedRelief{
     
@@ -54,10 +54,7 @@ public interface ShadedRelief extends org.opengis.style.ShadedRelief{
      * turns brightnessOnly on or off depending on value of flag.
      *
      * @param flag boolean
-     * 
-     * @deprecated symbolizers and underneath classes will be immutable in 2.6.x
      */
-    @Deprecated
     public void setBrightnessOnly(boolean flag);
 
     /**
@@ -66,10 +63,7 @@ public interface ShadedRelief extends org.opengis.style.ShadedRelief{
      * for Earth-based DEMs. The default value is system-dependent.
      *
      * @param reliefFactor an expression which evaluates to a double.
-     * 
-     * @deprecated symbolizers and underneath classes will be immutable in 2.6.x
      */
-    @Deprecated
     public void setReliefFactor(Expression reliefFactor);
 
     public void accept(org.geotools.styling.StyleVisitor visitor);

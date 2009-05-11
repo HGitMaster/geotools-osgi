@@ -36,8 +36,9 @@ import com.esri.sde.sdk.client.SeException;
  * @author Jake Fear
  * @author Gabriel Roldan
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcTransactionState.java $
- * @version $Id: SessionTransactionState.java 30722 2008-06-13 18:15:42Z acuster $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/ArcTransactionState.java $
+ * @version $Id: SessionTransactionState.java 32195 2009-01-09 19:00:35Z groldan $
  */
 final class SessionTransactionState implements Transaction.State {
     private static final Logger LOGGER = org.geotools.util.logging.Logging
@@ -58,8 +59,9 @@ final class SessionTransactionState implements Transaction.State {
      * Creates a new ArcTransactionState object.
      * 
      * @param listenerManager
-     * @param pool connection pool where to grab a connection and hold it while there's a
-     *            transaction open (signaled by any use of {@link #getConnection()}
+     * @param pool
+     *            connection pool where to grab a connection and hold it while there's a transaction
+     *            open (signaled by any use of {@link #getConnection()}
      */
     private SessionTransactionState(final ISession session) {
         if (!session.isTransactionActive()) {
@@ -74,8 +76,7 @@ final class SessionTransactionState implements Transaction.State {
      * <p>
      * Preconditions:
      * <ul>
-     * <li>{@link #setTransaction(Transaction)} already called with non <code>null</code>
-     * argument.
+     * <li>{@link #setTransaction(Transaction)} already called with non <code>null</code> argument.
      * <li>
      * </ul>
      * </p>
@@ -146,9 +147,10 @@ final class SessionTransactionState implements Transaction.State {
      * </p>
      * 
      * @see Transaction.State#setTransaction(Transaction)
-     * @param transaction transaction information, <code>null</code> signals this state lifecycle
-     *            end.
-     * @throws IllegalStateException if close() is called while a transaction is in progress
+     * @param transaction
+     *            transaction information, <code>null</code> signals this state lifecycle end.
+     * @throws IllegalStateException
+     *             if close() is called while a transaction is in progress
      */
     public void setTransaction(final Transaction transaction) {
         if (Transaction.AUTO_COMMIT.equals(transaction)) {
@@ -170,7 +172,8 @@ final class SessionTransactionState implements Transaction.State {
     /**
      * If this state has been closed throws an unchecked exception as its clearly a broken workflow.
      * 
-     * @throws IllegalStateException if the transaction state has been closed.
+     * @throws IllegalStateException
+     *             if the transaction state has been closed.
      */
     private void failIfClosed() throws IllegalStateException {
         if (session == null) {
@@ -239,12 +242,13 @@ final class SessionTransactionState implements Transaction.State {
      * As of GeoTools 2.5 we store the TransactionState using the connection pool as a key.
      * </p>
      * 
-     * @param transaction non autocommit transaction
+     * @param transaction
+     *            non autocommit transaction
      * @param listenerManager
-     * @param versioned True will update database wide version once per operation, false once per
-     *            commit
-     * @return the ArcTransactionState stored in the transaction with <code>connectionPool</code>
-     *         as key.
+     * @param versioned
+     *            True will update database wide version once per operation, false once per commit
+     * @return the ArcTransactionState stored in the transaction with <code>connectionPool</code> as
+     *         key.
      */
     public static SessionTransactionState getState(final Transaction transaction,
             final SessionPool connectionPool) throws IOException {
@@ -286,10 +290,11 @@ final class SessionTransactionState implements Transaction.State {
      * </p>
      * 
      * @author Gabriel Roldan (TOPP)
-     * @version $Id: SessionTransactionState.java 30722 2008-06-13 18:15:42Z acuster $
+     * @version $Id: SessionTransactionState.java 32195 2009-01-09 19:00:35Z groldan $
      * @since 2.5.x
      * @source $URL:
-     *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/pool/SessionTransactionState.java $
+     *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/
+     *         geotools/arcsde/pool/SessionTransactionState.java $
      */
     private static final class TransactionSession extends SessionWrapper {
 

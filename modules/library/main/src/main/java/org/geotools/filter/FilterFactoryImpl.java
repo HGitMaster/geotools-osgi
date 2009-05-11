@@ -95,6 +95,7 @@ import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.expression.Subtract;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.identity.GmlObjectId;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.spatial.BBOX;
@@ -119,8 +120,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * defaultcore.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryImpl.java $
- * @version $Id: FilterFactoryImpl.java 30746 2008-06-17 03:58:48Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryImpl.java $
+ * @version $Id: FilterFactoryImpl.java 32736 2009-04-04 06:51:02Z jive $
  */
 public class FilterFactoryImpl implements FilterFactory {
     
@@ -141,7 +142,7 @@ public class FilterFactoryImpl implements FilterFactory {
     } 
     
     public GmlObjectId gmlObjectId(String id) {
-    	return new GmlObjectIdImpl( id );
+        return new GmlObjectIdImpl( id );
     }
     
     public And and(Filter f, Filter g ) {
@@ -189,42 +190,68 @@ public class FilterFactoryImpl implements FilterFactory {
     }
     
     public PropertyIsEqualTo equal(Expression expr1, Expression expr2, boolean matchCase) {
-    	return new IsEqualsToImpl(this,expr1,expr2,matchCase); 
+        return new IsEqualsToImpl(this,expr1,expr2,matchCase); 
     }
     
-
+        public PropertyIsNotEqualTo notEqual(Expression expr1, Expression expr2) {
+                return notEqual(expr1, expr2, false );
+        }
+        
     public PropertyIsNotEqualTo notEqual(Expression expr1, Expression expr2, boolean matchCase) {
         return new IsNotEqualToImpl(this,expr1,expr2,matchCase);
     }
     
     public PropertyIsGreaterThan greater(Expression expr1, Expression expr2) {
-        return new IsGreaterThanImpl(this,expr1,expr2);
+        return greater(expr1,expr2,false);
     }
-
+    
+    public PropertyIsGreaterThan greater(Expression expr1, Expression expr2,
+                        boolean matchCase) {
+                return new IsGreaterThanImpl(this,expr1,expr2);
+        }       
     public PropertyIsGreaterThanOrEqualTo greaterOrEqual(Expression expr1,
             Expression expr2) {
-        return new IsGreaterThanOrEqualToImpl(this,expr1,expr2);
+        return greaterOrEqual(expr1,expr2,false);
+    }
+    
+    public PropertyIsGreaterThanOrEqualTo greaterOrEqual(Expression expr1,
+                        Expression expr2, boolean matchCase) {
+        return new IsGreaterThanOrEqualToImpl(this,expr1,expr2,matchCase);
     }
 
     public PropertyIsLessThan less(Expression expr1, Expression expr2) {
-        return new IsLessThenImpl(this,expr1,expr2);
+        return less(expr1,expr2,false);
+    }
+    
+    public PropertyIsLessThan less(Expression expr1, Expression expr2,
+                    boolean matchCase) {
+        return new IsLessThenImpl(this,expr1,expr2,matchCase);
     }
 
     public PropertyIsLessThanOrEqualTo lessOrEqual(Expression expr1,
             Expression expr2) {
-        return new IsLessThenOrEqualToImpl(this,expr1,expr2);
+        return lessOrEqual(expr1,expr2,false);
     }
-
+    
+    public PropertyIsLessThanOrEqualTo lessOrEqual(Expression expr1,
+                        Expression expr2, boolean matchCase) {
+        return new IsLessThenOrEqualToImpl(this,expr1,expr2,false);
+    }
+    
     public PropertyIsLike like(Expression expr, String pattern) {
         return like(expr,pattern,"*","?","\\");
     }
 
     public PropertyIsLike like(Expression expr, String pattern,
             String wildcard, String singleChar, String escape) {
-        
-        LikeFilterImpl filter = new LikeFilterImpl();
+        return like( expr, pattern, wildcard, singleChar, escape, false );
+    }
+    public PropertyIsLike like(Expression expr, String pattern,
+                        String wildcard, String singleChar, String escape, boolean matchCase) {
+            LikeFilterImpl filter = new LikeFilterImpl();
         filter.setExpression(expr);
         filter.setPattern(pattern,wildcard,singleChar,escape);
+        filter.setMatchingCase( matchCase );
         
         return filter;
     }
@@ -445,21 +472,21 @@ public class FilterFactoryImpl implements FilterFactory {
 
     public Function function(String name, Expression arg1, Expression arg2) {
         Function function = 
-        	functionFinder.findFunction( name, Arrays.asList( new Expression[]{ arg1, arg2 }) );
+                functionFinder.findFunction( name, Arrays.asList( new Expression[]{ arg1, arg2 }) );
         return function;
     }
 
     /** @deprecated Pending see org.opengis.filter.Factory2 */
     public Function function(String name, List<org.opengis.filter.expression.Expression> parameters, Literal fallback ){
         Function function = 
-        	functionFinder.findFunction( name, parameters, fallback );
+                functionFinder.findFunction( name, parameters, fallback );
         
         return function;        
     }
     public Function function(String name, Expression arg1, Expression arg2,
             Expression arg3) {
         Function function = 
-        	functionFinder.findFunction( name, Arrays.asList( new Expression[]{ arg1, arg2, arg3 }) );
+                functionFinder.findFunction( name, Arrays.asList( new Expression[]{ arg1, arg2, arg3 }) );
         
         return function;        
     }
@@ -504,7 +531,7 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public Literal literal(boolean b) {
-    	return b ? new LiteralExpressionImpl( Boolean.TRUE ) : new LiteralExpressionImpl( Boolean.FALSE );
+        return b ? new LiteralExpressionImpl( Boolean.TRUE ) : new LiteralExpressionImpl( Boolean.FALSE );
     }
 
     
@@ -517,7 +544,7 @@ public class FilterFactoryImpl implements FilterFactory {
      * @return The new Attribtue Expression
      */
     public AttributeExpression createAttributeExpression( String xpath){
-    	return new AttributeExpressionImpl( xpath );
+        return new AttributeExpressionImpl( xpath );
     }
     /**
      * Creates a Attribute Expression with an initial schema.
@@ -586,31 +613,31 @@ public class FilterFactoryImpl implements FilterFactory {
      */
     public CompareFilter createCompareFilter(short type)
         throws IllegalFilterException {
-    	
-    	switch(type) {
-    		case FilterType.COMPARE_EQUALS:
-    			return new IsEqualsToImpl(this);
-    			
-    		case FilterType.COMPARE_NOT_EQUALS:
-    			return new IsNotEqualToImpl(this);
-    			
-    		case FilterType.COMPARE_GREATER_THAN:
-    			return new IsGreaterThanImpl(this);
-    			
-    		case FilterType.COMPARE_GREATER_THAN_EQUAL:
-    			return new IsGreaterThanOrEqualToImpl(this);
-    			
-    		case FilterType.COMPARE_LESS_THAN:
-    			return new IsLessThenImpl(this);
-    			
-    		case FilterType.COMPARE_LESS_THAN_EQUAL:
-    			return new IsLessThenOrEqualToImpl(this);
-    			
-    		case FilterType.BETWEEN:
-    			return new BetweenFilterImpl(this);
-    	}
-    	
-    	throw new IllegalFilterException("Must be one of <,<=,==,>,>=,<>");
+        
+        switch(type) {
+                case FilterType.COMPARE_EQUALS:
+                        return new IsEqualsToImpl(this);
+                        
+                case FilterType.COMPARE_NOT_EQUALS:
+                        return new IsNotEqualToImpl(this);
+                        
+                case FilterType.COMPARE_GREATER_THAN:
+                        return new IsGreaterThanImpl(this);
+                        
+                case FilterType.COMPARE_GREATER_THAN_EQUAL:
+                        return new IsGreaterThanOrEqualToImpl(this);
+                        
+                case FilterType.COMPARE_LESS_THAN:
+                        return new IsLessThenImpl(this);
+                        
+                case FilterType.COMPARE_LESS_THAN_EQUAL:
+                        return new IsLessThenOrEqualToImpl(this);
+                        
+                case FilterType.BETWEEN:
+                        return new BetweenFilterImpl(this);
+        }
+        
+        throw new IllegalFilterException("Must be one of <,<=,==,>,>=,<>");
     }
 
     /**
@@ -644,40 +671,40 @@ public class FilterFactoryImpl implements FilterFactory {
      */
     public GeometryFilter createGeometryFilter(short filterType)
         throws IllegalFilterException {
-    	switch(filterType) {
-    		case FilterType.GEOMETRY_EQUALS:
-    			return new EqualsImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_DISJOINT:
-    			return new DisjointImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_DWITHIN:
-    			return new DWithinImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_INTERSECTS:
-    			return new IntersectsImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_CROSSES:
-    			return new CrossesImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_WITHIN:
-    			return new WithinImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_CONTAINS:
-    			return new ContainsImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_OVERLAPS:
-    			return new OverlapsImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_BEYOND:
-    			return new BeyondImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_BBOX:
-    			return new BBOXImpl(this,null,null);
-    			
-    		case FilterType.GEOMETRY_TOUCHES:
-    			return new TouchesImpl(this,null,null);
-    	}
+        switch(filterType) {
+                case FilterType.GEOMETRY_EQUALS:
+                        return new EqualsImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_DISJOINT:
+                        return new DisjointImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_DWITHIN:
+                        return new DWithinImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_INTERSECTS:
+                        return new IntersectsImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_CROSSES:
+                        return new CrossesImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_WITHIN:
+                        return new WithinImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_CONTAINS:
+                        return new ContainsImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_OVERLAPS:
+                        return new OverlapsImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_BEYOND:
+                        return new BeyondImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_BBOX:
+                        return new BBOXImpl(this,null,null);
+                        
+                case FilterType.GEOMETRY_TOUCHES:
+                        return new TouchesImpl(this,null,null);
+        }
        
         throw new IllegalFilterException("Not one of the accepted spatial filter types.");
     }
@@ -694,17 +721,17 @@ public class FilterFactoryImpl implements FilterFactory {
      */
     public GeometryDistanceFilter createGeometryDistanceFilter(short filterType)
         throws IllegalFilterException {
-    	
-    	switch(filterType) {
-			case FilterType.GEOMETRY_BEYOND:
-				return new BeyondImpl(this,null,null);
-				
-			case FilterType.GEOMETRY_DWITHIN:
-				return new DWithinImpl(this,null,null);
-			
-    	}
+        
+        switch(filterType) {
+                        case FilterType.GEOMETRY_BEYOND:
+                                return new BeyondImpl(this,null,null);
+                                
+                        case FilterType.GEOMETRY_DWITHIN:
+                                return new DWithinImpl(this,null,null);
+                        
+        }
    
-    	throw new IllegalFilterException("Not one of the accepted spatial filter types.");
+        throw new IllegalFilterException("Not one of the accepted spatial filter types.");
         
     }
 
@@ -784,21 +811,21 @@ public class FilterFactoryImpl implements FilterFactory {
      *         filter, including wrong type.
      *         
      * @deprecated use one of {@link org.opengis.filter.FilterFactory#and(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
+     *  {@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
+     *  {@link org.opengis.filter.FilterFactory#not(Filter)}
      */
     public LogicFilter createLogicFilter(short filterType)
         throws IllegalFilterException {
-    	
-    	List children = new ArrayList();
-    	switch (filterType) {
-	    	case FilterType.LOGIC_AND:
-	    		return new AndImpl(this,children);
-	    	case FilterType.LOGIC_OR:
-	    		return new OrImpl(this,children);
-	    	case FilterType.LOGIC_NOT:
-	    		return new NotImpl(this);
-    	}    	
+        
+        List children = new ArrayList();
+        switch (filterType) {
+                case FilterType.LOGIC_AND:
+                        return new AndImpl(this,children);
+                case FilterType.LOGIC_OR:
+                        return new OrImpl(this,children);
+                case FilterType.LOGIC_NOT:
+                        return new NotImpl(this);
+        }       
         throw new IllegalFilterException("Must be one of AND,OR,NOT.");
     }
 
@@ -814,24 +841,24 @@ public class FilterFactoryImpl implements FilterFactory {
      *         filter, including wrong type.
      *         
      * @deprecated use one of {@link org.opengis.filter.FilterFactory#and(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
+     *  {@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
+     *  {@link org.opengis.filter.FilterFactory#not(Filter)}
      */
     public LogicFilter createLogicFilter(org.geotools.filter.Filter filter, short filterType)
         throws IllegalFilterException {
-    	
-    	List children = new ArrayList();
-    	children.add(filter);
-    	
-    	switch (filterType) {
-	    	case FilterType.LOGIC_AND:
-	    		return new AndImpl(this,children);
-	    	case FilterType.LOGIC_OR:
-	    		return new OrImpl(this,children);
-	    	case FilterType.LOGIC_NOT:
-	    		return new NotImpl(this,filter);
-    	}
-    	
+        
+        List children = new ArrayList();
+        children.add(filter);
+        
+        switch (filterType) {
+                case FilterType.LOGIC_AND:
+                        return new AndImpl(this,children);
+                case FilterType.LOGIC_OR:
+                        return new OrImpl(this,children);
+                case FilterType.LOGIC_NOT:
+                        return new NotImpl(this,filter);
+        }
+        
         throw new IllegalFilterException("Must be one of AND,OR,NOT.");
     }
 
@@ -849,26 +876,26 @@ public class FilterFactoryImpl implements FilterFactory {
      *         filter, including wrong type.
      *         
      * @deprecated use one of {@link org.opengis.filter.FilterFactory#and(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
+     *  {@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
+     *  {@link org.opengis.filter.FilterFactory#not(Filter)}
      */
     public LogicFilter createLogicFilter(org.geotools.filter.Filter  filter1, org.geotools.filter.Filter filter2,
         short filterType) throws IllegalFilterException {
-    	
-    	List children = new ArrayList();
-    	children.add(filter1);
-    	children.add(filter2);
-    	
-    	switch (filterType) {
-	    	case FilterType.LOGIC_AND:
-	    		return new AndImpl(this,children);
-	    	case FilterType.LOGIC_OR:
-	    		return new OrImpl(this,children);
-	    	case FilterType.LOGIC_NOT:
-	    		//TODO: perhaps throw an exception here?
-	    		return new NotImpl(this,filter1);
-    	}
-    	
+        
+        List children = new ArrayList();
+        children.add(filter1);
+        children.add(filter2);
+        
+        switch (filterType) {
+                case FilterType.LOGIC_AND:
+                        return new AndImpl(this,children);
+                case FilterType.LOGIC_OR:
+                        return new OrImpl(this,children);
+                case FilterType.LOGIC_NOT:
+                        //TODO: perhaps throw an exception here?
+                        return new NotImpl(this,filter1);
+        }
+        
         throw new IllegalFilterException("Must be one of AND,OR,NOT.");
     }
     
@@ -880,14 +907,14 @@ public class FilterFactoryImpl implements FilterFactory {
      * @return The new Math Expression
      * 
      * @deprecated use one of
-     * 	{@link org.opengis.filter.FilterFactory#add(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#subtract(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#multiply(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#divide(Expression, Expression)}
+     *  {@link org.opengis.filter.FilterFactory#add(Expression, Expression)}
+     *  {@link org.opengis.filter.FilterFactory#subtract(Expression, Expression)}
+     *  {@link org.opengis.filter.FilterFactory#multiply(Expression, Expression)}
+     *  {@link org.opengis.filter.FilterFactory#divide(Expression, Expression)}
      * 
      */
     public MathExpression createMathExpression() {
-    	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -901,18 +928,18 @@ public class FilterFactoryImpl implements FilterFactory {
      */
     public MathExpression createMathExpression(short expressionType)
         throws IllegalFilterException {
-    	
-    	switch(expressionType) {
-	    	case ExpressionType.MATH_ADD:
-	    		return new AddImpl(null,null);
-	    	case ExpressionType.MATH_SUBTRACT:
-	    		return new SubtractImpl(null,null);
-	    	case ExpressionType.MATH_MULTIPLY:
-	    		return new MultiplyImpl(null,null);
-	    	case ExpressionType.MATH_DIVIDE:
-	    		return new DivideImpl(null,null);
-    	}	
-    	
+        
+        switch(expressionType) {
+                case ExpressionType.MATH_ADD:
+                        return new AddImpl(null,null);
+                case ExpressionType.MATH_SUBTRACT:
+                        return new SubtractImpl(null,null);
+                case ExpressionType.MATH_MULTIPLY:
+                        return new MultiplyImpl(null,null);
+                case ExpressionType.MATH_DIVIDE:
+                        return new DivideImpl(null,null);
+        }       
+        
         throw new IllegalFilterException("Unsupported math expression");
     }
 
@@ -943,13 +970,13 @@ public class FilterFactoryImpl implements FilterFactory {
          throw new RuntimeException("Unknown environment variable:" + name);
     }
 
-	public Map getImplementationHints() {
-		return Collections.EMPTY_MAP;
-	}
-	
-	public SortBy sort(String propertyName, SortOrder order) {
-		return new SortByImpl( property( propertyName ), order );
-	}
+        public Map getImplementationHints() {
+                return Collections.EMPTY_MAP;
+        }
+        
+        public SortBy sort(String propertyName, SortOrder order) {
+                return new SortByImpl( property( propertyName ), order );
+        }
 
     public org.geotools.filter.Filter and( org.geotools.filter.Filter filter1, org.geotools.filter.Filter filter2 ) {
         return (org.geotools.filter.Filter) and( (Filter) filter1, (Filter) filter2 );         
@@ -1023,4 +1050,5 @@ public class FilterFactoryImpl implements FilterFactory {
     public IdCapabilities idCapabilities(boolean eid, boolean fid) {
         return new IdCapabilitiesImpl( eid, fid );
     }
+        
 }

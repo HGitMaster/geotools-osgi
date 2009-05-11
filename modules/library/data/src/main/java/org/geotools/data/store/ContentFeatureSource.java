@@ -22,7 +22,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.geotools.data.DataUtilities;
@@ -40,16 +39,15 @@ import org.geotools.data.Transaction;
 import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.visitor.PropertyNameResolvingVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
-import org.opengis.referencing.FactoryException;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.OperationNotFoundException;
 
 
 /**
@@ -89,7 +87,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
     /**
      * hints
      */
-    protected Set<Hints.ClassKey> hints;
+    protected Set<Hints.Key> hints;
     /**
      * The query defining the feature source
      */
@@ -99,7 +97,10 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     protected SimpleFeatureType schema;
     
-    private QueryCapabilities queryCapabilities;
+    /**
+     * The query capabilities returned by this feature source
+     */
+    protected QueryCapabilities queryCapabilities;
     
   
     /**
@@ -115,10 +116,9 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
     public ContentFeatureSource(ContentEntry entry, Query query) {
         this.entry = entry;
         this.query = query;
-        this.queryCapabilities = new QueryCapabilities();
         
         //set up hints
-        hints = new HashSet<Hints.ClassKey>();
+        hints = new HashSet<Hints.Key>();
         hints.add( Hints.JTS_GEOMETRY_FACTORY );
         hints.add( Hints.JTS_COORDINATE_SEQUENCE_FACTORY );
         
@@ -340,7 +340,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     public final ReferencedEnvelope getBounds(Query query) throws IOException {
         query = joinQuery( query );
-        
+        query = resolvePropertyNames(query);
         /*
         if ( query == Query.ALL ) {
             //check the cache
@@ -385,7 +385,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     public final int getCount(Query query) throws IOException {
         query = joinQuery( query );
-        
+        query = resolvePropertyNames( query );
         /*
         if ( query == Query.ALL ) {
             //check the cache
@@ -491,8 +491,21 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     public final  FeatureReader<SimpleFeatureType, SimpleFeature> getReader(Query query) throws IOException {
         query = joinQuery( query );
+        query = resolvePropertyNames(query);
         
-         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReaderInternal( query );
+        // see if we need to enable native sorting in order to support stable paging
+        final int offset = query.getStartIndex() != null ? query.getStartIndex() : 0;
+        if(offset > 0 & query.getSortBy() == null) {
+            if(!getQueryCapabilities().supportsSorting(query.getSortBy()))
+                throw new IOException("Feature source does not support this sorting " +
+                        "so there is no way a stable paging (offset/limit) can be performed");
+            
+            DefaultQuery dq = new DefaultQuery(query);
+            dq.setSortBy(new SortBy[] {SortBy.NATURAL_ORDER});
+            query = dq;
+        }
+        
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReaderInternal( query );
         
         //
         //apply wrappers based on subclass capabilities
@@ -518,7 +531,15 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
             }    
         }
         
-        //max feature limit
+        // offset
+        if( !canOffset() && offset > 0 ) {
+            // skip the first n records
+            for(int i = 0; i < offset && reader.hasNext(); i++) {
+                reader.next();
+            }
+        }
+        
+        // max feature limit
         if ( !canLimit() ) {
             if (query.getMaxFeatures() != -1 && query.getMaxFeatures() < Integer.MAX_VALUE ) {
                 reader = new MaxFeatureReader<SimpleFeatureType, SimpleFeature>(reader, query.getMaxFeatures());
@@ -604,9 +625,27 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      * feature reader created by the subclass to be wrapped in a max feature capping 
      * decorator when the query specifies a max feature cap. 
      * </p>
-     * TODO: link to decorating feature reader
+     * @see MaxFeatureReader
      */
     protected boolean canLimit() {
+        return false;
+    }
+    
+    /**
+     * Determines if the datastore can natively skip the first <code>offset</code> number of features 
+     * returned in a query.
+     * <p>
+     * If the subclass can handle a map feature cap natively then it should override
+     * this method to return <code>true</code>. In this case it <b>must</b> do 
+     * the cap or throw an exception. 
+     * </p>
+     * <p>
+     * Not overriding this method or returning <code>false</code> will case the
+     * feature reader created by the subclass to be be accesset offset times before
+     * being returned to the caller. 
+     * </p>
+     */
+    protected boolean canOffset() {
         return false;
     }
     
@@ -677,6 +716,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     public final ContentFeatureSource getView(Query query) throws IOException {
         query = joinQuery(query);
+        query = resolvePropertyNames(query);
         
         //reflectively create subclass
         Class clazz = getClass();
@@ -765,7 +805,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      * </p>
      * @param hints The set of hints supported by the feature source.
      */
-    protected void addHints( Set<Hints.ClassKey> hints ) {
+    protected void addHints( Set<Hints.Key> hints ) {
         
     }
  
@@ -787,6 +827,33 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
         // join the queries
         return DataUtilities.mixQueries(this.query, query, null);
     }
+    
+    /**
+     * This method changes the query object so that all propertyName references are resolved
+     * to simple attribute names against the schema of the feature source.
+     * <p>
+     * For example, this method ensures that propertyName's such as "gml:name" are rewritten as
+     * simply "name".
+     *</p>
+     */
+    protected Query resolvePropertyNames( Query query ) {
+        Filter resolved = resolvePropertyNames( query.getFilter() );
+        if ( resolved == query.getFilter() ) {
+            return query;
+        }
+        
+        DefaultQuery newQuery = new DefaultQuery(query);
+        newQuery.setFilter( resolved );
+        return newQuery;
+    }
+    protected Filter resolvePropertyNames( Filter filter ) {
+        if ( filter == null || filter == Filter.INCLUDE || filter == Filter.EXCLUDE ) {
+            return filter;
+        }
+        
+        return (Filter) filter.accept( 
+            new PropertyNameResolvingVisitor(getSchema()) , null);
+    }
     /**
      * Creates the feature type or schema for the feature source.
      * <p>
@@ -804,6 +871,17 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      * </p>
      */
     protected abstract SimpleFeatureType buildFeatureType() throws IOException;
+    
+    /**
+     * Builds the query capabilities for this feature source. The default 
+     * implementation returns a newly built QueryCapabilities, subclasses
+     * are advised to build their own.
+     * @return
+     * @throws IOException
+     */
+    protected QueryCapabilities buildQueryCapabilities() {
+        return new QueryCapabilities();
+    }
 
     /**
      * Returns a new feature collection containing all the features of the 
@@ -882,6 +960,12 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
     //protected abstract FeatureCollection<SimpleFeatureType, SimpleFeature> readonly(ContentState state, Filter filter);
 
     public QueryCapabilities getQueryCapabilities() {
-        return this.queryCapabilities;
+        // lazy initialization, so that the subclass has all its data structures ready
+        // when the method is called (it might need to consult them in order to decide
+        // what query capabilities are really supported)
+        if(queryCapabilities == null) {
+            queryCapabilities = buildQueryCapabilities();
+        }
+        return queryCapabilities;
     }
 }

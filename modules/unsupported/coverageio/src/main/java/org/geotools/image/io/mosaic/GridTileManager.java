@@ -34,8 +34,8 @@ import org.geotools.util.FrequencySortedSet;
  * A tile manager for the particular case of tile distributed on a regular grid.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/GridTileManager.java $
- * @version $Id: GridTileManager.java 30729 2008-06-16 09:26:48Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/GridTileManager.java $
+ * @version $Id: GridTileManager.java 32440 2009-02-09 11:14:54Z acuster $
  * @author Martin Desruisseaux
  */
 final class GridTileManager extends TileManager {
@@ -97,11 +97,30 @@ final class GridTileManager extends TileManager {
             throws IOException, IllegalArgumentException
     {
         Tile.ensureNonNull("tiles", tiles);
+        Tile[] modifiedOrder = tiles; // May be modified later.
         final Map<Dimension,OverviewLevel> levelsBySubsampling = new HashMap<Dimension,OverviewLevel>();
-        for (final Tile tile : tiles) {
-            final Dimension subsampling = tile.getSubsampling();
+        for (int i=0; i<modifiedOrder.length; i++) {
+            Tile tile = modifiedOrder[i];
+            Dimension subsampling = tile.getSubsampling();
             OverviewLevel level = levelsBySubsampling.get(subsampling);
             if (level == null) {
+                /*
+                 * We are about to create a new OverviewLevel. We need to know the grid cell size.
+                 * We assume that this is the size of the largest tiles. Since the last row and the
+                 * last column may contain smaller tiles, and since the order of tiles in the user-
+                 * supplied array may be random, we search for larger tiles now.
+                 */
+                for (int j=i; ++j<modifiedOrder.length;) {
+                    final Tile candidate = modifiedOrder[j];
+                    if (candidate.isLargerThan(tile)) {
+                        if (modifiedOrder == tiles) {
+                            modifiedOrder = modifiedOrder.clone();
+                        }
+                        modifiedOrder[j] = tile;
+                        tile = candidate;
+                        subsampling = tile.getSubsampling();
+                    }
+                }
                 level = new OverviewLevel(tile, subsampling);
                 levelsBySubsampling.put(subsampling, level);
             } else {

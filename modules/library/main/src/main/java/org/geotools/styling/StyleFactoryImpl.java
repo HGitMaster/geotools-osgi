@@ -20,6 +20,7 @@ package org.geotools.styling;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.measure.unit.Unit;
@@ -36,6 +37,7 @@ import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.style.ColorReplacement;
 import org.opengis.style.ContrastMethod;
 import org.opengis.style.Description;
+import org.opengis.style.ExtensionSymbolizer;
 import org.opengis.style.ExternalMark;
 import org.opengis.style.GraphicFill;
 import org.opengis.style.GraphicLegend;
@@ -58,8 +60,8 @@ import org.opengis.util.InternationalString;
  * </ul>
  * 
  * @author iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleFactoryImpl.java $
- * @version $Id: StyleFactoryImpl.java 31685 2008-10-21 09:22:37Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleFactoryImpl.java $
+ * @version $Id: StyleFactoryImpl.java 32736 2009-04-04 06:51:02Z jive $
  */
 public class StyleFactoryImpl extends AbstractStyleFactory
     implements StyleFactory2, org.opengis.style.StyleFactory {
@@ -156,7 +158,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory
 
         return tSymb;
     }
-
+    
     public Extent createExtent(String name, String value) {
         Extent extent = new ExtentImpl();
         extent.setName(name);
@@ -786,7 +788,9 @@ public class StyleFactoryImpl extends AbstractStyleFactory
     	
     	return remoteOWS;
     }
-    
+    //
+    // Start of GeoAPI StyleFacstory implementation
+    //
     public ShadedRelief createShadedRelief(Expression reliefFactor) {
     	ShadedRelief relief = new ShadedReliefImpl();
     	relief.setReliefFactor(reliefFactor);
@@ -798,13 +802,11 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         return new AnchorPointImpl( filterFactory, x, y );
     }
 
-    public org.opengis.style.ChannelSelection channelSelection( FilterFactory ff, 
-            org.opengis.style.SelectedChannelType gray) {
-        return null;
-    }
     public org.opengis.style.ChannelSelection channelSelection(
             org.opengis.style.SelectedChannelType gray) {
-        return null;
+        ChannelSelectionImpl channelSelection = new ChannelSelectionImpl();
+        channelSelection.setGrayChannel( gray );
+        return channelSelection;
     }
     public org.opengis.style.ChannelSelection channelSelection(
             org.opengis.style.SelectedChannelType red, org.opengis.style.SelectedChannelType green,
@@ -866,24 +868,26 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         return null;
     }
 
+    public org.opengis.style.Graphic graphic(List<GraphicalSymbol> symbols, Expression opacity,
+            Expression size, Expression rotation, org.opengis.style.AnchorPoint anchor,
+            org.opengis.style.Displacement disp) {
+        return null;
+    }
     public GraphicFill graphicFill(List<GraphicalSymbol> symbols, Expression opacity,
-            Expression size, org.opengis.style.AnchorPoint anchorPoint,
+            Expression size, Expression rotation, org.opengis.style.AnchorPoint anchorPoint,
             org.opengis.style.Displacement displacement) {
         return null;
     }
-
     public GraphicLegend graphicLegend(List<GraphicalSymbol> symbols, Expression opacity,
-            Expression size, org.opengis.style.AnchorPoint anchorPoint,
+            Expression size, Expression rotation, org.opengis.style.AnchorPoint anchorPoint,
             org.opengis.style.Displacement displacement) {
         return null;
     }
-
     public GraphicStroke graphicStroke(List<GraphicalSymbol> symbols, Expression opacity,
-            Expression size, org.opengis.style.AnchorPoint anchorPoint,
+            Expression size, Expression rotation, org.opengis.style.AnchorPoint anchorPoint,
             org.opengis.style.Displacement displacement, Expression initialGap, Expression gap) {
         return null;
     }
-
     public org.opengis.style.Halo halo(org.opengis.style.Fill fill, Expression radius) {
         return null;
     }
@@ -893,11 +897,11 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         return null;
     }
 
-    public org.opengis.style.LineSymbolizer lineSymbolizer(Expression geometry,
-            Description description, Unit unit, org.opengis.style.Stroke stroke, Expression offset) {
+    public org.opengis.style.LineSymbolizer lineSymbolizer(String name, Expression geometry,
+            Description description, Unit<?> unit, org.opengis.style.Stroke stroke,
+            Expression offset) {
         return null;
     }
-
     public org.opengis.style.Mark mark(Expression wellKnownName, org.opengis.style.Fill fill,
             org.opengis.style.Stroke stroke) {
         return null;
@@ -913,69 +917,71 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         return null;
     }
 
-    public org.opengis.style.PointSymbolizer pointSymbolizer(Expression geometry,
-            Description description, Unit unit, org.opengis.style.Graphic graphic) {
+    public org.opengis.style.PointSymbolizer pointSymbolizer(String name, Expression geometry,
+            Description description, Unit<?> unit, org.opengis.style.Graphic graphic) {
         return null;
     }
-
-    public org.opengis.style.PolygonSymbolizer polygonSymbolizer(Expression geometry,
-            Description description, Unit unit, org.opengis.style.Stroke stroke,
+    public org.opengis.style.PolygonSymbolizer polygonSymbolizer(String name, Expression geometry,
+            Description description, Unit<?> unit, org.opengis.style.Stroke stroke,
             org.opengis.style.Fill fill, org.opengis.style.Displacement displacement,
             Expression offset) {
         return null;
     }
-
-    public org.opengis.style.RasterSymbolizer rasterSymbolizer(Expression geometry,
-            Description description, Unit unit, Expression opacity,
+    
+    public org.opengis.style.RasterSymbolizer rasterSymbolizer(String name, Expression geometry,
+            Description description, Unit<?> unit, Expression opacity,
             org.opengis.style.ChannelSelection channelSelection, OverlapBehavior overlapsBehaviour,
             org.opengis.style.ColorMap colorMap, org.opengis.style.ContrastEnhancement contrast,
-            org.opengis.style.ShadedRelief shaded, org.opengis.style.LineSymbolizer outline) {
+            org.opengis.style.ShadedRelief shaded, org.opengis.style.Symbolizer outline) {
         return null;
     }
-
-    public org.opengis.style.Rule rule(String name, Description description, GraphicLegend legend,
-            double min, double max, List<org.opengis.style.Symbolizer> symbolizers) {
+    
+    public ExtensionSymbolizer extensionSymbolizer(String name, String propertyName,
+            Description description, Unit<?> unit, String extensionName,
+            Map<String, Expression> parameters) {
         return null;
-    }
-
+    }    
+  
     public org.opengis.style.Rule rule(String name, Description description, GraphicLegend legend,
             double min, double max, List<org.opengis.style.Symbolizer> symbolizers, Filter filter) {
         return null;
     }
-
-    public org.opengis.style.SelectedChannelType selectedChannelType() {
-        return null;
-    }
-
+    
     public org.opengis.style.SelectedChannelType selectedChannelType(String channelName,
             org.opengis.style.ContrastEnhancement contrastEnhancement)
     {
         return null;
     }
-
-    public SemanticType semanticType(String name, org.opengis.style.ContrastEnhancement contrast) {
-        return null;
-    }
-
+    
     public org.opengis.style.ShadedRelief shadedRelief(Expression reliefFactor,
             boolean brightnessOnly) {
         return null;
     }
 
-    public org.opengis.style.Stroke stroke(GraphicStroke stroke, GraphicFill fill,
-            Expression color, Expression opacity, Expression width, Expression lineJoin,
-            Expression lineCap, float[] dashArray, Expression dashOffset) {
+    public org.opengis.style.Stroke stroke(Expression color, Expression opacity, Expression width,
+            Expression join, Expression cap, float[] dashes, Expression offset) {
         return null;
     }
-
+    
+    public org.opengis.style.Stroke stroke(GraphicFill fill, Expression color, Expression opacity,
+            Expression width, Expression join, Expression cap, float[] dashes, Expression offset) {
+        return null;
+    }
+    
+    public org.opengis.style.Stroke stroke(GraphicStroke stroke, Expression color,
+            Expression opacity, Expression width, Expression join, Expression cap, float[] dashes,
+            Expression offset) {
+        return null;
+    }
+    
     public org.opengis.style.Style style(String name, Description description, boolean isDefault,
             List<org.opengis.style.FeatureTypeStyle> featureTypeStyles,
             org.opengis.style.Symbolizer defaultSymbolizer) {
         return null;
     }
-
-    public org.opengis.style.TextSymbolizer textSymbolizer(Expression geometry,
-            Description description, Unit unit, Expression label, org.opengis.style.Font font,
+    
+    public org.opengis.style.TextSymbolizer textSymbolizer(String name, Expression geometry,
+            Description description, Unit<?> unit, Expression label, org.opengis.style.Font font,
             org.opengis.style.LabelPlacement placement, org.opengis.style.Halo halo,
             org.opengis.style.Fill fill) {
         return null;

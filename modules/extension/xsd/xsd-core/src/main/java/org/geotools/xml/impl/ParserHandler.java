@@ -44,6 +44,7 @@ import javax.xml.namespace.QName;
 import org.geotools.xml.BindingFactory;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.ElementInstance;
+import org.geotools.xml.ParserDelegate;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.geotools.xs.XS;
@@ -101,20 +102,17 @@ public class ParserHandler extends DefaultHandler {
     /** flag to indicate if the parser should validate or not */
     boolean validating;
     
-    /** flag to control if an exception is thrown on a falidation error */
-    boolean failOnValidationError = false;
+    /** handler for validation errors */
+    ValidatorHandler validator;
     
     /** wether the parser is strict or not */
     boolean strict = false;
 
-    /** list of "errors" that occur while parsing */
-    List errors;
-
     public ParserHandler(Configuration config) {
         this.config = config;
-        errors = new ArrayList();
         namespaces = new NamespaceSupport();
         validating = false;
+        validator = new ValidatorHandler();
     }
 
     public Configuration getConfiguration() {
@@ -138,15 +136,19 @@ public class ParserHandler extends DefaultHandler {
     }
     
     public void setFailOnValidationError( boolean failOnValidationError ) {
-        this.failOnValidationError = failOnValidationError;
+        validator.setFailOnValidationError(failOnValidationError);
     }
     
     public boolean isFailOnValidationError() {
-        return failOnValidationError;
+        return validator.isFailOnValidationError();
     }
 
     public List getValidationErrors() {
-        return errors;
+        return validator.getErrors();
+    }
+    
+    public ValidatorHandler getValidator() {
+        return validator;
     }
 
     public HandlerFactory getHandlerFactory() {
@@ -221,6 +223,12 @@ public class ParserHandler extends DefaultHandler {
 
         //binding walker support
         context.registerComponentInstance(new BindingWalkerFactoryImpl(bindingLoader, context));
+        
+        //register configuration itself
+        context.registerComponentInstance( config );
+
+        validator.startDocument();
+        docHandler.startDocument();
     }
 
     public void startElement(String uri, String localName, String qName, Attributes attributes)
@@ -416,7 +424,8 @@ O:          for (int i = 0; i < schemas.length; i++) {
             }
 
             index = new SchemaIndexImpl(schemas);
-
+            context.registerComponentInstance(index);
+            
             //if no default prefix is set in this namespace context, then 
             // set it to be the namesapce of the configuration
             if (namespaces.getURI("") == null) {
@@ -459,6 +468,20 @@ O:          for (int i = 0; i < schemas.length; i++) {
             }
         }
 
+        if (handler == null) {
+            //look for ParserDelegate instances in the context to see if there is a delegate
+            // around to handle this
+            List delegates = Schemas.getComponentInstancesOfType(context,ParserDelegate.class);
+            for ( Iterator d = delegates.iterator(); d.hasNext(); ) {
+                ParserDelegate delegate = (ParserDelegate) d.next();
+                if ( delegate.canHandle( qualifiedName ) ) {
+                    //found one
+                    handler = new DelegatingHandler( delegate, qualifiedName, parent );
+                    ((DelegatingHandler)handler).startDocument();
+                }
+                
+            }
+        }
         if (handler == null) {
             //if the type only contains one type of element, just assume the 
             // the element is of that type
@@ -583,6 +606,16 @@ O:          for (int i = 0; i < schemas.length; i++) {
 
         endElementInternal(handler);
 
+        //if the upper most delegating handler, then end the document
+        if ( handler instanceof DelegatingHandler && 
+                !handlers.isEmpty() && !(handlers.peek() instanceof DelegatingHandler) ) {
+            DelegatingHandler dh = (DelegatingHandler) handler;
+            dh.endDocument();
+            
+            //grabbed the parsed value
+            dh.getParseNode().setValue(dh.delegate.getParsedObject());
+        }
+        
         //pop namespace context
         namespaces.popContext();
     }
@@ -592,8 +625,11 @@ O:          for (int i = 0; i < schemas.length; i++) {
     }
 
     public void endDocument() throws SAXException {
+        validator.endDocument();
+        
         //only the document handler should be left on the stack
         documentHandler = (DocumentHandler) handlers.pop();
+        documentHandler.endDocument();
         
         //cleanup
         if ( index != null ) {
@@ -608,18 +644,17 @@ O:          for (int i = 0; i < schemas.length; i++) {
     }
 
     public void warning(SAXParseException e) throws SAXException {
-        //errors.add( e );
+        if ( isValidating() ) {
+            validator.warning( e );
+        }
     }
 
     public void error(SAXParseException e) throws SAXException {
         logger.log(Level.WARNING, e.getMessage());
-        
-        //check fail on validation flag
-        if ( isFailOnValidationError() ) {
-            throw e;
+        if ( isValidating() ) {
+         
+            validator.error( e );
         }
-        
-        errors.add(e);
     }
 
     public Object getValue() {

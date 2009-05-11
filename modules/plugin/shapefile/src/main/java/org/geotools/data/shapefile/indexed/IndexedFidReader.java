@@ -82,7 +82,7 @@ public class IndexedFidReader implements FIDReader, FileReader {
         streamLogger.open();
         getHeader(shpFiles);
 
-        buffer = ByteBuffer.allocateDirect(IndexedFidWriter.RECORD_SIZE);//allocateDirect(12 * 1024);
+        buffer = ByteBuffer.allocateDirect(IndexedFidWriter.RECORD_SIZE * 1024);
         buffer.position(buffer.limit());
     }
 
@@ -154,8 +154,17 @@ public class IndexedFidReader implements FIDReader, FileReader {
      */
     public long findFid(String fid) throws IOException {
         try {
-            long desired = Long.parseLong(fid
-                    .substring(fid.lastIndexOf(".") + 1));
+            int idx = typeName.length(); //typeName already contains the trailing "."
+            long desired = -1;
+            if(fid.startsWith(typeName)){
+                try{
+                    desired =  Long.parseLong(fid.substring(idx), 10);
+                }catch(NumberFormatException e){
+                    return -1;
+                }
+            }else{
+                return -1;
+            }
 
             if ((desired < 0)) {
                 return -1;
@@ -199,7 +208,7 @@ public class IndexedFidReader implements FIDReader, FileReader {
         }
 
         goTo(predictedRec);
-        buffer.limit(IndexedFidWriter.RECORD_SIZE);
+        hasNext(); // force data reading
         next();
         buffer.limit(buffer.capacity());
         if (currentId == desired) {

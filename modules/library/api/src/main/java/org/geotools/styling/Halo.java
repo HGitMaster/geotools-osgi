@@ -63,35 +63,32 @@ import org.opengis.filter.expression.Expression;
  * </li>
  * </ul>
  * </p>
- * $Id: Halo.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * $Id: Halo.java 32919 2009-05-03 14:18:31Z jive $
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/Halo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Halo.java $
  */
 public interface Halo extends org.opengis.style.Halo{
 
     /**
      * Expression that represents the the distance the halo extends from the
      * text
-     *
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param radius
      */
-    @Deprecated
     void setRadius(Expression radius);
 
     /**
      * The fill (color) of the halo
      *
-     * @return DOCUMENT ME!
+     * @return fill (color) of the halo
      */
     Fill getFill();
 
     /**
      * The fill (color) of the halo
      *
-     * @deprecated symbolizers and underneath classes are immutable
+     * @param fill
      */
-    @Deprecated
     void setFill(Fill fill);
 
     void accept(org.geotools.styling.StyleVisitor visitor);

@@ -129,12 +129,12 @@ public class StreamingRendererTest extends TestCase {
         final Exception sentinel = new RuntimeException("This is the one that should be thrown in hasNext()");
         
         // setup the mock necessary to have the renderer hit into the exception in hasNext()
-        FeatureIterator it2 = createNiceMock(FeatureIterator.class);
+        Iterator it2 = createNiceMock(Iterator.class);
         expect(it2.hasNext()).andThrow(sentinel).anyTimes();
         replay(it2);
         
         FeatureCollection fc = createNiceMock(FeatureCollection.class);
-        expect(fc.features()).andReturn(it2);
+        expect(fc.iterator()).andReturn(it2);
         expect(fc.size()).andReturn(200);
         expect(fc.getSchema()).andReturn(testFeatureType).anyTimes();
         replay(fc);
@@ -142,7 +142,7 @@ public class StreamingRendererTest extends TestCase {
         FeatureSource fs = createNiceMock(FeatureSource.class);
         expect(fs.getFeatures((Query) anyObject())).andReturn(fc);
         expect(fs.getSchema()).andReturn(testFeatureType).anyTimes();
-        expect(fs.getSupportedHints()).andReturn(new HashSet());
+        expect(fs.getSupportedHints()).andReturn(new HashSet()).anyTimes();
         replay(fs);
         
         // build map context

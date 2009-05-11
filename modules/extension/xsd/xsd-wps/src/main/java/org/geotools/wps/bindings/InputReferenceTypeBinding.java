@@ -19,9 +19,9 @@ package org.geotools.wps.bindings;
 
 import javax.xml.namespace.QName;
 
-import net.opengis.wps.MethodType;
-import net.opengis.wps.WpsFactory;
-import net.opengis.wps.InputReferenceType;
+import net.opengis.wps10.MethodType;
+import net.opengis.wps10.Wps10Factory;
+import net.opengis.wps10.InputReferenceType;
 
 import org.geotools.wps.WPS;
 import org.geotools.xml.Node;
@@ -33,7 +33,7 @@ import org.geotools.xml.ComplexEMFBinding;
  * @author Lucas Reed, Refractions Research Inc
  */
 public class InputReferenceTypeBinding extends ComplexEMFBinding {
-    public InputReferenceTypeBinding(WpsFactory factory) {
+    public InputReferenceTypeBinding(Wps10Factory factory) {
         super(factory, WPS.InputReferenceType);
     }
 

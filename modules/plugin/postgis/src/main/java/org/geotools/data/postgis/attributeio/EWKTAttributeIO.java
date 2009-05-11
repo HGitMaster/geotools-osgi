@@ -24,6 +24,7 @@ import java.sql.Types;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.geotools.geometry.jts.WKTReader2;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
@@ -37,7 +38,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  *
  * @since @2.4.1 Read/Write EWKT
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/EWKTAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/EWKTAttributeIO.java $
  */
 public class EWKTAttributeIO implements AttributeIO {
     WKTReader reader;
@@ -48,7 +49,7 @@ public class EWKTAttributeIO implements AttributeIO {
      */
     private WKTReader getWKTReader() {
         if (reader == null) {
-            reader = new WKTReader();
+            reader = new WKTReader2();
         }
         return reader;
     }

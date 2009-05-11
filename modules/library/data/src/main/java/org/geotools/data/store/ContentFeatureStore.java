@@ -139,6 +139,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      */
     public final FeatureWriter<SimpleFeatureType, SimpleFeature> getWriter( Query query, int flags ) throws IOException {
         query = joinQuery( query );
+        query = resolvePropertyNames(query);
         
         FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriterInternal( query, flags );
         
@@ -307,12 +308,13 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * will throw an {@link IllegalArgumentException}.
      * </p>
      */
-    public final void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
         throws IOException {
         if ( filter == null ) {
             String msg = "Must specify a filter, must not be null.";
             throw new IllegalArgumentException( msg );
         }
+        filter = resolvePropertyNames(filter);
         
         //grab a feature writer
         FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriter( filter, WRITER_UPDATE );
@@ -353,11 +355,12 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * will throw an {@link IllegalArgumentException}.
      * </p>
      */
-    public final void removeFeatures(Filter filter) throws IOException {
+    public void removeFeatures(Filter filter) throws IOException {
         if ( filter == null ) {
             String msg = "Must specify a filter, must not be null.";
             throw new IllegalArgumentException( msg );
         }
+        filter = resolvePropertyNames(filter);
         
         //grab a feature writer
         FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriter( filter, WRITER_UPDATE );
@@ -464,6 +467,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * Unlocks features specified by a filter.
      */
     public final void unLockFeatures(Filter filter) throws IOException {
+        filter = resolvePropertyNames(filter);
         String typeName = getSchema().getTypeName(); 
         
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReader(filter);

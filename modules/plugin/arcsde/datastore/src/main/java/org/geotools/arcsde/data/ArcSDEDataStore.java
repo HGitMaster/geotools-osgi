@@ -76,8 +76,9 @@ import com.esri.sde.sdk.client.SeQueryInfo;
  * 
  * @author Gabriel Roldan (TOPP)
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSDEDataStore.java $
- * @version $Id: ArcSDEDataStore.java 30842 2008-07-02 11:31:31Z groldan $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/datastore/src/main
+ *         /java/org/geotools/arcsde/data/ArcSDEDataStore.java $
+ * @version $Id: ArcSDEDataStore.java 31927 2008-11-28 18:46:51Z groldan $
  */
 public class ArcSDEDataStore implements DataStore {
 
@@ -109,7 +110,8 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * Creates a new ArcSDE DataStore working over the given connection pool
      * 
-     * @param connPool pool of {@link Session} this datastore works upon.
+     * @param connPool
+     *            pool of {@link Session} this datastore works upon.
      */
     public ArcSDEDataStore(final SessionPool connPool) {
         this(connPool, null);
@@ -118,10 +120,11 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * Creates a new ArcSDE DataStore working over the given connection pool
      * 
-     * @param connPool pool of {@link Session} this datastore works upon.
-     * @param namespaceUri namespace URI for the {@link SimpleFeatureType}s, {@link AttributeType}s,
-     *            and {@link AttributeDescriptor}s created by this datastore. May be
-     *            <code>null</code>.
+     * @param connPool
+     *            pool of {@link Session} this datastore works upon.
+     * @param namespaceUri
+     *            namespace URI for the {@link SimpleFeatureType}s, {@link AttributeType}s, and
+     *            {@link AttributeDescriptor}s created by this datastore. May be <code>null</code>.
      */
     public ArcSDEDataStore(final SessionPool connPool, final String namespaceUri) {
         this.connectionPool = connPool;
@@ -178,9 +181,9 @@ public class ArcSDEDataStore implements DataStore {
      * @return the list of full qualified feature class names on the ArcSDE database this DataStore
      *         works on. An ArcSDE full qualified class name is composed of three dot separated
      *         strings: "DATABASE.USER.CLASSNAME", wich is usefull enough to use it as namespace
-     * @throws RuntimeException if an exception occurs while retrieving the list of registeres
-     *             feature classes on the backend, or while obtaining the full qualified name of one
-     *             of them
+     * @throws RuntimeException
+     *             if an exception occurs while retrieving the list of registeres feature classes on
+     *             the backend, or while obtaining the full qualified name of one of them
      */
     public String[] getTypeNames() throws IOException {
         List<String> layerNames = new ArrayList<String>(connectionPool.getAvailableLayerNames());
@@ -196,8 +199,8 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
-     * Disposes this ArcSDEDataStore, which means disposing its session pool and hence
-     * closing all the SeConnection objects held.
+     * Disposes this ArcSDEDataStore, which means disposing its session pool and hence closing all
+     * the SeConnection objects held.
      * 
      * @see DataStore#dispose()
      */
@@ -225,19 +228,36 @@ public class ArcSDEDataStore implements DataStore {
     public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
             final Transaction transaction) throws IOException {
         assert query != null;
-        final String typeName = query.getTypeName();
-        assert typeName != null;
+        assert query.getTypeName() != null;
         assert query.getFilter() != null;
         assert transaction != null;
 
+        final SimpleFeatureType featureType = getQueryType(query);
+
+        return getFeatureReader(query, transaction, featureType);
+    }
+
+    public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
+            final Transaction transaction, final SimpleFeatureType featureType) throws IOException {
+        Filter filter = query.getFilter();
+        if (filter == Filter.EXCLUDE || filter.equals(Filter.EXCLUDE)) {
+            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(featureType);
+        }
+
+        final String typeName = query.getTypeName();
         ArcSdeVersionHandler versionHandler = getVersionHandler(typeName, transaction);
         ISession session = getSession(transaction);
 
-        // indicates the feature reader should close the connection when done
-        // if it's not inside a transaction.
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-        reader = getFeatureReader(query, session, versionHandler);
-
+        try {
+            reader = getFeatureReader(query, featureType, session, versionHandler);
+        } catch (IOException ioe) {
+            session.dispose();
+            throw ioe;
+        } catch (RuntimeException re) {
+            session.dispose();
+            throw re;
+        }
         return reader;
     }
 
@@ -249,17 +269,18 @@ public class ArcSDEDataStore implements DataStore {
      * differences (additions/modifications/deletions) made while a transaction is in progress.
      * </p>
      * 
-     * @param query the Query containing the request criteria
-     * @param session the session to use to retrieve content.
+     * @param query
+     *            the Query containing the request criteria
+     * @param session
+     *            the session to use to retrieve content.
      * @return
      * @throws IOException
      */
-    FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
-            final ISession session,
+    private FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
+            final SimpleFeatureType targetSchema, final ISession session,
             final ArcSdeVersionHandler versionHandler) throws IOException {
 
         final String typeName = query.getTypeName();
-        final String propertyNames[] = query.getPropertyNames();
 
         final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName, session);
         final SimpleFeatureType completeSchema = typeInfo.getFeatureType();
@@ -267,25 +288,8 @@ public class ArcSDEDataStore implements DataStore {
 
         Filter filter = query.getFilter();
 
-        if (filter == null) {
-            throw new NullPointerException("getFeatureReader requires Filter: "
-                    + "did you mean Filter.INCLUDE?");
-        }
-
-        SimpleFeatureType featureType = completeSchema;
-
-        if (propertyNames != null || query.getCoordinateSystem() != null) {
-            try {
-                featureType = DataUtilities.createSubType(featureType, propertyNames, query
-                        .getCoordinateSystem());
-            } catch (SchemaException e) {
-                LOGGER.log(Level.FINEST, e.getMessage(), e);
-                throw new DataSourceException("Could not create Feature Type for query", e);
-
-            }
-        }
         if (filter == Filter.EXCLUDE || filter.equals(Filter.EXCLUDE)) {
-            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(featureType);
+            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(targetSchema);
         }
 
         if (typeInfo.isInProcessView()) {
@@ -317,9 +321,9 @@ public class ArcSDEDataStore implements DataStore {
             reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, filter);
         }
 
-        if (!featureType.equals(reader.getFeatureType())) {
+        if (!targetSchema.equals(reader.getFeatureType())) {
             LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
-            reader = new ReTypeFeatureReader(reader, featureType, false);
+            reader = new ReTypeFeatureReader(reader, targetSchema, false);
         }
 
         if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
@@ -328,6 +332,28 @@ public class ArcSDEDataStore implements DataStore {
         }
 
         return reader;
+    }
+
+    public SimpleFeatureType getQueryType(Query query) throws IOException {
+        final String typeName = query.getTypeName();
+        final String propertyNames[] = query.getPropertyNames();
+
+        final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName);
+        final SimpleFeatureType completeSchema = typeInfo.getFeatureType();
+        final ArcSDEQuery sdeQuery;
+
+        SimpleFeatureType featureType = completeSchema;
+
+        if (!query.retrieveAllProperties() || query.getCoordinateSystem() != null) {
+            try {
+                featureType = DataUtilities.createSubType(featureType, propertyNames, query
+                        .getCoordinateSystem());
+            } catch (SchemaException e) {
+                LOGGER.log(Level.FINEST, e.getMessage(), e);
+                throw new DataSourceException("Could not create Feature Type for query", e);
+            }
+        }
+        return featureType;
     }
 
     /**
@@ -348,8 +374,8 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
-     * Delegates to
-     * {@link #getFeatureWriter(String, Filter, Transaction) getFeatureWriter(typeName, Filter.INCLUDE, transaction)}
+     * Delegates to {@link #getFeatureWriter(String, Filter, Transaction) getFeatureWriter(typeName,
+     * Filter.INCLUDE, transaction)}
      * 
      * @see DataStore#getFeatureWriter(String, Transaction)
      */
@@ -386,8 +412,7 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * @see DataStore#getFeatureWriter(String, Filter, Transaction)
      */
-    public ArcSdeFeatureWriter getFeatureWriter(final String typeName,
-            final Filter filter,
+    public ArcSdeFeatureWriter getFeatureWriter(final String typeName, final Filter filter,
             final Transaction transaction) throws IOException {
         final ArcSdeVersionHandler versionHandler = getVersionHandler(typeName, transaction);
         // get the connection the streamed writer content has to work over
@@ -401,16 +426,19 @@ public class ArcSDEDataStore implements DataStore {
             }
             final SimpleFeatureType featureType = typeInfo.getFeatureType();
 
-            final DefaultQuery query = new DefaultQuery(typeName, filter);
             final FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-
-            final ISession nonDisposableSession = new SessionWrapper(session) {
-                @Override
-                public void dispose() throws IllegalStateException {
-                    // do nothing, we don't want the reader to close the session
-                }
-            };
-            reader = getFeatureReader(query, nonDisposableSession, versionHandler);
+            if (Filter.EXCLUDE.equals(filter)) {
+                reader = new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(featureType);
+            } else {
+                final DefaultQuery query = new DefaultQuery(typeName, filter);
+                final ISession nonDisposableSession = new SessionWrapper(session) {
+                    @Override
+                    public void dispose() throws IllegalStateException {
+                        // do nothing, we don't want the reader to close the session
+                    }
+                };
+                reader = getFeatureReader(query, featureType, nonDisposableSession, versionHandler);
+            }
 
             final ArcSdeFeatureWriter writer;
 
@@ -448,8 +476,8 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
-     * Delegates to
-     * {@link #getFeatureWriter(String, Filter, Transaction) getFeatureWriter(typeName, Filter.EXCLUDE, transaction)}
+     * Delegates to {@link #getFeatureWriter(String, Filter, Transaction) getFeatureWriter(typeName,
+     * Filter.EXCLUDE, transaction)}
      * 
      * @see DataStore#getFeatureWriterAppend(String, Transaction)
      */
@@ -522,8 +550,8 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
-     * Delegates to {@link #updateSchema(String, SimpleFeatureType)} with
-     * {@code name.getLocalPart()}
+     * Delegates to {@link #updateSchema(String, SimpleFeatureType)} with {@code
+     * name.getLocalPart()}
      * 
      * @since 2.5
      * @see DataAccess#getFeatureSource(Name)
@@ -542,8 +570,7 @@ public class ArcSDEDataStore implements DataStore {
      * </p>
      */
     private org.opengis.filter.Filter getUnsupportedFilter(final FeatureTypeInfo typeInfo,
-            final Filter filter,
-            final ISession session) {
+            final Filter filter, final ISession session) {
         try {
             SeLayer layer;
             SeQueryInfo qInfo;
@@ -668,15 +695,15 @@ public class ArcSDEDataStore implements DataStore {
      * specification of ArcSDE specific hints for the "Feature Class" to create:
      * <ul>
      * At this time the following hints may be passed:
-     * <li><b>configuration.keywords</b>: database configuration keyword to use for the newly
-     * create feature type. In not present, <code>"DEFAULTS"</code> will be used.</li>
-     * <li><b>rowid.column.name</b>: indicates the name of the table column to set up as the
-     * unique identifier, and thus to be used as feature id.</li>
+     * <li><b>configuration.keywords</b>: database configuration keyword to use for the newly create
+     * feature type. In not present, <code>"DEFAULTS"</code> will be used.</li>
+     * <li><b>rowid.column.name</b>: indicates the name of the table column to set up as the unique
+     * identifier, and thus to be used as feature id.</li>
      * <li><b>rowid.column.type</b>: The row id column type. Must be one of the following allowed
-     * values: <code>"NONE"</code>, <code>"USER"</code>, <code>"SDE"</code> in order to set
-     * up the row id column name to not be managed at all, to be user managed or to be managed by
-     * ArcSDE, respectively. Refer to the ArcSDE documentation for an explanation of the meanings of
-     * those terms.</li>
+     * values: <code>"NONE"</code>, <code>"USER"</code>, <code>"SDE"</code> in order to set up the
+     * row id column name to not be managed at all, to be user managed or to be managed by ArcSDE,
+     * respectively. Refer to the ArcSDE documentation for an explanation of the meanings of those
+     * terms.</li>
      * </ul>
      * </p>
      * 
@@ -757,8 +784,8 @@ public class ArcSDEDataStore implements DataStore {
      * </ul>
      * 
      * @param select
-     * @throws UnsupportedOperationException if any of the unsupported constructs are found on
-     *             <code>select</code>
+     * @throws UnsupportedOperationException
+     *             if any of the unsupported constructs are found on <code>select</code>
      */
     private void verifyQueryIsSupported(PlainSelect select) throws UnsupportedOperationException {
         List<Object> errors = new LinkedList<Object>();

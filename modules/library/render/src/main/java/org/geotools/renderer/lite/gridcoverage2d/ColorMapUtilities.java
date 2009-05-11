@@ -182,8 +182,8 @@ class ColorMapUtilities {
 		final int dim = point.getDimension();
 		if (dim != 1) {
 			throw new MismatchedDimensionException(Errors.format(
-					ErrorKeys.MISMATCHED_DIMENSION_$2, new Integer(1),
-					new Integer(dim)));
+					ErrorKeys.MISMATCHED_DIMENSION_$2, Integer.valueOf(1),
+					Integer.valueOf(dim)));
 		}
 	}
 	/**

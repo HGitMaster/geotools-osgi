@@ -100,7 +100,7 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
     }
 
     /** FIXME: Please for the love on binpop */
-    public void XtestEvaulateWithStrings() throws Exception {
+    public void testEvaulateWithStrings() throws Exception {
         org.opengis.filter.expression.Expression function = ff.function("EqualInterval", ff.property("group"), ff.literal(5)  );
         Classifier classifier = (Classifier) function.evaluate( featureCollection );
         assertNotNull( classifier );

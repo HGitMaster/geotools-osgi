@@ -28,9 +28,12 @@ import org.geotools.filter.text.generated.parsers.Token;
  * <p>
  * The token class, used by the specific parser, requires to be adapted to
  * implementing the interface {@link IToken} which is used by the
- * {@link CQLFilterBuilder} and {@link TXT}}.
+ * {@link CQLFilterBuilder} and {@link ECQL}}.
  * </p>
- * 
+ * <p>
+ * Warning: This component is not published. It is part of module implementation. 
+ * Client module should not use this feature.
+ * </p>
  * @see IToken
  * @see CQLFilterBuilder
  * @see CQLCompiler

@@ -16,7 +16,10 @@
  */
 package org.geotools.data.h2;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,12 +29,19 @@ import java.util.Map;
 
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.SQLDialect;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.PropertyDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
@@ -73,8 +83,135 @@ public class H2Dialect extends SQLDialect {
         mappings.put(Point.class, new Integer(Types.BLOB));
         mappings.put(LineString.class, new Integer(Types.BLOB));
         mappings.put(Polygon.class, new Integer(Types.BLOB));
+        mappings.put(GeometryCollection.class, new Integer(Types.BLOB));
+        mappings.put(MultiPoint.class, new Integer(Types.BLOB));
+        mappings.put(MultiLineString.class, new Integer(Types.BLOB));
+        mappings.put(MultiPolygon.class, new Integer(Types.BLOB));
     }
 
+    @Override
+    public void initializeConnection(Connection cx) throws SQLException {
+        //spatialize this database (if neccessary)
+        Statement st = cx.createStatement();
+        try {
+            try {
+                st.execute( "SELECT GeoToolsVersion()");
+                
+                //db already spatialized
+                return;
+            }
+            catch( SQLException e ) {
+                //continue on, means database has not been spatialized
+            }
+            
+            BufferedReader r = new BufferedReader( 
+                    new InputStreamReader( getClass().getResourceAsStream( "h2.sql" ) ) );
+            
+            String line = null;
+            while( (line = r.readLine() ) != null ) {
+                st.execute( line );
+            }    
+            
+            r.close();
+        }
+        catch( IOException e ) {
+            throw new RuntimeException( e );
+        }
+        finally {
+            dataStore.closeSafe( st );
+        }
+        
+    }
+    
+    @Override
+    public Class<?> getMapping(ResultSet columnMetaData, Connection cx)
+            throws SQLException {
+        
+        //do a check for a column remark which marks this as a geometry
+        String remark = columnMetaData.getString( "REMARKS" );
+        if ( remark != null ) {
+            if ( "POINT".equalsIgnoreCase( remark ) ) {
+                return Point.class;
+            }
+            if ( "LINESTRING".equalsIgnoreCase( remark ) ) {
+                return LineString.class;
+            }
+            if ( "POLYGON".equalsIgnoreCase( remark ) ) {
+                return Polygon.class;
+            }
+            if ( "MULTIPOINT".equalsIgnoreCase( remark ) ) {
+                return MultiPoint.class;
+            }
+            if ( "MULTILINESTRING".equalsIgnoreCase( remark ) ) {
+                return MultiLineString.class;
+            }
+            if ( "MULTIPOLYGON".equalsIgnoreCase( remark ) ) {
+                return MultiPolygon.class;
+            }
+        }
+        
+        return null;
+    }
+    
+    @Override
+    public void encodePostColumnCreateTable(AttributeDescriptor att,
+            StringBuffer sql) {
+        if ( att instanceof GeometryDescriptor ) {
+            //try to narrow down the type with a comment
+            Class binding = att.getType().getBinding();
+            if (isConcreteGeometry(binding)) {
+                sql.append( " COMMENT '").append( binding.getSimpleName().toUpperCase() )
+                    .append( "'");
+            }
+        }
+    }
+    
+    @Override
+    public void postCreateTable(String schemaName,
+            SimpleFeatureType featureType, Connection cx) throws SQLException {
+        
+        Statement st = cx.createStatement();
+        try {
+            //post process the feature type and set up constraints based on geometry type
+            for ( PropertyDescriptor ad : featureType.getDescriptors() ) {
+                if ( ad instanceof GeometryDescriptor ) {
+                    Class binding = ad.getType().getBinding();
+                    if ( isConcreteGeometry( binding ) ) {
+                        String tableName = featureType.getTypeName();
+                        String propertyName = ad.getName().getLocalPart();
+                        StringBuffer sql = new StringBuffer();
+                        sql.append( "ALTER TABLE ");
+                        encodeTableName(tableName, sql);
+                        sql.append( " ADD CONSTRAINT " );
+                        encodeTableName( tableName + "_"+propertyName + "GeometryType", sql );
+                        sql.append( " CHECK ");
+                        encodeColumnName( propertyName, sql );
+                        sql.append( " IS NULL OR");
+                        sql.append( " GeometryType(");
+                        encodeColumnName( propertyName, sql );
+                        sql.append( ") = '").append( binding.getSimpleName().toUpperCase() )
+                            .append( "'");
+                            
+                        LOGGER.fine( sql.toString() );
+                        st.execute( sql.toString() );
+                    }
+                }
+            }
+        }
+        finally {
+            dataStore.closeSafe( st );
+        }
+    }
+    
+    boolean isConcreteGeometry( Class binding ) {
+        return Point.class.isAssignableFrom(binding) 
+            || LineString.class.isAssignableFrom(binding)
+            || Polygon.class.isAssignableFrom(binding) 
+            || MultiPoint.class.isAssignableFrom( binding ) 
+            || MultiLineString.class.isAssignableFrom(binding) 
+            || MultiPolygon.class.isAssignableFrom( binding );
+    }
+    
     public Integer getGeometrySRID(String schemaName, String tableName, String columnName,
         Connection cx) throws SQLException {
         //execute SELECT srid(<columnName>) FROM <tableName> LIMIT 1;
@@ -260,6 +397,25 @@ public class H2Dialect extends SQLDialect {
             }
         } finally {
             dataStore.closeSafe(st);
+        }
+    }
+    
+    @Override
+    public boolean isLimitOffsetSupported() {
+        return true;
+    }
+    
+    @Override
+    public void applyLimitOffset(StringBuffer sql, int limit, int offset) {
+        if(limit > 0 && limit < Integer.MAX_VALUE) {
+            sql.append(" LIMIT " + limit);
+            if(offset > 0) {
+                sql.append(" OFFSET " + offset);
+            }
+        } else if(offset > 0) {
+            // H2 pretends to have limit specified along with offset
+            sql.append(" LIMIT " + Integer.MAX_VALUE);
+            sql.append(" OFFSET " + offset);
         }
     }
 }

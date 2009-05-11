@@ -26,6 +26,7 @@ import java.util.List;
 import org.geotools.data.CollectionFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -39,7 +40,9 @@ import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.identity.FeatureId;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 
 public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
@@ -144,6 +147,55 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
         while (i.hasNext()) {
             SimpleFeature feature = (SimpleFeature) i.next();
             assertEquals("foo", feature.getAttribute(aname("stringProperty")));
+        }
+
+        features.close(i);
+    }
+    
+    public void testModifyGeometry() throws IOException {
+        // GEOT-2371
+        SimpleFeatureType t = featureStore.getSchema();
+        GeometryFactory gf = new GeometryFactory();
+        Point point = gf.createPoint(new Coordinate(-10, 0));
+		featureStore.modifyFeatures(new AttributeDescriptor[] { t.getDescriptor(aname("geometry")) },
+            new Object[] { point }, Filter.INCLUDE);
+
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureStore.getFeatures();
+        Iterator i = features.iterator();
+
+        assertTrue(i.hasNext());
+
+        while (i.hasNext()) {
+            SimpleFeature feature = (SimpleFeature) i.next();
+            assertTrue(point.equalsExact((Geometry) feature.getAttribute(aname("geometry"))));
+        }
+
+        features.close(i);
+    }
+    
+    public void testModifyMadeUpGeometry() throws IOException {
+        // GEOT-2371
+        SimpleFeatureType t = featureStore.getSchema();
+        GeometryFactory gf = new GeometryFactory();
+        Point point = gf.createPoint(new Coordinate(-10, 0));
+        
+        // make up a fake attribute with the same name, something that might happen
+        // in chains of retyping where attributes are rebuilt
+        AttributeTypeBuilder ab = new AttributeTypeBuilder();
+        ab.binding(Point.class);
+        AttributeDescriptor madeUp = ab.buildDescriptor(aname("geometry"));
+        
+        featureStore.modifyFeatures(new AttributeDescriptor[] { madeUp },
+            new Object[] { point }, Filter.INCLUDE);
+
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureStore.getFeatures();
+        Iterator i = features.iterator();
+
+        assertTrue(i.hasNext());
+
+        while (i.hasNext()) {
+            SimpleFeature feature = (SimpleFeature) i.next();
+            assertTrue(point.equalsExact((Geometry) feature.getAttribute(aname("geometry"))));
         }
 
         features.close(i);

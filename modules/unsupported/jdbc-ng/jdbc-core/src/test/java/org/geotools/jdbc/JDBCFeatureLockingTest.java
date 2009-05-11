@@ -16,6 +16,8 @@
  */
 package org.geotools.jdbc;
 
+import java.util.Collections;
+
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureLock;
@@ -26,6 +28,8 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
 
@@ -247,5 +251,74 @@ public abstract class JDBCFeatureLockingTest extends JDBCTestSupport {
 
         store.unLockFeatures();
         tx.close();
+    }
+    
+    public void testDeleteLockedFeatures() throws Exception {
+        FeatureLock lock = 
+            FeatureLockFactory.generate(tname("ft1"), 60 * 60 * 1000);
+        
+        Transaction tx = new DefaultTransaction();
+        store.setTransaction( tx );
+        store.setFeatureLock(lock);
+        tx.addAuthorization(lock.getAuthorization());
+        
+        FilterFactory ff = dataStore.getFilterFactory();
+        Filter f1 = ff.id( Collections.singleton( ff.featureId( tname("ft1")+".1")));
+        
+        assertEquals( 1, store.lockFeatures(f1) );
+        
+        Transaction tx1 = new DefaultTransaction();
+        store.setTransaction( tx1 );
+        try {
+            store.removeFeatures( f1 );
+            fail( "Locked feature should not be deleted.");
+        }
+        catch( FeatureLockException e ) {}
+        
+        store.setTransaction( tx );
+        store.removeFeatures( f1 );
+        
+        tx.commit();
+        tx.close();
+        tx1.close();
+        
+    }
+    
+    public void testModifyLockedFeatures() throws Exception {
+        FilterFactory ff = dataStore.getFilterFactory();
+        
+        Filter f0 = ff.equal( ff.property( aname("intProperty" ) ), ff.literal(1000), true);
+        assertEquals( 0 , store.getCount( new DefaultQuery( tname("ft1"), f0 ) ));
+        
+        FeatureLock lock = 
+            FeatureLockFactory.generate(tname("ft1"), 60 * 60 * 1000);
+        
+        Transaction tx = new DefaultTransaction();
+        store.setTransaction( tx );
+        store.setFeatureLock(lock);
+        tx.addAuthorization(lock.getAuthorization());
+        
+        Filter f1 = ff.id( Collections.singleton( ff.featureId( tname("ft1")+".1")));
+        store.lockFeatures(f1);
+        
+        Transaction tx1 = new DefaultTransaction();
+        store.setTransaction( tx1 );
+        
+        AttributeDescriptor ad = store.getSchema().getDescriptor( aname( "intProperty") );
+        Integer v = new Integer(1000);
+        
+        try {
+            store.modifyFeatures(ad, v, f1 ); 
+            fail( "Locked feature should not be modified.");
+        }
+        catch( FeatureLockException e ) {}
+        
+        store.setTransaction( tx );
+        store.modifyFeatures(ad, v, f1 );
+        tx.commit();
+       
+        assertEquals( 1 , store.getCount( new DefaultQuery( tname("ft1"), f0 ) ));
+        tx.close();
+        tx1.close();
     }
 }

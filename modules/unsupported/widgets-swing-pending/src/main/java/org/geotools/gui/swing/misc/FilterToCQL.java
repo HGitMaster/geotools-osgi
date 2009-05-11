@@ -331,14 +331,25 @@ public class FilterToCQL implements FilterVisitor, ExpressionVisitor {
         char esc = filter.getEscape().charAt(0);
         char multi = filter.getWildCard().charAt(0);
         char single = filter.getSingleChar().charAt(0);
-        String pattern = LikeFilterImpl.convertToSQL92(esc, multi, single, filter.getLiteral());
+        boolean matchCase = filter.isMatchingCase();
+        String pattern = LikeFilterImpl.convertToSQL92(esc,multi,single,matchCase,filter.getLiteral());
 
 
         Expression att = filter.getExpression();
 
         try {
+            if (!matchCase){
+                out.write(" UPPER(");
+            }
+
             att.accept(this, extraData);
-            out.write(" LIKE '");
+
+            if (!matchCase){
+                out.write(") LIKE '");
+            } else {
+                out.write(" LIKE '");
+            }
+
             out.write(pattern);
             out.write("' ");
         } catch (java.io.IOException ioe) {

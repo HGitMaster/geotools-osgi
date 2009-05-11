@@ -23,6 +23,7 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Contains;
 import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
 import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 
@@ -39,7 +40,7 @@ public class OracleFilterToSqlTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        encoder = new OracleFilterToSQL();
+        encoder = new OracleFilterToSQL(null);
         ff = CommonFactoryFinder.getFilterFactory2(null);
         gf = new GeometryFactory();
     }
@@ -99,7 +100,21 @@ public class OracleFilterToSqlTest extends TestCase {
         String encoded = encoder.encodeToString(overlaps);
         assertEquals("WHERE SDO_RELATE(\"GEOM\", ?, 'mask=overlapbdyintersect querytype=WINDOW') = 'TRUE' ", encoded);
     }
-
+    
+    public void testDWithinFilterWithUnit() throws Exception {
+        Coordinate coordinate = new Coordinate();
+		DWithin dwithin = ff.dwithin(ff.property("GEOM"), ff.literal(gf.createPoint(coordinate)), 10.0, "kilometers");
+        String encoded = encoder.encodeToString(dwithin);
+        assertEquals("WHERE SDO_WITHIN_DISTANCE(\"GEOM\",?,'distance=10.0 unit=kilometers') = 'TRUE' ", encoded);
+    }
+    
+    public void testDWithinFilterWithoutUnit() throws Exception {
+        Coordinate coordinate = new Coordinate();
+        DWithin dwithin = ff.dwithin(ff.property("GEOM"), ff.literal(gf.createPoint(coordinate)), 10.0, null);
+        String encoded = encoder.encodeToString(dwithin);
+        assertEquals("WHERE SDO_WITHIN_DISTANCE(\"GEOM\",?,'distance=10.0') = 'TRUE' ", encoded);
+    }
+    
     // THIS ONE WON'T PASS RIGHT NOW, BUT WE NEED TO PUT A TEST LIKE THIS
     // SOMEHWERE
     // THAT IS, SOMETHING CHECKING THAT TYPED FIDS GET CONVERTED INTO THE PROPER

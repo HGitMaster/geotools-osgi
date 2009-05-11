@@ -15,7 +15,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.geotools.data.wfs.v1_1_0;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +36,6 @@ import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
-
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
@@ -43,6 +48,8 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
+import org.junit.Before;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -52,7 +59,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public abstract class AbstractWfsDataStoreOnlineTest extends TestCase {
+public abstract class AbstractWfsDataStoreOnlineTest  {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.wfs.v_1_1_0.data.test");
 
@@ -91,6 +98,7 @@ public abstract class AbstractWfsDataStoreOnlineTest extends TestCase {
         this.geometryType = geometryType;
     }
 
+    @Before
     public void setUp() throws IOException {
         if (serviceAvailable == null) {
             // check for service availability only once
@@ -102,7 +110,7 @@ public abstract class AbstractWfsDataStoreOnlineTest extends TestCase {
                 serviceAvailable = Boolean.TRUE;
             } catch (Throwable t) {
                 LOGGER.log(Level.WARNING, "The test server is not available: " + SERVER_URL + ". "
-                        + getName() + " test disabled ");
+                        + getClass().getSimpleName() + " test disabled ");
                 url = null;
                 return;
             } finally {
@@ -127,6 +135,7 @@ public abstract class AbstractWfsDataStoreOnlineTest extends TestCase {
         }
     }
 
+    @Test
     public void testTypes() throws IOException, NoSuchElementException {
         if (Boolean.FALSE.equals(serviceAvailable)) {
             return;
@@ -148,6 +157,7 @@ public abstract class AbstractWfsDataStoreOnlineTest extends TestCase {
         assertNotNull(crs);
     }
 
+    @Test
     public void testFeatureSourceInfo() throws IOException, NoSuchAuthorityCodeException,
             FactoryException {
         if (Boolean.FALSE.equals(serviceAvailable)) {
@@ -168,6 +178,7 @@ public abstract class AbstractWfsDataStoreOnlineTest extends TestCase {
         assertEquals(testType.FEATURETYPENAME, info.getName());
     }
 
+    @Test
     public void testFeatureSourceGetBounds() throws IOException, NoSuchAuthorityCodeException,
             FactoryException {
         if (Boolean.FALSE.equals(serviceAvailable)) {
@@ -200,6 +211,7 @@ public abstract class AbstractWfsDataStoreOnlineTest extends TestCase {
         assertNull(bounds); // too expensive to calculate
     }
 
+    @Test
     public void testFeatureSourceGetCountAll() throws IOException {
         if (Boolean.FALSE.equals(serviceAvailable)) {
             return;
@@ -218,6 +230,7 @@ public abstract class AbstractWfsDataStoreOnlineTest extends TestCase {
      * 
      * @throws IOException
      */
+    @Test
     public void testFeatureSourceGetCountFilter() throws IOException {
         if (Boolean.FALSE.equals(serviceAvailable)) {
             return;
@@ -238,6 +251,7 @@ public abstract class AbstractWfsDataStoreOnlineTest extends TestCase {
         assertEquals(1, featureSource.getCount(query));
     }
 
+    @Test
     public void testFeatureSourceGetFeatures() throws IOException {
         if (Boolean.FALSE.equals(serviceAvailable)) {
             return;

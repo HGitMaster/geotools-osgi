@@ -157,4 +157,15 @@ public class MultiColumnFIDMapper extends AbstractFIDMapper {
         return getID(attValues);
     }
 
+    /**
+     * @return {@code true} if splitting fid by the same separator than
+     *         {@link #getPKAttributes(String)} results in the same number of strings than the
+     *         number of columns this FIDMapper uses to compose a fid
+     * @see FIDMapper#isValid(String)
+     */
+    public boolean isValid(String fid) {
+        String[] attributes = fid.split("&");
+        return attributes.length == colNames.length;
+    }
+
 }

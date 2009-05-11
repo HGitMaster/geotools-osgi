@@ -16,6 +16,8 @@
  */
 package org.geotools.gml2;
 
+import javax.xml.namespace.QName;
+
 import org.geotools.feature.DefaultFeatureCollections;
 import org.geotools.gml2.bindings.GMLAbstractFeatureCollectionBaseTypeBinding;
 import org.geotools.gml2.bindings.GMLAbstractFeatureCollectionTypeBinding;
@@ -66,6 +68,11 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
  *
  */
 public class GMLConfiguration extends Configuration {
+    /**
+     * Property which controls whether encoded features should include bounds.
+     */
+    public static final QName NO_FEATURE_BOUNDS = new QName( "org.geotools.gml", "noFeatureBounds" );
+
     /**
      * Creates the new gml configuration, with a depenendency
      * on {@link XLINKConfiguration}
@@ -160,7 +167,6 @@ public class GMLConfiguration extends Configuration {
         super.configureContext(container);
 
         container.registerComponentInstance(new FeatureTypeCache());
-        container.registerComponentImplementation(FeaturePropertyExtractor.class);
         
         container.registerComponentInstance(CoordinateSequenceFactory.class,
             CoordinateArraySequenceFactory.instance());

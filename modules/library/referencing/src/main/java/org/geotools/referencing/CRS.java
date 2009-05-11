@@ -88,8 +88,8 @@ import org.geotools.util.UnsupportedImplementationException;
  * </ul>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/CRS.java $
- * @version $Id: CRS.java 31487 2008-09-10 08:57:36Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/CRS.java $
+ * @version $Id: CRS.java 32191 2009-01-09 11:19:41Z jesseeichar $
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
  * @author Andrea Aime
@@ -800,10 +800,16 @@ search:             if (DefaultCoordinateSystemAxis.isCompassDirection(axis.getD
      */
     public static String toSRS(final CoordinateReferenceSystem crs) {
         if (crs != null) {
-            final ReferenceIdentifier name = crs.getName();
-            if (name != null) {
-                return name.toString();
-            }
+        	final Set<ReferenceIdentifier> identifiers = crs.getIdentifiers();
+        	if( identifiers.isEmpty() ){
+        		// fallback unfortunately this often doesnt work
+	            final ReferenceIdentifier name = crs.getName();
+	            if (name != null) {
+	                return name.toString();
+	            }
+        	} else {
+        		return identifiers.iterator().next().toString();
+        	}
         }
         return null;
     }

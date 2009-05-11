@@ -35,8 +35,8 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/ExternalGraphicImpl.java $
- * @version $Id: ExternalGraphicImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/ExternalGraphicImpl.java $
+ * @version $Id: ExternalGraphicImpl.java 32784 2009-04-13 10:50:27Z jive $
  */
 public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
     /** The logger for the default core module. */
@@ -61,11 +61,10 @@ public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
             replacements = new ArrayList<ColorReplacement>();
         }else{
             replacements = new ArrayList<ColorReplacement>(replaces);
-        }
-        
-        this.online = source;
-        
+        }       
+        this.online = source;        
     }
+    
     
     @Deprecated
     public void setURI(String uri) {

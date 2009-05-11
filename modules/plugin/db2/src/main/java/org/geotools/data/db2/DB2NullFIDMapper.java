@@ -16,6 +16,7 @@
  */
 package org.geotools.data.db2;
 
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
 import java.util.logging.Logger;
 
@@ -53,5 +54,18 @@ public class DB2NullFIDMapper extends NullFIDMapper {
         currentFID++;
 
         return String.valueOf(currentFID);
+    }
+    
+    /**
+     * @return {@code true} if fid is an integer, {@code false} othwerwise
+     * @see FIDMapper#isValid(String)
+     */
+    public boolean isValid(String fid){
+        try{
+            Integer.parseInt(fid, 10);
+        }catch(NumberFormatException e){
+            return false;
+        }
+        return true;
     }
 }

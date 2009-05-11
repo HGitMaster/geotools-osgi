@@ -22,6 +22,7 @@ import static org.geotools.data.shapefile.ShpFileType.SHX;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,10 +98,14 @@ public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, 
 
     private FileChannel dbfChannel;
 
+    private Charset dbfCharset;
+
     public ShapefileFeatureWriter(String typeName, ShpFiles shpFiles,
-            ShapefileAttributeReader attsReader,  FeatureReader<SimpleFeatureType, SimpleFeature> featureReader)
+            ShapefileAttributeReader attsReader,  FeatureReader<SimpleFeatureType, SimpleFeature> featureReader,
+            Charset charset)
             throws IOException {
         this.shpFiles = shpFiles;
+        this.dbfCharset = charset;
         // set up reader
         this.attReader = attsReader;
         this.featureReader = featureReader;
@@ -135,14 +140,17 @@ public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, 
 
         dbfHeader = ShapefileDataStore.createDbaseHeader(featureType);
         dbfChannel = storageFiles.get(DBF).getWriteChannel();
-        dbfWriter = new DbaseFileWriter(dbfHeader, dbfChannel);
+        dbfWriter = new DbaseFileWriter(dbfHeader, dbfChannel, dbfCharset);
 
-        if (attReader != null && attReader.hasNext()) {
-            shapeType = attReader.shp.getHeader().getShapeType();
-            handler = shapeType.getShapeHandler();
-            shpWriter.writeHeaders(bounds, shapeType, records, shapefileLength);
+        if(attReader != null) {
+            // don't try to read a shx file we're writing to in parallel
+            attReader.shp.disableShxUsage();
+            if(attReader.hasNext()) {
+                shapeType = attReader.shp.getHeader().getShapeType();
+                handler = shapeType.getShapeHandler();
+                shpWriter.writeHeaders(bounds, shapeType, records, shapefileLength);
+            }
         }
-
     }
 
     /**

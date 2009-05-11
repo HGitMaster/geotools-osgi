@@ -20,35 +20,51 @@ import org.geotools.caching.spatialindex.Data;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.Visitor;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
-
+/**
+ * A visitor that collects features into 
+ * a In-Memory FeatureCollection 
+ * 
+ */
 public class FeatureCollectingVisitor implements Visitor {
-    FeatureCollection fc;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> fc;
     int visited_nodes = 0;
 
-    public FeatureCollectingVisitor(FeatureType type) {
+    public FeatureCollectingVisitor(SimpleFeatureType type) {
         fc = new DefaultFeatureCollection("FeatureCollectingVisitor", type);
     }
 
-    public void visitData(Data d) {
-        fc.add((Feature) d.getData());
+    /**
+     * @param d Must be a SimpleFeature 
+     */
+    public void visitData(Data<?> d) {
+        fc.add((SimpleFeature) d.getData());
     }
 
     public void visitNode(Node n) {
         visited_nodes++;
     }
 
-    public FeatureCollection getCollection() {
+    /**
+     * @return the collection of features visited
+     */
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getCollection() {
         return fc;
     }
 
+    /**
+     * @return the number of nodes visited
+     */
     public int getVisitedNodes() {
         return visited_nodes;
     }
 
+    /**
+     * @returns true as this feature collection does something with the data it visits
+     */
     public boolean isDataVisitor() {
         return true;
     }

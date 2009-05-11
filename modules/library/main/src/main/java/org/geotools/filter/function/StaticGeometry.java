@@ -492,6 +492,17 @@ import com.vividsolutions.jts.io.WKTReader;
 		}
      }
      
+     static public long parseLong(String s)
+     {
+        try{
+            return Long.parseLong(s);
+        }
+        catch(NumberFormatException e) // be nice for silly people!
+        {
+            return (long) Math.round(Double.parseDouble(s));
+        }
+     }
+     
      static public boolean parseBoolean(String s)
      {
      	if (s.equalsIgnoreCase("") || s.equalsIgnoreCase("f") || s.equalsIgnoreCase("false")|| s.equalsIgnoreCase("0")|| s.equalsIgnoreCase("0.0"))

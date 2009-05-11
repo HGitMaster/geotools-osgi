@@ -216,4 +216,16 @@ public class CQLLiteralTest {
         CQL.toFilter(cqlExpression);
     }
 
+    @Test
+    public void doubleLiteral() throws Exception{
+
+        final String expected = "4.20082008E4";
+
+        Expression expr = CompilerUtil.parseExpression(language, expected);
+
+        Literal doubleLiteral = (Literal) expr;
+        Double actual = (Double) doubleLiteral.getValue();
+     
+        Assert.assertEquals(Double.parseDouble(expected), actual.doubleValue(), 8);
+    }
 }

@@ -207,6 +207,24 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         LineString ls = (LineString) f.getDefaultGeometry();
         assertTrue(ls.getCoordinateSequence() instanceof LiteCoordinateSequence);
     }
+    
+    public void testGetFeatureReaderLake() throws IOException, IllegalFilterException {
+        Transaction t = new DefaultTransaction();
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        reader = dataStore.getFeatureReader(new DefaultQuery(tname("lake")), t);
+
+        assertNotNull(reader);
+        try {
+            assertTrue(reader.hasNext());
+            assertNotNull(reader.next());
+            assertFalse(reader.hasNext());
+        } finally {
+            reader.close();
+            t.close();
+        }
+    }
 
     public void testGetFeatureReaderFilterPrePost() throws IOException, IllegalFilterException {
         Transaction t = new DefaultTransaction();
@@ -1633,19 +1651,61 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
         return true;
     }
-    
-    protected boolean areReferencedEnvelopesEuqal(ReferencedEnvelope e1, ReferencedEnvelope e2) {
-    	
-    	if (e1==null && e2 ==null) return true;
-    	if (e1==null || e2 == null) return false;
-    	
-    	boolean equal = 
-    		e1.getMinX()==e2.getMinX() &&
-    		e1.getMinY()==e2.getMinY() &&
-    		e1.getMaxX()==e2.getMaxX() &&
-    		e1.getMaxY()==e2.getMaxY();
-    	
-    	if (!equal) return false;
-    	return areCRSEqual(e1.getCoordinateReferenceSystem(), e2.getCoordinateReferenceSystem());
-    }
+	public void testGeneralization() throws Exception {
+		FeatureSource<SimpleFeatureType, SimpleFeature> fs = dataStore.getFeatureSource("lake");
+		
+		if (fs.getSupportedHints().contains(Hints.GEOMETRY_GENERALIZATION)==false)
+			return;
+		
+		FeatureCollection<SimpleFeatureType,SimpleFeature> fColl = fs.getFeatures();
+		FeatureIterator<SimpleFeature> iterator =fColl.features();
+		Geometry original = null;
+		if (iterator.hasNext())
+			 original = (Geometry) iterator.next().getDefaultGeometry();
+		fColl.close(iterator);
+		
+		double width = original.getEnvelope().getEnvelopeInternal().getWidth();
+		
+	    DefaultQuery query = new DefaultQuery();
+	    Hints hints = new Hints(Hints.GEOMETRY_GENERALIZATION,width/2);        
+	    query.setHints(hints);        
+	    
+	    Geometry generalized = null;    	
+	    fColl = fs.getFeatures(query);
+		iterator =fColl.features();    	
+		if (iterator.hasNext())
+			 generalized = (Geometry) iterator.next().getDefaultGeometry();
+		fColl.close(iterator);
+	    
+	    assertTrue(original.getNumPoints()>=generalized.getNumPoints());
+	}
+
+	public void testSimplification() throws Exception {
+		FeatureSource<SimpleFeatureType, SimpleFeature> fs = dataStore.getFeatureSource("road");
+		
+		if (fs.getSupportedHints().contains(Hints.GEOMETRY_SIMPLIFICATION)==false)
+			return;
+		
+		FeatureCollection<SimpleFeatureType,SimpleFeature> fColl = fs.getFeatures();
+		FeatureIterator<SimpleFeature> iterator =fColl.features();
+		Geometry original = null;
+		if (iterator.hasNext())
+			 original = (Geometry) iterator.next().getDefaultGeometry();
+		fColl.close(iterator);
+		
+		double width = original.getEnvelope().getEnvelopeInternal().getWidth();
+		
+	    DefaultQuery query = new DefaultQuery();
+	    Hints hints = new Hints(Hints.GEOMETRY_SIMPLIFICATION,width/2);        
+	    query.setHints(hints);        
+	    
+	    Geometry simplified = null;    	
+	    fColl = fs.getFeatures(query);
+		iterator =fColl.features();    	
+		if (iterator.hasNext())
+			 simplified = (Geometry) iterator.next().getDefaultGeometry();
+		fColl.close(iterator);
+	    
+	    assertTrue(original.getNumPoints()>=simplified.getNumPoints());
+	}
 }

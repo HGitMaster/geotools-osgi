@@ -34,6 +34,8 @@
  */
 package org.geotools.gce.geotiff;
 
+import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -52,15 +54,14 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
-import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
+import org.geotools.gce.geotiff.adapters.GeoTiffIIOMetadataDecoder;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
-
-import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
+import org.opengis.referencing.operation.MathTransform;
 
 /**
  * Provides basic information about the GeoTIFF format IO. This is currently an
@@ -121,10 +122,6 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 */
 	public boolean accepts(Object o) {
 
-		//
-		// if (o instanceof CatalogEntry) {
-		// o = ((CatalogEntry) o).resource();
-		// }
 		if (o == null) {
 			return false;
 		}
@@ -181,9 +178,18 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 			
 
 		} catch (Throwable e) {
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
-			return false;
+		    try {
+        		    if (e instanceof IllegalArgumentException){
+        		        MathTransform raster2Model = GeoTiffReader.parseWorldFile(o);
+        		        if (raster2Model != null)
+        		            return true;
+        		    }
+		    } catch(Throwable e2){
+			
+		    }
+		    if (LOGGER.isLoggable(Level.FINE))
+                        LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
+		    return false;
 		} finally {
 			if (reader != null) {
 				try{
@@ -201,9 +207,8 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 			}
 		}
 		return true;
-
 	}
-
+	
 	/**
 	 * If <CODE>source</CODE> is a file, this will return a reader object.
 	 * This file does not use hints in the construction of the geotiff reader.
@@ -215,7 +220,6 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 */
 	public GridCoverageReader getReader(Object source) {
 		return getReader(source, null);
-
 	}
 
 	/**

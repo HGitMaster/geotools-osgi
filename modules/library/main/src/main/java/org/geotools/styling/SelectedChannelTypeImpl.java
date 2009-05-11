@@ -17,7 +17,6 @@
 package org.geotools.styling;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.style.StyleVisitor;
@@ -25,7 +24,7 @@ import org.opengis.style.StyleVisitor;
 /**
  * Default implementation of SelectedChannelType.
  * 
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/SelectedChannelTypeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/SelectedChannelTypeImpl.java $
  */
 public class SelectedChannelTypeImpl implements SelectedChannelType {
     private FilterFactory filterFactory;
@@ -36,7 +35,7 @@ public class SelectedChannelTypeImpl implements SelectedChannelType {
 
     
     public SelectedChannelTypeImpl(){
-        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
+        this( CommonFactoryFinder.getFilterFactory(null));
     }
 
     public SelectedChannelTypeImpl(FilterFactory factory) {
@@ -47,6 +46,12 @@ public class SelectedChannelTypeImpl implements SelectedChannelType {
     public SelectedChannelTypeImpl(FilterFactory factory, ContrastEnhancement contrast ) {
         filterFactory = factory;
         contrastEnhancement = contrast;
+    }
+
+    public SelectedChannelTypeImpl(org.opengis.style.SelectedChannelType gray) {
+        filterFactory = CommonFactoryFinder.getFilterFactory2(null);
+        name = gray.getChannelName();
+        contrastEnhancement = new ContrastEnhancementImpl( gray.getContrastEnhancement() );        
     }
 
     public String getChannelName() {

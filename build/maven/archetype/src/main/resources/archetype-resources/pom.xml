@@ -16,7 +16,7 @@
     <url>http://www.example.org</url>
     
     <!-- TODO: Change the library number dependency to be a soft link rather 
-         than a hard link to 2.6.0.osgi1 as it is here.                     -->
+         than a hard link to 2.6.0.osgi2 as it is here.                     -->
     <dependencies>
       <!--dependency>
         <groupId>junit</groupId>

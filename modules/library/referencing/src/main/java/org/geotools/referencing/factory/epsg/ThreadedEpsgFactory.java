@@ -81,8 +81,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <code>{@linkplain ReferencingFactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/ThreadedEpsgFactory.java $
- * @version $Id: ThreadedEpsgFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/ThreadedEpsgFactory.java $
+ * @version $Id: ThreadedEpsgFactory.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class ThreadedEpsgFactory extends DeferredAuthorityFactory
@@ -420,7 +420,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
         try {
             factory = createBackingStore0();
             if (factory instanceof DirectEpsgFactory) {
-                final DatabaseMetaData info = ((DirectEpsgFactory) factory).connection.getMetaData();
+                final DatabaseMetaData info = ((DirectEpsgFactory) factory).getConnection().getMetaData();
                 product = info.getDatabaseProductName();
                 url     = info.getURL();
             }

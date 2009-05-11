@@ -37,6 +37,7 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.feature.type.PropertyType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.Identifier;
 
@@ -383,7 +384,7 @@ public class Types {
      *                The possible parent type.
      * 
      */
-    public static boolean isSuperType(AttributeType type, AttributeType parent) {
+    public static boolean isSuperType(PropertyType type, PropertyType parent) {
         while (type.getSuper() != null) {
             type = type.getSuper();
             if (type.equals(parent))

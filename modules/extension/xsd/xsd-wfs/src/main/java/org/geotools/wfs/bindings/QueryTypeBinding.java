@@ -16,21 +16,24 @@
  */
 package org.geotools.wfs.bindings;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
+import net.opengis.wfs.QueryType;
 import net.opengis.wfs.WfsFactory;
 
 import org.geotools.wfs.WFS;
 import org.geotools.xml.AbstractComplexEMFBinding;
 
-
 /**
  * Binding object for the type http://www.opengis.net/wfs:QueryType.
- *
+ * 
  * <p>
- *
+ * 
  * <pre>
- *         <code>
+ *         &lt;code&gt;
  *  &lt;xsd:complexType name=&quot;QueryType&quot;&gt;
  *      &lt;xsd:annotation&gt;
  *          &lt;xsd:documentation&gt;
@@ -149,13 +152,14 @@ import org.geotools.xml.AbstractComplexEMFBinding;
  *          &lt;/xsd:annotation&gt;
  *      &lt;/xsd:attribute&gt;
  *  &lt;/xsd:complexType&gt;
- * </code>
- *         </pre>
- *
+ * &lt;/code&gt;
+ * </pre>
+ * 
  * </p>
- *
+ * 
  * @generated
  */
+@SuppressWarnings( { "nls", "unchecked" })
 public class QueryTypeBinding extends AbstractComplexEMFBinding {
     public QueryTypeBinding(WfsFactory factory) {
         super(factory);
@@ -166,5 +170,40 @@ public class QueryTypeBinding extends AbstractComplexEMFBinding {
      */
     public QName getTarget() {
         return WFS.QueryType;
+    }
+
+    /**
+     * Overrides to return the value of the "typeName" attribute as a single String instead of a
+     * List. Otherwise typeName gets encoded as the {@link QueryType#getTypeName()} toString's value
+     * which depends on the toString implementation of the internal java.util.List.
+     * <p>
+     * Also, if the requested property is "SortBy" and the QueryType has an empty sortby list,
+     * returns null to avoid encoding an empty sortBy list
+     * </p>
+     */
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        if ("typeName".equals(name.getLocalPart())) {
+            QueryType query = (QueryType) object;
+            List typeName = query.getTypeName();
+            StringBuilder typeNameList = new StringBuilder();
+            if (typeName != null) {
+                for (Iterator<String> it = typeName.iterator(); it.hasNext();) {
+                    typeNameList.append(it.next());
+                    if (it.hasNext()) {
+                        typeNameList.append(",");
+                    }
+                }
+            }
+            return typeNameList.toString();
+        } else if ("SortBy".equals(name.getLocalPart())) {
+            QueryType query = (QueryType) object;
+            List sortBy = query.getSortBy();
+            if (sortBy != null && sortBy.size() == 0) {
+                return null;
+            }
+        }
+
+        return super.getProperty(object, name);
     }
 }

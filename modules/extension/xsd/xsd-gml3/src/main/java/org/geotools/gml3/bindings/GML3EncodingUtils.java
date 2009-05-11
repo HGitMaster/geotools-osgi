@@ -18,26 +18,28 @@ package org.geotools.gml3.bindings;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.gml3.GML;
-import org.geotools.xlink.XLINK;
 import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.Encoder;
+import org.geotools.xml.Configuration;
+import org.geotools.xml.SchemaIndex;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 
 
@@ -45,7 +47,7 @@ import com.vividsolutions.jts.geom.LineString;
  * Utility class for gml3 encoding.
  *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
- *
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  */
 public class GML3EncodingUtils {
     static DirectPosition[] positions(LineString line) {
@@ -115,29 +117,8 @@ public class GML3EncodingUtils {
      *   <li>PolygonPropertyType
      * </ul>
      */
-    static Object getProperty( Geometry geometry, QName name ) {
-
-        if (GML._Geometry.equals(name) || GML.Point.equals( name ) || 
-            GML.LineString.equals( name ) || GML.Polygon.equals( name ) ) {
-            //if the geometry is null, return null
-            if ( isEmpty( geometry ) ) {
-                return null;
-            }
-            
-            return geometry;
-        }
-        
-        if (XLINK.HREF.equals(name)) {
-            //only process if geometry is empty
-            if ( isEmpty(geometry) ) {
-                String id = GML3EncodingUtils.getID( geometry );
-                if ( id != null ) {
-                    return "#" + id;
-                }
-            }
-        }
-
-        return null;
+    public static Object getProperty( Geometry geometry, QName name ) {
+        return GML2EncodingUtils.GeometryPropertyType_getProperty( geometry, name );
     }
     
     /**
@@ -150,39 +131,35 @@ public class GML3EncodingUtils {
      *   <li>PolygonPropertyType
      * </ul>
      */
-    static List getProperties(Geometry geometry) {
-
-        String id = GML3EncodingUtils.getID( geometry );
-        
-        if ( !isEmpty(geometry) && id != null ) {
-            // return a comment which is hte xlink href
-            return Collections.singletonList(new Object[] { Encoder.COMMENT, "#" +id });            
-        }
-        
-        return null;
-    }
-    
-    static boolean isEmpty( Geometry geometry ) {
-        if ( geometry.isEmpty() ) {
-            //check for case of multi geometry, if it has > 0 goemetries 
-            // we consider this to be not empty
-            if ( geometry instanceof GeometryCollection ) {
-                if ( ((GeometryCollection) geometry).getNumGeometries() != 0 ) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        
-        return false;
+    public static List getProperties(Geometry geometry) {
+        return GML2EncodingUtils.GeometryPropertyType_getProperties(geometry);
     }
     
     public static Element AbstractFeatureType_encode(Object object, Document document, Element value) {
-        return GML2EncodingUtils.AbstractFeatureType_encode(object, document, value);
+        Feature feature = (Feature) object;
+        Name typeName;
+        if (feature.getDescriptor() == null) {
+            // no descriptor, assume WFS feature type name is the same as the name of the content
+            // model type
+            typeName = feature.getType().getName();
+        } else {
+            // honour the name set in the descriptor
+            typeName = feature.getDescriptor().getName();
+        }
+        Element encoding = document.createElementNS(typeName.getNamespaceURI(), typeName
+                .getLocalPart());
+        encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getIdentifier().getID());
+        return encoding;
     }
 
     public static Object AbstractFeatureType_getProperty(Object object,
-            QName name) {
-        return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name);
+            QName name, Configuration configuration) {
+        return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name, configuration);
     }
+    
+    public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex) {
+        return GML2EncodingUtils.AbstractFeatureType_getProperties(object, element, schemaIndex,
+            new HashSet<String>(Arrays.asList("name","description","boundedBy","location","metaDataProperty")));
+    }
+   
 }

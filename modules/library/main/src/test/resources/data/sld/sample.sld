@@ -85,6 +85,9 @@ A styling layer used for the unit tests of sldstyler
         <Rule>
         
         <LineSymbolizer>
+          <geometry>
+             <PropertyName>the_geom</PropertyName>
+          </geometry>
            <!-- A stroke describes how the line looks -->
           <Stroke>
             <!-- the CssParameters describe the actual style 

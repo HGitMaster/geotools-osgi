@@ -102,6 +102,16 @@ public class MemoryDataStoreTest extends DataTestCase {
         super.tearDown();
     }
 
+    public void testEmpty() throws Exception {
+        SimpleFeatureType type = DataUtilities.createType("namespace.typename",
+        "name:String,id:0,geom:MultiLineString");
+        MemoryDataStore memory = new MemoryDataStore( type );
+        
+        FeatureSource source = memory.getFeatureSource( "typename");
+        assertEquals( 0, source.getCount(Query.ALL) );
+        
+    }
+    
     public void testFixture() throws Exception {
         SimpleFeatureType type = DataUtilities.createType("namespace.typename",
                 "name:String,id:0,geom:MultiLineString");

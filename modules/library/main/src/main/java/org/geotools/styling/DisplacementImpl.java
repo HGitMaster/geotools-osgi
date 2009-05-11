@@ -31,8 +31,8 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/DisplacementImpl.java $
- * @version $Id: DisplacementImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/DisplacementImpl.java $
+ * @version $Id: DisplacementImpl.java 32784 2009-04-13 10:50:27Z jive $
  */
 public class DisplacementImpl implements Displacement, Cloneable {
     /** The logger for the default core module. */
@@ -54,6 +54,12 @@ public class DisplacementImpl implements Displacement, Cloneable {
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultDisplacement: " + ife);
         }
+    }
+
+    public DisplacementImpl(Expression dx, Expression dy) {
+        filterFactory = CommonFactoryFinder.getFilterFactory2(null);
+        displacementX = dx;
+        displacementY = dy;
     }
 
     public void setFilterFactory(FilterFactory factory) {

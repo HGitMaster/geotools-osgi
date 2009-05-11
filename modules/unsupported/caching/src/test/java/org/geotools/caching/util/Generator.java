@@ -18,30 +18,28 @@ package org.geotools.caching.util;
 
 import java.net.URI;
 import java.util.Random;
+
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.Query;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.Query;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
-import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.filter.FilterFactoryImpl;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
 
 
 public class Generator {
-    public static final FeatureType type;
+    public static final SimpleFeatureType type;
     private static final GeometryFactory gfact;
     private final static Random srand;
     private static final FilterFactory filterFactory;
@@ -51,21 +49,33 @@ public class Generator {
         srand = new Random();
         filterFactory = new FilterFactoryImpl();
 
-        FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("test");
-        GeometricAttributeType geom = new GeometricAttributeType("geom", Geometry.class, true,
-                null, DefaultEngineeringCRS.GENERIC_2D, Filter.INCLUDE);
-        AttributeType dummydata = DefaultAttributeTypeFactory.newAttributeType("dummydata",
-                String.class);
-        builder.addType(geom);
-        builder.addType(dummydata);
-        builder.setDefaultGeometry(geom);
-        builder.setNamespace(URI.create("testStore"));
+                
+//        List<Filter> filters = new ArrayList<Filter>();
+//        filters.add(Filter.INCLUDE);
+//        
+//        GeometryTypeImpl geom = new GeometryTypeImpl("geom", Geometry.class, DefaultEngineeringCRS.GENERIC_2D, true, false, filters,null,null);
+////        GeometricAttributeType geom = new GeometricAttributeType("geom", Geometry.class, true,
+////                null, DefaultEngineeringCRS.GENERIC_2D, Filter.INCLUDE);
+//        AttributeType dummydata = DefaultAttributeTypeFactory.newAttributeType("dummydata",
+//                String.class);
+//        builder.addType(geom);
+//        builder.addType(dummydata);
+//        builder.setDefaultGeometry(geom);
+//        builder.setNamespace(URI.create("testStore"));
+        
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();        
+        builder.setName("test");       
+        
+        builder.add("geom", Geometry.class, DefaultEngineeringCRS.GENERIC_2D);
+        builder.setNamespaceURI(URI.create("testStore"));
+        builder.setDefaultGeometry("geom");
 
-        try {
-            type = builder.getFeatureType();
-        } catch (SchemaException e) {
-            throw (RuntimeException) new RuntimeException().initCause(e);
-        }
+        builder.add("dummydata", String.class);
+//        try {
+            type = builder.buildFeatureType();
+//        } catch (SchemaException e) {
+//            throw (RuntimeException) new RuntimeException().initCause(e);
+//        }
     }
 
     private final Random rand;
@@ -154,20 +164,16 @@ public class Generator {
         return new LineString(cs, gfact);
     }
 
-    public Feature createFeature(int i) {
+    public SimpleFeature createFeature(int i) {
         //Geometry g = createRectangle(xrange * rand.nextDouble(), yrange * rand.nextDouble(),
         //        xrange * rand.nextDouble(), yrange * rand.nextDouble());
         Geometry g = createGeometry();
         String dummydata = "Id: " + i;
-        Feature f = null;
+        SimpleFeature f = null;
 
-        try {
-            f = type.create(new Object[] { g, dummydata });
-
-            return f;
-        } catch (IllegalAttributeException e) {
-            throw (RuntimeException) new RuntimeException().initCause(e);
-        }
+       	SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
+       	f= builder.buildFeature(dummydata, new Object[]{g, dummydata});
+        return f;
     }
 
     public static Coordinate pickRandomPoint(Coordinate center, double xrange, double yrange) {
@@ -182,8 +188,11 @@ public class Generator {
         double x_max = center.x + (xrange / 2);
         double y_min = center.y - (yrange / 2);
         double y_max = center.y + (yrange / 2);
-        Filter bb = filterFactory.bbox(type.getPrimaryGeometry().getLocalName(), x_min, y_min,
-                x_max, y_max, type.getPrimaryGeometry().getCoordinateSystem().toString());
+        String localname = type.getGeometryDescriptor().getLocalName();
+        String srs = type.getGeometryDescriptor().getCoordinateReferenceSystem().toString();
+        
+        Filter bb = filterFactory.bbox(localname, x_min, y_min,
+                x_max, y_max, srs);
 
         return new DefaultQuery(type.getTypeName(), bb);
     }
@@ -193,13 +202,16 @@ public class Generator {
         double x_max = center.x + (xrange / 2);
         double y_min = center.y - (yrange / 2);
         double y_max = center.y + (yrange / 2);
-        Filter bb = filterFactory.bbox(type.getPrimaryGeometry().getLocalName(), x_min, y_min,
-                x_max, y_max, type.getPrimaryGeometry().getCoordinateSystem().toString());
+        String localname = type.getGeometryDescriptor().getLocalName();
+        String srs = type.getGeometryDescriptor().getCoordinateReferenceSystem().toString();
+        
+        Filter bb = filterFactory.bbox(localname, x_min, y_min,
+                x_max, y_max, srs);
 
         return bb;
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return type;
     }
 }

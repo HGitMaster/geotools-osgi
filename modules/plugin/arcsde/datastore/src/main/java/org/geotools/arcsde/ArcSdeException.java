@@ -26,10 +26,11 @@ import com.esri.sde.sdk.client.SeException;
  * that otherwise get hidden in a normal stack trace.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: ArcSdeException.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: ArcSdeException.java 32195 2009-01-09 19:00:35Z groldan $
  * @since 2.5
  * @URL $URL:
- *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/ArcSdeException.java $
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *      /org/geotools/arcsde/ArcSdeException.java $
  */
 public class ArcSdeException extends DataSourceException {
 

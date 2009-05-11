@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  * out since both renderers do use the same painting logic.
  * 
  * @author Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/StyledShapePainter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/StyledShapePainter.java $
  */
 public final class StyledShapePainter {
 	private final static AffineTransform IDENTITY_TRANSFORM = new AffineTransform();
@@ -167,19 +167,20 @@ public final class StyledShapePainter {
 					Paint paint = ps2d.getFill();
 
 					if (paint instanceof TexturePaint) {
-						TexturePaint tp = (TexturePaint) paint;
-						BufferedImage image = tp.getImage();
-						Rectangle2D rect = tp.getAnchorRect();
-						AffineTransform at = graphics.getTransform();
-						double width = rect.getWidth() * at.getScaleX();
-						double height = -1.0 * rect.getHeight()
-								* at.getScaleY();// DJB: -1 because its
-						// flipped upside down by
-						// default. This flips it
-						// up.
-						Rectangle2D scaledRect = new Rectangle2D.Double(0, 0,
-								width, height);
-						paint = new TexturePaint(image, scaledRect);
+//						TexturePaint tp = (TexturePaint) paint;
+//						BufferedImage image = tp.getImage();
+//						Rectangle2D rect = tp.getAnchorRect();
+//						AffineTransform at = graphics.getTransform();
+//						double width = rect.getWidth() * at.getScaleX();
+//						double height = -1.0 * rect.getHeight()
+//								* at.getScaleY();// DJB: -1 because its
+//						// flipped upside down by
+//						// default. This flips it
+//						// up.
+//						Rectangle2D scaledRect = new Rectangle2D.Double(0, 0,
+//								width, height);
+//						paint = new TexturePaint(image, scaledRect);
+					    paint = (TexturePaint) paint;
 					}
 
 					graphics.setPaint(paint);
@@ -436,6 +437,7 @@ public final class StyledShapePainter {
 		graphics.setTransform(markAT);
 		graphics.setComposite(AlphaComposite.getInstance(
 				AlphaComposite.SRC_OVER, opacity));
+		
 
 		// we moved the origin to the middle of the image.
 		if(leftMiddle) {

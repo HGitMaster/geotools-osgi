@@ -63,9 +63,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XPath.java 31723 2008-10-28 06:51:03Z bencd $
- * @source $URL:
- *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/filter/XPath.java $
+ * @author Rini Angreani, Curtin University of Technology
+ * @version $Id: XPath.java 32813 2009-04-17 02:45:24Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/XPath.java $
  * @since 2.4
  */
 public class XPath {
@@ -458,11 +458,11 @@ public class XPath {
      * @param value
      *                the value of the attribute addressed by <code>xpath</code>
      * @param id
-     *                the identifier of the attribute addressed by <code>xpath</code>, might be
-     *                <code>null</code>
+     *            the identifier of the attribute addressed by <code>xpath</code>, might be
+     *            <code>null</code>
      * @param targetNodeType
-     *                the expected type of the attribute addressed by <code>xpath</code>, or
-     *                <code>null</code> if unknown
+     *            the expected type of the attribute addressed by <code>xpath</code>, or
+     *            <code>null</code> if unknown
      * @return
      */
     public Attribute set(final Attribute att, final StepList xpath, Object value, String id,
@@ -594,9 +594,15 @@ public class XPath {
         final Name attributeName = descriptor.getName();
         Object currStepValue = parent.getProperties(attributeName);
         if (currStepValue instanceof Collection) {
-            List values = new ArrayList((Collection) currStepValue);
-            if (values.size() >= index) {
+            List <Attribute> values = new ArrayList((Collection) currStepValue);
+            if (convertedValue == null && values.size() >= index) {
                 leafAttribute = (Attribute) values.get(index - 1);
+            }
+            for (Attribute stepValue : values) {
+                // eliminate duplicates in case the values come from denormalized view..
+                if (stepValue.getValue().equals(convertedValue)) {
+                    return stepValue;
+                }
             }
         } else if (currStepValue instanceof Attribute) {
             leafAttribute = (Attribute) currStepValue;
@@ -636,15 +642,14 @@ public class XPath {
     private Object convertValue(final AttributeDescriptor descriptor, final Object value) {
         final AttributeType type = descriptor.getType();
         Class<?> binding = type.getBinding();
-        if (type instanceof ComplexType && isSimpleContentType(type) && binding == Collection.class) {
-            return new ArrayList<Property>() {
-                {
-                    add(buildSimpleContent(type, value));
-                }
-            };
-        } else {
-            return FF.literal(value).evaluate(value, binding);
+        if (type instanceof ComplexType && binding == Collection.class) {
+            if (isSimpleContentType(type)) {
+                ArrayList<Property> list = new ArrayList<Property>();
+                list.add(buildSimpleContent(type, value));
+                return list;
+            } 
         }
+        return FF.literal(value).evaluate(value, binding);
     }
 
     /**
@@ -698,7 +703,19 @@ public class XPath {
         Name name = new NameImpl(null, "simpleContent");
         AttributeDescriptor descriptor = new AttributeDescriptorImpl(simpleContentType, name, 1, 1,
                 true, (Object) null);
-        return new AttributeImpl(convertedValue, descriptor, null);
+        return new AttributeImpl(convertedValue, descriptor, null) {
+            /*
+             * FIXME: this is an ugly hack. Here we rely on the Encoder fallback behaviour to encode
+             * simpleContent. Without this, the default toString() is used, and programmer debugging
+             * information is encoded into XML. Furthermore, the contained angle brackets break XML
+             * well-formedness as well as being garbage. This should be done properly when correct
+             * handling of complexType with simpleContent is implemented.
+             */
+            @Override
+            public String toString() {
+                return getValue().toString();
+            }
+        };
     }
 
     public boolean isComplexType(final StepList attrXPath, final AttributeDescriptor featureType) {

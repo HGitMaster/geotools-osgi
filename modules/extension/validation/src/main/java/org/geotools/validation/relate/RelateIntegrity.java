@@ -20,14 +20,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * RelateIntegrity<br>
  * @author bowens<br>
  * Created Apr 27, 2004<br>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelateIntegrity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelateIntegrity.java $
  * @version <br>
  * 
  * <b>Puropse:</b><br>
@@ -155,11 +155,7 @@ public class RelateIntegrity extends RelationIntegrity
 	{
 		boolean success = true;
 	
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
-
-		//JD: fix this!!
-		//filter = (Filter) ff.createBBoxExpression(bBox);
 
 		FeatureCollection<SimpleFeatureType, SimpleFeature> collectionA = featureSourceA.getFeatures(filter);
 		FeatureCollection<SimpleFeatureType, SimpleFeature> collectionB = featureSourceB.getFeatures(filter);
@@ -248,11 +244,7 @@ public class RelateIntegrity extends RelationIntegrity
 	{
 		boolean success = true;
 	
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
-
-		//JD: fix this!!
-		//filter = (Filter) ff.createBBoxExpression(bBox);
 
 		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = featureSourceA.getFeatures(filter);
 	

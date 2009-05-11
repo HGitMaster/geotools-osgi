@@ -29,9 +29,10 @@ import org.geotools.arcsde.pool.ISession;
  * Qualifies a column reference in an order by clause
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: OrderByElementQualifier.java 30722 2008-06-13 18:15:42Z acuster $
+ * @version $Id: OrderByElementQualifier.java 32195 2009-01-09 19:00:35Z groldan $
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/OrderByElementQualifier.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
+ *         /org/geotools/arcsde/data/view/OrderByElementQualifier.java $
  * @since 2.3.x
  */
 public class OrderByElementQualifier implements OrderByVisitor {
@@ -46,7 +47,8 @@ public class OrderByElementQualifier implements OrderByVisitor {
     /**
      * Creates a new OrderByElementQualifier object.
      * 
-     * @param session DOCUMENT ME!
+     * @param session
+     *            DOCUMENT ME!
      */
     private OrderByElementQualifier(ISession session, Map tableAliases) {
         this.session = session;
@@ -56,8 +58,10 @@ public class OrderByElementQualifier implements OrderByVisitor {
     /**
      * DOCUMENT ME!
      * 
-     * @param session DOCUMENT ME!
-     * @param orderBy DOCUMENT ME!
+     * @param session
+     *            DOCUMENT ME!
+     * @param orderBy
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
      */
     public static OrderByElement qualify(ISession session, Map tableAliases, OrderByElement orderBy) {
@@ -74,7 +78,8 @@ public class OrderByElementQualifier implements OrderByVisitor {
     /**
      * DOCUMENT ME!
      * 
-     * @param orderBy DOCUMENT ME!
+     * @param orderBy
+     *            DOCUMENT ME!
      */
     public void visit(OrderByElement orderBy) {
         OrderByElement qualifiedOrderBy = new OrderByElement();

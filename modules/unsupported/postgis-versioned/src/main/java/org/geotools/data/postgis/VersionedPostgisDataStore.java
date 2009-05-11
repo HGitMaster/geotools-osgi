@@ -608,9 +608,9 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      * @throws NoSuchElementException
      */
     public ModifiedFeatureIds getModifiedFeatureFIDs(String typeName, String version1,
-            String version2, Filter filter, String[] users, Transaction transaction) throws IOException {
-        if(filter == null)
-            filter = Filter.INCLUDE;
+            String version2, Filter originalFilter, String[] users, Transaction transaction) throws IOException {
+        if(originalFilter == null)
+            originalFilter = Filter.INCLUDE;
         RevisionInfo r1 = new RevisionInfo(version1);
         RevisionInfo r2 = new RevisionInfo(version2);
 
@@ -622,6 +622,9 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             r1 = r2;
             r2 = tmp;
         }
+        
+        // version enable the filter
+        Filter filter = transformFidFilter(typeName, originalFilter);
         
         // gather the minimum revision at which it makes sense to check for changes
         // then check if it makes sense to have any result, and limit the minimum rev

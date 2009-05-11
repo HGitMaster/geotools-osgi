@@ -17,8 +17,8 @@
 package org.geotools.filter.spatial;
 
 import org.geotools.filter.AttributeExpressionImpl;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.GeometryFilterImpl;
+import org.geotools.filter.BBoxExpressionImpl;
+import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterVisitor;
@@ -31,8 +31,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 
-public class BBOXImpl extends GeometryFilterImpl implements BBOX {
+public class BBOXImpl extends AbstractPreparedGeometryFilter implements BBOX {
 
 	double minx,miny,maxx,maxy;	
 	String srs;
@@ -46,6 +47,12 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 		    setExpression1(e1);
 		if(e2 != null)
 		    setExpression2(e2);
+	}
+
+	public BBOXImpl(FilterFactoryImpl factory, Expression name,
+			double minx, double miny, double maxx, double maxy, String srs) {
+		this(factory, name, factory.createBBoxExpression(new Envelope(minx,maxx,miny,maxy)));
+		this.srs=srs;
 	}
 
 	public String getPropertyName() {
@@ -70,6 +77,9 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 		return srs;
 	}
 	
+	/**
+	 * @deprecated use the constructor or setExpression2
+	 */
 	public void setSRS(String srs) {
 		this.srs = srs;
 	}
@@ -78,42 +88,84 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 		return minx;
 	}
 	
+	/**
+	 * @deprecated use the constructor or setExpression2
+	 */
 	public void setMinX(double minx) {
 		this.minx = minx;
+		updateExpression2();
 	}
 
 	public double getMinY() {
 		return miny;
 	}
 
+	/**
+	 * @deprecated use the constructor or setExpression2
+	 */
 	public void setMinY(double miny) {
 		this.miny = miny;
+		updateExpression2();
 	}
 	
 	public double getMaxX() {
 		return maxx;
 	}
 	
+	/**
+	 * @deprecated use the constructor or setExpression2
+	 */
 	public void setMaxX(double maxx) {
 		this.maxx = maxx;
+		updateExpression2();
 	}
 
 	public double getMaxY() {
 		return maxy;
 	}
 	
+	/**
+	 * @deprecated use the constructor or setExpression2
+	 */
 	public void setMaxY(double maxy) {
 		this.maxy = maxy;
+		updateExpression2();
 	}
-            
+
+	private void updateExpression2() {
+		// this is temporary until set...XY are removed
+		setExpression2(new BBoxExpressionImpl(new Envelope(minx,maxx,miny,maxy)){});
+	}
+
 	public boolean evaluate(Object feature) {
 		if (feature instanceof SimpleFeature && !validate((SimpleFeature)feature))
 			return false;
-		
-		Geometry left = getLeftGeometry(feature);
-		Geometry right = getRightGeometry(feature);
-		
-		Envelope envLeft = left.getEnvelopeInternal();
+		  Geometry left;
+		Geometry right;
+		switch (literals) {
+	        case BOTH:
+	            return cacheValue;
+	        case RIGHT: {
+	    		left = getLeftGeometry(feature);
+	    		right = getRightGeometry(feature);
+	    		
+	            return preppedEvaluate(rightPreppedGeom, left);
+	        }
+	        case LEFT: {
+	    		left = getLeftGeometry(feature);
+	    		right = getRightGeometry(feature);
+	            return preppedEvaluate(leftPreppedGeom, right);
+	        }
+	        default: {
+	            left = getLeftGeometry(feature);
+	            right = getRightGeometry(feature);
+	            return basicEvaluate(left, right);
+	        }
+        }
+	}
+
+    protected boolean basicEvaluate(Geometry left, Geometry right) {
+        Envelope envLeft = left.getEnvelopeInternal();
 		Envelope envRight = right.getEnvelopeInternal();
 		
 		 if(envRight.contains(envLeft) || envLeft.contains(envRight)) {
@@ -127,7 +179,24 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
          // Note that this is a pretty permissive logic
          //  if the type has somehow been mis-set (can't happen externally)
          //  then true is returned in all cases
-	}
+    }
+	
+    private boolean preppedEvaluate(PreparedGeometry prepped, Geometry other) {
+        Envelope envLeft = prepped.getGeometry().getEnvelopeInternal();
+		Envelope envRight = other.getEnvelopeInternal();
+		
+		 if(envRight.contains(envLeft) || envLeft.contains(envRight)) {
+             return true;
+         } else if(envRight.intersects(envLeft)) {
+             return prepped.intersects(other);
+         } else {
+             return false;
+         }
+
+         // Note that this is a pretty permissive logic
+         //  if the type has somehow been mis-set (can't happen externally)
+         //  then true is returned in all cases
+    }
 	
 	public Object accept(FilterVisitor visitor, Object extraData) {
 		return visitor.visit(this,extraData);
@@ -167,8 +236,12 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
     	        else if( value instanceof Geometry ){
     	            Geometry geom = (Geometry) value;
     	            env = geom.getEnvelopeInternal();
-    	            if( geom.getUserData() != null && geom.getUserData() instanceof String){
-    	                srs = (String) geom.getUserData();
+    	            if( geom.getUserData() != null){
+    	                if(geom.getUserData() instanceof String){
+    	                    srs = (String) geom.getUserData();
+    	                }else if (geom.getUserData() instanceof CoordinateReferenceSystem) {
+                            srs = CRS.toSRS((CoordinateReferenceSystem) geom.getUserData());
+                        }
     	            }
                 }
     	        else {

@@ -18,8 +18,6 @@ package org.geotools.jdbc;
 
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.dbcp.BasicDataSource;
 
 public class JDBCDelegatingTestSetup extends JDBCTestSetup {
@@ -31,9 +29,14 @@ public class JDBCDelegatingTestSetup extends JDBCTestSetup {
     }
 
     public void setUp() throws Exception {
-        super.setUp();
-        
+        // make sure we don't forget to run eventual extra stuff
         delegate.setUp();
+    }
+    
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        delegate.tearDown();
     }
     
     protected final void initializeDatabase() throws Exception {
@@ -63,4 +66,5 @@ public class JDBCDelegatingTestSetup extends JDBCTestSetup {
     protected String attributeName(String raw) {
         return delegate.attributeName(raw);
     }
+    
 }

@@ -17,7 +17,10 @@
  */
 package org.geotools.arcsde.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
@@ -35,7 +38,7 @@ import com.esri.sde.sdk.client.SeTable;
 
 /**
  * @author Gabriel Roldan (TOPP)
- * @version $Id: FIDReaderTest.java 31197 2008-08-20 20:56:42Z groldan $
+ * @version $Id: FIDReaderTest.java 32669 2009-03-23 16:12:41Z groldan $
  * @since 2.5.x
  */
 public class FIDReaderTest {
@@ -83,7 +86,8 @@ public class FIDReaderTest {
 
     /**
      * Test method for
-     * {@link org.geotools.arcsde.data.FIDReader#getFidReader(org.geotools.arcsde.pool.ISession, com.esri.sde.sdk.client.SeTable, com.esri.sde.sdk.client.SeLayer, com.esri.sde.sdk.client.SeRegistration)}.
+     * {@link org.geotools.arcsde.data.FIDReader#getFidReader(org.geotools.arcsde.pool.ISession, com.esri.sde.sdk.client.SeTable, com.esri.sde.sdk.client.SeLayer, com.esri.sde.sdk.client.SeRegistration)}
+     * .
      * 
      * @throws IOException
      */
@@ -106,13 +110,14 @@ public class FIDReaderTest {
         assertNotNull(fidReader);
         assertTrue(fidReader instanceof FIDReader.ShapeFidReader);
         assertEquals(-1, fidReader.getColumnIndex());
-        assertEquals("GEOM.fid", fidReader.getFidColumn());
+        //use toUpperCase, case may be different depending on the backend rdbms
+        assertEquals("GEOM.FID", fidReader.getFidColumn().toUpperCase());
     }
 
     private FIDReader getFidReader(String tableName) throws IOException {
         FIDReader fidReader;
         String dbName = session.getDatabaseName();
-        tableName = dbName == null ? "" : (dbName + ".") + session.getUser() + "." + tableName;
+        tableName = ((dbName == null || "".equals(dbName)) ? "" : (dbName + ".")) + session.getUser() + "." + tableName;
         tableName = tableName.toUpperCase();
 
         SeTable table = session.getTable(tableName);
@@ -132,8 +137,7 @@ public class FIDReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.geotools.arcsde.data.FIDReader#setColumnIndex(int)}.
+     * Test method for {@link org.geotools.arcsde.data.FIDReader#setColumnIndex(int)}.
      */
     @Test
     @Ignore
@@ -142,8 +146,7 @@ public class FIDReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.geotools.arcsde.data.FIDReader#getColumnIndex()}.
+     * Test method for {@link org.geotools.arcsde.data.FIDReader#getColumnIndex()}.
      */
     @Test
     @Ignore
@@ -163,7 +166,8 @@ public class FIDReaderTest {
 
     /**
      * Test method for
-     * {@link org.geotools.arcsde.data.FIDReader#getPropertiesToFetch(org.opengis.feature.simple.SimpleFeatureType)}.
+     * {@link org.geotools.arcsde.data.FIDReader#getPropertiesToFetch(org.opengis.feature.simple.SimpleFeatureType)}
+     * .
      */
     @Test
     @Ignore

@@ -40,7 +40,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * reached.
  *
  * @author Chris Holmes
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/DefaultQuery.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/DefaultQuery.java $
  */
 public class DefaultQuery implements Query {
     /** The properties to fetch */
@@ -333,6 +333,15 @@ public class DefaultQuery implements Query {
         this.typeName = typeName;
     }
 
+    /**
+     * Set the namespace of the type name.
+     * 
+     * @param namespace namespace of the type name
+     */
+    public void setNamespace(URI namespace) {
+        this.namespace = namespace;
+    }
+    
     /**
      * The handle attribute is included to allow a client to associate  a
      * mnemonic name to the Query request. The purpose of the handle attribute

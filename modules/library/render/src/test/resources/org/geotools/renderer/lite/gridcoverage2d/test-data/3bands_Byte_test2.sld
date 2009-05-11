@@ -14,16 +14,16 @@ http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd" version="1.0.0">
 	        <FeatureTypeName>Feature</FeatureTypeName>
 			<Rule>
 				<RasterSymbolizer>
-					<ColorMap type="ramp" extended="false">
-						<ColorMapEntry color="#ff0000" quantity="0.1" opacity="1.0"/>
-						<ColorMapEntry color="#00ff00" quantity="50.0" opacity="0.8"/>
-						<ColorMapEntry color="#0000ff" quantity="200.0" opacity="0.05"/>
-					</ColorMap>
 					<ChannelSelection>
 						<GrayChannel>
 							<SourceChannelName>1</SourceChannelName>
 						</GrayChannel>
 					</ChannelSelection>
+					<ColorMap type="ramp" extended="false">
+						<ColorMapEntry color="#ff0000" quantity="0.1" opacity="1.0"/>
+						<ColorMapEntry color="#00ff00" quantity="50.0" opacity="0.8"/>
+						<ColorMapEntry color="#0000ff" quantity="200.0" opacity="0.05"/>
+					</ColorMap>					
 				    <Opacity>1.0</Opacity>
 				</RasterSymbolizer>
 			</Rule>

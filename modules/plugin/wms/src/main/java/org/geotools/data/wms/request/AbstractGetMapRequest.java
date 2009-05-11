@@ -27,14 +27,14 @@ import org.apache.commons.lang.StringUtils;
 import org.geotools.data.ows.AbstractRequest;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
-import org.opengis.layer.Style;
+import org.geotools.data.ows.StyleImpl;
 
 /**
  * @author Richard Gould
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/wms/src/main/java/org/geotools/data/wms/request/AbstractGetMapRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/wms/src/main/java/org/geotools/data/wms/request/AbstractGetMapRequest.java $
  */
 public abstract class AbstractGetMapRequest extends AbstractWMSRequest implements GetMapRequest {
 
@@ -122,7 +122,7 @@ public abstract class AbstractGetMapRequest extends AbstractWMSRequest implement
         styles.push(style);
     }
     
-    public void addLayer( Layer layer, Style style) {
+    public void addLayer( Layer layer, StyleImpl style) {
     	if (style == null) {
     		addLayer(layer.getName(), "");
     		return;
@@ -130,7 +130,7 @@ public abstract class AbstractGetMapRequest extends AbstractWMSRequest implement
     	addLayer(layer.getName(), style.getName());
     }
     
-    public void addLayer( String layerName, Style style) {
+    public void addLayer( String layerName, StyleImpl style) {
     	if (style == null) {
     		addLayer(layerName, "");
     		return;
