@@ -59,6 +59,7 @@
               com.sun.media.jai.operator,
               com.sun.medialib.codec.*
             </Export-Package> 
+            <Private-Package>org.geotools.thirdparty.jai.imageio</Private-Package>
             <Import-Package>!sun.*,*</Import-Package> 
           </instructions>
           <unpackBundle>true</unpackBundle>
