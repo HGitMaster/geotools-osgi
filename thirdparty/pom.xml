@@ -36,6 +36,8 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
+    <module>de.berlios.it.geosolutions.imageio.ext.tiff</module>
+    <module>de.berlios.it.geosolutions.imageio.ext.utilities</module>
     <module>javax.media.jai.osgi</module>
     <module>javax.media.jai.osgi.linux.x86_64</module>
     <module>javax.media.jai.osgi.win32.x86</module>
