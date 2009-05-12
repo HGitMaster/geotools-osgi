@@ -20,6 +20,6 @@ Import-Package: com.vividsolutions.jts.geom,
 Export-Package: org.geotools.filter.function,
  org.geotools.filter.text.commons,
  org.geotools.filter.text.cql2,
- org.geotools.filter.text.generated.parsers,
- org.geotools.filter.text.txt
+ org.geotools.filter.text.ecql,
+ org.geotools.filter.text.generated.parsers
 Bundle-Vendor: Harman/Becker

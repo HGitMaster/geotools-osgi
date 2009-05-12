@@ -225,20 +225,19 @@
   </dependencies>
   
   <build>
-	<plugins>
-		<plugin>
-			<artifactId>maven-jar-plugin</artifactId>
-			<configuration>
-				<archive>
-					<manifestFile>META-INF/MANIFEST.MF</manifestFile>
-                  <manifest>
-                     <addClasspath>false</addClasspath>
-                  </manifest>
-				</archive>
-			</configuration>
-		</plugin>
-	</plugins>
-</build>
-  
+		<plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+						<manifest>
+						  <addClasspath>false</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+  </build>  
 
 </project>
