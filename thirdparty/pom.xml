@@ -43,6 +43,7 @@
     <module>javax.media.jai.osgi.linux.x86_64</module>
     <module>javax.media.jai.osgi.win32.x86</module>
     <module>javax.media.jai.osgi.imageio</module>
+    <module>javax.media.jai.osgi.imageio.linux.x86_64</module>
     <module>java3d.osgi</module>
     <module>com.vividsolutions.osgi.jts</module>
     <module>org.apache.batik.osgi.transcoder</module>

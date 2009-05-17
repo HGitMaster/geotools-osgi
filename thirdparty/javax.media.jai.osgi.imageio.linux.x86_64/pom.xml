@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>javax.media.jai.osgi</groupId>
+  <artifactId>javax.media.jai.osgi.imageio.linux.x86_64</artifactId>
+  <packaging>bundle</packaging>
+  <name>JAI ImageIO Linux x86_64 Native Libs</name>
+  <version>1.1</version>
+  <description>Java Advanced Imaging</description>
+
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>thirdparty</artifactId>
+    <version>2.6.0.osgi1</version>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>javax.media.jai.osgi</groupId>
+      <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
+      <version>1.1</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>javax.media.jai.osgi.imageio.linux.x86_64</Bundle-SymbolicName>
+            <Fragment-Host>javax.media.jai.osgi.jai_imageio</Fragment-Host>
+            <Bundle-DocURL>http://download.java.net/media/jai-imageio/javadoc/1.1/index.html</Bundle-DocURL>
+            <Bundle-Vendor>Harman/Becker</Bundle-Vendor>
+            <Bundle-NativeCode>libclib_jiio.so; osname=linux; processor=x86_64</Bundle-NativeCode>
+            <!-- Override the default of * to suppress a warning -->  
+            <Import-Package></Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+	<configuration>
+	  <archive>
+	    <manifest>
+	      <addClasspath>false</addClasspath>
+	    </manifest>
+	  </archive>
+	</configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <licenses>
+    <license>
+      <name>BSD</name>
+    </license>
+  </licenses>
+
+</project>
+
+
