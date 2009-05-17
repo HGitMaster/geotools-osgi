@@ -127,7 +127,7 @@ abstract class JDBCAccessBase implements JDBCAccess {
             initFromDB(config.getCoverageName(), con);
             calculateExtentsFromDB(config.getCoverageName(), con);
             calculateResolutionsFromDB(config.getCoverageName(), con);
-//            con.commit();
+            con.commit();
             con.close();
 
             for (ImageLevelInfo levelInfo : levelInfos) {
@@ -137,7 +137,7 @@ abstract class JDBCAccessBase implements JDBCAccess {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
 
             try {
-                //con.rollback();
+                con.rollback();
                 con.close();
             } catch (SQLException e1) {
             }
