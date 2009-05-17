@@ -79,9 +79,9 @@
       <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
-     <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
     </dependency>
     <dependency>
       <groupId>com.mockrunner</groupId>
@@ -112,10 +112,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -123,5 +119,17 @@
 
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
