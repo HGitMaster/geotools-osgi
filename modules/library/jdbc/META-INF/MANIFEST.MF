@@ -4,7 +4,7 @@ Bundle-Name: Geotools JDBC Data Access
 Bundle-SymbolicName: org.geotools.jdbc
 Bundle-Version: 2.6.0.osgi2
 Bundle-Vendor: Harman/Becker
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.api;bundle-version="2.6.0",
  org.opengis.geoapi;bundle-version="2.3.0",
