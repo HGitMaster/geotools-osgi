@@ -172,12 +172,33 @@
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
+            <id>jar</id>
             <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>test</id>
+            <phase>prepare-package</phase>
             <goals>
               <goal>test-jar</goal>
             </goals>
           </execution>
         </executions>
+        <!-- 
+           NOTE: This configuration inserts our OSGi manifest
+           into the jar, and also into the test-jar, as an ugly
+           and unwanted side effect.
+           Moving the configuration to the execution does not
+           solve the problem, which looks like a bug in Maven.
+           For the time being, we accept the hack..          
+        -->
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>           
       </plugin>
     </plugins>
   </build>
