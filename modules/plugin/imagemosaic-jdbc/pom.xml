@@ -194,6 +194,7 @@
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
             <manifest>
               <mainClass>org.geotools.gce.imagemosaic.jdbc.Toolbox</mainClass>
               <addClasspath>true</addClasspath>
@@ -203,5 +204,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>
