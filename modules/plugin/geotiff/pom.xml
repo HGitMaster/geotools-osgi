@@ -129,7 +129,7 @@
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
-  	  <artifactId>imageio-ext-tiff</artifactId>
+  	  <artifactId>de.berlios.it.geosolutions.imageio.ext.tiff</artifactId>
       <version>1.0.2</version>
     </dependency>
 
