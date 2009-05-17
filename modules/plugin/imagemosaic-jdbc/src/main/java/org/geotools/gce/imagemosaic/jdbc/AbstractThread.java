@@ -117,14 +117,10 @@ abstract class AbstractThread extends Thread {
     	
         if ((imageType==BufferedImage.TYPE_BYTE_BINARY || imageType==BufferedImage.TYPE_BYTE_INDEXED) 
         		&& (image.getColorModel() instanceof IndexColorModel) ) 
-        	scaledImage=new BufferedImage((int) Math.floor(
-                    image.getWidth() * rescaleX),
-                    (int) Math.floor(image.getHeight() * rescaleY),
-                    image.getType(),(IndexColorModel)image.getColorModel());
+        	scaledImage=new BufferedImage(pixelDimension.width, pixelDimension.height, 
+                    image.getType(), (IndexColorModel)image.getColorModel());
         else
-        	scaledImage = new BufferedImage((int) Math.floor(
-                    image.getWidth() * rescaleX),
-                (int) Math.floor(image.getHeight() * rescaleY),
+        	scaledImage = new BufferedImage(pixelDimension.width, pixelDimension.height,
                 image.getType());
         
         final Graphics2D g2D = (Graphics2D) scaledImage.getGraphics();
