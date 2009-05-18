@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Geotools ImageMosaic with Shapefile Index
+Bundle-SymbolicName: org.geotools.imagemosaic.shp
+Bundle-Version: 2.6.0.osgi2
+Bundle-Vendor: Harman/Becker
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.geotools.imagemosaic.base;bundle-version="2.6.0",
+ org.geotools.shapefile;bundle-version="2.6.0",
+ org.geotools.api;bundle-version="2.6.0",
+ org.geotools.coverage;bundle-version="2.6.0",
+ org.opengis.geoapi;bundle-version="2.3.0",
+ org.geotools.metadata;bundle-version="2.6.0"
+Import-Package: com.vividsolutions.jts.geom
