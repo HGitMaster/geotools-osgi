@@ -123,7 +123,6 @@
       <groupId>javax.media.jai.osgi</groupId>
       <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
       <!-- The version number is specified in the parent POM. -->
-      <scope>provided</scope>  <!-- Users should execute JAI installer. -->
     </dependency>
   </dependencies>
 

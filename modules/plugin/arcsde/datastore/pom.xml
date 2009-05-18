@@ -142,7 +142,6 @@
     <dependency>
       <groupId>javax.media.jai.osgi</groupId>
       <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 

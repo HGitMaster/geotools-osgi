@@ -61,6 +61,11 @@
             <Private-Package>org.geotools.thirdparty.jai.imageio</Private-Package>
             <Import-Package>!sun.*,*</Import-Package> 
           </instructions>
+          <!-- 
+               This is required because Maven puts target/classes on the 
+               classpath for some dependencies.
+          -->
+          <unpackBundle>true</unpackBundle>
         </configuration>
       </plugin>
          <plugin>
