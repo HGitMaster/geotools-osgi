@@ -149,6 +149,9 @@
          <module>repository</module>
          <module>widgets-swing-pending</module>
          <module>wps</module>
+
+         <!-- not really required, ad hoc addition -->
+         <module>coveragetools</module>
        </modules>
      </profile>
 

@@ -13,7 +13,6 @@ public interface ImageMosaicMetadata
 
     int getNumLevels();
 
-
     List<double[]> getResolutions();
 
     boolean hasBandAttributes();

@@ -153,7 +153,7 @@ public class ShpImageMosaicFormat extends ImageMosaicFormat
         }        
     }
     
-    private URL getSourceUrl(Object source) throws MalformedURLException
+    URL getSourceUrl(Object source) throws MalformedURLException
     {
         if (source instanceof File)
         {
@@ -225,7 +225,6 @@ public class ShpImageMosaicFormat extends ImageMosaicFormat
     {
         try
         {
-
             return new ShpImageMosaicReader(source, hints);
         }
         catch (MalformedURLException e)

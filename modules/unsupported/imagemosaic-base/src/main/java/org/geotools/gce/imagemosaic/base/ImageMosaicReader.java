@@ -722,7 +722,7 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 
     private RenderedImage loadImage(final ImageReadParam readP,
-            final Integer imageChoice, final Object imageRef)
+            final Integer imageChoice, final Object imageRef) throws IOException
     {
         RenderedImage loadedImage;
         // Get the band order & add to read parameters if necessary
@@ -776,7 +776,7 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
         return res;
     }
     
-    protected abstract ImageInputStream getImageInputStream(Object imageId);
+    protected abstract ImageInputStream getImageInputStream(Object imageId) throws IOException;
 
     /**
      * Retrieves the ULC of the BBOX composed by all the tiles we need to load.
