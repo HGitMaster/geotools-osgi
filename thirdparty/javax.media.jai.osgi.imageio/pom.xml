@@ -46,7 +46,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
-          <manifestLocation>META-INF</manifestLocation>
           <instructions>
             <_include>META-INF/headers.txt</_include>
             <Embed-Dependency>jai_imageio;inline=true,jiio_clib;inline=true</Embed-Dependency>
@@ -62,7 +61,6 @@
             <Private-Package>org.geotools.thirdparty.jai.imageio</Private-Package>
             <Import-Package>!sun.*,*</Import-Package> 
           </instructions>
-          <unpackBundle>true</unpackBundle>
         </configuration>
       </plugin>
          <plugin>
