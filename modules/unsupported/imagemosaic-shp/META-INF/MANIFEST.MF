@@ -14,3 +14,4 @@ Require-Bundle: org.geotools.imagemosaic.base;bundle-version="2.6.0",
  org.geotools.referencing;bundle-version="2.6.0"
 Import-Package: com.vividsolutions.jts.geom,
  com.vividsolutions.jts.index.strtree
+Export-Package: org.geotools.gce.imagemosaic.shp

@@ -8,11 +8,14 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class ImageMosaicMetadataImpl implements ImageMosaicMetadata
 {
+    private String name;
     private int numLevels;
     private boolean hasBandAttributes;
-    private boolean hasColorCorretion;
+    private boolean hasColorCorrection;
     private CoordinateReferenceSystem crs;
     private List<double[]> resolutions;
+    private GeneralEnvelope envelope;
+    private boolean colorModelExpansion;
 
     public ImageMosaicMetadataImpl(int numLevels)
     {
@@ -34,8 +37,7 @@ public class ImageMosaicMetadataImpl implements ImageMosaicMetadata
 
     public boolean getColorModelExpansion()
     {
-        // TODO Auto-generated method stub
-        return false;
+        return colorModelExpansion;
     }
 
     public CoordinateReferenceSystem getCoordinateReferenceSystem()
@@ -45,14 +47,12 @@ public class ImageMosaicMetadataImpl implements ImageMosaicMetadata
 
     public GeneralEnvelope getEnvelope()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return envelope;
     }
 
     public String getName()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return name;
     }
 
     public int getNumLevels()
@@ -62,19 +62,51 @@ public class ImageMosaicMetadataImpl implements ImageMosaicMetadata
 
     public List<double[]> getResolutions()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return resolutions;
     }
 
     public boolean hasBandAttributes()
     {
-        // TODO Auto-generated method stub
-        return false;
+        return hasBandAttributes;
     }
 
     public boolean hasColorCorrection()
     {
-        // TODO Auto-generated method stub
-        return false;
+        return hasColorCorrection;
+    }
+    
+    public void setHasBandAttributes(boolean hasBandAttributes)
+    {
+        this.hasBandAttributes = hasBandAttributes;
+    }
+
+    public void setHasColorCorrection(boolean hasColorCorrection)
+    {
+        this.hasColorCorrection = hasColorCorrection;
+    }
+
+    public void setCrs(CoordinateReferenceSystem crs)
+    {
+        this.crs = crs;
+    }
+
+    public void setResolutions(List<double[]> resolutions)
+    {
+        this.resolutions = resolutions;
+    }
+
+    public void setEnvelope(GeneralEnvelope envelope)
+    {
+        this.envelope = envelope;
+    }
+    
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
+    public void setColorModelExpansion(boolean expansion)
+    {
+        this.colorModelExpansion = expansion;
     }
 }

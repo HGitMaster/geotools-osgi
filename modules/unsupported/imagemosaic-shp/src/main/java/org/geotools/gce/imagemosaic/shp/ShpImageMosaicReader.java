@@ -1,15 +1,17 @@
 package org.geotools.gce.imagemosaic.shp;
 
-import java.awt.Rectangle;
-import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,20 +23,28 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
 
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.factory.Hints;
+import org.geotools.gce.imagemosaic.base.ImageMosaicMetadata;
+import org.geotools.gce.imagemosaic.base.ImageMosaicMetadataImpl;
 import org.geotools.gce.imagemosaic.base.ImageMosaicReader;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
+import org.geotools.referencing.CRS;
 import org.opengis.coverage.grid.Format;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.referencing.datum.PixelInCell;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 @SuppressWarnings("deprecation")
 public class ShpImageMosaicReader extends ImageMosaicReader
@@ -51,17 +61,35 @@ public class ShpImageMosaicReader extends ImageMosaicReader
 
     private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
 
-    private boolean expandMe;
-
     private boolean absolutePath; 
 
-    private String locationAttributeName;
+    private String locationAttrName;
 
-    private String bandSelectAttributeName;
+    private String bandSelectAttrName;
 
-    private String colorCorrectionAttributeName;
+    private String colorCorrectionAttrName;
     
     private Map<String, SimpleFeature> tileMap;
+
+    private boolean hasBandSelectAttribute;
+
+    private boolean hasColorCorrectionAttribute;
+
+    private SoftReference<MemorySpatialIndex> indexRef;
+    
+    /**
+     * Max number of tiles that this plugin will load.
+     * 
+     * If this number is exceeded, i.e. we request an area which is too large
+     * instead of getting stuck with opening thousands of files I give you back
+     * a fake coverage.
+     */
+    private int maxAllowedTiles = 
+        ShpImageMosaicFormat.MAX_ALLOWED_TILES.getDefaultValue();
+
+    private ImageMosaicMetadataImpl shpMetadata;
+
+    
 
     public ShpImageMosaicReader(Object source) throws IOException
     {
@@ -71,11 +99,15 @@ public class ShpImageMosaicReader extends ImageMosaicReader
     public ShpImageMosaicReader(Object source, Hints hints) throws IOException
     {
         super(source, hints);
+        //LOGGER.setLevel(Level.FINE);
         this.tileMap = new HashMap<String, SimpleFeature>();
         checkSource(source);
         openShapefile();
-        loadProperties();
-
+        Properties props = loadProperties();
+        findCoordinateReferenceSystem();
+        buildMetadata(props);
+        loadShapefile();
+        createIndex();
     }
 
     private void checkSource(Object source) throws DataSourceException,
@@ -91,19 +123,12 @@ public class ShpImageMosaicReader extends ImageMosaicReader
 
     private void openShapefile() throws IOException
     {
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Load tiles information, especially the bounds, which will be
-        // reused
-        //
-        // /////////////////////////////////////////////////////////////////////
         ShapefileDataStoreFactory sf = new ShapefileDataStoreFactory();
         tileIndexStore = sf.createDataStore(this.sourceURL);
 
         if (LOGGER.isLoggable(Level.FINE))
         {
-            LOGGER.fine("Connected mosaic reader to its data store "
-                    + sourceURL.toString());
+            LOGGER.fine("Connected to shapefile " + sourceURL);
         }
         final String[] typeNames = tileIndexStore.getTypeNames();
         if (typeNames.length <= 0)
@@ -112,17 +137,20 @@ public class ShpImageMosaicReader extends ImageMosaicReader
         }
         typeName = typeNames[0];
         featureSource = tileIndexStore.getFeatureSource(typeName);
-        
+    }
+
+    private void loadShapefile() throws IOException
+    {
         Iterator<SimpleFeature> it = featureSource.getFeatures().iterator();
         while (it.hasNext())
         {
             SimpleFeature feature = it.next();
-            String location = (String) feature.getAttribute(locationAttributeName);
+            String location = (String) feature.getAttribute(locationAttrName);
             tileMap.put(location, feature);
         }
     }
 
-    private void loadProperties() throws IOException
+    private Properties loadProperties() throws IOException
     {
         String temp = URLDecoder.decode(sourceURL.getFile(), "UTF8");
         final int index = temp.lastIndexOf(".");
@@ -132,13 +160,50 @@ public class ShpImageMosaicReader extends ImageMosaicReader
         if (!propertiesFile.exists() || !propertiesFile.isFile())
         {
             throw new FileNotFoundException(
-                    "The properties file descibing the " +
-                    "ShpImageMosaic does not exist: "
-                            + propertiesFile);
+                    "ShpImageMosaic properties not found: " + propertiesFile);
         }
         final Properties properties = new Properties();
         properties.load(new BufferedInputStream(new FileInputStream(
                 propertiesFile)));
+        return properties;
+    }
+    
+    private void findCoordinateReferenceSystem()
+    {
+        Object tempCRS = hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+        if (tempCRS != null)
+        {
+            this.crs = (CoordinateReferenceSystem) tempCRS;
+            LOGGER.log(Level.WARNING, 
+                    "Using forced coordinate reference system " + crs.toWKT());
+        }
+        else
+        {
+            GeometryDescriptor gd = featureSource.getSchema()
+                .getGeometryDescriptor();
+            crs = gd.getCoordinateReferenceSystem();
+            if (crs == null)
+            {
+                // use the default crs
+                crs = AbstractGridFormat.getDefaultCRS();
+                String msg = String.format(
+                        "Unable to find a CRS for this coverage, using a default one: %s",
+                         crs.toWKT());
+                LOGGER.log(Level.WARNING, msg);
+            }
+        }
+    }
+
+    
+    
+    private void buildMetadata(Properties properties)
+    {
+        
+        // resolutions levels
+        int numLevels = Integer.parseInt(properties.getProperty("LevelsNum"));
+
+        shpMetadata = new ImageMosaicMetadataImpl(numLevels);
+        
 
         // load the envelope
         final String envelope = properties.getProperty("Envelope2D");
@@ -151,69 +216,57 @@ public class ShpImageMosaicReader extends ImageMosaicReader
             cornersV[i][0] = Double.parseDouble(pair[0]);
             cornersV[i][1] = Double.parseDouble(pair[1]);
         }
-        this.originalEnvelope = new GeneralEnvelope(cornersV[0], cornersV[1]);
-        this.originalEnvelope.setCoordinateReferenceSystem(crs);
+        GeneralEnvelope env = new GeneralEnvelope(cornersV[0], cornersV[1]);
+        env.setCoordinateReferenceSystem(crs);
+        shpMetadata.setEnvelope(env);
 
-        // resolutions levels
-        numOverviews = Integer.parseInt(properties.getProperty("LevelsNum")) - 1;
+        
+        
+        
         final String levels = properties.getProperty("Levels");
         pairs = levels.split(" ");
-        overViewResolutions = numOverviews >= 1 ? new double[numOverviews][2]
-                : null;
-        pair = pairs[0].split(",");
-        highestRes = new double[2];
-        highestRes[0] = Double.parseDouble(pair[0]);
-        highestRes[1] = Double.parseDouble(pair[1]);
-
-        if (LOGGER.isLoggable(Level.FINE))
-            LOGGER.fine(new StringBuffer("Highest res ").append(highestRes[0])
-                    .append(" ").append(highestRes[1]).toString());
-
-        for (int i = 1; i < numOverviews + 1; i++)
+        
+        List<double[]> resolutions = shpMetadata.getResolutions();
+        for (int level = 0; level < numLevels; level++)
         {
-            pair = pairs[i].split(",");
-            overViewResolutions[i - 1][0] = Double.parseDouble(pair[0]);
-            overViewResolutions[i - 1][1] = Double.parseDouble(pair[1]);
-        }
+            double[] res = new double[2];
+            pair = pairs[0].split(",");
+            res[0] = Double.parseDouble(pair[0]);
+            res[1] = Double.parseDouble(pair[1]);
+            resolutions.add(res);
 
-        // name
-        coverageName = properties.getProperty("Name");
+            if (LOGGER.isLoggable(Level.FINE))
+            {
+                LOGGER.fine(String.format("Resolution %f %f", res[0], res[1]));
+            }
+        }
+        
+        shpMetadata.setName(properties.getProperty("Name"));
 
         // need a color expansion?
         // this is a newly added property we have to be ready to the case where
         // we do not find it.
         try
         {
-            expandMe = properties.getProperty("ExpandToRGB").equalsIgnoreCase(
-                    "true");
+            if (properties.getProperty("ExpandToRGB").
+                    equalsIgnoreCase("true"))
+            {
+                shpMetadata.setColorModelExpansion(true);
+            }
         }
         catch (Throwable t)
         {
-            expandMe = false;
+            LOGGER.warning(t.getMessage());
         }
 
-        originalGridRange = new GeneralGridRange(
-                new Rectangle((int) Math.round(originalEnvelope.getLength(0)
-                        / highestRes[0]), (int) Math.round(originalEnvelope
-                        .getLength(1)
-                        / highestRes[1])));
-        final GridToEnvelopeMapper geMapper = new GridToEnvelopeMapper(
-                originalGridRange, originalEnvelope);
-        geMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
-        raster2Model = geMapper.createTransform();
-
-        String absPathProp = properties.getProperty("", "False");
+        String absPathProp = properties.getProperty("AbsolutePath", "false");
         absolutePath = Boolean.parseBoolean(absPathProp);
 
-        locationAttributeName = properties.getProperty("LocationAttribute");
-
-        bandSelectAttributeName = 
-            properties.getProperty("ChannelSelectAttribute");
-
-        colorCorrectionAttributeName = 
-            properties.getProperty("ColorCorrectionAttribute");
+        locationAttrName = properties.getProperty("LocationAttribute");
+        bandSelectAttrName = properties.getProperty("ChannelSelectAttribute");
+        colorCorrectionAttrName = properties.getProperty("ColorCorrectionAttribute");
     }
-
+    
     @Override
     protected ReferencedEnvelope getEnvelope(Object imageId)
     {
@@ -225,20 +278,13 @@ public class ShpImageMosaicReader extends ImageMosaicReader
     @Override
     protected ImageInputStream getImageInputStream(Object imageId) throws IOException
     {
-        ////////////////////////////////////////////////////////////////
-        // ///////
-        //
-        // Load a tile from disk as requested.
-        //
-        ////////////////////////////////////////////////////////////////
-        // ///////
         if (LOGGER.isLoggable(Level.FINE))
         {
             LOGGER.fine("About to read image " + imageId);
         }
-        final File tempFile = new File(this.sourceURL.getFile());
-        final String parentLocation = tempFile.getParent();
+        
         String location = (String) imageId;
+        
         File imageFile;
         if (absolutePath)
         {
@@ -251,7 +297,6 @@ public class ShpImageMosaicReader extends ImageMosaicReader
         }
         
         
-        // If the tile is not there, dump a message and continue
         if (!imageFile.exists() || !imageFile.canRead() || !imageFile.isFile())
         {
             return null;
@@ -265,14 +310,192 @@ public class ShpImageMosaicReader extends ImageMosaicReader
 
     @Override
     protected List<?> getMatchingImageIds(ReferencedEnvelope env)
+            throws IOException
     {
-        // TODO Auto-generated method stub
-        return null;
+        int maxNumTiles = maxAllowedTiles;
+        GeneralEnvelope originalEnv = shpMetadata.getEnvelope();
+        GeneralEnvelope requestedOriginalEnv = null;
+        GeneralEnvelope intersectionEnv = null;
+        if (requestedOriginalEnv != null)
+        {
+            requestedOriginalEnv = transformEnvelope(requestedOriginalEnv);
+            if (!requestedOriginalEnv.intersects(originalEnv, true))
+            {
+                if (LOGGER.isLoggable(Level.WARNING))
+                    LOGGER.warning("The requested envelope does not intersect " +
+                    		"the envelope of this mosaic, " +
+                    		"we will return a null coverage.");
+                throw new DataSourceException(
+                        "Unable to create a coverage for this source");
+            }
+            intersectionEnv = new GeneralEnvelope(
+                    requestedOriginalEnv);
+            // intersect the requested area with the bounds of this layer
+            intersectionEnv.intersect(originalEnv);
+        }
+        else
+        {
+            requestedOriginalEnv = new GeneralEnvelope(originalEnv);
+            intersectionEnv = requestedOriginalEnv;
+        }
+        requestedOriginalEnv.setCoordinateReferenceSystem(this.crs);
+        intersectionEnv.setCoordinateReferenceSystem(this.crs);
+
+        // ok we got something to return, let's load records from the index
+        // Prepare the filter for loading th needed layers
+        final ReferencedEnvelope intersectionJTSEnvelope = new ReferencedEnvelope(
+                intersectionEnv.getMinimum(0), intersectionEnv
+                        .getMaximum(0), intersectionEnv.getMinimum(1),
+                intersectionEnv.getMaximum(1), crs);
+
+        // Load features from the index
+        // In case there are no features under the requested bbox which is legal
+        // in case the mosaic is not a real sqare, we return a fake mosaic.
+        if (LOGGER.isLoggable(Level.FINE))
+            LOGGER.fine("loading tile for envelope "
+                    + intersectionJTSEnvelope.toString());
+
+        final List<SimpleFeature> features = getFeaturesFromIndex(intersectionJTSEnvelope);
+        if (features == null || features.size() == 0)
+        {
+            return null;
+        }
+        // do we have any feature to load
+        final Iterator<SimpleFeature> it = features.iterator();
+        if (!it.hasNext())
+            throw new DataSourceException(
+                    "No data was found to match the actual request");
+
+        List<String> locations = new ArrayList<String>(features.size());
+        for (SimpleFeature f : features)
+        {
+            String location = (String) f.getAttribute(locationAttrName);
+            locations.add(location);
+        }
+        
+        return locations;
+    }
+
+    private GeneralEnvelope transformEnvelope(GeneralEnvelope env) throws DataSourceException
+    {
+        CoordinateReferenceSystem reqCrs = env.getCoordinateReferenceSystem();
+        if (!CRS.equalsIgnoreMetadata(reqCrs, this.crs))
+        {
+            return env;
+        }
+        
+        try
+        {
+            // transforming the envelope back to the dataset crs in
+            // order to interact with the original envelope for this
+            // mosaic.
+            MathTransform transform = CRS.findMathTransform(reqCrs, crs, true);
+            if (!transform.isIdentity())
+            {
+                env = CRS.transform(transform, env);
+                env.setCoordinateReferenceSystem(this.crs);
+
+                if (LOGGER.isLoggable(Level.FINE))
+                    LOGGER.fine(String.format("Reprojected envelope %s crs %s",
+                            env, crs.toWKT()));
+            }
+        }
+        catch (TransformException e)
+        {
+            throw new DataSourceException(
+                    "Unable to create a coverage for this source", e);
+        }
+        catch (FactoryException e)
+        {
+            throw new DataSourceException(
+                    "Unable to create a coverage for this source", e);
+        }
+        return env;
     }
 
     public Format getFormat()
     {
         return new ShpImageMosaicFormat();
     }
+    
+    private void createIndex() throws IOException
+    {
+        if (LOGGER.isLoggable(Level.FINE))
+            LOGGER.fine("About to create index");
+        // compare the created date of the index with the date on
+        // the shapefile
+        MemorySpatialIndex index = new MemorySpatialIndex(featureSource.getFeatures());
 
+        if (indexRef == null)
+        {
+            indexRef = new SoftReference<MemorySpatialIndex>(index);
+        }
+        SimpleFeatureType schema = featureSource.getSchema();
+        hasBandSelectAttribute 
+            = schema.getDescriptor(bandSelectAttrName) != null;
+        hasColorCorrectionAttribute 
+            = schema.getDescriptor(colorCorrectionAttrName) != null;
+
+        if (LOGGER.isLoggable(Level.FINE))
+            LOGGER.fine("Created index");
+    }
+
+    /**
+     * Retrieves the list of features that intersect the provided evelope
+     * loadinf them inside an index in memory where beeded.
+     * 
+     * @param envelope
+     *            Envelope for selectig features that intersect.
+     * @return A list of fetaures.
+     * @throws IOException
+     *             In case loading the needed features failes.
+     */
+    private List<SimpleFeature> getFeaturesFromIndex(final Envelope envelope)
+            throws IOException
+    {
+        List<SimpleFeature> features = null;
+        MemorySpatialIndex index;
+
+        synchronized (indexRef)
+        {
+            if (LOGGER.isLoggable(Level.FINE))
+                LOGGER.fine("Trying to use the index...");
+            index = indexRef.get();
+            if (index != null)
+            {
+                // need to see if the index is still valid and recreate it if
+                // necessary
+                // this is currently done by comparing the date the index was
+                // created to
+                // the date the shapefile was last modified
+                File f = new File(sourceURL.getFile());
+                if (index.getCreatedDate().before(new Date(f.lastModified())))
+                {
+                    createIndex();
+                }
+                else if (LOGGER.isLoggable(Level.FINE))
+                    LOGGER.fine("Index does not need to be created...");
+
+            }
+            else
+            {
+                if (LOGGER.isLoggable(Level.FINE))
+                    LOGGER.fine("Index needs to be recreated...");
+                index = new MemorySpatialIndex(featureSource.getFeatures());
+            }
+            if (LOGGER.isLoggable(Level.FINE))
+                LOGGER.fine("Index Loaded");
+        }
+        features = index.findFeatures(envelope);
+        if (features != null)
+            return features;
+        else
+            return Collections.emptyList();
+    }
+
+    @Override
+    public ImageMosaicMetadata getMetadata()
+    {
+        return shpMetadata;
+    }
 }
