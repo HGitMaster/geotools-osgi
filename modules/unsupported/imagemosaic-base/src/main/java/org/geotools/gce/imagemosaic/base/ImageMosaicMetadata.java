@@ -17,8 +17,6 @@ public interface ImageMosaicMetadata
 
     boolean hasBandAttributes();
 
-    int getBand(int position);
-
     boolean hasColorCorrection();
     
     double getColorCorrection(int band);

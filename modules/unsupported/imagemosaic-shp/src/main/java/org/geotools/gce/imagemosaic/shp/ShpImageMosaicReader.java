@@ -71,22 +71,8 @@ public class ShpImageMosaicReader extends ImageMosaicReader
     
     private Map<String, SimpleFeature> tileMap;
 
-    private boolean hasBandSelectAttribute;
-
-    private boolean hasColorCorrectionAttribute;
-
     private SoftReference<MemorySpatialIndex> indexRef;
     
-    /**
-     * Max number of tiles that this plugin will load.
-     * 
-     * If this number is exceeded, i.e. we request an area which is too large
-     * instead of getting stuck with opening thousands of files I give you back
-     * a fake coverage.
-     */
-    private int maxAllowedTiles = 
-        ShpImageMosaicFormat.MAX_ALLOWED_TILES.getDefaultValue();
-
     private ImageMosaicMetadataImpl shpMetadata;
 
     
@@ -99,7 +85,6 @@ public class ShpImageMosaicReader extends ImageMosaicReader
     public ShpImageMosaicReader(Object source, Hints hints) throws IOException
     {
         super(source, hints);
-        //LOGGER.setLevel(Level.FINE);
         this.tileMap = new HashMap<String, SimpleFeature>();
         checkSource(source);
         openShapefile();
@@ -130,7 +115,7 @@ public class ShpImageMosaicReader extends ImageMosaicReader
         {
             LOGGER.fine("Connected to shapefile " + sourceURL);
         }
-        final String[] typeNames = tileIndexStore.getTypeNames();
+        String[] typeNames = tileIndexStore.getTypeNames();
         if (typeNames.length <= 0)
         {
             throw new IllegalArgumentException("No typenames for index schema");
@@ -153,16 +138,16 @@ public class ShpImageMosaicReader extends ImageMosaicReader
     private Properties loadProperties() throws IOException
     {
         String temp = URLDecoder.decode(sourceURL.getFile(), "UTF8");
-        final int index = temp.lastIndexOf(".");
+        int index = temp.lastIndexOf(".");
         if (index != -1)
             temp = temp.substring(0, index);
-        final File propertiesFile = new File(temp + ".properties");
+        File propertiesFile = new File(temp + ".properties");
         if (!propertiesFile.exists() || !propertiesFile.isFile())
         {
             throw new FileNotFoundException(
                     "ShpImageMosaic properties not found: " + propertiesFile);
         }
-        final Properties properties = new Properties();
+        Properties properties = new Properties();
         properties.load(new BufferedInputStream(new FileInputStream(
                 propertiesFile)));
         return properties;
@@ -174,8 +159,7 @@ public class ShpImageMosaicReader extends ImageMosaicReader
         if (tempCRS != null)
         {
             this.crs = (CoordinateReferenceSystem) tempCRS;
-            LOGGER.log(Level.WARNING, 
-                    "Using forced coordinate reference system " + crs.toWKT());
+            LOGGER.warning("Using forced coordinate reference system " + crs.toWKT());
         }
         else
         {
@@ -187,9 +171,10 @@ public class ShpImageMosaicReader extends ImageMosaicReader
                 // use the default crs
                 crs = AbstractGridFormat.getDefaultCRS();
                 String msg = String.format(
-                        "Unable to find a CRS for this coverage, using a default one: %s",
+                        "Unable to find a CRS for this coverage, " +
+                        "using a default one: %s",
                          crs.toWKT());
-                LOGGER.log(Level.WARNING, msg);
+                LOGGER.warning(msg);
             }
         }
     }
@@ -198,17 +183,15 @@ public class ShpImageMosaicReader extends ImageMosaicReader
     
     private void buildMetadata(Properties properties)
     {
-        
-        // resolutions levels
         int numLevels = Integer.parseInt(properties.getProperty("LevelsNum"));
 
         shpMetadata = new ImageMosaicMetadataImpl(numLevels);
         
 
         // load the envelope
-        final String envelope = properties.getProperty("Envelope2D");
+        String envelope = properties.getProperty("Envelope2D");
         String[] pairs = envelope.split(" ");
-        final double cornersV[][] = new double[2][2];
+        double cornersV[][] = new double[2][2];
         String pair[];
         for (int i = 0; i < 2; i++)
         {
@@ -223,7 +206,7 @@ public class ShpImageMosaicReader extends ImageMosaicReader
         
         
         
-        final String levels = properties.getProperty("Levels");
+        String levels = properties.getProperty("Levels");
         pairs = levels.split(" ");
         
         List<double[]> resolutions = shpMetadata.getResolutions();
@@ -243,20 +226,10 @@ public class ShpImageMosaicReader extends ImageMosaicReader
         
         shpMetadata.setName(properties.getProperty("Name"));
 
-        // need a color expansion?
-        // this is a newly added property we have to be ready to the case where
-        // we do not find it.
-        try
+        String colorExpansion = properties.getProperty("ExpandToRGB", "false");
+        if (colorExpansion.equalsIgnoreCase("true"))
         {
-            if (properties.getProperty("ExpandToRGB").
-                    equalsIgnoreCase("true"))
-            {
-                shpMetadata.setColorModelExpansion(true);
-            }
-        }
-        catch (Throwable t)
-        {
-            LOGGER.warning(t.getMessage());
+            shpMetadata.setColorModelExpansion(true);
         }
 
         String absPathProp = properties.getProperty("AbsolutePath", "false");
@@ -309,10 +282,9 @@ public class ShpImageMosaicReader extends ImageMosaicReader
     }
 
     @Override
-    protected List<?> getMatchingImageIds(ReferencedEnvelope env)
+    protected List<?> getMatchingImageRefs(ReferencedEnvelope env)
             throws IOException
     {
-        int maxNumTiles = maxAllowedTiles;
         GeneralEnvelope originalEnv = shpMetadata.getEnvelope();
         GeneralEnvelope requestedOriginalEnv = null;
         GeneralEnvelope intersectionEnv = null;
@@ -321,10 +293,9 @@ public class ShpImageMosaicReader extends ImageMosaicReader
             requestedOriginalEnv = transformEnvelope(requestedOriginalEnv);
             if (!requestedOriginalEnv.intersects(originalEnv, true))
             {
-                if (LOGGER.isLoggable(Level.WARNING))
-                    LOGGER.warning("The requested envelope does not intersect " +
-                    		"the envelope of this mosaic, " +
-                    		"we will return a null coverage.");
+                LOGGER.warning("The requested envelope does not intersect " +
+                    "the envelope of this mosaic, " +
+                    "we will return a null coverage.");
                 throw new DataSourceException(
                         "Unable to create a coverage for this source");
             }
@@ -343,7 +314,7 @@ public class ShpImageMosaicReader extends ImageMosaicReader
 
         // ok we got something to return, let's load records from the index
         // Prepare the filter for loading th needed layers
-        final ReferencedEnvelope intersectionJTSEnvelope = new ReferencedEnvelope(
+        ReferencedEnvelope intersectionJTSEnvelope = new ReferencedEnvelope(
                 intersectionEnv.getMinimum(0), intersectionEnv
                         .getMaximum(0), intersectionEnv.getMinimum(1),
                 intersectionEnv.getMaximum(1), crs);
@@ -355,16 +326,11 @@ public class ShpImageMosaicReader extends ImageMosaicReader
             LOGGER.fine("loading tile for envelope "
                     + intersectionJTSEnvelope.toString());
 
-        final List<SimpleFeature> features = getFeaturesFromIndex(intersectionJTSEnvelope);
-        if (features == null || features.size() == 0)
+        List<SimpleFeature> features = getFeaturesFromIndex(intersectionJTSEnvelope);
+        if (features.isEmpty())
         {
             return null;
         }
-        // do we have any feature to load
-        final Iterator<SimpleFeature> it = features.iterator();
-        if (!it.hasNext())
-            throw new DataSourceException(
-                    "No data was found to match the actual request");
 
         List<String> locations = new ArrayList<String>(features.size());
         for (SimpleFeature f : features)
@@ -431,10 +397,15 @@ public class ShpImageMosaicReader extends ImageMosaicReader
             indexRef = new SoftReference<MemorySpatialIndex>(index);
         }
         SimpleFeatureType schema = featureSource.getSchema();
-        hasBandSelectAttribute 
-            = schema.getDescriptor(bandSelectAttrName) != null;
-        hasColorCorrectionAttribute 
-            = schema.getDescriptor(colorCorrectionAttrName) != null;
+        
+        if (schema.getDescriptor(bandSelectAttrName) != null)
+        {
+            shpMetadata.setHasBandAttributes(true);
+        }
+        if (schema.getDescriptor(colorCorrectionAttrName) != null)
+        {
+            shpMetadata.setHasColorCorrection(true);
+        }
 
         if (LOGGER.isLoggable(Level.FINE))
             LOGGER.fine("Created index");
@@ -450,7 +421,7 @@ public class ShpImageMosaicReader extends ImageMosaicReader
      * @throws IOException
      *             In case loading the needed features failes.
      */
-    private List<SimpleFeature> getFeaturesFromIndex(final Envelope envelope)
+    private List<SimpleFeature> getFeaturesFromIndex(Envelope envelope)
             throws IOException
     {
         List<SimpleFeature> features = null;
@@ -484,7 +455,7 @@ public class ShpImageMosaicReader extends ImageMosaicReader
                 index = new MemorySpatialIndex(featureSource.getFeatures());
             }
             if (LOGGER.isLoggable(Level.FINE))
-                LOGGER.fine("Index Loaded");
+                LOGGER.fine("Index loaded");
         }
         features = index.findFeatures(envelope);
         if (features != null)
@@ -494,8 +465,26 @@ public class ShpImageMosaicReader extends ImageMosaicReader
     }
 
     @Override
-    public ImageMosaicMetadata getMetadata()
+    protected ImageMosaicMetadata createMetadata()
     {
         return shpMetadata;
+    }
+
+    @Override
+    protected int[] getBands(Object imageId)
+    {
+        SimpleFeature feature = tileMap.get(imageId);
+        String attr = (String) feature.getAttribute(bandSelectAttrName);
+        String[] sbands = attr.split(",");
+        if (sbands.length == 3)
+        {
+            int bands[] = new int[3];
+            bands[0] = Integer.parseInt(sbands[0]);
+            bands[1] = Integer.parseInt(sbands[1]);
+            bands[2] = Integer.parseInt(sbands[2]);
+            return bands;
+        }
+
+        return null;
     }
 }

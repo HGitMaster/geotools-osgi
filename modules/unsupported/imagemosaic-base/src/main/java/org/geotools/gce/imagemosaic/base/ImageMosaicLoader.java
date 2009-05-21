@@ -4,6 +4,7 @@
 package org.geotools.gce.imagemosaic.base;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
@@ -15,7 +16,10 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.imageio.ImageReadParam;
+import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
@@ -23,40 +27,65 @@ import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
 import javax.media.jai.operator.MosaicDescriptor;
 
+import org.geotools.coverage.grid.GeneralGridEnvelope;
+import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.data.DataSourceException;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.ImageWorker;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.util.logging.Logging;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.datum.PixelInCell;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+@SuppressWarnings("deprecation")
 class ImageMosaicLoader
 {
-    ImageMosaicMetadata metadata;
-    ParameterBlockJAI pbjMosaic;
-    int numImages;
-    ROI[] rois;
-    PlanarImage[] alphaChannels;
-    Area finalLayout = new Area();
+    private static Logger LOGGER = Logging.getLogger(ImageMosaicLoader.class);
+    private ImageMosaicMetadata metadata;
+    private ParameterBlockJAI pbjMosaic;
+    private int numImages;
+    private ROI[] rois;
+    private PlanarImage[] alphaChannels;
+    private Area finalLayout = new Area();
 
-    boolean alphaIn;
-    boolean doTransparentColor;
-    boolean doInputImageThreshold;
-    boolean blend;
+    private boolean alphaIn;
+    private boolean doTransparentColor;
+    private boolean doInputImageThreshold;
+    private boolean blend;
     
-    double inputImageThresholdValue;
+    private double inputImageThresholdValue;
     
-    int[] alphaIndex;
-    ColorModel model;
-    Color transparentColor;
-    RenderedImage loadedImage;
+    private int[] alphaIndex;
+    private ColorModel model;
+    private Color transparentColor;
+    private RenderedImage loadedImage;
+    private GeneralEnvelope finalenvelope;
     
     
-    ImageMosaicLoader(int numImages)
+    ImageMosaicLoader(ImageMosaicMetadata metadata, ImageMosaicParameters mp)
     {
+        this.metadata = metadata;
+        this.numImages = mp.getMaxNumTiles();
+        transparentColor = mp.getInputTransparentColor();
+        inputImageThresholdValue = mp.getInputImageThreshold();
+        
+        
+        pbjMosaic = new ParameterBlockJAI("Mosaic");
+        pbjMosaic.setParameter("mosaicType",
+                MosaicDescriptor.MOSAIC_TYPE_OVERLAY);
+        
         rois = new ROI[numImages];
         alphaChannels = new PlanarImage[numImages];            
     }
     
-    void handleFirstImage()
+    void setOverallParameters()
     {
         // We check here if the images have an alpha channel or some
         // other sort of transparency. In case we have transparency
@@ -106,12 +135,12 @@ class ImageMosaicLoader
                     && alphaIn
                     && model.getTransparency() == Transparency.BITMASK)
             {
-                final IndexColorModel icm = (IndexColorModel) model;
-                final int transparentPixel = icm
+                IndexColorModel icm = (IndexColorModel) model;
+                int transparentPixel = icm
                         .getTransparentPixel();
                 if (transparentPixel != -1)
                 {
-                    final int oldTransparentColor = icm
+                    int oldTransparentColor = icm
                             .getRGB(transparentPixel);
                     if (oldTransparentColor == transparentColor
                             .getRGB())
@@ -122,23 +151,34 @@ class ImageMosaicLoader
             }
         }
     }
+    
+    void applyColorCorrection()
+    {
+        // apply band color fixing; if application
+        if (metadata.hasColorCorrection())
+        {
+            double[] bandFix = new double[3];
+            bandFix[0] = metadata.getColorCorrection(0);
+            bandFix[1] = metadata.getColorCorrection(1);
+            bandFix[2] = metadata.getColorCorrection(2);
 
-    void addToMosaic(ParameterBlockJAI pbjMosaic, Envelope bound,
+            ParameterBlock pb = new ParameterBlock();
+            pb.addSource(loadedImage);
+            pb.add(bandFix);
+            loadedImage = JAI.create("addconst", pb, null);
+        }
+    }
+    
+    
+
+    void addToMosaic(Envelope bound,
             Point2D ulc, double[] res, int i)
     {
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Computing TRANSLATION AND SCALING FACTORS
-        //
         // Using the spatial resolution we compute the translation factors for
         // positioning the actual image correctly in final mosaic.
-        //
-        // /////////////////////////////////////////////////////////////////////
         RenderedImage readyToMosaicImage = scaleAndTranslate(bound, ulc, res,
                 loadedImage);
 
-        // ///////////////////////////////////////////////////////////////////
-        //
         // INDEX COLOR MODEL EXPANSION
         //
         // Take into account the need for an expansions of the original color
@@ -159,52 +199,28 @@ class ImageMosaicLoader
         // willl have 4 bands, the other 3. If we want the mosaic to work we
         // have to add na extra band to the latter type of images for providing
         // alpha information to them.
-        //
-        //
-        // ///////////////////////////////////////////////////////////////////
+        ColorModel colorModel = readyToMosaicImage.getColorModel();
         if (metadata.getColorModelExpansion()
-                && readyToMosaicImage.getColorModel() instanceof IndexColorModel)
+                && colorModel instanceof IndexColorModel)
         {
             readyToMosaicImage = new ImageWorker(readyToMosaicImage)
                     .forceComponentColorModel().getPlanarImage();
         }
 
-        // ///////////////////////////////////////////////////////////////////
-        //
+        
         // TRANSPARENT COLOR MANAGEMENT
-        //
-        //
-        // ///////////////////////////////////////////////////////////////////
         if (doTransparentColor)
         {
-            if (ImageMosaicReader.LOGGER.isLoggable(Level.FINE))
-                ImageMosaicReader.LOGGER.fine("Support for alpha on input image number " + i);
-            // //////////////////////////////////////////////////////////////////
-            // ///
-            //
             // If requested I can perform the ROI operation on the prepared ROI
             // image for building up the alpha band
-            //
-            // //////////////////////////////////////////////////////////////////
-            // ///
             ImageWorker w = new ImageWorker(readyToMosaicImage);
-            if (readyToMosaicImage.getColorModel() instanceof IndexColorModel)
-            {
-                readyToMosaicImage = w.makeColorTransparent(transparentColor)
-                        .getPlanarImage();
-            }
-            else
-                readyToMosaicImage = w.makeColorTransparent(transparentColor)
-                        .getPlanarImage();
-            alphaIndex = new int[] { readyToMosaicImage.getColorModel()
-                    .getNumComponents() - 1 };
-
+            w.makeColorTransparent(transparentColor);
+            readyToMosaicImage = w.getPlanarImage();
+            alphaIndex = new int[] { colorModel.getNumComponents() - 1 };
         }
-        // ///////////////////////////////////////////////////////////////////
-        //
+        
+        
         // ROI
-        //
-        // ///////////////////////////////////////////////////////////////////
         if (doInputImageThreshold)
         {
             ImageWorker w = new ImageWorker(readyToMosaicImage);
@@ -216,18 +232,13 @@ class ImageMosaicLoader
         else if (alphaIn || doTransparentColor)
         {
             ImageWorker w = new ImageWorker(readyToMosaicImage);
-            // //////////////////////////////////////////////////////////////////
-            // ///
-            //
+
             // ALPHA in INPUT
             //
             // I have to select the alpha band and provide it to the final
             // mosaic operator. I have to force going to ComponentColorModel in
             // case the image is indexed.
-            //
-            // //////////////////////////////////////////////////////////////////
-            // ///
-            if (readyToMosaicImage.getColorModel() instanceof IndexColorModel)
+            if (colorModel instanceof IndexColorModel)
             {
                 alphaChannels[i] = w.forceComponentColorModel()
                         .retainLastBand().getPlanarImage();
@@ -238,11 +249,7 @@ class ImageMosaicLoader
 
         }
 
-        // /////////////////////////////////////////////////////////////////////
-        //
         // ADD TO MOSAIC
-        //
-        // /////////////////////////////////////////////////////////////////////
         pbjMosaic.addSource(readyToMosaicImage);
         PlanarImage pImage = PlanarImage.wrapRenderedImage(readyToMosaicImage);
         Area area = new Area(pImage.getBounds());
@@ -250,7 +257,7 @@ class ImageMosaicLoader
     }
 
     
-    void handleAnyImage()
+    void setSpecificParameters()
     {
         // Prepare the last parameters for the mosaic.
         //
@@ -443,7 +450,7 @@ class ImageMosaicLoader
         // In the general case when we have translation and scaling we do a
         // warp affine which is the most precise operation we can perform.
         //
-        final ParameterBlock pbjAffine = new ParameterBlock();
+        ParameterBlock pbjAffine = new ParameterBlock();
         Object interpolation = 
             ImageUtilities.NN_INTERPOLATION_HINT.get(JAI.KEY_INTERPOLATION);
         if (Math.abs(xTrans - (int) xTrans) < 1E-3
@@ -465,7 +472,7 @@ class ImageMosaicLoader
                 .add(interpolation);
 
             // avoid doing the color expansion now since it might not be needed
-            final RenderingHints hints = (RenderingHints) 
+            RenderingHints hints = (RenderingHints) 
                 ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL.clone();
             
             hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
@@ -473,11 +480,11 @@ class ImageMosaicLoader
         }
         
         // translation and scaling
-        final AffineTransform tx = new AffineTransform(scaleX, 0, 0, scaleY,
+        AffineTransform tx = new AffineTransform(scaleX, 0, 0, scaleY,
                 xTrans, yTrans);
         pbjAffine.addSource(image).add(tx).add(interpolation);
         // avoid doing the color expansion now since it might not be needed
-        final RenderingHints hints = (RenderingHints) 
+        RenderingHints hints = (RenderingHints) 
             ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL.clone();
 
         // adding the capability to do a border extension which is great when
@@ -486,4 +493,139 @@ class ImageMosaicLoader
         hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
         return JAI.create("Affine", pbjAffine, hints);
     }
+
+    void loadImage(ImageReadParam readP, Integer imageChoice,
+            ImageInputStream imageInputStream)
+    {
+        Boolean readMetadata = Boolean.FALSE;
+        Boolean readThumbnails = Boolean.FALSE;
+        Boolean verifyInput = Boolean.FALSE;
+        ParameterBlock pbjImageRead = new ParameterBlock();
+        pbjImageRead.add(imageInputStream);
+        pbjImageRead.add(imageChoice);
+        pbjImageRead.add(readMetadata);
+        pbjImageRead.add(readThumbnails);
+        pbjImageRead.add(verifyInput);
+        pbjImageRead.add(null);
+        pbjImageRead.add(null);
+        pbjImageRead.add(readP);
+        pbjImageRead.add(null);
+        loadedImage = JAI.create("ImageRead", pbjImageRead);
+    }
+    
+    /**
+     * Once we reach this method it means that we have loaded all the images
+     * which were intersecting the requested envelope. Next step is to create
+     * the final mosaic image and cropping it to the exact requested envelope.
+     * 
+     * @param location
+     * 
+     * @param envelope
+     * @param requestedEnvelope
+     * @param intersectionEnvelope
+     * @param res
+     * @param loadedTilesEnvelope
+     * @param pbjMosaic
+     * @param transparentColor
+     * @param doAlpha
+     * @param doTransparentColor
+     * @param finalLayout
+     * @param outputTransparentColor
+     * @param singleImageROI
+     * @return A {@link GridCoverage}, well actually a {@link GridCoverage2D}.
+     * @throws IllegalArgumentException
+     * @throws FactoryRegistryException
+     * @throws DataSourceException
+     */
+    PlanarImage cropIfNeeded(ImageMosaicParameters mp,
+            ReferencedEnvelope intersectionEnvelope,
+            ReferencedEnvelope loadedTilesEnvelope )
+            throws DataSourceException
+    {
+        finalenvelope = null;
+        PlanarImage preparationImage;
+        Rectangle loadedTilePixelsBound = finalLayout.getBounds();
+        if (LOGGER.isLoggable(Level.FINE))
+        {
+            LOGGER.fine(String.format("Loaded bbox %s while requested bbox %s", 
+                    loadedTilesEnvelope,
+                    mp.getRequestedEnvelope()));
+        }
+
+        // Check if we need to do a crop on the loaded tiles or not. Keep into
+        // account that most part of the time the loaded tiles will be go
+        // beyond the requested area, hence there is a need for cropping them
+        // while mosaicking them.
+        GeneralEnvelope loadedTilesBoundEnv = 
+            new GeneralEnvelope(loadedTilesEnvelope);
+        
+        double loadedWidth = loadedTilesBoundEnv.getSpan(0);
+        double loadedHeight = loadedTilesBoundEnv.getSpan(1);
+        double toleranceX = loadedWidth  / loadedTilePixelsBound.getWidth();
+        double toleranceY = loadedHeight / loadedTilePixelsBound.getHeight();
+        double tolerance = Math.min(toleranceX / 2.0, toleranceY  / 2.0);
+        GeneralEnvelope genIntersEnv = new GeneralEnvelope(intersectionEnvelope);
+        if (!genIntersEnv.equals(loadedTilesBoundEnv, tolerance, false))
+        {
+            // CROP the mosaic image to the requested BBOX
+            GeneralEnvelope intersection = new GeneralEnvelope(
+                    intersectionEnvelope);
+            intersection.intersect(loadedTilesBoundEnv);
+
+            // get the transform for going from world to grid
+            try
+            {
+                GridToEnvelopeMapper gridToEnvelopeMapper = new GridToEnvelopeMapper(
+                        new GeneralGridRange(loadedTilePixelsBound),
+                        loadedTilesBoundEnv);
+                gridToEnvelopeMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
+                MathTransform transform = gridToEnvelopeMapper
+                        .createTransform().inverse();
+                GeneralGridEnvelope finalRange = new GeneralGridEnvelope(CRS
+                        .transform(transform, intersection), PixelInCell.CELL_CORNER, false);
+                // CROP
+                finalLayout.intersect(new Area(finalRange.toRectangle()));
+                Rectangle tempRect = finalLayout.getBounds();
+                ImageLayout layout = new ImageLayout(
+                        tempRect.x, tempRect.y,
+                        tempRect.width, tempRect.height, 
+                        0, 0,
+                        JAI.getDefaultTileSize().width, 
+                        JAI.getDefaultTileSize().height,
+                        null, null);
+                RenderingHints rHints = 
+                    new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+                preparationImage = JAI.create("Mosaic", pbjMosaic, rHints);
+
+                finalenvelope = intersection;
+
+            }
+            catch (MismatchedDimensionException e)
+            {
+                throw new DataSourceException(
+                        "Problem when creating this mosaic.", e);
+            }
+            catch (TransformException e)
+            {
+                throw new DataSourceException(
+                        "Problem when creating this mosaic.", e);
+            }
+        }
+        else
+        {
+            preparationImage = JAI.create("Mosaic", pbjMosaic);
+            finalenvelope = new GeneralEnvelope(intersectionEnvelope);
+        }
+
+        if (LOGGER.isLoggable(Level.FINE))
+            LOGGER.fine("Mosaic created ");
+
+        return preparationImage;
+    }
+
+    GeneralEnvelope getFinalEnvelope()
+    {
+        return finalenvelope;
+    }
+    
 }

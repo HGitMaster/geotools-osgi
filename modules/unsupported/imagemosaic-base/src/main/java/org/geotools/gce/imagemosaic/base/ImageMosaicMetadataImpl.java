@@ -23,12 +23,6 @@ public class ImageMosaicMetadataImpl implements ImageMosaicMetadata
         this.resolutions = new ArrayList<double[]>(numLevels);
     }
 
-    public int getBand(int position)
-    {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
     public double getColorCorrection(int band)
     {
         // TODO Auto-generated method stub
