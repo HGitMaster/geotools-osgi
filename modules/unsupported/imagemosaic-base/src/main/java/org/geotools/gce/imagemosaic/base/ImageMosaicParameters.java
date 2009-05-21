@@ -23,13 +23,13 @@ public class ImageMosaicParameters
     
     public ImageMosaicParameters()
     {
-        inputTransparentColor = ImageMosaicFormat.INPUT_TRANSPARENT_COLOR
+        inputTransparentColor = AbstractImageMosaicFormat.INPUT_TRANSPARENT_COLOR
                 .getDefaultValue();
         
-        outputTransparentColor = ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR
+        outputTransparentColor = AbstractImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR
                 .getDefaultValue();
         
-        inputImageThreshold = ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
+        inputImageThreshold = AbstractImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
                 .getDefaultValue();
     }
 
@@ -42,7 +42,7 @@ public class ImageMosaicParameters
         {
             ParameterValue<?> param = (ParameterValue<?>) params[i];
             String name = param.getDescriptor().getName().getCode();
-            if (name.equals(ImageMosaicFormat.READ_GRIDGEOMETRY2D.getName()
+            if (name.equals(AbstractImageMosaicFormat.READ_GRIDGEOMETRY2D.getName()
                     .toString()))
             {
                 GridGeometry2D gg = (GridGeometry2D) param.getValue();
@@ -50,27 +50,27 @@ public class ImageMosaicParameters
                 bounds = gg.getGridRange2D().getBounds();
                 continue;
             }
-            if (name.equals(ImageMosaicFormat.INPUT_TRANSPARENT_COLOR.getName()
+            if (name.equals(AbstractImageMosaicFormat.INPUT_TRANSPARENT_COLOR.getName()
                     .toString()))
             {
                 inputTransparentColor = (Color) param.getValue();
                 continue;
 
             }
-            if (name.equals(ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
+            if (name.equals(AbstractImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
                     .getName().toString()))
             {
                 inputImageThreshold = ((Double) param.getValue()).doubleValue();
                 continue;
 
             }
-            if (name.equals(ImageMosaicFormat.FADING.getName().toString()))
+            if (name.equals(AbstractImageMosaicFormat.FADING.getName().toString()))
             {
                 blend = ((Boolean) param.getValue()).booleanValue();
                 continue;
 
             }
-            if (name.equals(ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR
+            if (name.equals(AbstractImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR
                     .getName().toString()))
             {
                 outputTransparentColor = (Color) param.getValue();
@@ -83,7 +83,7 @@ public class ImageMosaicParameters
                 overviewPolicy = (OverviewPolicy) param.getValue();
                 continue;
             }
-            if (name.equals(ImageMosaicFormat.MAX_ALLOWED_TILES.getName()
+            if (name.equals(AbstractImageMosaicFormat.MAX_ALLOWED_TILES.getName()
                     .toString()))
             {
                 maxNumTiles = param.intValue();

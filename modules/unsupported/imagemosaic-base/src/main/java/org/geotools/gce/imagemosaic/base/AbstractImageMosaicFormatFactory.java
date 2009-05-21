@@ -29,7 +29,7 @@ import org.geotools.coverage.grid.io.GridFormatFactorySpi;
  * @author Simone Giannecchini (simboss), GeoSolutions
  * @since 2.3
  */
-public abstract class ImageMosaicFormatFactory implements GridFormatFactorySpi {
+public abstract class AbstractImageMosaicFormatFactory implements GridFormatFactorySpi {
 	/**
 	 * Tells me if this plugin will work on not given the actual installation.
 	 * 

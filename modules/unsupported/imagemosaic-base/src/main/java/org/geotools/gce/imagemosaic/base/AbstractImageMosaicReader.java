@@ -74,7 +74,7 @@ import org.opengis.referencing.operation.TransformException;
  * 
  */
 @SuppressWarnings("deprecation")
-public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
+public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DReader
         implements GridCoverageReader
 {
 
@@ -90,7 +90,7 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
      * a fake coverage.
      */
     private int maxAllowedTiles 
-        = ImageMosaicFormat.MAX_ALLOWED_TILES.getDefaultValue();
+        = AbstractImageMosaicFormat.MAX_ALLOWED_TILES.getDefaultValue();
 
     private ImageMosaicMetadata metadata;
 
@@ -103,7 +103,7 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
      * @throws UnsupportedEncodingException
      * 
      */
-    public ImageMosaicReader(Object source, Hints hints) throws IOException
+    public AbstractImageMosaicReader(Object source, Hints hints) throws IOException
     {
         // managing hints
         if (this.hints == null)

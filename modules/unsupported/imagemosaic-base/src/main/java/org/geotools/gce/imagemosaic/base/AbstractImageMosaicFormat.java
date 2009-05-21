@@ -68,7 +68,7 @@ import org.opengis.parameter.ParameterDescriptor;
  * @since 2.3
  */
 @SuppressWarnings("deprecation")
-public abstract class ImageMosaicFormat extends AbstractGridFormat implements Format {
+public abstract class AbstractImageMosaicFormat extends AbstractGridFormat implements Format {
 
     /** Control the type of the final mosaic. */
     public static final ParameterDescriptor<Boolean> FADING = new DefaultParameterDescriptor<Boolean>(
@@ -93,7 +93,7 @@ public abstract class ImageMosaicFormat extends AbstractGridFormat implements Fo
     /**
      * Creates an instance and sets the metadata.
      */
-    public ImageMosaicFormat() {
+    public AbstractImageMosaicFormat() {
         setInfo();
     }
 

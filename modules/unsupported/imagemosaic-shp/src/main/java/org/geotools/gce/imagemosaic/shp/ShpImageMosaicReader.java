@@ -29,9 +29,9 @@ import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.factory.Hints;
+import org.geotools.gce.imagemosaic.base.AbstractImageMosaicReader;
 import org.geotools.gce.imagemosaic.base.ImageMosaicMetadata;
 import org.geotools.gce.imagemosaic.base.ImageMosaicMetadataImpl;
-import org.geotools.gce.imagemosaic.base.ImageMosaicReader;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -47,7 +47,7 @@ import org.opengis.referencing.operation.TransformException;
 import com.vividsolutions.jts.geom.Envelope;
 
 @SuppressWarnings("deprecation")
-public class ShpImageMosaicReader extends ImageMosaicReader
+public class ShpImageMosaicReader extends AbstractImageMosaicReader
 {
     /** Logger. */
     private final static Logger LOGGER = org.geotools.util.logging.Logging
