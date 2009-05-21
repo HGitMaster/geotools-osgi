@@ -20,9 +20,7 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.image.RenderedImage;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -84,9 +82,6 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
     private static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger("org.geotools.gce.imagemosaic.base");
 
-    private static final String COVERAGE_CREATION_ERROR 
-        = "Unable to create a coverage for this source";
-    
     /**
      * Max number of tiles that this plugin will load.
      * 
@@ -287,6 +282,10 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
     private ReferencedEnvelope transformAndIntersectEnvelopes(
             ImageMosaicParameters mp) throws DataSourceException
     {
+        final String COVERAGE_CREATION_ERROR 
+            = "Unable to create a coverage for this source";
+    
+        
         GeneralEnvelope reqEnv = mp.getRequestedEnvelope();
         ReferencedEnvelope intersectionEnvelope;
         if (reqEnv == null)
@@ -317,6 +316,7 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
                         + "we will return a null coverage.");
                 throw new DataSourceException(COVERAGE_CREATION_ERROR);
             }
+            
             // intersect the requested area with the bounds of this layer
             GeneralEnvelope intersectionEnv = new GeneralEnvelope(reqEnv);
             intersectionEnv.intersect(originalEnvelope);
@@ -395,13 +395,13 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
         // displacements in the final mosaic which we do not wnat to happen.
         double[] resolution = getResolution(readP, imageChoice);
 
-        // Envelope of the loaded dataset and upper left corner of this
-        // envelope.
+        // Compute the envelope of the loaded dataset and the upper left corner
+        // of this envelope.
         //
-        // Ths envelope corresponds to the union of the envelopes of all the
-        // tiles that intersect the area that was request by the user. It is
-        // crucial to understand that this geographic area can be, and it
-        // usually is, bigger then the requested one. This involves doing a
+        // This envelope corresponds to the union of the envelopes of all the
+        // tiles that intersect the area requested by the user. It is
+        // crucial to understand that this geographic area can be, and
+        // usually is, bigger than the requested one. This involves doing a
         // crop operation at the end of the mosaic creation.
         ReferencedEnvelope loadedDataSetBound = getLoadedTilesEnvelope(imageRefs);
         Point2D upperLeft = new Point2D.Double(loadedDataSetBound.getMinX(),
@@ -409,10 +409,9 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
 
         // CORE LOOP
         //
-        // Loop over the single features and load the images which
-        // intersect the requested envelope. Once all of them have been
-        // loaded, next step is to create the mosaic and then
-        // crop it as requested.
+        // Loop over the tiles intersecting the requested envelope. Once all of
+        // them have been loaded, the next step is to create the mosaic and then
+        // crop it if needed.
 
         int i = 0;
 
@@ -432,8 +431,8 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
 
             // Input alpha, ROI and transparent color management.
             //
-            // Once I get the first image Ican acquire all the information I
-            // need in order to decide which actions to while and after
+            // Once I get the first image I can acquire all the information I
+            // need in order to decide which actions to do while and after
             // loading the images.
             //
             // Specifically, I have to check if the loaded image have
@@ -456,10 +455,6 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
             i++;
         }
 
-        // Create the mosaic image by doing a crop if necessary and also
-        // managing the transparent color if applicable. Be aware that
-        // management of the transparent color involves removing
-        // transparency information from the input images.
         PlanarImage croppedImage = loader.cropIfNeeded(mp, intersectionJTSEnvelope, loadedDataSetBound);
         
         croppedImage = makeTransparent(mp.getOutputTransparentColor(),
@@ -490,11 +485,10 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
         loader.loadImage(readP, imageChoice, imageInputStream);
     }
 
-    private double[] getResolution(ImageReadParam readP,
-            Integer imageChoice)
+    private double[] getResolution(ImageReadParam readP, Integer imageChoice)
     {
         double[] res;
-        if (imageChoice.intValue() == 0)
+        if (imageChoice == 0)
         {
             res = new double[highestRes.length];
             res[0] = highestRes[0];
@@ -545,22 +539,19 @@ public abstract class ImageMosaicReader extends AbstractGridCoverage2DReader
     }
     
 
-    private PlanarImage makeTransparent(Color outputTransparentColor,
-            PlanarImage preparationImage)
+    private PlanarImage makeTransparent(Color transparentColor,
+            PlanarImage image)
     {
-        // FINAL ALPHA
-        if (outputTransparentColor != null)
+        if (transparentColor != null)
         {
             if (LOGGER.isLoggable(Level.FINE))
-                LOGGER.fine("Support for alpha");
+                LOGGER.fine("Making image transparent");
 
-            // If requested I can perform the ROI operation on the prepared ROI
-            // image for building up the alpha band
-            ImageWorker w = new ImageWorker(preparationImage);
-            w.makeColorTransparent(outputTransparentColor);
-            preparationImage = w.getPlanarImage();
+            ImageWorker w = new ImageWorker(image);
+            w.makeColorTransparent(transparentColor);
+            image = w.getPlanarImage();
         }
-        return preparationImage;
+        return image;
     }
 
 

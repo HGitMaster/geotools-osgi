@@ -29,6 +29,7 @@ import javax.media.jai.operator.MosaicDescriptor;
 
 import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -49,7 +50,7 @@ class ImageMosaicLoader
 {
     private static Logger LOGGER = Logging.getLogger(ImageMosaicLoader.class);
     private ImageMosaicMetadata metadata;
-    private ParameterBlockJAI pbjMosaic;
+    private ParameterBlockJAI pbj;
     private int numImages;
     private ROI[] rois;
     private PlanarImage[] alphaChannels;
@@ -60,13 +61,13 @@ class ImageMosaicLoader
     private boolean doInputImageThreshold;
     private boolean blend;
     
-    private double inputImageThresholdValue;
+    private double inputImageThreshold;
     
     private int[] alphaIndex;
     private ColorModel model;
     private Color transparentColor;
     private RenderedImage loadedImage;
-    private GeneralEnvelope finalenvelope;
+    private GeneralEnvelope finalEnvelope;
     
     
     ImageMosaicLoader(ImageMosaicMetadata metadata, ImageMosaicParameters mp)
@@ -74,12 +75,11 @@ class ImageMosaicLoader
         this.metadata = metadata;
         this.numImages = mp.getMaxNumTiles();
         transparentColor = mp.getInputTransparentColor();
-        inputImageThresholdValue = mp.getInputImageThreshold();
+        inputImageThreshold = mp.getInputImageThreshold();
         
         
-        pbjMosaic = new ParameterBlockJAI("Mosaic");
-        pbjMosaic.setParameter("mosaicType",
-                MosaicDescriptor.MOSAIC_TYPE_OVERLAY);
+        pbj = new ParameterBlockJAI("Mosaic");
+        pbj.setParameter("mosaicType", MosaicDescriptor.MOSAIC_TYPE_OVERLAY);
         
         rois = new ROI[numImages];
         alphaChannels = new PlanarImage[numImages];            
@@ -100,8 +100,8 @@ class ImageMosaicLoader
         //
         // If I request a threshod of 0 on a byte image, I can skip
         // doing the ROI!
-        doInputImageThreshold = checkIfThresholdIsNeeded(
-                loadedImage, inputImageThresholdValue);
+        doInputImageThreshold = 
+            checkIfThresholdIsNeeded(loadedImage, inputImageThreshold);
 
         // Checking if we have to do something against the final
         // transparent color.
@@ -116,9 +116,10 @@ class ImageMosaicLoader
         if (transparentColor != null)
         {
             // paranoiac check on the provided transparent color
-            transparentColor = new Color(transparentColor.getRed(),
-                    transparentColor.getGreen(), transparentColor
-                            .getBlue());
+            transparentColor = new Color(
+                    transparentColor.getRed(),
+                    transparentColor.getGreen(), 
+                    transparentColor.getBlue());
             doTransparentColor = true;
 
             // If the images use an IndexColorModel Bitamsk where
@@ -136,14 +137,11 @@ class ImageMosaicLoader
                     && model.getTransparency() == Transparency.BITMASK)
             {
                 IndexColorModel icm = (IndexColorModel) model;
-                int transparentPixel = icm
-                        .getTransparentPixel();
+                int transparentPixel = icm.getTransparentPixel();
                 if (transparentPixel != -1)
                 {
-                    int oldTransparentColor = icm
-                            .getRGB(transparentPixel);
-                    if (oldTransparentColor == transparentColor
-                            .getRGB())
+                    int oldTransparentColor = icm.getRGB(transparentPixel);
+                    if (oldTransparentColor == transparentColor.getRGB())
                     {
                         doTransparentColor = false;
                     }
@@ -224,8 +222,8 @@ class ImageMosaicLoader
         if (doInputImageThreshold)
         {
             ImageWorker w = new ImageWorker(readyToMosaicImage);
-            w.tileCacheEnabled(false).intensity().binarize(
-                    inputImageThresholdValue);
+            w.tileCacheEnabled(false).intensity();
+            w.binarize(inputImageThreshold);
             rois[i] = w.getImageAsROI();
 
         }
@@ -240,17 +238,18 @@ class ImageMosaicLoader
             // case the image is indexed.
             if (colorModel instanceof IndexColorModel)
             {
-                alphaChannels[i] = w.forceComponentColorModel()
-                        .retainLastBand().getPlanarImage();
+                w.forceComponentColorModel().retainLastBand();                
+                alphaChannels[i] = w.getPlanarImage();
             }
 
             else
+            {
                 alphaChannels[i] = w.retainBands(alphaIndex).getPlanarImage();
-
+            }
         }
 
         // ADD TO MOSAIC
-        pbjMosaic.addSource(readyToMosaicImage);
+        pbj.addSource(readyToMosaicImage);
         PlanarImage pImage = PlanarImage.wrapRenderedImage(readyToMosaicImage);
         Area area = new Area(pImage.getBounds());
         finalLayout.add(area);
@@ -283,29 +282,26 @@ class ImageMosaicLoader
         // overlapping regions.
 
         double th = getThreshold(loadedImage.getSampleModel().getDataType());
-        pbjMosaic
-                .setParameter("sourceThreshold", new double[][] { { th } });
+        pbj.setParameter("sourceThreshold", new double[][] { { th } });
         if (doInputImageThreshold)
         {
             // Set the ROI parameter in case it was requested by setting a
             // threshold.
-            pbjMosaic.setParameter("sourceROI", rois);
+            pbj.setParameter("sourceROI", rois);
 
         }
         else if (alphaIn || doTransparentColor)
         {
             // In case the input images have transparency information this
             // way we can handle it.
-            pbjMosaic.setParameter("sourceAlpha", alphaChannels);
+            pbj.setParameter("sourceAlpha", alphaChannels);
 
         }
-        // It might important to set the mosaic tpe to blend otherwise
+        // It might important to set the mosaic type to blend otherwise
         // sometimes strange results jump in.
         if (blend)
         {
-            pbjMosaic.setParameter("mosaicType",
-                    MosaicDescriptor.MOSAIC_TYPE_BLEND);
-
+            pbj.setParameter("mosaicType", MosaicDescriptor.MOSAIC_TYPE_BLEND);
         }            
     }        
     /**
@@ -424,8 +420,8 @@ class ImageMosaicLoader
         double resY = (bound.getMaxY() - bound.getMinY()) / image.getHeight();
         double scaleX = 1.0, scaleY = 1.0;
         double xTrans = 0.0, yTrans = 0.0;
-        if (Math.abs((resX - res[0]) / resX) > ImageMosaicReader.EPS
-                || Math.abs(resY - res[1]) > ImageMosaicReader.EPS)
+        if (Math.abs((resX - res[0]) / resX) > AbstractGridCoverage2DReader.EPS
+                || Math.abs(resY - res[1]) > AbstractGridCoverage2DReader.EPS)
         {
             scaleX = res[0] / resX;
             scaleY = res[1] / resY;
@@ -542,9 +538,9 @@ class ImageMosaicLoader
             ReferencedEnvelope loadedTilesEnvelope )
             throws DataSourceException
     {
-        finalenvelope = null;
-        PlanarImage preparationImage;
-        Rectangle loadedTilePixelsBound = finalLayout.getBounds();
+        finalEnvelope = null;
+        PlanarImage croppedImage;
+        Rectangle loadedRange = finalLayout.getBounds();
         if (LOGGER.isLoggable(Level.FINE))
         {
             LOGGER.fine(String.format("Loaded bbox %s while requested bbox %s", 
@@ -559,10 +555,10 @@ class ImageMosaicLoader
         GeneralEnvelope loadedTilesBoundEnv = 
             new GeneralEnvelope(loadedTilesEnvelope);
         
-        double loadedWidth = loadedTilesBoundEnv.getSpan(0);
+        double loadedWidth  = loadedTilesBoundEnv.getSpan(0);
         double loadedHeight = loadedTilesBoundEnv.getSpan(1);
-        double toleranceX = loadedWidth  / loadedTilePixelsBound.getWidth();
-        double toleranceY = loadedHeight / loadedTilePixelsBound.getHeight();
+        double toleranceX = loadedWidth  / loadedRange.getWidth();
+        double toleranceY = loadedHeight / loadedRange.getHeight();
         double tolerance = Math.min(toleranceX / 2.0, toleranceY  / 2.0);
         GeneralEnvelope genIntersEnv = new GeneralEnvelope(intersectionEnvelope);
         if (!genIntersEnv.equals(loadedTilesBoundEnv, tolerance, false))
@@ -573,19 +569,27 @@ class ImageMosaicLoader
             intersection.intersect(loadedTilesBoundEnv);
 
             // get the transform for going from world to grid
+            String msg = "Problem when creating this mosaic.";
             try
             {
-                GridToEnvelopeMapper gridToEnvelopeMapper = new GridToEnvelopeMapper(
-                        new GeneralGridRange(loadedTilePixelsBound),
-                        loadedTilesBoundEnv);
+                GeneralGridRange gridRange = new GeneralGridRange(loadedRange);
+                GridToEnvelopeMapper gridToEnvelopeMapper 
+                    = new GridToEnvelopeMapper(gridRange, loadedTilesBoundEnv);
                 gridToEnvelopeMapper.setPixelAnchor(PixelInCell.CELL_CORNER);
-                MathTransform transform = gridToEnvelopeMapper
-                        .createTransform().inverse();
-                GeneralGridEnvelope finalRange = new GeneralGridEnvelope(CRS
-                        .transform(transform, intersection), PixelInCell.CELL_CORNER, false);
+                
+                MathTransform transform = 
+                    gridToEnvelopeMapper.createTransform().inverse();
+                
+                GeneralEnvelope transformedRange = 
+                    CRS.transform(transform, intersection);
+                
+                GeneralGridEnvelope finalRange = 
+                    new GeneralGridEnvelope(transformedRange, PixelInCell.CELL_CORNER, false);
+
                 // CROP
                 finalLayout.intersect(new Area(finalRange.toRectangle()));
                 Rectangle tempRect = finalLayout.getBounds();
+
                 ImageLayout layout = new ImageLayout(
                         tempRect.x, tempRect.y,
                         tempRect.width, tempRect.height, 
@@ -593,39 +597,37 @@ class ImageMosaicLoader
                         JAI.getDefaultTileSize().width, 
                         JAI.getDefaultTileSize().height,
                         null, null);
+                
                 RenderingHints rHints = 
                     new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-                preparationImage = JAI.create("Mosaic", pbjMosaic, rHints);
-
-                finalenvelope = intersection;
-
+                
+                croppedImage = JAI.create("Mosaic", pbj, rHints);
+                finalEnvelope = intersection;
             }
             catch (MismatchedDimensionException e)
             {
-                throw new DataSourceException(
-                        "Problem when creating this mosaic.", e);
+                throw new DataSourceException(msg, e);
             }
             catch (TransformException e)
             {
-                throw new DataSourceException(
-                        "Problem when creating this mosaic.", e);
+                throw new DataSourceException(msg, e);
             }
         }
         else
         {
-            preparationImage = JAI.create("Mosaic", pbjMosaic);
-            finalenvelope = new GeneralEnvelope(intersectionEnvelope);
+            croppedImage = JAI.create("Mosaic", pbj);
+            finalEnvelope = new GeneralEnvelope(intersectionEnvelope);
         }
 
         if (LOGGER.isLoggable(Level.FINE))
             LOGGER.fine("Mosaic created ");
 
-        return preparationImage;
+        return croppedImage;
     }
 
     GeneralEnvelope getFinalEnvelope()
     {
-        return finalenvelope;
+        return finalEnvelope;
     }
     
 }

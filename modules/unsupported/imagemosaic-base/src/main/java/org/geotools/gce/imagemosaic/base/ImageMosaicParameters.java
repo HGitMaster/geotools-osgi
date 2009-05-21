@@ -24,11 +24,13 @@ public class ImageMosaicParameters
     public ImageMosaicParameters()
     {
         inputTransparentColor = ImageMosaicFormat.INPUT_TRANSPARENT_COLOR
-        .getDefaultValue();
+                .getDefaultValue();
+        
         outputTransparentColor = ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR
-        .getDefaultValue();
+                .getDefaultValue();
+        
         inputImageThreshold = ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
-        .getDefaultValue();
+                .getDefaultValue();
     }
 
     public void evaluate(GeneralParameterValue[] params)
