@@ -2,14 +2,14 @@ package org.geotools.gce.imagemosaic.base;
 
 import java.util.List;
 
-import org.geotools.geometry.GeneralEnvelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public interface ImageMosaicMetadata
 {
     String getName();
 
-    GeneralEnvelope getEnvelope();
+    Envelope getEnvelope();
 
     int getNumLevels();
 

@@ -3,7 +3,7 @@ package org.geotools.gce.imagemosaic.base;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.geometry.GeneralEnvelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class ImageMosaicMetadataImpl implements ImageMosaicMetadata
@@ -14,7 +14,7 @@ public class ImageMosaicMetadataImpl implements ImageMosaicMetadata
     private boolean hasColorCorrection;
     private CoordinateReferenceSystem crs;
     private List<double[]> resolutions;
-    private GeneralEnvelope envelope;
+    private Envelope envelope;
     private boolean colorModelExpansion;
 
     public ImageMosaicMetadataImpl(int numLevels)
@@ -39,7 +39,7 @@ public class ImageMosaicMetadataImpl implements ImageMosaicMetadata
         return crs;
     }
 
-    public GeneralEnvelope getEnvelope()
+    public Envelope getEnvelope()
     {
         return envelope;
     }
@@ -89,7 +89,7 @@ public class ImageMosaicMetadataImpl implements ImageMosaicMetadata
         this.resolutions = resolutions;
     }
 
-    public void setEnvelope(GeneralEnvelope envelope)
+    public void setEnvelope(Envelope envelope)
     {
         this.envelope = envelope;
     }

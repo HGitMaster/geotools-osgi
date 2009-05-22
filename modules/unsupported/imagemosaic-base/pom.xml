@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt-imagemosaic</artifactId>
+  <artifactId>gt-imagemosaic-base</artifactId>
   <packaging>jar</packaging>
   <name>imagemosaic datasource module</name>
   <url>http://maven.geotools.fr/reports/modules/unsupported/imagemosaic-base/</url>

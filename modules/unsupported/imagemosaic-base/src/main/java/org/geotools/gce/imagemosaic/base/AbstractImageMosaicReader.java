@@ -39,13 +39,16 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.ImageWorker;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -148,7 +151,7 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
         this.metadata = createMetadata();
 
         // load the envelope
-        this.originalEnvelope = metadata.getEnvelope();
+        this.originalEnvelope = new GeneralEnvelope(metadata.getEnvelope());
 
         // resolutions levels
         numOverviews = metadata.getNumLevels()-1;
@@ -564,5 +567,43 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
     public int getGridCoverageCount()
     {
         return 1;
+    }
+
+
+    protected GeneralEnvelope transformEnvelope(GeneralEnvelope env) throws DataSourceException
+    {
+        CoordinateReferenceSystem reqCrs = env.getCoordinateReferenceSystem();
+        if (!CRS.equalsIgnoreMetadata(reqCrs, this.crs))
+        {
+            return env;
+        }
+        
+        try
+        {
+            // transforming the envelope back to the dataset crs in
+            // order to interact with the original envelope for this
+            // mosaic.
+            MathTransform transform = CRS.findMathTransform(reqCrs, crs, true);
+            if (!transform.isIdentity())
+            {
+                env = CRS.transform(transform, env);
+                env.setCoordinateReferenceSystem(this.crs);
+    
+                if (LOGGER.isLoggable(Level.FINE))
+                    LOGGER.fine(String.format("Reprojected envelope %s crs %s",
+                            env, crs.toWKT()));
+            }
+        }
+        catch (TransformException e)
+        {
+            throw new DataSourceException(
+                    "Unable to create a coverage for this source", e);
+        }
+        catch (FactoryException e)
+        {
+            throw new DataSourceException(
+                    "Unable to create a coverage for this source", e);
+        }
+        return env;
     }
 }

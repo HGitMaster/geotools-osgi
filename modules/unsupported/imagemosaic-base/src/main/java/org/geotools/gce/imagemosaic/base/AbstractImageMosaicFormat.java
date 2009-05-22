@@ -18,6 +18,7 @@ package org.geotools.gce.imagemosaic.base;
 
 import java.awt.Color;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
@@ -100,8 +101,8 @@ public abstract class AbstractImageMosaicFormat extends AbstractGridFormat imple
     /**
      * Sets the metadata information.
      */
-    private void setInfo() {
-        final HashMap<String,String> info = new HashMap<String,String> ();
+    protected void setInfo() {
+        Map<String,String> info = new HashMap<String,String> ();
         info.put("name", "ImageMosaicBase");
         info.put("description", "Abstract Image Mosaicking Plugin");
         info.put("vendor", "Geotools");
