@@ -34,15 +34,11 @@ import org.geotools.gce.imagemosaic.base.ImageMosaicMetadata;
 import org.geotools.gce.imagemosaic.base.ImageMosaicMetadataImpl;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
 import org.opengis.coverage.grid.Format;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -50,7 +46,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class ShpImageMosaicReader extends AbstractImageMosaicReader
 {
     /** Logger. */
-    private final static Logger LOGGER = org.geotools.util.logging.Logging
+    public final static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger("org.geotools.gce.imagemosaic.shp");
 
     private URL sourceURL;
@@ -282,51 +278,16 @@ public class ShpImageMosaicReader extends AbstractImageMosaicReader
     }
 
     @Override
-    protected List<?> getMatchingImageRefs(ReferencedEnvelope env)
+    protected List<?> getMatchingImageRefs(ReferencedEnvelope intersectionEnv)
             throws IOException
     {
-        GeneralEnvelope originalEnv = shpMetadata.getEnvelope();
-        GeneralEnvelope requestedOriginalEnv = null;
-        GeneralEnvelope intersectionEnv = null;
-        if (requestedOriginalEnv != null)
-        {
-            requestedOriginalEnv = transformEnvelope(requestedOriginalEnv);
-            if (!requestedOriginalEnv.intersects(originalEnv, true))
-            {
-                LOGGER.warning("The requested envelope does not intersect " +
-                    "the envelope of this mosaic, " +
-                    "we will return a null coverage.");
-                throw new DataSourceException(
-                        "Unable to create a coverage for this source");
-            }
-            intersectionEnv = new GeneralEnvelope(
-                    requestedOriginalEnv);
-            // intersect the requested area with the bounds of this layer
-            intersectionEnv.intersect(originalEnv);
-        }
-        else
-        {
-            requestedOriginalEnv = new GeneralEnvelope(originalEnv);
-            intersectionEnv = requestedOriginalEnv;
-        }
-        requestedOriginalEnv.setCoordinateReferenceSystem(this.crs);
-        intersectionEnv.setCoordinateReferenceSystem(this.crs);
-
-        // ok we got something to return, let's load records from the index
-        // Prepare the filter for loading th needed layers
-        ReferencedEnvelope intersectionJTSEnvelope = new ReferencedEnvelope(
-                intersectionEnv.getMinimum(0), intersectionEnv
-                        .getMaximum(0), intersectionEnv.getMinimum(1),
-                intersectionEnv.getMaximum(1), crs);
-
         // Load features from the index
         // In case there are no features under the requested bbox which is legal
         // in case the mosaic is not a real sqare, we return a fake mosaic.
         if (LOGGER.isLoggable(Level.FINE))
-            LOGGER.fine("loading tile for envelope "
-                    + intersectionJTSEnvelope.toString());
+            LOGGER.fine("loading tile for envelope " + intersectionEnv);
 
-        List<SimpleFeature> features = getFeaturesFromIndex(intersectionJTSEnvelope);
+        List<SimpleFeature> features = getFeaturesFromIndex(intersectionEnv);
         if (features.isEmpty())
         {
             return null;
@@ -340,43 +301,6 @@ public class ShpImageMosaicReader extends AbstractImageMosaicReader
         }
         
         return locations;
-    }
-
-    private GeneralEnvelope transformEnvelope(GeneralEnvelope env) throws DataSourceException
-    {
-        CoordinateReferenceSystem reqCrs = env.getCoordinateReferenceSystem();
-        if (!CRS.equalsIgnoreMetadata(reqCrs, this.crs))
-        {
-            return env;
-        }
-        
-        try
-        {
-            // transforming the envelope back to the dataset crs in
-            // order to interact with the original envelope for this
-            // mosaic.
-            MathTransform transform = CRS.findMathTransform(reqCrs, crs, true);
-            if (!transform.isIdentity())
-            {
-                env = CRS.transform(transform, env);
-                env.setCoordinateReferenceSystem(this.crs);
-
-                if (LOGGER.isLoggable(Level.FINE))
-                    LOGGER.fine(String.format("Reprojected envelope %s crs %s",
-                            env, crs.toWKT()));
-            }
-        }
-        catch (TransformException e)
-        {
-            throw new DataSourceException(
-                    "Unable to create a coverage for this source", e);
-        }
-        catch (FactoryException e)
-        {
-            throw new DataSourceException(
-                    "Unable to create a coverage for this source", e);
-        }
-        return env;
     }
 
     public Format getFormat()

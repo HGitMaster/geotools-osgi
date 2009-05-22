@@ -9,6 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +29,29 @@ public class ShpImageMosaicFormat extends AbstractImageMosaicFormat
     /** Logger. */
     private final static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger("org.geotools.gce.imagemosaic.shp");
+    
+    public ShpImageMosaicFormat()    
+    {
+        setInfo();
+    }
 
+    /**
+     * Sets the metadata information.
+     */
+    @Override
+    protected void setInfo() {
+        super.setInfo();
+        Map<String,String> info = new HashMap<String,String> ();
+        info.put("name", "ShpImageMosaic");
+        info.put("description", "Image Mosaics with Shapefile Index");
+        info.put("vendor", "Geotools");
+        info.put("docURL", "");
+        info.put("version", "2.6.0");
+        mInfo = info;
+    }
+
+    
+    
     @Override
     public boolean accepts(Object source)
     {
