@@ -150,8 +150,11 @@
          <module>widgets-swing-pending</module>
          <module>wps</module>
 
-         <!-- not really required, ad hoc addition -->
+         <!-- not really required, ad hoc additions -->
          <module>coveragetools</module>
+         <module>imagemosaic-base</module>
+         <module>imagemosaic-shp</module>
+         <module>imagemosaic-sql</module>
        </modules>
      </profile>
 
