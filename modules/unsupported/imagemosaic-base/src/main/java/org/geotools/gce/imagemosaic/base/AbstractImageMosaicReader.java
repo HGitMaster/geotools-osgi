@@ -302,7 +302,7 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
             ReferencedEnvelope refReqEnv = new ReferencedEnvelope(reqEnv);
             try
             {
-                intersectionEnvelope = refReqEnv.transform(crs, true);
+                refReqEnv = refReqEnv.transform(crs, true);
             }
             catch (TransformException e)
             {
@@ -312,7 +312,7 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
             {
                 throw new DataSourceException(COVERAGE_CREATION_ERROR);
             }
-            if (!reqEnv.intersects(originalEnvelope, true))
+            if (!originalEnvelope.intersects(refReqEnv, true))
             {
                 LOGGER.warning("The requested envelope does not intersect "
                         + "the envelope of this mosaic, "
@@ -321,7 +321,7 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
             }
             
             // intersect the requested area with the bounds of this layer
-            GeneralEnvelope intersectionEnv = new GeneralEnvelope(reqEnv);
+            GeneralEnvelope intersectionEnv = new GeneralEnvelope(refReqEnv);
             intersectionEnv.intersect(originalEnvelope);
 
             intersectionEnvelope = new ReferencedEnvelope(intersectionEnv);

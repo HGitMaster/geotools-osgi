@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -193,5 +194,19 @@ public class SqlImageMosaicReader extends AbstractImageMosaicReader
     protected int[] getBands(Object imageId)
     {
         throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public void dispose()
+    {
+        super.dispose();
+        try
+        {
+            jdbcAccess.close();
+        }
+        catch (SQLException exc)
+        {
+            LOGGER.log(Level.SEVERE, "SQL error", exc);
+        }
     }
 }
