@@ -57,5 +57,7 @@ interface JDBCAccess
     
     Envelope getTileEnvelope(ImageLevelInfo levelInfo, Object tileId);
     
-    ImageInputStream getImageInputStream(ImageLevelInfo levelInfo, Object tileId);    
+    ImageInputStream getImageInputStream(ImageLevelInfo levelInfo, Object tileId);
+    
+    void close() throws SQLException;
 }
