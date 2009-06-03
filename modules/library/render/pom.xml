@@ -241,15 +241,6 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/SVGGlyphRendererTest.java</exclude>
-            <exclude>**/SVGGraphicFactoryTest.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
     </plugins>
   </build>  
 
