@@ -724,6 +724,7 @@ abstract class JDBCAccessBase implements JDBCAccess {
         String statementString = getTileEnvelopeSelectStatement(levelInfo);
         ReferencedEnvelope envelope = null;
         try {
+            Connection con = dataSource.getConnection();
             PreparedStatement s = con.prepareStatement(statementString);
             s.setObject(1, tileId);
 
@@ -734,6 +735,7 @@ abstract class JDBCAccessBase implements JDBCAccess {
             }
             r.close();
             s.close();
+            con.close();
         }
         catch (SQLException exc)
         {
@@ -747,6 +749,7 @@ abstract class JDBCAccessBase implements JDBCAccess {
         ImageInputStream iis = null;
         String sql = getTileSelectStatement(levelInfo);
         try {
+            Connection con = dataSource.getConnection();
             PreparedStatement s = con.prepareStatement(sql);
             s.setObject(1, tileId);
 
@@ -759,6 +762,7 @@ abstract class JDBCAccessBase implements JDBCAccess {
             }
             r.close();
             s.close();
+            con.close();
         }
         catch (SQLException exc)
         {
@@ -772,4 +776,12 @@ abstract class JDBCAccessBase implements JDBCAccess {
         return iis;
     }
     
+    public void close() throws SQLException
+    {
+        if (con != null)
+        {
+            con.close();
+            con = null;
+        }
+    }    
 }
