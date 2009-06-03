@@ -158,18 +158,22 @@
       <groupId>org.apache.batik.osgi</groupId>
       <artifactId>org.apache.batik.osgi.transcoder</artifactId>
       <!-- The version number is specified in the parent POM. -->
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-util</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
        <groupId>xerces</groupId>
        <artifactId>xercesImpl</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis-xerces</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -225,19 +229,28 @@
   </dependencies>
   
   <build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
-						<manifest>
-						  <addClasspath>false</addClasspath>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+            <manifest>
+              <addClasspath>false</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/SVGGlyphRendererTest.java</exclude>
+            <exclude>**/SVGGraphicFactoryTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>  
 
 </project>
