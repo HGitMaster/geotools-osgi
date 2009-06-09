@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.geotools.render
 Bundle-Version: 2.6.0.osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
+Eclipse-BuddyPolicy: registered
 Require-Bundle: org.geotools.main;bundle-version="2.6.0",
  org.geotools.coverage;bundle-version="2.6.0",
  org.geotools.cql;bundle-version="2.6.0",
