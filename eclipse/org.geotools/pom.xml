@@ -19,8 +19,9 @@
       <resource>
         <directory>${basedir}</directory>
         <includes>
-          <include>about.ini</include>
+          <include>about.*</include>
           <include>META-INF/**</include>
+          <include>icons/**</include>
         </includes>
       </resource>
     </resources>
