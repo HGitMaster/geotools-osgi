@@ -698,8 +698,10 @@ abstract class JDBCAccessBase implements JDBCAccess {
         String statementString = getGridSelectStatement(levelInfo);
 
         try {
-            con = dataSource.getConnection();
-
+            if (con == null)
+            {
+                con = dataSource.getConnection();
+            }
             PreparedStatement s = con.prepareStatement(statementString);
             setGridSelectParams(s, (GeneralEnvelope)requestEnvelope, levelInfo);
 
