@@ -19,24 +19,25 @@
       <resource>
         <directory>${basedir}</directory>
         <includes>
-          <include>about.ini</include>
+          <include>about.*</include>
           <include>META-INF/**</include>
+          <include>icons/**</include>
         </includes>
       </resource>
     </resources>
 
     <plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
-						<manifest>
-							<addClasspath>false</addClasspath>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
+	  <plugin>
+	    <artifactId>maven-jar-plugin</artifactId>
+		  <configuration>
+		    <archive>
+			  <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+			  <manifest>
+			    <addClasspath>false</addClasspath>
+			  </manifest>
+			</archive>
+          </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
