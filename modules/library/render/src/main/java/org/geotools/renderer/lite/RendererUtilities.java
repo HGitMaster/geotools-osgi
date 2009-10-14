@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.JTS;
@@ -33,10 +33,11 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.MismatchedDimensionException;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.EngineeringCRS;
@@ -60,7 +61,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author dblasby
  * @author Simone Giannecchini
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/RendererUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6-M2/modules/library/render/src/main/java/org/geotools/renderer/lite/RendererUtilities.java $
  */
 public final class RendererUtilities {
 
@@ -146,7 +147,7 @@ public final class RendererUtilities {
 		// //
             final GridToEnvelopeMapper m = (GridToEnvelopeMapper) gridToEnvelopeMappers.get();
 		try {
-            m.setGridRange(new GeneralGridRange(paintArea));
+            m.setGridRange(new GridEnvelope2D(paintArea));
             m.setEnvelope(genvelope);
             return m.createAffineTransform().createInverse();
 		} catch (MismatchedDimensionException e) {
@@ -159,101 +160,77 @@ public final class RendererUtilities {
 
 	}
 
-	/**
-	 * Creates the map's bounding box in real world coordinates <p/> ((Taken
-	 * from the old LiteRenderer))
-	 * 
-	 * @param worldToScreen
-	 *            a transform which converts World coordinates to screen pixel
-	 *            coordinates.
-	 * @param paintArea
-	 *            the size of the rendering output area
-	 * @deprecated Uses the alternative using a
-	 *             <code>CoordinateReferenceSystem</code> that doe not assume
-	 *             anything on axes order.
-	 */
-	public static Envelope createMapEnvelope(Rectangle paintArea,
-			AffineTransform worldToScreen)
-			throws NoninvertibleTransformException {
-		AffineTransform pixelToWorld = null;
 
-		// Might throw NoninvertibleTransformException
-		pixelToWorld = worldToScreen.createInverse();
+    /**
+     * Creates the map's bounding box in real world coordinates.
+     * 
+     * @param worldToScreen
+     *            a transform which converts World coordinates to screen pixel coordinates. No
+     *            assumptions are done on axis order as this is assumed to be pre-calculated. The
+     *            affine transform may specify an rotation, in case the envelope will encompass the
+     *            complete (rotated) world polygon.
+     * @param paintArea
+     *            the size of the rendering output area
+     * @return the envelope in world coordinates corresponding to the screen rectangle.
+     */
+    public static Envelope createMapEnvelope(Rectangle paintArea, AffineTransform worldToScreen)
+            throws NoninvertibleTransformException {
+        //
+        // (X1,Y1) (X2,Y1)
+        //
+        // (X1,Y2) (X2,Y2)
+        double[] pts = new double[8];
+        pts[0] = paintArea.getMinX();
+        pts[1] = paintArea.getMinY();
+        pts[2] = paintArea.getMaxX();
+        pts[3] = paintArea.getMinY();
+        pts[4] = paintArea.getMaxX();
+        pts[5] = paintArea.getMaxY();
+        pts[6] = paintArea.getMinX();
+        pts[7] = paintArea.getMaxY();
+        worldToScreen.inverseTransform(pts, 0, pts, 0, 4);
+        double xMin = Double.MAX_VALUE;
+        double yMin = Double.MAX_VALUE;
+        double xMax = Double.MIN_VALUE;
+        double yMax = Double.MIN_VALUE;
+        for (int i = 0; i < 4; i++) {
+            xMin = Math.min(xMin, pts[2 * i]);
+            yMin = Math.min(yMin, pts[2 * i + 1]);
+            xMax = Math.max(xMax, pts[2 * i]);
+            yMax = Math.max(yMax, pts[2 * i + 1]);
+        }
+        return new Envelope(xMin, xMax, yMin, yMax);
+    }
 
-		Point2D p1 = new Point2D.Double();
-		Point2D p2 = new Point2D.Double();
-		pixelToWorld.transform(new Point2D.Double(paintArea.getMinX(),
-				paintArea.getMinY()), p1);
-		pixelToWorld.transform(new Point2D.Double(paintArea.getMaxX(),
-				paintArea.getMaxY()), p2);
+    /**
+     * Creates the map's bounding box in real world coordinates
+     * <p/>
+     * 
+     * NOTE It is worth to note that here we do not take into account the half a pixel translation
+     * stated by ogc for coverages bounds. One reason is that WMS 1.1.1 does not follow it!!!
+     * 
+     * @param worldToScreen
+     *            a transform which converts World coordinates to screen pixel coordinates.
+     * @param paintArea
+     *            the size of the rendering output area
+     */
+    public static ReferencedEnvelope createMapEnvelope(Rectangle paintArea,
+            AffineTransform worldToScreen, final CoordinateReferenceSystem crs)
+            throws NoninvertibleTransformException {
 
-		double x1 = p1.getX();
-		double y1 = p1.getY();
-		double x2 = p2.getX();
-		double y2 = p2.getY();
-		return new Envelope(Math.min(x1, x2), Math.max(x1, x2), Math
-				.min(y1, y2), Math.max(y1, y2));
-	}
-
-	/**
-	 * Creates the map's bounding box in real world coordinates <p/>
-	 * 
-	 * NOTE It is worth to note that here we do not take into account the half a
-	 * pixel translation stated by ogc for coverages bounds. One reason is that
-	 * WMS 1.1.1 does not follow it!!!
-	 * 
-	 * @param worldToScreen
-	 *            a transform which converts World coordinates to screen pixel
-	 *            coordinates.
-	 * @param paintArea
-	 *            the size of the rendering output area
-	 */
-	public static ReferencedEnvelope createMapEnvelope(Rectangle paintArea,
-			AffineTransform worldToScreen, final CoordinateReferenceSystem crs)
-			throws NoninvertibleTransformException {
-
-		// //
-		//
-		// Make sure the CRS is 2d
-		//
-		// //
-		final CoordinateReferenceSystem crs2d= CRS.getHorizontalCRS(crs);
-        if(crs2d==null)
+        // //
+        //
+        // Make sure the CRS is 2d
+        //
+        // //
+        final CoordinateReferenceSystem crs2d = CRS.getHorizontalCRS(crs);
+        if (crs2d == null)
             throw new UnsupportedOperationException(Errors.format(
-                      ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
-                      crs));			
+                    ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1, crs));
 
-		// //
-		//
-		// build the transform
-		//
-		// //
-		final AffineTransform pixelToWorld = worldToScreen.createInverse();
-
-		// //
-		//
-		// tranform corners
-		//
-		// //
-		Point2D p1 = new Point2D.Double();
-		Point2D p2 = new Point2D.Double();
-		pixelToWorld.transform(new Point2D.Double(paintArea.getMinX(),
-				paintArea.getMinY()), p1);
-		pixelToWorld.transform(new Point2D.Double(paintArea.getMaxX(),
-				paintArea.getMaxY()), p2);
-
-		// //
-		//
-		// build the final envelope
-		//
-		// //
-		double x1 = p1.getX();
-		double y1 = p1.getY();
-		double x2 = p2.getX();
-		double y2 = p2.getY();
-		return new ReferencedEnvelope(Math.min(x1, x2), Math.max(x1, x2), Math
-				.min(y1, y2), Math.max(y1, y2), crs2d);
-	}
+        Envelope env = createMapEnvelope(paintArea, worldToScreen);
+        return new ReferencedEnvelope(env, crs2d);
+    }
 
 	/**
 	 * Find the scale denominator of the map. Method: 1. find the diagonal
@@ -424,6 +401,24 @@ public final class RendererUtilities {
             return (envelope.getWidth() * OGC_DEGREE_TO_METERS) / (imageWidth / getDpi(hints) * 0.0254);
         } else {
             return envelope.getWidth() / (imageWidth / getDpi(hints) * 0.0254);
+        }
+    }
+    
+    /**
+     * This method performs the computation using the methods suggested by the OGC SLD specification, page 26.
+     * @param CRS the coordinate reference system. Used to check if we are operating in degrees or
+     * meters.
+     * @param worldToScreen the transformation mapping world coordinates to screen coordinates. Might
+     * specify a rotation in addition to translation and scaling.
+     * @return
+     */
+    public static double calculateOGCScaleAffine(CoordinateReferenceSystem crs,AffineTransform worldToScreen, Map hints) {
+        double scale = XAffineTransform.getScale(worldToScreen);
+        // if it's geodetic, we're dealing with lat/lon unit measures
+        if(crs instanceof GeographicCRS) {
+            return (OGC_DEGREE_TO_METERS * getDpi(hints))/(scale * 0.0254);
+        } else {            
+            return (getDpi(hints))/(scale * 0.0254);
         }
     }
 
@@ -669,7 +664,7 @@ public final class RendererUtilities {
         // transform (instead of creating a new one) if the grid
         // and envelope are the same one than during last invocation.
         final GridToEnvelopeMapper m = (GridToEnvelopeMapper) gridToEnvelopeMappers.get();
-        m.setGridRange(new GeneralGridRange(paintArea));
+        m.setGridRange(new GridEnvelope2D(paintArea));
         m.setEnvelope(newEnvelope);
         return (AffineTransform) (m.createTransform().inverse());
 

@@ -51,6 +51,7 @@ import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ImageUtilities;
@@ -72,8 +73,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author  Simone Giannecchini
  * @author  Andrea Aime
  * @author  Alessio Fabiani
- * @source  $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
- * @version  $Id: GridCoverageRenderer.java 32890 2009-04-30 16:56:18Z simonegiannecchini $
+ * @source  $URL: http://svn.osgeo.org/geotools/tags/2.6-M2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
+ * @version  $Id: GridCoverageRenderer.java 33802 2009-08-26 01:50:19Z jive $
  * @task  Add support for SLD styles
  */
 @SuppressWarnings("deprecation")
@@ -174,15 +175,47 @@ public final class GridCoverageRenderer {
      * @param screenSize
      *                at which we want to rendere the source
      *                {@link GridCoverage2D}.
+     * @param worldToScreen if not <code>null</code> and if it contains a rotation,
+     * this Affine Tranform is used directly to convert from world coordinates
+     * to screen coordinates. Otherwise, a standard {@link GridToEnvelopeMapper}
+     * is used to calculate the affine transform.
+     * 
      * @throws TransformException
      * @throws NoninvertibleTransformException
-     * 
+     * @deprecated Use {@link GridCoverageRenderer#GridCoverageRenderer(CoordinateReferenceSystem, Envelope, Rectangle, AffineTransform, RenderingHints)}
+     *             instead
      */
     public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
             final Envelope envelope, Rectangle screenSize)
             throws TransformException, NoninvertibleTransformException {
 
-        this(destinationCRS, envelope, screenSize, null);
+        this(destinationCRS, envelope, screenSize, null, null);
+    }
+	
+    /**
+     * Creates a new {@link GridCoverageRenderer} object.
+     * 
+     * @param destinationCRS
+     *                the CRS of the {@link GridCoverage2D} to render.
+     * @param envelope
+     *                delineating the area to be rendered.
+     * @param screenSize
+     *                at which we want to rendere the source
+     *                {@link GridCoverage2D}.
+     * @param worldToScreen if not <code>null</code> and if it contains a rotation,
+     * this Affine Tranform is used directly to convert from world coordinates
+     * to screen coordinates. Otherwise, a standard {@link GridToEnvelopeMapper}
+     * is used to calculate the affine transform.
+     * 
+     * @throws TransformException
+     * @throws NoninvertibleTransformException
+     * 
+     */
+    public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
+            final Envelope envelope, Rectangle screenSize, AffineTransform worldToScreen)
+            throws TransformException, NoninvertibleTransformException {
+
+        this(destinationCRS, envelope, screenSize, worldToScreen, null);
 
     }
 
@@ -198,13 +231,40 @@ public final class GridCoverageRenderer {
      *                {@link GridCoverage2D}.
      * @param java2dHints
      *                to control this rendering process.
+     * @throws TransformException
+     * @throws NoninvertibleTransformException
+     * @deprecated Use {@link GridCoverageRenderer#GridCoverageRenderer(CoordinateReferenceSystem, Envelope, Rectangle, AffineTransform, RenderingHints)}
+     *             instead
+     */
+    public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
+            final Envelope envelope, Rectangle screenSize, RenderingHints java2dHints) throws TransformException,
+            NoninvertibleTransformException {
+        this(destinationCRS, envelope, screenSize, null,java2dHints);
+    }
+	
+    /**
+     * Creates a new {@link GridCoverageRenderer} object.
      * 
+     * @param destinationCRS
+     *                the CRS of the {@link GridCoverage2D} to render.
+     * @param envelope
+     *                delineating the area to be rendered.
+     * @param screenSize
+     *                at which we want to rendere the source
+     *                {@link GridCoverage2D}.
+     * @param worldToScreen if not <code>null</code> and if it contains a rotation,
+     * this Affine Tranform is used directly to convert from world coordinates
+     * to screen coordinates. Otherwise, a standard {@link GridToEnvelopeMapper}
+     * is used to calculate the affine transform.
+     * 
+     * @param java2dHints
+     *                to control this rendering process.
      * @throws TransformException
      * @throws NoninvertibleTransformException
      */
     public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
             final Envelope envelope, Rectangle screenSize,
-            RenderingHints java2dHints) throws TransformException,
+            AffineTransform worldToScreen, RenderingHints java2dHints) throws TransformException,
             NoninvertibleTransformException {
 
         // ///////////////////////////////////////////////////////////////////
@@ -231,8 +291,16 @@ public final class GridCoverageRenderer {
         //
         // ///////////////////////////////////////////////////////////////////
         gridToEnvelopeMapper.setEnvelope(destinationEnvelope);
-        finalGridToWorld = new AffineTransform(gridToEnvelopeMapper.createAffineTransform());
-        finalWorldToGrid = finalGridToWorld.createInverse();
+        
+        // PHUSTAD : The gridToEnvelopeMapper does not handle rotated views. 
+        // 
+        if (worldToScreen != null && XAffineTransform.getRotation(worldToScreen) != 0.0) { 
+            finalWorldToGrid = new AffineTransform(worldToScreen);
+            finalGridToWorld = finalWorldToGrid.createInverse();
+        } else {
+            finalGridToWorld = new AffineTransform(gridToEnvelopeMapper.createAffineTransform());
+            finalWorldToGrid = finalGridToWorld.createInverse();
+        }
 
         // ///////////////////////////////////////////////////////////////////
         //
