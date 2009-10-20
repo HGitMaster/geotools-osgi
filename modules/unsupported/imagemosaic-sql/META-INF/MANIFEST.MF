@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools Image Mosaic via SQL Database
 Bundle-SymbolicName: org.geotools.imagemosaic.sql
-Bundle-Version: 2.6.0.osgi2
+Bundle-Version: 2.6.0.osgi3
 Bundle-Vendor: Harman/Becker
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.geotools.imagemosaic.base;bundle-version="2.6.0",

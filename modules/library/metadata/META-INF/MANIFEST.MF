@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools Metadata Module
 Bundle-SymbolicName: org.geotools.metadata
-Bundle-Version: 2.6.0.osgi2
+Bundle-Version: 2.6.0.osgi3
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-BuddyPolicy: registered
 Import-Package: javax.measure.converter,

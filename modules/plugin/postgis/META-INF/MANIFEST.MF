@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools PostGIS DataSource
 Bundle-SymbolicName: org.geotools.postgis
-Bundle-Version: 2.6.0.osgi2
+Bundle-Version: 2.6.0.osgi3
 Bundle-Vendor: Harman/Becker
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-RegisterBuddy: org.geotools.metadata

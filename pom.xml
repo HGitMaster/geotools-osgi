@@ -163,7 +163,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>geotools</artifactId>
   <packaging>pom</packaging>
-  <version>2.6.0.osgi2</version>
+  <version>2.6.0.osgi3</version>
   <name>Geotools</name>
   <url>http://maven.geotools.fr/reports/</url>
 
@@ -544,17 +544,17 @@
       <dependency>
         <groupId>org.opengis</groupId>
         <artifactId>geoapi</artifactId>
-       	<version>2.3.0.osgi1</version>
+       	<version>2.3.0.osgi2</version>
       </dependency>
       <dependency>
         <groupId>org.opengis</groupId>
         <artifactId>geoapi-dummy-pending</artifactId>
-        <version>2.3.0.osgi1</version>
+        <version>2.3.0.osgi2</version>
       </dependency>
       <dependency>
         <groupId>org.opengis</groupId>
         <artifactId>geoapi-pending</artifactId>
-        <version>2.3.0.osgi1</version>
+        <version>2.3.0.osgi2</version>
       </dependency>
 
       <dependency>
