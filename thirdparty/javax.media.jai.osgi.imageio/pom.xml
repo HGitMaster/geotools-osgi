@@ -21,15 +21,15 @@
       <groupId>javax.media</groupId>
       <artifactId>jai_imageio</artifactId>
       <version>1.1</version>
-         <optional>true</optional>
-         <scope>compile</scope>
+      <optional>true</optional>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>javax.media</groupId>
       <artifactId>jiio_clib</artifactId>
       <version>1.1</version>
-         <optional>true</optional>
-         <scope>compile</scope>
+      <optional>true</optional>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -54,34 +54,57 @@
             <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
             <Export-Package>com.sun.media.imageio.*,
               com.sun.media.imageioimpl.*,
-              com.sun.media.jai.imageioimpl,
-              com.sun.media.jai.operator,
-              com.sun.medialib.codec.*
-            </Export-Package> 
+              com.sun.media.jai.imageioimpl, com.sun.media.jai.operator,
+              com.sun.medialib.codec.* </Export-Package>
             <Private-Package>org.geotools.thirdparty.jai.imageio</Private-Package>
-            <Import-Package>!sun.*,*</Import-Package> 
+            <Import-Package>!sun.*,*</Import-Package>
           </instructions>
-          <!-- 
-               This is required because Maven puts target/classes on the 
-               classpath for some dependencies.
+          <!--
+            This is required because Maven puts target/classes on the
+            classpath for some dependencies.
           -->
           <unpackBundle>true</unpackBundle>
         </configuration>
       </plugin>
-         <plugin>
-            <artifactId>maven-jar-plugin</artifactId>
-            <configuration>
-               <archive>
-                  <manifest>
-                     <addClasspath>false</addClasspath>
-                  </manifest>
-               </archive>
-            </configuration>
-
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>false</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <attach>true</attach>
+          <archive>
+            <manifestEntries>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+              <Bundle-Name>${name}</Bundle-Name>
+              <Bundle-SymbolicName>javax.media.jai.osgi.jai_imageio.source </Bundle-SymbolicName>
+              <Bundle-Version>${version}</Bundle-Version>
+              <Eclipse-SourceBundle>
+                javax.media.jai.osgi.jai_imageio;version="${version}";roots:="." </Eclipse-SourceBundle>
+            </manifestEntries>
+          </archive>
+        </configuration>
       </plugin>
     </plugins>
   </build>
-
   <repositories>
     <repository>
       <id>jiio.bin.deps</id>
@@ -89,7 +112,4 @@
       <url>file:${basedir}/repository</url>
     </repository>
   </repositories>
-
 </project>
-
-

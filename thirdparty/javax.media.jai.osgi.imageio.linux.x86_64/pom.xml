@@ -7,7 +7,6 @@
   <name>JAI ImageIO Linux x86_64 Native Libs</name>
   <version>1.1</version>
   <description>Java Advanced Imaging</description>
-
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>thirdparty</artifactId>
@@ -21,11 +20,8 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-
   <build>
-
     <plugins>
-
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -36,32 +32,55 @@
             <Fragment-Host>javax.media.jai.osgi.jai_imageio</Fragment-Host>
             <Bundle-DocURL>http://download.java.net/media/jai-imageio/javadoc/1.1/index.html</Bundle-DocURL>
             <Bundle-Vendor>Harman/Becker</Bundle-Vendor>
-            <Bundle-NativeCode>libclib_jiio.so; osname=linux; processor=x86_64</Bundle-NativeCode>
-            <!-- Override the default of * to suppress a warning -->  
+            <Bundle-NativeCode>libclib_jiio.so; osname=linux;
+              processor=x86_64</Bundle-NativeCode>
+            <!-- Override the default of * to suppress a warning -->
             <Import-Package></Import-Package>
           </instructions>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-	<configuration>
-	  <archive>
-	    <manifest>
-	      <addClasspath>false</addClasspath>
-	    </manifest>
-	  </archive>
-	</configuration>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>false</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <attach>true</attach>
+          <archive>
+            <manifestEntries>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+              <Bundle-Name>${name}</Bundle-Name>
+              <Bundle-SymbolicName>javax.media.jai.osgi.imageio.linux.x86_64.source </Bundle-SymbolicName>
+              <Bundle-Version>${version}</Bundle-Version>
+              <Eclipse-SourceBundle>
+                javax.media.jai.osgi.imageio.linux.x86_64;version="${version}";roots:="." </Eclipse-SourceBundle>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-
   <licenses>
     <license>
       <name>BSD</name>
     </license>
   </licenses>
-
 </project>
-
-

@@ -9,16 +9,16 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>thirdparty</artifactId>
-    <version>2.6.0.osgi3</version> 
-  </parent> 
+    <version>2.6.0.osgi3</version>
+  </parent>
   <dependencies>
-   <dependency>
-        <groupId>java3d</groupId>
-        <artifactId>vecmath</artifactId>
-        <version>1.3.1</version>
-        <optional>true</optional>
-        <scope>compile</scope>
-   </dependency>
+    <dependency>
+      <groupId>java3d</groupId>
+      <artifactId>vecmath</artifactId>
+      <version>1.3.1</version>
+      <optional>true</optional>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -28,14 +28,81 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-		<Bundle-Name>Java 3D Vecmath Runtime Environment</Bundle-Name>
-                <Bundle-SymbolicName>java3d.osgi.vecmath</Bundle-SymbolicName>
-                <Bundle-Description>OSGI bundle for Java 3D Vecmath Runtime Environment</Bundle-Description>
-		<Bundle-Version>1.3.1</Bundle-Version>
-            	<Export-Package>javax.vecmath.*</Export-Package>
-               <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
+            <Bundle-Name>Java 3D Vecmath Runtime Environment</Bundle-Name>
+            <Bundle-SymbolicName>java3d.osgi.vecmath</Bundle-SymbolicName>
+            <Bundle-Description>OSGI bundle for Java 3D Vecmath Runtime
+              Environment</Bundle-Description>
+            <Bundle-Version>1.3.1</Bundle-Version>
+            <Export-Package>javax.vecmath.*</Export-Package>
+            <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
           </instructions>
           <unpackBundle>true</unpackBundle>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <id>get-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sources</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>unpack-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <classifier>sources</classifier>
+              <includes>**/*.java</includes>
+              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+              <outputDirectory>/src/main/java</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <attach>true</attach>
+          <archive>
+            <manifestEntries>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+              <Bundle-Name>${name}</Bundle-Name>
+              <Bundle-SymbolicName>java3d.osgi.vecmath.source </Bundle-SymbolicName>
+              <Bundle-Version>${version}</Bundle-Version>
+              <Eclipse-SourceBundle>
+                java3d.osgi.vecmath;version="${version}";roots:="." </Eclipse-SourceBundle>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}/src</directory>
+            </fileset>
+          </filesets>
         </configuration>
       </plugin>
     </plugins>
