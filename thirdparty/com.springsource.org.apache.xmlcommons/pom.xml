@@ -26,7 +26,7 @@
         <artifactId>${artifactId}</artifactId>
         <version>${version}</version> <type>jar</type>
         <classifier>sources</classifier> <includes>**/*.java</includes>
-        <outputDirectory>/src/main/java</outputDirectory>
+        <outputDirectory>src/main/java</outputDirectory>
         </artifactItem> </artifactItems>
         <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
         </configuration> </execution> </executions> </plugin

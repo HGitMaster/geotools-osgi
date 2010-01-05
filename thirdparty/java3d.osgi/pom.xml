@@ -61,7 +61,7 @@
               <classifier>sources</classifier>
               <includes>**/*.java</includes>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
-              <outputDirectory>/src/main/java</outputDirectory>
+              <outputDirectory>src/main/java</outputDirectory>
             </configuration>
           </execution>
         </executions>
