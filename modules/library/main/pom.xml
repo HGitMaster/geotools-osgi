@@ -232,9 +232,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-      <version>1.6</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -244,6 +243,11 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-wkt</artifactId>
       <version>${project.version}</version> 
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
