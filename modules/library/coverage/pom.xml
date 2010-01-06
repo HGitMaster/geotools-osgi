@@ -154,19 +154,19 @@
   <!-- =========================================================== -->
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
- 				<configuration>
-					<archive>
-						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifestFile>META-INF/MANIFEST.MF</manifestFile>
             <manifest>
               <addClasspath>false</addClasspath>
             </manifest>
-					</archive>
-				</configuration>
-			</plugin>
+               </archive>
+            </configuration>
+         </plugin>
      <plugin>
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
@@ -177,7 +177,7 @@
             <id>attach-sources</id>
             <phase>verify</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
@@ -197,7 +197,7 @@
           </archive>
         </configuration>
       </plugin>
-		</plugins>
-	</build>
+      </plugins>
+   </build>
 
 </project>

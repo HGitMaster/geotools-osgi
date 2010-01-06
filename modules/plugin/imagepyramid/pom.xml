@@ -102,7 +102,7 @@
     </dependency>
     <dependency>
       <groupId>net.java.dev.osgi</groupId>
-      <artifactId>net.java.dev.osgi.jsr-275</artifactId>
+      <artifactId>net.java.dev.osgi.jsr275</artifactId>
     </dependency>
     <dependency>
       <groupId>java3d.osgi</groupId>

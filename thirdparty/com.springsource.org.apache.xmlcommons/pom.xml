@@ -86,17 +86,6 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>${basedir}/src</directory>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 </project>

@@ -257,48 +257,48 @@
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
-	<plugins>
-		<plugin>
-			<groupId>org.geotools.maven</groupId>
-			<artifactId>jjtree-javacc</artifactId>
-			<version>${project.version}</version>
-			<configuration>
-				<sourceDirectory>${basedir}/src/main/java</sourceDirectory> <!-- Where to search for .jjt files -->
-				<nodeDirectory>${basedir}/modified-src</nodeDirectory>  <!-- Where to search for Node.java  -->
-				<nodePackage>org.geotools.filter.parser</nodePackage>
-			</configuration>
-			<executions>
-				<execution>
-					<goals>
-						<goal>generate</goal>
-					</goals>
-				</execution>
-			</executions>
-		</plugin>
+   <plugins>
+      <plugin>
+         <groupId>org.geotools.maven</groupId>
+         <artifactId>jjtree-javacc</artifactId>
+         <version>${project.version}</version>
+         <configuration>
+            <sourceDirectory>${basedir}/src/main/java</sourceDirectory> <!-- Where to search for .jjt files -->
+            <nodeDirectory>${basedir}/modified-src</nodeDirectory>  <!-- Where to search for Node.java  -->
+            <nodePackage>org.geotools.filter.parser</nodePackage>
+         </configuration>
+         <executions>
+            <execution>
+               <goals>
+                  <goal>generate</goal>
+               </goals>
+            </execution>
+         </executions>
+      </plugin>
 
-		<!--
-			build test jar so that tests can be shared with legacy feature model
-			module
-		-->
-		<plugin>
-			<artifactId>maven-jar-plugin</artifactId>
-			<configuration>
-				<archive>
-					<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+      <!--
+         build test jar so that tests can be shared with legacy feature model
+         module
+      -->
+      <plugin>
+         <artifactId>maven-jar-plugin</artifactId>
+         <configuration>
+            <archive>
+               <manifestFile>META-INF/MANIFEST.MF</manifestFile>
                   <manifest>
                      <addClasspath>false</addClasspath>
                   </manifest>
-				</archive>
-			</configuration>
-			<executions>
-				<execution>
-					<phase>package</phase>
-					<goals>
-						<goal>test-jar</goal>
-					</goals>
-				</execution>
-			</executions>
-		</plugin>
+            </archive>
+         </configuration>
+         <executions>
+            <execution>
+               <phase>package</phase>
+               <goals>
+                  <goal>test-jar</goal>
+               </goals>
+            </execution>
+         </executions>
+      </plugin>
       <plugin>
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
@@ -309,7 +309,7 @@
             <id>attach-sources</id>
             <phase>verify</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
@@ -329,7 +329,7 @@
           </archive>
         </configuration>
       </plugin>
-	</plugins>
+   </plugins>
 </build>
 
 

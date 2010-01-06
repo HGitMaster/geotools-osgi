@@ -104,23 +104,23 @@
 
 
 <build>
-	<plugins>
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-surefire-plugin</artifactId>
-		</plugin>
+   <plugins>
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
 
-		<plugin>
-			<artifactId>maven-jar-plugin</artifactId>
-			<configuration>
-				<archive>
-					<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+      <plugin>
+         <artifactId>maven-jar-plugin</artifactId>
+         <configuration>
+            <archive>
+               <manifestFile>META-INF/MANIFEST.MF</manifestFile>
                   <manifest>
                      <addClasspath>false</addClasspath>
                   </manifest>
-				</archive>
-			</configuration>
-		</plugin>
+            </archive>
+         </configuration>
+      </plugin>
       <plugin>
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
@@ -131,7 +131,7 @@
             <id>attach-sources</id>
             <phase>verify</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
@@ -152,7 +152,7 @@
         </configuration>
       </plugin>
 
-	</plugins>
+   </plugins>
 </build>
 
 

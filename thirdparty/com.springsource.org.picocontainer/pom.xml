@@ -15,7 +15,7 @@
         <executions>
           <execution>
             <id>unpack-sources</id>
-            <phase>compile</phase>
+            <phase>verify</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -28,7 +28,7 @@
                   <type>jar</type>
                   <classifier>sources</classifier>
                   <includes>**/*.java</includes>
-                  <outputDirectory>src/main/java</outputDirectory>
+                  <outputDirectory>target/unpacked-sources</outputDirectory>
                 </artifactItem>
               </artifactItems>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
@@ -74,7 +74,7 @@
             <id>attach-sources</id>
             <phase>verify</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
@@ -91,17 +91,13 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>${basedir}/src</directory>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
     </plugins>
+
+    <resources>
+      <resource>
+        <directory>target/unpacked-sources</directory>
+        <includes><include>**/*.java</include></includes>
+      </resource>
+    </resources>
   </build>
 </project>

@@ -129,7 +129,7 @@
 
     <dependency>
       <groupId>net.java.dev.osgi</groupId>
-      <artifactId>net.java.dev.osgi.jsr-275</artifactId>
+      <artifactId>net.java.dev.osgi.jsr275</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
 
@@ -173,18 +173,18 @@
   </dependencies>
   
   <build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+      <plugins>
+         <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifestFile>META-INF/MANIFEST.MF</manifestFile>
                   <manifest>
                      <addClasspath>false</addClasspath>
                   </manifest>
-					</archive>
-				</configuration>
-			</plugin>
+               </archive>
+            </configuration>
+         </plugin>
       <plugin>
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
@@ -195,7 +195,7 @@
             <id>attach-sources</id>
             <phase>verify</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
@@ -215,7 +215,7 @@
           </archive>
         </configuration>
       </plugin>
-		</plugins>
-	</build>
+      </plugins>
+   </build>
 
 </project>

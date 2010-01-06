@@ -128,7 +128,7 @@
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
-  	  <artifactId>de.berlios.it.geosolutions.imageio.ext.tiff</artifactId>
+     <artifactId>de.berlios.it.geosolutions.imageio.ext.tiff</artifactId>
       <version>1.0.2</version>
     </dependency>
 
@@ -174,7 +174,7 @@
             <id>attach-sources</id>
             <phase>verify</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>

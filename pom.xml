@@ -391,14 +391,14 @@
       </roles>
     </developer>
     <developer>
-	    <name>Mauricio Pazos</name>
-	    <id>mauricio.pazos</id>
-	    <email>mauricio.pazos@axios.es</email>
-	    <organization>Axios</organization>
-	    <roles>
-		    <role>Java Developer</role>
-		    <role>Module Maintainer</role>
-	    </roles>
+       <name>Mauricio Pazos</name>
+       <id>mauricio.pazos</id>
+       <email>mauricio.pazos@axios.es</email>
+       <organization>Axios</organization>
+       <roles>
+          <role>Java Developer</role>
+          <role>Module Maintainer</role>
+       </roles>
     </developer>
     <developer>
       <name>Christiaan ten Klooster</name>
@@ -544,7 +544,7 @@
       <dependency>
         <groupId>org.opengis</groupId>
         <artifactId>geoapi</artifactId>
-       	<version>2.3.0.osgi2</version>
+         <version>2.3.0.osgi2</version>
       </dependency>
       <dependency>
         <groupId>org.opengis</groupId>
@@ -559,8 +559,8 @@
 
       <dependency>
          <groupId>net.java.dev.osgi</groupId>
-         <artifactId>net.java.dev.osgi.jsr-275</artifactId>
-         <version>1.0-beta-2</version>
+         <artifactId>net.java.dev.osgi.jsr275</artifactId>
+         <version>1.0.0.beta-2</version>
       </dependency>
       
 
@@ -597,9 +597,9 @@
       </dependency>
 
       <dependency>
-	<groupId>org.apache.batik.osgi</groupId>
-	<artifactId>org.apache.batik.osgi.transcoder</artifactId>
-	<version>1.6</version>
+   <groupId>org.apache.batik.osgi</groupId>
+   <artifactId>org.apache.batik.osgi.transcoder</artifactId>
+   <version>1.6</version>
       </dependency>
                   
       <dependency>
@@ -687,9 +687,9 @@
         <version>2.1</version>
       </dependency>
       <dependency>
-	<groupId>org.apache.commons</groupId>
-	<artifactId>com.springsource.org.apache.commons.collections</artifactId>
-	<version>3.2.1</version> 
+   <groupId>org.apache.commons</groupId>
+   <artifactId>com.springsource.org.apache.commons.collections</artifactId>
+   <version>3.2.1</version> 
       </dependency>
       <dependency>
         <groupId>commons-pool</groupId>
@@ -712,9 +712,9 @@
         <version>1.2.12</version>  <!-- Same as the dependency in commons-logging -->
       </dependency>
       <dependency>
-	<groupId>org.apache.commons</groupId>
-	<artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
-	<version>1.7.0</version> 
+   <groupId>org.apache.commons</groupId>
+   <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
+   <version>1.7.0</version> 
       </dependency>
       <dependency>
         <groupId>commons-httpclient</groupId>
@@ -1135,6 +1135,7 @@
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
         <configuration>
           <attach>true</attach>
         </configuration>
@@ -1274,9 +1275,9 @@
     </repository>
 
     <repository>
-    	<id>com.springsource.repository.bundles.external</id>
-    	<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-    	<url>http://repository.springsource.com/maven/bundles/external</url>
+      <id>com.springsource.repository.bundles.external</id>
+      <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/external</url>
     </repository>
 
   </repositories>
