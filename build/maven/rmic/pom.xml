@@ -64,8 +64,8 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.lang</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>

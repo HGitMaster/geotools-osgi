@@ -99,8 +99,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.logging</artifactId>
     </dependency>
   </dependencies>
 
@@ -108,43 +108,43 @@
   <!-- ==================================================== -->
   <!--     Compilation (including non-standard plugins)     -->
   <!-- ==================================================== -->
-	<build>
-		<plugins>
+   <build>
+      <plugins>
 
-			<plugin>
-				<groupId>org.geotools.maven</groupId>
-				<artifactId>jjtree-javacc</artifactId>
-				<version>${project.version}</version>
+         <plugin>
+            <groupId>org.geotools.maven</groupId>
+            <artifactId>jjtree-javacc</artifactId>
+            <version>${project.version}</version>
 
-				<configuration>
-					<nodePackage>org.geotools.filter.text.generated.parsers</nodePackage>
-					<nodeDirectory>${basedir}/modified-src</nodeDirectory>
-					<sourceDirectory>${basedir}/src/main/jjtree</sourceDirectory>
-				</configuration>
+            <configuration>
+               <nodePackage>org.geotools.filter.text.generated.parsers</nodePackage>
+               <nodeDirectory>${basedir}/modified-src</nodeDirectory>
+               <sourceDirectory>${basedir}/src/main/jjtree</sourceDirectory>
+            </configuration>
 
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>generate</goal>
+                  </goals>
 
-					</execution>
+               </execution>
 
-				</executions>
+            </executions>
 
-			</plugin>
+         </plugin>
 
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+         <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifestFile>META-INF/MANIFEST.MF</manifestFile>
                   <manifest>
                      <addClasspath>false</addClasspath>
                   </manifest>
-					</archive>
-				</configuration>
-			</plugin>
+               </archive>
+            </configuration>
+         </plugin>
       <plugin>
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
@@ -175,8 +175,8 @@
           </archive>
         </configuration>
       </plugin>
-		</plugins>
+      </plugins>
 
-	</build>
+   </build>
 
 </project>

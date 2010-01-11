@@ -102,8 +102,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-pool</groupId>
-      <artifactId>commons-pool</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.pool</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>

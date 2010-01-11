@@ -92,8 +92,8 @@
       <scope>provided</scope>   <!-- Needed for compilation, not for running -->
     </dependency>
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.logging</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>

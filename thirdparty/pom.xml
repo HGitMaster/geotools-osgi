@@ -47,7 +47,6 @@
     <module>com.springsource.org.apache.batik.dom</module>
     <module>com.springsource.org.apache.batik.dom.svg</module>
     <module>com.springsource.org.apache.batik.util</module>
-    <module>com.springsource.org.apache.commons.beanutils</module>
     <module>com.springsource.org.apache.commons.lang</module>
     <module>com.springsource.org.apache.commons.logging</module>
     <module>com.springsource.org.apache.commons.pool</module>
@@ -56,6 +55,7 @@
     <module>com.springsource.com.lowagie.text</module>
     <module>com.springsource.org.apache.bcel</module>
     <module>com.springsource.org.apache.commons.collections</module>
+    <module>com.springsource.org.apache.commons.beanutils</module>
     <module>com.springsource.org.apache.regexp</module>
     <module>com.springsource.org.apache.xalan</module>
     <module>com.springsource.org.apache.xerces</module>
