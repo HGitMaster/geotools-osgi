@@ -13,6 +13,39 @@
   </parent>
   <build>
     <plugins>
+
+<!-- REMOVE ME PLEASE! -->
+<plugin>
+  <artifactId>maven-antrun-plugin</artifactId>
+  <executions>
+    <execution>
+      <phase>validate</phase>
+      <configuration>
+        <tasks>
+          <delete>
+            <fileset dir="${settings.localRepository}/org/apache/batik/com.springsource.org.apache.batik.dom">
+              <include name="**/*.jar"/>
+              <exclude name="**/*.pom"/>
+              <exclude name="**/*.war"/>
+              <exclude name="**/*.ear"/>
+              <exclude name="**/*.md5"/>
+              <exclude name="**/*.sha"/>
+              <exclude name="maven/**"/>
+              <exclude name="felix/**"/>
+              <!--any other extensions?...-->
+              <!--match the timestamp pattern-->
+              <!--containsregexp expression="[0-9]{8}.[0-9]{6}-[0-9]+"/-->
+            </fileset>
+          </delete>
+        </tasks>
+      </configuration>
+      <goals>
+        <goal>run</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
