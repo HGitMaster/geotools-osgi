@@ -35,6 +35,8 @@ import org.geotools.data.DataUtilities;
  * Encapsulates the idea of a file for writing data to and then later updating the original.
  * 
  * @author jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/StorageFile.java $
  */
 public final class StorageFile implements Comparable<StorageFile>, FileWriter {
     private final ShpFiles shpFiles;

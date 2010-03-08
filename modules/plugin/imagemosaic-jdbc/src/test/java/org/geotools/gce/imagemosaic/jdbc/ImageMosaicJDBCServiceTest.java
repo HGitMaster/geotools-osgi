@@ -16,49 +16,49 @@
  */
 package org.geotools.gce.imagemosaic.jdbc;
 
-import junit.framework.TestCase;
+import java.util.Iterator;
 
+import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 import org.geotools.coverage.grid.io.GridFormatFinder;
 
-import java.util.Iterator;
-
-
 /**
  * @author Simone Giannecchini
+ * 
  *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic-jdbc/src/test/java/org/geotools/gce/imagemosaic/jdbc/ImageMosaicJDBCServiceTest.java $
  */
 public class ImageMosaicJDBCServiceTest extends TestCase {
-    /**
-     *
-     */
-    public ImageMosaicJDBCServiceTest() {
-    }
+	/**
+	 * 
+	 */
+	public ImageMosaicJDBCServiceTest() {
+	}
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        TestRunner.run(ImageMosaicJDBCServiceTest.class);
-    }
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		TestRunner.run(ImageMosaicJDBCServiceTest.class);
+	}
 
-    public void testIsAvailable() {
-        Iterator<GridFormatFactorySpi> list = GridFormatFinder.getAvailableFormats()
-                                                              .iterator();
-        boolean found = false;
+	public void testIsAvailable() {
+		Iterator<GridFormatFactorySpi> list = GridFormatFinder
+				.getAvailableFormats().iterator();
+		boolean found = false;
 
-        while (list.hasNext()) {
-            final GridFormatFactorySpi fac = list.next();
+		while (list.hasNext()) {
+			final GridFormatFactorySpi fac = list.next();
 
-            if (fac instanceof ImageMosaicJDBCFormatFactory) {
-                found = true;
+			if (fac instanceof ImageMosaicJDBCFormatFactory) {
+				found = true;
 
-                break;
-            }
-        }
+				break;
+			}
+		}
 
-        assertTrue("ImageMosaicJDBCFormatFactorySpi not registered", found);
-    }
+		assertTrue("ImageMosaicJDBCFormatFactorySpi not registered", found);
+	}
 }

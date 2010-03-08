@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultRepository;
 import org.geotools.data.FeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -44,41 +45,41 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
  * Validator purpose.
  * 
  * <p>
  * Description of Validator ...
  * </p>
- *
+ * 
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
  * @author bowens
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/test/java/org/geotools/validation/BatchValidator.java $
- * @version $Id: BatchValidator.java 30662 2008-06-12 21:44:16Z acuster $
+ * @source $URL:
+ *         http://svn.geotools.org/trunk/modules/extension/validation/src/test/java/org/geotools
+ *         /validation/BatchValidator.java $
+ * @version $Id: BatchValidator.java 33694 2009-08-06 13:23:57Z aaime $
  */
 public class BatchValidator {
     private static Properties dataStoreProp;
-    private static Properties transProp;
-    
-    private static Validator validator;
-    private static DefaultRepository dataRepository;
 
+    private static Properties transProp;
+
+    private static Validator validator;
+
+    private static DefaultRepository dataRepository;
 
     public static void main(String[] args) {
         loadProperties(args);
 
         Map ds = loadDataStores();
         ValidationProcessor v = loadTests();
-		dataRepository = new DefaultRepository();
-        
+        dataRepository = new DefaultRepository();
+
         runTransactions(ds, v);
     }
 
-
-    private static void runTransactions(Map dsm, ValidationProcessor v) 
-    {
+    private static void runTransactions(Map dsm, ValidationProcessor v) {
         if ((dsm == null) || (dsm.size() == 0)) {
             System.out.println("No Datastores were defined.");
 
@@ -86,90 +87,72 @@ public class BatchValidator {
         }
 
         if (v == null) {
-            System.err.println(
-                "An error occured: Cannot run without a ValidationProcessor.");
+            System.err.println("An error occured: Cannot run without a ValidationProcessor.");
 
             return;
         }
-		
-		
+
         Iterator it = dsm.keySet().iterator();
-		
-		/** set up the data repository */
-		while (it.hasNext()) 
-	   	{
-			String typeRef = it.next().toString();
-			DataStore ds = (DataStore) dsm.get(typeRef);
-			try
-			{
-				dataRepository.register(typeRef, ds);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-	   	}
-		validator = new Validator(dataRepository, v);
-		/** validator is now ready to go */
-		
-		it = dataRepository.getDataStores().values().iterator();
-		/** do the feature type validation dance */
-		while (it.hasNext())
-		{
-			DataStore store = (DataStore)it.next();
-			String typeNames[] = null;
-			try
-			{
-				typeNames = store.getTypeNames();
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			//HACK: get ALL feature types and smash through their features
-			// this is really really slow and will be fixed
-			for (int p = 0; p < typeNames.length; p++)
-			{
-				try
-				{
-					validator.featureValidation(typeNames[p], store.getFeatureSource(typeNames[p]).getFeatures(), null);
-				} catch (IOException e1)
-				{
-					e1.printStackTrace();
-				} catch (Exception e1)
-				{
-					e1.printStackTrace();
-				}
-			}
-			
-		}
-		
-		ReferencedEnvelope envelope = makeEnvelope();
-		
-		
-		/** do the integrity validation dance */
-		try
-		{
-			validator.integrityValidation(dsm, envelope, null);
-		} catch (IOException e1)
-		{
-			e1.printStackTrace();
-		} catch (Exception e1)
-		{
-			e1.printStackTrace();
-		}
-		
-		if (true)	//HACK premature evacuation
-			return;
-		
-		// --------------------------------------------------
-		// start of the old code
-		
-		
-	   	//v.integrityValidation()
-		//v.featureValidation( , fs.getSchema(),fs.getFeatures().features(), vr);
-	   	
-		it = dsm.keySet().iterator();
-        while (it.hasNext()) 
-        {
+
+        /** set up the data repository */
+        while (it.hasNext()) {
+            String typeRef = it.next().toString();
+            DataStore ds = (DataStore) dsm.get(typeRef);
+            try {
+                dataRepository.register(typeRef, ds);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        validator = new Validator(dataRepository, v);
+        
+        /** validator is now ready to go */
+
+        /** do the feature type validation dance */
+        for( DataStore store : dataRepository.getDataStores()){
+            String typeNames[] = null;
+            try {
+                typeNames = store.getTypeNames();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // HACK: get ALL feature types and smash through their features
+            // this is really really slow and will be fixed
+            for (int p = 0; p < typeNames.length; p++) {
+                try {
+                    validator.featureValidation(typeNames[p], store.getFeatureSource(typeNames[p])
+                            .getFeatures(), null);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+        }
+
+        ReferencedEnvelope envelope = makeEnvelope();
+
+        /** do the integrity validation dance */
+        try {
+            validator.integrityValidation(dsm, envelope, null);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
+        if (true) // HACK premature evacuation
+            return;
+
+        // --------------------------------------------------
+        // start of the old code
+
+        // v.integrityValidation()
+        // v.featureValidation( , fs.getSchema(),fs.getFeatures().features(), vr);
+
+        it = dsm.keySet().iterator();
+        while (it.hasNext()) {
             Map sources = new HashMap();
             String key = it.next().toString();
             DataStore ds = (DataStore) dsm.get(key);
@@ -183,13 +166,13 @@ public class BatchValidator {
                     FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource(ss[j]);
                     sources.put(ss, fs);
 
-                    //BatchValidationResults vr = new BatchValidationResults();
-                    
-//                    v.runFeatureTests( "" /** fix me */, fs.getSchema(),
-//                        fs.getFeatures().features(), vr);
-                    //System.out.println("Feature Test Results for " + key + ":"
-                    //    + ss[j]);
-                    //System.out.println(vr.toString());
+                    // BatchValidationResults vr = new BatchValidationResults();
+
+                    // v.runFeatureTests( "" /** fix me */, fs.getSchema(),
+                    // fs.getFeatures().features(), vr);
+                    // System.out.println("Feature Test Results for " + key + ":"
+                    // + ss[j]);
+                    // System.out.println(vr.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -198,14 +181,10 @@ public class BatchValidator {
             Envelope env = null;
 
             try {
-                double minx = Double.parseDouble(transProp.getProperty(
-                            "Bounds.minX"));
-                double miny = Double.parseDouble(transProp.getProperty(
-                            "Bounds.maxX"));
-                double maxx = Double.parseDouble(transProp.getProperty(
-                            "Bounds.maxX"));
-                double maxy = Double.parseDouble(transProp.getProperty(
-                            "Bounds.maxY"));
+                double minx = Double.parseDouble(transProp.getProperty("Bounds.minX"));
+                double miny = Double.parseDouble(transProp.getProperty("Bounds.maxX"));
+                double maxx = Double.parseDouble(transProp.getProperty("Bounds.maxX"));
+                double maxy = Double.parseDouble(transProp.getProperty("Bounds.maxY"));
                 env = new Envelope(minx, miny, maxx, maxy);
             } catch (Exception e) {
                 System.err.println("Envelope not specified in Transaction.properties.");
@@ -213,14 +192,14 @@ public class BatchValidator {
             }
 
             if (env == null) {
-                env = new Envelope(Integer.MIN_VALUE, Integer.MIN_VALUE,
-                        Integer.MAX_VALUE, Integer.MAX_VALUE);
+                env = new Envelope(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE,
+                        Integer.MAX_VALUE);
             }
 
             try {
                 BatchValidationResults vr = new BatchValidationResults();
-                
-                //v.runIntegrityTests( null /* fix me */, sources, env, vr);
+
+                // v.runIntegrityTests( null /* fix me */, sources, env, vr);
                 System.out.println("Feature Integrety Test Results");
                 System.out.println(vr.toString());
             } catch (Exception e) {
@@ -229,41 +208,33 @@ public class BatchValidator {
         }
     }
 
+    private static ReferencedEnvelope makeEnvelope() {
+        ReferencedEnvelope env;
+        try {
+            double minx = Double.parseDouble(transProp.getProperty("Bounds.minX"));
+            double miny = Double.parseDouble(transProp.getProperty("Bounds.maxX"));
+            double maxx = Double.parseDouble(transProp.getProperty("Bounds.maxX"));
+            double maxy = Double.parseDouble(transProp.getProperty("Bounds.maxY"));
+            env = new ReferencedEnvelope(minx, miny, maxx, maxy, null);
+        } catch (Exception e) {
+            System.err.println("Envelope not specified in Transaction.properties.");
+            env = new ReferencedEnvelope();
+        }
 
-	private static ReferencedEnvelope makeEnvelope()
-	{
-	    ReferencedEnvelope env;
-		try {
-		    double minx = Double.parseDouble(transProp.getProperty(
-						"Bounds.minX"));
-			double miny = Double.parseDouble(transProp.getProperty(
-						"Bounds.maxX"));
-			double maxx = Double.parseDouble(transProp.getProperty(
-						"Bounds.maxX"));
-			double maxy = Double.parseDouble(transProp.getProperty(
-						"Bounds.maxY"));
-			env = new ReferencedEnvelope(minx, miny, maxx, maxy, null);
-		} catch (Exception e) {
-			System.err.println("Envelope not specified in Transaction.properties.");
-			env = new ReferencedEnvelope();
-		}
-		
-		if (env == null) {
-			env = new ReferencedEnvelope(Integer.MIN_VALUE, Integer.MIN_VALUE,
-					Integer.MAX_VALUE, Integer.MAX_VALUE,null);
-		}
-		
-		return env;
-	}
+        if (env == null) {
+            env = new ReferencedEnvelope(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE,
+                    Integer.MAX_VALUE, null);
+        }
+
+        return env;
+    }
 
     private static void loadProperties(String[] args) {
         File dsProp = null;
         File trProp = null;
 
-        dsProp = new File(ClassLoader.getSystemResource(
-                    "org/geotools/demos/DataStore.properties").getFile());
-        trProp = new File(ClassLoader.getSystemResource(
-                    "org/geotools/demos/Transaction.properties").getFile());
+        dsProp = DataUtilities.urlToFile(ClassLoader.getSystemResource("org/geotools/demos/DataStore.properties"));
+        trProp = DataUtilities.urlToFile(ClassLoader.getSystemResource("org/geotools/demos/Transaction.properties"));
 
         if (args.length > 0) {
             int i = 0;
@@ -274,62 +245,47 @@ public class BatchValidator {
 
                 if ("-data".equals(param)) {
                     File tmp = null;
-                    tmp = new File(ClassLoader.getSystemResource(value).getFile());
+                    tmp = DataUtilities.urlToFile((ClassLoader.getSystemResource(value)));
 
                     if (tmp != null) {
                         dsProp = tmp;
                     } else {
-                        System.err.println(
-                            "Error: The data property file could not be found.");
+                        System.err.println("Error: The data property file could not be found.");
                         System.err.println("Data file:" + value);
                         System.exit(1);
                     }
-                } 
-                else 
-                {
-                    if ("-trans".equals(param)) 
-                    {
+                } else {
+                    if ("-trans".equals(param)) {
                         File tmp = null;
-                        tmp = new File(ClassLoader.getSystemResource(value)
-                                                  .getFile());
+                        tmp =  DataUtilities.urlToFile(ClassLoader.getSystemResource(value));
 
                         if (tmp != null) {
                             trProp = tmp;
                         } else {
-                            System.err.println(
-                                "Error: The transaction property file could not be found.");
+                            System.err
+                                    .println("Error: The transaction property file could not be found.");
                             System.err.println("Data file:" + value);
                             System.exit(1);
                         }
-                    } 
-                    else 
-                    {
-                        if ("-help".equals(param)) 
-                        {
+                    } else {
+                        if ("-help".equals(param)) {
                             System.out.println("Batch Validator");
                             System.out.println("Version 0.1");
                             System.out.println("");
-                            System.out.println(
-                                "Usage: java Validator [Options]");
-                            System.out.println(
-                                "Options: -help -data -trans");
+                            System.out.println("Usage: java Validator [Options]");
+                            System.out.println("Options: -help -data -trans");
                             System.out.println("");
                             System.out.println("-data <filename>");
-                            System.out.println(
-                                "Replaces the default datastore property file");
+                            System.out.println("Replaces the default datastore property file");
                             System.out.println("");
                             System.out.println("-trans <filename>");
-                            System.out.println(
-                                "Replaces the default transaction property file");
+                            System.out.println("Replaces the default transaction property file");
                             System.out.println("");
                             System.out.println("-help");
                             System.out.println("This screen.");
                             System.exit(0);
-                        } 
-                        else 
-                        {
-                            System.err.println(
-                                "Usage Error: use -help for usage");
+                        } else {
+                            System.err.println("Usage Error: use -help for usage");
                             System.err.println("Invalid option:" + param);
                             System.exit(1);
                         }
@@ -339,8 +295,7 @@ public class BatchValidator {
         }
 
         // the files should all contain the specified data, time to check for existance ...
-        if ((dsProp == null)
-                || (!dsProp.exists() || (!dsProp.isFile() || !dsProp.canRead()))) {
+        if ((dsProp == null) || (!dsProp.exists() || (!dsProp.isFile() || !dsProp.canRead()))) {
             System.err.println("Error: The data property file had errors.");
 
             if (dsProp == null) {
@@ -358,8 +313,7 @@ public class BatchValidator {
                             System.err.println("Data file cannot be read.");
                             System.err.println(dsProp.toString());
                         } else {
-                            System.err.println(
-                                "Data file had an unknown error.");
+                            System.err.println("Data file had an unknown error.");
                             System.err.println(dsProp.toString());
                         }
                     }
@@ -369,8 +323,7 @@ public class BatchValidator {
             System.exit(1);
         }
 
-        if ((trProp == null)
-                || (!trProp.exists() || (!trProp.isFile() || !trProp.canRead()))) {
+        if ((trProp == null) || (!trProp.exists() || (!trProp.isFile() || !trProp.canRead()))) {
             System.err.println("Error: The test property file had errors.");
 
             if (trProp == null) {
@@ -381,17 +334,14 @@ public class BatchValidator {
                     System.err.println(trProp.toString());
                 } else {
                     if (!trProp.isFile()) {
-                        System.err.println(
-                            "Transaction path specified is not a file.");
+                        System.err.println("Transaction path specified is not a file.");
                         System.err.println(trProp.toString());
                     } else {
                         if (!trProp.canRead()) {
-                            System.err.println(
-                                "Transaction file cannot be read.");
+                            System.err.println("Transaction file cannot be read.");
                             System.err.println(trProp.toString());
                         } else {
-                            System.err.println(
-                                "Transaction file had an unknown error.");
+                            System.err.println("Transaction file had an unknown error.");
                             System.err.println(trProp.toString());
                         }
                     }
@@ -434,36 +384,31 @@ public class BatchValidator {
         }
     }
 
-
-
     private synchronized static Map loadDataStores() {
         String dsIds = dataStoreProp.getProperty("DataStoreIds");
         String[] ids = dsIds.split(",");
         Map result = new HashMap();
-        //int rcount = 0;
+        // int rcount = 0;
 
         // remove whitespace
-        for (int i = 0; i < ids.length; i++) 
-        {
+        for (int i = 0; i < ids.length; i++) {
             ids[i] = ids[i].trim();
 
             Map m = new HashMap();
             String tmp = dataStoreProp.getProperty(ids[i] + ".Params");
             String[] params = tmp.split(",");
 
-            for (int j = 0; j < params.length; j++) 
-            {
+            for (int j = 0; j < params.length; j++) {
                 String[] vals = params[j].split("=");
 
                 if (vals.length == 2) {
                     m.put(vals[0].trim(), vals[1].trim());
                 } else {
                     System.err.println("DataStore " + ids[i]
-                        + " incured an error loading a parameter.");
-                    System.err.println(
-                        "This DataStore may not be loaded correctly.");
-                    System.err.println(
-                        "Parameters should be specified in a comma delimited list key=value");
+                            + " incured an error loading a parameter.");
+                    System.err.println("This DataStore may not be loaded correctly.");
+                    System.err
+                            .println("Parameters should be specified in a comma delimited list key=value");
                     System.err.println("You specified:" + tmp);
                 }
             }
@@ -475,14 +420,14 @@ public class BatchValidator {
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 System.err.println("DataStore " + ids[i]
-                    + " incured an error and will not be used.");
+                        + " incured an error and will not be used.");
             }
 
             if (dataStore != null) {
                 result.put(ids[i], dataStore);
             } else {
                 System.err.println("DataStore " + ids[i]
-                    + " incured an error and will not be used.");
+                        + " incured an error and will not be used.");
             }
         }// end for ids
 
@@ -540,81 +485,83 @@ public class BatchValidator {
             System.err.println(plugInDir.toString());
             System.exit(1);
         }
-        
+
         int numSuites = 0;
-        try{
-        	numSuites = Integer.parseInt(transProp.getProperty("NumberTestSuites"));
-        }catch(Exception e){}
-        
+        try {
+            numSuites = Integer.parseInt(transProp.getProperty("NumberTestSuites"));
+        } catch (Exception e) {
+        }
+
         Map ts = new HashMap(numSuites);
-        for(int i=0;i<numSuites;i++){
-        	String path = transProp.getProperty("TestSuiteFile."+(i+1));
-        	loadTestSuite(ts,plugIns,path);
+        for (int i = 0; i < numSuites; i++) {
+            String path = transProp.getProperty("TestSuiteFile." + (i + 1));
+            loadTestSuite(ts, plugIns, path);
         }
 
         // We need to make our own validator for batch
         // processing
         // (for starters it should use a custom FeatureResults
-        //  that logs fail/warning information)
+        // that logs fail/warning information)
         BatchValidatorProcessor gv = new BatchValidatorProcessor(ts, plugIns);
 
         return gv;
     }
-    
-    private static void loadTestSuite(Map ts, Map plugIns, String tsPath){
-    	File testSuite = null;
-    	try{
-    		testSuite = new File(tsPath);
-    	}catch(Exception e){
-    		System.err.println(tsPath);
-    		e.printStackTrace();
-    		return;
-    	}
 
-    	if (testSuite == null) {
-    		System.err.println("TestSuite file does not exist");
-    		System.exit(1);
-    	}
+    private static void loadTestSuite(Map ts, Map plugIns, String tsPath) {
+        File testSuite = null;
+        try {
+            testSuite = new File(tsPath);
+        } catch (Exception e) {
+            System.err.println(tsPath);
+            e.printStackTrace();
+            return;
+        }
 
-    	if (!testSuite.exists()) {
-    		System.err.println("TestSuite file does not exist");
-    		System.err.println(testSuite.toString());
-    		System.exit(1);
-    	}
+        if (testSuite == null) {
+            System.err.println("TestSuite file does not exist");
+            System.exit(1);
+        }
 
-    	if (!testSuite.isFile()) {
-    		System.err.println("TestSuite file is not a file");
-    		System.err.println(testSuite.toString());
-    		System.exit(1);
-    	}
+        if (!testSuite.exists()) {
+            System.err.println("TestSuite file does not exist");
+            System.err.println(testSuite.toString());
+            System.exit(1);
+        }
 
-    	if (!testSuite.canRead()) {
-    		System.err.println("TestSuite file cannot be read");
-    		System.err.println(testSuite.toString());
-    		System.exit(1);
-    	}
+        if (!testSuite.isFile()) {
+            System.err.println("TestSuite file is not a file");
+            System.err.println(testSuite.toString());
+            System.exit(1);
+        }
 
-    	TestSuiteDTO dto = null;
+        if (!testSuite.canRead()) {
+            System.err.println("TestSuite file cannot be read");
+            System.err.println(testSuite.toString());
+            System.exit(1);
+        }
 
-    	try {
-    		dto = XMLReader.readTestSuite( testSuite.getName(), new FileReader(testSuite), plugIns);
-    	} catch (FileNotFoundException e) {
-    		System.err.println("TestSuite file was not found.");
-    		System.err.println(testSuite.toString());
-    		e.printStackTrace();
-    		System.exit(1);
-    	} catch (ValidationException e) {
-    		System.err.println("TestSuite load had errors.");
-    		System.err.println(testSuite.toString());
-    		e.printStackTrace();
-    		System.exit(1);
-    	}
+        TestSuiteDTO dto = null;
 
-    	ts.put(dto.getName(), dto);
+        try {
+            dto = XMLReader.readTestSuite(testSuite.getName(), new FileReader(testSuite), plugIns);
+        } catch (FileNotFoundException e) {
+            System.err.println("TestSuite file was not found.");
+            System.err.println(testSuite.toString());
+            e.printStackTrace();
+            System.exit(1);
+        } catch (ValidationException e) {
+            System.err.println("TestSuite load had errors.");
+            System.err.println(testSuite.toString());
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        ts.put(dto.getName(), dto);
     }
 
     static class BatchValidationResults implements ValidationResults {
         Map errors = new HashMap();
+
         Validation v;
 
         public void error(SimpleFeature feature, String message) {
@@ -636,27 +583,26 @@ public class BatchValidator {
         public String toString() {
             String r = "";
             Iterator i = errors.keySet().iterator();
-            if(i.hasNext()){
-            	while (i.hasNext()) {
-                	SimpleFeature f = (SimpleFeature) i.next();
-                	String msg = (String) errors.get(f);
-                	r += (f.getID() + " " + msg + "\n");
-            	}
-            }else{
-            	r = "PASSED";
+            if (i.hasNext()) {
+                while (i.hasNext()) {
+                    SimpleFeature f = (SimpleFeature) i.next();
+                    String msg = (String) errors.get(f);
+                    r += (f.getID() + " " + msg + "\n");
+                }
+            } else {
+                r = "PASSED";
             }
 
-            return r+"\n";
+            return r + "\n";
         }
     }
 }
 
-
 /*
  * Created on Feb 9, 2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * 
+ * To change the template for this generated file go to Window - Preferences - Java - Code
+ * Generation - Code and Comments
  */
 class BatchValidatorProcessor extends ValidationProcessor {
     /**
@@ -676,10 +622,12 @@ class BatchValidatorProcessor extends ValidationProcessor {
      * <p>
      * Builds a ValidationProcessor with the DTO provided.
      * </p>
-     *
-     * @param testSuites Map a map of names -> TestSuiteDTO objects
-     * @param plugIns Map a map of names -> PlugInDTO objects
-     *
+     * 
+     * @param testSuites
+     *            Map a map of names -> TestSuiteDTO objects
+     * @param plugIns
+     *            Map a map of names -> PlugInDTO objects
+     * 
      * @see load(Map,Map)
      */
     public BatchValidatorProcessor(Map testSuites, Map plugIns) {
@@ -693,7 +641,7 @@ class BatchValidatorProcessor extends ValidationProcessor {
      * <p>
      * loads this instance data into this instance.
      * </p>
-     *
+     * 
      * @param testSuites
      * @param plugIns
      */
@@ -702,14 +650,12 @@ class BatchValidatorProcessor extends ValidationProcessor {
         Set plugInNames = new HashSet();
         Iterator i = testSuites.keySet().iterator();
 
-		// go through each test suite
-        while (i.hasNext()) 
-        {
+        // go through each test suite
+        while (i.hasNext()) {
             TestSuiteDTO dto = (TestSuiteDTO) testSuites.get(i.next());
             Iterator j = dto.getTests().keySet().iterator();
-			// go through each test plugIn
-            while (j.hasNext()) 
-            {
+            // go through each test plugIn
+            while (j.hasNext()) {
                 TestDTO tdto = (TestDTO) dto.getTests().get(j.next());
                 plugInNames.add(tdto.getPlugIn().getName());
             }
@@ -717,7 +663,7 @@ class BatchValidatorProcessor extends ValidationProcessor {
 
         i = plugIns.values().iterator();
         Map errors = new HashMap();
-        
+
         // go through each plugIn and add it to errors
         while (i.hasNext())
             errors.put(i.next(), Boolean.FALSE);
@@ -726,9 +672,8 @@ class BatchValidatorProcessor extends ValidationProcessor {
         Map defaultPlugIns = new HashMap(plugInNames.size());
         i = plugInNames.iterator();
 
-		// go through each plugIn
-        while (i.hasNext()) 
-        {
+        // go through each plugIn
+        while (i.hasNext()) {
             String plugInName = (String) i.next();
             PlugInDTO dto = (PlugInDTO) plugIns.get(plugInName);
             Class plugInClass = null;
@@ -736,7 +681,7 @@ class BatchValidatorProcessor extends ValidationProcessor {
             try {
                 plugInClass = Class.forName(dto.getClassName());
             } catch (ClassNotFoundException e) {
-                //Error, using default.
+                // Error, using default.
                 errors.put(dto, e);
                 e.printStackTrace();
             }
@@ -752,32 +697,30 @@ class BatchValidatorProcessor extends ValidationProcessor {
             }
 
             try {
-                PlugIn plugIn = new org.geotools.validation.PlugIn(plugInName,
-                        plugInClass, dto.getDescription(), plugInArgs);
+                PlugIn plugIn = new org.geotools.validation.PlugIn(plugInName, plugInClass, dto
+                        .getDescription(), plugInArgs);
                 defaultPlugIns.put(plugInName, plugIn);
             } catch (ValidationException e) {
                 e.printStackTrace();
                 errors.put(dto, e);
 
-                //error should log here
+                // error should log here
                 continue;
             }
 
-            errors.put(dto, Boolean.TRUE);	// store the plugIn
+            errors.put(dto, Boolean.TRUE); // store the plugIn
         }
 
         // step 3 configure plug-ins with tests + add to processor
         i = testSuites.keySet().iterator();
 
-		// for each TEST SUITE
-        while (i.hasNext()) 
-        {
+        // for each TEST SUITE
+        while (i.hasNext()) {
             TestSuiteDTO tdto = (TestSuiteDTO) testSuites.get(i.next());
             Iterator j = tdto.getTests().keySet().iterator();
 
-			// for each TEST in the test suite
-            while (j.hasNext()) 
-            {
+            // for each TEST in the test suite
+            while (j.hasNext()) {
                 TestDTO dto = (TestDTO) tdto.getTests().get(j.next());
 
                 // deal with test
@@ -798,10 +741,10 @@ class BatchValidatorProcessor extends ValidationProcessor {
                 }
 
                 try {
-                    PlugIn plugIn = (org.geotools.validation.PlugIn) defaultPlugIns
-                        .get(dto.getPlugIn().getName());
-                    Validation validation = plugIn.createValidation(dto.getName(),
-                            dto.getDescription(), testArgs);
+                    PlugIn plugIn = (org.geotools.validation.PlugIn) defaultPlugIns.get(dto
+                            .getPlugIn().getName());
+                    Validation validation = plugIn.createValidation(dto.getName(), dto
+                            .getDescription(), testArgs);
 
                     if (validation instanceof FeatureValidation) {
                         addValidation((FeatureValidation) validation);
@@ -814,7 +757,7 @@ class BatchValidatorProcessor extends ValidationProcessor {
                     e.printStackTrace();
                     errors.put(dto, e);
 
-                    //error should log here
+                    // error should log here
                     continue;
                 }
 
@@ -824,5 +767,5 @@ class BatchValidatorProcessor extends ValidationProcessor {
             errors.put(tdto, Boolean.TRUE);
         } // end while each test suite
     }// end load method
-    
+
 }

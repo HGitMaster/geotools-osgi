@@ -26,7 +26,9 @@ import java.sql.ResultSet;
  * how to parse and encode Feature attributes into resultset fields
  *
  * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/attributeio/AttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/attributeio/AttributeIO.java $
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public interface AttributeIO {
     /**

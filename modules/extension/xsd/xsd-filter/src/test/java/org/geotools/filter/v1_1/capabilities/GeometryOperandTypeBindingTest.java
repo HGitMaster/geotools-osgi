@@ -58,6 +58,8 @@ import org.geotools.xml.Binding;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/test/java/org/geotools/filter/v1_1/capabilities/GeometryOperandTypeBindingTest.java $
  */
 public class GeometryOperandTypeBindingTest extends OGCTestSupport {
     public void testType() {

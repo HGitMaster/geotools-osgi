@@ -18,17 +18,33 @@ package org.geotools.process.feature;
 
 import java.util.Map;
 
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Process which buffers an entire feature collection.
  * 
  * @author Justin Deoliveira, OpenGEO
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/feature/BufferFeatureCollectionProcess.java $
  */
-public class BufferFeatureCollectionProcess extends AbstractFeatureCollectionProcess {
+public class BufferFeatureCollectionProcess extends FeatureToFeatureProcess {
+
+    /**
+     * Constructor
+     *
+     * @param factory
+     */
+    public BufferFeatureCollectionProcess(BufferFeatureCollectionFactory factory) {
+        super(factory);
+    }
 
     @Override
     protected void processFeature(SimpleFeature feature, Map<String, Object> input) throws Exception {
@@ -38,6 +54,20 @@ public class BufferFeatureCollectionProcess extends AbstractFeatureCollectionPro
        g = g.buffer( buffer );
        
        feature.setDefaultGeometry( g );
-   }
+    }
 
+    @Override
+    SimpleFeatureType getTargetSchema(SimpleFeatureType sourceSchema, Map<String, Object> input) {
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        for (AttributeDescriptor ad : sourceSchema.getAttributeDescriptors()) {
+            GeometryDescriptor defaultGeometry = sourceSchema.getGeometryDescriptor();
+            if(ad == defaultGeometry) {
+                tb.add(ad.getName().getLocalPart(), Polygon.class, defaultGeometry.getCoordinateReferenceSystem());
+            } else {
+                tb.add(ad);
+            }
+        }
+        tb.setName(sourceSchema.getName());
+        return tb.buildFeatureType();
+    }
 }

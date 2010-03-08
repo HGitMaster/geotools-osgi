@@ -53,6 +53,8 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/test/java/org/geotools/gml2/bindings/GML2MockData.java $
  */
 public class GML2MockData {
     /** factory used to create geometries */

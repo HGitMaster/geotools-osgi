@@ -36,7 +36,7 @@ import org.opengis.feature.type.GeometryDescriptor;
  * This is a support class which creates test features for use in testing.
  *
  * @author jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/feature/SampleFeatureFixtures.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/feature/SampleFeatureFixtures.java $
  */
 public class SampleFeatureFixtures {
     /**

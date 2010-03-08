@@ -27,12 +27,35 @@ import org.geotools.resources.Utilities;
  * A style that contains the specification to renderer both the contour and the interior of a shape
  *
  * @author Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/PolygonStyle2D.java $
- * @version $Id: PolygonStyle2D.java 30649 2008-06-12 19:44:08Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/PolygonStyle2D.java $
+ * @version $Id: PolygonStyle2D.java 34849 2010-01-29 16:07:40Z aaime $
  */
 public class PolygonStyle2D extends LineStyle2D {
     protected Paint fill;
+    protected Style2D graphicFill;
     protected Composite fillComposite;
+
+
+    /**
+     * Returns a Style2D used for filling the {@linkplain org.geotools.renderer.geom.Polygon polygon}
+     * to be rendered, or <code>null</code> if none.
+     * 
+     * @return the current fill or null if none
+     */
+    public Style2D getGraphicFill()
+    {
+    	return graphicFill;
+    }
+    
+    /**
+     * Sets a Style2D for filling the {@linkplain org.geotools.renderer.geom.Polygon polygon} to be
+     * rendered. Set it to <code>null</code> if no Style2D filling is to be performed.
+     *
+     * @param graphicFill
+     */
+    public void setGraphicFill(Style2D graphicFill) {
+        this.graphicFill = graphicFill;
+    }
 
     /**
      * Returns the filling color for the {@linkplain org.geotools.renderer.geom.Polygon polygon} to

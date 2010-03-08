@@ -25,7 +25,7 @@ import org.geotools.xml.schema.ElementValue;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/ElementValueGT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/ElementValueGT.java $
  */
 public class ElementValueGT implements ElementValue {
     private Element element;

@@ -52,7 +52,7 @@ import org.opengis.filter.FilterFactory2;
  * Test functioning of PropertyDataStore.
  * 
  * @author Jody Garnett, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
  */
 public class PropertyDataStoreTest extends TestCase {
     PropertyDataStore store;

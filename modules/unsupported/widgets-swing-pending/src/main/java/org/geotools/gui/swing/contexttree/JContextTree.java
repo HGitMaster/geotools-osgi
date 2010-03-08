@@ -51,6 +51,8 @@ import org.geotools.map.MapContext;
  * is based on a JXTreeTable.
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/JContextTree.java $
  */
 public class JContextTree extends javax.swing.JPanel{
 

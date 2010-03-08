@@ -76,7 +76,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2DataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2DataStore.java $
  */
 public class DB2DataStore extends JDBCDataStore implements DataStore{
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(

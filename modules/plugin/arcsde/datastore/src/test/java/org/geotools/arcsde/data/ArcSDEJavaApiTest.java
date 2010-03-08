@@ -28,10 +28,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
-import org.geotools.arcsde.pool.SessionPool;
-import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
+import org.geotools.arcsde.session.Command;
+import org.geotools.arcsde.session.Commands;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.ISessionPool;
+import org.geotools.arcsde.session.SdeRow;
+import org.geotools.arcsde.session.UnavailableConnectionException;
 import org.geotools.data.DataSourceException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -73,7 +75,7 @@ import com.esri.sde.sdk.client.SeVersion;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/ArcSDEJavaApiTest.java $
- * @version $Id: ArcSDEJavaApiTest.java 32709 2009-03-26 16:08:09Z groldan $
+ * @version $Id: ArcSDEJavaApiTest.java 34490 2009-11-25 04:19:32Z groldan $
  */
 public class ArcSDEJavaApiTest {
     /** package logger */
@@ -85,7 +87,7 @@ public class ArcSDEJavaApiTest {
 
     private ISession session;
 
-    private SessionPool pool;
+    private ISessionPool pool;
 
     @BeforeClass
     public static void oneTimeSetUp() throws Exception {
@@ -325,7 +327,7 @@ public class ArcSDEJavaApiTest {
             throw e;
         }
     }
-    
+
     @Test
     public void testCalculateCountSpatialFilter() throws Exception {
         try {
@@ -778,12 +780,12 @@ public class ArcSDEJavaApiTest {
      *             DOCUMENT ME!
      * @throws IOException
      *             DOCUMENT ME!
-     * @throws UnavailableArcSDEConnectionException
+     * @throws UnavailableConnectionException
      *             DOCUMENT ME!
      */
     @Test
     public void testCreateBaseTable() throws SeException, IOException,
-            UnavailableArcSDEConnectionException {
+            UnavailableConnectionException {
 
         final SeColumnDefinition[] colDefs = new SeColumnDefinition[7];
 
@@ -897,12 +899,12 @@ public class ArcSDEJavaApiTest {
      *             DOCUMENT ME!
      * @throws IOException
      *             DOCUMENT ME!
-     * @throws UnavailableArcSDEConnectionException
+     * @throws UnavailableConnectionException
      *             DOCUMENT ME!
      */
     @Test
     public void testCreateNonStandardSchema() throws SeException, IOException,
-            UnavailableArcSDEConnectionException {
+            UnavailableConnectionException {
 
         Command<Void> createCommand = new Command<Void>() {
             @Override
@@ -1033,8 +1035,7 @@ public class ArcSDEJavaApiTest {
     } // End method createBaseTable
 
     @Test
-    public void testDeleteById() throws IOException, UnavailableArcSDEConnectionException,
-            SeException {
+    public void testDeleteById() throws IOException, UnavailableConnectionException, SeException {
 
         final String typeName = testData.getTempTableName();
         final SeQuery query = session.createAndExecuteQuery(new String[] { "ROW_ID", "INT32_COL" },
@@ -1082,7 +1083,7 @@ public class ArcSDEJavaApiTest {
         testData.truncateTempTable();
 
         {
-            final SessionPool connPool = testData.getConnectionPool();
+            final ISessionPool connPool = testData.getConnectionPool();
             transSession = connPool.getSession();
             // start a transaction on transConn
             transSession.startTransaction();
@@ -1181,7 +1182,8 @@ public class ArcSDEJavaApiTest {
         final SeVersion defaultVersion;
         final SeVersion newVersion;
         {
-            defaultVersion = session.getDefaultVersion();
+            defaultVersion = session.issue(new Commands.GetVersionCommand(
+                    SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME));
 
             newVersion = session.issue(new Command<SeVersion>() {
 
@@ -1285,16 +1287,16 @@ public class ArcSDEJavaApiTest {
         assertEquals(0, newVersionCount);
     }
 
-    private void insertIntoDifferentTransactionsAndMerge(ISession session) throws IOException {
-        SeVersion defaultVersion = session.getDefaultVersion();
-        SeState currentState = session.createState(defaultVersion.getStateId());
-        if (currentState.isOpen()) {
-            try {
-                currentState.close();
-            } catch (SeException e) {
-
-            }
-        }
-        // SeState newState1 = session.createchi
-    }
+    // private void insertIntoDifferentTransactionsAndMerge(ISession session) throws IOException {
+    // SeVersion defaultVersion = session.getDefaultVersion();
+    // SeState currentState = session.createState(defaultVersion.getStateId());
+    // if (currentState.isOpen()) {
+    // try {
+    // currentState.close();
+    // } catch (SeException e) {
+    //
+    // }
+    // }
+    // // SeState newState1 = session.createchi
+    // }
 }

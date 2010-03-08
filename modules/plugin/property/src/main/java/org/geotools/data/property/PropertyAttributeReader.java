@@ -67,7 +67,7 @@ import com.vividsolutions.jts.io.WKTReader;
  *  </code>
  *</pre>
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyAttributeReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyAttributeReader.java $
  */
 public class PropertyAttributeReader implements AttributeReader {
     /** DOCUMENT ME!  */

@@ -16,25 +16,29 @@
  */
 package org.geotools.referencing.factory.wms;
 
-import java.util.Collection;
+import static org.junit.Assert.*;
 
-import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
+import java.util.Collection;
 
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.ReferencingFactoryFinder;
-
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.geotools.referencing.operation.projection.EquatorialOrthographic;
+import org.geotools.referencing.operation.projection.EquidistantCylindrical;
+import org.geotools.referencing.operation.projection.ObliqueOrthographic;
+import org.geotools.referencing.operation.projection.PolarOrthographic;
+import org.junit.Before;
+import org.junit.Test;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.ProjectedCRS;
 
 
 /**
  * Tests {@link AutoCRSFactory}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/factory/wms/AUTOTest.java $
- * @version $Id: AUTOTest.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/factory/wms/AUTOTest.java $
+ * @version $Id: AUTOTest.java 34859 2010-02-03 19:30:23Z aaime $
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
@@ -84,10 +88,48 @@ public final class AUTOTest {
     public void test42001() throws FactoryException {
         final ProjectedCRS utm = factory.createProjectedCRS("AUTO:42001,0.0,0.0");
         assertNotNull("auto-utm", utm);
-        assertSame   (utm, factory.createObject("AUTO :42001, 0,0"));
-        assertSame   (utm, factory.createObject("AUTO2:42001, 0,0"));
-        assertSame   (utm, factory.createObject(      "42001, 0,0"));
-        assertNotSame(utm, factory.createObject("AUTO :42001,30,0"));
+        assertSame   (utm, factory.createObject("AUTO :42001 ,0,0"));
+        assertSame   (utm, factory.createObject("AUTO2:42001 ,0,0"));
+        assertSame   (utm, factory.createObject(      "42001 ,0,0"));
+        assertNotSame(utm, factory.createObject("AUTO :42001 ,30,0"));
         assertEquals ("Transverse_Mercator", utm.getConversionFromBase().getMethod().getName().getCode());
+    }
+    
+    /**
+     * Check we can parse also the unit
+     */
+    @Test
+    public void test42001Units() throws FactoryException {
+        final ProjectedCRS utm = factory.createProjectedCRS("AUTO:42001,9001,0.0,0.0");
+        assertNotNull("auto-utm", utm);
+        assertSame   (utm, factory.createObject("AUTO :42001, 9001,0,0"));
+        assertSame   (utm, factory.createObject("AUTO2:42001, 9001,0,0"));
+        assertSame   (utm, factory.createObject(      "42001, 9001,0,0"));
+        assertNotSame(utm, factory.createObject("AUTO :42001, 9001,30,0"));
+        assertEquals ("Transverse_Mercator", utm.getConversionFromBase().getMethod().getName().getCode());
+    }
+    
+    @Test
+    public void test42003() throws FactoryException {
+        ProjectedCRS eqc = factory.createProjectedCRS("AUTO:42003,9001,0.0,0");
+        assertEquals ("Orthographic", eqc.getConversionFromBase().getMethod().getName().getCode());
+        assertTrue(eqc.getConversionFromBase().getMathTransform() instanceof EquatorialOrthographic);
+        
+        eqc = factory.createProjectedCRS("AUTO:42003,9001,0.0,90");
+        assertEquals ("Orthographic", eqc.getConversionFromBase().getMethod().getName().getCode());
+        assertTrue(eqc.getConversionFromBase().getMathTransform() instanceof PolarOrthographic);
+        
+        eqc = factory.createProjectedCRS("AUTO:42003,9001,0.0,45");
+        assertEquals ("Orthographic", eqc.getConversionFromBase().getMethod().getName().getCode());
+        assertTrue(eqc.getConversionFromBase().getMathTransform() instanceof ObliqueOrthographic);
+    }
+    
+    @Test
+    public void test42004() throws FactoryException {
+        final ProjectedCRS eqc = factory.createProjectedCRS("AUTO:42004,9001,0.0,35");
+        assertEquals ("Equidistant_Cylindrical", eqc.getConversionFromBase().getMethod().getName().getCode());
+        String stdParallel1Code = EquidistantCylindrical.Provider.STANDARD_PARALLEL_1.getName().getCode();
+        double stdParallel1 = eqc.getConversionFromBase().getParameterValues().parameter(stdParallel1Code).doubleValue();
+        assertEquals(35.0, stdParallel1, 1e-9);
     }
 }

@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Extender geometry datatypes.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2SQLBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2SQLBuilder.java $
  */
 public class DB2SQLBuilder extends GeoAPISQLBuilder {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(

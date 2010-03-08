@@ -39,6 +39,8 @@ import com.sun.media.imageio.plugins.tiff.TIFFTag;
  * @author Simone Giannecchini, GeoSolutions
  * @since 2.3
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/imageio/geotiff/GeoTiffIIOMetadataEncoder.java $
  */
 public final class GeoTiffIIOMetadataEncoder {
 
@@ -296,7 +298,7 @@ public final class GeoTiffIIOMetadataEncoder {
 
 		final int numKeyEntries = numGeoTiffEntries;
 		geoTiffEntries.add(new Integer(keyID), new GeoKeyEntry(keyID, tag,
-				offset, count));
+				count, offset));
 		getGeoKeyEntryAt(0).setCount(numKeyEntries);
 		numGeoTiffEntries++;
 	}

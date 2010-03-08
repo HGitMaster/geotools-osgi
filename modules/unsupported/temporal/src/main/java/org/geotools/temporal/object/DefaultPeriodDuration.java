@@ -26,6 +26,8 @@ import org.opengis.util.InternationalString;
  * about the duration of a period.
  * 
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultPeriodDuration.java $
  */
 public class DefaultPeriodDuration extends DefaultDuration implements PeriodDuration {
 

@@ -21,30 +21,25 @@ package org.geotools.gce.image;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageReadParam;
 import javax.media.jai.RenderedOp;
 
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.factory.Hints;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.test.TestData;
-import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -53,7 +48,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Simone Giannecchini
  * @author Alessio Fabiani
  * @author rgould
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/image/src/test/java/org/geotools/gce/image/WorldImageReaderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/image/src/test/java/org/geotools/gce/image/WorldImageReaderTest.java $
  */
 public class WorldImageReaderTest extends WorldImageBaseTestCase {
 
@@ -164,7 +159,7 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
         wiReader = new WorldImageReader(file);
 		final ParameterValue policy = (ParameterValue) ((AbstractGridFormat) wiReader
 				.getFormat()).OVERVIEW_POLICY.createValue();	
-		policy.setValue(Hints.VALUE_OVERVIEW_POLICY_NEAREST);
+		policy.setValue(OverviewPolicy.NEAREST);
 
         // more than native resolution (250 pixel representation for 125 pixels image)
         assertEquals(0, getChosenOverview(250,wiReader,policy));
@@ -197,7 +192,7 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
         //
         ///////////////////////////////////////////////////////////////////////
         Hints hints = new Hints();
-        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_QUALITY);
+        hints.put(Hints.OVERVIEW_POLICY, OverviewPolicy.QUALITY);
         WorldImageReader wiReader = new WorldImageReader(file,hints);
         
         // between 16 and 9, any value should report the match of 16
@@ -215,11 +210,11 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
         //
         ///////////////////////////////////////////////////////////////////////
         //parameter ovverrides hints
-        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_NEAREST);
+        hints.put(Hints.OVERVIEW_POLICY, OverviewPolicy.NEAREST);
         wiReader = new WorldImageReader(file, hints);
 		final ParameterValue policy = (ParameterValue) ((AbstractGridFormat) wiReader
 				.getFormat()).OVERVIEW_POLICY.createValue();	
-		policy.setValue(Hints.VALUE_OVERVIEW_POLICY_QUALITY);
+		policy.setValue(OverviewPolicy.QUALITY);
 		
         // between 16 and 9, any value should report the match of 16
         assertEquals(4, getChosenOverview(16,wiReader,policy));
@@ -240,7 +235,7 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
         //
         ///////////////////////////////////////////////////////////////////////
         Hints hints = new Hints();
-        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_SPEED);
+        hints.put(Hints.OVERVIEW_POLICY, OverviewPolicy.SPEED);
         WorldImageReader wiReader = new WorldImageReader(file, hints);
         // between 16 and 9, any value should report the match of 16
         assertEquals(1, getChosenOverview(15,wiReader));
@@ -257,11 +252,11 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
         //
         ///////////////////////////////////////////////////////////////////////
         //parameter overrides hints
-        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_NEAREST);
+        hints.put(Hints.OVERVIEW_POLICY, OverviewPolicy.NEAREST);
         wiReader = new WorldImageReader(file, hints);
 		final ParameterValue policy = (ParameterValue) ((AbstractGridFormat) wiReader
 				.getFormat()).OVERVIEW_POLICY.createValue();	
-		policy.setValue(Hints.VALUE_OVERVIEW_POLICY_SPEED);
+		policy.setValue(OverviewPolicy.SPEED);
         // between 16 and 9, any value should report the match of 16
         assertEquals(1, getChosenOverview(15,wiReader,policy));
         assertEquals(1, getChosenOverview(14,wiReader,policy));
@@ -281,7 +276,7 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 		final Parameter readGG = new Parameter(
 				AbstractGridFormat.READ_GRIDGEOMETRY2D);
 
-		readGG.setValue(new GridGeometry2D(new GeneralGridRange(
+		readGG.setValue(new GridGeometry2D(new GridEnvelope2D(
 				new java.awt.Rectangle(size, (int) (164.0 / 125.0 * size))),
 				new ReferencedEnvelope(118.8, 134.56, 47.819, 63.142,
 						DefaultGeographicCRS.WGS84)));

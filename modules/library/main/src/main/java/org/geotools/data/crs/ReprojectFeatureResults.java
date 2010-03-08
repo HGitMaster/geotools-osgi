@@ -66,7 +66,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author aaime
  * @author $Author: jive $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/crs/ReprojectFeatureResults.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/crs/ReprojectFeatureResults.java $
  * @version $Id: ReprojectFeatureResults.java 31085 2008-07-28 07:58:00Z jgarnett $ TODO: handle the case where there is more than one geometry and the other geometries have a different CS than the default geometry
  */
 public class ReprojectFeatureResults extends AbstractFeatureCollection {

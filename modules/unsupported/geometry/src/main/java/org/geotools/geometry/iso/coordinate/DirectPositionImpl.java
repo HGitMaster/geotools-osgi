@@ -31,6 +31,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * @author Jackson Roehrig & Sanjay Jena
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/DirectPositionImpl.java $
  */
 public class DirectPositionImpl implements DirectPosition, Cloneable, Serializable {
     private static final long serialVersionUID = 2327211794986364062L;

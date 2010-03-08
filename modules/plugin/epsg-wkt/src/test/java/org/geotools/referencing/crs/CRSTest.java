@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author Jody Garnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-wkt/src/test/java/org/geotools/referencing/crs/CRSTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-wkt/src/test/java/org/geotools/referencing/crs/CRSTest.java $
  */
 public class CRSTest extends TestCase {
     /**

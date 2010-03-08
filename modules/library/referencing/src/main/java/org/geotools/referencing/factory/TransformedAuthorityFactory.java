@@ -63,7 +63,7 @@ import org.geotools.util.Utilities;
  * and {@link CRSAuthorityFactory} interfaces to implement.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/TransformedAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/TransformedAuthorityFactory.java $
  * @version $Id: TransformedAuthorityFactory.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

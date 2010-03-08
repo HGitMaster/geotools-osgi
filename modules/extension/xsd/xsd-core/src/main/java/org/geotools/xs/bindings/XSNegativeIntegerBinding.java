@@ -42,6 +42,8 @@ import org.geotools.xs.XS;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/bindings/XSNegativeIntegerBinding.java $
  */
 public class XSNegativeIntegerBinding implements SimpleBinding {
     /**
@@ -85,7 +87,7 @@ public class XSNegativeIntegerBinding implements SimpleBinding {
         throws Exception {
         Number number = (Number) value;
 
-        if (number.intValue() == 0) {
+        if (number.longValue() == 0) {
             throw new IllegalArgumentException("negativeInteger value '" + number
                 + "' required to be negative");
         }

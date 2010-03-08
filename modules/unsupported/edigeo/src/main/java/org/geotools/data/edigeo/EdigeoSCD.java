@@ -24,6 +24,8 @@ import java.util.HashMap;
 /**
  *
  * @author mcoudert
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/edigeo/src/main/java/org/geotools/data/edigeo/EdigeoSCD.java $
  */
 public class EdigeoSCD {
     

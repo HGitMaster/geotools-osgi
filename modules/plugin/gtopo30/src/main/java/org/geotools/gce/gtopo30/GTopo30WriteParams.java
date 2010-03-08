@@ -27,6 +27,8 @@ import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
  * @author Simone Giannecchini, GeoSolutions.
  * @since 2.3.x
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/gtopo30/src/main/java/org/geotools/gce/gtopo30/GTopo30WriteParams.java $
  */
 public final class GTopo30WriteParams extends GeoToolsWriteParams {
 

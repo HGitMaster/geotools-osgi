@@ -34,7 +34,7 @@ import org.xml.sax.SAXNotRecognizedException;
  * </p>
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/handlers/DocumentHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/DocumentHandler.java $
  */
 public class DocumentHandler extends XMLElementHandler {
     public final static String DEFAULT_NAMESPACE_HINT_KEY = "org.geotools.xml.handlers.DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY";

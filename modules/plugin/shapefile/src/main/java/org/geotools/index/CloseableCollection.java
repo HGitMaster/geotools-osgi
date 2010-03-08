@@ -24,6 +24,8 @@ import java.util.Iterator;
  * Tag interface for collection that must be closed 
  * 
  * @author jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/index/CloseableCollection.java $
  */
 public interface CloseableCollection<T> extends Collection<T>{
 

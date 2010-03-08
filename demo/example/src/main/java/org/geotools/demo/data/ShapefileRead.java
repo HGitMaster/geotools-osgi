@@ -13,22 +13,19 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.demo.swing.ShapeFileDialog;
 import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.collection.AbstractFeatureVisitor;
-import org.geotools.gui.swing.ProgressWindow;
+import org.geotools.swing.ProgressWindow;
 import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotools.swing.data.JFileDataStoreChooser;
 
 /**
  * How to Read a Shapefile.
@@ -38,6 +35,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Jody Garnett (Refractions Research)
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/data/ShapefileRead.java $
  */
 public class ShapefileRead {
 
@@ -46,7 +45,7 @@ public class ShapefileRead {
 		
 		File file;
 		if (args.length == 0){
-		    file = ShapeFileDialog.showOpenShapefile(null);
+		    file = JFileDataStoreChooser.showOpenFile("shp", null);
 		}
 		else {
 			file = new File( args[0] );
@@ -67,13 +66,14 @@ public class ShapefileRead {
 		FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = dataStore.getFeatureSource(typeName);
 		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = featureSource.getFeatures();
 		
-		class DistanceVisitor extends AbstractFeatureVisitor {
+		class DistanceVisitor implements FeatureVisitor {
 			int length =0;
 			public void visit(Feature feature) {
 				Geometry geometry = (Geometry) feature.getDefaultGeometryProperty().getValue();
 				length += geometry.getLength();
 			}
-		};
+		}
+
 		DistanceVisitor distance = new DistanceVisitor();
 		
 		collection.accepts( distance, new ProgressWindow(null));

@@ -26,6 +26,8 @@ import org.geotools.xml.test.XMLTestSupport;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/test/java/org/geotools/gml2/bindings/GMLTestSupport.java $
  */
 public class GMLTestSupport extends XMLTestSupport {
     protected Configuration createConfiguration() {

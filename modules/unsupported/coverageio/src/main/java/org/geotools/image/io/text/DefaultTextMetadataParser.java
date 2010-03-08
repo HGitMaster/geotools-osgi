@@ -31,7 +31,7 @@ import org.opengis.referencing.cs.CoordinateSystem;
  * <a href="http://www.opengeospatial.org/standards/gmljp2">GML in JPEG 2000</a> standard.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/DefaultTextMetadataParser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/DefaultTextMetadataParser.java $
  * @version $Id: DefaultTextMetadataParser.java 30970 2008-07-09 14:14:55Z cedricbr $
  * @author Cédric Briançon
  */

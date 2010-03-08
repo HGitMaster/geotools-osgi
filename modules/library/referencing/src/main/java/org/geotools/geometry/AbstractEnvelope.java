@@ -36,7 +36,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * or {@link org.geotools.util.Cloneable} interfaces is left to implementors.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/geometry/AbstractEnvelope.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/geometry/AbstractEnvelope.java $
  * @version $Id: AbstractEnvelope.java 30892 2008-07-04 15:17:36Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

@@ -40,6 +40,8 @@ import org.opengis.filter.expression.Expression;
  * Component used to present opacity
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/column/OpacityComponent.java $
  */
 public final class OpacityComponent extends RenderAndEditComponent {
 

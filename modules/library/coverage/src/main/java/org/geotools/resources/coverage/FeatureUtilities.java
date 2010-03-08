@@ -22,20 +22,24 @@ import java.util.List;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.referencing.CRS;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -56,15 +60,31 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * should be seen as temporary implementations.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/resources/coverage/FeatureUtilities.java $
- * @version $Id: FeatureUtilities.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/resources/coverage/FeatureUtilities.java $
+ * @version $Id: FeatureUtilities.java 34917 2010-02-18 18:02:26Z aaime $
  * @author Simone Giannecchini
  */
 public final class FeatureUtilities {
+    
+    static FeatureTypeFactory typeFactory;
+    static FeatureFactory featureFactory;
+    
     /**
      * Do not allows instantiation of this class.
      */
     private FeatureUtilities() {
+    }
+    
+    private static FeatureTypeFactory getTypeFactory() {
+        if(typeFactory == null)
+            typeFactory = new FeatureTypeFactoryImpl();  // CommonFactoryFinder.getFeatureTypeFactory(null);
+        return typeFactory;
+    }
+    
+    private static FeatureFactory getFeatureFactory() {
+        if(featureFactory == null)
+            featureFactory = CommonFactoryFinder.getFeatureFactory(null);
+        return featureFactory;
     }
 
     /**
@@ -94,75 +114,50 @@ public final class FeatureUtilities {
      *         grid coverage itself in the "grid" attribute.
      */
     public static FeatureCollection<SimpleFeatureType, SimpleFeature> wrapGridCoverage(final GridCoverage2D coverage)
-            throws TransformException, SchemaException, IllegalAttributeException
-    {
+            throws TransformException, SchemaException {
         final Polygon bounds = getPolygon(coverage.getEnvelope2D());
         final CoordinateReferenceSystem sourceCRS = coverage.getCoordinateReferenceSystem2D();
 
-        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder(getTypeFactory());
         ftb.setName("GridCoverage");
         ftb.add("geom", Polygon.class, sourceCRS);
         ftb.add("grid", GridCoverage.class);
         SimpleFeatureType schema = ftb.buildFeatureType();
 
         // create the feature
-        SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, coverage }, null);
+        SimpleFeatureBuilder fb = new SimpleFeatureBuilder(schema, getFeatureFactory());
+        fb.add(bounds);
+        fb.add(coverage);
+        SimpleFeature feature = fb.buildFeature(null);
 
         final FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
         collection.add(feature);
 
         return collection;
     }
-
+    
     /**
-     * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
-     * (temporary).
-     *
-     * @param  reader the grid coverage reader.
-     * @return a feature with the grid coverage envelope as the geometry and the
-     *         grid coverage itself in the "grid" attribute.
-     *
-     * @deprecated Please use FeatureUtilities#wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader, GeneralParameterValue[] params)
+     * Checks if the feature type specified is a GridCoverage wrapper
+     * @param featureType
+     * @return
      */
-    public static FeatureCollection<SimpleFeatureType, SimpleFeature> wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader)
-    	throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
-				// create surrounding polygon
-				final PrecisionModel pm = new PrecisionModel();
-				final GeometryFactory gf = new GeometryFactory(pm, 0);
-				final Rectangle2D rect = gridCoverageReader.getOriginalEnvelope()
-						.toRectangle2D();
-				final CoordinateReferenceSystem sourceCrs = CRS
-					.getHorizontalCRS(gridCoverageReader.getCrs());
-				if(sourceCrs==null)
-					throw new UnsupportedOperationException(
-							Errors.format(
-				                    ErrorKeys.CANT_SEPARATE_CRS_$1,sourceCrs));
-
-				final Coordinate[] coord = new Coordinate[5];
-				coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
-				coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
-				coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
-				coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
-				coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
-
-				// }
-				final LinearRing ring = gf.createLinearRing(coord);
-				final Polygon bounds = new Polygon(ring, null, gf);
-
-				SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
-		        ftb.setName("GridCoverage");
-		        ftb.add("geom", Polygon.class, sourceCrs);
-		        ftb.add("grid", AbstractGridCoverage2DReader.class);
-		        SimpleFeatureType schema = ftb.buildFeatureType();
-
-		        // create the feature
-		        SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, gridCoverageReader }, null);
-
-				final FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
-				collection.add(feature);
-
-				return collection;
-		}
+    public static boolean isWrappedCoverage(SimpleFeatureType featureType) {
+        if(!"GridCoverage".equals(featureType.getName().getLocalPart()))
+            return false;
+        
+        if(featureType.getAttributeCount() != 2)
+            return false;
+        
+        AttributeDescriptor polyDescriptor = featureType.getDescriptor("geom");
+        if(polyDescriptor == null || !Polygon.class.equals(polyDescriptor.getType().getBinding()))
+            return false;
+        
+        AttributeDescriptor gridDescriptor = featureType.getDescriptor("grid");
+        if(gridDescriptor == null || !GridCoverage.class.equals(gridDescriptor.getType().getBinding()))
+            return false;
+        
+        return true;
+    }
 
     /**
      * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
@@ -174,8 +169,7 @@ public final class FeatureUtilities {
      */
     public static FeatureCollection<SimpleFeatureType, SimpleFeature> wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader,
 			GeneralParameterValue[] params) throws TransformException,
-			FactoryRegistryException, SchemaException,
-			IllegalAttributeException {
+			FactoryRegistryException, SchemaException {
 
 		// create surrounding polygon
 		final PrecisionModel pm = new PrecisionModel();
@@ -201,7 +195,7 @@ public final class FeatureUtilities {
 		final LinearRing ring = gf.createLinearRing(coord);
 		final Polygon bounds = new Polygon(ring, null, gf);
 
-		SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+		SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder(getTypeFactory());
         ftb.setName("GridCoverage");
         ftb.add("geom", Polygon.class, sourceCrs);
         ftb.add("grid", AbstractGridCoverage2DReader.class);
@@ -209,7 +203,11 @@ public final class FeatureUtilities {
         SimpleFeatureType schema = ftb.buildFeatureType();
 
         // create the feature
-        SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, gridCoverageReader, params }, null);
+        SimpleFeatureBuilder fb = new SimpleFeatureBuilder(schema, getFeatureFactory());
+        fb.add(bounds);
+        fb.add(gridCoverageReader);
+        fb.add(params);
+        SimpleFeature feature = fb.buildFeature(null);
 
 
 		final FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
@@ -217,6 +215,33 @@ public final class FeatureUtilities {
 
 		return collection;
 	}
+    
+    /**
+     * Checks if the feature type specified is a AbstractGridCoverage2DReader wrapper
+     * @param featureType
+     * @return
+     */
+    public static boolean isWrappedCoverageReader(SimpleFeatureType featureType) {
+        if(!"GridCoverage".equals(featureType.getName().getLocalPart()))
+            return false;
+        
+        if(featureType.getAttributeCount() != 3)
+            return false;
+        
+        AttributeDescriptor polyDescriptor = featureType.getDescriptor("geom");
+        if(polyDescriptor == null || !Polygon.class.equals(polyDescriptor.getType().getBinding()))
+            return false;
+        
+        AttributeDescriptor gridDescriptor = featureType.getDescriptor("grid");
+        if(gridDescriptor == null || !AbstractGridCoverage2DReader.class.equals(gridDescriptor.getType().getBinding()))
+            return false;
+        
+        AttributeDescriptor paramDescriptor = featureType.getDescriptor("params");
+        if(paramDescriptor == null || !GeneralParameterValue[].class.equals(paramDescriptor.getType().getBinding()))
+            return false;
+        
+        return true;
+    }
 
 	/**
 	 * Converts a JTS {@link Polygon}, which represents a ROI, int an AWT

@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Tests cases for DataUtilities.
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/data/DataUtilitiesTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/DataUtilitiesTest.java $
  */
 public class DataUtilitiesTest extends DataTestCase {
     /**
@@ -85,39 +85,30 @@ public class DataUtilitiesTest extends DataTestCase {
 
         String os = System.getProperty("os.name");
 
-        String c = "C:\\";
-        String cOne = "C:\\one";
-        String cOneTwo = "C:\\one\\two";
-        String cOneTwoThreeSpace = "C:\\one\\two\\and three";
-        String d = "D:\\";
-        String slashOne = "/one";
-        String one = "one";
-        String slashoneTwoThree = "/one/two/and three";
-
         if (os.toUpperCase().contains("WINDOWS")) {
-            handleFile(c);
-            handleFile(cOne);
-            handleFile(cOneTwo);
-            handleFile(cOneTwoThreeSpace);
-            handleFile(d);
+            handleFile("C:\\");
+            handleFile("C:\\one");
+            handleFile("C:\\one\\two");
+            handleFile("C:\\one\\two\\and three");
+            handleFile("D:\\");
             if (TestData.isExtensiveTest())
                 handleFile("\\\\host\\share\\file");
         } else {
-            handleFile(slashOne);
-
-            handleFile(one);
-            handleFile(slashoneTwoThree);
-        }
+            handleFile("/one");
+            handleFile("one");
+            handleFile("/one/two/and three");
+            handleFile("/hello world/this++().file");
+        }        
+        assertURL("one", "file:one");
+        assertURL("/one", "file:///one");
+        assertURL(replaceSlashes("C:\\"), "file://C:/");
+        assertURL(replaceSlashes("C:\\one"), "file://C:/one");
+        assertURL(replaceSlashes("C:\\one\\two"), "file://C:/one/two");
+        assertURL(replaceSlashes("C:\\one\\two\\and three"), "file://C:/one/two/and three");
         
-        String prefix = "file://";
-        assertURL(one, prefix+one);
-        assertURL(slashOne, prefix+slashOne);
-        assertURL(replaceSlashes(c), prefix+replaceSlashes(c));
-        assertURL(replaceSlashes(cOne), prefix+replaceSlashes(cOne));
-        assertURL(replaceSlashes(cOneTwo), prefix+replaceSlashes(cOneTwo));
-        assertURL(replaceSlashes(cOneTwoThreeSpace), prefix+replaceSlashes(cOneTwoThreeSpace));
-        
-        
+        File file = File.createTempFile("hello","world");
+        handleFile(file.getAbsolutePath() );
+        handleFile(file.getPath() );        
     }
     private String replaceSlashes(String string) {
         return string.replaceAll("\\\\", "/");
@@ -136,22 +127,21 @@ public class DataUtilitiesTest extends DataTestCase {
                 expectedFilePath = expectedFilePath.substring(0,expectedFilePath.length()-1);
             }
             assertEquals( expectedFilePath, file.getPath());
-        }
-        
+        }        
     }
 
     public void handleFile( String path ) throws Exception {
         File file = new File( path );
         URI uri = file.toURI();
-        URL url = file.toURL();
+        URL url = file.toURI().toURL();
         URL url2 = file.toURI().toURL();
         
         assertEquals( "jdk contract", file.getAbsoluteFile(), new File( uri ));
 
-        File toFile = DataUtilities.urlToFile( url );        
+        File toFile = DataUtilities.urlToFile( url );
         assertEquals( path+":url", file.getAbsoluteFile(), toFile);
 
-        File toFile2 = DataUtilities.urlToFile( url2 );        
+        File toFile2 = DataUtilities.urlToFile( url2 );
         assertEquals( path+":url2", file.getAbsoluteFile(), toFile2 );
     }
     /**

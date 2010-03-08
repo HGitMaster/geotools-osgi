@@ -31,6 +31,8 @@ import com.vividsolutions.jts.geom.LineString;
  * 
  * @author Andrea Aime
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/label/LineStringCursor.java $
  */
 public class LineStringCursor {
 
@@ -318,7 +320,7 @@ public class LineStringCursor {
      * @return
      */
     public LineStringCursor reverse() {
-        return new LineStringCursor(lineString.reverse());
+        return new LineStringCursor((LineString) lineString.reverse());
     }
 
     /**

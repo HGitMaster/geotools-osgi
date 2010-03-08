@@ -22,7 +22,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.util.Converters;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.capability.FunctionName;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.ExpressionVisitor;
@@ -32,14 +34,12 @@ import org.opengis.filter.expression.Literal;
 /**
  * Implementation of "Recode" as a normal function.
  * <p>
- * This implementation is compatible with the Function
- * interface; the parameter list can be used to set the
- * threshold values etc...
+ * This implementation is compatible with the Function interface; the parameter list can be used to
+ * set the threshold values etc...
  * <p>
  * This function expects:
  * <ol>
  * <li>PropertyName; use "Rasterdata" to indicate this is a colour map
- * <li>Literal: lookup value
  * <li>Literal: data 1
  * <li>Literal: value 1
  * <li>Literal: data 2
@@ -48,28 +48,22 @@ import org.opengis.filter.expression.Literal;
  * In reality any expression will do.
  * 
  * @author Johann Sorel (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/filter/RecodeFunction.java $
  */
 public class RecodeFunction implements Function {
-    
-    /**
-     * Use as a PropertyName when defining a color map.
-     * The "Raterdata" is expected to apply to only a single band;
-     */
-    public static final String RASTER_DATA = "Rasterdata";
-    
+
     private final List<Expression> parameters;
+
     private final Literal fallback;
-    
-    
+
     /**
-     * Make the instance of FunctionName available in
-     * a consistent spot.
+     * Make the instance of FunctionName available in a consistent spot.
      */
     public static final FunctionName NAME = new Name();
 
     /**
-     * Describe how this function works.
-     * (should be available via FactoryFinder lookup...)
+     * Describe how this function works. (should be available via FactoryFinder lookup...)
      */
     public static class Name implements FunctionName {
 
@@ -78,11 +72,8 @@ public class RecodeFunction implements Function {
         }
 
         public List<String> getArgumentNames() {
-            return Arrays.asList(new String[]{
-                        "LookupValue",
-                        "Data 1", "Value 1",
-                        "Data 2", "Value 2"
-                    });
+            return Arrays.asList(new String[] { "LookupValue", "Data 1", "Value 1", "Data 2",
+                    "Value 2" });
         }
 
         public String getName() {
@@ -91,7 +82,7 @@ public class RecodeFunction implements Function {
     };
 
     public RecodeFunction() {
-        this( new ArrayList<Expression>(), null);
+        this(new ArrayList<Expression>(), null);
     }
 
     public RecodeFunction(List<Expression> parameters, Literal fallback) {
@@ -115,49 +106,43 @@ public class RecodeFunction implements Function {
         return evaluate(object, Object.class);
     }
 
-    public <T> T evaluate(Object object, Class<T> context) {
-        final Expression lookupExp = parameters.get(0);
-        Expression currentExp = parameters.get(1);
-
-        final List<Expression> splits;
+    public <T> T evaluate(Object object, Class<T> targetClass) {
         if (parameters.size() == 2) {
-            return currentExp.evaluate(object, context);
-        } else if (parameters.size() % 2 == 1) {
-            splits = parameters.subList(1, parameters.size());
-        } else {
-            //this should not happen
-            splits = parameters.subList(1, parameters.size() - 1);
+            return parameters.get(1).evaluate(object, targetClass);
         }
-        
-        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
-        for (int i = 0; i < splits.size(); i += 2) {
-            Expression dataExp = splits.get(i);
-            Expression resultExp = splits.get(i + 1);
-            
-            
-            String lookupValue = lookupExp.evaluate(object, String.class);
-            
-            //we deal with a raster data
-            if(lookupValue.equalsIgnoreCase(RASTER_DATA)){
-                Double bandValue = new Double(object.toString());
-                Double compareValue = dataExp.evaluate(object, Double.class);
-                
-                if(bandValue == compareValue){
-                    return resultExp.evaluate(object, context);
-                }
-                
-            }
-            //we deal with something else, a mistake ? can it happen ?
-            else{
-            }
-            
-        }
-        return currentExp.evaluate(object, context);
-    }
 
+        final Expression propertyNameExp = parameters.get(0);
+
+        final List<Expression> pairList;
+
+        if (parameters.size() % 2 == 1) {
+            pairList = parameters.subList(1, parameters.size());
+        } else {
+            // this should not happen
+            pairList = parameters.subList(1, parameters.size() - 1);
+        }
+
+        // we are going to use this to construct equals experssions
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+
+        for (int i = 0; i < pairList.size(); i += 2) {
+            Expression keyExpr = pairList.get(i);
+            Expression valueExpr = pairList.get(i + 1);
+
+            // we are going to test our propertyNameExpression against the keyExpression
+            // if they are equal we will return the valueExpression
+            //
+            PropertyIsEqualTo compareFilter = ff.equals(propertyNameExp, keyExpr);
+
+            if (compareFilter.evaluate(object)) {
+                return valueExpr.evaluate(object, targetClass); // yeah!
+            }
+        }
+        return fallback == null ? null : Converters.convert(fallback, targetClass);
+    }
 
     public Literal getFallbackValue() {
         return fallback;
     }
-    
+
 }

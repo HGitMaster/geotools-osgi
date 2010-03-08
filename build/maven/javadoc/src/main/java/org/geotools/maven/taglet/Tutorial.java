@@ -25,7 +25,7 @@ import com.sun.tools.doclets.Taglet;
  * The <code>@tutorial</code> tag. This tag expects a link toward a tutorial page on the
  * Geotools wiki pages (Confluence).
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/build/maven/javadoc/src/main/java/org/geotools/maven/taglet/Tutorial.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/main/java/org/geotools/maven/taglet/Tutorial.java $
  * @version $Id: Tutorial.java 30567 2008-06-08 11:26:56Z acuster $
  * @author Martin Desruisseaux
  */

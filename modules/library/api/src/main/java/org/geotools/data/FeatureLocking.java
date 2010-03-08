@@ -44,7 +44,7 @@ import org.opengis.filter.Filter;
  * @author Ray Gallagher
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/data/FeatureLocking.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/FeatureLocking.java $
  * @version $Id: FeatureLocking.java 30642 2008-06-12 17:52:06Z acuster $
  */
 public interface FeatureLocking<T extends FeatureType, F extends Feature> extends FeatureStore<T, F> {

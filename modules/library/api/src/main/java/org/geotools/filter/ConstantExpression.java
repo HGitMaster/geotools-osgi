@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.geotools.util.Converters;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Add;
@@ -44,7 +45,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/filter/ConstantExpression.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/ConstantExpression.java $
  */
 public class ConstantExpression implements LiteralExpression, Cloneable {
     public static final ConstantExpression NULL = constant(null);
@@ -88,10 +89,7 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
     }
 
     public <T> T evaluate(Object object, Class<T> context) {
-        if(value == null || value.getClass().equals(context))
-            return context.cast( value );
-        else
-            return null;
+        return Converters.convert(getValue(), context);
     }
 
     public Object getValue() {

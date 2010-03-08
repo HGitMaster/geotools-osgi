@@ -127,8 +127,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  *      North American Datum Conversion Utility</a>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/NADCONTransform.java $
- * @version $Id: NADCONTransform.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/NADCONTransform.java $
+ * @version $Id: NADCONTransform.java 34103 2009-10-09 07:28:41Z aaime $
  * @author Rueben Schulz
  *
  * @todo the transform code does not deal with the case where grids cross +- 180 degrees.
@@ -877,7 +877,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
     /**
      * Inverse of a {@link NADCONTransform}.
      *
-     * @version $Id: NADCONTransform.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: NADCONTransform.java 34103 2009-10-09 07:28:41Z aaime $
      * @author Rueben Schulz
      */
     private final class Inverse extends AbstractMathTransform.Inverse
@@ -950,7 +950,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      * geographic} to {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS
      * geographic} coordinate reference systems.
      *
-     * @version $Id: NADCONTransform.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: NADCONTransform.java 34103 2009-10-09 07:28:41Z aaime $
      * @author Rueben Schulz
      */
     public static class Provider extends MathTransformProvider {

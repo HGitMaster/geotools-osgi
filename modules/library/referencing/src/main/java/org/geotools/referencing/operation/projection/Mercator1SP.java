@@ -34,8 +34,8 @@ import org.geotools.resources.i18n.Vocabulary;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"Mercator 1SP" on RemoteSensing.org</A>
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Mercator1SP.java $
- * @version $Id: Mercator1SP.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Mercator1SP.java $
+ * @version $Id: Mercator1SP.java 34715 2009-12-21 17:11:00Z aaime $
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
@@ -68,7 +68,7 @@ public class Mercator1SP extends Mercator {
     /**
      * Provides the transform equations for the spherical case of the Mercator projection.
      *
-     * @version $Id: Mercator1SP.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: Mercator1SP.java 34715 2009-12-21 17:11:00Z aaime $
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
@@ -114,7 +114,7 @@ public class Mercator1SP extends Mercator {
      * provider} for a {@linkplain Mercator1SP Mercator 1SP} projection (EPSG code 9804).
      *
      * @since 2.2
-     * @version $Id: Mercator1SP.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: Mercator1SP.java 34715 2009-12-21 17:11:00Z aaime $
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      *
@@ -132,6 +132,7 @@ public class Mercator1SP extends Mercator {
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(Citations.OGC,      "Mercator_1SP"),
                 new NamedIdentifier(Citations.EPSG,     "Mercator (1SP)"),
+                new NamedIdentifier(Citations.EPSG,     "Mercator (1SP) (Spherical)"),
                 new NamedIdentifier(Citations.EPSG,     "9804"),
                 new NamedIdentifier(Citations.GEOTIFF,  "CT_Mercator"),
                 new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(

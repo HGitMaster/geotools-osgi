@@ -106,7 +106,7 @@ import org.opengis.filter.spatial.Within;
  * 
  * @author Jody Garnett, Refractions Research
  * @since GeoTools 2.2.M3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/Filters.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/Filters.java $
  */
 public class Filters {
 	/** <code>NOTFOUND</code> indicates int value was unavailable */

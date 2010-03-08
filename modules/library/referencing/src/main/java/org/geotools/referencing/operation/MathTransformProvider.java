@@ -63,8 +63,8 @@ import org.geotools.referencing.operation.transform.MathTransformProxy;
  * {@linkplain DefaultCoordinateOperationFactory math transform factory} will read all of them.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/MathTransformProvider.java $
- * @version $Id: MathTransformProvider.java 31000 2008-07-10 21:11:13Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/MathTransformProvider.java $
+ * @version $Id: MathTransformProvider.java 34038 2009-10-01 21:02:24Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public abstract class MathTransformProvider extends DefaultOperationMethod {
@@ -187,8 +187,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
             final ReferenceIdentifier[] identifiers, final double defaultValue,
             final double minimum, final double maximum, final Unit<?> unit)
     {
-        return new DefaultParameterDescriptor(toMap(identifiers), defaultValue,
-                                              minimum, maximum, unit, true);
+        return DefaultParameterDescriptor.create(toMap(identifiers), defaultValue,minimum, maximum, unit, true);
     }
 
     /**
@@ -205,7 +204,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
             final ReferenceIdentifier[] identifiers,
             final double minimum, final double maximum, final Unit<?> unit)
     {
-        return new DefaultParameterDescriptor(toMap(identifiers), Double.NaN,
+        return DefaultParameterDescriptor.create(toMap(identifiers), Double.NaN,
                                               minimum, maximum, unit, false);
     }
 
@@ -382,7 +381,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @return The requested parameter value.
      * @throws ParameterNotFoundException if the parameter is not found.
      */
-    private static <T> ParameterValue<T> getParameter(final ParameterDescriptor<T> param,
+    protected static <T> ParameterValue<T> getParameter(final ParameterDescriptor<T> param,
                                                       final ParameterValueGroup    group)
             throws ParameterNotFoundException
     {
@@ -553,7 +552,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * Furthermore, it avoid to pollute {@code MathTransformProvider} with methods unused
      * for the vast majority of providers.
      *
-     * @version $Id: MathTransformProvider.java 31000 2008-07-10 21:11:13Z desruisseaux $
+     * @version $Id: MathTransformProvider.java 34038 2009-10-01 21:02:24Z aaime $
      * @author Martin Desruisseaux (IRD)
      *
      * @since 2.2

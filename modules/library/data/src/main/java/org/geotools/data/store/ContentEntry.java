@@ -52,6 +52,8 @@ import org.opengis.feature.type.Name;
  *
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentEntry.java $
  */
 public final class ContentEntry {
     /**
@@ -127,7 +129,7 @@ public final class ContentEntry {
         } else {
             ContentState auto = state.get(Transaction.AUTO_COMMIT);
             ContentState copy = (ContentState) auto.copy();
-            copy.setTransaction(transaction);
+            copy.setTransaction(transaction != null ? transaction : Transaction.AUTO_COMMIT);
             state.put(transaction, copy);
 
             return copy;

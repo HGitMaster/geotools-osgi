@@ -22,6 +22,8 @@ import org.opengis.filter.BinaryLogicOperator;
 
 /**
  * @author jdeolive
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/BinaryLogicAbstract.java $
  */
 public abstract class BinaryLogicAbstract extends AbstractFilter implements BinaryLogicOperator {
 	protected List/*<Filter>*/ children;

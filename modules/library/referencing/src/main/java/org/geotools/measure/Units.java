@@ -28,7 +28,7 @@ import javax.measure.quantity.Dimensionless;
  * A set of units to use in addition of {@link SI} and {@link NonSI}.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/measure/Units.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/measure/Units.java $
  * @version $Id: Units.java 30776 2008-06-20 17:00:11Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

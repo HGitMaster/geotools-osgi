@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  * Tests the {@link ScaledColorSpace} implementation.
  * This is a visual test when run from the command line.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/ScaledColorSpaceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/ScaledColorSpaceTest.java $
  * @version $Id: ScaledColorSpaceTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

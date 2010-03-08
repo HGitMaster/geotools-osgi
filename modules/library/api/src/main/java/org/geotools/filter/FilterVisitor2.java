@@ -24,6 +24,8 @@ import org.opengis.filter.IncludeFilter;
  * Transition class to handle Filter.INCLUDES and Filter.EXCLUDES
  *
  * @deprecated use {@link org.opengis.filter.FilterVisitor}
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/FilterVisitor2.java $
  */
 public interface FilterVisitor2 extends FilterVisitor {
     void visit(IncludeFilter filter);

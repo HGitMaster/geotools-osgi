@@ -38,6 +38,8 @@ import org.opengis.feature.IllegalAttributeException;
 /**
  *
  * @author mcoudert
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/edigeo/src/main/java/org/geotools/data/edigeo/EdigeoVEC.java $
  */
 public class EdigeoVEC {
 

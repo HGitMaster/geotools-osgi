@@ -37,7 +37,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/test/java/org/geotools/xml/GMLStreamingParserStressTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/GMLStreamingParserStressTest.java $
  */
 public class GMLStreamingParserStressTest extends TestCase {
 

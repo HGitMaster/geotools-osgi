@@ -48,6 +48,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * it will be used to clip this request envelope.
  * <p> 
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/WFSBBoxFilterVisitor.java $
  */
 public class WFSBBoxFilterVisitor implements org.geotools.filter.FilterVisitor2 {
     private static final Logger logger=org.geotools.util.logging.Logging.getLogger("org.geotools.filter");                

@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the creation of a grid coverage using floating point value.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/grid/FloatRasterTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/grid/FloatRasterTest.java $
  * @version $Id: FloatRasterTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

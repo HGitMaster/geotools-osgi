@@ -40,15 +40,15 @@ public final class InverseColorMapRasterOp implements RasterOp {
 	 */
 	public static final int DEFAULT_ALPHA_TH = 1;
 
-	protected final IndexColorModel icm;
+	private final IndexColorModel icm;
 
-	protected int alphaThreshold;
+	private int alphaThreshold;
 
-	protected boolean hasAlpha;
+	private boolean hasAlpha;
 
-	protected int transparencyIndex;
+	private int transparencyIndex;
 
-	protected EfficientInverseColorMapComputation invCM;
+	private EfficientInverseColorMapComputation invCM;
 
 	public InverseColorMapRasterOp(final IndexColorModel destCM,
 			final int quantizationColors, final int alphaThreshold) {
@@ -93,8 +93,7 @@ public final class InverseColorMapRasterOp implements RasterOp {
 			icm.getGreens(colorMap[1]);
 			icm.getBlues(colorMap[2]);
 		}
-		invCM = new EfficientInverseColorMapComputation(colorMap,
-				quantizationColors);
+		invCM = new EfficientInverseColorMapComputation(colorMap,quantizationColors);
 
 	}
 
@@ -104,7 +103,7 @@ public final class InverseColorMapRasterOp implements RasterOp {
 
 	public WritableRaster createCompatibleDestRaster(Raster src) {
 		return icm.createCompatibleWritableRaster(src
-				.getWidth(), src.getHeight());
+				.getWidth(), src.getHeight()).createWritableTranslatedChild(src.getMinX(), src.getMinY());
 	}
 
 	public WritableRaster filter(Raster src, WritableRaster dest) {

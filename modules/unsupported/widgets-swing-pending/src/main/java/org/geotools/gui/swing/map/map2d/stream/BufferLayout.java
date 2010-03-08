@@ -26,6 +26,8 @@ import java.awt.LayoutManager;
  * the complete size of the parent
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/BufferLayout.java $
  */
 public class BufferLayout implements LayoutManager{
 

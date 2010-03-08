@@ -43,7 +43,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @author Cory Horner
  * @since 2.2M2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/function/Collection_UniqueFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/Collection_UniqueFunction.java $
  */
 public class Collection_UniqueFunction extends FunctionExpressionImpl
     implements FunctionExpression {

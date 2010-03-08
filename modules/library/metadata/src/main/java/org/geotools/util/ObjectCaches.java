@@ -39,6 +39,8 @@ import org.opengis.util.GenericName;
  * @since 2.5
  * @author Jody Garnett
  * @author Cory Horner
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/ObjectCaches.java $
  */
 public final class ObjectCaches {
     /**

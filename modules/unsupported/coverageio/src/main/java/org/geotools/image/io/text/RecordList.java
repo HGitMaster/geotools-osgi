@@ -47,7 +47,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * computed when needed. The interval computation should be accurate even if there is
  * missing and/or duplicated records.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/RecordList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/RecordList.java $
  * @version $Id: RecordList.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

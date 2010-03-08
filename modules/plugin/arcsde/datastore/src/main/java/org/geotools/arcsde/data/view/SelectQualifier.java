@@ -31,7 +31,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.Union;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 /**
  * Visitor on a PlainSelect that produces another one but with all the table names and field names
@@ -57,7 +57,7 @@ import org.geotools.arcsde.pool.ISession;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: SelectQualifier.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: SelectQualifier.java 33451 2009-07-02 17:53:36Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/view/SelectQualifier.java $

@@ -42,7 +42,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *
  * @see SimpleType
  * @see XMLElementHandler
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/handlers/SimpleElementHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/SimpleElementHandler.java $
  */
 public class SimpleElementHandler extends XMLElementHandler {
     

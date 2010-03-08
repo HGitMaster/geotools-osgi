@@ -88,7 +88,7 @@ public final class EsriHdrFormat extends BaseGDALGridFormat implements Format {
     /**
      * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object, Hints)
      */
-    public GridCoverageReader getReader(Object source, Hints hints) {
+    public EsriHdrReader getReader(Object source, Hints hints) {
         try {
             return new EsriHdrReader(source, hints);
         } catch (MismatchedDimensionException e) {

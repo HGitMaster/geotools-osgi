@@ -37,6 +37,8 @@ import org.opengis.referencing.IdentifiedObject;
  * layer CRS panel
  * 
  * @author  Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/propertyedit/LayerCRSPropertyPanel.java $
  */
 public class LayerCRSPropertyPanel extends javax.swing.JPanel implements PropertyPane {
 

@@ -16,6 +16,8 @@
  */
 package org.geotools.styling;
 
+import java.util.List;
+
 
 /**
  * A NamedLayer is used to refer to a layer that has a name in a WMS.
@@ -44,15 +46,16 @@ package org.geotools.styling;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/NamedLayer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/NamedLayer.java $
  */
 public interface NamedLayer extends StyledLayer {
+	
+	public List<FeatureTypeConstraint> layerFeatureConstraints();
     public FeatureTypeConstraint[] getLayerFeatureConstraints();
-
     public void setLayerFeatureConstraints(FeatureTypeConstraint[] constraints);
 
+    public List<Style> styles();
     public Style[] getStyles();
-
     public void addStyle(Style sl);
 
     /**

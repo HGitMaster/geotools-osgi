@@ -32,6 +32,7 @@ import org.geotools.filter.text.commons.TokenAdapter;
 import org.geotools.filter.text.generated.parsers.CQLParser;
 import org.geotools.filter.text.generated.parsers.Node;
 import org.geotools.filter.text.generated.parsers.ParseException;
+import org.geotools.filter.text.generated.parsers.Token;
 import org.geotools.filter.text.generated.parsers.TokenMgrError;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
@@ -60,7 +61,9 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
  * 
  * @author Mauricio Pazos (Axios Engineering)
  * 
- * @version $Id: CQLCompiler.java 31937 2008-12-01 13:54:45Z mauricio.pazos $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQLCompiler.java $
+ * @version $Id: CQLCompiler.java 34180 2009-10-21 09:05:04Z mpazos $
  * @since 2.5
  */
 public class CQLCompiler extends CQLParser implements ICompiler{

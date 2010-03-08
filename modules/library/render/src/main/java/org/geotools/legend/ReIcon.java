@@ -26,6 +26,8 @@ import javax.swing.Icon;
  * Quick utility class used to "resize" an icon.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/legend/ReIcon.java $
  */
 public class ReIcon {
     final Icon icon;

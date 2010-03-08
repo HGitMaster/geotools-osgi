@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: GenericSurfaceImpl.java 25075 2007-04-09 19:20:46Z desruisseaux $
+ ** $Id: GenericSurfaceImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/geometry/GenericSurfaceImpl.java,v $
  **
@@ -23,6 +23,8 @@ import org.opengis.geometry.coordinate.GenericSurface;
  * @UML type GM_GenericSurface
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/geometry/GenericSurfaceImpl.java $
  * @version 2.0
  *
  * @revisit Why this interface is not defined in the primitive package, since the sub-interfaces

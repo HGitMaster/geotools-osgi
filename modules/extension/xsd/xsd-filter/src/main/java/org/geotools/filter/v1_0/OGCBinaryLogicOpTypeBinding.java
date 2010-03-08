@@ -25,6 +25,9 @@ import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -54,6 +57,8 @@ import org.geotools.xml.Node;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/OGCBinaryLogicOpTypeBinding.java $
  */
 public class OGCBinaryLogicOpTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
@@ -137,7 +142,12 @@ public class OGCBinaryLogicOpTypeBinding extends AbstractComplexBinding {
             for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
                 Filter filter = (Filter) f.next();
 
-                if (filter instanceof BinaryComparisonOperator && !(filter instanceof BinarySpatialOperator)) {
+                if (!(filter instanceof BinarySpatialOperator) && 
+                     (filter instanceof BinaryComparisonOperator ||
+                      filter instanceof PropertyIsLike || 
+                      filter instanceof PropertyIsNull || 
+                      filter instanceof PropertyIsBetween) ) {
+                    
                     comparison.add(filter);
                 }
             }

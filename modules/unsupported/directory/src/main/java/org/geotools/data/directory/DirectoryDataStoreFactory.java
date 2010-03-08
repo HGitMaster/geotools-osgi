@@ -21,12 +21,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.data.DataUtilities;
 
 /**
  * Creates a Directory DataStore
@@ -52,7 +54,8 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
         }
 
         URL url = (URL) URLP.lookUp(params);
-        File f = new File(url.getFile());
+        File f = DataUtilities.urlToFile(url);
+        
         if (!f.isDirectory()) {
             throw new IOException("Invalid parameter " + URLP.key
                     + " : is not a valid directory");
@@ -85,12 +88,14 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
     public boolean canProcess(Map<String, Serializable> params) {
         try {
             URL url = (URL) URLP.lookUp(params);
-        	File f = new File( url.getFile() );
+        	File f = DataUtilities.urlToFile(url);
             return f != null && f.exists() && f.isDirectory();
         } catch (Exception e) {
             return false;
         }
     }
+    
+    
 
     public boolean isAvailable() {
         return true;

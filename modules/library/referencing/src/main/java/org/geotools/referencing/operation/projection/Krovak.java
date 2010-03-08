@@ -95,8 +95,8 @@ import static java.lang.Math.*;
  * @see <A HREF="http://www.posc.org/Epicentre.2_2/DataModel/ExamplesofUsage/eu_cs34e2.html">Krovak on POSC</A>
  *
  * @since 2.4
- * @version $Id: Krovak.java 31762 2008-11-04 12:30:47Z jezekjan $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Krovak.java $
+ * @version $Id: Krovak.java 34723 2009-12-22 10:55:34Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Krovak.java $
  * @author Jan Jezek
  * @author Martin Desruisseaux
  */
@@ -379,7 +379,7 @@ public class Krovak extends MapProjection {
      * provider} for an {@linkplain Krovak Krovak} projection (EPSG code 9819).
      *
      * @since 2.4
-     * @version $Id: Krovak.java 31762 2008-11-04 12:30:47Z jezekjan $
+     * @version $Id: Krovak.java 34723 2009-12-22 10:55:34Z aaime $
      * @author Jan Jezek
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
@@ -399,6 +399,7 @@ public class Krovak extends MapProjection {
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,     "latitude_of_center"),
                     new NamedIdentifier(Citations.EPSG,    "Latitude of projection centre"),
+                    new NamedIdentifier(Citations.EPSG,    "Latitude of origin"),
                     new NamedIdentifier(Citations.GEOTIFF, "CenterLat")
                 }, 49.5, -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -411,6 +412,7 @@ public class Krovak extends MapProjection {
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,     "longitude_of_center"),
                     new NamedIdentifier(Citations.EPSG,    "Longitude of projection centre"),
+                    new NamedIdentifier(Citations.EPSG,    "Longitude of origin"),
                     new NamedIdentifier(Citations.GEOTIFF, "CenterLong")
                 }, 42.5-17.66666666666667, -180, 180, NonSI.DEGREE_ANGLE);
 

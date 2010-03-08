@@ -34,8 +34,8 @@ import org.codehaus.plexus.util.FileUtils;
  *
  * @goal collect
  * @phase package
- * @source $URL: http://gtsvn.refractions.net/trunk/build/maven/jar-collector/src/main/java/org/geotools/maven/JarCollector.java $
- * @version $Id: JarCollector.java 30567 2008-06-08 11:26:56Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/jar-collector/src/main/java/org/geotools/maven/JarCollector.java $
+ * @version $Id: JarCollector.java 33719 2009-08-07 15:52:38Z aaime $
  * @author Martin Desruisseaux
  */
 public class JarCollector extends AbstractMojo {
@@ -124,7 +124,7 @@ public class JarCollector extends AbstractMojo {
         File collect = new File(collectDirectory);
         if (!collect.exists()) {
             if (!collect.mkdir()) {
-                throw new MojoExecutionException("Failed to create target directory.");
+                throw new MojoExecutionException("Failed to create target directory: " + collect.getAbsolutePath());
             }
         }
         if (collect.getCanonicalFile().equals(jarFile.getParentFile().getCanonicalFile())) {

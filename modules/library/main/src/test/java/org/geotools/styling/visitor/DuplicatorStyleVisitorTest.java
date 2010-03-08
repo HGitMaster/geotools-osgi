@@ -1,7 +1,7 @@
 /*
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
- * 
+ *
  *    (C) 2005-2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
@@ -16,6 +16,8 @@
  */
 package org.geotools.styling.visitor;
 
+import java.awt.Color;
+import java.net.URL;
 import java.util.Collections;
 
 import javax.xml.transform.TransformerException;
@@ -24,7 +26,9 @@ import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.resources.Utilities;
 import org.geotools.styling.AnchorPoint;
+import org.geotools.styling.ColorMapEntry;
 import org.geotools.styling.Displacement;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.FeatureTypeConstraint;
@@ -40,6 +44,7 @@ import org.geotools.styling.Mark;
 import org.geotools.styling.PointPlacement;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.SLDTransformer;
 import org.geotools.styling.Stroke;
@@ -49,6 +54,7 @@ import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.UomOgcMapping;
 import org.geotools.styling.UserLayer;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
@@ -59,7 +65,7 @@ import org.opengis.util.Cloneable;
  * Unit test for DuplicatorStyleVisitor.
  *
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/styling/visitor/DuplicatorStyleVisitorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/visitor/DuplicatorStyleVisitorTest.java $
  */
 public class DuplicatorStyleVisitorTest extends TestCase {
     StyleBuilder sb;
@@ -76,6 +82,19 @@ public class DuplicatorStyleVisitorTest extends TestCase {
         ff = CommonFactoryFinder.getFilterFactory2(null);
         sb = new StyleBuilder(sf, ff);
         visitor = new DuplicatingStyleVisitor( sf, ff );
+    }
+
+    public void testRasterSymbolizerDuplication() {
+    	// create a default RasterSymbolizer
+    	RasterSymbolizer original = sb.createRasterSymbolizer();
+
+    	// duplicate it
+    	original.accept(visitor);
+    	RasterSymbolizer copy = (RasterSymbolizer) visitor.getCopy();
+    	
+    	// compare it
+    	assertNotNull(copy);
+    	assertEquals(original, copy);
     }
     
     public void testStyleDuplication() throws IllegalFilterException {
@@ -230,7 +249,11 @@ public class DuplicatorStyleVisitorTest extends TestCase {
     }
 
     public void testPointSymbolizer() throws Exception {
-        PointSymbolizer pointSymb = sf.createPointSymbolizer();
+        URL urlExternal = getClass().getResource("/data/sld/blob.gif");
+        ExternalGraphic extg = sb.createExternalGraphic(urlExternal, "image/svg+xml");
+        Graphic graphic = sb.createGraphic(extg, null, null);
+        PointSymbolizer pointSymb = sb.createPointSymbolizer(graphic);
+
         pointSymb.accept(visitor);
         PointSymbolizer clone = (PointSymbolizer) visitor.getCopy();
 
@@ -239,6 +262,32 @@ public class DuplicatorStyleVisitorTest extends TestCase {
         
         PointSymbolizer notEq = sf.getDefaultPointSymbolizer();
         notEq.setGeometryPropertyName("something_else");
+        assertEqualsContract(clone, notEq, pointSymb);
+    }
+
+    public void testRasterSymbolizerWithUOM() throws Exception {
+        RasterSymbolizer rasterSymb = sf.createRasterSymbolizer();
+        rasterSymb.setUnitOfMeasure(UomOgcMapping.FOOT.getUnit());
+        rasterSymb.accept(visitor);
+        RasterSymbolizer clone = (RasterSymbolizer) visitor.getCopy();
+
+        assertEquals(clone.getUnitOfMeasure(), rasterSymb.getUnitOfMeasure());
+
+        RasterSymbolizer notEq = sf.createRasterSymbolizer();
+
+        assertFalse(Utilities.equals(notEq.getUnitOfMeasure(), rasterSymb.getUnitOfMeasure()));
+    }
+
+    public void testPointSymbolizerWithUOM() throws Exception {
+        PointSymbolizer pointSymb = sf.createPointSymbolizer();
+        pointSymb.setUnitOfMeasure(UomOgcMapping.FOOT.getUnit());
+        pointSymb.accept(visitor);
+        PointSymbolizer clone = (PointSymbolizer) visitor.getCopy();
+
+        assertCopy(pointSymb, clone);
+        assertEqualsContract(pointSymb, clone);
+
+        PointSymbolizer notEq = sf.getDefaultPointSymbolizer();
         assertEqualsContract(clone, notEq, pointSymb);
     }
 
@@ -252,6 +301,50 @@ public class DuplicatorStyleVisitorTest extends TestCase {
         assertCopy(textSymb, clone);
         assertEqualsContract(textSymb, clone);
         
+        TextSymbolizer notEq = sf.getDefaultTextSymbolizer();
+        Expression ancX = ff.literal(10);
+        Expression ancY = ff.literal(10);
+        AnchorPoint ancPoint = sf.createAnchorPoint(ancX, ancY);
+        LabelPlacement placement = sf.createPointPlacement(ancPoint,
+                null, null);
+        notEq.setLabelPlacement(placement);
+        assertEqualsContract(clone, notEq, textSymb);
+    }
+    
+    public void testTextSymbolizerVendorParams() {
+        TextSymbolizer textSymb = sf.createTextSymbolizer();
+        textSymb.getOptions().put("autoWrap", "100");
+        
+        textSymb.accept(visitor);
+        TextSymbolizer clone = (TextSymbolizer) visitor.getCopy();
+        assertCopy(textSymb, clone);
+        assertEqualsContract(textSymb, clone);
+        
+        assertEquals(1, clone.getOptions().size());
+        assertEquals("100", clone.getOptions().get("autoWrap"));
+    }
+    
+    public void testTextSymbolizerVendorOptions() {
+        TextSymbolizer textSymb = sf.createTextSymbolizer();
+        textSymb.getOptions().put("autoWrap", "100");
+
+        textSymb.accept(visitor);
+        TextSymbolizer clone = (TextSymbolizer) visitor.getCopy();
+        assertCopy(textSymb, clone);
+        assertEqualsContract(textSymb, clone);
+    }
+
+    public void testTextSymbolizerWithUOM() {
+        TextSymbolizer textSymb = sf.createTextSymbolizer();
+        textSymb.setUnitOfMeasure(UomOgcMapping.METRE.getUnit());
+        Expression offset = ff.literal(10);
+        textSymb.setLabelPlacement(sf.createLinePlacement(offset));
+
+        textSymb.accept(visitor);
+        TextSymbolizer clone = (TextSymbolizer) visitor.getCopy();
+        assertCopy(textSymb, clone);
+        assertEqualsContract(textSymb, clone);
+
         TextSymbolizer notEq = sf.getDefaultTextSymbolizer();
         Expression ancX = ff.literal(10);
         Expression ancY = ff.literal(10);
@@ -355,7 +448,25 @@ public class DuplicatorStyleVisitorTest extends TestCase {
             visitor.setStrict(false);
         }
     }
-    
+
+    public void testPolygonSymbolizerWithUOM() {
+        try {
+            //visitor.setStrict(true);
+            PolygonSymbolizer polygonSymb = sf.createPolygonSymbolizer();
+            polygonSymb.setUnitOfMeasure(UomOgcMapping.FOOT.getUnit());
+            PolygonSymbolizer clone = (PolygonSymbolizer) visitor
+                    .copy(polygonSymb);
+            assertCopy(polygonSymb, clone);
+
+            PolygonSymbolizer notEq = sf.getDefaultPolygonSymbolizer();
+            notEq.setUnitOfMeasure(UomOgcMapping.PIXEL.getUnit());
+
+            assertEqualsContract(clone, notEq, polygonSymb);
+        } finally {
+            visitor.setStrict(false);
+        }
+    }
+
     public void testLineSymbolizer() {
         LineSymbolizer lineSymb = sf.createLineSymbolizer();
         LineSymbolizer clone = (LineSymbolizer) visitor.copy( lineSymb);
@@ -363,6 +474,16 @@ public class DuplicatorStyleVisitorTest extends TestCase {
 
         LineSymbolizer notEq = sf.getDefaultLineSymbolizer();
         notEq.setGeometryPropertyName("something_else");
+        assertEqualsContract(clone, notEq, lineSymb);
+    }
+
+    public void testLineSymbolizerWithUOM() {
+        LineSymbolizer lineSymb = sf.createLineSymbolizer();
+        LineSymbolizer clone = (LineSymbolizer) visitor.copy( lineSymb);
+        assertCopy(lineSymb, clone);
+
+        LineSymbolizer notEq = sf.getDefaultLineSymbolizer();
+        notEq.setUnitOfMeasure(UomOgcMapping.METRE.getUnit());
         assertEqualsContract(clone, notEq, lineSymb);
     }
 
@@ -466,7 +587,7 @@ public class DuplicatorStyleVisitorTest extends TestCase {
         // assertHashcode equality
         int controlEqHash = controlEqual.hashCode();
         int testHash = test.hashCode();
-        if( controlEqHash == testHash ){
+        if( controlEqHash != testHash ){
             System.out.println( "Warning  - Equal objects should return equal hashcodes");
         }
     }
@@ -489,6 +610,28 @@ public class DuplicatorStyleVisitorTest extends TestCase {
         int controlEqHash = controlEqual.hashCode();
         int testHash = test.hashCode();
         assertTrue("Equal objects should return equal hashcodes",controlEqHash == testHash);
+    }
+    
+    public void testColorMapEntryDuplication() throws Exception {
+
+        ColorMapEntry cme = sf.createColorMapEntry();
+        cme.setColor(sb.colorExpression(Color.YELLOW));
+        cme.setLabel("thelabel");
+        cme.setQuantity(sb.literalExpression(66.66));
+        cme.setOpacity(sb.literalExpression(0.77));
+
+        cme.accept(visitor);
+
+        ColorMapEntry cme2 = (ColorMapEntry) visitor.getCopy();
+
+        assertEquals("Colormaps LABEL must be equal after duplication ", cme.getLabel(), cme2
+                .getLabel());
+        assertEquals("Colormaps QUANTITY must be equal after duplication ", cme.getQuantity(), cme2
+                .getQuantity());
+        assertEquals("Colormaps COLOR must be equal after duplication ", cme.getColor(), cme2
+                .getColor());
+        assertEquals("Colormaps OPACITY must be equal after duplication ", cme.getOpacity(), cme2
+                .getOpacity());
     }
     
 }

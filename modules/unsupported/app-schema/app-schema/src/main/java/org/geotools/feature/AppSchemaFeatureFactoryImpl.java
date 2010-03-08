@@ -44,7 +44,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @version $Id: AppSchemaFeatureFactoryImpl.java 31815 2008-11-10 07:53:14Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/AppSchemaFeatureFactoryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/AppSchemaFeatureFactoryImpl.java $
  * @since 2.6
  */
 public class AppSchemaFeatureFactoryImpl extends ValidatingFeatureFactoryImpl {

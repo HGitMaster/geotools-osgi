@@ -29,8 +29,8 @@ import org.opengis.filter.expression.Expression;
 /**
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AttributeMapping.java 32469 2009-02-11 07:53:06Z ang05a $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AttributeMapping.java $
+ * @version $Id: AttributeMapping.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AttributeMapping.java $
  * @since 2.4
  */
 public class AttributeMapping {
@@ -105,7 +105,16 @@ public class AttributeMapping {
     public boolean isNestedAttribute() {
         return false;
     }
-
+    
+    /**
+     * This is overridden by TreeAttributeMapping
+     * 
+     * @return always return false
+     */
+    public boolean isTreeAttribute() {
+        return false;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {

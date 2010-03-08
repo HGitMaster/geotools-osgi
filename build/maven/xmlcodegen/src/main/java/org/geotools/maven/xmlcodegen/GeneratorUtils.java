@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
@@ -34,7 +35,7 @@ public class GeneratorUtils {
 		//get anonymous types
 		List anonymous = new ArrayList();
 		
-		//add any anonymous types of global elements
+		//add any anonymous types of global elements + attributes
 		for ( Iterator e = schema.getElementDeclarations().iterator(); e.hasNext(); ) {
 			XSDElementDeclaration element = (XSDElementDeclaration ) e.next();
 			if ( element.getAnonymousTypeDefinition() != null ) {
@@ -42,7 +43,13 @@ public class GeneratorUtils {
 				anonymous.add( element.getAnonymousTypeDefinition() );
 			}
 		}
-		
+		for ( Iterator a = schema.getAttributeDeclarations().iterator(); a.hasNext(); ) {
+			XSDAttributeDeclaration attribute = (XSDAttributeDeclaration) a.next();
+			if ( attribute.getAnonymousTypeDefinition() != null ) {
+				attribute.getAnonymousTypeDefinition().setName( "_" + attribute.getName() );
+				anonymous.add( attribute.getAnonymousTypeDefinition() );
+			}
+		}
     	//add any anonymous types foudn with type definitions
     	for ( Iterator t = types.iterator(); t.hasNext(); ) {
     		XSDTypeDefinition type = (XSDTypeDefinition) t.next();

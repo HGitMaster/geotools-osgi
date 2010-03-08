@@ -35,7 +35,7 @@ import org.geotools.referencing.wkt.Formatter;
  * transform. Those elements are created by the derived CRS itself.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefiningConversion.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefiningConversion.java $
  * @version $Id: DefiningConversion.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Matthias Basler

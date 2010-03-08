@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: SurfaceBoundaryImpl.java 25075 2007-04-09 19:20:46Z desruisseaux $
+ ** $Id: SurfaceBoundaryImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/SurfaceBoundaryImpl.java,v $
  **
@@ -19,6 +19,8 @@ import org.opengis.geometry.primitive.SurfaceBoundary;
 
 /**
  * LiteGO1 implementation of the SurfaceBoundary interface.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/SurfaceBoundaryImpl.java $
  */
 public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements SurfaceBoundary {
     private static final long serialVersionUID = 8658623156496260842L;

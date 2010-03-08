@@ -25,6 +25,8 @@ import org.geotools.gui.swing.map.map2d.stream.event.NavigationEvent;
  * NavigableMap2DListener used to listen to Map2D Navigation events 
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/listener/NavigationListener.java $
  */
 public interface NavigationListener extends EventListener{
     

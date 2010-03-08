@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -114,7 +115,19 @@ public class DirectoryDataStore implements DataStore {
     }
 
     public void createSchema(SimpleFeatureType featureType) throws IOException {
-        throw new UnsupportedOperationException("This datastore does not support type creation");
+        File f = new File(cache.directory, featureType.getTypeName()+".shp");
+        
+        String shpDataStoreClassName = "org.geotools.data.shapefile.ShapefileDataStore";
+        DataStore ds = null;
+        try {
+            ds = (DataStore) Class.forName(shpDataStoreClassName).getConstructor(URL.class)
+                .newInstance(f.toURL());
+            ds.createSchema(featureType);
+            cache.refreshCacheContents();
+        }
+        catch(Exception e) {
+            throw (IOException) new IOException("Error creating new data store").initCause(e);
+        }
     }
 
     public void dispose() {
@@ -156,7 +169,7 @@ public class DirectoryDataStore implements DataStore {
         updateSchema(typeName.getLocalPart(), featureType);
     }
     
-    DataStore getDataStore(String typeName) throws IOException {
+    public DataStore getDataStore(String typeName) throws IOException {
         // grab the store for a specific feature type, making sure it's actually there
         DataStore store = cache.getDataStore(typeName, true);
         if(store == null)

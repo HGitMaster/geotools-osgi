@@ -28,7 +28,7 @@ import org.opengis.feature.type.FeatureType;
  * Represents an Empty, Typed, FeatureReader.
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/EmptyFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/EmptyFeatureReader.java $
  */
 public class EmptyFeatureReader<T extends FeatureType, F extends Feature> implements  FeatureReader<T, F> {
 	T featureType;

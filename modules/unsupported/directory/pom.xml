@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32330 2009-01-26 18:20:41Z aaime $              
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>unsupported</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
 
 
@@ -27,7 +27,7 @@
   <artifactId>gt-directory</artifactId>
   <packaging>jar</packaging>
   <name>Directory module</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/directory/</url>
+  
 
   <scm>
     <connection>
@@ -94,13 +94,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-gml</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-mif</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

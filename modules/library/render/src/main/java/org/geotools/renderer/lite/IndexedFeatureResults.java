@@ -39,7 +39,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * IndexedFeatureReader
  * 
  * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/IndexedFeatureResults.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/IndexedFeatureResults.java $
  */
 public final class IndexedFeatureResults extends DataFeatureCollection {
 	STRtree index = new STRtree();

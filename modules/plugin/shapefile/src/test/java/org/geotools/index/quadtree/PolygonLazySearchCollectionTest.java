@@ -27,6 +27,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author Jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/test/java/org/geotools/index/quadtree/PolygonLazySearchCollectionTest.java $
  */
 public class PolygonLazySearchCollectionTest extends TestCaseSupport {
 
@@ -43,8 +45,8 @@ public class PolygonLazySearchCollectionTest extends TestCaseSupport {
     protected void setUp() throws Exception {
         super.setUp();
         file = copyShapefiles("shapes/statepop.shp");
-        ds = new IndexedShapefileDataStore(file.toURL());
-        ds.buildQuadTree(0);
+        ds = new IndexedShapefileDataStore(file.toURI().toURL());
+        ds.buildQuadTree();
         tree = LineLazySearchCollectionTest.openQuadTree(file);
         crs = ds.getSchema().getCoordinateReferenceSystem();
     }
@@ -68,7 +70,7 @@ public class PolygonLazySearchCollectionTest extends TestCaseSupport {
         ReferencedEnvelope env = new ReferencedEnvelope(-70, -68.2, 44.5, 45.7,
                 crs);
         LazySearchCollection collection = new LazySearchCollection(tree, env);
-        assertEquals(10, collection.size());
+        assertEquals(14, collection.size());
 
     }
 

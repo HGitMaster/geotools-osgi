@@ -51,7 +51,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author dzwiers www.refractions.net
  *
  * @see ComplexType
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/handlers/ComplexElementHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/ComplexElementHandler.java $
  */
 public class ComplexElementHandler extends XMLElementHandler {
     

@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
  * @
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/test/java/org/geotools/xml/GMLParserTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/GMLParserTest.java $
  */
 public class GMLParserTest extends TestCase {
     public void testSchema(){

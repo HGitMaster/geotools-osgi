@@ -22,11 +22,13 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.geotools.factory.Factory;
+import org.geotools.util.KVP;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
@@ -87,7 +89,7 @@ import org.opengis.util.InternationalString;
  * </p>
  * 
  * @author Jody Garnett (Refractions Research)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/data/DataAccessFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/DataAccessFactory.java $
  */
 public interface DataAccessFactory extends Factory {
     /**
@@ -335,7 +337,36 @@ public interface DataAccessFactory extends Factory {
                      InternationalString description,
                      boolean required,
                      Object sample) {
-            super(key, type, description, null, required, 1, 1, sample, null);
+            super(key, type, new SimpleInternationalString(key), description, required, 1, 1, sample, null);
+        }
+
+        /**
+         * Provides support for text representations
+         *
+         * @param key Key used to file this Param in the Parameter Map for
+         *        createDataStore
+         * @param type Class type intended for this Param
+         * @param description User description of Param (40 chars or less)
+         * @param required <code>true</code> is param is required
+         * @param sample Sample value as an example for user input
+         * @param extra metadata information, preferably keyed by known identifiers 
+         * like {@link Parameter#IS_PASSWORD}
+         */
+        public Param(String key,
+                     Class type,
+                     String description,
+                     boolean required,
+                     Object sample,
+                     Map<String, ?> metadata) {
+            this(key, type, new SimpleInternationalString(description), required, sample, metadata);
+        }
+        public Param(String key,
+                Class type,
+                String description,
+                boolean required,
+                Object sample,
+                Object... metadata ) {
+            this( key, type, description, required, sample, new KVP( metadata ));
         }
 
         /**
@@ -356,15 +387,7 @@ public interface DataAccessFactory extends Factory {
                      boolean required,
                      Object sample,
                      Map<String, ?> metadata) {
-            super(key, type, description, null, required, 1, 1, sample, metadata);
-        }
-
-        /**
-         * Provides for easy access to the {@link Parameter#IS_PASSWORD} metadata
-         * @return true if {@code metadata.get(IS_PASSWORD) == Boolean.TRUE}
-         */
-        public boolean isPassword(){
-            return metadata != null && Boolean.TRUE.equals(super.metadata.get(IS_PASSWORD));
+            super(key, type, new SimpleInternationalString(key), description, required, 1, 1, sample, metadata);
         }
         
         /**

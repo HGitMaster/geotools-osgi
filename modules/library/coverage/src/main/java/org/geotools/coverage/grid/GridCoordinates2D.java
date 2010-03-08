@@ -30,7 +30,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * {@link Point} for interoperability with Java2D.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoordinates2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoordinates2D.java $
  * @version $Id: GridCoordinates2D.java 30776 2008-06-20 17:00:11Z desruisseaux $
  * @author Martin Desruisseaux
  *

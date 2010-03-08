@@ -52,8 +52,8 @@ import org.geotools.resources.i18n.Vocabulary;
  * {@linkplain #base}<sup><var>a</var></sup>&times;({@linkplain #base}<sup><var>b</var></sup>)<sup><var>x</var></sup></p>
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ExponentialTransform1D.java $
- * @version $Id: ExponentialTransform1D.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ExponentialTransform1D.java $
+ * @version $Id: ExponentialTransform1D.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *
  * @see LogarithmicTransform1D
@@ -326,7 +326,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
     /**
      * The provider for the {@link ExponentialTransform1D}.
      *
-     * @version $Id: ExponentialTransform1D.java 30836 2008-07-01 18:02:49Z desruisseaux $
+     * @version $Id: ExponentialTransform1D.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
      * @author Martin Desruisseaux (IRD)
      */
     public static class Provider extends MathTransformProvider {
@@ -345,7 +345,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
          * The operation parameter descriptor for the {@link #scale scale} parameter value.
          * Valid values range is unrestricted. The default value is 1.
          */
-        public static final ParameterDescriptor SCALE = new DefaultParameterDescriptor(
+        public static final ParameterDescriptor SCALE = DefaultParameterDescriptor.create(
                 "scale", 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**

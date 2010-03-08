@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: CurveImpl.java 28439 2007-12-20 12:14:28Z desruisseaux $
+ ** $Id: CurveImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/CurveImpl.java,v $
  **
@@ -37,6 +37,8 @@ import org.opengis.geometry.primitive.CurveBoundary;
  * of the (hard) math functions like intersection, etc.  A curve consists of
  * any number of CurveSegment objects (such as LineStrings) that must be
  * connected end-to-end.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/CurveImpl.java $
  */
 public class CurveImpl extends GeometryImpl implements Curve {
     /**

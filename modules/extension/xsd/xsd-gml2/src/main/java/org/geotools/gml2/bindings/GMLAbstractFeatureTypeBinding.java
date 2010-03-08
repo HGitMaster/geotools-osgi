@@ -16,6 +16,8 @@
  */
 package org.geotools.gml2.bindings;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -64,6 +66,8 @@ import org.w3c.dom.Element;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLAbstractFeatureTypeBinding.java $
  */
 public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
     /** Cache of feature types */
@@ -118,15 +122,11 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
             throws Exception {
         return GML2EncodingUtils.AbstractFeatureType_encode(object, document, value);
     }
-
-    public Object getProperty(Object object, QName name)
-        throws Exception {
-        return GML2EncodingUtils.AbstractFeatureType_getProperty(object, name, configuration);
-    }
     
     @Override
-    public List getProperties(Object object, XSDElementDeclaration element)
-            throws Exception {
-        return GML2EncodingUtils.AbstractFeatureType_getProperties(object, element, schemaIndex);
+    public List getProperties(Object object, XSDElementDeclaration element) throws Exception {
+        return GML2EncodingUtils.AbstractFeatureType_getProperties(object, element, schemaIndex,
+                new HashSet<String>(Arrays.asList("name", "description", "boundedBy")),
+                configuration);
     }
 }

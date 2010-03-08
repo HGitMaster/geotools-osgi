@@ -85,7 +85,7 @@ import org.opengis.referencing.operation.TransformException;
  *    those information. For example, the {@link #getCoordinateReferenceSystem} method
  *    constructs a {@link CoordinateReferenceSystem} object using available information.</p>
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/MetadataReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/MetadataReader.java $
  * @version $Id: MetadataReader.java 31486 2008-09-09 20:46:25Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Cédric Briançon

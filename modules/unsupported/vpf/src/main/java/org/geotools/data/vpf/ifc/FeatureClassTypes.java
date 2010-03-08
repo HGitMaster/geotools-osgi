@@ -22,7 +22,7 @@ package org.geotools.data.vpf.ifc;
  * Created on 21. april 2004, 15:35
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/FeatureClassTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/FeatureClassTypes.java $
  */
 public interface FeatureClassTypes {
 

@@ -34,6 +34,8 @@ import org.geotools.geometry.iso.topograph2D.Position;
  * at the same node and have the same direction.
  * Contains all {@link EdgeEnd}s which start at the same point and are
  * parallel.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/relate/EdgeEndBundle.java $
  */
 public class EdgeEndBundle extends EdgeEnd {
 	

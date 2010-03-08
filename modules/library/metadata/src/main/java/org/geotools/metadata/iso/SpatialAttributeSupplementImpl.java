@@ -28,7 +28,7 @@ import org.opengis.metadata.SpatialAttributeSupplement;
 /**
  * Spatial attributes in the application schema for the feature types.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/SpatialAttributeSupplementImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/SpatialAttributeSupplementImpl.java $
  * @version $Id: SpatialAttributeSupplementImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

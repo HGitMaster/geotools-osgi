@@ -29,6 +29,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * The boundary of Curves shall be represented as CurveBoundary.
  * 
  * @author Jackson Roehrig & Sanjay Jena
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/CurveBoundaryImpl.java $
  */
 public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 		CurveBoundary {

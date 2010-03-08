@@ -17,6 +17,7 @@
 package org.geotools.sld.bindings;
 
 import java.awt.Color;
+import org.geotools.filter.Filters;
 import org.geotools.styling.ColorMapEntry;
 
 
@@ -36,8 +37,8 @@ public class SLDColorMapEntryBindingTest extends SLDTestSupport {
         ColorMapEntry entry = (ColorMapEntry) parse();
         assertNotNull(entry);
         assertEquals(org.geotools.styling.SLD.color(entry.getColor()), Color.BLACK);
-        assertEquals(org.geotools.styling.SLD.doubleValue(entry.getOpacity()), 1.2d, 0d);
-        assertEquals(org.geotools.styling.SLD.doubleValue(entry.getQuantity()), 3.4d, 0d);
+        assertEquals(Filters.asDouble(entry.getOpacity()), 1.2d, 0d);
+        assertEquals(Filters.asDouble(entry.getQuantity()), 3.4d, 0d);
         assertEquals(entry.getLabel(), "someLabel");
     }
 }

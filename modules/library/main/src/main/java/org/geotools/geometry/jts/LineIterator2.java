@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.LineString;
  *
  * @author Andrea Aime
  * @author simone giannecchini
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/LineIterator2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/LineIterator2.java $
  * @version $Id: LineIterator2.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public final class LineIterator2 implements PathIterator {

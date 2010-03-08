@@ -22,6 +22,8 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -40,6 +42,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/expression/SimpleFeaturePropertyAccessorFactory.java $
  */
 public class SimpleFeaturePropertyAccessorFactory implements
         PropertyAccessorFactory {
@@ -133,11 +137,37 @@ public class SimpleFeaturePropertyAccessorFactory implements
         }
         public Object get(Object object, String xpath, Class target) {
         	if ( object instanceof SimpleFeature ) {
-        		return ((SimpleFeature) object).getDefaultGeometry();
+        	    SimpleFeature f = (SimpleFeature) object;
+        	    Object defaultGeometry = f.getDefaultGeometry();
+
+                    // not found? Ok, let's do a lookup then...
+                    if ( defaultGeometry == null ) {
+                        for ( Object o : f.getAttributes() ) {
+                            if ( o instanceof Geometry ) {
+                                defaultGeometry = o;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    return defaultGeometry;
         	}
-        	if ( object instanceof SimpleFeatureType ) {
-        		return ((SimpleFeatureType)object).getGeometryDescriptor();
-        	}
+        	
+                if ( object instanceof SimpleFeatureType ) {
+                    SimpleFeatureType ft = (SimpleFeatureType) object;
+                    GeometryDescriptor gd = ft.getGeometryDescriptor();
+                
+                    if ( gd == null ) {
+                        //look for any geometry descriptor
+                        for ( AttributeDescriptor ad : ft.getAttributeDescriptors() ) {
+                            if ( Geometry.class.isAssignableFrom( ad.getType().getBinding() ) ) {
+                                return ad;
+                            }
+                        }
+                    }
+                    
+                    return gd;
+                }
             
         	return null;
         }

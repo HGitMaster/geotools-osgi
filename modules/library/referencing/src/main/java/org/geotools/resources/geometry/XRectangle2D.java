@@ -36,7 +36,7 @@ import org.geotools.resources.Classes;
  * {@linkplain Double#NaN NaN} values.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/resources/geometry/XRectangle2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/resources/geometry/XRectangle2D.java $
  * @version $Id: XRectangle2D.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

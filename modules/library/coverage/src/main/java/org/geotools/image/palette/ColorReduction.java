@@ -26,30 +26,35 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 
-import javax.media.jai.AreaOpImage;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
+import javax.media.jai.PointOpImage;
 import javax.media.jai.operator.BandMergeDescriptor;
 import javax.media.jai.operator.BandSelectDescriptor;
 import javax.media.jai.operator.MultiplyConstDescriptor;
 
 /**
+ * {@link PointOpImage} to perform color reduction on an image using the palette builder.
  * 
  * @author Simone Giannecchini, GeoSolutions
  *
  */
 @SuppressWarnings("unchecked")
-public class ColorReduction extends AreaOpImage {
+public class ColorReduction extends PointOpImage {
 
 	private int numColors;
 
 	private int alphaThreshold;
 
 	private CustomPaletteBuilder paletteBuilder;
+	
+	private boolean initialized = false;
+
+	private RenderingHints hints;
 
 	public ColorReduction(RenderedImage image, RenderingHints hints,
 			int numColors, int alpaThreshold, int subsx, int subsy) {
-		super(image, new ImageLayout(image), null, false, null, 0, 0, 0, 0);
+		super(image, new ImageLayout(image), null, false);
 		this.numColors = numColors;
 		this.alphaThreshold = alpaThreshold;
 		if (image.getColorModel().hasAlpha()) {
@@ -71,10 +76,10 @@ public class ColorReduction extends AreaOpImage {
 			this.setSource(image, 0);
 		}
 
-		this.paletteBuilder = new CustomPaletteBuilder(image, this.numColors,
-				subsx, subsy, 1);
-		this.paletteBuilder.buildPalette();
-		this.setImageLayout(getImageLayout(image, hints));
+		// force palette computation
+		this.paletteBuilder = new CustomPaletteBuilder(image, this.numColors,subsx, subsy, 1);
+		this.hints=hints;
+		
 
 	}
 
@@ -85,13 +90,18 @@ public class ColorReduction extends AreaOpImage {
 			layout = new ImageLayout(image);
 
 		layout.setColorModel(this.paletteBuilder.getIndexColorModel());
-		layout.setSampleModel(paletteBuilder.getIndexColorModel()
-				.createCompatibleSampleModel(image.getWidth(),
-						image.getHeight()));
+		layout.setSampleModel(paletteBuilder.getIndexColorModel().createCompatibleSampleModel(image.getWidth(),image.getHeight()));
 		return layout;
 	}
 
+	@Override
 	public Raster computeTile(int tx, int ty) {
+		synchronized (this) {
+			if(!initialized){
+				this.paletteBuilder.buildPalette();
+				this.setImageLayout(getImageLayout(getSourceImage(0), hints));
+			}
+		}
 		final RenderedImage sourceImage = getSourceImage(0);
 		final ColorModel sourceColorModel = sourceImage.getColorModel();
 		final Raster sourceRaster = sourceImage.getTile(tx, ty);
@@ -108,11 +118,12 @@ public class ColorReduction extends AreaOpImage {
 		final WritableRaster destRaster = this.colorModel
 				.createCompatibleWritableRaster(w, h)
 				.createWritableTranslatedChild(minx, miny);
+		
+		// scan the provided tile and for each pixel assing the best color we have
 		for (int i = minx; i < maxx; i++)
 			for (int j = miny; j < maxy; j++) {
 				sourceRaster.getPixel(i, j, rgba);
-				destRaster.setSample(i, j, 0, paletteBuilder
-						.findNearestColorIndex(rgba, alphaBand));
+				destRaster.setSample(i, j, 0, paletteBuilder.findNearestColorIndex(rgba, alphaBand));
 			}
 		return destRaster;
 	}

@@ -56,6 +56,7 @@ import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
@@ -68,6 +69,8 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+import org.xml.sax.Attributes;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -84,6 +87,8 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GML2EncodingUtils.java $
  */
 public class GML2EncodingUtils {
     
@@ -275,56 +280,37 @@ public class GML2EncodingUtils {
 
         return encoding;
     }
-
-    static Set<QName> abstractFeatureTypeProperties = new HashSet<QName>();
-    static {
-        abstractFeatureTypeProperties.add( GML.name );
-        abstractFeatureTypeProperties.add( GML.description );
-        abstractFeatureTypeProperties.add( GML.location );
-       
-    }
     
-    public static Object AbstractFeatureType_getProperty(Object object,
-            QName name, Configuration configuration) {
-      
-        Feature feature = (Feature) object;
-
-        if (abstractFeatureTypeProperties.contains(name)) {
-            Property property = feature.getProperty(new NameImpl(name.getNamespaceURI(), name
-                    .getLocalPart()));
-            if (property == null) {
+    /**
+     * Return gml:boundedBy property if wanted.
+     * 
+     * @param feature
+     *            feature for which bounds might be required
+     * @param configuration
+     *            encoder configuration, used to suppress feature bounds
+     * @return the feature bounds, or null if none or unwanted
+     */
+    private static BoundingBox getBoundedBy(Feature feature, Configuration configuration) {
+        // check for flag not to include bounds
+        if (configuration.hasProperty(GMLConfiguration.NO_FEATURE_BOUNDS)) {
+            return null;
+        } else {
+            BoundingBox bounds = feature.getBounds();
+            // do a check for the case where the feature has no geometry properties
+            if (bounds.isEmpty()
+                    && (feature.getDefaultGeometryProperty() == null || feature
+                            .getDefaultGeometryProperty().getValue() == null)) {
                 return null;
             } else {
-                return property.getValue();
-            }
-        }
-      
-        if (GML.boundedBy.equals(name)) {
-            //check for flag not to include bounds
-            if ( !configuration.hasProperty( GMLConfiguration.NO_FEATURE_BOUNDS ) ) {
-                BoundingBox bounds = feature.getBounds();
-        
-                if (bounds.isEmpty()) {
-                    //do a check for the case where the feature has no geometry 
-                    // properties
-                    if (feature.getDefaultGeometryProperty() == null
-                            || feature.getDefaultGeometryProperty().getValue() == null) {
-                        return null;
-                    }
-                }
-        
                 return bounds;
             }
         }
+    }
+    
+    public static List AbstractFeatureType_getProperties(Object object,
+            XSDElementDeclaration element, SchemaIndex schemaIndex, Set<String> toFilter,
+            Configuration configuration) {
         
-        return null;
-    }
-    
-    public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex) {
-        return AbstractFeatureType_getProperties(object, element, schemaIndex, new HashSet<String>(Arrays.asList("name","description","boundedBy")));
-    }
-    
-    public static List AbstractFeatureType_getProperties(Object object,XSDElementDeclaration element,SchemaIndex schemaIndex, Set<String> toFilter) {
         Feature feature = (Feature) object;
         
         //check if this was a resolved feature, if so dont return anything
@@ -386,21 +372,17 @@ public class GML2EncodingUtils {
             if (attribute.isElementDeclarationReference()) {
                 attribute = attribute.getResolvedElementDeclaration();
             }
-
-            //ignore abstract featureType properties
-            if (GML.NAMESPACE.equals(attribute.getTargetNamespace())) {
-                for ( QName n : abstractFeatureTypeProperties ) {
-                    if ( n.getLocalPart().equals( attribute.getName() )) {
-                        continue O;
-                    }
-                }
-                
-            }
             
-            if (featureType instanceof SimpleFeatureType) {
+            if (GML.boundedBy
+                    .equals(new QName(attribute.getTargetNamespace(), attribute.getName()))) {
+                BoundingBox bounds = getBoundedBy(feature, configuration);
+                if (bounds != null) {
+                    properties.add(new Object[] { particle, bounds });
+                }
+            } else if (featureType instanceof SimpleFeatureType) {
                 // simple feature brain damage: discard namespace
                 // make sure the feature type has an element
-                if (((SimpleFeatureType) featureType).getDescriptor(attribute.getName()) == null) {
+                if (!isValidDescriptor(featureType, new NameImpl(attribute.getName()))) {
                     continue;
                 }
                 // get the value
@@ -411,7 +393,7 @@ public class GML2EncodingUtils {
                 Name propertyName = new NameImpl(attribute.getTargetNamespace(), attribute
                         .getName());
                 // make sure the feature type has an element
-                if (featureType.getDescriptor(propertyName) == null) {
+                if (!isValidDescriptor(featureType, propertyName)) {
                     continue;
                 }
                 // get the value (might be multiple)
@@ -566,7 +548,23 @@ public class GML2EncodingUtils {
         
         return false;
     }
-    
-    
-    
+
+    /**
+     * Return true if name is the name of a descriptor of the type or of an ancestor type.
+     * 
+     * @param type type to test
+     * @param name name of descriptor
+     * @return true if the type or an ancestor has a descriptor of this name
+     */
+    private static boolean isValidDescriptor(ComplexType type, Name name) {
+        if (type.getDescriptor(name) != null) {
+            return true;
+        } else if (type.getSuper() instanceof ComplexType) {
+            return isValidDescriptor((ComplexType) type.getSuper(), name);
+        } else {
+            return false;
+        }
+    }
+
+     
 }

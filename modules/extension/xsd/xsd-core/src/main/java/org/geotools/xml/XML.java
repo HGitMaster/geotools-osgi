@@ -23,6 +23,8 @@ import javax.xml.namespace.QName;
  * attributes in the http://www.w3.org/XML/1998/namespace schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/XML.java $
  */
 public final class XML extends XSD {
 

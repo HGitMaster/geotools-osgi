@@ -31,8 +31,8 @@ import java.util.Set;
 
 import org.geotools.arcsde.data.ArcSDEQuery.FilterSet;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
-import org.geotools.arcsde.data.versioning.AutoCommitDefaultVersionHandler;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.data.versioning.AutoCommitVersionHandler;
+import org.geotools.arcsde.session.ISession;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -63,6 +63,7 @@ import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BBOX;
 
+import com.esri.sde.sdk.client.SeVersion;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -84,7 +85,7 @@ public class ArcSDEQueryTest {
     private ArcSDEQuery _queryAll;
 
     /**
-     * do not access it directly, use {@link #getQueryFiltered()}
+     * do not access it directly, use {@link #createFilteringQuery()}
      */
     private ArcSDEQuery queryFiltered;
 
@@ -172,7 +173,7 @@ public class ArcSDEQueryTest {
                 .toFilter("STRING_COL = strConcat('string', STRING_COL) AND STRING_COL > 'String2' AND BBOX(SHAPE, 10.0,20.0,30.0,40.0)");
         filteringQuery = new DefaultQuery(typeName, filter);
         // filteringQuery based on the above filter...
-        ArcSDEQuery sdeQuery = getQueryFiltered();
+        ArcSDEQuery sdeQuery = createFilteringQuery();
 
         FilterSet filters;
         try {
@@ -199,7 +200,7 @@ public class ArcSDEQueryTest {
 
         filteringQuery = new DefaultQuery(typeName, filter);
         // filteringQuery based on the above filter...
-        sdeQuery = getQueryFiltered();
+        sdeQuery = createFilteringQuery();
 
         try {
             filters = sdeQuery.getFilters();
@@ -225,7 +226,7 @@ public class ArcSDEQueryTest {
 
         filteringQuery = new DefaultQuery(typeName, filter);
         // filteringQuery based on the above filter...
-        sdeQuery = getQueryFiltered();
+        sdeQuery = createFilteringQuery();
 
         try {
             filters = sdeQuery.getFilters();
@@ -259,7 +260,7 @@ public class ArcSDEQueryTest {
         Filter filter = ff.id(ids);
         filteringQuery = new DefaultQuery(typeName, filter);
         // filteringQuery based on the above filter...
-        ArcSDEQuery sdeQuery = getQueryFiltered();
+        ArcSDEQuery sdeQuery = createFilteringQuery();
 
         FilterSet filters;
         try {
@@ -286,11 +287,12 @@ public class ArcSDEQueryTest {
         return this._queryAll;
     }
 
-    private ArcSDEQuery getQueryFiltered() throws IOException {
+    private ArcSDEQuery createFilteringQuery() throws IOException {
         ISession session = dstore.getSession(Transaction.AUTO_COMMIT);
         FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, session);
         this.queryFiltered = ArcSDEQuery.createQuery(session, ftype, filteringQuery, fti
-                .getFidStrategy(), new AutoCommitDefaultVersionHandler());
+                .getFidStrategy(), new AutoCommitVersionHandler(
+                SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME));
         return this.queryFiltered;
     }
 
@@ -366,7 +368,7 @@ public class ArcSDEQueryTest {
 
     @Test
     public void testCalculateResultCountNonSpatialFilter() throws Exception {
-        ArcSDEQuery q = getQueryFiltered();
+        ArcSDEQuery q = createFilteringQuery();
         int calculated;
         try {
             calculated = q.calculateResultCount();
@@ -376,17 +378,18 @@ public class ArcSDEQueryTest {
         }
         Assert.assertEquals(FILTERING_COUNT, calculated);
     }
-    
+
     @Test
     public void testCalculateResultCountSpatialFilter() throws Exception {
         ISession session = dstore.getSession(Transaction.AUTO_COMMIT);
         FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, session);
-        
-        //same filter than ArcSDEJavaApiTest.testCalculateCountSpatialFilter
+
+        // same filter than ArcSDEJavaApiTest.testCalculateCountSpatialFilter
         Filter filter = CQL.toFilter("BBOX(SHAPE, -180, -90, -170, -80)");
         filteringQuery = new DefaultQuery(typeName, filter);
         ArcSDEQuery q = ArcSDEQuery.createQuery(session, ftype, filteringQuery, fti
-                .getFidStrategy(), new AutoCommitDefaultVersionHandler());
+                .getFidStrategy(), new AutoCommitVersionHandler(
+                SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME));
         int calculated;
         try {
             calculated = q.calculateResultCount();
@@ -396,16 +399,17 @@ public class ArcSDEQueryTest {
         }
         Assert.assertEquals(2, calculated);
     }
-    
+
     @Test
     public void testCalculateResultCountMixedFilter() throws Exception {
         ISession session = dstore.getSession(Transaction.AUTO_COMMIT);
         FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, session);
-        
+
         Filter filter = CQL.toFilter("INT32_COL < 5 AND BBOX(SHAPE, -180, -90, -170, -80)");
         filteringQuery = new DefaultQuery(typeName, filter);
         ArcSDEQuery q = ArcSDEQuery.createQuery(session, ftype, filteringQuery, fti
-                .getFidStrategy(), new AutoCommitDefaultVersionHandler());
+                .getFidStrategy(), new AutoCommitVersionHandler(
+                SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME));
         int calculated;
         try {
             calculated = q.calculateResultCount();
@@ -415,7 +419,7 @@ public class ArcSDEQueryTest {
         }
         Assert.assertEquals(1, calculated);
     }
-    
+
     @Test
     public void testCalculateQueryExtent() throws Exception {
         {
@@ -459,7 +463,7 @@ public class ArcSDEQueryTest {
                 featureReader.close();
             }
 
-            ArcSDEQuery queryFiltered = getQueryFiltered();
+            ArcSDEQuery queryFiltered = createFilteringQuery();
             Envelope actual;
             try {
                 actual = queryFiltered.calculateQueryExtent();
@@ -473,7 +477,7 @@ public class ArcSDEQueryTest {
     }
 
     private void assertEquals(Envelope e1, Envelope e2) {
-        final double tolerance = 1.0E-9;
+        final double tolerance = 1.0E-5;
         Assert.assertEquals(e1.getMinX(), e2.getMinX(), tolerance);
         Assert.assertEquals(e1.getMinY(), e2.getMinY(), tolerance);
         Assert.assertEquals(e1.getMaxX(), e2.getMaxX(), tolerance);

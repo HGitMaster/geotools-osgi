@@ -62,7 +62,7 @@ public class IndexedFidWriterTest extends FIDTestCase {
      * Test method for 'org.geotools.index.fid.IndexedFidWriter.hasNext()'
      */
     public void testHasNext() throws MalformedURLException, IOException {
-        FidIndexer.generate(backshp.toURL());
+        FidIndexer.generate(backshp.toURI().toURL());
         initWriter();
 
         for( int i = 1, j = indexFile.getRecordCount(); i < j; i++ ) {
@@ -75,7 +75,7 @@ public class IndexedFidWriterTest extends FIDTestCase {
      * Test method for 'org.geotools.index.fid.IndexedFidWriter.remove()'
      */
     public void testRemove() throws MalformedURLException, IOException {
-        FidIndexer.generate(backshp.toURL());
+        FidIndexer.generate(backshp.toURI().toURL());
         initWriter();
         writer.next();
         writer.remove();
@@ -97,7 +97,7 @@ public class IndexedFidWriterTest extends FIDTestCase {
     }
 
     public void testRemoveCounting() throws Exception {
-        FidIndexer.generate(backshp.toURL());
+        FidIndexer.generate(backshp.toURI().toURL());
         initWriter();
         writer.next();
         writer.remove();

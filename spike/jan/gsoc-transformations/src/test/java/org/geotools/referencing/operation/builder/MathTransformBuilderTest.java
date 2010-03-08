@@ -38,7 +38,7 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * A test for the MathTransformBuilders.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/spike/jan/gsoc-transformations/src/test/java/org/geotools/referencing/operation/builder/MathTransformBuilderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/spike/jan/gsoc-transformations/src/test/java/org/geotools/referencing/operation/builder/MathTransformBuilderTest.java $
  * @version $Id: MathTransformBuilderTest.java 30731 2008-06-16 16:56:12Z acuster $
  * @author Jan Jezek
  * @author Adrian Custer

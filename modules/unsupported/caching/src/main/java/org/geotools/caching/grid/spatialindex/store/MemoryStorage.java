@@ -35,6 +35,8 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author crousson
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/store/MemoryStorage.java $
  */
 public class MemoryStorage implements Storage {
     private HashMap<NodeIdentifier, Node> map;

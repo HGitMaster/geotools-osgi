@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * A dom based parser to build filters as per OGC 01-067
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterDOMParser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterDOMParser.java $
  * @version $Id: FilterDOMParser.java 32694 2009-03-25 09:45:28Z aaime $
  *
  * @task TODO: split this class up into multiple methods.

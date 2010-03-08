@@ -31,7 +31,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Breaks a FeatureCollection<SimpleFeatureType, SimpleFeature> into classes using the standard deviation classification method.
  * 
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/function/StandardDeviationFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/StandardDeviationFunction.java $
  */
 public class StandardDeviationFunction extends ClassificationFunction {
 

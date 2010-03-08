@@ -34,8 +34,8 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link GeocentricTranslation} class.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/GeocentricTranslationTest.java $
- * @version $Id: GeocentricTranslationTest.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/GeocentricTranslationTest.java $
+ * @version $Id: GeocentricTranslationTest.java 34665 2009-12-13 12:40:59Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public final class GeocentricTranslationTest {
@@ -45,7 +45,7 @@ public final class GeocentricTranslationTest {
      */
     @Test
     public void testTranslation() throws FactoryException, TransformException {
-        final String        classification = "Geocentric translations";
+        final String        classification = "Geocentric translations (geog2d domain)";
         final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final ParameterValueGroup    param = factory.getDefaultParameters(classification);
 
@@ -70,7 +70,7 @@ public final class GeocentricTranslationTest {
      */
     @Test
     public void testSevenParam() throws FactoryException, TransformException {
-        final String        classification = "Position Vector 7-param. transformation";
+        final String        classification = "Position Vector transformation (geog2d domain)";
         final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final ParameterValueGroup    param = factory.getDefaultParameters(classification);
 
@@ -99,7 +99,7 @@ public final class GeocentricTranslationTest {
      */
     @Test
     public void testFrameRotation() throws FactoryException, TransformException {
-        final String        classification = "Coordinate Frame rotation";
+        final String        classification = "Coordinate Frame rotation (geog2d domain)";
         final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final ParameterValueGroup    param = factory.getDefaultParameters(classification);
 
@@ -129,7 +129,7 @@ public final class GeocentricTranslationTest {
      */
     @Test
     public void testGeotoolsExtensions() throws FactoryException, TransformException {
-        final String        classification = "Coordinate Frame rotation";
+        final String        classification = "Coordinate Frame rotation (geog2d domain)";
         final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final ParameterValueGroup    param = factory.getDefaultParameters(classification);
         final Ellipsoid    sourceEllipsoid = DefaultEllipsoid.INTERNATIONAL_1924;

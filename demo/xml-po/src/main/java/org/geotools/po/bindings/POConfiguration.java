@@ -9,9 +9,10 @@
  */
 package org.geotools.po.bindings;
 
+import java.util.Map;
+
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;	
 import org.geotools.po.ObjectFactory;
-import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
 import org.picocontainer.MutablePicoContainer;
 
@@ -19,6 +20,8 @@ import org.picocontainer.MutablePicoContainer;
  * Parser configuration for the http://www.geotools.org/po schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/xml-po/src/main/java/org/geotools/po/bindings/POConfiguration.java $
  */
 public class POConfiguration extends Configuration {
 
@@ -28,41 +31,7 @@ public class POConfiguration extends Configuration {
      * @generated
      */     
     public POConfiguration() {
-       super();
-       
-       //TODO: add dependencies here
-    }
-    
-    /**
-     * @return the schema namespace uri: http://www.geotools.org/po.
-     * @generated
-     */
-    public String getNamespaceURI() {
-    	return PO.NAMESPACE;
-    }
-    
-    /**
-     * @return the uri to the the po.xsd .
-     * @generated
-     */
-    public String getSchemaFileURL() {
-        return getSchemaLocationResolver().resolveSchemaLocation( 
-           null, getNamespaceURI(), "po.xsd"
-        );
-    }
-    
-    /**
-     * @return new instanceof {@link POBindingConfiguration%>}.
-     */    
-    public BindingConfiguration getBindingConfiguration() {
-     	return new POBindingConfiguration();
-    }
-    
-    /**
-     * @return A new instance of {@link POSchemaLocationResolver%>}.
-     */
-    public XSDSchemaLocationResolver getSchemaLocationResolver() {
-    	return new POSchemaLocationResolver();
+       super(PO.getInstance());
     }
     
     /**
@@ -70,6 +39,15 @@ public class POConfiguration extends Configuration {
      */
     protected void configureContext(MutablePicoContainer context) {
     	context.registerComponentImplementation( ObjectFactory.class );
+    }
+    
+    @Override
+    protected void configureBindings(Map bindings) {
+        //Types
+        bindings.put(PO.Items,ItemsBinding.class);
+        bindings.put(PO.PurchaseOrderType,PurchaseOrderTypeBinding.class);
+        bindings.put(PO.SKU,SKUBinding.class);
+        bindings.put(PO.USAddress,USAddressBinding.class);
     }
     
 } 

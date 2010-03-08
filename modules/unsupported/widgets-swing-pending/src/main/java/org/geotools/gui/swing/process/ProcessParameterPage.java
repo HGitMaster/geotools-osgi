@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 
 import org.geotools.data.Parameter;
 import org.geotools.process.ProcessFactory;
+import org.opengis.feature.type.Name;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -39,9 +40,12 @@ import com.vividsolutions.jts.geom.Geometry;
  * This page is responsible making a user interface based on the provided ProcessFactory.
  * 
  * @author Jody, gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ProcessParameterPage.java $
  */
 public class ProcessParameterPage extends JPage {
     ProcessFactory factory;
+    Name name;
     Map<String, Object> input;
     
     // map of ParamWidget to keys, but value is a list of ParamWidgets
@@ -76,7 +80,7 @@ public class ProcessParameterPage extends JPage {
 //    	if (paramMap == null) {
 //    		return null;
 //    	}
-    	ProcessRunPage resultPage = new ProcessRunPage(factory, paramMap);    	
+    	ProcessRunPage resultPage = new ProcessRunPage(factory, name, paramMap);    	
     	this.getJProcessWizard().registerWizardPanel( resultPage );
     	resultPage.setJProcessWizard(this.getJProcessWizard());
         return resultPage.getIdentifier();
@@ -115,11 +119,11 @@ public class ProcessParameterPage extends JPage {
         page.removeAll();
         page.setLayout(new GridLayout(0, 2));
 
-        JLabel title = new JLabel(factory.getTitle().toString());
+        JLabel title = new JLabel(factory.getTitle(name).toString());
         page.add(title);
-        JLabel description = new JLabel(factory.getDescription().toString());
+        JLabel description = new JLabel(factory.getDescription(name).toString());
         page.add(description);
-        for( Entry<String, Parameter< ? >> entry : factory.getParameterInfo().entrySet() ) {
+        for( Entry<String, Parameter< ? >> entry : factory.getParameterInfo(name).entrySet() ) {
             Parameter< ? > parameter = entry.getValue();
             
             // if the minOccurs of the param is -1, it can be any number so default

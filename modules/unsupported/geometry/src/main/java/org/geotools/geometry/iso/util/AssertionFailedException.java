@@ -20,6 +20,8 @@ package org.geotools.geometry.iso.util;
 /**
  * Thrown when the application is in an inconsistent state. Indicates a problem
  * with the code.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/AssertionFailedException.java $
  */
 public class AssertionFailedException extends RuntimeException {
 

@@ -71,7 +71,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * Test for mysql.  Must use a locally available instance of mysql.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/mysql/src/test/java/org/geotools/data/mysql/MySQLDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/test/java/org/geotools/data/mysql/MySQLDataStoreTest.java $
  */
 public class MySQLDataStoreTest extends TestCase {
     /** The logger for the filter module. */

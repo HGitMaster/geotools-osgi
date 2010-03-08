@@ -34,7 +34,7 @@ package org.geotools.filter;
  * to the use of SortBy.
  * <p>
  * @author Jody Garnett, Refractions Research.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/filter/SortBy2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/SortBy2.java $
  */
 public interface SortBy2 extends SortBy {
     /**

@@ -29,6 +29,8 @@ import org.geotools.styling.Symbolizer;
 
 /**
  * @author  pc
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/RenderingBufferExtractorTest.java $
  */
 public class RenderingBufferExtractorTest extends TestCase {
     StyleBuilder sb = new StyleBuilder();
@@ -118,8 +120,8 @@ public class RenderingBufferExtractorTest extends TestCase {
                 .colorExpression(Color.BLACK), sb.literalExpression(null))));
         MetaBufferEstimator rbe = new MetaBufferEstimator();
         rbe.visit(style);
-        assertEquals(0, rbe.getBuffer());
-        assertFalse(rbe.isEstimateAccurate());
+        assertEquals(1, rbe.getBuffer());
+        assertTrue(rbe.isEstimateAccurate());
     }
     
     public void testLiteralParseGraphics() {

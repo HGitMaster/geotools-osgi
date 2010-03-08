@@ -22,12 +22,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.NoSuchElementException;
+
 import org.geotools.data.shapefile.StreamLogging;
 
 /**
  * Class to read an attribute index file
  * 
  * @author Manuele Ventoruzzo
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/attribute/AttributeIndexReader.java $
  */
 public class AttributeIndexReader {
 

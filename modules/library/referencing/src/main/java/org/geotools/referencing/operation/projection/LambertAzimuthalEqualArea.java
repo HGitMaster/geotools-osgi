@@ -51,7 +51,7 @@ import static java.lang.Math.*;
  *
  * @since 2.4
  * @version $Id: LambertAzimuthalEqualArea.java 30760 2008-06-18 14:28:24Z desruisseaux $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertAzimuthalEqualArea.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertAzimuthalEqualArea.java $
  * @author Gerald Evenden  (for original code in Proj4)
  * @author Beate Stollberg
  * @author Martin Desruisseaux

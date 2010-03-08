@@ -26,6 +26,8 @@ import org.geotools.gui.swing.map.map2d.stream.strategy.StreamingStrategy;
  * Map event
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/event/MapEvent.java $
  */
 public class MapEvent extends EventObject{
 

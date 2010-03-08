@@ -24,7 +24,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 /**
  * Projective transform in 2D case.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ProjectiveTransform2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ProjectiveTransform2D.java $
  * @version $Id: ProjectiveTransform2D.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Jan Jezek
  */

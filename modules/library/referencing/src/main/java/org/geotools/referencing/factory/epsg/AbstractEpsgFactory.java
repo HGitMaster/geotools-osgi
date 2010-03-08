@@ -164,7 +164,7 @@ import org.opengis.util.InternationalString;
  * {@link #isPrimaryKey} method.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AbstractEpsgFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AbstractEpsgFactory.java $
  * @version $Id: AbstractEpsgFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Yann Cézard
  * @author Martin Desruisseaux (IRD)
@@ -2992,7 +2992,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      * do not preserve any connection to the database.
      *
      * @since 2.2
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AbstractEpsgFactory.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AbstractEpsgFactory.java $
      * @version $Id: AbstractEpsgFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
      * @author Martin Desruisseaux (IRD)
      */

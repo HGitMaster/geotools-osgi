@@ -43,7 +43,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * registered for use in {@link org.opengis.referencing.ReferencingFactoryFinder}.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/URN_AuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/URN_AuthorityFactory.java $
  * @version $Id: URN_AuthorityFactory.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Justin Deoliveira
  * @author Martin Desruisseaux

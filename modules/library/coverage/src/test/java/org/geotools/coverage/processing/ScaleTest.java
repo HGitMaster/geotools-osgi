@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the scale operation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/processing/ScaleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/processing/ScaleTest.java $
  * @version $Id: ScaleTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Simone Giannecchini (GeoSolutions)
  * @author Martin Desruisseaux (Geomatys)

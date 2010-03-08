@@ -30,10 +30,12 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  * 
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: jive $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/ConnectionPoolManager.java $
- * @version $Id: ConnectionPoolManager.java 30646 2008-06-12 18:48:06Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/ConnectionPoolManager.java $
+ * @version $Id: ConnectionPoolManager.java 33484 2009-07-06 02:17:34Z jdeolive $
  * Last Modified: $Date: 2003/11/21 18:51:20 $ 
  * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class ConnectionPoolManager {
     /** The singleton instance of the ConnectionPoolManager. */

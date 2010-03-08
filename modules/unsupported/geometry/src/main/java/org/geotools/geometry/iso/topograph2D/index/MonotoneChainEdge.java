@@ -35,6 +35,8 @@ import org.geotools.geometry.iso.topograph2D.Envelope;
  * types of real-world data, these properties eliminate a large number of
  * segment comparisons, producing substantial speed gains.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/index/MonotoneChainEdge.java $
  */
 public class MonotoneChainEdge {
 

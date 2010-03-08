@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/shp/PolygonHandlerTest.java $
- * @version $Id: PolygonHandlerTest.java 30670 2008-06-12 23:59:23Z acuster $
+ * @version $Id: PolygonHandlerTest.java 33985 2009-09-25 09:02:24Z aaime $
  * @author Ian Schneider
  */
 public class PolygonHandlerTest extends TestCaseSupport {
@@ -49,7 +49,7 @@ public class PolygonHandlerTest extends TestCaseSupport {
         c[0] = new Coordinate(0, 0, 0);
         c[1] = new Coordinate(1, 1, Double.NaN);
         c[2] = new Coordinate(1, 2, 3);
-        PolygonHandler handler = new PolygonHandler();
+        PolygonHandler handler = new PolygonHandler(new GeometryFactory());
         assertTrue(handler.getShapeType() == ShapeType.POLYGON);
         for (int i = 0, ii = c.length; i < ii; i++) {
             assertTrue(handler.pointInList(c[i], c));
@@ -83,7 +83,7 @@ public class PolygonHandlerTest extends TestCaseSupport {
             }
         }
 
-        PolygonHandler ph = new PolygonHandler();
+        PolygonHandler ph = new PolygonHandler(new GeometryFactory());
         ArrayList assigned = ph.assignHolesToShells(shells, holes);
         assertEquals(((ArrayList) assigned.get(0)).size(), holes.size());
 

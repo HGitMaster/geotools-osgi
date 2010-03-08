@@ -36,8 +36,8 @@ import java.lang.reflect.Field;
  * them.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/resources/IndexedResourceCompiler.java $
- * @version $Id: IndexedResourceCompiler.java 30640 2008-06-12 17:34:32Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/IndexedResourceCompiler.java $
+ * @version $Id: IndexedResourceCompiler.java 34724 2009-12-22 11:17:18Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public final class IndexedResourceCompiler implements Comparator<Object> {

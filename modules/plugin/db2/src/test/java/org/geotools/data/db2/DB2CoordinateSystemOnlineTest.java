@@ -24,7 +24,7 @@ import java.sql.SQLException;
  * Exercise DB2CoordinateSystem.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2CoordinateSystemOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2CoordinateSystemOnlineTest.java $
  */
 public class DB2CoordinateSystemOnlineTest extends AbstractDB2OnlineTestCase {
     private Connection conn;

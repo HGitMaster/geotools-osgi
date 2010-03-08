@@ -48,7 +48,7 @@ import org.geotools.factory.FactoryNotFoundException;
  * and fallback on an other one if the primary factory failed.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/FallbackAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/FallbackAuthorityFactory.java $
  * @version $Id: FallbackAuthorityFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux
  *

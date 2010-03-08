@@ -39,7 +39,7 @@ import org.geotools.factory.Hints;
  * <pre><code>
  * featureSource.getFeatures( Query.FIDS );
  * </code></pre>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/data/FIDSQuery.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/FIDSQuery.java $
  */
 class FIDSQuery implements Query {
     static final String[] NO_PROPERTIES = new String[0];

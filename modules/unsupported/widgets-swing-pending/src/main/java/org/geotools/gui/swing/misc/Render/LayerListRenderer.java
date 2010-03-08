@@ -36,6 +36,8 @@ import org.geotools.map.MapLayer;
  * layer list renderer
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/misc/Render/LayerListRenderer.java $
  */
 public class LayerListRenderer implements ListCellRenderer{
 

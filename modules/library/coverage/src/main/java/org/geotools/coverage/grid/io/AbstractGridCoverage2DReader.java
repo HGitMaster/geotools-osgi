@@ -23,6 +23,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
 import java.awt.image.SampleModel;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -38,7 +39,6 @@ import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.TypeMap;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataSourceException;
@@ -53,9 +53,15 @@ import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.ColorInterpretation;
+import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.InvalidParameterNameException;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
@@ -141,7 +147,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * The original {@link GridRange} for the {@link GridCoverage2D} of this
 	 * reader.
 	 */
-	protected GeneralGridRange originalGridRange = null;
+	protected GridEnvelope originalGridRange = null;
 
 	/**
 	 * Input stream that can be used to initialize subclasses of
@@ -158,6 +164,35 @@ public abstract class AbstractGridCoverage2DReader implements
 	protected GridCoverageFactory coverageFactory;
 
 	private ArrayList<Resolution> resolutionsLevels;
+
+    /**
+     * Read the current grid coverage from the stream.
+     * <p>
+     * Example:<pre><code>
+     * </code></pre>
+     * The method {@link #hasMoreGridCoverages} should be invoked first in order to verify that a
+     * coverage is available.
+     * 
+     * @param parameters Optional parameters matching {@link Format#getReadParameters}.
+     * @return a {@linkplain GridCoverage grid coverage} from the input source.
+     * @throws InvalidParameterNameException
+     *             if a parameter in {@code parameters} doesn't have a recognized name.
+     * @throws InvalidParameterValueException
+     *             if a parameter in {@code parameters} doesn't have a valid value.
+     * @throws ParameterNotFoundException
+     *             if a parameter was required for the operation but was not provided in the {@code
+     *             parameters} list.
+     * @throws CannotCreateGridCoverageException
+     *             if the coverage can't be created for a logical reason (for example an unsupported
+     *             format, or an inconsistency found in the data).
+     * @throws IOException
+     *             if a read operation failed for some other input/output reason, including
+     *             {@link FileNotFoundException} if no file with the given {@code name} can be
+     *             found, or {@link javax.imageio.IIOException} if an error was thrown by the
+     *             underlying image library.
+     */
+    public abstract GridCoverage2D read(GeneralParameterValue[] parameters)
+            throws IllegalArgumentException, IOException;
 
 	// -------------------------------------------------------------------------
 	//
@@ -285,63 +320,15 @@ public abstract class AbstractGridCoverage2DReader implements
 		if (this.hints != null)
 			if (this.hints.containsKey(Hints.OVERVIEW_POLICY))
 				overviewPolicy = (OverviewPolicy) this.hints.get(Hints.OVERVIEW_POLICY);
-			else if (this.hints.containsKey(Hints.IGNORE_COVERAGE_OVERVIEW))
-				overviewPolicy = ((Boolean) this.hints
-						.get(Hints.IGNORE_COVERAGE_OVERVIEW)).booleanValue() ? OverviewPolicy.IGNORE
-						: OverviewPolicy.QUALITY;
+
 
 		// use default if not provided. Default is nearest
 		if (overviewPolicy == null)
-			overviewPolicy = OverviewPolicy.NEAREST;
+			overviewPolicy = OverviewPolicy.getDefaultPolicy();
 		assert overviewPolicy != null;
 		return overviewPolicy;
 	}
 	
-	/**
-	 * This method is responsible for preparing the read param for doing an
-	 * {@link ImageReader#read(int, ImageReadParam)}.
-	 * 
-	 * 
-	 * <p>
-	 * This method is responsible for preparing the read param for doing an
-	 * {@link ImageReader#read(int, ImageReadParam)}. It sets the passed
-	 * {@link ImageReadParam} in terms of decimation on reading using the
-	 * provided requestedEnvelope and requestedDim to evaluate the needed
-	 * resolution. It also returns and {@link Integer} representing the index of
-	 * the raster to be read when dealing with multipage raster.
-	 * 
-	 * @param readP
-	 *            an instance of {@link ImageReadParam} for setting the
-	 *            subsampling factors.
-	 * @param requestedEnvelope
-	 *            the {@link GeneralEnvelope} we are requesting.
-	 * @param requestedDim
-	 *            the requested dimensions.
-	 * @return the index of the raster to read in the underlying data source.
-	 * @throws IOException
-	 * @throws TransformException
-	 * @deprecated use
-	 *             {@link #setReadParams(String, ImageReadParam, GeneralEnvelope, Rectangle)}
-	 *             instead and set the policy for overviews.
-	 */
-	protected Integer setReadParams(ImageReadParam readP,
-			GeneralEnvelope requestedEnvelope, Rectangle requestedDim)
-			throws IOException, TransformException {
-
-		// //
-		//
-		// Check Hint to ignore overviews
-		//
-		// //
-		Object o = hints.get(Hints.IGNORE_COVERAGE_OVERVIEW);
-		if (o != null && ((Boolean) o).booleanValue()) {
-			return setReadParams(OverviewPolicy.IGNORE, readP, requestedEnvelope, requestedDim);
-
-		}
-		return setReadParams(OverviewPolicy.QUALITY, readP, requestedEnvelope, requestedDim);
-		
-	}
-
 	private Integer getOverviewImage(OverviewPolicy policy, double[] requestedRes) {
 	    // setup policy
         if(policy == null)
@@ -412,9 +399,9 @@ public abstract class AbstractGridCoverage2DReader implements
             // different than the one of the overviews), and we would end up going out of the loop
             // since not even the lowest can "top" the request for one axis 
             if(curr.scaleFactor>requestedScaleFactor|| i == size - 1) {
-                if(policy == Hints.VALUE_OVERVIEW_POLICY_QUALITY)
+                if(policy == OverviewPolicy.QUALITY)
                     return prev.imageChoice;
-                else if(policy == Hints.VALUE_OVERVIEW_POLICY_SPEED)
+                else if(policy == OverviewPolicy.SPEED)
                     return curr.imageChoice;
                 else if(requestedScaleFactor - prev.scaleFactor < curr.scaleFactor - requestedScaleFactor)
                     return prev.imageChoice;
@@ -489,17 +476,17 @@ public abstract class AbstractGridCoverage2DReader implements
 			final int choice = imageChoice.intValue();
 			if (choice == 0) {
 				// highest resolution
-				w = originalGridRange.getLength(0);
-				h = originalGridRange.getLength(1);
+				w = originalGridRange.getSpan(0);
+				h = originalGridRange.getSpan(1);
 				selectedRes[0] = highestRes[0];
 				selectedRes[1] = highestRes[1];
 			} else {
 				// some overview
 				selectedRes[0] = overViewResolutions[choice - 1][0];
 				selectedRes[1] = overViewResolutions[choice - 1][1];
-				w = (int) Math.round(originalEnvelope.getLength(0)
+				w = (int) Math.round(originalEnvelope.getSpan(0)
 						/ selectedRes[0]);
-				h = (int) Math.round(originalEnvelope.getLength(1)
+				h = (int) Math.round(originalEnvelope.getSpan(1)
 						/ selectedRes[1]);
 
 			}
@@ -572,7 +559,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @return a {@link GridCoverage}
 	 * @throws IOException
 	 */
-	protected final GridCoverage createImageCoverage(PlanarImage image,
+	protected final GridCoverage2D createImageCoverage(PlanarImage image,
 			MathTransform raster2Model) throws IOException {
 
 		// creating bands
@@ -634,8 +621,8 @@ public abstract class AbstractGridCoverage2DReader implements
 					}
 				}
 				requestedRes = new double[2];
-				requestedRes[0] = envelope.getLength(0) / dim.getWidth();
-				requestedRes[1] = envelope.getLength(1) / dim.getHeight();
+				requestedRes[0] = envelope.getSpan(0) / dim.getWidth();
+				requestedRes[1] = envelope.getSpan(1) / dim.getHeight();
 			}
 			return requestedRes;
 		} catch (TransformException e) {
@@ -663,7 +650,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @return the {@link GeneralGridRange} that represents the raster grid
 	 *         dimensions of the highest resolution level in this dataset.
 	 */
-	public final GeneralGridRange getOriginalGridRange() {
+	public final GridEnvelope getOriginalGridRange() {
 		return originalGridRange;
 	}
 

@@ -52,6 +52,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/MultiSurfacePropertyTypeBinding.java $
  */
 public class MultiSurfacePropertyTypeBinding extends AbstractComplexBinding {
     /**

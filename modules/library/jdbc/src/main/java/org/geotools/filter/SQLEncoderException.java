@@ -22,7 +22,9 @@ package org.geotools.filter;
  *
  * @deprecated Since you're using OpenGISSFilterToSQLEncoder, use FilterToSQLException as well
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/filter/SQLEncoderException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/filter/SQLEncoderException.java $
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class SQLEncoderException extends Exception {
     private static final long serialVersionUID = -2394509611777950167L;

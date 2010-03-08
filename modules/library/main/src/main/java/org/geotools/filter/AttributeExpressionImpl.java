@@ -35,8 +35,8 @@ import org.opengis.filter.expression.ExpressionVisitor;
  * internally defined manner.
  *
  * @author Rob Hranac, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/AttributeExpressionImpl.java $
- * @version $Id: AttributeExpressionImpl.java 30921 2008-07-05 07:51:23Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/AttributeExpressionImpl.java $
+ * @version $Id: AttributeExpressionImpl.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public class AttributeExpressionImpl extends DefaultExpression
     implements AttributeExpression {
@@ -228,6 +228,9 @@ public class AttributeExpressionImpl extends DefaultExpression
      * @return true if specified object is equal to this filter; else false
      */
     public boolean equals(Object obj) {
+        if(obj == null)
+            return false;
+        
         if (obj.getClass() == this.getClass()) {
             AttributeExpressionImpl expAttr = (AttributeExpressionImpl) obj;
 

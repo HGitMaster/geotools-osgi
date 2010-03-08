@@ -30,7 +30,7 @@ import org.opengis.filter.expression.Add;
  * @author Chris Holmes, TOPP
  *
  * @task REVISIT: validate these so we know if they break.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/test/java/org/geotools/filter/SQLEncoderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/filter/SQLEncoderTest.java $
  */
 public class SQLEncoderTest extends SQLFilterTestSupport {
     private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();

@@ -34,6 +34,8 @@ import org.geotools.xs.XSConfiguration;
  * </p>
  * 
  * @see ApplicationSchemaConfiguration
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/CatalogApplicationSchemaConfiguration.java $
  */
 public class CatalogApplicationSchemaConfiguration extends Configuration {
 

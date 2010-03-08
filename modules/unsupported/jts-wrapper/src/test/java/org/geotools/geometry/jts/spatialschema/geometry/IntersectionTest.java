@@ -26,6 +26,8 @@ import org.opengis.geometry.primitive.Surface;
 /**
  * @author Jody Garnett
  * @author Joel Skelton
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/test/java/org/geotools/geometry/jts/spatialschema/geometry/IntersectionTest.java $
  */
 public class IntersectionTest extends AbstractGeometryTest {
 

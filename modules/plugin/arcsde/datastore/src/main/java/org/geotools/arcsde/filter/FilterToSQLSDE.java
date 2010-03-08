@@ -228,35 +228,51 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
         String fidField = layerFidFieldName;
 
         try {
-            StringBuffer sb = new StringBuffer();
-            sb.append("(" + fidField + " IN(");
-
-            for (int i = 0; i < nFids; i++) {
-                sb.append(fids[i]);
-
-                if (i < (nFids - 1)) {
-                    sb.append(", ");
-                }
-                if (i == 999) {
-                    sb.deleteCharAt(sb.length() - 1); // delete the trailing
-                    // space
-                    sb.deleteCharAt(sb.length() - 1); // delete the trailing
-                    // comma
-                    sb.append(")) OR (" + fidField + " IN(");
-                }
-            }
-
-            sb.append("))");
+            String sql = buildFilter(fids, fidField + " IN(", ")", ",", 1000, " OR ");
 
             if (LOGGER.isLoggable(Level.FINER)) {
-                LOGGER.finer("added fid filter: " + sb.toString());
+                LOGGER.finer("added fid filter: " + sql);
             }
 
-            this.out.write(sb.toString());
+            this.out.write(sql);
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }
         return unused;
+    }
+
+    // return a string
+    private String buildFilter(long[] fids, String prefix, String suffix, String separator,
+            int groupSize, String groupSeparator) {
+        final int count = fids.length;
+        final int groups = count / groupSize;
+        final int remainder = count % groupSize;
+        final StringBuilder sql = new StringBuilder();
+        for (int i = 0; i < groups; i++) {
+            if (i > 0) {
+                sql.append(groupSeparator);
+            }
+            sql.append(prefix);
+            addSubList(sql, fids, i * groupSize, (i + 1) * groupSize, separator);
+            sql.append(suffix);
+        }
+        if (remainder > 0) {
+            if (groups > 0) {
+                sql.append(groupSeparator);
+            }
+            sql.append(prefix);
+            addSubList(sql, fids, count - remainder, count, separator);
+            sql.append(suffix);
+        }
+        return sql.toString();
+    }
+
+    private void addSubList(StringBuilder sql, long[] fids, int start, int end, String separator) {
+        for (int i = start; i < end; i++) {
+            sql.append(fids[i]);
+            sql.append(separator);
+        }
+        sql.setLength(sql.length() - separator.length());
     }
 
     /**

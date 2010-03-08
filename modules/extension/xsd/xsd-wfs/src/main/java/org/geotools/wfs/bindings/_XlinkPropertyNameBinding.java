@@ -75,6 +75,8 @@ import org.w3c.dom.Text;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/_XlinkPropertyNameBinding.java $
  */
 public class _XlinkPropertyNameBinding extends AbstractComplexEMFBinding {
     public _XlinkPropertyNameBinding(WfsFactory factory) {

@@ -42,7 +42,7 @@ import org.geotools.util.UnsupportedImplementationException;
  * Abstract coordinate reference system, usually defined by a coordinate system and a datum.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/crs/AbstractCRS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/crs/AbstractCRS.java $
  * @version $Id: AbstractCRS.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

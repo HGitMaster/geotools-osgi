@@ -17,26 +17,24 @@
 package org.geotools.coverage.processing;
 
 import java.awt.RenderingHints;
-import java.util.Map;
-import javax.media.jai.BorderExtender;
+
 import javax.media.jai.Interpolation;
 import javax.media.jai.KernelJAI;
 
+import org.geotools.coverage.processing.operation.Resample;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.processing.OperationNotFoundException;
+import org.opengis.geometry.Envelope;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.geometry.Envelope;
-
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.coverage.processing.operation.Resample;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -49,8 +47,8 @@ import org.geotools.coverage.processing.operation.Resample;
  * selected by users in some widget), use the {@linkplain AbstractProcessor processor} directly.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/Operations.java $
- * @version $Id: Operations.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/Operations.java $
+ * @version $Id: Operations.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *
  * @see org.geotools.coverage.processing.operation
@@ -76,7 +74,7 @@ public class Operations {
      */
     public Operations(final RenderingHints hints) {
         if (hints != null && !hints.isEmpty()) {
-            processor = new BufferedProcessor(hints);
+            processor = new DefaultProcessor(hints);
         }
         // Otherwise, will creates the processor only when first needed.
     }
@@ -318,25 +316,6 @@ public class Operations {
         return (GridCoverage) doOperation("Interpolate", source, "Type", types);
     }
 
-    /**
-     * Recolors a coverage to the specified colormaps.
-     *
-     * @param source    The source coverage.
-     * @param colorMaps The color maps to apply.
-     * @throws CoverageProcessingException if the operation can't be applied.
-     *
-     * @see org.geotools.coverage.processing.operation.Recolor
-     *
-     * @since 2.3
-     *
-     * @deprecated Parameter of type {@link Map} is deprecated. Please use the parameter of
-     *             type {@link ColorMap} instead.
-     */
-    public GridCoverage recolor(final GridCoverage source, final Map[] colorMaps)
-            throws CoverageProcessingException
-    {
-        return (GridCoverage) doOperation("Recolor", source, "ColorMaps", colorMaps);
-    }
 
     /**
      * Recolors a coverage to the specified color maps.
@@ -518,90 +497,11 @@ public class Operations {
                 "Interpolation", interpolation);
     }
 
-    /**
-     * Translates and resizes an image.
-     *
-     * @todo The two last arguments can also be provided as hints at {@link #Operations(Hints)}
-     *       construction time. Investigate which way should be encouraged.
-     *
-     * @param source   The source coverage.
-     * @param xScale   The scale factor along the <var>x</var> axis.
-     * @param yScale   The scale factor along the <var>y</var> axis.
-     * @param xTrans   The translation along the <var>x</var> axis.
-     * @param yTrans   The translation along the <var>x</var> axis.
-     * @param interpolation The interpolation to use, or {@code null} for the default.
-     * @param extender The border extender, or {@code null} for the default.
-     * @throws CoverageProcessingException if the operation can't be applied.
-     *
-     * @see org.geotools.coverage.processing.operation.Scale
-     * @deprecated Replaced by {@link #scale(GridCoverage,double,double,double,double,
-     *             Interpolation}.
-     * @since 2.3
-     */
-    public GridCoverage scale(final GridCoverage source,
-                              final double xScale, final double yScale,
-                              final double xTrans, final double yTrans,
-                              final Interpolation interpolation,
-                              final BorderExtender extender)
-            throws CoverageProcessingException
-    {
-        return (GridCoverage) doOperation("Scale", source,
-                                          "xScale", Float.valueOf((float) xScale),
-                                          "yScale", Float.valueOf((float) yScale),
-                                          "xTrans", Float.valueOf((float) xTrans),
-                                          "yTrans", Float.valueOf((float) yTrans),
-                                          "Interpolation", interpolation);
-    }
-
-
-
-
     /////////////////////////////////////////////////////////////////////////////////
     ////////                                                                 ////////
     ////////                F I L T E R   O P E R A T I O N S                ////////
     ////////                                                                 ////////
     /////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @deprecated Renamed as {@link #subsampleAverage subsampleAverage} (lower case "s").
-     *
-     * @since 2.3
-     */
-    public GridCoverage SubsampleAverage(final GridCoverage source,
-                                         final double scaleX, final double scaleY,
-                                         final Interpolation interpolation,
-                                         final BorderExtender be)
-            throws CoverageProcessingException
-    {
-        return subsampleAverage(source, scaleX, scaleY, interpolation, be);
-    }
-
-    /**
-     * Subsamples an image by averaging over a moving window
-     *
-     * @todo The two last arguments can also be provided as hints at {@link #Operations(Hints)}
-     *       construction time. Investigate which way should be encouraged.
-     *
-     * @param source   The source coverage.
-     * @param scaleX   The scale factor along the <var>x</var> axis.
-     * @param scaleY   The scale factor along the <var>y</var> axis.
-     * @param interpolation The interpolation to use, or {@code null} for the default.
-     * @param be The border extender, or {@code null} for the default.
-     * @throws CoverageProcessingException if the operation can't be applied.
-     *
-     * @see org.geotools.coverage.processing.operation.SubsampleAverage
-     * @deprecated use {@link #subsampleAverage(GridCoverage, double, double)} instead.
-     * @since 2.3
-     */
-    public GridCoverage subsampleAverage(final GridCoverage   source,
-                                         final double         scaleX,
-                                         final double         scaleY,
-                                         final Interpolation  interpolation,
-                                         final BorderExtender be)
-            throws CoverageProcessingException
-    {
-        return subsampleAverage(source, scaleX, scaleY);
-    }
 
     /**
      * Subsamples an image by averaging over a moving window
@@ -692,36 +592,6 @@ public class Operations {
                 "scaleY",            Integer.valueOf(scaleY),
                 "qsFilterArray",     qsFilter,
                 "Interpolation",     interpolation);
-    }
-
-    /**
-     * Subsamples an image by integral factors.
-     *
-     * @todo The two last arguments can also be provided as hints at {@link #Operations(Hints)}
-     *       construction time. Investigate which way should be encouraged.
-     *
-     * @param source   The source coverage.
-     * @param scaleX   The scale factor along the <var>x</var> axis. The default value is 2.
-     * @param scaleY   The scale factor along the <var>y</var> axis. The default value is 2.
-     * @param qsFilter The filter. Default to a quadrant symmetric filter generated from a
-     *                 Gaussian kernel
-     * @param interpolation The interpolation to use, or {@code null} for the default.
-     * @param be The border extender, or {@code null} for the default.
-     * @throws CoverageProcessingException if the operation can't be applied.
-     *
-     * @see org.geotools.coverage.processing.operation.FilteredSubsample
-     * @deprecated use {@link #filteredSubsample(GridCoverage, int, int, float[], Interpolation)}
-     * @since 2.3
-     */
-    public GridCoverage filteredSubsample(final GridCoverage   source,
-                                          final int            scaleX,
-                                          final int            scaleY,
-                                          final float[]        qsFilter,
-                                          final Interpolation  interpolation,
-                                          final BorderExtender be)
-            throws CoverageProcessingException
-    {
-        return filteredSubsample(source, scaleX, scaleY, qsFilter, interpolation);
     }
 
     /**

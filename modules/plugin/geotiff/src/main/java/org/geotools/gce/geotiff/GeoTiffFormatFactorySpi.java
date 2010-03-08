@@ -35,11 +35,12 @@
 package org.geotools.gce.geotiff;
 
 // Geotools dependencies
+import java.awt.RenderingHints;
 import java.util.Collections;
 import java.util.Map;
 
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
-import org.opengis.coverage.grid.Format;
 
 /**
  * The <CODE>GeoTiffFormatFactorySpi</CODE> should never be instantiated
@@ -77,7 +78,7 @@ public final class GeoTiffFormatFactorySpi implements GridFormatFactorySpi {
 	 * @throws UnsupportedOperationException
 	 *             if this format is unavailable.
 	 */
-	public Format createFormat() {
+	public AbstractGridFormat createFormat() {
 		if (!isAvailable()) {
 			throw new UnsupportedOperationException(
 					"The GeoTiff plugin requires the JAI and JAI ImageI/O libraries!");
@@ -108,12 +109,12 @@ public final class GeoTiffFormatFactorySpi implements GridFormatFactorySpi {
 	}
 
 	/**
-	 * Returns the implementation hints. The default implementation returns en
+	 * Returns the implementation hints. The default implementation returns an
 	 * empty map.
 	 * 
 	 * @return Empty Map.
 	 */
-	public Map getImplementationHints() {
-		return Collections.EMPTY_MAP;
+	public Map<RenderingHints.Key, ?>  getImplementationHints() {
+		return Collections.emptyMap();
 	}
 }

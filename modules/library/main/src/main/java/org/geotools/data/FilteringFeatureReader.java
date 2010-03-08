@@ -42,7 +42,7 @@ import org.opengis.filter.Filter;
  * </p>
  *
  * @author Chris Holmes
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/FilteringFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FilteringFeatureReader.java $
  * @version $Id: FilteringFeatureReader.java 31406 2008-09-05 02:11:38Z jdeolive $
  */
 public class FilteringFeatureReader<T extends FeatureType, F extends Feature> implements DelegatingFeatureReader<T,F> {

@@ -100,7 +100,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
             File tmp, 
             boolean memorymapped) throws IOException, MalformedURLException {
         IndexedShapefileDataStore s;
-        s = new IndexedShapefileDataStore(tmp.toURL(),
+        s = new IndexedShapefileDataStore(tmp.toURI().toURL(),
                 memorymapped, true);
 
         s.createSchema(type);
@@ -110,7 +110,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
         store.addFeatures(one);
         store.addFeatures(one);
 
-        s = new IndexedShapefileDataStore(tmp.toURL());
+        s = new IndexedShapefileDataStore(tmp.toURI().toURL());
         assertEquals(one.size() * 2, store.getCount(Query.ALL));
     }
 
@@ -132,7 +132,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
             throws IOException, MalformedURLException, Exception {
         IndexedShapefileDataStore s;
         String typeName;
-        s = (IndexedShapefileDataStore) new IndexedShapefileDataStore(tmp.toURL(),
+        s = (IndexedShapefileDataStore) new IndexedShapefileDataStore(tmp.toURI().toURL(),
                 memorymapped, true);
 
         s.createSchema(type);
@@ -141,7 +141,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
                 .getTypeName());
         store.addFeatures(one);
 
-        s = new IndexedShapefileDataStore(tmp.toURL());
+        s = new IndexedShapefileDataStore(tmp.toURI().toURL());
         typeName = s.getTypeNames()[0];
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> two = s.getFeatureSource(typeName).getFeatures();

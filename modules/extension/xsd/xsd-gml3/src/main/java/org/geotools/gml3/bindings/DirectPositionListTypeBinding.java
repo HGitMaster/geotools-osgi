@@ -62,6 +62,8 @@ import org.w3c.dom.Element;
  * </p>
  * 
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/DirectPositionListTypeBinding.java $
  */
 public class DirectPositionListTypeBinding extends AbstractComplexBinding {
 

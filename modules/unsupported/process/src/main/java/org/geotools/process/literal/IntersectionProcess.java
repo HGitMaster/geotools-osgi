@@ -16,15 +16,9 @@
  */
 package org.geotools.process.literal;
 
-import java.util.HashMap;
-import java.util.Map;
 
-import org.geotools.process.Process;
 import org.geotools.process.ProcessFactory;
 import org.geotools.process.impl.SimpleProcess;
-import org.geotools.text.Text;
-import org.geotools.util.NullProgressListener;
-import org.opengis.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Geometry;
 

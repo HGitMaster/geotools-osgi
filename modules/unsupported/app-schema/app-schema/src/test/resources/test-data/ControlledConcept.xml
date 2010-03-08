@@ -40,7 +40,7 @@
 				may be absolute URL's. Imports and includes at the schemas will be
 				followed as long as they're relative paths.
 			-->
-			<schemaUri>commonSchemas_new/GeoSciML/vocabulary.xsd</schemaUri>
+			<schemaUri>http://schemas.opengis.net/GeoSciML/geosciml.xsd </schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>
@@ -57,7 +57,7 @@
 					<isMultiple>true</isMultiple>
 				</AttributeMapping>
 				<AttributeMapping>
-					<targetAttribute>gml:name[2]</targetAttribute>
+					<targetAttribute>FEATURE_LINK</targetAttribute>
 					<sourceExpression>
 						<OCQL>COMPOSITION_ID</OCQL>
 					</sourceExpression>

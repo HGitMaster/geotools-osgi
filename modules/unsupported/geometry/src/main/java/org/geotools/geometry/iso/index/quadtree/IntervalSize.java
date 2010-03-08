@@ -24,6 +24,8 @@ package org.geotools.geometry.iso.index.quadtree;
  * subdivide an interval to fail, by computing a midpoint value which does not
  * lie strictly between the endpoints.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/IntervalSize.java $
  * @version 1.7.2
  */
 public class IntervalSize {

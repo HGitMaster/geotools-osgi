@@ -67,6 +67,8 @@ import org.w3c.dom.Element;
  * </pre>
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wps/src/main/java/org/geotools/wps/bindings/LanguagesBinding.java $
  */
 public class LanguagesBinding extends AbstractComplexBinding {
 

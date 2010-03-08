@@ -23,8 +23,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.geotools.factory.FactoryFinder;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
@@ -34,6 +32,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * Test case to watch this thing turn over.
  * 
  * @author Jody, gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/test/java/org/geotools/process/literal/ProcessTest.java $
  */
 public class ProcessTest extends TestCase {
 

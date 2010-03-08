@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.geotools.data.DataStore;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -68,7 +68,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *this off to the lite renderer as normal.
  *
  * @author  jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/UserLayerImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/UserLayerImpl.java $
  */
 public class UserLayerImpl extends StyledLayerImpl implements UserLayer {
 
@@ -80,9 +80,9 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer {
     private DataStore inlineFeatureDatastore = null;
     private SimpleFeatureType inlineFeatureType = null;
     RemoteOWS remoteOWS;
-    List styles = new ArrayList<Style>();
-    FeatureTypeConstraint[] constraints = new FeatureTypeConstraint[0];
-
+    List<Style> styles = new ArrayList<Style>();
+    List<FeatureTypeConstraint> constraints = new ArrayList<FeatureTypeConstraint>();
+    
     public RemoteOWS getRemoteOWS() {
         return remoteOWS;
     }
@@ -107,15 +107,21 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer {
     {
     	this.remoteOWS = service;
     }
-    
-    public FeatureTypeConstraint[] getLayerFeatureConstraints(){
+    public List<FeatureTypeConstraint> layerFeatureConstraints() {
     	return constraints;
     }
-    
-    public void setLayerFeatureConstraints(FeatureTypeConstraint[] constraints){
-    	this.constraints = constraints;
+    public FeatureTypeConstraint[] getLayerFeatureConstraints(){
+    	return constraints.toArray(new FeatureTypeConstraint[0]);
     }
     
+    public void setLayerFeatureConstraints(FeatureTypeConstraint[] array){
+    	this.constraints.clear();
+    	this.constraints.addAll( Arrays.asList(array));
+    }
+    
+    public List<Style> userStyles() {
+    	return styles;
+    }
     public Style[] getUserStyles(){
        return (Style[])styles.toArray(new Style[0]);
     }
@@ -144,15 +150,8 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer {
             if (!(Utilities.equals(inlineFeatureDatastore, other.inlineFeatureDatastore) && Utilities.equals(inlineFeatureType, other.inlineFeatureType) && Utilities.equals(remoteOWS, other.remoteOWS) && Utilities.equals(styles, other.styles))) {
                 return false;
             }
-
-            final int length = constraints.length;
-            if (length != other.constraints.length) {
-                return false;
-            }
-            for (int i = 0; i < length; i++) {
-                if (!Utilities.equals(constraints[i], other.constraints[i])) {
-                    return false;
-                }
+            if (!Utilities.equals(constraints, other.constraints)){
+            	return false;
             }
             return true;
         }

@@ -66,7 +66,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * Eclipse. Port is incomplete. Fix it if you care about it.
  * 
  * @author Rob Atkinson
- * @version $Id: TimeSeriesStressTest.java 32935 2009-05-04 04:35:04Z bencaradocdavies $
+ * @version $Id: TimeSeriesStressTest.java 33235 2009-06-08 03:16:11Z ang05a $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas
  *         /community-schema-ds/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
@@ -140,7 +140,7 @@ public class TimeSeriesStressTest extends OnlineTestCase {
             schemaLocation = new URL(location);
         }
         assertNotNull(location, schemaLocation);
-        reader.parse(schemaLocation);
+        reader.parse(schemaLocation, null);
     }
 
     private Name name(String ns, String localName) {

@@ -35,7 +35,7 @@ import org.opengis.filter.expression.Expression;
  * 
  * @author Cory Horner, Refractions Research Inc.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/visitor/StandardDeviationVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/StandardDeviationVisitor.java $
  */
 public class StandardDeviationVisitor implements FeatureCalc {
 	private Expression expr;

@@ -20,15 +20,18 @@
 package org.geotools.data.shapefile.dbf;
 
 import java.io.IOException;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.geotools.data.shapefile.FileReader;
 import org.geotools.data.shapefile.ShpFileType;
@@ -61,25 +64,25 @@ import org.geotools.resources.NIOUtilities;
  * 
  * </PRE></CODE>
  * 
- * @author Ian Schneider
+ * @author Ian Schneider, Andrea Aaime
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/dbf/DbaseFileReader.java $
  */
 public class DbaseFileReader implements FileReader {
 
     public final class Row {
-        public Object read(int column) throws IOException {
-            int offset = getOffset(column);
+        public Object read(final int column) throws IOException {
+            final int offset = fieldOffsets[column];
             return readObject(offset, column);
         }
 
         public String toString() {
-            StringBuffer ret = new StringBuffer("DBF Row - ");
+            final StringBuffer ret = new StringBuffer("DBF Row - ");
             for (int i = 0; i < header.getNumFields(); i++) {
                 ret.append(header.getFieldName(i)).append(": \"");
                 try {
                     ret.append(this.read(i));
-                } catch (IOException ioe) {
+                } catch (final IOException ioe) {
                     ret.append(ioe.getMessage());
                 }
                 ret.append("\" ");
@@ -94,15 +97,13 @@ public class DbaseFileReader implements FileReader {
 
     ReadableByteChannel channel;
 
-    CharBuffer charBuffer;
-
-    Charset charset;
-
-    CharsetDecoder decoder;
+    byte[] bytes;
 
     char[] fieldTypes;
 
     int[] fieldLengths;
+    
+    int[] fieldOffsets;
 
     int cnt = 1;
 
@@ -113,10 +114,18 @@ public class DbaseFileReader implements FileReader {
     protected boolean randomAccessEnabled;
 
     protected int currentOffset = 0;
-    private StreamLogging streamLogger = new StreamLogging("Dbase File Reader");
+    private final StreamLogging streamLogger = new StreamLogging("Dbase File Reader");
 
     private Charset stringCharset;
 
+    private boolean oneBytePerChar;
+
+    private Calendar calendar = 
+        Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.US);
+
+    private final long MILLISECS_PER_DAY = 24*60*60*1000;
+
+    
     /**
      * Creates a new instance of DBaseFileReader
      * 
@@ -125,21 +134,20 @@ public class DbaseFileReader implements FileReader {
      * @throws IOException
      *                 If an error occurs while initializing.
      */
-    public DbaseFileReader(ShpFiles shapefileFiles,
-            boolean useMemoryMappedBuffer, Charset charset) throws IOException {
-        ReadableByteChannel dbfChannel = shapefileFiles.getReadChannel(ShpFileType.DBF, this);
+    public DbaseFileReader(final ShpFiles shapefileFiles,
+            final boolean useMemoryMappedBuffer, final Charset charset) throws IOException {
+        final ReadableByteChannel dbfChannel = shapefileFiles.getReadChannel(ShpFileType.DBF, this);
         init(dbfChannel, useMemoryMappedBuffer, charset);
     }
 
-    public DbaseFileReader(ReadableByteChannel readChannel, boolean useMemoryMappedBuffer, Charset charset) throws IOException {
+    public DbaseFileReader(final ReadableByteChannel readChannel, final boolean useMemoryMappedBuffer, final Charset charset) throws IOException {
         init(readChannel, useMemoryMappedBuffer, charset);
     }
 
-    private void init(ReadableByteChannel dbfChannel, boolean useMemoryMappedBuffer,
-            Charset charset) throws IOException {
+    private void init(final ReadableByteChannel dbfChannel, final boolean useMemoryMappedBuffer,
+            final Charset charset) throws IOException {
         this.channel = dbfChannel;
         this.stringCharset = charset;
-        this.charset = Charset.forName("ISO-8859-1"); // charset;
 
         this.useMemoryMappedBuffer = useMemoryMappedBuffer;
         this.randomAccessEnabled = (channel instanceof FileChannel);
@@ -150,7 +158,7 @@ public class DbaseFileReader implements FileReader {
         // create the ByteBuffer
         // if we have a FileChannel, lets map it
         if (channel instanceof FileChannel && this.useMemoryMappedBuffer) {
-            FileChannel fc = (FileChannel) channel;
+            final FileChannel fc = (FileChannel) channel;
             buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             buffer.position((int) fc.position());
             this.currentOffset = 0;
@@ -176,18 +184,24 @@ public class DbaseFileReader implements FileReader {
         // Set up some buffers and lookups for efficiency
         fieldTypes = new char[header.getNumFields()];
         fieldLengths = new int[header.getNumFields()];
+        fieldOffsets = new int[header.getNumFields()];
         for (int i = 0, ii = header.getNumFields(); i < ii; i++) {
             fieldTypes[i] = header.getFieldType(i);
             fieldLengths[i] = header.getFieldLength(i);
+            if(i > 0)
+                fieldOffsets[i] = fieldOffsets[i -1] + header.getFieldLength(i - 1);
         }
+        bytes = new byte[header.getRecordLength() - 1];
         
-        charBuffer = CharBuffer.allocate(header.getRecordLength() - 1);
-        decoder = charset.newDecoder();
+
+        // check if we working with a latin-1 char Charset
+        final String cname = stringCharset.name();
+        oneBytePerChar = "ISO-8869-1".equals(cname) || "US-ASCII".equals(cname);
         
         row = new Row();
     }
 
-    protected int fill(ByteBuffer buffer, ReadableByteChannel channel)
+    protected int fill(final ByteBuffer buffer, final ReadableByteChannel channel)
             throws IOException {
         int r = buffer.remaining();
         // channel reads return -1 when EOF or other error
@@ -213,14 +227,6 @@ public class DbaseFileReader implements FileReader {
             fill(buffer, channel);
             buffer.position(0);
         }
-    }
-
-    private int getOffset(int column) {
-        int offset = 0;
-        for (int i = 0, ii = column; i < ii; i++) {
-            offset += fieldLengths[i];
-        }
-        return offset;
     }
 
     /**
@@ -250,8 +256,7 @@ public class DbaseFileReader implements FileReader {
 
         buffer = null;
         channel = null;
-        charBuffer = null;
-        decoder = null;
+        bytes= null;
         header = null;
         row = null;
     }
@@ -294,7 +299,7 @@ public class DbaseFileReader implements FileReader {
             bufferCheck();
 
             // read the deleted flag
-            char tempDeleted = (char) buffer.get();
+            final char tempDeleted = (char) buffer.get();
 
             // skip the next bytes
             buffer.position(buffer.position() + header.getRecordLength() - 1); // the
@@ -311,6 +316,7 @@ public class DbaseFileReader implements FileReader {
                 foundRecord = true;
             }
         }
+        cnt++;
     }
 
     /**
@@ -324,7 +330,7 @@ public class DbaseFileReader implements FileReader {
      *                 If an error occurs.
      * @return The same array passed in.
      */
-    public Object[] readEntry(Object[] entry, final int offset)
+    public Object[] readEntry(final Object[] entry, final int offset)
             throws IOException {
         if (entry.length - offset < header.getNumFields()) {
             throw new ArrayIndexOutOfBoundsException();
@@ -335,10 +341,8 @@ public class DbaseFileReader implements FileReader {
         // retrieve the record length
         final int numFields = header.getNumFields();
 
-        int fieldOffset = 0;
         for (int j = 0; j < numFields; j++) {
-            entry[j + offset] = readObject(fieldOffset, j);
-            fieldOffset += fieldLengths[j];
+            entry[j + offset] = readObject(fieldOffsets[j], j);
         }
 
         return entry;
@@ -352,20 +356,15 @@ public class DbaseFileReader implements FileReader {
      *                 If an error occurs.
      * @return The value of the field
      */
-    public Object readField(int fieldNum)
+    public Object readField(final int fieldNum)
             throws IOException {
-        // retrieve the record length
-        int fieldOffset = 0;
-        for (int j = 0; j < fieldNum; j++) {
-            fieldOffset += fieldLengths[j];
-        }
-        return readObject(fieldOffset, fieldNum);
+        return readObject(fieldOffsets[fieldNum], fieldNum);
     }
 
     /**
      * Transfer, by bytes, the next record to the writer.
      */
-    public void transferTo(DbaseFileWriter writer) throws IOException {
+    public void transferTo(final DbaseFileWriter writer) throws IOException {
         bufferCheck();
         buffer.limit(buffer.position() + header.getRecordLength());
         writer.channel.write(buffer);
@@ -386,16 +385,14 @@ public class DbaseFileReader implements FileReader {
             bufferCheck();
 
             // read the deleted flag
-            char deleted = (char) buffer.get();
+            final char deleted = (char) buffer.get();
             if (deleted == '*') {
                 continue;
             }
 
-            charBuffer.position(0);
             buffer.limit(buffer.position() + header.getRecordLength() - 1);
-            decoder.decode(buffer, charBuffer, true);
+            buffer.get(bytes); // SK: There is a side-effect here!!!
             buffer.limit(buffer.capacity());
-            charBuffer.flip();
 
             foundRecord = true;
         }
@@ -412,10 +409,9 @@ public class DbaseFileReader implements FileReader {
      *                 If an error occurs.
      * @return The same array passed in.
      */
-    public Object[] readEntry(Object[] entry) throws IOException {
+    public Object[] readEntry(final Object[] entry) throws IOException {
         return readEntry(entry, 0);
     }
-
     private Object readObject(final int fieldOffset, final int fieldNum)
             throws IOException {
         final char type = fieldTypes[fieldNum];
@@ -431,7 +427,8 @@ public class DbaseFileReader implements FileReader {
             // (L)logical (T,t,F,f,Y,y,N,n)
             case 'l':
             case 'L':
-                switch (charBuffer.charAt(fieldOffset)) {
+                final char c = (char) bytes[fieldOffset];
+                switch (c) {
 
                 case 't':
                 case 'T':
@@ -448,114 +445,98 @@ public class DbaseFileReader implements FileReader {
                 default:
 
                     throw new IOException("Unknown logical value : '"
-                            + charBuffer.charAt(fieldOffset) + "'");
+                            + c + "'");
                 }
                 break;
             // (C)character (String)
             case 'c':
             case 'C':
-                // oh, this seems like a lot of work to parse strings...but,
-                // For some reason if zero characters ( (int) char == 0 ) are
-                // allowed
-                // in these strings, they do not compare correctly later on down
-                // the
-                // line....
-                int start = fieldOffset;
-                int end = fieldOffset + fieldLen - 1;
-                charBuffer.limit(charBuffer.capacity());
-                // trim off whitespace and 'zero' chars
-                while (start < end) {
-                    char c = charBuffer.get(start);
-                    if (c == 0 || Character.isWhitespace(c)) {
-                        start++;
-                    } else
-                        break;
+                // remember we need to skip trailing and leading spaces
+                if(oneBytePerChar) {
+                    object = fastParse(bytes, fieldOffset, fieldLen).trim();
+                } else {
+                    object = new String(bytes, fieldOffset, fieldLen, stringCharset.name()).trim();
                 }
-                while (end > start) {
-                    char c = charBuffer.get(end);
-                    if (c == 0 || Character.isWhitespace(c)) {
-                        end--;
-                    } else
-                        break;
-                }
-                // set up the new indexes for start and end
-                charBuffer.position(start).limit(end + 1);
-                String s = charBuffer.toString();
-                charBuffer.clear();
-                object = s;
                 break;
             // (D)date (Date)
             case 'd':
             case 'D':
                 try {
-                    String tempString = charBuffer.subSequence(fieldOffset,
-                            fieldOffset + 4).toString();
-                    int tempYear = Integer.parseInt(tempString);
-                    tempString = charBuffer.subSequence(fieldOffset + 4,
-                            fieldOffset + 6).toString();
-                    int tempMonth = Integer.parseInt(tempString) - 1;
-                    tempString = charBuffer.subSequence(fieldOffset + 6,
-                            fieldOffset + 8).toString();
-                    int tempDay = Integer.parseInt(tempString);
-                    Calendar cal = Calendar.getInstance();
+                    String tempString = fastParse(bytes,fieldOffset,4); 
+                    final int tempYear = Integer.parseInt(tempString);
+                    tempString =  fastParse(bytes,fieldOffset + 4,2);
+                    final int tempMonth = Integer.parseInt(tempString) - 1;
+                    tempString = fastParse(bytes,fieldOffset + 6,2); 
+                    final int tempDay = Integer.parseInt(tempString);
+                    final Calendar cal = Calendar.getInstance(Locale.US);
                     cal.clear();
                     cal.set(Calendar.YEAR, tempYear);
                     cal.set(Calendar.MONTH, tempMonth);
                     cal.set(Calendar.DAY_OF_MONTH, tempDay);
                     object = cal.getTime();
-                } catch (NumberFormatException nfe) {
+                } catch (final NumberFormatException nfe) {
                     // todo: use progresslistener, this isn't a grave error.
                 }
                 break;
+            // (@) Timestamp (Date)
+            case '@':
+                try {      
+                    //TODO: Find a smarter way to do this. 
+                    //timestampBytes = bytes[fieldOffset:fieldOffset+7]
+                    byte[] timestampBytes = {
+                        // Time in millis, after reverse.
+                        bytes[fieldOffset+7], bytes[fieldOffset+6], bytes[fieldOffset+5], bytes[fieldOffset+4],
+                        // Days, after reverse.
+                        bytes[fieldOffset+3], bytes[fieldOffset+2], bytes[fieldOffset+1], bytes[fieldOffset]                    
+                    };
+                       
+                    ByteArrayInputStream i_bytes = new ByteArrayInputStream(timestampBytes);
+                    DataInputStream i_stream = new DataInputStream(new BufferedInputStream(i_bytes));
 
-            // (F)floating (Double)
+                    int time = i_stream.readInt();
+                    int days = i_stream.readInt();
+                              
+                    calendar.setTimeInMillis(days * MILLISECS_PER_DAY + DbaseFileHeader.MILLIS_SINCE_4713 + time);
+
+                    object = calendar.getTime();
+
+                } catch (final NumberFormatException nfe) {
+                   // todo: use progresslistener, this isn't a grave error.
+                }
+                break;                
+            // (N)umeric (Integer, Long or Fallthrough to Double)
             case 'n':
             case 'N':
-                try {
-                    final Class clazz = header.getFieldClass(fieldNum);
-                    final String number = extractNumberString(charBuffer,
-                            fieldOffset, fieldLen);
+                final String string = fastParse(bytes,fieldOffset,fieldLen);
+                    Class clazz = header.getFieldClass(fieldNum);
                     if (clazz == Integer.class) {
-                        object = new Integer(number);
-                        break;
-                    } else if (clazz == Long.class) {
-                        object = new Long(number);
-                        break;
+                        try {
+                            object = Integer.parseInt(string);
+                            break;
+                        } catch (NumberFormatException e) {
+                            // try to parse as long... 
+                            clazz = Long.class; 
+                        }
+                    } 
+                    if (clazz == Long.class) {
+                        try {
+                            object = Long.parseLong(string);
+                            break;
+                        } catch (final NumberFormatException e2) {
+                            // fall through to the floating point number
+                        }
                     }
                     // else will fall through to the floating point number
-                } catch (NumberFormatException e) {
 
-                    // todo: use progresslistener, this isn't a grave error.
-
-                    // don't do this!!! the Double parse will be attemted as we
-                    // fall
-                    // through, so no need to create a new Object. -IanS
-                    // object = new Integer(0);
-
-                    // Lets try parsing a long instead...
-                    try {
-                        object = new Long(extractNumberString(charBuffer,
-                                fieldOffset, fieldLen));
-                        break;
-                    } catch (NumberFormatException e2) {
-
-                    }
-                }
-
+            // (F)loating point number
             case 'f':
-            case 'F': // floating point number
+            case 'F': 
                 try {
 
-                    object = new Double(extractNumberString(charBuffer,
-                            fieldOffset, fieldLen));
-                } catch (NumberFormatException e) {
-                    // todo: use progresslistener, this isn't a grave error,
-                    // though it
-                    // does indicate something is wrong
-
-                    // okay, now whatever we got was truly undigestable. Lets go
-                    // with
-                    // a zero Double.
+                        object = Double.parseDouble(fastParse(bytes,fieldOffset,fieldLen));
+                } catch (final NumberFormatException e) {
+                    // okay, now whatever we got was truly indigestible. Lets go
+                    // with a zero Double.
                     object = new Double(0.0);
                 }
                 break;
@@ -566,22 +547,27 @@ public class DbaseFileReader implements FileReader {
         }
         return object;
     }
-
+    
     /**
-     * @param charBuffer2
-     *                TODO
-     * @param fieldOffset
+     * Performs a faster byte[] to String conversion under the assumption the content
+     * is represented with one byte per char 
      * @param fieldLen
+     * @param fieldOffset
+     * @return
      */
-    private final String extractNumberString(final CharBuffer charBuffer2,
-            final int fieldOffset, final int fieldLen) {
-        String thing = charBuffer2.subSequence(fieldOffset,
-                fieldOffset + fieldLen).toString().trim();
-        return thing;
+    String fastParse(final byte[] bytes, final int fieldOffset, final int fieldLen) {
+        // faster reading path, the decoder is for some reason slower,
+        // probably because it has to make extra checks to support multibyte chars
+        final char[] chars = new char[fieldLen]; 
+        for (int i = 0; i < fieldLen; i++) {
+            // force the byte to a positive integer interpretation before casting to char
+            chars[i] = ((char) (0x00FF & bytes[fieldOffset+i]));
+        }
+        return new String(chars);
     }
 
-    public static void main(String[] args) throws Exception {
-        DbaseFileReader reader = new DbaseFileReader(new ShpFiles(args[0]),
+    public static void main(final String[] args) throws Exception {
+        final DbaseFileReader reader = new DbaseFileReader(new ShpFiles(args[0]),
                 false, Charset.forName("ISO-8859-1"));
         System.out.println(reader.getHeader());
         int r = 0;

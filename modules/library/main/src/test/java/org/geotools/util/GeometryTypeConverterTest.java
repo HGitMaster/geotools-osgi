@@ -24,6 +24,8 @@ import junit.framework.TestCase;
  * Test suite for the GeometryTypeConverterFactory Converters.
  * 
  * @author Mauro Bartolomeoli
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/util/GeometryTypeConverterTest.java $
  */
 public class GeometryTypeConverterTest extends TestCase {
 	Set<ConverterFactory> factories=null;

@@ -39,6 +39,8 @@ import org.jdom.Element;
  * @author Simone Giannecchini, GeoSolutions
  * @since 2.3
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/adapters/GeoTiffIIOMetadataEncoder.java $
  */
 public final class GeoTiffIIOMetadataEncoder {
 
@@ -296,7 +298,7 @@ public final class GeoTiffIIOMetadataEncoder {
 
 		final int numKeyEntries = numGeoTiffEntries;
 		geoTiffEntries.add(new Integer(keyID), new GeoKeyEntry(keyID, tag,
-				offset, count));
+				count, offset));
 		getGeoKeyEntryAt(0).setCount(numKeyEntries);
 		numGeoTiffEntries++;
 	}

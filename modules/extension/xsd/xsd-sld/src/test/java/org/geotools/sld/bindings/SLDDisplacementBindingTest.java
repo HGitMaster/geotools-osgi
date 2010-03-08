@@ -16,6 +16,7 @@
  */
 package org.geotools.sld.bindings;
 
+import org.geotools.filter.Filters;
 import org.geotools.styling.Displacement;
 
 
@@ -28,7 +29,7 @@ public class SLDDisplacementBindingTest extends SLDTestSupport {
         SLDMockData.displacement(document, document);
 
         Displacement d = (Displacement) parse();
-        assertEquals(org.geotools.styling.SLD.intValue(d.getDisplacementX()), 1);
-        assertEquals(org.geotools.styling.SLD.intValue(d.getDisplacementY()), 2);
+        assertEquals(Filters.asInt(d.getDisplacementX()), 1);
+        assertEquals(Filters.asInt(d.getDisplacementY()), 2);
     }
 }

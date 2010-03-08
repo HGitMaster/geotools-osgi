@@ -106,7 +106,9 @@ import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
  * 
  * @author Amr Alam, Refractions Research
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBC2DataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBC2DataStore.java $
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public abstract class JDBC2DataStore extends JDBC1DataStore {
 

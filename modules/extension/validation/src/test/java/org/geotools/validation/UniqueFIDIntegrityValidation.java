@@ -42,7 +42,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @author bowens, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/test/java/org/geotools/validation/UniqueFIDIntegrityValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/UniqueFIDIntegrityValidation.java $
  * @version $Id: UniqueFIDIntegrityValidation.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class UniqueFIDIntegrityValidation implements IntegrityValidation {

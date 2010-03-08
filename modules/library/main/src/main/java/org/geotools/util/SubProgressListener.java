@@ -32,6 +32,8 @@ package org.geotools.util;
  * </code></pre>
  * 
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/util/SubProgressListener.java $
  */
 public class SubProgressListener extends DelegateProgressListener {
     /** Initial starting value */

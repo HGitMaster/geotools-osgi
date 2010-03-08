@@ -28,7 +28,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/visitor/CountVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/CountVisitor.java $
  */
 public class CountVisitor implements FeatureCalc {
     int count = 0;

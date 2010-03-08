@@ -59,6 +59,8 @@ import org.xml.sax.InputSource;
  * notes:
  * - spaces must be replaced by "_" in description
  * - "No_description" is the default
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/xml/GeometryConformanceTestCases.java $
  */
 public class GeometryConformanceTestCases extends TestCase {
 
@@ -198,7 +200,7 @@ public class GeometryConformanceTestCases extends TestCase {
 		
 		if( isAllExcluded(excludes) ) return;
 
-		InputStream inputStream = file.toURL().openStream();
+		InputStream inputStream = file.toURI().toURL().openStream();
 		InputSource inputSource = new InputSource(inputStream);
         GeometryTestContainer container = parser.parseTestDefinition(inputSource);
         container.checkTestOverrides(name, excludes);                      
@@ -224,7 +226,7 @@ public class GeometryConformanceTestCases extends TestCase {
             File excludesFile = new File(excludesPath);
             if (excludesFile.exists()) {
                 Properties excludes = new Properties();
-                InputStream inputStream = excludesFile.toURL().openStream();
+                InputStream inputStream = excludesFile.toURI().toURL().openStream();
                 excludes.load(inputStream);
                 return excludes;
             }

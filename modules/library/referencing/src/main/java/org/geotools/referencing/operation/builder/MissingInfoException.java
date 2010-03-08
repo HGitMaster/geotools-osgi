@@ -21,7 +21,7 @@ import org.opengis.referencing.FactoryException;
  * Thrown when a required operation can't be performed because some information is missing or isn't set up properly.
  * 
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/MissingInfoException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/MissingInfoException.java $
  * @version $Id: MissingInfoException.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Jan Jezek
  *

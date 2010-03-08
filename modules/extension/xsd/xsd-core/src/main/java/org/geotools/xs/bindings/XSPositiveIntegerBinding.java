@@ -43,6 +43,8 @@ import org.geotools.xs.XS;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/bindings/XSPositiveIntegerBinding.java $
  */
 public class XSPositiveIntegerBinding implements SimpleBinding {
     /**
@@ -89,7 +91,7 @@ public class XSPositiveIntegerBinding implements SimpleBinding {
         throws Exception {
         Number number = (Number) value;
 
-        if (number.intValue() < 1) {
+        if (number.longValue() < 1) {
             throw new IllegalArgumentException("positiveInteger value '" + number
                 + "' must be positive.");
         }
@@ -106,7 +108,7 @@ public class XSPositiveIntegerBinding implements SimpleBinding {
     public String encode(Object object, String value) throws Exception {
         Number number = (Number) object;
 
-        if (number.intValue() == 0) {
+        if (number.longValue() == 0) {
             throw new IllegalArgumentException("positiveInteger value '" + number
                 + "' must be positive.");
         }

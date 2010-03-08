@@ -24,6 +24,8 @@ import org.geotools.gui.swing.map.map2d.stream.event.MapEvent;
  * Map2DListener used to listen to Map2D events
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/listener/MapListener.java $
  */
 public interface MapListener extends EventListener{
 

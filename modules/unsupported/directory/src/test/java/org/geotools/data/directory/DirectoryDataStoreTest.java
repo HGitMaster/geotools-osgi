@@ -12,13 +12,19 @@ import java.util.List;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.property.PropertyDataStore;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.junit.Test;
+import org.opengis.feature.simple.SimpleFeatureType;
+
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * This one checks proper wrapping and some api methods.
  * For a test of proper listing and updates see the DataStoreCache test
  * @author Andrea Aime - OpenGeo
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/directory/src/test/java/org/geotools/data/directory/DirectoryDataStoreTest.java $
  */
 public class DirectoryDataStoreTest extends TestSupport {
     
@@ -66,5 +72,30 @@ public class DirectoryDataStoreTest extends TestSupport {
         assertSame(dds, fs.getDataStore());
     }
 
+    @Test
+    public void testCreateSchema() throws Exception {
+        File dir = File.createTempFile("foo", "shp", new File("target"));
+        dir.delete();
+        dir.mkdir();
+        
+        DataStore ds = new DirectoryDataStore(dir, NSURI);
+        assertEquals(0, ds.getTypeNames().length);
+        
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName("foo");
+        tb.add("geom", Polygon.class);
+        tb.add("bar", Integer.class);
+        ds.createSchema(tb.buildFeatureType());
+        
+        SimpleFeatureType ft = ds.getSchema("foo");
+        assertNotNull(ft);
+        
+        //clean up
+        ds.dispose();
+        for (File f : dir.listFiles()) {
+            f.delete();
+        }
+        dir.delete();
+    }
     
 }

@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.util.Utilities;
-
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.style.StyleVisitor;
@@ -33,25 +32,34 @@ import org.opengis.util.Cloneable;
  *
  * @author Ian Turton, CCG
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/LinePlacementImpl.java $
- * @version $Id: LinePlacementImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/LinePlacementImpl.java $
+ * @version $Id: LinePlacementImpl.java 33813 2009-08-28 14:45:11Z jive $
  */
 public class LinePlacementImpl implements LinePlacement, Cloneable {
     /** The logger for the default core module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
-    private Expression perpendicularOffset = null;
     
-    private final boolean generalized;
-    private final boolean aligned;
-    private final boolean repeated;
-    private final Expression gap;
-    private final Expression initialGap;
+    private Expression perpendicularOffset;    
+    private boolean generalized;
+    private boolean aligned;
+    private boolean repeated;
+    private Expression gap;
+    private Expression initialGap;
 
     public LinePlacementImpl() {
         this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
     }
 
+    public LinePlacementImpl(org.opengis.style.LinePlacement placement) {
+        this.gap = placement.getGap();
+        this.initialGap = placement.getInitialGap();
+        this.generalized = placement.isGeneralizeLine();
+        this.perpendicularOffset = placement.getPerpendicularOffset();
+        this.repeated = placement.isRepeated();
+        this.aligned = placement.IsAligned();
+    }
+    
     public LinePlacementImpl(FilterFactory factory) {
         this(factory,false,false,false, null,null);
     }
@@ -97,7 +105,6 @@ public class LinePlacementImpl implements LinePlacement, Cloneable {
      *
      * @param perpendicularOffset New value of property perpendicularOffset.
      */
-    @Deprecated
     public void setPerpendicularOffset(Expression perpendicularOffset) {
         this.perpendicularOffset = perpendicularOffset;
     }
@@ -118,6 +125,10 @@ public class LinePlacementImpl implements LinePlacement, Cloneable {
         return aligned;
     }
 
+    public boolean isAligned() {
+        return aligned;
+    }
+    
     public boolean isGeneralizeLine() {
         return generalized;
     }
@@ -190,6 +201,37 @@ public class LinePlacementImpl implements LinePlacement, Cloneable {
         return result;
     }
 
+    static LinePlacementImpl cast(org.opengis.style.LabelPlacement placement) {
+        if( placement == null ){
+            return null;
+        }
+        else if (placement instanceof LinePlacementImpl){
+            return (LinePlacementImpl) placement;
+        }
+        else if (placement instanceof LinePlacement){
+            LinePlacementImpl copy = new LinePlacementImpl( (LinePlacement)placement );
+            return copy;
+        }
+        return null;
+    }
 
-    
+    public void setRepeated(boolean repeated) {
+        this.repeated = repeated;
+    }
+
+    public void setGeneralized(boolean generalized) {
+        this.generalized = generalized;
+    }
+
+    public void setAligned(boolean aligned) {
+        this.aligned = aligned;
+    }
+
+    public void setGap(Expression gap) {
+        this.gap = gap;
+    }
+
+    public void setInitialGap(Expression initialGap) {
+        this.initialGap = initialGap;
+    }   
 }

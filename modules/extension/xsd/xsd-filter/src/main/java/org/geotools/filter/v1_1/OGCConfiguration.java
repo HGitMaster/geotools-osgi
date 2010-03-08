@@ -83,6 +83,8 @@ import org.geotools.xml.Configuration;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_1/OGCConfiguration.java $
  */
 public class OGCConfiguration extends Configuration {
     /**

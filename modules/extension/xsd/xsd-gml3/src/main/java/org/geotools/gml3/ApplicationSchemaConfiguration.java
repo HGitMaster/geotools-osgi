@@ -35,7 +35,9 @@ import org.geotools.xs.XSConfiguration;
  *
  * @author Justin Deoliveira, The Open Planning Project
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ApplicationSchemaConfiguration.java 30665 2008-06-12 22:48:07Z acuster $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/ApplicationSchemaConfiguration.java $
+ * @version $Id: ApplicationSchemaConfiguration.java 34128 2009-10-12 07:08:50Z mbedward $
  * @since 2.4
  */
 public class ApplicationSchemaConfiguration extends Configuration {

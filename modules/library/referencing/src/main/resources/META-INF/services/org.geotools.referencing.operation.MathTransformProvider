@@ -12,9 +12,11 @@ org.geotools.referencing.operation.transform.MolodenskiTransform$ProviderAbridge
 org.geotools.referencing.operation.transform.NADCONTransform$Provider
 org.geotools.referencing.operation.transform.WarpTransform2D$Provider
 org.geotools.referencing.operation.projection.EquidistantCylindrical$Provider
+org.geotools.referencing.operation.projection.EquidistantCylindrical$SphericalProvider
 org.geotools.referencing.operation.projection.PlateCarree$Provider
 org.geotools.referencing.operation.projection.Mercator1SP$Provider
 org.geotools.referencing.operation.projection.Mercator2SP$Provider
+org.geotools.referencing.operation.projection.MercatorPseudoProvider
 org.geotools.referencing.operation.projection.TransverseMercator$Provider
 org.geotools.referencing.operation.projection.TransverseMercator$Provider_SouthOrientated
 org.geotools.referencing.operation.projection.ObliqueMercator$Provider
@@ -25,7 +27,6 @@ org.geotools.referencing.operation.projection.AlbersEqualArea$Provider
 org.geotools.referencing.operation.projection.LambertConformal1SP$Provider
 org.geotools.referencing.operation.projection.LambertConformal2SP$Provider
 org.geotools.referencing.operation.projection.LambertConformalBelgium$Provider
-org.geotools.referencing.operation.projection.LambertConformalESRI$Provider
 org.geotools.referencing.operation.projection.LambertAzimuthalEqualArea$Provider
 org.geotools.referencing.operation.projection.Orthographic$Provider
 org.geotools.referencing.operation.projection.Stereographic$Provider
@@ -36,3 +37,6 @@ org.geotools.referencing.operation.projection.PolarStereographic$ProviderNorth
 org.geotools.referencing.operation.projection.PolarStereographic$ProviderSouth
 org.geotools.referencing.operation.projection.NewZealandMapGrid$Provider
 org.geotools.referencing.operation.projection.Krovak$Provider
+org.geotools.referencing.operation.projection.CassiniSoldner$Provider
+org.geotools.referencing.operation.projection.EquidistantConic$Provider
+org.geotools.referencing.operation.projection.Polyconic$Provider

@@ -38,6 +38,8 @@ import org.opengis.geometry.primitive.CurveInterpolation;
  * with the obvious savings of storage space.
  * 
  * @author Jackson Roehrig & Sanjay Jena
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/LineStringImpl.java $
  */
 public class LineStringImpl extends CurveSegmentImpl implements LineString {
     private static final long serialVersionUID = -4463400288452707656L;

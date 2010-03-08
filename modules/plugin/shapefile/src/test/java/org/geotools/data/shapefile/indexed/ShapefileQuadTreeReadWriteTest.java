@@ -39,6 +39,8 @@ import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.index.CloseableCollection;
+import org.geotools.index.Data;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory2;
@@ -51,7 +53,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/indexed/ShapefileQuadTreeReadWriteTest.java $
- * @version $Id: ShapefileQuadTreeReadWriteTest.java 30670 2008-06-12 23:59:23Z acuster $
+ * @version $Id: ShapefileQuadTreeReadWriteTest.java 33694 2009-08-06 13:23:57Z aaime $
  * @author Ian Schneider
  */
 public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
@@ -92,6 +94,17 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         fail.initCause(cause);
         throw fail;
     }
+    
+    public void testReadOutside() throws Exception {
+        File f = copyShapefiles("shapes/statepop.shp");
+        ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
+        IndexedShapefileDataStore ds = (IndexedShapefileDataStore) createDataStore(fac, 
+        		f.toURI().toURL(), true);
+        CloseableCollection<Data> coll = ds.queryQuadTree(new Envelope(-62, 23, -61, 22));
+        assertNotNull(coll);
+        assertTrue(coll.isEmpty());
+        coll.close();
+    }
 
     public void testWriteTwice() throws Exception {
         copyShapefiles("shapes/stream.shp");
@@ -121,7 +134,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
             ShapefileDataStoreFactory maker, boolean memorymapped ) throws IOException,
             MalformedURLException {
         DataStore s;
-        s = createDataStore(maker, tmp.toURL(), memorymapped);
+        s = createDataStore(maker, tmp.toURI().toURL(), memorymapped);
 
         s.createSchema(type);
         FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) s.getFeatureSource(type.getTypeName());
@@ -129,14 +142,14 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         store.addFeatures(one);
         store.addFeatures(one);
 
-        s = createDataStore(maker, tmp.toURL(), true);
+        s = createDataStore(maker, tmp.toURI().toURL(), true);
         assertEquals(one.size() * 2, store.getCount(Query.ALL));
     }
 
     void test( String f ) throws Exception {
         File file = copyShapefiles(f); // Work on File rather than URL from
         // JAR.
-        DataStore s = createDataStore(new ShapefileDataStoreFactory(), file.toURL(), true);
+        DataStore s = createDataStore(new ShapefileDataStoreFactory(), file.toURI().toURL(), true);
         String typeName = s.getTypeNames()[0];
         FeatureSource<SimpleFeatureType, SimpleFeature> source = s.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
@@ -152,7 +165,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
             MalformedURLException, Exception {
         DataStore s;
         String typeName;
-        s = createDataStore(maker, tmp.toURL(), memorymapped);
+        s = createDataStore(maker, tmp.toURI().toURL(), memorymapped);
 
         s.createSchema(type);
 
@@ -160,7 +173,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
 
         store.addFeatures(one);
 
-        s = createDataStore(new ShapefileDataStoreFactory(), tmp.toURL(), true);
+        s = createDataStore(new ShapefileDataStoreFactory(), tmp.toURI().toURL(), true);
         typeName = s.getTypeNames()[0];
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> two = s.getFeatureSource(typeName).getFeatures();
@@ -221,7 +234,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 
         Map params = new HashMap();
-        params.put(ShapefileDataStoreFactory.URLP.key, file.toURL());
+        params.put(ShapefileDataStoreFactory.URLP.key, file.toURI().toURL());
         params.put(ShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, new Boolean(true));
         IndexedShapefileDataStore ds = (IndexedShapefileDataStore) fac.createDataStore(params);
 

@@ -42,6 +42,8 @@ import org.opengis.filter.identity.Identifier;
  * were represented as an change event with no known bounds.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/BatchFeatureEvent.java $
  */
 public class BatchFeatureEvent extends FeatureEvent {
     private static final long serialVersionUID = 3154238322369916486L;
@@ -61,7 +63,7 @@ public class BatchFeatureEvent extends FeatureEvent {
      * by the client to track selection.
      */
     @SuppressWarnings("unchecked")
-	protected WeakHashSet<Identifier> fids;
+	protected WeakHashSet<Identifier> fids = new WeakHashSet<Identifier>(Identifier.class);
 
     /**
      * Used to change this into a COMMIT or ROLLBACK if needed.
@@ -132,6 +134,7 @@ public class BatchFeatureEvent extends FeatureEvent {
             }
         }
     }
+    
     /**
      * This is the set of Identifiers that have been created
      * over the course of this operation.
@@ -143,7 +146,7 @@ public class BatchFeatureEvent extends FeatureEvent {
      * @return Set of Identifiers created during this commit
      */
     @SuppressWarnings("unchecked")
-    public WeakHashSet<Identifier> getCreatedFeatureIds(){
+    public WeakHashSet<Identifier> getCreatedFeatureIds() {
     	return fids;
     }
 }

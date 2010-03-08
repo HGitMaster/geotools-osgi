@@ -19,9 +19,25 @@ package org.geotools.filter.function;
 
 /**
  * Classifies into ranges of minimum and maximum values.
+ * <p>
+ * The buckets are defined such that:<br>
+ * min <= x < max
+ * </p>
+ * <p>
+ * So if you provide the following min/max values:<br>
+ * min = {3, 6, 9}<br>
+ * max = {4, 10, 30}<br>
+ * </p>
+ * <p>
+ * The classify function will classify items based on:<br>
+ * 3 <= x < 4<br>
+ * 6 <= x < 10<br>
+ * 9 <= x <= 30<br>
  * 
  * @author Cory Horner, Refractions Research
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/RangedClassifier.java $
  */
 public final class RangedClassifier extends Classifier {
 

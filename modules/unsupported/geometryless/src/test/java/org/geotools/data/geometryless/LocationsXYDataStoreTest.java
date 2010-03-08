@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author Rob Atkinson
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/geometryless/src/test/java/org/geotools/data/geometryless/LocationsXYDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/test/java/org/geotools/data/geometryless/LocationsXYDataStoreTest.java $
  */
 public class LocationsXYDataStoreTest extends TestCase {
     /** The logger for the filter module. */

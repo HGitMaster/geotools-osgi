@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/test/java/org/geotools/filter/SQLEncoderOracleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/test/java/org/geotools/filter/SQLEncoderOracleTest.java $
  * @version $Id: SQLEncoderOracleTest.java 31131 2008-08-05 09:33:13Z aaime $ Last Modified: $Date: 2003/11/26 22:57:45 $
  */
 public class SQLEncoderOracleTest extends TestCase {

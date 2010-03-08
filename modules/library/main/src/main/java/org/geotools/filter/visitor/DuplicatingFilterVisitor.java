@@ -71,6 +71,8 @@ import org.opengis.filter.spatial.Within;
  * </ul>
  * @author Jesse
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/DuplicatingFilterVisitor.java $
  */
 public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisitor {
 

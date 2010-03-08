@@ -18,10 +18,13 @@ package org.geotools.resources.image;
 
 import java.awt.Color;
 import java.awt.color.ColorSpace;
-import java.awt.image.DataBuffer;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.util.Arrays;
+
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -34,8 +37,8 @@ import java.util.Arrays;
  * It may change in incompatible way in any future version.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/resources/image/ColorUtilities.java $
- * @version $Id: ColorUtilities.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/resources/image/ColorUtilities.java $
+ * @version $Id: ColorUtilities.java 34937 2010-02-22 12:30:31Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini
  */
@@ -282,22 +285,22 @@ public final class ColorUtilities {
      * Reference: http://www.brucelindbloom.com/index.html?ColorDifferenceCalc.html
      */
     public static float colorDistance(final float[] lab1, final float[] lab2) {
-        if (false) {
-            // Compute distance using CIE94 formula.
-            // NOTE: this formula sometime fails because of negative
-            //       value in the first Math.sqrt(...) expression.
-            final double dL = (double)lab1[0] - lab2[0];
-            final double da = (double)lab1[1] - lab2[1];
-            final double db = (double)lab1[2] - lab2[2];
-            final double C1 = Math.hypot(lab1[1], lab1[2]);
-            final double C2 = Math.hypot(lab2[1], lab2[2]);
-            final double dC = C1 - C2;
-            final double dH = Math.sqrt(da*da + db*db - dC*dC);
-            final double sL = dL / 2;
-            final double sC = dC / (1 + 0.048*C1);
-            final double sH = dH / (1 + 0.014*C1);
-            return (float)Math.sqrt(sL*sL + sC*sC + sH*sH);
-        } else {
+//        if (false) {
+//            // Compute distance using CIE94 formula.
+//            // NOTE: this formula sometime fails because of negative
+//            //       value in the first Math.sqrt(...) expression.
+//            final double dL = (double)lab1[0] - lab2[0];
+//            final double da = (double)lab1[1] - lab2[1];
+//            final double db = (double)lab1[2] - lab2[2];
+//            final double C1 = Math.hypot(lab1[1], lab1[2]);
+//            final double C2 = Math.hypot(lab2[1], lab2[2]);
+//            final double dC = C1 - C2;
+//            final double dH = Math.sqrt(da*da + db*db - dC*dC);
+//            final double sL = dL / 2;
+//            final double sC = dC / (1 + 0.048*C1);
+//            final double sH = dH / (1 + 0.014*C1);
+//            return (float)Math.sqrt(sL*sL + sC*sC + sH*sH);
+//        } else {
             // Compute distance using delta E formula.
             double sum = 0;
             for (int i=Math.min(lab1.length, lab2.length); --i>=0;) {
@@ -305,7 +308,7 @@ public final class ColorUtilities {
                 sum += delta*delta;
             }
             return (float)Math.sqrt(sum);
-        }
+//        }
     }
 
     /**
@@ -443,7 +446,7 @@ public final class ColorUtilities {
      */
 	public static double getMinimum(int dataType) {
 		switch (dataType) {
-		case DataBuffer.TYPE_BYTE:
+		case DataBuffer.TYPE_BYTE:case DataBuffer.TYPE_USHORT:
 			return 0;
 		case DataBuffer.TYPE_SHORT:
 			return Short.MIN_VALUE;
@@ -453,14 +456,69 @@ public final class ColorUtilities {
 			return Long.MIN_VALUE;
 		case DataBuffer.TYPE_FLOAT:
 			return -Float.MAX_VALUE;
-
 		default:
-			//@todo
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,"DataType unknown:",dataType));
 
 		}
 	}
 	
+	/**
+     * Returns a suitable threshold depending on the {@link DataBuffer} type.
+     * 
+     * <p>
+     * Remember that the threshold works with >=.
+     * 
+     * @param dataType
+     *            to create a low threshold for.
+     * @return a minimum threshold value suitable for this data type.
+     */
+    public static double getThreshold(int dataType) {
+        switch (dataType) {
+        case DataBuffer.TYPE_BYTE:
+        case DataBuffer.TYPE_USHORT:
+            // this may cause problems and truncations when the native mosaic
+            // operations is enabled
+            return 0.0;
+        case DataBuffer.TYPE_INT:
+            return Integer.MIN_VALUE;
+        case DataBuffer.TYPE_SHORT:
+            return Short.MIN_VALUE;
+        case DataBuffer.TYPE_DOUBLE:
+            return -Double.MAX_VALUE;
+        case DataBuffer.TYPE_FLOAT:
+            return -Float.MAX_VALUE;
+        }
+        return 0;
+    }
+    
+    /**
+     * Looks for the specified color in the color model
+     * @param bgColor The color to be searched
+     * @param icm The color model to be searched into
+     * @return The index of the color in the color model, or -1 if not found
+     */
+    public static int findColorIndex(Color bgColor, IndexColorModel icm) {
+    	if(bgColor== null)
+    		throw new NullPointerException((Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"bgColor")));
+    	if(icm== null)
+    		throw new NullPointerException((Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"icm")));    		
+    		
+        final int r = bgColor.getRed();
+        final int g = bgColor.getGreen();
+        final int b = bgColor.getBlue();
+        final int a = bgColor.getAlpha();
+        final int size = icm.getMapSize();
+        
+        for(int i = 0; i < size; i++) {
+            if(r == icm.getRed(i) &&
+               g == icm.getGreen(i) &&
+               b == icm.getBlue(i) &&
+               (a == icm.getAlpha(i) || !icm.hasAlpha()))
+                return i;
+        }
+        return -1;
+    }
+    
     /**
      * Provide the maximum allowe value for a certain data type.
      * @param dataType the data type to suggest a maximum value for.
@@ -472,6 +530,8 @@ public final class ColorUtilities {
 			return 255;
 		case DataBuffer.TYPE_SHORT:
 			return Short.MAX_VALUE;
+		case DataBuffer.TYPE_USHORT:
+ 			return 65535;			
 		case DataBuffer.TYPE_INT:
 			return Integer.MAX_VALUE;
 		case DataBuffer.TYPE_DOUBLE:
@@ -480,8 +540,7 @@ public final class ColorUtilities {
 			return Float.MAX_VALUE;
 
 		default:
-			//@todo
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,"DataType unknown:",dataType));
 
 		}
 	}

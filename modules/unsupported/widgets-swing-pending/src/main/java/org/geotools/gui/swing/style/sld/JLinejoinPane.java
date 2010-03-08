@@ -26,6 +26,8 @@ import org.opengis.filter.expression.Expression;
  * Line join panel
  * 
  * @author  Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/style/sld/JLinejoinPane.java $
  */
 public class JLinejoinPane extends javax.swing.JPanel {
     

@@ -27,7 +27,7 @@ import org.geotools.resources.Arguments;
 /**
  * A writer that put line number in front of every line.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/io/NumberedLineWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/io/NumberedLineWriter.java $
  * @version $Id: NumberedLineWriter.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

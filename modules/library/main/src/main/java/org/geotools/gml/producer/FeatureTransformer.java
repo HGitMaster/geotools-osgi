@@ -90,8 +90,8 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/gml/producer/FeatureTransformer.java $
- * @version $Id: FeatureTransformer.java 32242 2009-01-16 18:40:59Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/producer/FeatureTransformer.java $
+ * @version $Id: FeatureTransformer.java 33604 2009-07-21 13:11:26Z aaime $
  *
  * @todo Add support for schemaLocation
  */
@@ -841,7 +841,8 @@ public class FeatureTransformer extends TransformerBase {
 
                 contentHandler.startElement("", "", name, fidAtts);
 
-                if (featureBounding) {
+                // encode the bounds if requested and the bounds are not missing or empty
+                if (featureBounding && f.getBounds() != null && !f.getBounds().isEmpty()) {
                     //HACK pt.2 see line 511, if the cite stuff wanted to hack
                     //in a boundedBy geometry, we don't want to do it twice.
                     //So if 

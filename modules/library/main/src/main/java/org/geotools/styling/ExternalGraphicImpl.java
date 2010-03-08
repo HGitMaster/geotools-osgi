@@ -18,15 +18,18 @@ package org.geotools.styling;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.Icon;
+
 import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.style.ColorReplacement;
+import org.opengis.style.GraphicalSymbol;
 import org.opengis.style.StyleVisitor;
 import org.opengis.util.Cloneable;
 
@@ -35,21 +38,22 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/ExternalGraphicImpl.java $
- * @version $Id: ExternalGraphicImpl.java 32784 2009-04-13 10:50:27Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/ExternalGraphicImpl.java $
+ * @version $Id: ExternalGraphicImpl.java 33813 2009-08-28 14:45:11Z jive $
  */
 public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
     /** The logger for the default core module. */
     //private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
-    private final Icon inlineContent;
-    private final Collection<ColorReplacement> replacements;
-    private final OnLineResource online;
+    private Icon inlineContent;
+    private OnLineResource online;
     
     
     private URL location = null;
     private String format = null;
     private String uri = null;
     private Map<String,Object> customProps = null;
+    
+    private final Set<ColorReplacement> colorReplacements;
 
     public ExternalGraphicImpl(){
         this(null,null,null);
@@ -58,9 +62,9 @@ public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
     public ExternalGraphicImpl(Icon icon,Collection<ColorReplacement> replaces, OnLineResource source){
         this.inlineContent = icon;
         if(replaces == null){
-            replacements = new ArrayList<ColorReplacement>();
+            colorReplacements = new TreeSet<ColorReplacement>();
         }else{
-            replacements = new ArrayList<ColorReplacement>(replaces);
+            colorReplacements = new TreeSet<ColorReplacement>(replaces);
         }       
         this.online = source;        
     }
@@ -82,13 +86,12 @@ public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
     }
 
     /**
-     * Provides the URL for where the external graphic resouce can be located.
+     * Provides the URL for where the external graphic resource can be located.
      *
      * @return The URL of the ExternalGraphic
      *
-     * @throws MalformedURLException DOCUMENT ME!
+     * @throws MalformedURLException If unable to represent external graphic as a URL
      */
-    @Deprecated
     public java.net.URL getLocation() throws MalformedURLException {
         if (location == null) {
             location = new URL(uri);
@@ -102,7 +105,6 @@ public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
      *
      * @param format New value of property Format.
      */
-    @Deprecated
     public void setFormat(java.lang.String format) {
         this.format = format;
     }
@@ -112,7 +114,6 @@ public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
      *
      * @param location New value of property location.
      */
-    @Deprecated
     public void setLocation(java.net.URL location) {
         this.uri = location.toString();
         this.location = location;
@@ -209,13 +210,45 @@ public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
     public OnLineResource getOnlineResource() {
         return online;
     }
+    
+    public void setOnlineResource(OnLineResource online) {
+        this.online = online;
+    }
 
     public Icon getInlineContent() {
         return inlineContent;
     }
+    
+    public void setInlineContent(Icon inlineContent) {
+        this.inlineContent = inlineContent;
+    }
 
     public Collection<ColorReplacement> getColorReplacements() {
-        return Collections.unmodifiableCollection(replacements);
+        return Collections.unmodifiableCollection( colorReplacements );
+    }
+    
+    public Set<ColorReplacement> colorReplacements() {
+        return this.colorReplacements;
+    }
+
+    static GraphicalSymbol cast(GraphicalSymbol item) {
+        if( item == null ){
+            return null;
+        }
+        else if (item instanceof ExternalGraphicImpl){
+            return (ExternalGraphicImpl) item;
+        }
+        else if (item instanceof org.opengis.style.ExternalGraphic){
+            org.opengis.style.ExternalGraphic graphic = (org.opengis.style.ExternalGraphic) item;
+            ExternalGraphicImpl copy = new ExternalGraphicImpl();
+            copy.colorReplacements().addAll( graphic.getColorReplacements() );
+            copy.setFormat( graphic.getFormat() );
+            copy.setInlineContent( graphic.getInlineContent() );
+            copy.setOnlineResource( graphic.getOnlineResource() );
+
+            return copy;
+        }
+        return null;
     }
 
 

@@ -16,14 +16,16 @@
  */
 package org.geotools.arcsde.data;
 
+import java.awt.RenderingHints;
+import java.awt.RenderingHints.Key;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
@@ -38,16 +40,33 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
+
+    /**
+     * {@link Hints#FEATURE_DETACHED} and the ones supported by
+     * {@link ArcSDEDataStore#getGeometryFactory}
+     * 
+     * @see #getSupportedHints()
+     */
+    private static final Set<Key> supportedHints = new HashSet<Key>();
+    static {
+        supportedHints.add(Hints.FEATURE_DETACHED);
+        supportedHints.add(Hints.JTS_GEOMETRY_FACTORY);
+        supportedHints.add(Hints.JTS_COORDINATE_SEQUENCE_FACTORY);
+        supportedHints.add(Hints.JTS_PRECISION_MODEL);
+        supportedHints.add(Hints.JTS_SRID);
+    };
 
     protected Transaction transaction = Transaction.AUTO_COMMIT;
 
@@ -64,20 +83,24 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
         this.dataStore = dataStore;
         this.queryCapabilities = new QueryCapabilities() {
             @Override
-            public boolean supportsSorting(SortBy[] sortAttributes) {
+            public boolean supportsSorting(final SortBy[] sortAttributes) {
                 final SimpleFeatureType featureType = typeInfo.getFeatureType();
-                for (int i = 0; i < sortAttributes.length; i++) {
-                    SortBy sortBy = sortAttributes[i];
-                    if (SortBy.NATURAL_ORDER == sortBy) {
+                for (SortBy sortBy : sortAttributes) {
+                    if (SortBy.NATURAL_ORDER == sortBy || SortBy.REVERSE_ORDER == sortBy) {
                         // TODO: we should be able to support natural order
                         return false;
-                    }
-                    String attName = sortBy.getPropertyName().getPropertyName();
-                    if (featureType.getDescriptor(attName) == null) {
-                        return false;
+                    } else {
+                        String attName = sortBy.getPropertyName().getPropertyName();
+                        AttributeDescriptor descriptor = featureType.getDescriptor(attName);
+                        if (descriptor == null) {
+                            return false;
+                        }
+                        if (descriptor instanceof GeometryDescriptor) {
+                            return false;
+                        }
                     }
                 }
-                return false;
+                return true;
             }
         };
     }
@@ -220,7 +243,6 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      * </p>
      * 
      * @return
-     * @throws IOException
      */
     protected final ISession getSession() throws IOException {
         return dataStore.getSession(transaction);
@@ -282,13 +304,30 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     }
 
     /**
-     * ArcSDE features are always "detached", so we return the FEATURE_DETACHED hint here.
+     * ArcSDE features are always "detached", so we return the FEATURE_DETACHED hint here, as well
+     * as the JTS related ones.
+     * <p>
+     * The JTS related hints supported are:
+     * <ul>
+     * <li>JTS_GEOMETRY_FACTORY
+     * <li>JTS_COORDINATE_SEQUENCE_FACTORY
+     * <li>JTS_PRECISION_MODEL
+     * <li>JTS_SRID
+     * </ul>
+     * Note, however, that if a {@link GeometryFactory} is provided through the {@code
+     * JTS_GEOMETRY_FACTORY} hint, that very factory is used and takes precedence over all the other
+     * ones.
+     * </p>
      * 
-     * @return singleton with {@link Hints#FEATURE_DETACHED}
      * @see FeatureSource#getSupportedHints()
+     * @see Hints#FEATURE_DETACHED
+     * @see Hints#JTS_GEOMETRY_FACTORY
+     * @see Hints#JTS_COORDINATE_SEQUENCE_FACTORY
+     * @see Hints#JTS_PRECISION_MODEL
+     * @see Hints#JTS_SRID
      */
-    public final Set getSupportedHints() {
-        return Collections.singleton(Hints.FEATURE_DETACHED);
+    public final Set<RenderingHints.Key> getSupportedHints() {
+        return supportedHints;
     }
 
     public ArcSdeVersionHandler getVersionHandler() throws IOException {

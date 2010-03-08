@@ -24,7 +24,7 @@ import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/TempFeatureResults.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/TempFeatureResults.java $
  */
 final class TempFeatureResults implements ValidationResults {
 	Validation trial;

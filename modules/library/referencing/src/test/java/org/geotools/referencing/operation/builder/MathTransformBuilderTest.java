@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
 /**
  * A test for the MathTransformBuilders.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/operation/builder/MathTransformBuilderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/builder/MathTransformBuilderTest.java $
  * @version $Id: MathTransformBuilderTest.java 31014 2008-07-15 09:14:09Z jezekjan $
  * @author Jan Jezek
  * @author Adrian Custer

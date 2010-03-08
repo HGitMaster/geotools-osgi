@@ -56,6 +56,8 @@ import com.vividsolutions.jts.geom.Point;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLPointPropertyTypeBinding.java $
  */
 public class GMLPointPropertyTypeBinding extends AbstractComplexBinding {
     /**

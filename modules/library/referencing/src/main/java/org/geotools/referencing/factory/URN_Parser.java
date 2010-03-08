@@ -36,7 +36,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * This class must be immutable in order to avoid the need for synchronization in the authority
  * factory.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/URN_Parser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/URN_Parser.java $
  * @version $Id: URN_Parser.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux
  */

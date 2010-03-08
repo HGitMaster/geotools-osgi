@@ -17,6 +17,12 @@
  */
 package org.geotools.styling;
 
+import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
+
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.PropertyName;
+
 
 
 /**
@@ -55,9 +61,87 @@ package org.geotools.styling;
  * <p></p>
  *
  * @author James Macgill, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/Symbolizer.java $
- * @version $Id: Symbolizer.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Symbolizer.java $
+ * @version $Id: Symbolizer.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public interface Symbolizer extends org.opengis.style.Symbolizer{
     void accept(org.geotools.styling.StyleVisitor visitor);
+    
+    /**
+     * Defines a measure unit for the symbolizer.
+     * This parameter is inherited from GML.
+     * Renderers shall use the unit to correctly render symbols.
+     *
+     * Recommended uom definitions are :
+     * <p>
+     * <ul>
+     *     <li>{@code metre}</li>
+     *     <li>{@code foot}</li>
+     *     <li>{@code pixel}</li>
+     * </ul>
+     * <p>
+     * @since SymbologyEncoding 1.1
+     * @param uom can be null, which indicates usage of the pixel unit. 
+     */
+    void setUnitOfMeasure(Unit<Length> uom);
+    
+    public Description getDescription();
+    
+    /**
+     * Tile and Abstract of Symbolzer.
+     * 
+     * @since SymbologyEncoding 1.1
+     * @param description
+     */
+    void setDescription(org.opengis.style.Description description);    
+    
+    /**
+     * Name of symbolizer; not always human readable.
+     * <p>
+     * Please consider getDescription().getTitle() as an alternative if
+     * presenting this symbolizer in a user interface.
+     * 
+     * @since SymbologyEncoding 1.1
+     * @param name
+     */
+    void setName( String name );    
+    
+    /**
+     * A shortcut to get the geometry property name in the case the geometry
+     * expression is a PropertyName. In case the geometry expression is null,
+     * and in the case the geometry expression is not a PropertyName, this
+     * method will return null.
+     */
+    String getGeometryPropertyName();
+
+    /**
+     * A shortcut to define the geometry expression as a {@link PropertyName}
+     * Typically, features only have one geometry so, in general, the need to
+     * select one is not required. Note: this moves a little away from the SLD
+     * spec which provides an XPath reference to a Geometry object, but does
+     * follow it in spirit.
+     */
+    void setGeometryPropertyName(String geometryPropertyName);
+    
+    /**
+     * This defines the geometry to be used for styling.<br>
+     * The property is optional and if it is absent (null) then the "default"
+     * geometry property of the feature should be used.<br>
+     * Typically, features only have one geometry so, in general, the need to
+     * select one is not required.<br>
+     * The expression can also build a new geometry out of existing attributes 
+     * or transform an existing geometry. For geometry transformations that
+     * do change the geometry locations or that make up geometries out of
+     * non geometric attributes it is advised that the Expression implements
+     * the SpatialTransformationFunction interface
+     */
+    Expression getGeometry();
+    
+    /**
+     * Sets the expression used for styling. See {@link #getGeometry()} for further
+     * details.
+     * @param geometry
+     */
+    void setGeometry(Expression geometry);
+    
 }

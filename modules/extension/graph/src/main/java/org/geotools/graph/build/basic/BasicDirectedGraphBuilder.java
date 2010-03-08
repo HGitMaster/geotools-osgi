@@ -33,7 +33,7 @@ import org.geotools.graph.structure.basic.BasicDirectedNode;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/build/basic/BasicDirectedGraphBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/build/basic/BasicDirectedGraphBuilder.java $
  */
 public class BasicDirectedGraphBuilder extends BasicGraphBuilder {
  

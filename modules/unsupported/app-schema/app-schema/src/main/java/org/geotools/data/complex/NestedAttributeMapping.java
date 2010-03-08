@@ -23,16 +23,21 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.filter.XPath.StepList;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.FilterFactoryImplNamespaceAware;
+import org.geotools.filter.NestedAttributeExpression;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * This class represents AttributeMapping for attributes that are nested inside another complex
@@ -42,6 +47,8 @@ import org.opengis.filter.expression.Expression;
  * features are also stored for caching if a filter involving these nested features is run.
  * 
  * @author Rini Angreani, Curtin University of Technology
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/NestedAttributeMapping.java $
  */
 public class NestedAttributeMapping extends AttributeMapping {
     /**
@@ -72,7 +79,7 @@ public class NestedAttributeMapping extends AttributeMapping {
     /**
      * Filter factory
      */
-    private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
+    private FilterFactory filterFac;
 
     /**
      * Sole constructor
@@ -93,10 +100,12 @@ public class NestedAttributeMapping extends AttributeMapping {
      */
     public NestedAttributeMapping(Expression idExpression, Expression parentExpression,
             StepList targetXPath, boolean isMultiValued, Map<Name, Expression> clientProperties,
-            Name sourceElement, StepList sourcePath) throws IOException {
+            Name sourceElement, StepList sourcePath, NamespaceSupport namespaces)
+            throws IOException {
         super(idExpression, parentExpression, targetXPath, null, isMultiValued, clientProperties);
         this.nestedTargetXPath = sourcePath;
         this.nestedFeatureType = sourceElement;
+        this.filterFac = new FilterFactoryImplNamespaceAware(namespaces);
     }
 
     @Override
@@ -111,11 +120,14 @@ public class NestedAttributeMapping extends AttributeMapping {
      * Get matching input features that are stored in this mapping using a supplied link value.
      * 
      * @param foreignKeyValue
+     * @param reprojection
+     *            Reprojected CRS or null
      * @return The matching input feature
      * @throws IOException
      * @throws IOException
      */
-    public Collection<Feature> getInputFeatures(Object foreignKeyValue) throws IOException {
+    public Collection<Feature> getInputFeatures(Object foreignKeyValue,
+            CoordinateReferenceSystem reprojection) throws IOException {
         ArrayList<Feature> matchingFeatures = new ArrayList<Feature>();
         if (source == null) {
             // We can't initiate this in the constructor because the feature type mapping
@@ -138,7 +150,10 @@ public class NestedAttributeMapping extends AttributeMapping {
         Filter filter = filterFac.equals(this.nestedSourceExpression, filterFac
                 .literal(foreignKeyValue));
         // get all the nested features based on the link values
-        FeatureCollection<FeatureType, Feature> fCollection = source.getFeatures(filter);
+        DefaultQuery query = new DefaultQuery();
+        query.setCoordinateSystemReproject(reprojection);
+        query.setFilter(filter);
+        FeatureCollection<FeatureType, Feature> fCollection = source.getFeatures(query);
         Iterator<Feature> it = fCollection.iterator();
 
         while (it.hasNext()) {
@@ -157,27 +172,52 @@ public class NestedAttributeMapping extends AttributeMapping {
      * Get the maching built features that are stored in this mapping using a supplied link value
      * 
      * @param foreignKeyValue
+     * @param reprojection
+     *            Reprojected CRS or null
      * @return The matching simple features
      * @throws IOException
      */
-    public Collection<Feature> getFeatures(Object foreignKeyValue) throws IOException {
+    public Collection<Feature> getFeatures(Object foreignKeyValue,
+            CoordinateReferenceSystem reprojection) throws IOException {
         if (mappingSource == null) {
             // this cannot be set in the constructor since it might not exist yet
             mappingSource = DataAccessRegistry.getFeatureSource(nestedFeatureType);
         }
         assert mappingSource != null;
+        Filter filter;
 
-        Filter filter = filterFac.equals(filterFac.property(this.nestedTargetXPath.toString()),
-                filterFac.literal(foreignKeyValue));
-        // get all the mapped nested features based on the link values
-        FeatureCollection<FeatureType, Feature> fCollection = mappingSource.getFeatures(filter);
-        Iterator<Feature> iterator = fCollection.iterator();
         ArrayList<Feature> matchingFeatures = new ArrayList<Feature>();
+        PropertyName propertyName = null;
+
+        if (!(mappingSource instanceof MappingFeatureSource)) {
+            // non app-schema source.. may not have simple feature source behind it
+            // so we need to filter straight on the complex features
+            propertyName = new NestedAttributeExpression(this.nestedTargetXPath.toString(),
+                    reprojection);
+        } else {
+            propertyName = filterFac.property(this.nestedTargetXPath.toString());
+        }
+        filter = filterFac.equals(propertyName, filterFac.literal(foreignKeyValue));
+
+        DefaultQuery query = new DefaultQuery();
+        query.setCoordinateSystemReproject(reprojection);
+        query.setFilter(filter);
+
+        // get all the mapped nested features based on the link values
+        FeatureCollection<FeatureType, Feature> fCollection = mappingSource.getFeatures(query);
+        Iterator<Feature> iterator = fCollection.iterator();
         while (iterator.hasNext()) {
             matchingFeatures.add(iterator.next());
         }
         fCollection.close(iterator);
 
         return matchingFeatures;
+    }
+
+    /**
+     * @return the nested feature type name
+     */
+    public Name getNestedFeatureType() {
+        return this.nestedFeatureType;
     }
 }

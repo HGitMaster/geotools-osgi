@@ -28,7 +28,7 @@ import java.util.Set;
  * This class serves as the implementation of the constant Transaction.NONE.
  * It is a NullObject and we feel no need to make this class public.
  * </p>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/data/AutoCommitTransaction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/AutoCommitTransaction.java $
  */
 class AutoCommitTransaction implements Transaction {
     /**

@@ -48,7 +48,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * of the column when queried with the ID from the feature table.
  *
  * @author Chris Holmes, Vision for New York
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MysqlGeomColumn.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MysqlGeomColumn.java $
  * @version $Id: MysqlGeomColumn.java 30703 2008-06-13 15:03:59Z acuster $
  */
 public class MysqlGeomColumn {

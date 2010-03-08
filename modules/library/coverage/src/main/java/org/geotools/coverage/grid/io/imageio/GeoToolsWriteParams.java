@@ -29,6 +29,8 @@ import javax.imageio.ImageWriteParam;
  * @author Simone Giannecchini
  * @since 2.3.x
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/imageio/GeoToolsWriteParams.java $
  */
 public abstract class GeoToolsWriteParams extends ImageWriteParam {
 

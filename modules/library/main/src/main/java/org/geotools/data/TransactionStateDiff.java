@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * AbstractDataStore.
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/TransactionStateDiff.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/TransactionStateDiff.java $
  */
 public class TransactionStateDiff implements State {
     /**
@@ -194,7 +194,12 @@ public class TransactionStateDiff implements State {
         	writer = store.createFeatureWriter(typeName, transaction);
         }catch (UnsupportedOperationException e) {
 			// backwards compatibility
-        	writer = store.getFeatureWriter(typeName);
+        	try {
+        		writer = store.getFeatureWriter(typeName);
+        	}
+        	catch( UnsupportedOperationException eek){
+        		throw e; // throw original - our fallback did not work
+        	}
 		}
         SimpleFeature feature;
         SimpleFeature update;

@@ -73,6 +73,8 @@ import com.vividsolutions.jts.io.WKTReader;
  *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/commons/AbstractFilterBuilder.java $
  */
 public abstract class AbstractFilterBuilder {
 
@@ -366,7 +368,7 @@ public abstract class AbstractFilterBuilder {
 
     public Literal buildLiteralInteger(final String image) {
         
-        return filterFactory.literal(Integer.parseInt(image));
+        return filterFactory.literal(Long.parseLong(image));
     }
     public Literal buildLiteralDouble(final String tokenImage) {
         

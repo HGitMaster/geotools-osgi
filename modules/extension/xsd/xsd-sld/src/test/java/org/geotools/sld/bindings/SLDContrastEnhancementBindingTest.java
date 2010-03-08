@@ -16,6 +16,7 @@
  */
 package org.geotools.sld.bindings;
 
+import org.geotools.filter.Filters;
 import org.geotools.styling.ContrastEnhancement;
 
 
@@ -32,9 +33,9 @@ public class SLDContrastEnhancementBindingTest extends SLDTestSupport {
         assertNotNull(ce);
 
         assertNotNull(ce.getGammaValue());
-        assertEquals(1.23, org.geotools.styling.SLD.doubleValue(ce.getGammaValue()), 0d);
+        assertEquals(1.23, Filters.asDouble(ce.getGammaValue()), 0d);
 
         assertNotNull(ce.getType());
-        assertEquals("Histogram", org.geotools.styling.SLD.stringValue(ce.getType()));
+        assertEquals("Histogram", Filters.asString(ce.getType()));
     }
 }

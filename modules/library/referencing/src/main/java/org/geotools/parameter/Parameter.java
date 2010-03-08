@@ -54,8 +54,8 @@ import org.geotools.util.Utilities;
  * @param <T> The value type.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/parameter/Parameter.java $
- * @version $Id: Parameter.java 31552 2008-09-18 19:57:08Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/Parameter.java $
+ * @version $Id: Parameter.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  * @author Jody Garnett (Refractions Research)
  *
@@ -78,62 +78,62 @@ public class Parameter<T> extends AbstractParameter implements ParameterValue<T>
      */
     private Unit<?> unit;
 
-    /**
-     * Constructs a parameter from the specified name and value. This convenience
-     * constructor creates a {@link DefaultParameterDescriptor} object. But if such
-     * an object was available, then the preferred way to get a {@code ParameterValue}
-     * is to invokes {@link ParameterDescriptor#createValue}.
-     *
-     * @param name  The parameter name.
-     * @param value The parameter value.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    public Parameter(final String name, final int value) {
-        this(new DefaultParameterDescriptor(name, 0, Integer.MIN_VALUE, Integer.MAX_VALUE));
-        this.value = (T) (Object) value;
-    }
-
-    /**
-     * Constructs a parameter from the specified name and value. This convenience
-     * constructor creates a {@link DefaultParameterDescriptor} object. But if such
-     * an object was available, then the preferred way to get a {@code ParameterValue} is
-     * to invokes {@link ParameterDescriptor#createValue}.
-     *
-     * @param name  The parameter name.
-     * @param value The parameter value.
-     * @param unit  The unit for the parameter value.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    public Parameter(final String name, final double value, final Unit<?> unit) {
-        this(new DefaultParameterDescriptor(name, Double.NaN, Double.NEGATIVE_INFINITY,
-                                            Double.POSITIVE_INFINITY, normalize(unit)));
-        this.value = (T) (Object) value;
-        this.unit  = unit;
-    }
-
-    /**
-     * Constructs a parameter from the specified enumeration. This convenience
-     * constructor creates a {@link DefaultParameterDescriptor} object. But if
-     * such an object was available, then the preferred way to get a {@code ParameterValue}
-     * is to invokes {@link ParameterDescriptor#createValue}.
-     *
-     * @param name  The parameter name.
-     * @param value The parameter value.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    public Parameter(final String name, final CodeList value) {
-        this(new DefaultParameterDescriptor(name, value.getClass(), (CodeList)null));
-        this.value = (T) (Object) value;
-    }
+//    /**
+//     * Constructs a parameter from the specified name and value. This convenience
+//     * constructor creates a {@link DefaultParameterDescriptor} object. But if such
+//     * an object was available, then the preferred way to get a {@code ParameterValue}
+//     * is to invokes {@link ParameterDescriptor#createValue}.
+//     *
+//     * @param name  The parameter name.
+//     * @param value The parameter value.
+//     *
+//     * @deprecated This constructor can not ensure type safety with parameterized types.
+//     *             Use the static {@code create} methods instead.
+//     */
+//    @Deprecated
+//    public Parameter(final String name, final int value) {
+//        this(DefaultParameterDescriptor.create(name, 0, Integer.MIN_VALUE, Integer.MAX_VALUE));
+//        this.value = (T) (Object) value;
+//    }
+//
+//    /**
+//     * Constructs a parameter from the specified name and value. This convenience
+//     * constructor creates a {@link DefaultParameterDescriptor} object. But if such
+//     * an object was available, then the preferred way to get a {@code ParameterValue} is
+//     * to invokes {@link ParameterDescriptor#createValue}.
+//     *
+//     * @param name  The parameter name.
+//     * @param value The parameter value.
+//     * @param unit  The unit for the parameter value.
+//     *
+//     * @deprecated This constructor can not ensure type safety with parameterized types.
+//     *             Use the static {@code create} methods instead.
+//     */
+//    @Deprecated
+//    public Parameter(final String name, final double value, final Unit<?> unit) {
+//        this(DefaultParameterDescriptor.create(name, Double.NaN, Double.NEGATIVE_INFINITY,
+//                                            Double.POSITIVE_INFINITY, normalize(unit)));
+//        this.value = (T) (Object) value;
+//        this.unit  = unit;
+//    }
+//
+//    /**
+//     * Constructs a parameter from the specified enumeration. This convenience
+//     * constructor creates a {@link DefaultParameterDescriptor} object. But if
+//     * such an object was available, then the preferred way to get a {@code ParameterValue}
+//     * is to invokes {@link ParameterDescriptor#createValue}.
+//     *
+//     * @param name  The parameter name.
+//     * @param value The parameter value.
+//     *
+//     * @deprecated This constructor can not ensure type safety with parameterized types.
+//     *             Use the static {@code create} methods instead.
+//     */
+//    @Deprecated
+//    public Parameter(final String name, final CodeList value) {
+//        this(new DefaultParameterDescriptor(name, value.getClass(), null,(CodeList)null));
+//        this.value = (T) (Object) value;
+//    }
 
     /**
      * Constructs a parameter value from the specified descriptor.
@@ -162,18 +162,6 @@ public class Parameter<T> extends AbstractParameter implements ParameterValue<T>
         super(descriptor);
         unit = descriptor.getUnit();
         setValue(value);
-    }
-
-    /**
-     * Normalize the specified unit into one of "standard" units used in projections.
-     */
-    private static Unit<?> normalize(final Unit<?> unit) {
-        if (unit != null) {
-            if (SI.METER          .isCompatible(unit)) return SI.METER;
-            if (NonSI.DAY         .isCompatible(unit)) return NonSI.DAY;
-            if (NonSI.DEGREE_ANGLE.isCompatible(unit)) return NonSI.DEGREE_ANGLE;
-        }
-        return unit;
     }
 
     /**

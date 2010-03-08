@@ -25,7 +25,6 @@ import org.geotools.feature.visitor.MaxVisitor;
 import org.geotools.feature.visitor.MinVisitor;
 import org.geotools.feature.visitor.SumVisitor;
 import org.geotools.feature.visitor.UniqueVisitor;
-import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.FunctionExpression;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Add;
@@ -110,8 +109,7 @@ public class FeatureCollectionAggregateVisitorTests extends AbstractPostgisDataT
     }
     
     public void testSumExpression() throws Exception {
-        ExpressionBuilder eb = new ExpressionBuilder();
-        FunctionExpression expr = (FunctionExpression) eb.parser("Collection_Sum(id)");
+        FunctionExpression expr = (FunctionExpression) ff.function("Collection_Sum", ff.property("id"));
         int result = ((Number) expr.evaluate(roads)).intValue();
         assertTrue(roads.isOptimized);
         assertEquals(6, result);

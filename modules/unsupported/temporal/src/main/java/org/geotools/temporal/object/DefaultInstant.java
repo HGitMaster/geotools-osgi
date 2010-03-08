@@ -16,8 +16,8 @@
  */
 package org.geotools.temporal.object;
 
-import java.util.Calendar;
 import java.util.Collection;
+
 import org.geotools.util.Utilities;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
@@ -28,6 +28,8 @@ import org.opengis.temporal.Position;
  * in space.
  * 
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultInstant.java $
  */
 public class DefaultInstant extends DefaultTemporalGeometricPrimitive implements Instant {
 
@@ -105,6 +107,26 @@ public class DefaultInstant extends DefaultTemporalGeometricPrimitive implements
         return false;
     }
 
+ //   /**
+ //     * Verify if this entry is identical to the specified object.
+ //    */
+ //   public int compareTo(Object object) {
+ //      if (object == this) {
+ //           return 0;
+ //       }
+ //       if (object instanceof DefaultInstant) {
+ //           final DefaultInstant that = (DefaultInstant) object;
+ //
+ //           if (Utilities.equals(this.position, that.position) &&
+ //                   Utilities.equals(this.begunBy, that.begunBy) &&
+ //                   Utilities.equals(this.endBy, that.endBy))
+ //               return 0;
+ //           else 
+ //               return this.position.getDate().compareTo(that.getPosition().getDate());
+ //       }
+ //       
+ //       throw new ClassCastException("Object of type " + object.getClass() + " cannot be compared to " + this.getClass());
+ //   }
     @Override
     public int hashCode() {
         int hash = 5;

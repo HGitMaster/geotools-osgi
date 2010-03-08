@@ -21,7 +21,7 @@ package org.geotools.factory;
  * Thrown when a factory can't be found or can't be instantiate.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/FactoryRegistryException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/FactoryRegistryException.java $
  * @version $Id: FactoryRegistryException.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

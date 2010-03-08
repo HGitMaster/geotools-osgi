@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  * Tests the various {@link InternationalString} implementations.
  *
  * @author Martin Desruisseaux (IRD)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/util/InternationalStringTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/InternationalStringTest.java $
  * @version $Id: InternationalStringTest.java 31148 2008-08-07 13:37:58Z desruisseaux $
  */
 public final class InternationalStringTest {

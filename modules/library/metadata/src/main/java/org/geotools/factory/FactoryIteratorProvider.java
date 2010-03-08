@@ -29,7 +29,7 @@ import java.util.Iterator;
  * the Eclipse platform for instance.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/FactoryIteratorProvider.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/FactoryIteratorProvider.java $
  * @version $Id: FactoryIteratorProvider.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  *

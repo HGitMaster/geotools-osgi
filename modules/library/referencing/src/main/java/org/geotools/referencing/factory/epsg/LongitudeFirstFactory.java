@@ -50,7 +50,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * </pre></blockquote>
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/LongitudeFirstFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/LongitudeFirstFactory.java $
  * @version $Id: LongitudeFirstFactory.java 31994 2008-12-10 16:06:18Z aaime $
  * @author Martin Desruisseaux
  *

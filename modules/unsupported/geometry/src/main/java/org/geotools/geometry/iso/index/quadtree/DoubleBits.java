@@ -26,6 +26,8 @@ package org.geotools.geometry.iso.index.quadtree;
  * The algorithms and constants in this class apply only to IEEE-754
  * double-precision floating point format.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/DoubleBits.java $
  * @version 1.7.2
  */
 public class DoubleBits {

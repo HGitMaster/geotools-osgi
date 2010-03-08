@@ -38,8 +38,8 @@ import org.opengis.referencing.operation.TransformException;
  * or target dimensions. This transformer is not thread-safe.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/geometry/jts/DefaultCoordinateSequenceTransformer.java $
- * @version $Id: DefaultCoordinateSequenceTransformer.java 30872 2008-07-04 14:23:24Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/geometry/jts/DefaultCoordinateSequenceTransformer.java $
+ * @version $Id: DefaultCoordinateSequenceTransformer.java 33341 2009-06-22 17:18:58Z aaime $
  * @author Andrea Aime
  * @author Martin Desruisseaux
  */
@@ -65,6 +65,10 @@ public class DefaultCoordinateSequenceTransformer implements CoordinateSequenceT
     public DefaultCoordinateSequenceTransformer() {
         csFactory = DefaultCoordinateSequenceFactory.instance();
     }
+    
+    public DefaultCoordinateSequenceTransformer(CoordinateSequenceFactory csFactory) {
+        this.csFactory = csFactory;
+    }
 
     /**
      * {@inheritDoc}
@@ -78,7 +82,12 @@ public class DefaultCoordinateSequenceTransformer implements CoordinateSequenceT
         final int bufferCapacity = buffer.length / Math.max(sourceDim, targetDim);
         int remainingBeforeFlush = Math.min(bufferCapacity, size);
         int ib = 0; // Index in the buffer array.
-        int it = 0; // Index in the target array.
+        int it = 0; // Index in the target sequence.
+        
+        // create a target CS so that the dimensions not contemplated in the source CS  
+        // are copied over (think Z or M with a 2d CRS)
+        int targetCSDim = targetDim + (sequence.getDimension() - sourceDim);
+		CoordinateSequence result =  csFactory.create(sequence.size(), targetCSDim);
 
         for (int i = 0; i < size; i++) {
             switch (sourceDim) {
@@ -113,33 +122,23 @@ public class DefaultCoordinateSequenceTransformer implements CoordinateSequenceT
 
                 for (int j = 0; j < n; j++) {
                     final Coordinate t;
-
-                    switch (targetDim) {
-                    default:
-                        throw new MismatchedDimensionException();
-
-                    case 3:
-                        t = new Coordinate(buffer[ib++], buffer[ib++], buffer[ib++]);
-
-                        break;
-
-                    case 2:
-                        t = new Coordinate(buffer[ib++], buffer[ib++]);
-
-                        break;
-
-                    case 1:
-                        t = new Coordinate(buffer[ib++], Double.NaN);
-
-                        break;
-
-                    case 0:
-                        t = new Coordinate(Double.NaN, Double.NaN);
-
-                        break;
+                    
+                    // copy the transformed portion
+                    int oi = 0;
+                    for (; oi < targetDim; oi++) {
+                        result.setOrdinate(it, oi, buffer[ib++]);   
                     }
-
-                    tcs[it++] = t;
+                    // copy over the non transformed portion
+                    for (; oi < targetCSDim; oi++) {
+                        result.setOrdinate(it, oi, sequence.getOrdinate(it, oi + (targetDim - sourceDim)));   
+                    }
+                    // force to NaN eventual extra ordinates the sequence has (some are fixed size, wont'
+                    // care about us trying to tell them a size). This works around a bug in the default
+                    // JTS coordinate sequence implementation
+                    for (; oi < result.getDimension(); oi++) {
+                        result.setOrdinate(it, oi, Double.NaN);   
+                    }
+                    it++;
                 }
                 assert ib == (n * targetDim);
                 ib = 0;
@@ -148,6 +147,6 @@ public class DefaultCoordinateSequenceTransformer implements CoordinateSequenceT
         }
         assert it == tcs.length : tcs.length - it;
 
-        return csFactory.create(tcs);
+        return result;
     }
 }

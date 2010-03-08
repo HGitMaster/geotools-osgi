@@ -37,7 +37,7 @@ import org.geotools.resources.i18n.Errors;
  * Default parameters for {@link NetcdfImageReader}.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio-netcdf/src/main/java/org/geotools/image/io/netcdf/NetcdfReadParam.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio-netcdf/src/main/java/org/geotools/image/io/netcdf/NetcdfReadParam.java $
  * @version $Id: NetcdfReadParam.java 30680 2008-06-13 10:22:22Z acuster $
  * @author Martin Desruisseaux
  *

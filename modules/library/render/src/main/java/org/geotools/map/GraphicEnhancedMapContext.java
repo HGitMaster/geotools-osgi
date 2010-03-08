@@ -36,7 +36,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </p>
  * 
  * @author simone giannecchini
- * @version $Id: GraphicEnhancedMapContext.java 30649 2008-06-12 19:44:08Z acuster $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/GraphicEnhancedMapContext.java $
+ * @version $Id: GraphicEnhancedMapContext.java 34126 2009-10-12 06:35:18Z mbedward $
  */
 public class GraphicEnhancedMapContext extends DefaultMapContext {
 

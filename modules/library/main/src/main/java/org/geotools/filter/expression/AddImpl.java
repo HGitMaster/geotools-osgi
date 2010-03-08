@@ -28,6 +28,8 @@ import org.opengis.filter.expression.ExpressionVisitor;
  * 
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/expression/AddImpl.java $
  */
 public class AddImpl extends MathExpressionImpl implements Add {
 

@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: BoundaryImpl.java 25075 2007-04-09 19:20:46Z desruisseaux $
+ ** $Id: BoundaryImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/BoundaryImpl.java,v $
  **
@@ -25,6 +25,8 @@ import org.opengis.geometry.Boundary;
  * @UML type GM_Boundary
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/BoundaryImpl.java $
  * @version 2.0
  */
 public class BoundaryImpl extends ComplexImpl implements Boundary {

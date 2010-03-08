@@ -26,7 +26,7 @@ import org.opengis.metadata.quality.RelativeInternalPositionalAccuracy;
  * Closeness of the relative positions of features in the scope to their respective
  * relative positions accepted as or being true.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/RelativeInternalPositionalAccuracyImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/RelativeInternalPositionalAccuracyImpl.java $
  * @version $Id: RelativeInternalPositionalAccuracyImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

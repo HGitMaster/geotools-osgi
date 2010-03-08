@@ -48,11 +48,11 @@ import org.opengis.filter.expression.Expression;
  * </p>
  *
  * <p>
- * $Id: PointPlacement.java 32919 2009-05-03 14:18:31Z jive $
+ * $Id: PointPlacement.java 33833 2009-09-04 12:26:28Z jive $
  * </p>
  *
  * @author Ian Turton
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/PointPlacement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/PointPlacement.java $
  */
 public interface PointPlacement extends org.opengis.style.PointPlacement,LabelPlacement {
     /**
@@ -68,7 +68,7 @@ public interface PointPlacement extends org.opengis.style.PointPlacement,LabelPl
      * use as an "anchor" for positioning it relative to a point geometry.
      * @param anchorPoint relative to the origional geometry
      */
-    void setAnchorPoint(AnchorPoint anchorPoint);
+    void setAnchorPoint(org.opengis.style.AnchorPoint anchorPoint);
 
     /**
      * Returns the Displacement which gives X and Y offset displacements to use
@@ -82,7 +82,7 @@ public interface PointPlacement extends org.opengis.style.PointPlacement,LabelPl
      * sets the Displacement which gives X and Y offset displacements to use
      * for rendering a text label near a point.
      */
-    void setDisplacement(Displacement displacement);
+    void setDisplacement(org.opengis.style.Displacement displacement);
 
     /**
      * Returns the rotation of the label.

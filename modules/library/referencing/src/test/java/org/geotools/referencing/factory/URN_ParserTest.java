@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link URN_Parser} class.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/factory/URN_ParserTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/factory/URN_ParserTest.java $
  * @version $Id: URN_ParserTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux
  */

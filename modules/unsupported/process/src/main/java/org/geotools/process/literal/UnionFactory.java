@@ -21,8 +21,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.geotools.data.Parameter;
+import org.geotools.feature.NameImpl;
 import org.geotools.process.Process;
-import org.geotools.process.impl.AbstractProcessFactory;
+import org.geotools.process.impl.SingleProcessFactory;
 import org.geotools.text.Text;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
@@ -40,8 +41,10 @@ import com.vividsolutions.jts.geom.Geometry;
  * </li>
  * 
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/literal/UnionFactory.java $
  */
-public class UnionFactory extends AbstractProcessFactory {
+public class UnionFactory extends SingleProcessFactory {
     // making parameters available as static constants to help java programmers
     /** First geometry for union */
     static final Parameter<Geometry> GEOM1 =
@@ -70,6 +73,10 @@ public class UnionFactory extends AbstractProcessFactory {
         resultInfo.put( RESULT.key, RESULT );
     }
     
+    public UnionFactory() {
+        super(new NameImpl(GT_NAMESPACE, "Union"));
+    }
+    
 	public Process create(){
 		return new UnionProcess();
 	}
@@ -94,10 +101,6 @@ public class UnionFactory extends AbstractProcessFactory {
 	    return Text.text("Union");
 	}
 
-	public String getName() {
-		return "Union";
-	}
-	
 	public boolean supportsProgress() {
 		return true;
 	} 	  

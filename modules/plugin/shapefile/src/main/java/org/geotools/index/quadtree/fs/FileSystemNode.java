@@ -54,17 +54,15 @@ public class FileSystemNode extends Node {
      * @param subNodesLength
      *                DOCUMENT ME!
      */
-    FileSystemNode(Envelope bounds, int id, Node parent,
-            ScrollingBuffer buffer, int startByte, int subNodesLength) {
-        super(bounds, id, parent);
+    FileSystemNode(Envelope bounds, int id, ScrollingBuffer buffer, int startByte, int subNodesLength) {
+        super(bounds, id);
         this.buffer = buffer;
         this.subNodeStartByte = startByte;
         this.subNodesLength = subNodesLength;
     }
 
     public Node copy() throws IOException {
-        FileSystemNode copy = new FileSystemNode(getBounds(), id, getParent(),
-                buffer, subNodeStartByte, subNodesLength);
+        FileSystemNode copy = new FileSystemNode(getBounds(), id, buffer, subNodeStartByte, subNodesLength);
         copy.numShapesId = numShapesId;
         copy.shapesId = new int[numShapesId];
         System.arraycopy(shapesId, 0, copy.shapesId, 0, numShapesId);
@@ -180,7 +178,7 @@ public class FileSystemNode extends Node {
         int numSubNodes = buf.getInt();
 
         // let's create the new node
-        FileSystemNode node = new FileSystemNode(env, id, parent, buf,
+        FileSystemNode node = new FileSystemNode(env, id, buf,
                 (int) buf.getPosition(), offset);
         node.setShapesId(ids);
         node.setNumSubNodes(numSubNodes);

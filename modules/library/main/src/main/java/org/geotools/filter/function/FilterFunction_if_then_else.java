@@ -33,19 +33,19 @@ public class FilterFunction_if_then_else extends FunctionExpressionImpl
     }
 
     public Object evaluate(Object feature) {
-        boolean arg0;
+        boolean select;
         Object arg1;
         Object arg2;
 
         try { // attempt to get value and perform conversion
-            arg0 = ((Boolean) getExpression(0).evaluate(feature))
+            select = ((Boolean) getExpression(0).evaluate(feature))
                     .booleanValue();
         } catch (Exception e) // probably a type error
         {
             throw new IllegalArgumentException(
                     "Filter Function problem for function if_then_else argument #0 - expected type boolean");
         }
-        if( arg0 ){
+        if( select ){
             try { // attempt to get value and perform conversion
                 arg1 = (Object) getExpression(1).evaluate(feature);
                 return arg1;

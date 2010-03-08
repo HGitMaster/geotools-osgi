@@ -28,6 +28,8 @@ import org.geotools.map.MapLayer;
  * layer opacity item
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/popup/LayerOpacityItem.java $
  */
 public class LayerOpacityItem implements TreePopupItem{
 

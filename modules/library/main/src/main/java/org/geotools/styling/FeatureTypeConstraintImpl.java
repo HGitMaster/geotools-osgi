@@ -24,7 +24,7 @@ import org.opengis.filter.Filter;
 
 /**
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/FeatureTypeConstraintImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/FeatureTypeConstraintImpl.java $
  */
 public class FeatureTypeConstraintImpl implements FeatureTypeConstraint, Cloneable {
     /** the feature type name */

@@ -113,8 +113,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </ul>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/AbstractCoverage.java $
- * @version $Id: AbstractCoverage.java 30776 2008-06-20 17:00:11Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/AbstractCoverage.java $
+ * @version $Id: AbstractCoverage.java 33884 2009-09-10 16:33:05Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */
 public abstract class AbstractCoverage extends PropertySourceImpl implements Coverage {
@@ -405,7 +405,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @since 2.3
      */
     public GeometryValuePair find(final DirectPosition p) {
-        final List pairs = find(p, 1);
+        final List<? extends GeometryValuePair> pairs = find(p, 1);
         return pairs.isEmpty() ? null : (GeometryValuePair) pairs.get(0);
     }
 
@@ -683,7 +683,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * for a two-dimensional slice of a coverage (which may or may not be a
      * {@linkplain org.geotools.coverage.grid.GridCoverage2D grid coverage}).
      *
-     * @version $Id: AbstractCoverage.java 30776 2008-06-20 17:00:11Z desruisseaux $
+     * @version $Id: AbstractCoverage.java 33884 2009-09-10 16:33:05Z simonegiannecchini $
      * @author Martin Desruisseaux (IRD)
      *
      * @see AbstractCoverage#getRenderableImage

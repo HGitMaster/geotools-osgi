@@ -95,7 +95,7 @@ import org.opengis.referencing.operation.Projection;
  * // etc...
  * </pre></blockquote>
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMetadataParser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMetadataParser.java $
  * @version $Id: TextMetadataParser.java 30972 2008-07-09 15:39:01Z cedricbr $
  * @author Martin Desruisseaux (IRD)
  * @author Cédric Briançon

@@ -27,7 +27,7 @@ import org.opengis.feature.type.FeatureType;
 /**
  * A simple event object to represent all events triggered by FeatureCollection
  * instances (typically change events).
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/feature/CollectionEvent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/feature/CollectionEvent.java $
  */
 public class CollectionEvent extends EventObject {
     private static final long serialVersionUID = -1864190177730929948L;

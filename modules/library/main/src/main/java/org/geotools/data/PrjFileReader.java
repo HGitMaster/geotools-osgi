@@ -27,6 +27,7 @@ import java.nio.charset.CharsetDecoder;
 
 import org.geotools.factory.Hints;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.resources.NIOUtilities;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -148,9 +149,9 @@ public class PrjFileReader {
 	}
 
 	public void close() throws IOException {
+		NIOUtilities.clean(buffer); // will close if a MappedByteBuffer
 		if (channel.isOpen()) {
 			channel.close();
-
 		}
 	}
 

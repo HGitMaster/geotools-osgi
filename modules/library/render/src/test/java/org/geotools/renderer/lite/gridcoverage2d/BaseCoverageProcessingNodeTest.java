@@ -35,6 +35,8 @@ import org.junit.Test;
 /**
  * {@link TestCase}    subclass for    {@link BaseCoverageProcessingNode}    .
  * @author    Simone Giannecchini, GeoSlutions.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/gridcoverage2d/BaseCoverageProcessingNodeTest.java $
  */
 public class BaseCoverageProcessingNodeTest  {
 

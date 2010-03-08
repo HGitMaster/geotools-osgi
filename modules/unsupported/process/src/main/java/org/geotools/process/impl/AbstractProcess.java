@@ -16,13 +16,9 @@
  */
 package org.geotools.process.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 
 import org.geotools.process.Process;
 import org.geotools.process.ProcessFactory;
-import org.geotools.util.NullProgressListener;
-import org.opengis.util.ProgressListener;
 
 /**
  * Provide an implementation of the process method to implement your own Process.
@@ -30,9 +26,12 @@ import org.opengis.util.ProgressListener;
  * This is a straight forward abstract process that has all the fields filled in.
  * </p>
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/impl/AbstractProcess.java $
  */
 public abstract class AbstractProcess implements Process {   
     protected ProcessFactory factory;
+    
     protected AbstractProcess( ProcessFactory factory ){
         this.factory = factory;
     }    

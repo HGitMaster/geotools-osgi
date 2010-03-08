@@ -26,6 +26,8 @@ import junit.framework.TestCase;
  * Makes sure the symbol factory lookup works as advertised
  * @author Andrea Aime - TOPP
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/style/DynamicSymbolFactoryFinderTest.java $
  */
 public class DynamicSymbolFactoryFinderTest extends TestCase {
 
@@ -38,9 +40,8 @@ public class DynamicSymbolFactoryFinderTest extends TestCase {
     
     public void testLookupExternalGraphicFactories() {
         List<ExternalGraphicFactory> result = loadIterator(DynamicSymbolFactoryFinder.getExternalGraphicFactories());
-        assertTrue(result.size() >= 2);
+        assertTrue(result.size() >= 1);
         assertContainsClassInstance(result, ImageGraphicFactory.class);
-        assertContainsClassInstance(result, SVGGraphicFactory.class);
     }
     
     public void assertContainsClassInstance(List list, Class clazz) {

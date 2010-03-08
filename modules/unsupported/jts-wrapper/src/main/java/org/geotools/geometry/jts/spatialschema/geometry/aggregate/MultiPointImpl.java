@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: MultiPointImpl.java 28267 2007-12-06 02:11:00Z desruisseaux $
+ ** $Id: MultiPointImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/aggregate/MultiPointImpl.java,v $
  **
@@ -13,6 +13,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.aggregate.MultiPoint;
 
 /**
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/aggregate/MultiPointImpl.java $
  */
 public class MultiPointImpl extends AggregateImpl 
 	implements MultiPoint {

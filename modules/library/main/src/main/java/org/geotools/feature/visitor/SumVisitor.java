@@ -36,7 +36,7 @@ import org.opengis.filter.expression.Expression;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/visitor/SumVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/SumVisitor.java $
  */
 public class SumVisitor implements FeatureCalc {
     private Expression expr;
@@ -76,12 +76,12 @@ public class SumVisitor implements FeatureCalc {
     private static SumStrategy createStrategy(Class type) {
         if (type == Integer.class) {
             return new IntegerSumStrategy();
-        } else if (type == Double.class) {
-            return new DoubleSumStrategy();
         } else if (type == Long.class) {
             return new LongSumStrategy();
         } else if (type == Float.class) {
             return new FloatSumStrategy();
+        } else if (Number.class.isAssignableFrom(type)) {
+            return new DoubleSumStrategy();
         }
 
         return null;

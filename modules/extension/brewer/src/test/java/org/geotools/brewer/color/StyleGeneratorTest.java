@@ -19,8 +19,12 @@ package org.geotools.brewer.color;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -34,6 +38,7 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.function.ClassificationFunction;
 import org.geotools.filter.function.EqualIntervalFunction;
+import org.geotools.filter.function.ExplicitClassifier;
 import org.geotools.filter.function.RangedClassifier;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
@@ -42,7 +47,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorTest.java $
  */
 public class StyleGeneratorTest extends DataTestCase {
     public StyleGeneratorTest(String arg0) {
@@ -123,5 +128,73 @@ public class StyleGeneratorTest extends DataTestCase {
 
         assertNotNull(StyleGenerator.toStyleExpression(rule[0].getFilter()));
         assertNotNull(StyleGenerator.toStyleExpression(rule[1].getFilter()));
+    }
+    
+    
+    /**
+     * This test cases test the generation of a style
+     * using a ExcplicitClassifier
+     */
+    public void testExplicitClassifier(){
+    	 ColorBrewer brewer = new ColorBrewer();
+         brewer.loadPalettes();
+
+         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+         Expression expr = null;
+
+         SimpleFeatureType type = riverType;
+         final String attribName = "river";
+         FeatureCollection<SimpleFeatureType, SimpleFeature> fc = DataUtilities.collection(riverFeatures);
+
+         expr = ff.property(attribName);
+
+         String paletteName = "YlGn"; //type = Sequential
+         
+         //TEST classifier with everything in a single bin
+         final Set<String>[] binValues2 = new Set[1];
+         binValues2[0] = new HashSet<String>();
+         //assign each of the features to one of the bins
+         try {
+			fc.accepts(new FeatureVisitor(){
+				public void visit(Feature feature) {				
+					binValues2[0].add(((SimpleFeature)feature).getAttribute(attribName).toString() );
+					
+				}}, null);
+		} catch (IOException e) {
+			fail(e.getMessage());
+			e.printStackTrace();
+		}
+         
+		 ExplicitClassifier classifier = new ExplicitClassifier(binValues2);
+         Color[] colors = brewer.getPalette(paletteName).getColors(binValues2.length);
+
+         // get the fts
+         FeatureTypeStyle fts = StyleGenerator.createFeatureTypeStyle(classifier, expr, colors,
+                 "myfts", riverFeatures[0].getFeatureType().getGeometryDescriptor(),
+                 StyleGenerator.ELSEMODE_IGNORE, 0.5, null);
+         assertNotNull(fts);
+
+         // test each filter
+         //we would expect two rules here - one for each of the two bins created
+         List<Rule> rules = fts.rules();
+         assertEquals(1, rules.size());
+         
+         //do a preliminary test to make sure each rule's filter returns some results     
+         assertNotNull(StyleGenerator.toStyleExpression(rules.get(0).getFilter()));
+         final Filter filter = rules.get(0).getFilter();
+         try {
+			fc.accepts(new FeatureVisitor(){
+
+				public void visit(Feature feature) {
+					if (!filter.evaluate(feature)){
+						fail("Not all features accepted.");
+					}
+					
+				}}, null);
+		} catch (IOException e) {
+			fail(e.getMessage());
+			e.printStackTrace();
+		}
+         
     }
 }

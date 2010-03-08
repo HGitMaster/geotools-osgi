@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: ComplexBoundaryImpl.java 25075 2007-04-09 19:20:46Z desruisseaux $
+ ** $Id: ComplexBoundaryImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/complex/ComplexBoundaryImpl.java,v $
  **
@@ -24,6 +24,8 @@ import org.opengis.geometry.complex.ComplexBoundary;
  * @UML type GM_ComplexBoundary
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/complex/ComplexBoundaryImpl.java $
  * @version 2.0
  */
 public class ComplexBoundaryImpl extends BoundaryImpl implements ComplexBoundary {

@@ -27,6 +27,8 @@ import java.nio.channels.ReadableByteChannel;
  * ShapefileFiles.unlock method to release the lock on the URL.
  * 
  * @author jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ReadableByteChannelDecorator.java $
  */
 public class ReadableByteChannelDecorator implements ReadableByteChannel {
 

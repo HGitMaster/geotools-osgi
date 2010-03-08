@@ -16,19 +16,11 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.io.File;
+import java.io.IOException;
 
-import org.geotools.TestData;
 import org.geotools.data.shapefile.ShpFiles;
 import org.geotools.data.shapefile.TestCaseSupport;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
 
 public abstract class FIDTestCase extends TestCaseSupport {
     protected FIDTestCase( String name ) throws IOException {

@@ -26,6 +26,8 @@ import java.util.TreeMap;
 
 /**
  * A map of nodes, indexed by the coordinate of the node
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/NodeMap.java $
  */
 public class NodeMap {
 

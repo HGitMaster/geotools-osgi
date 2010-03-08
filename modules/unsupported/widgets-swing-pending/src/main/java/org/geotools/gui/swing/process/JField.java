@@ -38,6 +38,8 @@ import com.vividsolutions.jts.io.WKTWriter;
 
 /**
  * Field that uses the converter API to hack away at a text representation of the provided value.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/JField.java $
  */
 public class JField extends AbstractParamWidget {
     private JTextArea text;

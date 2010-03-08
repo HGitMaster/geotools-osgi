@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  * Tests the {@link AllAuthoritiesFactory} implementation.
  *
  * @author Martin Desruisseaux (IRD)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/factory/AllAuthoritiesFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/factory/AllAuthoritiesFactoryTest.java $
  * @version $Id: AllAuthoritiesFactoryTest.java 30641 2008-06-12 17:42:27Z acuster $
  */
 public final class AllAuthoritiesFactoryTest {

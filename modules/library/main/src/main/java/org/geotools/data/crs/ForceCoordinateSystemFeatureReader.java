@@ -59,7 +59,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author jgarnett, Refractions Research, Inc.
  * @author aaime
  * @author $Author: jive $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemFeatureReader.java $
  * @version $Id: ForceCoordinateSystemFeatureReader.java 32123 2008-12-30 16:53:44Z aaime $
  */
 public class ForceCoordinateSystemFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {

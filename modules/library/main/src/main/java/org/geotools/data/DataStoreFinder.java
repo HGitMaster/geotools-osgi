@@ -50,7 +50,7 @@ import org.opengis.feature.type.FeatureType;
  * <p>
  * Example:<br/><code>org.geotools.data.mytype.MyTypeDataStoreFacotry</code>
  * </p>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/DataStoreFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/DataStoreFinder.java $
  */
 public final class DataStoreFinder {
 	/** The logger for the filter module. */
@@ -89,7 +89,7 @@ public final class DataStoreFinder {
     }
 
     /**
-     * Finds all implemtaions of DataStoreFactory which have registered using
+     * Finds all implementations of DataStoreFactory which have registered using
      * the services mechanism, regardless weather it has the appropriate
      * libraries on the classpath.
      *
@@ -143,4 +143,5 @@ public final class DataStoreFinder {
 		getServiceRegistry().scanForPlugins();
 
 	}
+    
 }

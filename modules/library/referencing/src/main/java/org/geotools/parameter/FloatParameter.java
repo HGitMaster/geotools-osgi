@@ -41,7 +41,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * than {@code ParameterValue} since it avoid the creation of {@link Double} objects.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/parameter/FloatParameter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/FloatParameter.java $
  * @version $Id: FloatParameter.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

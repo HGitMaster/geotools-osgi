@@ -5,18 +5,14 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32912 2009-05-02 10:00:36Z aaime $              
-     ======================================================================= -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" 
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-                               http://maven.apache.org/maven-v4_0_0.xsd">
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $              
+     ======================================================================= --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                                 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>geotools</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
   
 
@@ -27,9 +23,7 @@
   <artifactId>demo</artifactId>
   <packaging>pom</packaging>
   <name>Geotools demos and examples</name>
-  <description>
-    Demos and Examples for Geotools 2, discussion in wiki.
-  </description>
+  <description>Demos and Examples for Geotools 2, discussion in wiki.</description>
 
   <licenses>
     <license>
@@ -76,6 +70,7 @@
   <!--     Build Configuration                                     -->
   <!--         copies all JARs in a single directory.              -->
   <!-- =========================================================== -->
+  <!--
   <build>
     <plugins>
       <plugin>
@@ -92,40 +87,18 @@
       </plugin>
     </plugins>
   </build>
-  
+  -->
   
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
-
-  <profiles>
-    <profile>
-      <id>introduction</id>
-        <activation> 
-          <property><name>all</name></property>
-       </activation>
-       <modules>
-         <module>introduction</module>
-       </modules>
-    </profile>
-
-    <profile>
-      <id>mappane-use</id>
-        <activation>
-          <property><name>all</name></property>
-       </activation>
-       <modules>
-         <module>mappane-use</module>
-       </modules>
-    </profile>
-  </profiles>
-
   <modules>
-    <module>libraryJTS</module>
     <module>example</module>
+    <module>libraryJTS</module>
     <module>svgsupport</module>
-    <!--module>xml-po</module--> <!-- what is this? -->
+    <module>gmlparsing</module>
+    <module>jdbc</module>
+    <!--module>xml-po</module-->
   </modules>
   
 </project>
-

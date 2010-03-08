@@ -23,6 +23,8 @@ import javax.swing.JComponent;
  *  creating, validating and maintaining a widget for one process parameter.
  * 
  * @author Graham Davis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ParamWidget.java $
  */
 public interface ParamWidget {
 	

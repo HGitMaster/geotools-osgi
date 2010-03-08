@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.LineString;
  * Common filter testing code factored up here.
  *
  * @author Chris Holmes
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/filter/FilterTestSupport.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/FilterTestSupport.java $
  */
 public abstract class FilterTestSupport extends TestCase {
     /** Standard logging instance */

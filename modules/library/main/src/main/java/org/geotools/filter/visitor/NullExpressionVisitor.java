@@ -30,6 +30,8 @@ import org.opengis.filter.expression.Subtract;
  * This class does *nothing* - useful to prevent null checks in AbstractFilterVisitor.
  * 
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/NullExpressionVisitor.java $
  */
 public class NullExpressionVisitor implements ExpressionVisitor{
 

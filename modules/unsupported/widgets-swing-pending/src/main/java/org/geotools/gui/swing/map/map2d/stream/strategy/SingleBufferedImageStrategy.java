@@ -43,6 +43,8 @@ import java.awt.geom.AffineTransform;
  * Must repaint everything each time.
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/strategy/SingleBufferedImageStrategy.java $
  */
 public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 

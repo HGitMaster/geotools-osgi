@@ -21,6 +21,8 @@ package org.geotools.geometry.iso.topograph2D;
  * Constants representing the dimensions of a point, a curve and a surface.
  * Also, constants representing the dimensions of the empty geometry and
  * non-empty geometries, and a wildcard dimension meaning "any dimension".
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Dimension.java $
  */
 public class Dimension {
 

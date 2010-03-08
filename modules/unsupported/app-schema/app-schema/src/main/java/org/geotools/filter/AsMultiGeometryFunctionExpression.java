@@ -44,6 +44,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/AsMultiGeometryFunctionExpression.java $
  */
 public class AsMultiGeometryFunctionExpression extends FunctionExpressionImpl {
     public AsMultiGeometryFunctionExpression() {

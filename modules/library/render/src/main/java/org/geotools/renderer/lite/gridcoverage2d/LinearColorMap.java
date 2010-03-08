@@ -45,6 +45,8 @@ import org.opengis.util.InternationalString;
 
 /**
  * @author        Simone Giannecchini, GeoSolutions.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/LinearColorMap.java $
  */
 public final class LinearColorMap extends AbstractList<LinearColorMapElement>
 		implements ColorMapTransform<LinearColorMapElement> {
@@ -175,7 +177,7 @@ public final class LinearColorMap extends AbstractList<LinearColorMapElement>
 		//
 		//
 		//	/////////////////////////////////////////////////////////////////////
-		if(preFilteringElements!=null)
+		if(preFilteringElements!=null&&preFilteringElements.length>0) 
 		{
 			this.preFilteringElements=(LinearColorMapElement[]) preFilteringElements.clone();
 			Color color=this.preFilteringElements[0].getColors()[0];

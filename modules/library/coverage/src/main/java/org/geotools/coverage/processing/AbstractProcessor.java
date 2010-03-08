@@ -52,7 +52,7 @@ import org.geotools.util.logging.Logging;
  * Base class for {@linkplain Coverage coverage} processor implementations.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/AbstractProcessor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/AbstractProcessor.java $
  * @version $Id: AbstractProcessor.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

@@ -32,7 +32,7 @@ import org.opengis.filter.expression.PropertyName;
  * 
  * @author Cory Horner, Refractions Research Inc.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/filter/function/QuantileFunctionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/function/QuantileFunctionTest.java $
  */
 public class QuantileFunctionTest extends FunctionTestSupport {
    
@@ -82,10 +82,87 @@ public class QuantileFunctionTest extends FunctionTestSupport {
         Object value = func.evaluate(featureCollection);
         assertTrue(value instanceof RangedClassifier);
         RangedClassifier ranged = (RangedClassifier) value;
+        
+		//the values being quantiled are
+		//{4,90,20,43,29,61,8,12};
+		//so there should be two groups:
+		// {4, 8, 12, 20}       4 <= x < 29
+		// {29, 43, 61, 90}     29 <= x <= 90
         assertEquals(2, ranged.getSize());
-        assertEquals("4..20", ranged.getTitle(0));
-        assertEquals("20..90", ranged.getTitle(1));
+        assertEquals("4..29", ranged.getTitle(0));
+        assertEquals("29..90", ranged.getTitle(1));
     }
+    
+    
+    /**
+     * Test a feature collection where each feature will be in
+     * it's own bin.
+     * <p>Creates a feature collection with five features 1-5.  Then
+     * uses the quantile function to put these features in 5 bins.  Each
+     * bin should have a single feature.</p>
+     * 
+     * @throws Exception
+     */
+    public void testSingleBin() throws Exception {
+
+    	//create a feature collection with five features values 1-5
+		SimpleFeatureType dataType = DataUtilities.createType("classification.test1", "id:0,value:int");
+		int iVal[] = new int[] { 1, 2, 3, 4, 5 };
+		SimpleFeature[] myfeatures = new SimpleFeature[iVal.length];
+		for (int i = 0; i < iVal.length; i++) {
+			myfeatures[i] = SimpleFeatureBuilder.build(dataType, new Object[] {
+					new Integer(i + 1), new Integer(iVal[i]) },
+					"classification.test1" + (i + 1));
+		}
+		MemoryDataStore store = new MemoryDataStore();
+		store.createSchema(dataType);
+		store.addFeatures(myfeatures);
+		FeatureCollection<SimpleFeatureType, SimpleFeature> myFeatureCollection = store.getFeatureSource("test1").getFeatures();
+
+		//run the quantile function
+		org.opengis.filter.expression.Expression function = ff.function("Quantile", ff.property("value"), ff.literal(5));
+		Classifier classifier = (Classifier) function.evaluate(myFeatureCollection);
+		
+		//verify the results
+		assertNotNull(classifier);
+		assertEquals(classifier.getClass(), RangedClassifier.class);
+		RangedClassifier range = (RangedClassifier) classifier;
+		assertEquals(5, range.getSize());
+
+		for (int i = 0; i < 5; i++) {
+			assertTrue(i + 1 == ((Number) range.getMin(i)).doubleValue());
+			if (i != 4) {
+				assertTrue(i + 2 == ((Number) range.getMax(i)).doubleValue());
+				assertEquals((i + 1) + ".." + (i + 2), range.getTitle(i));
+			} else {
+				assertTrue(i + 1 == ((Number) range.getMax(i)).doubleValue());
+				assertEquals((i + 1) + ".." + (i + 1), range.getTitle(i));
+			}
+		}
+	}
+    
+    public void test2() throws Exception {
+        //create a feature collection with five features values 1-5
+    	SimpleFeatureType dataType = DataUtilities.createType("classification.test1", "id:0,value:int");
+    	int iVal[] = new int[] { 1, 2, 3, 4, 5, 6 };
+    	SimpleFeature[] myfeatures = new SimpleFeature[iVal.length];
+    	for (int i = 0; i < iVal.length; i++) {
+    		myfeatures[i] = SimpleFeatureBuilder.build(dataType, new Object[] {
+    				new Integer(i + 1), new Integer(iVal[i]) },
+    				"classification.t" + (i + 1));
+    	}
+    	MemoryDataStore store = new MemoryDataStore();
+    	store.createSchema(dataType);
+    	store.addFeatures(myfeatures);
+    	FeatureCollection<SimpleFeatureType, SimpleFeature> myFeatureCollection = store.getFeatureSource("test1").getFeatures();
+
+    	//run the quantile function
+    	org.opengis.filter.expression.Expression function = ff.function("Quantile", ff.property("value"), ff.literal(5));
+    	Classifier classifier = (Classifier) function.evaluate(myFeatureCollection);
+    	RangedClassifier range = (RangedClassifier) classifier;
+    }
+    
+    
     public void testEvaluateWithStrings() throws Exception {
         org.opengis.filter.expression.Expression function = ff.function("Quantile", ff.property("group"), ff.literal(2)  );
         Classifier classifier = (Classifier) function.evaluate( featureCollection );

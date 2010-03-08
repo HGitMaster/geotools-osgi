@@ -16,7 +16,7 @@
  */
 package org.geotools.data.shapefile;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.SHP;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,12 +38,10 @@ import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 
@@ -67,13 +65,15 @@ import org.geotools.data.DataUtilities;
  * </p>
  * 
  * @author jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShpFiles.java $
  */
 public class ShpFiles {
     /**
      * The urls for each type of file that is associated with the shapefile. The
      * key is the type of file
      */
-    private final Map<ShpFileType, URL> urls = new HashMap<ShpFileType, URL>();
+    private final Map<ShpFileType, URL> urls = new ConcurrentHashMap<ShpFileType, URL>();
 
     /**
      * A read/write lock, so that we can have concurrent readers 
@@ -84,7 +84,7 @@ public class ShpFiles {
      * The set of locker sources per thread. Used as a debugging aid and to upgrade/downgrade
      * the locks
      */
-    private final Map<Thread, Collection<ShpFilesLocker>> lockers = new HashMap<Thread, Collection<ShpFilesLocker>>();
+    private final Map<Thread, Collection<ShpFilesLocker>> lockers = new ConcurrentHashMap<Thread, Collection<ShpFilesLocker>>();
 
     /**
      * Searches for all the files and adds then to the map of files.

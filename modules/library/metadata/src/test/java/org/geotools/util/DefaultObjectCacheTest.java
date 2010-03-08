@@ -24,6 +24,8 @@ import static org.junit.Assert.*;
  * Tests the {@link DefaultObjectCache} with simple tests.
  *
  * @author Cory Horner
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/DefaultObjectCacheTest.java $
  */
 public final class DefaultObjectCacheTest {
     /**

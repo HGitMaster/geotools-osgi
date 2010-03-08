@@ -144,8 +144,8 @@
 		<complexContent>
 			<extension base="gml:AbstractGMLType">
 				<sequence>
-					<element ref="gml:valueComponent" minOccurs="0" maxOccurs="unbounded"/>
-					<element ref="gml:valueComponents" minOccurs="0"/>
+					<!--element ref="gml:valueComponent" minOccurs="0" maxOccurs="unbounded"/>
+					<element ref="gml:valueComponents" minOccurs="0"/-->
 				</sequence>
 			</extension>
 		</complexContent>

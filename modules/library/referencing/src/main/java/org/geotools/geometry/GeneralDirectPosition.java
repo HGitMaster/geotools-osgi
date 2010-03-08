@@ -47,7 +47,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Most methods in this implementation are final for performance reason.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/geometry/GeneralDirectPosition.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/geometry/GeneralDirectPosition.java $
  * @version $Id: GeneralDirectPosition.java 30920 2008-07-04 23:56:32Z jgarnett $
  * @author Martin Desruisseaux (IRD)
  *

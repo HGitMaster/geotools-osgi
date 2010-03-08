@@ -39,6 +39,7 @@ import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -62,6 +63,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin Deoliveira, The Open Planning Project
  * @author Gabriel Roldan, Axios Engineering
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/FeaturePropertyAccessorFactory.java $
  */
 public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
 
@@ -89,6 +92,15 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
 
     public PropertyAccessor createPropertyAccessor(Class type, String xpath, Class target,
             Hints hints) {
+        
+        if (SimpleFeature.class.isAssignableFrom(type)) {
+            /*
+             * This class is not intended for use with SimpleFeature and causes problems when
+             * discovered via SPI and used by code expecting SimpleFeature behaviour. In particular
+             * WMS styling code may fail when this class is present. See GEOS-3525.
+             */
+            return null;
+        }
 
         if (xpath == null)
             return null;
@@ -96,7 +108,7 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         if (!ComplexAttribute.class.isAssignableFrom(type)
                 && !ComplexType.class.isAssignableFrom(type)
                 && !AttributeDescriptor.class.isAssignableFrom(type))
-            return null; // we only work with simple feature
+            return null;
 
         if ("".equals(xpath) && target == Geometry.class)
             return DEFAULT_GEOMETRY_ACCESS;
@@ -154,7 +166,7 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
 
         public Object get(Object object, String xpath, Class target) {
             Attribute feature = (Attribute) object;
-            return feature.getIdentifier();
+            return feature.getIdentifier().toString();
         }
 
         public void set(Object object, String xpath, Object value, Class target) {

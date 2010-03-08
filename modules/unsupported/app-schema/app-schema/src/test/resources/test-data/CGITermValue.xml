@@ -64,7 +64,7 @@
 				may be absolute URL's. Imports and includes at the schemas will be
 				followed as long as they're relative paths.
 			-->
-			<schemaUri>commonSchemas_new/GeoSciML/CGI_Value.xsd</schemaUri>
+			<schemaUri>http://schemas.opengis.net/GeoSciML/geosciml.xsd</schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>
@@ -78,18 +78,19 @@
 					<sourceExpression>
 						<OCQL>VALUE</OCQL>
 					</sourceExpression>
+					<!-- Test client property encoding on complex types with simple content -->
+					<ClientProperty>
+					    <name>codeSpace</name>
+					    <value>'some:uri'</value>
+					</ClientProperty>
 				</AttributeMapping>
 				<AttributeMapping>
 					<targetAttribute>
-			            gml:name[1]
+			            FEATURE_LINK
   		            </targetAttribute>
 					<sourceExpression>
 						<OCQL>strTrim(getId())</OCQL>
 					</sourceExpression>
-					<ClientProperty>
-						<name>codeSpace</name>
-						<value>'urn:ietf:rfc:2141'</value>
-					</ClientProperty>
 				</AttributeMapping>
 			</attributeMappings>
 		</FeatureTypeMapping>

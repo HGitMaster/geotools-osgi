@@ -57,7 +57,8 @@ import com.vividsolutions.jts.geom.Geometry;
  *       encoded.
  * @task REVISIT: need to figure out exceptions, we're currently eating io
  *       errors, which is bad. Probably need a generic visitor exception.
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/jdbc/src/main/java/org/geotools/filter/SQLEncoder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/filter/SQLEncoder.java $
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
     /** error message for exceptions */

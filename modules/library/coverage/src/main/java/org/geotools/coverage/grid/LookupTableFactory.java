@@ -32,7 +32,7 @@ import org.geotools.util.WeakValueHashMap;
  * This factory is used internally by {@link GridCoverageViews#create}.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/grid/LookupTableFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/LookupTableFactory.java $
  * @version $Id: LookupTableFactory.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

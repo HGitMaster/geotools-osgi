@@ -39,6 +39,8 @@ import org.geotools.xml.Node;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/OGCEqualsBinding.java $
  */
 public class OGCEqualsBinding extends AbstractComplexBinding {
     FilterFactory2 filterFactory;

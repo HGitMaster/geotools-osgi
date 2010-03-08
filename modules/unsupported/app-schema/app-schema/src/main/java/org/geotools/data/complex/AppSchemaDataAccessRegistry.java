@@ -71,4 +71,26 @@ public class AppSchemaDataAccessRegistry extends DataAccessRegistry {
         return getMapping(featureTypeName).getSource();
     }
 
+    /**
+     * Return true if a type name is mapped in one of the registered app-schema data accesses.
+     * 
+     * @param featureTypeName
+     *            Feature type name
+     * @return
+     * @throws IOException
+     */
+    public static boolean hasName(Name featureTypeName) throws IOException {
+        if (registry == null) {
+            // nothing's been registered, but it's OK, return false
+            return false;
+        }
+        for (DataAccess<FeatureType, Feature> dataAccess : registry) {
+            if (dataAccess instanceof AppSchemaDataAccess
+                    && dataAccess.getNames().contains(featureTypeName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

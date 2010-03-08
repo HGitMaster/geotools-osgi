@@ -21,32 +21,26 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
-
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.filter.IllegalFilterException;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.renderer.style.SLDStyleFactory.SymbolizerKey;
 import org.geotools.styling.ExternalGraphic;
-import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Fill;
+import org.geotools.styling.Graphic;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.Rule;
-import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyleFactoryFinder;
-import org.geotools.styling.Symbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -59,7 +53,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  *
  * @author jamesm
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/test/java/org/geotools/renderer/style/SLDStyleFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/style/SLDStyleFactoryTest.java $
  */
 public class SLDStyleFactoryTest extends TestCase {
     
@@ -86,6 +80,11 @@ public class SLDStyleFactoryTest extends TestCase {
         fb.set("symb", "0xF054");
         fb.set("icon", "draw.png");
         feature = fb.buildFeature(null);
+    }
+    
+    @Override
+    protected void tearDown() throws Exception {
+        sld.setVectorRenderingEnabled(false);
     }
     
     /** This test created from Render2DTest.testSimplePointRender */
@@ -192,6 +191,23 @@ public class SLDStyleFactoryTest extends TestCase {
         // different ways they have been loaded
     }
     
+    public void testCreateDynamicExternalGraphicsVector() throws Exception {
+        URL url = StreamingRenderer.class.getResource("test-data/");
+        PointSymbolizer symb = sf.createPointSymbolizer();
+        ExternalGraphic eg = sf.createExternalGraphic(url + "${icon}", "image/png");
+        symb.getGraphic().addExternalGraphic(eg);
+        sld.setVectorRenderingEnabled(true);
+        
+        IconStyle2D gs = (IconStyle2D) sld.createStyle(feature, symb, range);
+        // make sure the style has been recognized as dynamic
+        SymbolizerKey key = new SymbolizerKey(symb, range);
+        assertTrue(sld.dynamicSymbolizers.containsKey(key));
+
+        BufferedImage expected = ImageIO.read(StreamingRenderer.class.getResource("test-data/draw.png"));
+        assertEquals(expected.getHeight(), gs.getIcon().getIconHeight());
+        assertEquals(expected.getWidth(), gs.getIcon().getIconWidth());
+    }
+    
     public void testDefaultSizeExternalGraphic() throws Exception {
         URL url = StreamingRenderer.class.getResource("test-data/");
         PointSymbolizer symb = sf.createPointSymbolizer();
@@ -202,6 +218,33 @@ public class SLDStyleFactoryTest extends TestCase {
         BufferedImage img = gs.getImage();
         assertEquals(64, img.getHeight());
         assertEquals(64, img.getWidth());
+    }
+    
+    public void testResizeExternalGraphic() throws Exception {
+        URL url = StreamingRenderer.class.getResource("test-data/");
+        PointSymbolizer symb = sf.createPointSymbolizer();
+        ExternalGraphic eg = sf.createExternalGraphic(url + "icon64.png", "image/png");
+        symb.getGraphic().graphicalSymbols().add(eg);
+        symb.getGraphic().setSize(ff.literal(20));
+        
+        GraphicStyle2D gs = (GraphicStyle2D) sld.createPointStyle(feature, symb, range);
+        BufferedImage img = gs.getImage();
+        assertEquals(20, img.getHeight());
+        assertEquals(20, img.getWidth());
+    }
+    
+    public void testResizeGraphicFill() throws Exception {
+        URL url = StreamingRenderer.class.getResource("test-data/");
+        PolygonSymbolizer symb = sf.createPolygonSymbolizer();
+        ExternalGraphic eg = sf.createExternalGraphic(url + "icon64.png", "image/png");
+        Graphic g = sf.createGraphic(new ExternalGraphic[] {eg}, null, null, null, ff.literal(20), null);
+        Fill fill = sf.createFill(null, null, null, g);
+        symb.setFill(fill);
+        
+        PolygonStyle2D ps = sld.createPolygonStyle(feature, symb, range);
+        assertTrue(ps.getFill() instanceof TexturePaint);
+        TexturePaint paint = (TexturePaint) ps.getFill();
+        assertEquals(20, paint.getImage().getWidth());
     }
     
     public void testDefaultSizeMark() throws Exception {

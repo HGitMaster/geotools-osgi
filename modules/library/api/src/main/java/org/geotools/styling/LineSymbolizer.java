@@ -16,6 +16,8 @@
  */
 package org.geotools.styling;
 
+import org.opengis.filter.expression.Expression;
+
 
 /**
  * A symbolizer describes how a feature should appear on a map.
@@ -75,8 +77,8 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/LineSymbolizer.java $
- * @version $Id: LineSymbolizer.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/LineSymbolizer.java $
+ * @version $Id: LineSymbolizer.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public interface LineSymbolizer extends org.opengis.style.LineSymbolizer, Symbolizer {
     /**
@@ -93,12 +95,14 @@ public interface LineSymbolizer extends org.opengis.style.LineSymbolizer, Symbol
      *
      * @param stroke The Stroke style to use when rendering lines.
      */
-    void setStroke(Stroke stroke);
-
-    String getGeometryPropertyName();
+    void setStroke(org.opengis.style.Stroke stroke);
 
     /**
-     * @param geometry property name
+     * Define an offset to draw lines in parallel to the original geometry.
+     * 
+     * @param offset
+     *            Distance in UOMs to offset line; left-hand side is positive; right-hand side is
+     *            negative; the default value is 0
      */
-    void setGeometryPropertyName(String geometryPropertyName);
+    void setPerpendicularOffset(Expression offset);
 }

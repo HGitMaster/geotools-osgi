@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,9 +35,11 @@ import org.geotools.feature.NameImpl;
 import org.geotools.feature.Types;
 import org.geotools.feature.ValidatingFeatureFactoryImpl;
 import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.type.ComplexFeatureTypeImpl;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.util.CheckedArrayList;
 import org.geotools.xs.XSSchema;
+import org.opengis.feature.Association;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.FeatureFactory;
@@ -64,8 +67,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: XPath.java 32813 2009-04-17 02:45:24Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/XPath.java $
+ * @version $Id: XPath.java 34894 2010-02-16 07:51:16Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/XPath.java $
  * @since 2.4
  */
 public class XPath {
@@ -127,6 +130,21 @@ public class XPath {
             }
             return sb.toString();
         }
+        
+        public StepList subList(int fromIndex, int toIndex) {
+            if (fromIndex < 0)
+                throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
+            if (toIndex > size())
+                throw new IndexOutOfBoundsException("toIndex = " + toIndex);
+            if (fromIndex > toIndex)
+                throw new IllegalArgumentException("fromIndex(" + fromIndex +
+                                                   ") > toIndex(" + toIndex + ")");
+            StepList subList = new StepList();
+            for (int i = fromIndex; i < toIndex; i++) {
+                subList.add(this.get(i));
+            }
+            return subList;
+        }
 
         public StepList clone() {
             StepList copy = new StepList();
@@ -182,6 +200,8 @@ public class XPath {
 
         private boolean isXmlAttribute;
 
+        private boolean isIndexed;
+
         /**
          * Creates a "property" xpath step (i.e. isXmlAttribute() == false).
          * 
@@ -189,7 +209,28 @@ public class XPath {
          * @param index
          */
         public Step(final QName name, final int index) {
-            this(name, index, false);
+            this(name, index, false, false);
+        }
+        
+        /**
+         * Creates an xpath step for the given qualified name and index; and the given flag to
+         * indicate if it it an "attribute" or "property" step.
+         * 
+         * @param name
+         *            the qualified name of the step (name should include prefix to be reflected in
+         *            toString())
+         * @param index
+         *            the index (indexing starts at 1 for Xpath) of the step
+         * @param isXmlAttribute
+         *            whether the step referers to an "attribute" or a "property" (like for
+         *            attributes and elements in xml)
+         * @throws NullPointerException
+         *             if <code>name==null</code>
+         * @throws IllegalArgumentException
+         *             if <code>index &lt; 1</code>
+         */
+        public Step(final QName name, final int index, boolean isXmlAttribute) {
+            this(name, index, isXmlAttribute, false);
         }
 
         /**
@@ -197,19 +238,22 @@ public class XPath {
          * indicate if it it an "attribute" or "property" step.
          * 
          * @param name
-         *                the qualified name of the step (name should include prefix to be reflected
-         *                in toString())
+         *            the qualified name of the step (name should include prefix to be reflected in
+         *            toString())
          * @param index
-         *                the index (indexing starts at 1 for Xpath) of the step
+         *            the index (indexing starts at 1 for Xpath) of the step
          * @param isXmlAttribute
-         *                whether the step referers to an "attribute" or a "property" (like for
-         *                attributes and elements in xml)
+         *            whether the step referers to an "attribute" or a "property" (like for
+         *            attributes and elements in xml)
+         * @param isIndexed
+         *            whether or not the index is to be shown in the string representation even if
+         *            index = 1
          * @throws NullPointerException
-         *                 if <code>name==null</code>
+         *             if <code>name==null</code>
          * @throws IllegalArgumentException
-         *                 if <code>index &lt; 1</code>
+         *             if <code>index &lt; 1</code>
          */
-        public Step(final QName name, final int index, boolean isXmlAttribute) {
+        public Step(final QName name, final int index, boolean isXmlAttribute, boolean isIndexed) {
             if (name == null) {
                 throw new NullPointerException("name");
             }
@@ -219,6 +263,7 @@ public class XPath {
             this.attributeName = name;
             this.index = index;
             this.isXmlAttribute = isXmlAttribute;
+            this.isIndexed = isIndexed;
         }
 
         /**
@@ -251,7 +296,11 @@ public class XPath {
                 sb.append(attributeName.getPrefix()).append(':');
             }
             sb.append(attributeName.getLocalPart());
-            if (index > 1) {
+            if (isIndexed || index > 1) {
+                // we want to print index = 1 as well if specified
+                // so filtering on the first index doesn't return all
+                // e.g. gml:name[1] doesn't get translated to
+                // gml:name i.e. all gml:name instances
                 sb.append("[").append(index).append("]");
             }
             return sb.toString();
@@ -271,7 +320,7 @@ public class XPath {
         }
 
         public Object clone() {
-            return new Step(this.attributeName, this.index, this.isXmlAttribute);
+            return new Step(this.attributeName, this.index, this.isXmlAttribute, this.isIndexed);
         }
 
         /**
@@ -351,19 +400,24 @@ public class XPath {
             } else {
                 int index = 1;
                 boolean isXmlAttribute = false;
+                boolean isIndexed = false;
                 String stepName = step;
                 if (step.indexOf('[') != -1) {
                     int start = step.indexOf('[');
                     int end = step.indexOf(']');
                     stepName = step.substring(0, start);
-                    index = Integer.parseInt(step.substring(start + 1, end));
+                    Scanner scanner = new Scanner(step.substring(start + 1, end));  
+                    if (scanner.hasNextInt()) { 
+                       index = scanner.nextInt();
+                       isIndexed = true;
+                    } 
                 }
                 if (step.charAt(0) == '@') {
                     isXmlAttribute = true;
                     stepName = stepName.substring(1);
                 }
-                QName qName = deglose(stepName, root, namespaces);
-                steps.add(new Step(qName, index, isXmlAttribute));
+                QName qName = deglose(stepName, root, namespaces, isXmlAttribute);
+                steps.add(new Step(qName, index, isXmlAttribute, isIndexed));
             }
             //            
             // if (step.indexOf('[') != -1) {
@@ -402,7 +456,7 @@ public class XPath {
     }
 
     private static QName deglose(final String prefixedName, final AttributeDescriptor root,
-            final NamespaceSupport namespaces) {
+            final NamespaceSupport namespaces, boolean isXmlAttribute) {
         if (prefixedName == null) {
             throw new NullPointerException("prefixedName");
         }
@@ -412,14 +466,17 @@ public class XPath {
         final String prefix;
         final String namespaceUri;
         final String localName;
-        final Name rootName = root.getName();
-        final String defaultNamespace = rootName.getNamespaceURI() == null ? XMLConstants.NULL_NS_URI
-                : rootName.getNamespaceURI();
 
         int prefixIdx = prefixedName.indexOf(':');
 
         if (prefixIdx == -1) {
             localName = prefixedName;
+            final Name rootName = root.getName();
+            // don't use default namespace for client properties (xml attribute), and FEATURE_LINK
+            final String defaultNamespace = (isXmlAttribute
+                    || localName.equals(ComplexFeatureTypeImpl.FEATURE_CHAINING_LINK_NAME
+                            .getLocalPart()) || rootName.getNamespaceURI() == null) ? XMLConstants.NULL_NS_URI
+                    : rootName.getNamespaceURI();
             namespaceUri = defaultNamespace;
             if (XMLConstants.NULL_NS_URI.equals(defaultNamespace)) {
                 prefix = XMLConstants.DEFAULT_NS_PREFIX;
@@ -447,26 +504,28 @@ public class XPath {
     }
 
     /**
-     * Sets the value of the attribute of <code>att</code> addressed by <code>xpath</code> and
-     * of type <code>targetNodeType</code> to be <code>value</code> with id <code>id</code>.
+     * Sets the value of the attribute of <code>att</code> addressed by <code>xpath</code> and of
+     * type <code>targetNodeType</code> to be <code>value</code> with id <code>id</code>.
      * 
      * @param att
-     *                the root attribute for which to set the child attribute value
+     *            the root attribute for which to set the child attribute value
      * @param xpath
-     *                the xpath expression that addresses the <code>att</code> child whose value
-     *                is to be set
+     *            the xpath expression that addresses the <code>att</code> child whose value is to
+     *            be set
      * @param value
-     *                the value of the attribute addressed by <code>xpath</code>
+     *            the value of the attribute addressed by <code>xpath</code>
      * @param id
      *            the identifier of the attribute addressed by <code>xpath</code>, might be
      *            <code>null</code>
      * @param targetNodeType
      *            the expected type of the attribute addressed by <code>xpath</code>, or
      *            <code>null</code> if unknown
+     * @param isXlinkRef
+     *            true if the attribute would only contain xlink:href client property
      * @return
      */
     public Attribute set(final Attribute att, final StepList xpath, Object value, String id,
-            AttributeType targetNodeType) {
+            AttributeType targetNodeType, boolean isXlinkRef) {
         if (XPath.LOGGER.isLoggable(Level.CONFIG)) {
             XPath.LOGGER.entering("XPath", "set", new Object[] { att, xpath, value, id,
                     targetNodeType });
@@ -502,9 +561,11 @@ public class XPath {
             final QName stepName = currStep.getName();
             final Name attributeName = Types.toName(stepName);
 
+            final boolean isLastStep = !stepsIterator.hasNext();
+
             AttributeDescriptor currStepDescriptor = null;
 
-            if (targetNodeType == null) {
+            if (!isLastStep || targetNodeType == null) {
                 if (null == attributeName.getNamespaceURI()) {
                     currStepDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
                             attributeName.getLocalPart());
@@ -562,8 +623,7 @@ public class XPath {
                         + parentType.getName().getLocalPart() + " properties: " + parentAtts);
             }
 
-            final boolean isLastStep = !stepsIterator.hasNext();
-
+ 
             if (isLastStep) {
                 // reached the leaf
                 if (currStepDescriptor == null) {
@@ -572,13 +632,14 @@ public class XPath {
                 }
                 int index = currStep.getIndex();
                 Attribute attribute = setValue(currStepDescriptor, id, value, index, parent,
-                        targetNodeType);
+                        targetNodeType, isXlinkRef);
                 return attribute;
             } else {
                 // parent = appendComplexProperty(parent, currStep,
                 // currStepDescriptor);
                 int index = currStep.getIndex();
-                Attribute _parent = setValue(currStepDescriptor, null, null, index, parent, null);
+                Attribute _parent = setValue(currStepDescriptor, null, null, index, parent, null,
+                        isXlinkRef);
                 parent = (ComplexAttribute) _parent;
             }
         }
@@ -587,33 +648,57 @@ public class XPath {
 
     private Attribute setValue(final AttributeDescriptor descriptor, final String id,
             final Object value, final int index, final ComplexAttribute parent,
-            final AttributeType targetNodeType) {
+            final AttributeType targetNodeType, boolean isXlinkRef) {
         // adapt value to context
         Object convertedValue = convertValue(descriptor, value);
         Attribute leafAttribute = null;
         final Name attributeName = descriptor.getName();
         Object currStepValue = parent.getProperties(attributeName);
-        if (currStepValue instanceof Collection) {
-            List <Attribute> values = new ArrayList((Collection) currStepValue);
-            if (convertedValue == null && values.size() >= index) {
-                leafAttribute = (Attribute) values.get(index - 1);
-            }
-            for (Attribute stepValue : values) {
-                // eliminate duplicates in case the values come from denormalized view..
-                if (stepValue.getValue().equals(convertedValue)) {
-                    return stepValue;
+        if (!isXlinkRef) {
+            // skip this process if the attribute would only contain xlink:ref
+            // that is chained, because it won't contain any values, and we
+            // want to create a new empty leaf attribute
+            if (currStepValue instanceof Collection) {
+                List<Attribute> values = new ArrayList((Collection) currStepValue);
+                if (convertedValue == null && values.size() >= index) {
+                    leafAttribute = (Attribute) values.get(index - 1);
                 }
+                for (Attribute stepValue : values) {
+                    // eliminate duplicates in case the values come from denormalized view..
+                    if (stepValue.getValue().equals(convertedValue)) {
+                        return stepValue;
+                    }
+                }
+            } else if (currStepValue instanceof Attribute) {
+                leafAttribute = (Attribute) currStepValue;
+            } else if (currStepValue != null) {
+                throw new IllegalStateException("Unknown addressed object. Xpath:" + attributeName
+                        + ", addressed: " + currStepValue.getClass().getName() + " ["
+                        + currStepValue.toString() + "]");
             }
-        } else if (currStepValue instanceof Attribute) {
-            leafAttribute = (Attribute) currStepValue;
-        } else if (currStepValue != null) {
-            throw new IllegalStateException("Unknown addressed object. Xpath:" + attributeName
-                    + ", addressed: " + currStepValue.getClass().getName() + " ["
-                    + currStepValue.toString() + "]");
         }
         if (leafAttribute == null) {
             AttributeBuilder builder = new AttributeBuilder(featureFactory);
-            builder.init(parent);
+            builder.setDescriptor(parent.getDescriptor());
+            //check for mapped type override
+
+            builder.setType(parent.getType());
+            if (parent instanceof ComplexAttribute) {
+                ComplexAttribute complex = (ComplexAttribute) parent;
+                Collection properties = (Collection) complex.getValue();
+                for (Iterator itr = properties.iterator(); itr.hasNext();) {
+                    Property property = (Property) itr.next();
+                    if (property instanceof Attribute && ! property.getName().getLocalPart().equals("simpleContent")) {
+                        Attribute att = (Attribute) property;
+                        builder.add(att.getIdentifier() == null ? null : att.getIdentifier().toString(), att
+                                .getValue(), att.getName());
+                    } else if (property instanceof Association) {
+                        Association assoc = (Association) property;
+                        builder.associate(assoc.getValue(), assoc.getName());
+                    }
+                }
+            }
+
             if (targetNodeType != null) {
                 leafAttribute = builder.add(id, convertedValue, attributeName, targetNodeType);
             } else {
@@ -643,11 +728,16 @@ public class XPath {
         final AttributeType type = descriptor.getType();
         Class<?> binding = type.getBinding();
         if (type instanceof ComplexType && binding == Collection.class) {
-            if (isSimpleContentType(type)) {
+            if (!(value instanceof Collection) && isSimpleContentType(type)) {
                 ArrayList<Property> list = new ArrayList<Property>();
                 list.add(buildSimpleContent(type, value));
                 return list;
             } 
+        }
+        if (binding == String.class && value instanceof Collection) {
+            // if it's a single value in a collection, strip the square brackets
+            String collectionString = value.toString();
+            return collectionString.substring(1, collectionString.length() - 1);
         }
         return FF.literal(value).evaluate(value, binding);
     }
@@ -703,19 +793,7 @@ public class XPath {
         Name name = new NameImpl(null, "simpleContent");
         AttributeDescriptor descriptor = new AttributeDescriptorImpl(simpleContentType, name, 1, 1,
                 true, (Object) null);
-        return new AttributeImpl(convertedValue, descriptor, null) {
-            /*
-             * FIXME: this is an ugly hack. Here we rely on the Encoder fallback behaviour to encode
-             * simpleContent. Without this, the default toString() is used, and programmer debugging
-             * information is encoded into XML. Furthermore, the contained angle brackets break XML
-             * well-formedness as well as being garbage. This should be done properly when correct
-             * handling of complexType with simpleContent is implemented.
-             */
-            @Override
-            public String toString() {
-                return getValue().toString();
-            }
-        };
+        return new AttributeImpl(convertedValue, descriptor, null);
     }
 
     public boolean isComplexType(final StepList attrXPath, final AttributeDescriptor featureType) {

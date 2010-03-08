@@ -25,11 +25,14 @@ import org.geotools.feature.Types;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
+import org.opengis.feature.type.FeatureType;
 
 /**
  * JXPath property handler that works on AttributeDescriptor/type
  * 
  * @author Gabriel Roldan
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributeDescriptorPropertyHandler.java $
  */
 public class AttributeDescriptorPropertyHandler implements DynamicPropertyHandler {
 
@@ -55,19 +58,23 @@ public class AttributeDescriptorPropertyHandler implements DynamicPropertyHandle
 	 * <code>o</code>.
 	 */
 	public Object getProperty(Object o, String propName) {
-		AttributeDescriptor value = null;
-		AttributeDescriptor node = (AttributeDescriptor)o;
-		if(node.getName().getLocalPart().equals(propName)){
-			return node;
-		}
-		if(!(node.getType() instanceof ComplexType)){
-			throw new IllegalArgumentException("can't ask for property "
-					+ propName + " of a non complex type: " + node.getType());
-		}
-		ComplexType complex = (ComplexType) node.getType();
-        value = (AttributeDescriptor) Types.descriptor(complex, propName);
-		//value = Descriptors.node(complex, propName);
-		return value;
+	    ComplexType complex;
+	    if (o instanceof AttributeDescriptor) {
+	        AttributeDescriptor node = (AttributeDescriptor)o;
+	        if(node.getName().getLocalPart().equals(propName)){
+	            return node;
+	        }
+	        if(!(node.getType() instanceof ComplexType)){
+	            throw new IllegalArgumentException("can't ask for property "
+	                    + propName + " of a non complex type: " + node.getType());
+	        }
+	        complex = (ComplexType) node.getType();
+	    } else if (o instanceof ComplexType) {
+	        complex = (ComplexType) o;
+	    } else {
+	        throw new RuntimeException("Unexpected type passed to binding");
+	    }
+	    return Types.descriptor(complex, propName);
 	}
 
 	public void setProperty(Object feature, String propertyName, Object value) {

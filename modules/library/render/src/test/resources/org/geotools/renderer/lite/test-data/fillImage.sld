@@ -19,6 +19,7 @@
                 </Graphic>
               </GraphicFill>
             </Fill>
+            <Stroke/>
           </PolygonSymbolizer>
         </Rule>
       </FeatureTypeStyle>

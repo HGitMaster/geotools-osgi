@@ -27,10 +27,13 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -69,10 +72,10 @@ import java.util.zip.ZipFile;
  * of this one.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/sample-data/src/main/java/org/geotools/test/TestData.java $
- * @version $Id: TestData.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/sample-data/src/main/java/org/geotools/test/TestData.java $
+ * @version $Id: TestData.java 34820 2010-01-19 17:00:00Z danieleromagnoli $
  * @author James McGill
- * @author Simone Giannecchiin
+ * @author Simone Giannecchini
  * @author Martin Desruisseaux
  *
  * @tutorial http://www.geotools.org/display/GEOT/5.8+Test+Data
@@ -118,12 +121,66 @@ public class TestData implements Runnable {
      */
     private static final boolean mediaLibAvailable;
     static {
+
+    	// do we wrappers at hand?
+        boolean mediaLib = false;
         Class mediaLibImage = null;
         try {
             mediaLibImage = Class.forName("com.sun.medialib.mlib.Image");
         } catch (ClassNotFoundException e) {
         }
-        mediaLibAvailable = (mediaLibImage != null);
+        mediaLib = (mediaLibImage != null);
+        
+        
+        // npw check if we either wanted to disable explicitly and if we installed the native libs
+        if(mediaLib){
+        
+	        try {
+	        	// explicit disable
+	            mediaLib =
+	                !Boolean.getBoolean("com.sun.media.jai.disableMediaLib");
+	            
+	            //native libs installed
+		        if(mediaLib)
+		        {
+		        	final Class mImage=mediaLibImage;
+	                mediaLib=AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+	                     public Boolean run() {
+	                    	 try {
+	                    		//get the method
+	                    		final Class params[] = {};
+								Method method= mImage.getDeclaredMethod("isAvailable", params);
+
+								//invoke
+	                    		final Object paramsObj[] = {};
+
+	        		        	final Object o=mImage.newInstance();
+		                        return (Boolean) method.invoke(o, paramsObj);
+							} catch (Throwable e) {
+								return false;
+							}
+	                     }
+	                });
+		        }	            
+	        } catch (Throwable e) {
+	            // Because the property com.sun.media.jai.disableMediaLib isn't
+	            // defined as public, the users shouldn't know it.  In most of
+	            // the cases, it isn't defined, and thus no access permission
+	            // is granted to it in the policy file.  When JAI is utilized in
+	            // a security environment, AccessControlException will be thrown.
+	            // In this case, we suppose that the users would like to use
+	            // medialib accelaration.  So, the medialib won't be disabled.
+	
+	            // The fix of 4531501
+	        	
+	        	mediaLib=false;
+	        }
+	        
+
+        }
+
+
+        mediaLibAvailable=mediaLib;
     }
 
     /**
@@ -563,4 +620,5 @@ public class TestData implements Runnable {
             }
         }
     }
+
 }

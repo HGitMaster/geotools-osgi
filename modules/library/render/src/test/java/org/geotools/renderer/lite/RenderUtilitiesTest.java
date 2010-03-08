@@ -16,6 +16,8 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 
 import junit.framework.TestCase;
@@ -83,6 +85,95 @@ public class RenderUtilitiesTest extends TestCase {
         assertEquals(1325232.03, scale, 0.01);
     }
     
+    public void testOGCScaleAffineProjected() throws Exception {
+        // 1 pixel == 500 m  =>  0.00028 m [ screen] == 500 m [world]
+        // => scaleDenominator = 500/0.00028
+        final AffineTransform screenToWord = AffineTransform.getScaleInstance(500,500);
+        final AffineTransform worldToScreen = screenToWord.createInverse();
+        
+        final CoordinateReferenceSystem crs = DefaultEngineeringCRS.CARTESIAN_2D;
+        double scale;
+        
+        scale = RendererUtilities.calculateOGCScaleAffine(crs, worldToScreen,new HashMap());
+        assertEquals(500/0.00028, scale, 0.0001);
+        
+        worldToScreen.rotate(1.0);
+        scale = RendererUtilities.calculateOGCScaleAffine(crs, worldToScreen,new HashMap());
+        assertEquals(500/0.00028, scale, 0.0001);
+        
+        worldToScreen.translate(100.0,100.0);
+        scale = RendererUtilities.calculateOGCScaleAffine(crs, worldToScreen,new HashMap());
+        assertEquals(500/0.00028, scale, 0.0001);
+    }
+    
+    public void testOGCScaleAffineGeographic() throws Exception {
+        // 1 pixel == 0.5 degree  =>  0.00028 m [ screen] == 0.5 degree * OGC_DEGREE_TO_METERS m [world]
+        // => scaleDenominator = 0.5 * OGC_DEGREE_TO_METERS/0.00028
+        final AffineTransform screenToWord = AffineTransform.getScaleInstance(0.5,0.5);
+        final AffineTransform worldToScreen = screenToWord.createInverse();
+        
+        final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+        double scale;
+        
+        scale = RendererUtilities.calculateOGCScaleAffine(crs, worldToScreen,new HashMap());
+        assertEquals(0.5*RendererUtilities.OGC_DEGREE_TO_METERS/0.00028, scale, 0.0001);
+        
+        worldToScreen.rotate(1.0);
+        scale = RendererUtilities.calculateOGCScaleAffine(crs, worldToScreen,new HashMap());
+        assertEquals(0.5*RendererUtilities.OGC_DEGREE_TO_METERS/0.00028, scale, 0.0001);
+        
+        worldToScreen.translate(100.0,100.0);
+        scale = RendererUtilities.calculateOGCScaleAffine(crs, worldToScreen,new HashMap());
+        assertEquals(0.5*RendererUtilities.OGC_DEGREE_TO_METERS/0.00028, scale, 0.0001);
+      
+    }
+    
+    public void testCreateMapEnvelope() throws Exception {
+        final double offset = 10000;
+        final Rectangle paintArea = new Rectangle(0,0,800,600);
+      
+        final AffineTransform worldToScreen = AffineTransform.getScaleInstance(0.5,0.5);
+        worldToScreen.translate(-offset,-offset);
+        AffineTransform at = new AffineTransform(worldToScreen);
+        Envelope env = RendererUtilities.createMapEnvelope(paintArea, at);
+        assertEnvelopeEquals(new Envelope(offset,offset+1600,offset,offset+1200),env,0.001);
+        // Test for negative world coordinates
+        at.translate(2*offset,2*offset);
+        env = RendererUtilities.createMapEnvelope(paintArea, at);
+        assertEnvelopeEquals(new Envelope(-offset,-offset+1600,-offset,-offset+1200),env,0.001);
+        // Restore to standard offset
+        at.translate(-2*offset,-2*offset);
+        at.rotate(Math.PI/2.0,offset,offset);
+        env = RendererUtilities.createMapEnvelope(paintArea, at);
+        assertEnvelopeEquals(new Envelope(offset,offset+1200,offset-1600,offset),env,0.0001);
+        at = new AffineTransform(worldToScreen);
+        at.rotate(Math.PI/4.0,offset,offset);
+        env = RendererUtilities.createMapEnvelope(paintArea, at);
+        assertEnvelopeEquals(new Envelope(
+                                          offset,
+                                          offset+Math.cos(Math.PI/4.0)*1600 + Math.sin(Math.PI/4.0)*1200,
+                                          offset-Math.sin(Math.PI/4.0)*1600,
+                                          offset+Math.cos(Math.PI/4.0)*1200),env,0.0001);
+        
+    }
+    
+    private void assertEnvelopeEquals(Envelope expected, Envelope actual, double delta) {
+         if (expected.equals(actual)) {
+             return;
+         }
+         boolean equals = true;
+         equals &= Math.abs(expected.getMinX() - actual.getMinX()) <= delta;
+         equals &= Math.abs(expected.getMaxX() - actual.getMaxX()) <= delta;
+         equals &= Math.abs(expected.getMinY() - actual.getMinY()) <= delta;
+         equals &= Math.abs(expected.getMaxY() - actual.getMaxY()) <= delta;
+         if (!equals) {
+             failNotEquals(null,expected,actual); 
+         }
+ 
+         
+        
+    }
+
     /**
      * The following test is from the tile module where the behavior
      * of RenderUtilities changed between 2.2. and 2.4.

@@ -33,6 +33,8 @@ import com.vividsolutions.jts.geom.Point;
  * Tests for {@link SimpleFeatureImpl}.
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/feature/simple/SimpleFeatureTypeImplTest.java $
  */
 public class SimpleFeatureTypeImplTest extends TestCase {
 

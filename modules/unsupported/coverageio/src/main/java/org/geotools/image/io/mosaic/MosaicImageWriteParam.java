@@ -26,7 +26,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * The parameters for {@link MosaicImageWriter}.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageWriteParam.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageWriteParam.java $
  * @version $Id: MosaicImageWriteParam.java 30729 2008-06-16 09:26:48Z desruisseaux $
  * @author Martin Desruisseaux
  */

@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
  * tiles created from the source tiles by the {@linkplain #builder}. A {@linkplain #manager
  * tile manager} is created for those target tiles.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/TestBase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/TestBase.java $
  * @version $Id: TestBase.java 31649 2008-10-12 17:56:37Z desruisseaux $
  * @author Martin Desruisseaux
  */

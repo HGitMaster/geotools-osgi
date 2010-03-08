@@ -37,7 +37,7 @@ import org.geotools.util.SimpleInternationalString;
  * Standardized resource reference.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/CitationImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/CitationImpl.java $
  * @version $Id: CitationImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Jody Garnett

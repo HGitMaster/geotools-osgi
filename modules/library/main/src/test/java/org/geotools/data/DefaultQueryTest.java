@@ -30,7 +30,7 @@ import org.opengis.filter.Filter;
 /**
  *
  * @author jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/data/DefaultQueryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/DefaultQueryTest.java $
  */
 public class DefaultQueryTest extends TestCase {
     

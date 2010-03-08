@@ -28,7 +28,7 @@ import org.opengis.metadata.spatial.VectorSpatialRepresentation;
 /**
  * Information about the vector spatial objects in the dataset.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/spatial/VectorSpatialRepresentationImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/spatial/VectorSpatialRepresentationImpl.java $
  * @version $Id: VectorSpatialRepresentationImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

@@ -26,6 +26,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
+import org.geotools.geometry.jts.coordinatesequence.PackedCSBuilder;
 
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
@@ -33,6 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
+import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
 import com.vividsolutions.jts.io.InStream;
 import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKBWriter;
@@ -43,7 +45,7 @@ import com.vividsolutions.jts.io.WKBWriter;
  * An attribute IO implementation that can manage the WKB
  *
  * @author Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/PgWKBAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/PgWKBAttributeIO.java $
  */
 public class PgWKBAttributeIO implements AttributeIO {
     private boolean useByteArray;
@@ -66,9 +68,15 @@ public class PgWKBAttributeIO implements AttributeIO {
                 pm = new PrecisionModel();
             Integer SRID = (Integer) hints.get(Hints.JTS_SRID);
             int srid = SRID == null ? 0 : SRID.intValue();
+            Integer dimension = (Integer) hints.get(Hints.COORDINATE_DIMENSION);
             CoordinateSequenceFactory csFactory = (CoordinateSequenceFactory) hints.get(Hints.JTS_COORDINATE_SEQUENCE_FACTORY);
-            if(csFactory == null)
-                csFactory = CoordinateArraySequenceFactory.instance();
+            if(csFactory == null) {
+                if(dimension == null || dimension <= 3) {
+                    csFactory = CoordinateArraySequenceFactory.instance();
+                } else {
+                    csFactory = new LiteCoordinateSequenceFactory();
+                }
+            } 
             gf = new GeometryFactory(pm, srid, csFactory);
         }
         wkbr = new WKBReader(gf);

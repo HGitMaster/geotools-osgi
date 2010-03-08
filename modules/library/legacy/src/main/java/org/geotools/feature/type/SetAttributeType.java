@@ -33,7 +33,7 @@ import org.opengis.filter.Filter;
  * NOTE: Some of the methods in this class has nasty order-dependant assumptions, please fix.
  * 
  * @author dzwiers
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/main/java/org/geotools/feature/type/SetAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/type/SetAttributeType.java $
  * 
  * @deprecated Will be removed from Geotools 2.6.
  */

@@ -28,6 +28,8 @@ import java.util.List;
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-sld/src/main/java/org/geotools/sld/CssParameter.java $
  */
 public class CssParameter {
     String name;

@@ -26,7 +26,7 @@ import junit.framework.TestCase;
  * This simply tests and demonstrates how to make a new feature factory.
  *
  * @author Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/test/java/org/geotools/feature/FeatureTypeFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/test/java/org/geotools/feature/FeatureTypeFactoryTest.java $
  */
 public class FeatureTypeFactoryTest extends TestCase {
   

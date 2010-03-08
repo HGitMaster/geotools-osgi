@@ -39,7 +39,7 @@ import org.opengis.filter.expression.Expression;
  * any regressions as we move forward to SE 1.1 interfaces.
  *
  * @author iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/styling/StyleFactoryImplTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/StyleFactoryImplTest.java $
  */
 public class StyleFactoryImplTest extends TestCase {
     static StyleFactory styleFactory;

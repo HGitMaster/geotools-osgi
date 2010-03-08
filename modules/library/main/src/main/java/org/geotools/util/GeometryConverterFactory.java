@@ -38,6 +38,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
  * @since 2.4
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/util/GeometryConverterFactory.java $
  */
 public class GeometryConverterFactory implements ConverterFactory {
 

@@ -25,6 +25,8 @@ import java.awt.geom.Rectangle2D;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/AlgoRectangle2D.java $
  */
 public class AlgoRectangle2D {
 

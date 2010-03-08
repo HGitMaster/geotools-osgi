@@ -29,7 +29,7 @@ import org.geotools.resources.XArray;
  *       a real merge of two {@link GeographicMetadata} objects.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/MetadataMerge.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/MetadataMerge.java $
  * @version $Id: MetadataMerge.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux
  */

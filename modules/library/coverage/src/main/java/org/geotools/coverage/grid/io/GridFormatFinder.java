@@ -55,6 +55,7 @@ import org.opengis.coverage.grid.GridCoverage;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/main/src/org/geotools/data/coverage/grid/GridFormatFinder.java $
  */
+@SuppressWarnings("deprecation")
 public final class GridFormatFinder {
 	/**
 	 * The service registry for this manager. Will be initialized only when
@@ -117,7 +118,6 @@ public final class GridFormatFinder {
 	 * at runtime.
 	 */
 	public static synchronized void scanForPlugins() {
-
 		getServiceRegistry().scanForPlugins();
 
 	}
@@ -139,7 +139,6 @@ public final class GridFormatFinder {
 	 * @return an array with all available {@link GridFormatFactorySpi}
 	 *         implementations.
 	 */
-	@SuppressWarnings("deprecation")
 	public static Format[] getFormatArray() {
 		final Set<GridFormatFactorySpi> formats = GridFormatFinder.getAvailableFormats();
 		final List<Format> formatSet = new ArrayList<Format>(formats.size());
@@ -159,16 +158,15 @@ public final class GridFormatFinder {
 	 * @return an unmodifiable {@link Set} comprising all the {@link Format}
 	 *         that can read the {@link Object} o.
 	 */
-	@SuppressWarnings("deprecation")
-        public static synchronized Set<Format> findFormats(Object o) {
+        public static synchronized Set<AbstractGridFormat> findFormats(Object o) {
 		final Set<GridFormatFactorySpi> availaibleFormats = getAvailableFormats();
-		final Set<Format> formats=new HashSet<Format>();
+		final Set<AbstractGridFormat> formats=new HashSet<AbstractGridFormat>();
 		final Iterator<GridFormatFactorySpi> it = availaibleFormats.iterator();
 		while (it.hasNext()) {
 			// get the factory
 			final GridFormatFactorySpi spi = (GridFormatFactorySpi) it.next();
 			// create a format for it
-			final Format retVal = spi.createFormat();
+			final AbstractGridFormat retVal = spi.createFormat();
 			// check if we can accept it
 			if (retVal instanceof AbstractGridFormat) {
 				if (((AbstractGridFormat) retVal).accepts(o))
@@ -198,12 +196,12 @@ public final class GridFormatFinder {
 	 *         {@link Object} o or <code>null</code> in no plugins was able to
 	 *         accept it.
 	 */
-	@SuppressWarnings("deprecation")
-        public static synchronized Format findFormat(Object o) {
-		final Set<Format> formats = findFormats(o);
-		final Iterator<Format> it = formats.iterator();
-		if (it.hasNext())
-			return (Format) it.next();
+        public static synchronized AbstractGridFormat findFormat(Object o) {
+		final Set<AbstractGridFormat> formats = findFormats(o);
+		final Iterator<AbstractGridFormat> it = formats.iterator();
+		if (it.hasNext()){
+			return (AbstractGridFormat) it.next();
+		}
 		return new UnknownFormat();
 
 	}

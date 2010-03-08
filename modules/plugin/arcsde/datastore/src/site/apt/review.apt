@@ -8,9 +8,10 @@
 
   STATUS: DIRTY
       Code is CLEAN
-      Data 18M (!?excuse me?) need a provenance review.
-        http://jira.codehaus.org/browse/GEOT-1878
-
+      Data is CLEAN. Size: ~7M. 
+      All the imagery files in the src/test/resources/test-data folder are small subsets
+       of publicly redistributable MassGIS data. They are controlled by a US State government 
+       and as such are "Public Records".
 
 
   The following was taken from the ArcSDE wiki page...

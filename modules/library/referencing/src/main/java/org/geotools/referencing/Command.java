@@ -56,7 +56,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Implementation of the {@link CRS#main} method. Exists as a separated class in order
  * to reduce the class loading for applications that don't want to run this main method.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/Command.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/Command.java $
  * @version $Id: Command.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

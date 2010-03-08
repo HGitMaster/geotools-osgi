@@ -30,6 +30,8 @@ import java.util.Stack;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/AlgoLine2D.java $
  */
 public class AlgoLine2D {
 

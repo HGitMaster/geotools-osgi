@@ -35,7 +35,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * ship or satellite).
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultEngineeringDatum.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultEngineeringDatum.java $
  * @version $Id: DefaultEngineeringDatum.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

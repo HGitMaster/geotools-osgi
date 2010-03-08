@@ -16,30 +16,19 @@
  */
 package org.geotools.coverageio.gdal.mrsid;
 
-import it.geosolutions.imageio.gdalframework.GDALCommonIIOImageMetadata;
-import it.geosolutions.imageio.plugins.mrsid.MrSIDIIOImageMetadata;
 import it.geosolutions.imageio.plugins.mrsid.MrSIDImageReaderSpi;
 
-import java.awt.Rectangle;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
 
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverageio.gdal.BaseGDALGridCoverage2DReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.referencing.FactoryException;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 /**
  * This class can read a MrSID data source and create a {@link GridCoverage2D}

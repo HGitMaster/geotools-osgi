@@ -78,7 +78,7 @@ public final class JP2ECWFormatFactory extends BaseGridFormatFactorySPI implemen
      * 
      * @return A {@link JP2ECWFormat}.;
      */
-    public Format createFormat() {
+    public JP2ECWFormat createFormat() {
         return new JP2ECWFormat();
     }
 }

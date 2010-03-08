@@ -58,6 +58,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Emily
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/featurecache/readers/GridCachingFeatureCollection.java $
  */
 public class GridCachingFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature>{
 	private static final int MAX_FILTER_SIZE = 4; //the maximum number of "and" statements allowed in filter  

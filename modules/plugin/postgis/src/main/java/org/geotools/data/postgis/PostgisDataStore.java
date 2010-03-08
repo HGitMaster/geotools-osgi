@@ -110,8 +110,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Chris Holmes, TOPP
  * @author Andrea Aime
  * @author Paolo Rizzi
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStore.java $
- * @version $Id: PostgisDataStore.java 32627 2009-03-13 12:00:55Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStore.java $
+ * @version $Id: PostgisDataStore.java 33328 2009-06-19 17:48:05Z aaime $
  *
  * @task REVISIT: So Paolo Rizzi has a number of improvements in
  *       http://jira.codehuas.org/browse/GEOT-379  I rolled in a few of them,
@@ -1048,10 +1048,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         Connection dbConnection = null;
         Class type = null;
         int srid = 0;
+        int dimension = 2;
         try {
             dbConnection = getConnection(Transaction.AUTO_COMMIT);
             StringBuffer sql = new StringBuffer();
-            sql.append("SELECT type FROM geometry_columns WHERE ");
+            sql.append("SELECT type, coord_dimension FROM geometry_columns WHERE ");
             String dbSchema = config.getDatabaseSchemaName();
             if (schemaEnabled && dbSchema != null && dbSchema.length() > 0) {
                 sql.append("f_table_schema='");
@@ -1075,7 +1076,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
             if (result.next()) {
                 geometryType = result.getString("type");
+                dimension = result.getInt("coord_dimension");
                 LOGGER.fine("geometry type is: " + geometryType);
+                if(dimension < 2) {
+                    dimension = 2;
+                    LOGGER.warning("Geometry dimension " + dimension + " + is invalid, assuming 2");
+                }
+                    
             }
             result.close();
 
@@ -1145,7 +1152,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
         
         return new AttributeTypeBuilder().name(columnName).binding(type)
-        	.nillable(nillable).crs(crs).buildDescriptor(columnName);
+        	.nillable(nillable).crs(crs).userData(Hints.COORDINATE_DIMENSION, dimension).buildDescriptor(columnName);
     }
 
     private PostgisAuthorityFactory getPostgisAuthorityFactory() {
@@ -1317,11 +1324,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 //this construct seems unnecessary, since we already would
                 //pass over if this wasn't a geometry...
                 Class type = geomAttribute.getType().getBinding();
-
-                if (geomAttribute instanceof GeometryDescriptor) {
-                    typeName = getGeometrySQLTypeName(type);
-                } else {
-                    typeName = (String) CLASS_MAPPINGS.get(type);
+                
+                
+                int dimension = 2;
+                typeName = getGeometrySQLTypeName(type);
+                
+                GeometryDescriptor gd = (GeometryDescriptor) geomAttribute;
+                if(gd.getUserData().get(Hints.COORDINATE_DIMENSION) instanceof Integer) {
+                    dimension = (Integer) gd.getUserData().get(Hints.COORDINATE_DIMENSION);
                 }
 
                 if (typeName != null) {
@@ -1339,7 +1349,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     sql.append(tableName);
                     sql.append("','");
                     sql.append(columnName);
-                    sql.append("',2,");
+                    sql.append("',");
+                    sql.append(dimension);
+                    sql.append(",");
                     sql.append(SRID);
                     sql.append(",'");
                     sql.append(typeName);
@@ -1376,7 +1388,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     sql.append(columnName);
                     sql.append(" CHECK (ndims(");
                     sql.append(sqlb.encodeColumnName(columnName));
-                    sql.append(") = 2);");
+                    sql.append(") = ");
+                    sql.append(dimension);
+                    sql.append(");");
                     sqlStr = sql.toString();
                     LOGGER.info(sqlStr);
                     if (shouldExecute) {
@@ -1804,7 +1818,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         if(geometryType != null)
             crs = geometryType.getCoordinateReferenceSystem();
         
-        Hints hints = queryData != null ? queryData.getHints() : GeoTools.getDefaultHints();            
+        Hints hints = queryData != null ? queryData.getHints() : GeoTools.getDefaultHints();
+        if(geometryType != null && geometryType.getUserData().get(Hints.COORDINATE_DIMENSION) instanceof Integer) { 
+            hints.put(Hints.COORDINATE_DIMENSION, geometryType.getUserData().get(Hints.COORDINATE_DIMENSION));
+        }
         int D = (crs == null || Boolean.TRUE.equals( queryData.getHints().get( Hints.FEATURE_2D )))
                 ? 2 : crs.getCoordinateSystem().getDimension();
         

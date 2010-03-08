@@ -26,7 +26,7 @@ import org.geotools.graph.structure.line.BasicXYNode;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/build/line/BasicLineGraphBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/build/line/BasicLineGraphBuilder.java $
  */
 public class BasicLineGraphBuilder extends BasicGraphBuilder {
   

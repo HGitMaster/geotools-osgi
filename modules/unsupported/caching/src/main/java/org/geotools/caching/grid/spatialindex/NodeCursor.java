@@ -10,6 +10,8 @@ import org.geotools.caching.spatialindex.Shape;
  * 
  * @author Emily
  * @since 1.2.0
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/NodeCursor.java $
  */
 public class NodeCursor {
 

@@ -27,10 +27,8 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -39,9 +37,10 @@ import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
-import org.geotools.arcsde.pool.SessionPool;
+import org.geotools.arcsde.session.Command;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.ISessionPool;
+import org.geotools.arcsde.session.SdeRow;
 import org.geotools.data.BatchFeatureEvent;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -59,15 +58,11 @@ import org.geotools.data.FeatureEvent.Type;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.feature.Attribute;
@@ -110,15 +105,14 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/da/src/test/java/org
  *         /geotools/arcsde/data/ArcSDEFeatureStoreTest.java $
- * @version $Id: ArcSDEFeatureStoreTest.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEFeatureStoreTest.java 33646 2009-07-28 17:40:55Z groldan $
  */
 public class ArcSDEFeatureStoreTest {
     /** package logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(ArcSDEFeatureStoreTest.class.getPackage().getName());
 
-    /** DOCUMENT ME! */
-    private static TestData testData;
+    private TestData testData;
 
     /**
      * Flag that indicates whether the underlying database is MS SQL Server.
@@ -132,8 +126,8 @@ public class ArcSDEFeatureStoreTest {
      */
     private static boolean databaseIsMsSqlServer;
 
-    @BeforeClass
-    public static void oneTimeSetUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         testData = new TestData();
         testData.setUp();
 
@@ -150,27 +144,11 @@ public class ArcSDEFeatureStoreTest {
         }
     }
 
-    @AfterClass
-    public static void oneTimeTearDown() {
+    @After
+    public void tearDown() {
         boolean cleanTestTable = false;
         boolean cleanPool = true;
         testData.tearDown(cleanTestTable, cleanPool);
-    }
-
-    /**
-     * loads {@code test-data/testparams.properties} into a Properties object, wich is used to
-     * obtain test tables names and is used as parameter to find the DataStore
-     * 
-     * @throws Exception
-     *             DOCUMENT ME!
-     */
-    @Before
-    public void setUp() throws Exception {
-        testData.truncateTempTable();
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     /**
@@ -396,7 +374,7 @@ public class ArcSDEFeatureStoreTest {
             }
         }
 
-        SessionPool connectionPool = testData.getConnectionPool();
+        ISessionPool connectionPool = testData.getConnectionPool();
         ISession session = connectionPool.getSession();
         SeQuery seQuery;
         try {
@@ -576,7 +554,6 @@ public class ArcSDEFeatureStoreTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testInsertTransactionAndQueryByFid() throws Exception {
         // start with an empty table
@@ -609,6 +586,42 @@ public class ArcSDEFeatureStoreTest {
             throw e;
         } finally {
             transaction.close();
+        }
+    }
+
+    /**
+     * Make sure features are validated against it's schema before being added
+     */
+    @Test
+    public void testInsertNonNillableAttributeCheck() throws Exception {
+        // start with an empty table
+        testData.truncateTempTable();
+        final String typeName = testData.getTempTableName();
+        final int featureCount = 1;
+
+        SimpleFeature feature;
+        feature = testData.createTestFeatures(LineString.class, featureCount).features().next();
+
+        final DataStore ds = testData.getDataStore();
+
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds
+                .getFeatureSource(typeName);
+
+        SimpleFeatureType ftype = store.getSchema();
+
+        assertFalse(ftype.getDescriptor("INT32_COL").isNillable());
+
+        feature.setAttribute("INT32_COL", null);
+
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = DataUtilities
+                .collection(feature);
+        try {
+            store.addFeatures(collection);
+            fail("Expected IAE");
+        } catch (IllegalArgumentException e) {
+            // note this should really be org.opengis.feature.IllegalAttributeException but
+            // Types.validate throws IllegalArgumentException instead
+            assertTrue(true);
         }
     }
 
@@ -838,11 +851,17 @@ public class ArcSDEFeatureStoreTest {
             SimpleFeature feature;
             try {
                 feature = writer.next();
+                // set this attribute as its the only non nillable one
+                feature.setAttribute("INT32_COL", Integer.valueOf(0));
+                // now set the geometry
                 feature.setAttribute(defaultGeometry.getName(), p1);
                 writer.write();
                 fid1 = feature.getID();
 
                 feature = writer.next();
+                // set this attribute as its the only non nillable one
+                feature.setAttribute("INT32_COL", Integer.valueOf(0));
+                // now set the geometry
                 feature.setAttribute(defaultGeometry.getName(), p2);
                 writer.write();
                 fid2 = feature.getID();
@@ -970,28 +989,6 @@ public class ArcSDEFeatureStoreTest {
          * String msg = "a FEATURES_ADDED event should have been called " + features.size() + "
          * times"; assertEquals(msg, features.size(), featureAddedEventCount[0]);
          */
-    }
-
-    @Test
-    public void testCreateNillableShapeSchema() throws IOException, SchemaException, SeException {
-        SimpleFeatureType type;
-        final String typeName = "GT_TEST_CREATE";
-
-        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-        b.setName(typeName);
-
-        b.add("OBJECTID", Integer.class);
-        b.add("SHAPE", MultiLineString.class);
-
-        type = b.buildFeatureType();
-
-        ArcSDEDataStore ds = testData.getDataStore();
-
-        testData.deleteTable(typeName);
-        Map hints = new HashMap();
-        hints.put("configuration.keyword", testData.getConfigKeyword());
-        ds.createSchema(type, hints);
-        testData.deleteTable(typeName);
     }
 
     @Test

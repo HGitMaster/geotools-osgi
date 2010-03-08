@@ -43,7 +43,7 @@ import org.geotools.resources.OptionalDependencies;
  * as returned by {@link Tile#getAbsoluteRegion}. They must be wide enough for including
  * all children bounds.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/TreeNode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/TreeNode.java $
  * @version $Id: TreeNode.java 30742 2008-06-16 19:48:45Z desruisseaux $
  * @author Martin Desruisseaux
  */

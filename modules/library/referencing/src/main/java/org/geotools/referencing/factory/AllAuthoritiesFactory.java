@@ -46,7 +46,7 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  * their own instance.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/AllAuthoritiesFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/AllAuthoritiesFactory.java $
  * @version $Id: AllAuthoritiesFactory.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

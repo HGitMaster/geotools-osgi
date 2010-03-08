@@ -72,7 +72,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * be created by VPFFileFactory.
  *
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/file/VPFFile.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/file/VPFFile.java $
  */
 public class VPFFile implements SimpleFeatureType, FileConstants, DataTypesDefinition {
     //    private final TableInputStream stream;

@@ -45,6 +45,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </p>
  * @author jdeolive
  * @author jgarnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/FeatureImpl.java $
  */
 public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 

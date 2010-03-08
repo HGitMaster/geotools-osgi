@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DOCUMENT ME!
  *
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/readers/LineGeometryFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/readers/LineGeometryFactory.java $
  */
 public class LineGeometryFactory extends VPFGeometryFactory implements FileConstants {
     /* (non-Javadoc)

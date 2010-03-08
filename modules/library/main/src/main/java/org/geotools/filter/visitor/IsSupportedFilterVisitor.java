@@ -77,6 +77,8 @@ import org.opengis.filter.spatial.Within;
  * entire Filter.
  * 
  * @author Jody Garnett (Refractions Research)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/IsSupportedFilterVisitor.java $
  */
 public class IsSupportedFilterVisitor implements FilterVisitor, ExpressionVisitor {
     

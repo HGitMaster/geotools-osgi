@@ -47,7 +47,7 @@ import static org.junit.Assert.*;
 /**
  * Tests some operation steps involved in coordinate operation creation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/operation/LinearConversionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/LinearConversionTest.java $
  * @version $Id: LinearConversionTest.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

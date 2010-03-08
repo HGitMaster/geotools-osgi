@@ -19,6 +19,7 @@ package org.geotools.data.shapefile.shp;
 import java.nio.ByteBuffer;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
@@ -33,14 +34,15 @@ import com.vividsolutions.jts.geom.MultiPoint;
  */
 public class MultiPointHandler implements ShapeHandler {
     final ShapeType shapeType;
-    GeometryFactory geometryFactory = new GeometryFactory();
+    GeometryFactory geometryFactory;
 
     /** Creates new MultiPointHandler */
-    public MultiPointHandler() {
+    public MultiPointHandler(GeometryFactory gf) {
         shapeType = ShapeType.POINT;
+        this.geometryFactory = gf;
     }
 
-    public MultiPointHandler(ShapeType type) throws ShapefileException {
+    public MultiPointHandler(ShapeType type, GeometryFactory gf) throws ShapefileException {
         if ((type != ShapeType.MULTIPOINT) && (type != ShapeType.MULTIPOINTM)
                 && (type != ShapeType.MULTIPOINTZ)) {
             throw new ShapefileException(
@@ -48,8 +50,9 @@ public class MultiPointHandler implements ShapeHandler {
         }
 
         shapeType = type;
+        this.geometryFactory = gf;
     }
-
+    
     /**
      * Returns the shapefile shape type value for a point
      * 
@@ -104,23 +107,23 @@ public class MultiPointHandler implements ShapeHandler {
         buffer.position(buffer.position() + 4 * 8);
 
         int numpoints = buffer.getInt();
-        Coordinate[] coords = new Coordinate[numpoints];
+        int dimensions = shapeType == shapeType.MULTIPOINTZ ? 3 : 2;
+        CoordinateSequence cs = geometryFactory.getCoordinateSequenceFactory().create(numpoints, dimensions);
 
         for (int t = 0; t < numpoints; t++) {
-            double x = buffer.getDouble();
-            double y = buffer.getDouble();
-            coords[t] = new Coordinate(x, y);
+            cs.setOrdinate(t, 0, buffer.getDouble());
+            cs.setOrdinate(t, 1, buffer.getDouble());
         }
 
         if (shapeType == ShapeType.MULTIPOINTZ) {
             buffer.position(buffer.position() + 2 * 8);
 
             for (int t = 0; t < numpoints; t++) {
-                coords[t].z = buffer.getDouble(); // z
+                cs.setOrdinate(t, 2, buffer.getDouble()); // z
             }
         }
 
-        return geometryFactory.createMultiPoint(coords);
+        return geometryFactory.createMultiPoint(cs);
     }
 
     public void write(ByteBuffer buffer, Object geometry) {

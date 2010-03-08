@@ -63,7 +63,9 @@ import org.opengis.filter.FilterFactory;
  *       suggestions email the list, as we should think this through more, but
  *       I've other pressing  tasks.
  * @deprecated please use PostPreProcessFilterSplittingVisitor
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/filter/SQLUnpacker.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/filter/SQLUnpacker.java $
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class SQLUnpacker {
     /**

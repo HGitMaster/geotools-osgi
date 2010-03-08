@@ -25,6 +25,8 @@ import org.picocontainer.MutablePicoContainer;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/smil/SMIL20Configuration.java $
  */
 public class SMIL20Configuration extends Configuration {
     public SMIL20Configuration() {

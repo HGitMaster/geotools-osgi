@@ -32,8 +32,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * only one tile. Consequently, sample values are set directly in the raster (no need to deal for
  * multi-tiles).
  *
- * @source $URL: http://svn.geotools.org/branches/2.5.x/demo/coverage-use/src/main/java/org/geotools/demo/coverage/FloatRasterDemo.java $
- * @version $Id: FloatRasterDemo.java 30570 2008-06-08 11:46:24Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/coverage/FloatRasterDemo.java $
+ * @version $Id: FloatRasterDemo.java 34132 2009-10-12 07:45:46Z mbedward $
  * @author Martin Desruisseaux
  */
 public class FloatRasterDemo extends junit.framework.TestCase {

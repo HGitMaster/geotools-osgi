@@ -35,6 +35,8 @@ import org.geotools.xml.impl.jxpath.FeatureNodeFactory;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/XPathPropertyAccessorFactory.java $
  */
 public class XPathPropertyAccessorFactory implements PropertyAccessorFactory {
     /**

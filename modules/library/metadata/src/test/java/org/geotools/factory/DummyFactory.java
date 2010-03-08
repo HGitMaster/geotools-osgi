@@ -28,8 +28,8 @@ import static org.junit.Assert.*;
  * just need a {@code InternalFactory.class} value different
  * than {@code DummyFactory.class}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/factory/DummyFactory.java $
- * @version $Id: DummyFactory.java 30640 2008-06-12 17:34:32Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/factory/DummyFactory.java $
+ * @version $Id: DummyFactory.java 34126 2009-10-12 06:35:18Z mbedward $
  * @author Martin Desruisseaux
  */
 interface InternalFactory extends Factory {
@@ -38,7 +38,9 @@ interface InternalFactory extends Factory {
 /**
  * Dummy factory interface for {@link FactoryRegistryTest}.
  *
- * @version $Id: DummyFactory.java 30640 2008-06-12 17:34:32Z acuster $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/factory/DummyFactory.java $
+ * @version $Id: DummyFactory.java 34126 2009-10-12 06:35:18Z mbedward $
  * @author Martin Desruisseaux
  */
 public interface DummyFactory extends InternalFactory {

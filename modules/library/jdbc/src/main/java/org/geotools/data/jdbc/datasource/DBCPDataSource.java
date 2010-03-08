@@ -25,6 +25,8 @@ import org.apache.commons.dbcp.BasicDataSource;
  * 
  * @author Administrator
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/DBCPDataSource.java $
  */
 public class DBCPDataSource extends AbstractManageableDataSource {
 

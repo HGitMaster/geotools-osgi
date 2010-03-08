@@ -24,7 +24,7 @@ package org.geotools.data.vpf.exc;
  * </p>
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/exc/VPFDataFormatException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/exc/VPFDataFormatException.java $
  * @version $Id: VPFDataFormatException.java 30687 2008-06-13 11:03:06Z acuster $
  */
 public class VPFDataFormatException extends RuntimeException {

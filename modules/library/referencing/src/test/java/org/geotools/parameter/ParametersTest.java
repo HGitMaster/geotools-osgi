@@ -51,14 +51,15 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.wkt.Formatter;
 
 import org.junit.*;
+
 import static org.junit.Assert.*;
 
 
 /**
  * Tests the <code>org.geotools.parameter</code> package.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/parameter/ParametersTest.java $
- * @version $Id: ParametersTest.java 30760 2008-06-18 14:28:24Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/parameter/ParametersTest.java $
+ * @version $Id: ParametersTest.java 33897 2009-09-13 09:17:55Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public final class ParametersTest {
@@ -70,11 +71,11 @@ public final class ParametersTest {
     @Test
     public void testSequence() {
         for (int i=-1000; i<=1000; i++) {
-            assertEquals("new (Integer, ...)", i, new Parameter("Integer", i          ).intValue());
-            assertEquals("new (Double, ...)",  i, new Parameter("Double",  i, null    ).doubleValue(), 0.0);
-            assertEquals("new (Double, ...)",  i, new Parameter("Double",  i, Unit.ONE).doubleValue(), 0.0);
+            assertEquals("new (Integer, ...)", i, Parameter.create("Integer", i          ).intValue());
+            assertEquals("new (Double, ...)",  i, Parameter.create("Double",  i, null    ).doubleValue(), 0.0);
+            assertEquals("new (Double, ...)",  i,  Parameter.create("Double",  i, Unit.ONE).doubleValue(), 0.0);
             assertEquals("new (Double, ...)",  Math.toRadians(i),
-                new Parameter("Double", i, NonSI.DEGREE_ANGLE).doubleValue(SI.RADIAN), 1E-6);
+            		 Parameter.create("Double", i, NonSI.DEGREE_ANGLE).doubleValue(SI.RADIAN), 1E-6);
         }
     }
 
@@ -85,7 +86,7 @@ public final class ParametersTest {
     @Test
     public void testRangeIntegers() {
         Parameter<Integer> param;
-        param = new Parameter(new DefaultParameterDescriptor("Range", 15, -30, +40));
+        param = new Parameter(DefaultParameterDescriptor.create("Range", 15, -30, +40));
         assertEquals(   "intValue", 15, param.intValue());
         assertEquals("doubleValue", 15, param.doubleValue(), 0.0);
         param.setValue(12);
@@ -122,7 +123,7 @@ public final class ParametersTest {
     @Test
     public void testRangeDoubles() {
         Parameter<Double> param;
-        param = new Parameter(new DefaultParameterDescriptor("Range", 15.0, -30.0, +40.0, null));
+        param = new Parameter(DefaultParameterDescriptor.create("Range", 15.0, -30.0, +40.0, null));
         assertEquals(   "intValue", 15, param.intValue());
         assertEquals("doubleValue", 15, param.doubleValue(), 0.0);
         param.setValue(12.0);
@@ -159,7 +160,7 @@ public final class ParametersTest {
      */
     @Test
     public void testCodeList() {
-        Parameter<AxisDirection> param = new Parameter("Test", AxisDirection.DISPLAY_UP);
+        Parameter<AxisDirection> param = Parameter.create("Test", AxisDirection.class,AxisDirection.DISPLAY_UP);
         ParameterDescriptor op = param.getDescriptor();
         assertEquals("Set<AxisDirection>",
                      new HashSet<AxisDirection>(Arrays.asList(AxisDirection.values())),
@@ -181,7 +182,7 @@ public final class ParametersTest {
             // This is the expected exception.
             assertEquals("Test", exception.getParameterName());
         }
-        param = new Parameter("Test", AxisDirection.DISPLAY_UP);
+        param = Parameter.create("Test",AxisDirection.class, AxisDirection.DISPLAY_UP);
         param.setValue(dummy); // Should not fails.
         assertEquals("equals(clone)", param, param.clone());
     }
@@ -191,17 +192,18 @@ public final class ParametersTest {
      */
     @Test
     public void testParameterDescriptor() {
-        ParameterDescriptor<Double> descriptor;
+        ParameterDescriptor<Double> dDescriptor;
+        ParameterDescriptor<Integer> iDescriptor;
         ParameterValue<Double>      parameter;
 
-        descriptor = new DefaultParameterDescriptor("Test", 12, 4, 20, SI.METER);
-        parameter  = descriptor.createValue();
-        assertEquals("name",         "Test",       descriptor.getName().getCode());
-        assertEquals("unit",         SI.METER,     descriptor.getUnit());
-        assertEquals("class",        Double.class, descriptor.getValueClass());
-        assertEquals("defaultValue", 12.0,         descriptor.getDefaultValue().doubleValue(), 0.0);
-        assertEquals("minimum",       4.0,         descriptor.getMinimumValue());
-        assertEquals("maximum",      20.0,         descriptor.getMaximumValue());
+        dDescriptor = DefaultParameterDescriptor.create("Test", 12, 4, 20, SI.METER);
+        parameter  = dDescriptor.createValue();
+        assertEquals("name",         "Test",       dDescriptor.getName().getCode());
+        assertEquals("unit",         SI.METER,     dDescriptor.getUnit());
+        assertEquals("class",        Double.class, dDescriptor.getValueClass());
+        assertEquals("defaultValue", 12.0,         dDescriptor.getDefaultValue().doubleValue(), 0.0);
+        assertEquals("minimum",       4.0,         dDescriptor.getMinimumValue());
+        assertEquals("maximum",      20.0,         dDescriptor.getMaximumValue());
         assertEquals("value",        12,           parameter.intValue());
         assertEquals("unit",         SI.METER,     parameter.getUnit());
         for (int i=4; i<=20; i++) {
@@ -231,14 +233,14 @@ public final class ParametersTest {
             assertEquals("value", i/100,              parameter.doubleValue(SI.METER), 0);
         }
         try {
-            descriptor = new DefaultParameterDescriptor("Test", 3, 4, 20);
+        	iDescriptor = DefaultParameterDescriptor.create("Test", 3, 4, 20);
             fail("setValue(< min)");
         } catch (InvalidParameterValueException exception) {
             // This is the expected exception.
             assertEquals("Test", exception.getParameterName());
         }
         try {
-            descriptor = new DefaultParameterDescriptor("Test", 12, 20, 4);
+        	iDescriptor = DefaultParameterDescriptor.create("Test", 12, 20, 4);
             fail("ParameterDescriptor(min > max)");
         } catch (IllegalArgumentException exception) {
             // This is the expected exception.
@@ -254,7 +256,7 @@ public final class ParametersTest {
         ParameterDescriptor<?> descriptor;
         Set<?>                 validValues;
 
-        parameter  = new Parameter("Test", 14);
+        parameter  = Parameter.create("Test", 14);
         descriptor = parameter.getDescriptor();
         assertNull  ("unit",                         parameter.getUnit());
         assertEquals("intValue",     14,             parameter.intValue());
@@ -281,7 +283,7 @@ public final class ParametersTest {
         }
         serialize(parameter);
 
-        parameter  = new Parameter("Test", 3, SI.METER);
+        parameter  = Parameter.create("Test", 3, SI.METER);
         descriptor = (ParameterDescriptor)       parameter.getDescriptor();
         assertEquals("intValue",       3,        parameter.intValue());
         assertEquals("doubleValue",    3,        parameter.doubleValue(), 0);
@@ -301,7 +303,7 @@ public final class ParametersTest {
         }
         serialize(parameter);
 
-        parameter   = new Parameter("Test", AxisDirection.NORTH);
+        parameter   = Parameter.create("Test",AxisDirection.class, AxisDirection.NORTH);
         descriptor  = (ParameterDescriptor) parameter.getDescriptor();
         validValues = descriptor.getValidValues();
         assertEquals("value",  AxisDirection.NORTH, parameter.getValue());

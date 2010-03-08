@@ -46,7 +46,7 @@ import org.geotools.resources.Classes;
  * one.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/RangeSpecifier.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/RangeSpecifier.java $
  * @version $Id: RangeSpecifier.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

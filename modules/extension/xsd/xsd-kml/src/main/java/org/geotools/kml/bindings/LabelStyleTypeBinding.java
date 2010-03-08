@@ -48,6 +48,8 @@ import org.geotools.xml.Node;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/bindings/LabelStyleTypeBinding.java $
  */
 public class LabelStyleTypeBinding extends AbstractComplexBinding {
     StyleBuilder sb;

@@ -48,6 +48,8 @@ import com.vividsolutions.jts.geom.Polygon;
  *  
  * @author m.bartolomeoli
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/util/GeometryTypeConverterFactory.java $
  */
 public class GeometryTypeConverterFactory implements ConverterFactory {
 

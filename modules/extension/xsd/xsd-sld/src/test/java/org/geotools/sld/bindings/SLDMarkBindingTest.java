@@ -17,6 +17,7 @@
 package org.geotools.sld.bindings;
 
 import java.awt.Color;
+import org.geotools.filter.Filters;
 import org.geotools.styling.Mark;
 
 
@@ -40,6 +41,6 @@ public class SLDMarkBindingTest extends SLDTestSupport {
         assertEquals(Integer.parseInt("56", 16), c.getBlue());
 
         assertNotNull(mark.getWellKnownName());
-        assertEquals(org.geotools.styling.SLD.stringValue(mark.getWellKnownName()), "wellKnownName");
+        assertEquals(Filters.asString(mark.getWellKnownName()), "wellKnownName");
     }
 }

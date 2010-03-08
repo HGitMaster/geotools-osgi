@@ -44,6 +44,7 @@ import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * A FeatureWriter for ShapefileDataStore. Uses a write and annotate technique
@@ -53,6 +54,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * completes.
  * 
  * @author Jesse Eichar
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileFeatureWriter.java $
  */
 public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
@@ -99,6 +102,8 @@ public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, 
     private FileChannel dbfChannel;
 
     private Charset dbfCharset;
+    
+    private GeometryFactory gf = new GeometryFactory();
 
     public ShapefileFeatureWriter(String typeName, ShpFiles shpFiles,
             ShapefileAttributeReader attsReader,  FeatureReader<SimpleFeatureType, SimpleFeature> featureReader,
@@ -147,7 +152,7 @@ public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, 
             attReader.shp.disableShxUsage();
             if(attReader.hasNext()) {
                 shapeType = attReader.shp.getHeader().getShapeType();
-                handler = shapeType.getShapeHandler();
+                handler = shapeType.getShapeHandler(new GeometryFactory());
                 shpWriter.writeHeaders(bounds, shapeType, records, shapefileLength);
             }
         }
@@ -164,11 +169,10 @@ public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, 
         // but if records > 0 and shapeType is null there's probably
         // another problem.
         if ((records <= 0) && (shapeType == null)) {
-            GeometryDescriptor geometryAttributeType = featureType
+            GeometryDescriptor geometryDescriptor = featureType
                     .getGeometryDescriptor();
 
-            Class gat = geometryAttributeType.getType().getBinding();
-            shapeType = JTSUtilities.getShapeType(gat);
+            shapeType = JTSUtilities.getShapeType(geometryDescriptor);
         }
 
         shpWriter.writeHeaders(bounds, shapeType, records, shapefileLength);
@@ -226,7 +230,7 @@ public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, 
         // before the end of the file
         if (attReader != null && attReader.hasNext()) {
             shapeType = attReader.shp.getHeader().getShapeType();
-            handler = shapeType.getShapeHandler();
+            handler = shapeType.getShapeHandler(gf);
 
             // handle the case where zero records have been written, but the
             // stream is closed and the headers
@@ -353,14 +357,17 @@ public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, 
 
         // if this is the first Geometry, find the shapeType and handler
         if (shapeType == null) {
-            int dims = JTSUtilities.guessCoorinateDims(g.getCoordinates());
-
             try {
-                shapeType = JTSUtilities.getShapeType(g, dims);
+                if(g != null) {
+                    int dims = JTSUtilities.guessCoorinateDims(g.getCoordinates());
+                    shapeType = JTSUtilities.getShapeType(g, dims);
+                } else {
+                    shapeType = JTSUtilities.getShapeType(currentFeature.getType().getGeometryDescriptor());
+                }
 
                 // we must go back and annotate this after writing
                 shpWriter.writeHeaders(new Envelope(), shapeType, 0, 0);
-                handler = shapeType.getShapeHandler();
+                handler = shapeType.getShapeHandler(gf);
             } catch (ShapefileException se) {
                 throw new RuntimeException("Unexpected Error", se);
             }
@@ -370,14 +377,19 @@ public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, 
         g = JTSUtilities.convertToCollection(g, shapeType);
 
         // bounds calculations
-        Envelope b = g.getEnvelopeInternal();
-
-        if (!b.isNull()) {
-            bounds.expandToInclude(b);
+        if(g != null) {
+	        Envelope b = g.getEnvelopeInternal();
+	
+	        if (!b.isNull()) {
+	            bounds.expandToInclude(b);
+	        }
         }
 
         // file length update
-        shapefileLength += (handler.getLength(g) + 8);
+        if(g != null)
+        	shapefileLength += (handler.getLength(g) + 8);
+        else
+        	shapefileLength += (4 + 8);
 
         // write it
         shpWriter.writeGeometry(g);

@@ -43,6 +43,8 @@ import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
  * <LI>Computing the intersections between the edges and nodes of two different
  * graphs
  * </UL>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/PlanarGraph.java $
  */
 public class PlanarGraph {
 

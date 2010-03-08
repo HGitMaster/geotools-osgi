@@ -35,7 +35,7 @@ import org.geotools.util.logging.Logging;
  * Creates {@link TileManager} instances from a collection of tiles.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/TileManagerFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/TileManagerFactory.java $
  * @version $Id: TileManagerFactory.java 30729 2008-06-16 09:26:48Z desruisseaux $
  * @author Martin Desruisseaux
  */

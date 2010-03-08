@@ -28,6 +28,8 @@ import org.geotools.coverage.grid.io.GridFormatFinder;
  * @author Simone Giannecchini
  * @since 2.3
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagepyramid/src/test/java/org/geotools/gce/imagepyramid/ImagePyramidServiceTest.java $
  */
 public class ImagePyramidServiceTest extends TestCase {
 
@@ -47,7 +49,7 @@ public class ImagePyramidServiceTest extends TestCase {
 	}
 
 	public void testIsAvailable() {
-		Iterator list = GridFormatFinder.getAvailableFormats().iterator();
+		final Iterator<GridFormatFactorySpi> list = GridFormatFinder.getAvailableFormats().iterator();
 		boolean found = false;
 
 		while (list.hasNext()) {

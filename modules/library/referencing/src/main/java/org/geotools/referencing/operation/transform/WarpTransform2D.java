@@ -19,7 +19,14 @@ package org.geotools.referencing.operation.transform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
+import javax.media.jai.JAI;
 import javax.media.jai.Warp;
 import javax.media.jai.WarpAffine;
 import javax.media.jai.WarpQuadratic;
@@ -69,8 +76,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Image Manipulation</A> in the <cite>Programming in Java Advanced Imaging</cite> guide.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/WarpTransform2D.java $
- * @version $Id: WarpTransform2D.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/WarpTransform2D.java $
+ * @version $Id: WarpTransform2D.java 34939 2010-02-23 09:17:28Z simonegiannecchini $
  * @author Martin Desruisseaux
  * @author Alessio Fabiani
  *
@@ -85,6 +92,36 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      */
     private static final long serialVersionUID = -7949539694656719923L;
 
+    private final static boolean USE_HACK;
+    static{
+    	final String buildVersion=JAI.getBuildVersion();
+    	final SimpleDateFormat df=  new SimpleDateFormat("yyyy-MM-dd' 'hh:mm:ss.SSSZ");
+    	final TimeZone tz= TimeZone.getTimeZone("UTC");
+    	df.setTimeZone(tz);
+    	boolean hack=false;
+    	try {
+			final Date date_ = buildVersion!=null?df.parse(buildVersion):new java.util.Date();
+			//reduce granularity to minute
+			final GregorianCalendar tempCal = new GregorianCalendar(tz);
+			tempCal.setTime(date_);
+			tempCal.set(Calendar.HOUR_OF_DAY, 0);
+			tempCal.set(Calendar.MINUTE, 0);
+			tempCal.set(Calendar.SECOND, 0);
+			tempCal.set(Calendar.MILLISECOND, 0);
+			final Date date=tempCal.getTime();
+			
+			// 113 version
+			final GregorianCalendar version113= new GregorianCalendar(tz);
+			version113.set(2006, 8, 12,0,0,0);
+			version113.set(Calendar.MILLISECOND, 0);
+			// we need the hacke only if we are using 1.1.3
+			hack=!date.after(version113.getTime());
+		} catch (ParseException e) {
+			hack=false;
+		}
+		USE_HACK=hack;
+    }
+    
     /**
      * The maximal polynomial degree allowed.
      *
@@ -218,21 +255,23 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
          * according the scale values, but the 'preScale' and 'postScale' are interchanged.
          * When JAI bug will be fixed, delete all the following block until the next comment.
          */
-        final double scaleX = preScaleX / postScaleX;
-        final double scaleY = preScaleY / postScaleY;
-        if (scaleX!=1 || scaleY!=1) {
-            final int n = numCoords*2;
-            if (cloneCoords) {
-                float[] o;
-                o=srcCoords; srcCoords=new float[n]; System.arraycopy(o, srcOffset, srcCoords, 0, n); srcOffset=0;
-                o=dstCoords; dstCoords=new float[n]; System.arraycopy(o, dstOffset, dstCoords, 0, n); dstOffset=0;
-            }
-            for (int i=0; i<n;) {
-                srcCoords[srcOffset + i  ] /= scaleX;
-                dstCoords[dstOffset + i++] *= scaleX;
-                srcCoords[srcOffset + i  ] /= scaleY;
-                dstCoords[dstOffset + i++] *= scaleY;
-            }
+        if(USE_HACK){
+	        final double scaleX = preScaleX / postScaleX;
+	        final double scaleY = preScaleY / postScaleY;
+	        if (scaleX!=1 || scaleY!=1) {
+	            final int n = numCoords*2;
+	            if (cloneCoords) {
+	                float[] o;
+	                o=srcCoords; srcCoords=new float[n]; System.arraycopy(o, srcOffset, srcCoords, 0, n); srcOffset=0;
+	                o=dstCoords; dstCoords=new float[n]; System.arraycopy(o, dstOffset, dstCoords, 0, n); dstOffset=0;
+	            }
+	            for (int i=0; i<n;) {
+	                srcCoords[srcOffset + i  ] /= scaleX;
+	                dstCoords[dstOffset + i++] *= scaleX;
+	                srcCoords[srcOffset + i  ] /= scaleY;
+	                dstCoords[dstOffset + i++] *= scaleY;
+	            }
+	        }
         }
         /*
          * Note: Warp semantic (transforms coordinates from destination to source) is the
@@ -536,7 +575,6 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * This trick is used for avoiding the creation of thousands of temporary objects
      * when transforming an array of points using {@link Warp#mapDestPoint}.
      */
-    @SuppressWarnings("serial")
     private static final class PointFloat extends Point2D.Float {
         @Override
         public PointFloat clone() {
@@ -570,7 +608,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * {@linkplain WarpPolynomial image warp} from a set of polynomial coefficients,
      * and wrap it in a {@link WarpTransform2D} object.
      *
-     * @version $Id: WarpTransform2D.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: WarpTransform2D.java 34939 2010-02-23 09:17:28Z simonegiannecchini $
      * @author Martin Desruisseaux
      */
     public static class Provider extends MathTransformProvider {
@@ -578,7 +616,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         private static final long serialVersionUID = -7949539694656719923L;
 
         /** Descriptor for the "{@link WarpPolynomial#getDegree degree}" parameter value. */
-        public static final ParameterDescriptor DEGREE = new DefaultParameterDescriptor(
+        public static final ParameterDescriptor<Integer> DEGREE = DefaultParameterDescriptor.create(
                 "degree", 2, 1, MAX_DEGREE);
 
         /** Descriptor for the "{@link WarpPolynomial#getXCoeffs xCoeffs}" parameter value. */
@@ -599,13 +637,13 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         public static final ParameterDescriptor POST_SCALE_X;
 
         /** Descriptor for the "{@link WarpPolynomial#getPostScaleY postScaleY}" parameter value. */
-        public static final ParameterDescriptor POST_SCALE_Y;
+        public static final ParameterDescriptor<Float> POST_SCALE_Y;
         static {
             final Float ONE = 1f;
-             PRE_SCALE_X = new DefaultParameterDescriptor( "preScaleX", null, ONE, false);
-             PRE_SCALE_Y = new DefaultParameterDescriptor( "preScaleY", null, ONE, false);
-            POST_SCALE_X = new DefaultParameterDescriptor("postScaleX", null, ONE, false);
-            POST_SCALE_Y = new DefaultParameterDescriptor("postScaleY", null, ONE, false);
+             PRE_SCALE_X = DefaultParameterDescriptor.create( "preScaleX",null, Float.class, ONE, false);
+             PRE_SCALE_Y = DefaultParameterDescriptor.create( "preScaleY", null, Float.class, ONE, false);
+            POST_SCALE_X = DefaultParameterDescriptor.create("postScaleX", null, Float.class, ONE, false);
+            POST_SCALE_Y = DefaultParameterDescriptor.create("postScaleY", null, Float.class, ONE, false);
         }
 
         /**

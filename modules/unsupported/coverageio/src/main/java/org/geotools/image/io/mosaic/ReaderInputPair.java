@@ -25,7 +25,7 @@ import org.geotools.util.Utilities;
  * A pair of {@link ImageReader} with its input. Only used as keys in hash map.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/ReaderInputPair.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/ReaderInputPair.java $
  * @version $Id: ReaderInputPair.java 31341 2008-09-01 18:38:10Z desruisseaux $
  * @author Martin Desruisseaux
  */

@@ -37,12 +37,13 @@ import org.opengis.style.StyleVisitor;
 import org.opengis.util.Cloneable;
 
 /**
- * DOCUMENT ME!
+ * Implementation of Feature Type Style; care is taken to ensure everything
+ * is mutable.
  *
  * @author James Macgill
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/FeatureTypeStyleImpl.java $
- * @version $Id: FeatureTypeStyleImpl.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/FeatureTypeStyleImpl.java $
+ * @version $Id: FeatureTypeStyleImpl.java 33833 2009-09-04 12:26:28Z jive $
  */
 public class FeatureTypeStyleImpl implements org.geotools.styling.FeatureTypeStyle, Cloneable {
     
@@ -53,7 +54,7 @@ public class FeatureTypeStyleImpl implements org.geotools.styling.FeatureTypeSty
     private Id featureInstances = null;
     private Set<Name> featureTypeNames = new LinkedHashSet<Name>();
     
-    private final Description description = new DescriptionImpl();
+    private DescriptionImpl description = new DescriptionImpl();
     private String name = "name";
     private OnLineResource online = null;
 
@@ -79,14 +80,18 @@ public class FeatureTypeStyleImpl implements org.geotools.styling.FeatureTypeSty
         rules = new ArrayList<Rule>();
     }
     
-    public FeatureTypeStyleImpl(FeatureTypeStyleImpl fts){
-        this.description.setAbstract( fts.description.getAbstract());
-        this.description.setTitle(fts.description.getTitle());
-        this.featureInstances = fts.featureInstances;
-        this.featureTypeNames = new LinkedHashSet<Name>(fts.featureTypeNames);
-        this.name = fts.name;
-        this.rules = new ArrayList<Rule>(fts.rules);
-        this.semantics = new LinkedHashSet<SemanticType>(fts.semantics);
+    public FeatureTypeStyleImpl(org.opengis.style.FeatureTypeStyle fts){
+        this.description = new DescriptionImpl( fts.getDescription() );
+        this.featureInstances = fts.getFeatureInstanceIDs();
+        this.featureTypeNames = new LinkedHashSet<Name>(fts.featureTypeNames());
+        this.name = fts.getName();
+        this.rules = new ArrayList<Rule>();
+        if( fts.rules() != null ){
+            for (org.opengis.style.Rule rule : fts.rules()) {
+                rules.add( RuleImpl.cast(rule) ); // need to deep copy?
+            }
+        }
+        this.semantics = new LinkedHashSet<SemanticType>(fts.semanticTypeIdentifiers());
     }
     
     public List<Rule> rules() {
@@ -363,5 +368,20 @@ public class FeatureTypeStyleImpl implements org.geotools.styling.FeatureTypeSty
 
     public OnLineResource getOnlineResource() {
         return online;
+    }
+
+    static FeatureTypeStyleImpl cast(FeatureTypeStyle featureTypeStyle) {
+        if( featureTypeStyle == null){
+            return null;
+        }
+        else if ( featureTypeStyle instanceof FeatureTypeStyleImpl){
+            return (FeatureTypeStyleImpl) featureTypeStyle;
+        }
+        else {
+            FeatureTypeStyleImpl copy = new FeatureTypeStyleImpl();
+            // the above is a deep copy - replace with cast if we can
+            return copy;
+        }
+
     }
 }

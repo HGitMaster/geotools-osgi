@@ -29,7 +29,7 @@ import org.geotools.resources.ClassChanger;
  * into coincidence with another, generally measured in degrees, sexagesimal degrees or grads.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/measure/Angle.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/measure/Angle.java $
  * @version $Id: Angle.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (PMO, IRD)
  *

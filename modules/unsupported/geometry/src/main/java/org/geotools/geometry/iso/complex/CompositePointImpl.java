@@ -34,6 +34,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * for completeness. It is a Complex containing one and only one Point.
  * 
  * @author Jackson Roehrig & Sanjay Jena
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/complex/CompositePointImpl.java $
  */
 public class CompositePointImpl extends CompositeImpl<PointImpl> implements CompositePoint {
     private static final long serialVersionUID = 3391515492110694489L;

@@ -20,12 +20,11 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 
-import org.opengis.util.Cloneable;
-import org.opengis.coverage.grid.GridGeometry;
-
-import org.geotools.util.Utilities;
-import org.geotools.resources.Classes;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
+import org.geotools.resources.Classes;
+import org.geotools.util.Utilities;
+import org.opengis.coverage.grid.GridGeometry;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -37,8 +36,8 @@ import org.geotools.referencing.operation.transform.AffineTransform2D;
  * instances.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/grid/ImageGeometry.java $
- * @version $Id: ImageGeometry.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/ImageGeometry.java $
+ * @version $Id: ImageGeometry.java 33009 2009-05-14 19:40:06Z simonegiannecchini $
  * @author Martin Desruisseaux
  *
  * @see GridGeometry2D
@@ -53,7 +52,7 @@ public class ImageGeometry implements GridGeometry, Serializable, Cloneable {
     /**
      * The grid range.
      */
-    private final GridRange2D gridRange;
+    private final GridEnvelope2D gridRange;
 
     /**
      * The <cite>grid to CRS</cite> affine transform.
@@ -68,14 +67,14 @@ public class ImageGeometry implements GridGeometry, Serializable, Cloneable {
      * @param gridToCRS The affine transform from pixel coordinates to "real world" coordinates.
      */
     public ImageGeometry(final Rectangle bounds, final AffineTransform gridToCRS) {
-        this.gridRange = new GridRange2D(bounds);
+        this.gridRange = new GridEnvelope2D(bounds);
         this.gridToCRS = new AffineTransform2D(gridToCRS);
     }
 
     /**
      * Returns the image bounds in pixel coordinates.
      */
-    public GridRange2D getGridRange() {
+    public GridEnvelope2D getGridRange() {
         return gridRange.clone();
     }
 

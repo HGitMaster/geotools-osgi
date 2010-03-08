@@ -53,6 +53,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Christophe Rousson <christophe.rousson@gmail.com>, Google SoC 2007 
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/test/java/org/geotools/caching/grid/featurecache/ConcurrentAccessTest.java $
  */
 public class ConcurrentAccessTest extends TestCase {
     boolean hardest = false;

@@ -35,18 +35,16 @@ public class Node {
     protected int numShapesId;
     protected int[] shapesId;
     protected List subNodes;
-    protected Node parent;
     private boolean visited = false;
     private boolean childrenVisited = false;
     protected int id;
+//    static int count;
 
-    public Node(Envelope bounds, int id, Node parent) {
-        this.parent = parent;
+    public Node(Envelope bounds, int id) {
         this.id = id;
         this.bounds = new Envelope(bounds);
         this.subNodes = new ArrayList(4);
-        this.shapesId = new int[4];
-        Arrays.fill(this.shapesId, -1);
+        this.shapesId = null;
     }
 
     /**
@@ -143,7 +141,10 @@ public class Node {
      * @param id
      */
     public void addShapeId(int id) {
-        if (this.shapesId.length == this.numShapesId) {
+        if(this.shapesId == null) {
+            this.shapesId = new int[4];
+            Arrays.fill(this.shapesId, -1);
+        } else if (this.shapesId.length == this.numShapesId) {
             // Increase the array
             int[] newIds = new int[this.numShapesId * 2];
             Arrays.fill(newIds, -1);
@@ -206,26 +207,12 @@ public class Node {
         return this.shapesId;
     }
 
-    public Node getParent() {
-        return parent;
-    }
-
-    public void setParent(Node parent) {
-        this.parent = parent;
-    }
-
     public boolean isVisited() {
         return visited;
     }
 
     public void setVisited(boolean visited) {
         this.visited = visited;
-    }
-
-    public Node getSibling() throws StoreException {
-        if (parent == null || id == parent.getNumSubNodes() - 1)
-            return null;
-        return parent.getSubNode(id + 1);
     }
 
     public boolean isChildrenVisited() {
@@ -237,6 +224,6 @@ public class Node {
     }
 
     public Node copy() throws IOException {
-        return new Node(bounds, id, parent);
+        return new Node(bounds, id);
     }
 }

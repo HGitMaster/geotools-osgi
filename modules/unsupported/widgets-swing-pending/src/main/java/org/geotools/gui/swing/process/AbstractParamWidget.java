@@ -26,6 +26,8 @@ import org.geotools.text.Text;
  * useful when implementing your own ParamWidget.
 
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/AbstractParamWidget.java $
  */
 public abstract class AbstractParamWidget implements ParamWidget {
 	protected final Parameter< ? > parameter;

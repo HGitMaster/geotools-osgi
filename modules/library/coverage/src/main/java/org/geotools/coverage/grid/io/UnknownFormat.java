@@ -21,7 +21,6 @@ import java.util.HashMap;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.factory.Hints;
 import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -59,7 +58,7 @@ public class UnknownFormat extends AbstractGridFormat implements Format {
 	/**
 	 * @see AbstractGridFormat#getReader(Object)
 	 */
-	public GridCoverageReader getReader(java.lang.Object source) {
+	public AbstractGridCoverage2DReader getReader(java.lang.Object source) {
 		throw new UnsupportedOperationException(
 			"Trying to get a reader from an unknown format.");
 	}
@@ -78,7 +77,7 @@ public class UnknownFormat extends AbstractGridFormat implements Format {
 	/**
 	 * @see AbstractGridFormat#getReader(Object, Hints)
 	 */
-	public GridCoverageReader getReader(Object source, Hints hints) {
+	public AbstractGridCoverage2DReader getReader(Object source, Hints hints) {
 		throw new UnsupportedOperationException(
 				"Trying to get a reader from an unknown format.");
 	}

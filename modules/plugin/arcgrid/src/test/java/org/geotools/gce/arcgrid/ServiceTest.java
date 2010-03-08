@@ -31,7 +31,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * 
  * @author Simone Giannecchini
  * @author ian
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ServiceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ServiceTest.java $
  */
 public class ServiceTest extends TestCase {
 

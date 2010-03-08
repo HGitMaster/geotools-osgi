@@ -78,7 +78,7 @@ public final class MrSIDFormatFactory extends BaseGridFormatFactorySPI implement
      *
      * @return A {@link MrSIDFormat}
      */
-    public Format createFormat() {
+    public MrSIDFormat createFormat() {
         return new MrSIDFormat();
     }
 }

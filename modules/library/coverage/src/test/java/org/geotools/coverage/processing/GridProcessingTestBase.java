@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
  * Base class for grid processing tests. This class provides a few convenience
  * methods performing some operations on {@link GridCoverage2D}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/processing/GridProcessingTestBase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/processing/GridProcessingTestBase.java $
  * @version $Id: GridProcessingTestBase.java 30920 2008-07-04 23:56:32Z jgarnett $
  * @author Martin Desruisseaux (IRD)
  */

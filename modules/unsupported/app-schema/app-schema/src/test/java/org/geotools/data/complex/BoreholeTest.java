@@ -29,7 +29,9 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
@@ -37,13 +39,19 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
 import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
 import org.geotools.data.complex.config.EmfAppSchemaReader;
+import org.geotools.data.complex.config.FeatureTypeRegistry;
 import org.geotools.data.complex.config.XMLConfigDigester;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.Types;
+import org.geotools.feature.type.ComplexFeatureTypeImpl;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.xlink.XLINK;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.geotools.xml.SchemaIndex;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
@@ -64,12 +72,12 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: BoreholeTest.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @version $Id: BoreholeTest.java 34793 2010-01-15 08:08:17Z ang05a $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
  * @since 2.4
  */
-public class BoreholeTest extends TestCase {
+public class BoreholeTest {
     private static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(BoreholeTest.class.getPackage().getName());
 
@@ -85,46 +93,45 @@ public class BoreholeTest extends TestCase {
 
     private static final String GEONS = "http://www.seegrid.csiro.au/xml/geometry";
 
-    final String schemaBase = "/test-data/";
+    private static final String schemaBase = "/test-data/";
 
     final Name typeName = new NameImpl(XMMLNS, "Borehole");
 
-    EmfAppSchemaReader reader;
+    private static EmfAppSchemaReader reader;
 
     private FeatureSource source;
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception
-     *                 DOCUMENT ME!
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
+    private static DataAccess<FeatureType, Feature> mappingDataStore;
+    
+    @BeforeClass
+    public static void oneTimeSetUp() throws IOException {
+        System.out.println("beforeclass");
+        final Map dsParams = new HashMap();
+        final URL url = BoreholeTest.class.getResource(schemaBase + "BoreholeTest_properties.xml");
+        dsParams.put("dbtype", "app-schema");
+        dsParams.put("url", url.toExternalForm());
+
+        mappingDataStore = DataAccessFinder.getDataStore(dsParams);
+        assertNotNull(mappingDataStore);
+
         reader = EmfAppSchemaReader.newInstance();
-        // Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.FINEST);
     }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception
-     *                 DOCUMENT ME!
-     */
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    
+    @AfterClass
+    public static void oneTimeTearDown() throws IOException {
+        DataAccessRegistry.unregisterAll();
     }
-
+    
     /**
      * 
      * @param location
      *                schema location path discoverable through getClass().getResource()
      */
-    private void loadSchema(String location) throws IOException {
+    private SchemaIndex loadSchema(String location) throws IOException {
         // load needed GML types directly from the gml schemas
         URL schemaLocation = getClass().getResource(location);
         assertNotNull(location, schemaLocation);
-        reader.parse(schemaLocation);
+        return reader.parse(schemaLocation, null);
     }
 
     /**
@@ -133,23 +140,26 @@ public class BoreholeTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testParseBoreholeSchema() throws Exception {
         /*
          * not found types and elements:
          */
 
         // load geosciml schema
+        SchemaIndex schemaIndex;
         try {
-            loadSchema(schemaBase + "commonSchemas/XMML/1/borehole.xsd");
+            schemaIndex = loadSchema(schemaBase + "commonSchemas/XMML/1/borehole.xsd");
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
 
-        Map typeRegistry = reader.getTypeRegistry();
+        FeatureTypeRegistry typeRegistry = new FeatureTypeRegistry();
+        typeRegistry.addSchemas(schemaIndex);
 
         Name typeName = Types.typeName(XMMLNS, "BoreholeType");
-        ComplexType borehole = (ComplexType) typeRegistry.get(typeName);
+        ComplexFeatureTypeImpl borehole = (ComplexFeatureTypeImpl) typeRegistry.getAttributeType(typeName);
         assertNotNull(borehole);
         assertTrue(borehole instanceof FeatureType);
 
@@ -160,7 +170,7 @@ public class BoreholeTest extends TestCase {
         assertTrue(superType instanceof FeatureType);
 
         // ensure all needed types were parsed and aren't just empty proxies
-        Collection properties = borehole.getDescriptors();
+        Collection properties = borehole.getTypeDescriptors();
         assertEquals(16, properties.size());
         Map expectedNamesAndTypes = new HashMap();
         // from gml:AbstractFeatureType
@@ -213,9 +223,9 @@ public class BoreholeTest extends TestCase {
         }
 
         Name tcl = Types.typeName(SWENS, "TypedCategoryListType");
-        AttributeType typedCategoryListType = (AttributeType) typeRegistry.get(tcl);
+        AttributeType typedCategoryListType = (AttributeType) typeRegistry.getAttributeType(tcl);
         assertNotNull(typedCategoryListType);
-        assertFalse(typedCategoryListType instanceof ComplexType);
+        assertTrue(typedCategoryListType instanceof ComplexType);
     }
 
     private Name typeName(String ns, String localName) {
@@ -226,6 +236,7 @@ public class BoreholeTest extends TestCase {
         return new NameImpl(ns, localName);
     }
 
+    @Test
     public void testLoadMappingsConfig() throws Exception {
         XMLConfigDigester reader = new XMLConfigDigester();
         URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
@@ -271,15 +282,13 @@ public class BoreholeTest extends TestCase {
         assertEquals(Expression.NIL, attMapping.getSourceExpression());
     }
 
+    @Test
     public void testGetDataStore() throws Exception {
-        DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
-        assertNotNull(mappingDataStore);
         assertNotNull(mappingDataStore.getSchema(typeName));
-        mappingDataStore.dispose();
     }
 
+    @Test
     public void testDataStore() throws Exception {
-        DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
         FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
                 .getFeatureSource(typeName);
 
@@ -292,7 +301,7 @@ public class BoreholeTest extends TestCase {
         FeatureCollection<FeatureType, Feature> features = (FeatureCollection<FeatureType, Feature>) fSource
                 .getFeatures();
 
-        int resultCount = getCount(features);
+        int resultCount = features.size();
         String msg = "be sure difference in result count is not due to different dataset."
                 + " Query used should be min_time_d = 'carnian'";
         assertEquals(msg, EXPECTED_RESULT_COUNT, resultCount);
@@ -305,12 +314,11 @@ public class BoreholeTest extends TestCase {
             count++;
         }
         features.close(it);
-        mappingDataStore.dispose();
         assertEquals(EXPECTED_RESULT_COUNT, count);
     }
 
+    @Test
     public void testQueryXlinkProperty() throws Exception {
-        final DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
         final FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
                 .getFeatureSource(typeName);
         final String queryProperty = "sa:shape/geo:LineByVector/geo:origin/@xlink:href";
@@ -331,7 +339,7 @@ public class BoreholeTest extends TestCase {
                 .getFeatures(filter);
 
         // did the query work?
-        int resultCount = getCount(features);
+        int resultCount = features.size();
         assertEquals(1, resultCount);
 
         // the datastore performed the query by unmapping the client property
@@ -345,8 +353,6 @@ public class BoreholeTest extends TestCase {
         // String obtainedValue = (String) propertyName.evaluate(feature);
         // assertNotNull(obtainedValue);
         // assertEquals(queryLiteral, obtainedValue);
-
-        mappingDataStore.dispose();
     }
 
     /**
@@ -354,8 +360,8 @@ public class BoreholeTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testTraverseDeep() throws Exception {
-        final DataAccess<FeatureType, Feature> mappingDataStore = getDataStore();
         final FeatureSource<FeatureType, Feature> fSource = (FeatureSource<FeatureType, Feature>) mappingDataStore
                 .getFeatureSource(typeName);
         final String queryProperty = "sa:shape/geo:LineByVector/geo:origin/@xlink:href";
@@ -370,7 +376,6 @@ public class BoreholeTest extends TestCase {
                 .getFeatures();
         Feature f = (Feature) features.iterator().next();
         traverse(f);
-        mappingDataStore.dispose();
     }
 
     private void traverse(Attribute f) {
@@ -384,31 +389,6 @@ public class BoreholeTest extends TestCase {
                 traverse(att);
             }
         }
-    }
-
-    private DataAccess<FeatureType, Feature> getDataStore() throws IOException {
-        final Map dsParams = new HashMap();
-        final URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
-        dsParams.put("dbtype", "app-schema");
-        dsParams.put("url", url.toExternalForm());
-
-        DataAccess<FeatureType, Feature> mappingDataStore = DataAccessFinder.getDataStore(dsParams);
-        assertNotNull(mappingDataStore);
-        return mappingDataStore;
-    }
-
-    private int getCount(FeatureCollection features) {
-        Iterator iterator = features.iterator();
-        int count = 0;
-        try {
-            while (iterator.hasNext()) {
-                iterator.next();
-                count++;
-            }
-        } finally {
-            features.close(iterator);
-        }
-        return count;
     }
 
 }

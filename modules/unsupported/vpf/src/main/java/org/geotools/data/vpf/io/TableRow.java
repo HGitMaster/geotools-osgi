@@ -25,7 +25,7 @@ import org.geotools.data.vpf.ifc.VPFRow;
  * TableRow.java Created: Thu Jan 02 23:58:39 2003
  *
  * @author <a href="mailto:kobit@users.fs.net">Artur Hefczyc</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/TableRow.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/TableRow.java $
  * @version 1.0
  */
 public class TableRow implements VPFRow {

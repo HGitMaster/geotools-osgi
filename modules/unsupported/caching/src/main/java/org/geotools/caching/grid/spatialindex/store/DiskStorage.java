@@ -58,6 +58,8 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author Christophe Rousson <christophe.rousson@gmail.com>, Google SoC 2007 
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/store/DiskStorage.java $
  */
 public class DiskStorage implements Storage {
     public final static String DATA_FILE_PROPERTY = "DiskStorage.DataFile";

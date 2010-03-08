@@ -66,6 +66,8 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/GMLConfiguration.java $
  */
 public class GMLConfiguration extends Configuration {
     /**

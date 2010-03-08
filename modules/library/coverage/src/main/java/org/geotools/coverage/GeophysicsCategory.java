@@ -37,8 +37,8 @@ import org.geotools.util.NumberRange;
  * the identity transform, or {@code null} if this category is a qualitative one.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/GeophysicsCategory.java $
- * @version $Id: GeophysicsCategory.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/GeophysicsCategory.java $
+ * @version $Id: GeophysicsCategory.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */
 final class GeophysicsCategory extends Category {
@@ -88,10 +88,10 @@ final class GeophysicsCategory extends Category {
      *       a general algorithm would be usefull in the super-class constructor as well.
      */
     @Override
-    public NumberRange getRange() throws IllegalStateException {
+    public NumberRange<? extends Number> getRange() throws IllegalStateException {
         if (range == null) try {
             final MathTransform1D tr = inverse.transform;
-            final NumberRange r = inverse.range;
+            final NumberRange<? extends Number> r = inverse.range;
             boolean minIncluded = r.isMinIncluded();
             boolean maxIncluded = r.isMaxIncluded();
             double min  = tr.transform(r.getMinimum());
@@ -180,12 +180,12 @@ final class GeophysicsCategory extends Category {
      * values is 0 to 20 exclusive or 0 to 18 inclusive, not 0 to 19.9999... The numbers between
      * 18 and 20 is a "gray area" where we don't know for sure what the user intend to do.
      *
-     * @version $Id: GeophysicsCategory.java 30643 2008-06-12 18:27:03Z acuster $
+     * @version $Id: GeophysicsCategory.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
      * @author Martin Desruisseaux (IRD)
      *
      * @see GeophysicsCategory#getRange
      */
-    private static final class Range extends NumberRange {
+    private static final class Range extends NumberRange<Double> {
         /**
          * Serial number for interoperability with different versions.
          */
@@ -210,7 +210,7 @@ final class GeophysicsCategory extends Category {
                      final double maximum,  final boolean isMaxIncluded,
                      final double minimum2, final double  maximum2)
         {
-            super(minimum, isMinIncluded, maximum, isMaxIncluded);
+            super(NumberRange.create(minimum, isMinIncluded, maximum, isMaxIncluded));
             this.minimum2 = minimum2;
             this.maximum2 = maximum2;
         }

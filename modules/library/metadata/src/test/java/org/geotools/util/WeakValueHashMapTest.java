@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link WeakHashSet}. A standard {@link HashMap} object is used for comparaison purpose.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/util/WeakValueHashMapTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/WeakValueHashMapTest.java $
  * @version $Id: WeakValueHashMapTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

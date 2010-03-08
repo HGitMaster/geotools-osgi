@@ -17,6 +17,7 @@
 package org.geotools.util;
 
 import org.geotools.factory.Hints;
+import org.geotools.factory.Hints.Key;
 
 
 /**
@@ -26,8 +27,17 @@ import org.geotools.factory.Hints;
  *
  * @since 2.4
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/util/ConverterFactory.java $
  */
 public interface ConverterFactory {
+    
+    /**
+    * Hint which specifies if only safe conversions should be atttemped by 
+    * converter implementations.
+    */
+    static final Key SAFE_CONVERSION = new Key(Boolean.class);
+    
     /**
      * Creates a {@link Converter} instance for converting one type
      * of object to another.

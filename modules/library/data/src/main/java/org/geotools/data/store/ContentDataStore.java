@@ -21,10 +21,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -93,6 +95,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * </p>
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentDataStore.java $
  */
 public abstract class ContentDataStore implements DataStore {
 
@@ -142,8 +146,17 @@ public abstract class ContentDataStore implements DataStore {
      */
     protected LockingManager lockingManager = new InProcessLockingManager();
     
+    /**
+     * factory used to create the datastore
+     */
+    protected DataStoreFactorySpi dataStoreFactory;
+    
     public ContentDataStore() {
-        this.entries = new HashMap<Name,ContentEntry>();
+        // get a concurrent map so that we can do reads in parallel with writes (writes vs writes
+        // are actually synchronized to prevent double work, see getEntry()).
+        this.entries = new ConcurrentHashMap<Name,ContentEntry>();
+        // grabbing the logger here makes the logger name polymorphic (the name of the actual
+        // subclass will be used
         this.LOGGER = org.geotools.util.logging.Logging.getLogger(
             getClass().getPackage().getName()
         );
@@ -212,6 +225,27 @@ public abstract class ContentDataStore implements DataStore {
         this.geometryFactory = geometryFactory;
     }
 
+    /**
+     * Returns the factory used to create the data store.
+     * 
+     * @return The data store factory, possibly <code>null</code>. 
+     */
+    public DataStoreFactorySpi getDataStoreFactory() {
+        return dataStoreFactory;
+    }
+    
+    /**
+     * Sets the data store factory used to create the datastore.
+     * <p>
+     * WARNING: This property should only be set in cases where the datastore factory is 
+     * stateless and does not maintain any references to created datastores. Setting this 
+     * property in such a case will result in a memory leak. 
+     * </p>
+     */
+    public void setDataStoreFactory(DataStoreFactorySpi dataStoreFactory) {
+        this.dataStoreFactory = dataStoreFactory;
+    }
+    
     /**
      * The namespace uri of the datastore.
      * 
@@ -448,12 +482,14 @@ public abstract class ContentDataStore implements DataStore {
         return lockingManager;
     }
 
-    public final FeatureSource<SimpleFeatureType, SimpleFeature> getView(Query query) throws IOException, SchemaException {
-        throw new UnsupportedOperationException();
+    public final ContentFeatureSource getView(Query query) throws IOException, SchemaException {
+        ContentFeatureSource origional = getFeatureSource( query.getTypeName() );
+        return origional.getView(query);
     }
 
     public final void updateSchema(String typeName, SimpleFeatureType featureType)
         throws IOException {
+        throw new UnsupportedOperationException();
     }
 
     public void dispose() {

@@ -51,6 +51,8 @@ import org.opengis.referencing.operation.TransformException;
  * File datachooser
  * 
  * @author  Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/datachooser/JFileDataPanel.java $
  */
 public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
 

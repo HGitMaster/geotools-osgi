@@ -32,7 +32,6 @@ import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
@@ -84,7 +83,7 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 	 * @return a GridCoverageReader object or null if the source object could
 	 *         not be accessed.
 	 */
-	public GridCoverageReader getReader(final Object o) {
+	public GTopo30Reader getReader(final Object o) {
 		return getReader(o, null);
 	}
 
@@ -141,7 +140,7 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 
 		if (o instanceof File) {
 			try {
-				urlToUse = ((File) o).toURL();
+				urlToUse = ((File) o).toURI().toURL();
 			} catch (MalformedURLException e) {
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
@@ -153,7 +152,7 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 		} else if (o instanceof String) {
 			try {
 				// is it a filename?
-				urlToUse = new File((String) o).toURL();
+				urlToUse = new File((String) o).toURI().toURL();
 			} catch (MalformedURLException e) {
 				// is it a URL
 				try {
@@ -192,7 +191,7 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 	 * @return a GridCoverageReader object or null if the source object could
 	 *         not be accessed.
 	 */
-	public GridCoverageReader getReader(final Object o, Hints hints) {
+	public GTopo30Reader getReader(final Object o, Hints hints) {
 
 		try {
 			return new GTopo30Reader(o);

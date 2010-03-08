@@ -42,6 +42,8 @@ import org.geotools.xml.*;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-sld/src/main/java/org/geotools/sld/bindings/SLDPerpendicularOffsetBinding.java $
  */
 public class SLDPerpendicularOffsetBinding extends AbstractComplexBinding {
     /**

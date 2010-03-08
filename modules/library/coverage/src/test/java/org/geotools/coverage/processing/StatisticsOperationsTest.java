@@ -49,6 +49,8 @@ import static org.junit.Assert.*;
  *
  * @author Simone Giannecchini (GeoSolutions)
  * @author Martin Desruisseaux (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/processing/StatisticsOperationsTest.java $
  */
 public final class StatisticsOperationsTest extends GridProcessingTestBase {
     /**

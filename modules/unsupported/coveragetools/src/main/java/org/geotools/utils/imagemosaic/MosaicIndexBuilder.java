@@ -115,6 +115,8 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @author Simone Giannecchini, GeoSolutions
  * @author Alessio Fabiani, GeoSolutions
  * @author Blaz Repnik
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/imagemosaic/MosaicIndexBuilder.java $
  * @version 0.3
  * 
  */
@@ -259,7 +261,7 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 		GeometryFactory geomFactory = new GeometryFactory(precMod);
 		try {
 				index = new ShapefileDataStore(new File(locationPath + File.separator
-					+ indexName + ".shp").toURL());
+					+ indexName + ".shp").toURI().toURL());
 		} catch (MalformedURLException ex) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
@@ -365,11 +367,11 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 					} catch (Exception e) {
 						// ignore exception
 					}
-					try {
-						r.dispose();
-					} catch (Exception e) {
-						// ignore exception
-					}
+//					try {
+//						r.dispose();
+//					} catch (Exception e) {
+//						// ignore exception
+//					}
 
 					// send a message
 					message = new StringBuffer("Skipped file ").append(

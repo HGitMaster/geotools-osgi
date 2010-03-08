@@ -26,6 +26,8 @@ import org.geotools.xml.XSD;
  * attributes in the http://earth.google.com/kml/2.1 schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/KML.java $
  */
 public final class KML extends XSD {
     /** singleton instance */

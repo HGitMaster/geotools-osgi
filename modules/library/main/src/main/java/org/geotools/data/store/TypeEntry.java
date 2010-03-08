@@ -58,7 +58,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * 
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/store/TypeEntry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/TypeEntry.java $
  */
 public interface TypeEntry {
     
@@ -152,7 +152,7 @@ public interface TypeEntry {
      * the resource, not those that control opperation.
      * <ul>
      * <li>when representing a URL the hashcode must be: url.hashCode()
-     * <li>when representing a File the hashcode must be: file.toURL().hashcode()
+     * <li>when representing a File the hashcode must be: file.toURI().toURL().hashcode()
      * <li>when representing a database connection: hascode of jdbc url w/ out username, password
      * </ul> 
      * </p>

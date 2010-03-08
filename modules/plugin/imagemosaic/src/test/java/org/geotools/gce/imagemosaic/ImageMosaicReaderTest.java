@@ -17,65 +17,60 @@
 package org.geotools.gce.imagemosaic;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.widget.ScrollingImagePanel;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import junit.framework.JUnit4TestAdapter;
 import junit.textui.TestRunner;
 
-import org.geotools.coverage.AbstractCoverage;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.coverage.grid.io.UnknownFormat;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.parameter.Parameter;
 import org.geotools.test.TestData;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.identity.FeatureId;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.datum.PixelInCell;
 
 /**
  * Testing {@link ImageMosaicReader}.
  * 
- * @author Simone Giannecchini
+ * @author Simone Giannecchini, GeoSolutions
+ * @author Stefan Alfons Krueger (alfonx), Wikisquare.de 
  * @since 2.3
  * 
  */
-public class ImageMosaicReaderTest extends TestCase {
+@SuppressWarnings("deprecation")
+public class ImageMosaicReaderTest{
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite();
-
-		suite.addTest(new ImageMosaicReaderTest("testDefaultParameterValue"));
-		suite.addTest(new ImageMosaicReaderTest("testInputAlpha"));
-		suite.addTest(new ImageMosaicReaderTest("testInputImageROI"));
-		suite.addTest(new ImageMosaicReaderTest("testCrop"));
-		suite.addTest(new ImageMosaicReaderTest("testErrors"));
-		suite.addTest(new ImageMosaicReaderTest("testUpdateBand"));
-		
-
-		return suite;
+	public static junit.framework.Test suite() { 
+	    return new JUnit4TestAdapter(ImageMosaicReaderTest.class); 
 	}
 
 	private URL rgbURL;
@@ -90,164 +85,19 @@ public class ImageMosaicReaderTest extends TestCase {
 
 	private URL rgbAURL;
 
-	private URL bandsURL;
+	private URL overviewURL;
+
+	private URL rgbJarURL;
 	
-	// private URL morandini;
-
+	private URL indexJarURL;
+	
+	private URL indexAlphaJarURL;
+	
+	private URL grayJarURL;
+	
+	private URL index_unique_paletteAlphaJarURL;
+	
 	private boolean interactive;
-
-	public ImageMosaicReaderTest(String string) {
-		super(string);
-	}
-
-	/**
-	 * Testing input thresholds.
-	 * 
-	 * @throws MismatchedDimensionException
-	 * @throws NoSuchAuthorityCodeException
-	 * @throws IOException
-	 */
-	public void testInputImageROI() throws MismatchedDimensionException,
-			NoSuchAuthorityCodeException, IOException {
-
-		 // //
-		 //
-		 // This image is RGB. If we do thresholding with a value of 100 we will
-		 // just throw away a lot of values and we will replace them with 0.
-		 //
-		 // //
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(rgbURL, Double.NaN, null,null,
-		 "testInputImageROI-rgbURL", false);
-		 imageMosaicSimpleParamsTest(rgbURL, 100, null,null,
-		 "testInputImageROI-rgbURL", false);
-		
-		 // //
-		 //
-		 // This image has borders that are transparent black which means
-		 // (0,0,0,0) hence if we want the mosaic to come out clean and nice we
-		 // have to do Overlay with ROI to get superimposition, otherwise blend
-		 // with ROI 1 or Blend without ROI to get average!
-		 //
-		 // //
-		 if (interactive) {
-		 imageMosaicSimpleParamsTest(rgbAURL, Double.NaN, null,null,
-		 "testInputImageROI-rgbAURL-original-superimposition-bad",
-		 false);
-		 imageMosaicSimpleParamsTest(rgbAURL, 1, null,null,
-		 "testInputImageROI-rgbAURL-original-superimposition-good",
-		 false);
-		 }
-		 imageMosaicSimpleParamsTest(rgbAURL, 1, null,null,
-		 "testInputImageROI-rgbAURL-fading-ROI", true);
-		 imageMosaicSimpleParamsTest(rgbAURL, Double.NaN, null,null,
-		 "testInputImageROI-rgbAURL-fading-intrinsic-alpha", true);
-		
-		 // //
-		 //
-		 // This images have borders that are black and have a color model that
-		 // is IndexColorModel but all with different palette hence a color
-		 // conversion will be applied.
-		 //
-		 // The provided threshold will result in having most part of the input
-		 // images replaced by the default background values.
-		 //
-		 // //
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(indexURL, Double.NaN, null,null,
-		 "testInputImageROI-indexURL-original", false);
-		 imageMosaicSimpleParamsTest(indexURL, 100, null,null,
-		 "testInputImageROI-indexURL", false);
-		
-		 // //
-		 //
-		 // This images have borders that are transparent black which means
-		 // (0,0,0,0) and have a color model that
-		 // is IndexColorModel but all with different palette hence a color
-		 // conversion will be applied.
-		 //
-		 // The provided threshold will result in having most part of the input
-		 // images replaced by the default background values which means the
-		 // replaced part will be transparent.
-		 //
-		 // //
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(indexAlphaURL, Double.NaN, null,null,
-		 "testInputImageROI-indexAlphaURL-original", false);
-		 imageMosaicSimpleParamsTest(indexAlphaURL, 100, null,null,
-		 "testInputImageROI-indexAlphaURL", false);
-		
-		 // //
-		 //
-		 // Grayscale images. The ROIs will just make them darker because they
-		 // will replace part of the input values with zero.
-		 //
-		 // //
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(grayURL, Double.NaN, null,null,
-		 "testInputImageROI-grayURL-original", false);
-		 imageMosaicSimpleParamsTest(grayURL, 100, null,null,
-		 "testInputImageROI-grayURL", false);
-		
-		 // //
-		 //
-		 // Grayscale images with index color model with alpha. The ROIs will
-		 // just make them more transparent because they
-		 // will replace part of the input values with zero.
-		 //
-		 // //
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(index_unique_paletteAlphaURL,
-		 Double.NaN, null,null,
-		 "testInputImageROI-index_unique_paletteAlphaURL-original",
-		 false);
-		 imageMosaicSimpleParamsTest(index_unique_paletteAlphaURL, 100, null,null,
-		 "testInputImageROI-index_unique_paletteAlphaURL", false);
-
-	}
-
-	/**
-	 * Testing both input threshold and alpha.
-	 * 
-	 * @throws MismatchedDimensionException
-	 * @throws NoSuchAuthorityCodeException
-	 * @throws IOException
-	 */
-	public void testROIAlpha() throws MismatchedDimensionException,
-			NoSuchAuthorityCodeException, IOException {
-
-		 boolean interactive = TestData.isInteractiveTest();
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(rgbURL, 100, null,null,
-		 "testROIAlpha-rgbURL-original", false);
-		 imageMosaicSimpleParamsTest(rgbURL, 100, Color.black,null,
-		 "testROIAlpha-rgbURL", false);
-		
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(rgbAURL, 5, null,null,
-		 "testROIAlpha-rgbAURL-original", false);
-		 imageMosaicSimpleParamsTest(rgbAURL, 5, new Color(35, 34, 25),null,
-		 "testROIAlpha-rgbAURL", false);
-		
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(indexURL, 5, null,null,
-		 "testROIAlpha-indexURL-original", false);
-		 imageMosaicSimpleParamsTest(indexURL, 5, new Color(58, 49, 8),null,
-		 "testROIAlpha-indexURL", false);
-		
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(indexAlphaURL, 30, null,null,
-		 "testROIAlpha-indexAlphaURL-original", false);
-		 imageMosaicSimpleParamsTest(indexAlphaURL, 30, new Color(41, 41, 33),null,
-		 "testROIAlpha-indexAlphaURL", false);
-		
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(grayURL, 100, null,null,
-		 "testROIAlpha-grayURL-original", false);
-		 imageMosaicSimpleParamsTest(grayURL, 100, Color.black,null,
-		 "testROIAlpha-grayURL", false);
-
-	}
 
 	/**
 	 * Testing crop capabilities.
@@ -256,15 +106,28 @@ public class ImageMosaicReaderTest extends TestCase {
 	 * @throws IOException
 	 * @throws FactoryException
 	 */
-	public void testCrop() throws MismatchedDimensionException, IOException,
+	@Test
+	@Ignore
+	public void crop() throws MismatchedDimensionException, IOException,
 			FactoryException {
 		imageMosaicCropTest(rgbURL, "crop-rgbURL");
+		imageMosaicCropTest(rgbJarURL, "crop-rgbJarURL");
+		
 		imageMosaicCropTest(indexURL, "crop-indexURL");
+		imageMosaicCropTest(indexJarURL, "crop-indexJarURL");
+		
 		imageMosaicCropTest(grayURL, "crop-grayURL");
+		imageMosaicCropTest(grayJarURL, "crop-grayJarURL");
+		
+		imageMosaicCropTest(overviewURL, "crop-overviewURL");
+		
 		imageMosaicCropTest(indexAlphaURL, "crop-indexAlphaURL");
+		imageMosaicCropTest(indexAlphaJarURL, "crop-indexAlphaJarURL");
+		
 		imageMosaicCropTest(rgbAURL, "crop-rgbAURL");
-		imageMosaicCropTest(index_unique_paletteAlphaURL,
-				"crop-index_unique_paletteAlphaURL");
+		
+		imageMosaicCropTest(index_unique_paletteAlphaURL,"crop-index_unique_paletteAlphaURL");
+		imageMosaicCropTest(index_unique_paletteAlphaJarURL,"crop-index_unique_paletteAlphaJarURL");
 
 	}
 
@@ -276,65 +139,71 @@ public class ImageMosaicReaderTest extends TestCase {
 	 * @throws MismatchedDimensionException
 	 * @throws NoSuchAuthorityCodeException
 	 */
-	public void testInputAlpha() throws IOException,
+	@Test
+	@Ignore
+	public void alpha() throws IOException,
 			MismatchedDimensionException, NoSuchAuthorityCodeException {
+		
+		final String testName="alpha-";
+		if (interactive)
+			imageMosaicSimpleParamsTest(rgbURL, null, null,testName+rgbURL.getFile()+"-original", false);
+		imageMosaicSimpleParamsTest(rgbURL, Color.black,Color.black,testName+rgbURL.getFile(), false);
 
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(rgbURL, Double.NaN, null,null,
-		 "testFinalAlpha-rgbURL-original", false);
-		 imageMosaicSimpleParamsTest(rgbURL, Double.NaN, Color.black,Color.black,
-		 "testFinalAlpha-rgbURL", false);
+		if (interactive)
+			imageMosaicSimpleParamsTest(rgbJarURL, null, null,testName+rgbJarURL.getFile()+"-original", false);
+		imageMosaicSimpleParamsTest(rgbJarURL, Color.black,Color.black,testName+rgbURL.getFile(), false);
+
+		if (interactive)
+			// the input images have transparency and they do overlap, we need
+			// to ask for blending mosaic.
+			imageMosaicSimpleParamsTest(rgbAURL, null, null,testName+rgbAURL.getFile()+"-original", true);
+		imageMosaicSimpleParamsTest(rgbAURL, Color.black,Color.black,testName+rgbAURL.getFile(), false);
+
+		// //
+		//
+		// This images have borders that are black and have a color model that
+		// is IndexColorModel but all with different palette hence a color
+		// conversion will be applied to go to RGB.
+		//
+		// When we do the input transparent color we will add transparency to
+		// the images but only where the transparent color resides. Moreover the
+		// background will be transparent.
+		//
+		// //
+		if (interactive)
+			imageMosaicSimpleParamsTest(indexURL, null, null,testName+indexURL.getFile()+"-original", false);
+		imageMosaicSimpleParamsTest(indexURL, new Color(58, 49, 8),Color.black,testName+indexURL.getFile(), false);
+
+		if (interactive)
+			imageMosaicSimpleParamsTest(indexJarURL, null, null,testName+indexJarURL.getFile()+"-original", false);
+		imageMosaicSimpleParamsTest(indexJarURL, new Color(58, 49, 8),Color.black,testName+indexJarURL.getFile(), false);
 		
-		 if (interactive)
-		 // the input images have transparency and they do overlap, we need
-		 // to ask for blending mosaic.
-		 imageMosaicSimpleParamsTest(rgbAURL, Double.NaN, null,null,
-		 "testFinalAlpha-rgbAURL-original", true);
-		 imageMosaicSimpleParamsTest(rgbAURL, Double.NaN, Color.black,Color.black,// new
-		 // Color(35,
-		 // 34,
-		 // 25),
-		 "testFinalAlpha-rgbAURL", false);
 		
-		 // //
-		 //
-		 // This images have borders that are black and have a color model that
-		 // is IndexColorModel but all with different palette hence a color
-		 // conversion will be applied to go to RGB.
-		 //
-		 // When we do the input transparent color we will add transparency to
-		 // the images but only where the transparent color resides. Moreover the
-		 // background will be trasparent.
-		 //
-		 // //
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(indexURL, Double.NaN, null,null,
-		 "testFinalAlpha-indexURL-original", false);
-		 imageMosaicSimpleParamsTest(indexURL, Double.NaN, new Color(58, 49,
-		 8),Color.black,
-		 "testFinalAlpha-indexURL", false);
+		if (interactive)
+			imageMosaicSimpleParamsTest(overviewURL, null, null,testName+overviewURL.getFile()+"-original", false);
+		imageMosaicSimpleParamsTest(overviewURL, new Color(58, 49, 8),Color.black,testName+overviewURL.getFile()+"-indexURL", false);		
 		
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(indexAlphaURL, Double.NaN, null,null,
-		 "testFinalAlpha-indexAlphaURL-original", false);
-		 imageMosaicSimpleParamsTest(indexAlphaURL, Double.NaN, new Color(41,
-		 41, 33),Color.black, "testFinalAlpha-indexAlphaURL", false);
 		
-		 if (interactive)
-		 imageMosaicSimpleParamsTest(grayURL, Double.NaN, null,null,
-		 "testFinalAlpha-grayURL-original", false);
-		 imageMosaicSimpleParamsTest(grayURL, Double.NaN, Color.black,Color.black,
-		 "testFinalAlpha-grayURL", false);
+		if (interactive)
+			imageMosaicSimpleParamsTest(indexAlphaURL, null, null,testName+indexAlphaURL.getFile()+"-original", false);
+		imageMosaicSimpleParamsTest(indexAlphaURL, new Color(41,41, 33), Color.black,testName+indexAlphaURL.getFile(), false);
+
+		if (interactive)
+			imageMosaicSimpleParamsTest(indexAlphaJarURL, null, null,testName+indexAlphaJarURL.getFile()+"-original", false);
+		imageMosaicSimpleParamsTest(indexAlphaJarURL, new Color(41,41, 33), Color.black,testName+indexAlphaJarURL.getFile(), false);
 		
-		 //
-		 // if (interactive)
-		 // imageMosaicSimpleParamsTest(morandini, Double.NaN, null,
-		 // "testFinalAlpha-morandini-original", false);
-		 // imageMosaicSimpleParamsTest(morandini, Double.NaN, Color.white,
-		 // "testFinalAlpha-morandini", false);
+		
+		if (interactive)
+			imageMosaicSimpleParamsTest(grayURL, null, null,testName+grayURL.getFile()+"-original", false);
+		imageMosaicSimpleParamsTest(grayURL, Color.black,Color.black, testName+grayURL.getFile(), false);
+		
+		if (interactive)
+			imageMosaicSimpleParamsTest(grayJarURL, null, null,testName+grayJarURL.getFile()+"-original", false);
+		imageMosaicSimpleParamsTest(grayJarURL, Color.black,Color.black, testName+grayJarURL.getFile(), false);
+
 
 	}
-
+	
 	/**
 	 * Tests the {@link ImageMosaicReader} with default parameters for the
 	 * various input params.
@@ -343,75 +212,135 @@ public class ImageMosaicReaderTest extends TestCase {
 	 * @throws MismatchedDimensionException
 	 * @throws NoSuchAuthorityCodeException
 	 */
-	public void testDefaultParameterValue() throws IOException,
+	@Test
+	@Ignore
+	public void overviews() throws IOException,	
+			MismatchedDimensionException, NoSuchAuthorityCodeException {
+		final AbstractGridFormat format = getFormat(overviewURL);
+		final ImageMosaicReader reader = getReader(overviewURL, format);
+
+		// limit yourself to reading just a bit of it
+		final ParameterValue<GridGeometry2D> gg =  ImageMosaicFormat.READ_GRIDGEOMETRY2D.createValue();
+		final GeneralEnvelope envelope = reader.getOriginalEnvelope();
+		final Dimension dim= new Dimension();
+		dim.setSize(reader.getOriginalGridRange().getSpan(0)/2.0, reader.getOriginalGridRange().getSpan(1)/2.0);
+		final Rectangle rasterArea=(( GridEnvelope2D)reader.getOriginalGridRange());
+		rasterArea.setSize(dim);
+		final GridEnvelope2D range= new GridEnvelope2D(rasterArea);
+		gg.setValue(new GridGeometry2D(range,envelope));
+		
+		// use imageio with defined tiles
+		final ParameterValue<Boolean> useJai = ImageMosaicFormat.USE_JAI_IMAGEREAD.createValue();
+		useJai.setValue(false);
+		
+		final ParameterValue<String> tileSize = ImageMosaicFormat.SUGGESTED_TILE_SIZE.createValue();
+		tileSize.setValue("128,128");
+		
+		// Test the output coverage
+		checkCoverage(reader, new GeneralParameterValue[] {gg,useJai ,tileSize}, "overviews test");
+	}	
+ 
+	/**
+	 * Tests the {@link ImageMosaicReader} with default parameters for the
+	 * various input params.
+	 * 
+	 * @throws IOException
+	 * @throws MismatchedDimensionException
+	 * @throws NoSuchAuthorityCodeException
+	 */
+	@Test
+	public void defaultParameterValue() throws IOException,	
 			MismatchedDimensionException, NoSuchAuthorityCodeException {
 
-		imageMosaicSimpleParamsTest(rgbURL, Double.NaN, null, Color.black,
-				"testDefaultParameterValue", false);
-		 imageMosaicSimpleParamsTest(indexURL, Double.NaN, null, null,
-		 "testDefaultParameterValue", false);
-		 imageMosaicSimpleParamsTest(grayURL, Double.NaN, null, null,
-		 "testDefaultParameterValue", false);
-		 imageMosaicSimpleParamsTest(indexAlphaURL, Double.NaN, null, null,
-		 "testDefaultParameterValue", false);
+		final String baseTestName="testDefaultParameterValue-";
+		imageMosaicSimpleParamsTest(rgbURL, null, null,baseTestName+rgbURL.getFile(), false);
+		imageMosaicSimpleParamsTest(rgbAURL, null,  null,baseTestName+rgbAURL.getFile(), false);
+		imageMosaicSimpleParamsTest(overviewURL, null,null,baseTestName+overviewURL.getFile(), false);
+		imageMosaicSimpleParamsTest(indexURL, null, null,baseTestName+indexURL.getFile(), false);
+		imageMosaicSimpleParamsTest(grayURL, null, null,baseTestName+grayURL.getFile(), false);
+		imageMosaicSimpleParamsTest(indexAlphaURL, null, null,baseTestName+indexAlphaURL.getFile(), false);
+
+		// And again with URL that points into a JAR
+		imageMosaicSimpleParamsTest(rgbJarURL, null, null,baseTestName+rgbJarURL.getFile(), false);
+		imageMosaicSimpleParamsTest(indexJarURL, null, null,baseTestName+indexJarURL.getFile(), false);
+		imageMosaicSimpleParamsTest(grayJarURL, null, null,baseTestName+grayJarURL.getFile(), false);
+		imageMosaicSimpleParamsTest(indexAlphaJarURL, null, null,baseTestName+indexAlphaJarURL.getFile(), false);
 	}
 	
 	
-	//
-	//test reading the bands in a different order & updating the bands
-	public void testUpdateBand() {
-		final AbstractGridFormat format = getFormat(bandsURL);
-		final ImageMosaicReader reader = getReader(bandsURL, format);
+	@Test
+	@Ignore
+	public void errors() {
+		////
+		//
+		// MOSAIC_LOCATION_ATTRIBUTE
+		//
+		// error for location attribute
+		AbstractGridCoverage2DReader reader=null;
+		try {
+			reader=(AbstractGridCoverage2DReader) ((AbstractGridFormat) GridFormatFinder.findFormat(rgbURL)).getReader(rgbURL, new Hints(Hints.MOSAIC_LOCATION_ATTRIBUTE, "aaaa"));
+			Assert.assertNull(reader);
+		} catch (Throwable e) {
+			Assert.fail(e.getLocalizedMessage());
+		}
+		try {
+			reader=(AbstractGridCoverage2DReader) ((AbstractGridFormat) GridFormatFinder.findFormat(rgbJarURL)).getReader(rgbJarURL, new Hints(Hints.MOSAIC_LOCATION_ATTRIBUTE, "aaaa"));
+			Assert.assertNull(reader);
+		} catch (Throwable e) {
+			Assert.fail(e.getLocalizedMessage());
+		}
 		
-		
-		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
-		Set<FeatureId> fids = new HashSet<FeatureId>();
-		
-        fids.add(ff.featureId("1"));
-        Filter filter = ff.id(fids);
 
-        reader.updateBandSelection(filter, new int[]{2, 0, 1}, new double[]{0,0,0});
-        try{
-        	AbstractCoverage coverage = (AbstractCoverage) reader.read(new GeneralParameterValue[]{});
-        	assertNotNull(coverage);
-        }catch (Throwable e){
-        	assertTrue(false);
-        }
-	}
+		try {
+			reader=(AbstractGridCoverage2DReader) ((AbstractGridFormat) GridFormatFinder.findFormat(rgbURL)).getReader(rgbURL, new Hints(Hints.MOSAIC_LOCATION_ATTRIBUTE, "location"));
+			Assert.assertNotNull(reader);
+			reader.dispose();
+			Assert.assertTrue(true);
+		} catch (Throwable e) {
+			Assert.fail(e.getLocalizedMessage());
+		}
 
-	public void testErrors() {
-		//error for location attribute
-		try{
-			((AbstractGridFormat) GridFormatFinder
-			.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MOSAIC_LOCATION_ATTRIBUTE,"aaaa"));
-			assertTrue(false);
-		}catch (Throwable e) {
+		try {
+			reader=(AbstractGridCoverage2DReader) ((AbstractGridFormat) GridFormatFinder.findFormat(rgbJarURL)).getReader(rgbJarURL, new Hints(Hints.MOSAIC_LOCATION_ATTRIBUTE, "location"));
+			Assert.assertNotNull(reader);
+			reader.dispose();
+			Assert.assertTrue(true);
+		} catch (Throwable e) {
+			Assert.fail(e.getLocalizedMessage());
+		}
+
+		////
+		//
+		// MAX_ALLOWED_TILES
+		//
+		////
+		// error for num tiles
+		try {
+			reader=(AbstractGridCoverage2DReader) ((AbstractGridFormat) GridFormatFinder.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MAX_ALLOWED_TILES, Integer.valueOf(2)));
+			Assert.assertNotNull(reader);
 			
+			//read the coverage
+			@SuppressWarnings("unused")
+			GridCoverage2D gc = (GridCoverage2D) reader.read(null);
+			Assert.fail("MAX_ALLOWED_TILES was not respected");
+		} catch (Throwable e) {
+
+			if (reader != null) 
+				reader.dispose();
+			
+			Assert.assertTrue(true);
 		}
-		
-		try{
-			((AbstractGridFormat) GridFormatFinder
-					.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MOSAIC_LOCATION_ATTRIBUTE,"location"));
-			assertTrue(true);
-		}catch (Throwable e) {
-			assertTrue(false);
-		}
-		
-		//error for num tiles
-		try{
-			((AbstractGridFormat) GridFormatFinder
-					.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MAX_ALLOWED_TILES,new Integer(2))).read(null);
-			assertTrue(false);
-		}catch (Throwable e) {
-			assertTrue(true);
-		}
-		
-		try{
-			((AbstractGridFormat) GridFormatFinder
-					.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MAX_ALLOWED_TILES,new Integer(1000))).read(null);
-			assertTrue(true);
-		}catch (Exception e) {
-		    fail( e.getLocalizedMessage() );
+
+		try {
+			reader=(AbstractGridCoverage2DReader) ((AbstractGridFormat) GridFormatFinder.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MAX_ALLOWED_TILES,Integer.valueOf(1000)));
+			Assert.assertNotNull(reader);
+			//read the coverage
+			GridCoverage2D gc = (GridCoverage2D) reader.read(null);
+			Assert.assertTrue(true);
+			gc.dispose(true);
+			reader.dispose();
+		} catch (Exception e) {
+			Assert.fail(e.getLocalizedMessage());
 		}
 	}
 
@@ -426,48 +355,29 @@ public class ImageMosaicReaderTest extends TestCase {
 	 * @throws MismatchedDimensionException
 	 * @throws NoSuchAuthorityCodeException
 	 */
-	private void imageMosaicSimpleParamsTest(URL testURL, double roithreshold,
-			Color inputTransparent, Color outputTransparent, String title,
-			boolean blend) throws IOException, MismatchedDimensionException,
+	private void imageMosaicSimpleParamsTest(
+			final URL testURL, 
+			final Color inputTransparent, 
+			final Color outputTransparent, 
+			final String title,
+			final boolean blend) throws IOException, MismatchedDimensionException,
 			NoSuchAuthorityCodeException {
 
-		// /////////////////////////////////////////////////////////////////
-		//
 		// Get the resources as needed.
-		//
-		//
-		// /////////////////////////////////////////////////////////////////
-		assertNotNull(testURL);
+		Assert.assertNotNull(testURL);
 		final AbstractGridFormat format = getFormat(testURL);
 		final ImageMosaicReader reader = getReader(testURL, format);
 
-		// /////////////////////////////////////////////////////////////////
-		//
 		// limit yourself to reading just a bit of it
-		//
-		//
-		// /////////////////////////////////////////////////////////////////
-		final ParameterValue roiThreshold = (ParameterValue) ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
-				.createValue();
-		roiThreshold.setValue(new Double(roithreshold));
-		final ParameterValue inTransp = (ParameterValue) ImageMosaicFormat.INPUT_TRANSPARENT_COLOR
-				.createValue();
+		final ParameterValue<Color> inTransp =  ImageMosaicFormat.INPUT_TRANSPARENT_COLOR.createValue();
 		inTransp.setValue(inputTransparent);
-		final ParameterValue outTransp = (ParameterValue) ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR
-				.createValue();
+		final ParameterValue<Color> outTransp =  ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR.createValue();
 		outTransp.setValue(outputTransparent);
-		final ParameterValue blendPV = (ParameterValue) ImageMosaicFormat.FADING
-				.createValue();
+		final ParameterValue<Boolean> blendPV =ImageMosaicFormat.FADING.createValue();
 		blendPV.setValue(blend);
 
-		// /////////////////////////////////////////////////////////////////
-		//
 		// Test the output coverage
-		//
-		//
-		// /////////////////////////////////////////////////////////////////
-		testCoverage(reader, new GeneralParameterValue[] { roiThreshold,
-				inTransp, blendPV, outTransp }, title);
+		checkCoverage(reader, new GeneralParameterValue[] { inTransp, blendPV, outTransp }, title);
 	}
 
 	/**
@@ -481,22 +391,35 @@ public class ImageMosaicReaderTest extends TestCase {
 	 *            {@link GridCoverage2D}.
 	 * @param title
 	 *            to print out as the head of the frame in case we visualize it.
+	 * @return 
 	 * @throws IOException
 	 */
-	private void testCoverage(final ImageMosaicReader reader,
+	@SuppressWarnings("unchecked")
+	private void checkCoverage(final ImageMosaicReader reader,
 			GeneralParameterValue[] values, String title) throws IOException {
-		// /////////////////////////////////////////////////////////////////
-		//
 		// Test the coverage
-		//
-		//
-		// /////////////////////////////////////////////////////////////////
-		AbstractCoverage coverage = (AbstractCoverage) reader.read(values);
-		assertNotNull(coverage);
-		if (TestData.isInteractiveTest())
-			show(((GridCoverage2D) coverage).getRenderedImage(), title);
+		final GridCoverage2D coverage = (GridCoverage2D) reader.read(values);
+		Assert.assertNotNull(coverage);
+		if (interactive)
+			show( coverage.getRenderedImage(), title);
 		else
-			((GridCoverage2D) coverage).getRenderedImage().getData();
+			PlanarImage.wrapRenderedImage( coverage.getRenderedImage()).getTiles();;
+			
+		for(GeneralParameterValue pv:values){
+			if(pv.getDescriptor().getName().equals(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName())){
+				
+				Parameter<GridGeometry2D> param= (Parameter<GridGeometry2D>) pv;
+				// check envelope if it has been requested
+				Assert.assertEquals(param.getValue().getEnvelope(), coverage.getEnvelope());
+
+			}
+		}
+		
+		if (!interactive){
+			// dispose stuff
+			coverage.dispose(true);
+			reader.dispose();
+		}
 	}
 
 	/**
@@ -537,16 +460,17 @@ public class ImageMosaicReaderTest extends TestCase {
 	private ImageMosaicReader getReader(URL testURL,
 			final AbstractGridFormat format) {
 		return getReader(testURL, format, null);
-		
+
 	}
 
 	private ImageMosaicReader getReader(URL testURL,
-			final AbstractGridFormat format,Hints hints) {
-		final ImageMosaicReader reader = (ImageMosaicReader) format
-				.getReader(testURL,hints);
-		assertNotNull(reader);
+			final AbstractGridFormat format, Hints hints) {
+//		Get a reader
+		final ImageMosaicReader reader = (ImageMosaicReader) format.getReader(testURL, hints);
+		Assert.assertNotNull(reader);
 		return reader;
 	}
+
 	/**
 	 * Tries to get an {@link AbstractGridFormat} for the provided URL.
 	 * 
@@ -556,21 +480,15 @@ public class ImageMosaicReaderTest extends TestCase {
 	 */
 	private AbstractGridFormat getFormat(URL testURL) {
 
-		// /////////////////////////////////////////////////////////////////
-		//
-		// Get a reader
-		//
-		//
-		// /////////////////////////////////////////////////////////////////
-		final AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
-				.findFormat(testURL);
-		assertNotNull(format);
-		assertFalse("UknownFormat",format instanceof UnknownFormat);
+		// Get format
+		final AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder.findFormat(testURL);
+		Assert.assertNotNull(format);
+		Assert.assertFalse("UknownFormat", format instanceof UnknownFormat);
 		return format;
 	}
 
 	/**
-	 * Testes {@link ImageMosaicReader} asking to crop the lower left quarter of
+	 * Tests {@link ImageMosaicReader} asking to crop the lower left quarter of
 	 * the input coverage.
 	 * 
 	 * @param title
@@ -583,48 +501,30 @@ public class ImageMosaicReaderTest extends TestCase {
 	private void imageMosaicCropTest(URL testURL, String title)
 			throws IOException, MismatchedDimensionException, FactoryException {
 
-		// /////////////////////////////////////////////////////////////////
-		//
 		// Get the resources as needed.
-		//
-		//
-		// /////////////////////////////////////////////////////////////////
-		assertNotNull(testURL);
+		Assert.assertNotNull(testURL);
 		final AbstractGridFormat format = getFormat(testURL);
 		final ImageMosaicReader reader = getReader(testURL, format);
 
-		//
-		// /////////////////////////////////////////////////////////////////
-		//
+
 		// crop
-		//
-		//
-		// /////////////////////////////////////////////////////////////////
-		final ParameterValue gg = (ParameterValue) ImageMosaicFormat.READ_GRIDGEOMETRY2D
-				.createValue();
+		final ParameterValue<GridGeometry2D> gg =  ImageMosaicFormat.READ_GRIDGEOMETRY2D.createValue();
 		final GeneralEnvelope oldEnvelope = reader.getOriginalEnvelope();
 		final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] {
 				oldEnvelope.getLowerCorner().getOrdinate(0)
-						+ oldEnvelope.getLength(0) / 2,
+						+ oldEnvelope.getSpan(0) / 2,
 				oldEnvelope.getLowerCorner().getOrdinate(1)
-						+ oldEnvelope.getLength(1) / 2 }, new double[] {
+						+ oldEnvelope.getSpan(1) / 2 }, new double[] {
 				oldEnvelope.getUpperCorner().getOrdinate(0),
 				oldEnvelope.getUpperCorner().getOrdinate(1) });
 		cropEnvelope.setCoordinateReferenceSystem(reader.getCrs());
-		gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
-				600, 300)), cropEnvelope));
-		final ParameterValue outTransp = (ParameterValue) ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR
-				.createValue();
+		gg.setValue(new GridGeometry2D(PixelInCell.CELL_CENTER,reader.getOriginalGridToWorld(PixelInCell.CELL_CENTER),cropEnvelope,null));
+		final ParameterValue<Color> outTransp =  ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR.createValue();
 		outTransp.setValue(Color.black);
 
-		// /////////////////////////////////////////////////////////////////
-		//
-		// Show the coverage
-		//
-		//
-		// /////////////////////////////////////////////////////////////////
-		testCoverage(reader, new GeneralParameterValue[] { gg, outTransp },
-				title);
+
+		// test the coverage
+		checkCoverage(reader, new GeneralParameterValue[] { gg, outTransp },title);
 
 	}
 
@@ -636,28 +536,63 @@ public class ImageMosaicReaderTest extends TestCase {
 
 	}
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
-				256 * 1024 * 1024);
-		JAI.getDefaultInstance().getTileScheduler().setParallelism(5);
-		JAI.getDefaultInstance().getTileScheduler().setPriority(5);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(5);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(5);
-
-		bandsURL = TestData.url(this, "bands/mosaic.shp");
+	@Before
+	public void setUp() throws Exception {
+		//remove generated file
+		cleanUp();
+		
 		rgbURL = TestData.url(this, "rgb/mosaic.shp");
-		rgbAURL = TestData.url(this, "rgba/modis.shp");
+		rgbJarURL = new URL("jar:"+TestData.url(this, "rgb.jar").toExternalForm()+"!/rgb/mosaic.shp");
+		
+		overviewURL = TestData.url(this, "overview/");
+		rgbAURL = TestData.url(this, "rgba/");
+		
 		indexURL = TestData.url(this, "index/modis.shp");
+		indexJarURL = new URL("jar:"+TestData.url(this, "index.jar").toExternalForm()+"!/index/modis.shp");
+		
 		indexAlphaURL = TestData.url(this, "index_alpha/modis.shp");
+		indexAlphaJarURL = new URL("jar:"+TestData.url(this, "index_alpha.jar").toExternalForm()+"!/index_alpha/modis.shp");
+		
 		grayURL = TestData.url(this, "gray/dof.shp");
-		index_unique_paletteAlphaURL = TestData.url(this,
-				"index_alpha_unique_palette/dof.shp");
-		//
-		// morandini = new File("C:\\work\\data\\m\\m.shp").toURL();
-
-		interactive = TestData.isInteractiveTest();
+		grayJarURL = new URL("jar:"+TestData.url(this, "gray.jar").toExternalForm()+"!/gray/dof.shp");
+		
+		index_unique_paletteAlphaURL = TestData.url(this,"index_alpha_unique_palette/dof.shp");
+		index_unique_paletteAlphaJarURL = new URL("jar:"+TestData.url(this, "index_alpha_unique_palette.jar").toExternalForm()+"!/index_alpha_unique_palette/dof.shp");
+		
+		interactive =TestData.isInteractiveTest();
 
 	}
+
+	/**
+	 * Cleaning up the generated files (shape and properties so that we recreate them.
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private void cleanUp() throws FileNotFoundException, IOException {
+			if(interactive)
+				return;
+			File dir=TestData.file(this, "overview/");
+			File[] files = dir.listFiles((FilenameFilter)FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter("tif")));
+			for(File file:files){
+				file.delete();
+			}
+			
+			dir=TestData.file(this, "rgba/");
+			files = dir.listFiles((FilenameFilter)FileFilterUtils.notFileFilter(
+					FileFilterUtils.orFileFilter(
+							FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter("png")),
+							FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter("wld"))
+					)));
+			for(File file:files){
+				file.delete();
+			}
+	}
+	
+	@After
+	public void tearDown() throws FileNotFoundException, IOException{
+		cleanUp();
+	}
+
 
 }

@@ -33,7 +33,7 @@ import org.opengis.filter.expression.Expression;
  *  </pre>
  *
  * @author iant
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/SelectedChannelType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/SelectedChannelType.java $
  */
 public interface SelectedChannelType extends org.opengis.style.SelectedChannelType {
     
@@ -55,7 +55,7 @@ public interface SelectedChannelType extends org.opengis.style.SelectedChannelTy
      */
     public void setContrastEnhancement(Expression gammaValue);
 
-    public void setContrastEnhancement(ContrastEnhancement enhancement);
+    public void setContrastEnhancement(org.opengis.style.ContrastEnhancement enhancement);
 
     public ContrastEnhancement getContrastEnhancement();
 

@@ -30,8 +30,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * Defines an expression that holds a literal for return.
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/LiteralExpressionImpl.java $
- * @version $Id: LiteralExpressionImpl.java 30876 2008-07-04 14:33:43Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/LiteralExpressionImpl.java $
+ * @version $Id: LiteralExpressionImpl.java 34698 2009-12-18 09:33:36Z aaime $
  */
 public class LiteralExpressionImpl extends DefaultExpression
     implements LiteralExpression {
@@ -302,15 +302,13 @@ public class LiteralExpressionImpl extends DefaultExpression
             // This is a problem.  The Expression with type String of "2.0"
             // should be equals to the Expression with type Integer of "2.0"
             // Same thing with doubles and integers (as noted in the javadocs)
-            /*boolean isEqual = (expLit.getType() == this.expressionType);
 
-            if (!isEqual) {
-                return false;
-            }*/
-
-            if ((expLit == null) && (this.literal == null)) {
-                return true;
+            if (this.literal == null) {
+                return expLit.literal == null;
             }
+            if (this.expressionType == expLit.expressionType 
+                    && this.literal.equals(expLit.literal))
+                return true;
 
             if (expressionType == LITERAL_GEOMETRY) {
                 return ((Geometry) this.literal).equals((Geometry) expLit.evaluate(null, Geometry.class));
@@ -320,6 +318,8 @@ public class LiteralExpressionImpl extends DefaultExpression
                 return ((String) this.literal).equals((String) expLit.evaluate(null, String.class));
             } else if (expressionType == LITERAL_DOUBLE) {
                 return ((Double) this.literal).equals((Double) expLit.evaluate(null, Double.class));
+            } else if (expressionType == LITERAL_LONG) {
+                return ((Long) this.literal).equals((Long) expLit.evaluate(null, Long.class));                
             } else {
                 return true;
             }

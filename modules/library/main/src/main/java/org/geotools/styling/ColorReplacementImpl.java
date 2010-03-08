@@ -30,7 +30,7 @@ import org.opengis.style.StyleVisitor;
  * @author Jody Garnett
  * @source $URL: http://svn.geotools.org/trunk/modules/library/main/src/main/java/org/geotools/styling/ColorReplacmeentImpl.java $
  */
-public class ColorReplacementImpl implements ColorReplacement {
+public class ColorReplacementImpl implements org.geotools.styling.ColorReplacement {
 
     private Function function;
 
@@ -39,7 +39,7 @@ public class ColorReplacementImpl implements ColorReplacement {
     }
 
     /**
-     * Function used to perform color Replacmeent.
+     * Function used to perform color Replacement.
      * <p>
      * It is assumed this function is defined in accordance with the "Recode" function
      * from Symbology Encoding 1.1.
@@ -52,6 +52,10 @@ public class ColorReplacementImpl implements ColorReplacement {
 
     public Object accept(StyleVisitor visitor, Object extraData) {
         return visitor.visit( this, extraData );
+    }
+
+    public void setRecoding(Function function) {
+        this.function = function;
     }
 
 }

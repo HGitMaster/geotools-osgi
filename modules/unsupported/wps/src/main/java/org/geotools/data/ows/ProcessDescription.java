@@ -24,6 +24,8 @@ import org.opengis.util.InternationalString;
  * Used to hold data regarding Processes. Used by the DescribeProcessResponse
  * 
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wps/src/main/java/org/geotools/data/ows/ProcessDescription.java $
  */
 public class ProcessDescription {
     private String name;

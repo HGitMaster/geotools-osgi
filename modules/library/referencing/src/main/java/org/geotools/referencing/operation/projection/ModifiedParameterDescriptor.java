@@ -35,7 +35,7 @@ import org.geotools.referencing.operation.MathTransformProvider;  // For javadoc
  * and may wish to override the neutral default values with some default value appropriate
  * for that area.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ModifiedParameterDescriptor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ModifiedParameterDescriptor.java $
  * @version $Id: ModifiedParameterDescriptor.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

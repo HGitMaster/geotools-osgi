@@ -16,19 +16,11 @@
  */
 package org.geotools.process;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * An {@link Executor} that provides methods to manage termination and
@@ -42,6 +34,8 @@ import java.util.concurrent.TimeoutException;
  * for completion.
  * 
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/ProcessExecutor.java $
  */
 public interface ProcessExecutor extends ExecutorService {
     /**

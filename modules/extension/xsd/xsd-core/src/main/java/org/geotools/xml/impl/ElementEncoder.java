@@ -33,6 +33,8 @@ import java.util.logging.Logger;
  * @author Justin Deoliveira, The Open Planning Project
  * TODO: rename this class, it is not just for element.s
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/ElementEncoder.java $
  */
 public class ElementEncoder {
     /**
@@ -78,17 +80,15 @@ public class ElementEncoder {
      */
     public Element encode(Object value, XSDElementDeclaration element,Document document, XSDTypeDefinition container) {
         ElementEncodeExecutor executor = new ElementEncodeExecutor(value, element, document, logger);
-        bindingWalker.walk(element, executor, container, context);
-
+        BindingVisitorDispatch.walk(value, bindingWalker, element, executor, container, context);
         return executor.getEncodedElement();
     }
 
-    public Attr encode(Object value, XSDAttributeDeclaration attribute, Document document, XSDTypeDefinition container) {
+    public Attr encode(Object value, XSDAttributeDeclaration attribute, Document document,
+            XSDTypeDefinition container) {
         AttributeEncodeExecutor executor = new AttributeEncodeExecutor(value, attribute, document,
                 logger);
-
-        bindingWalker.walk(attribute, executor, container, context);
-
+        BindingVisitorDispatch.walk(value, bindingWalker, attribute, executor, container, context);
         return executor.getEncodedAttribute();
     }
 

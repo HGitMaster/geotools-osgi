@@ -26,6 +26,8 @@ package org.geotools.feature;
  * <ul>
  * <li>FeatureCollectioType.getMemberType()
  * @author Jody Garnett (Refractions Research)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/FeatureCollectionType.java $
  */
 public interface FeatureCollectionType extends FeatureType {
     /**

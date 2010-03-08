@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link Line} and {@link Plane} classes.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/math/GeometryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/math/GeometryTest.java $
  * @version $Id: GeometryTest.java 30725 2008-06-13 19:29:06Z desruisseaux $
  * @author Martin Desruisseaux (PMO, IRD)
  */

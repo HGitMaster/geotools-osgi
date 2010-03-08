@@ -40,7 +40,7 @@ import org.opengis.referencing.operation.Projection;
  * @todo Uses those information, gotten from getters, to write into a
  *       {@link GeographicMetadata}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/MetadataWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/MetadataWriter.java $
  * @version $Id: MetadataWriter.java 30998 2008-07-10 15:08:09Z cedricbr $
  * @author Cédric Briançon
  *

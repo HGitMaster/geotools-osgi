@@ -27,7 +27,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * thrown when a metadata is defined twice with different values.  It may also be thrown
  * if a metadata can be computed from other metadata, but their values are inconsistent.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/AmbiguousMetadataException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/AmbiguousMetadataException.java $
  * @version $Id: AmbiguousMetadataException.java 30965 2008-07-09 10:04:21Z cedricbr $
  * @author Martin Desruisseaux (IRD)
  *

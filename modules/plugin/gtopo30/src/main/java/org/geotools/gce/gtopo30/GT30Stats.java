@@ -26,6 +26,8 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.StringTokenizer;
 
+import org.geotools.data.DataUtilities;
+
 
 /**
  * This class parses the STX GTopo30 statistics file and allows to retrieve its
@@ -34,7 +36,7 @@ import java.util.StringTokenizer;
  * @author aaime
  * @author simone giannecchini
  * @author mkraemer
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/gtopo30/src/main/java/org/geotools/gce/gtopo30/GT30Stats.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/gtopo30/src/main/java/org/geotools/gce/gtopo30/GT30Stats.java $
  */
 final class GT30Stats {
     /** Minimum value in the data file */
@@ -57,8 +59,7 @@ final class GT30Stats {
      * @throws IOException if some problem occurs trying to read the file
      */
     public GT30Stats(final URL statsURL) throws IOException {
-        final String path = statsURL.getFile();
-        final File stats = new File(java.net.URLDecoder.decode(path, "UTF-8"));
+        final File stats = DataUtilities.urlToFile(statsURL);
 
 		BufferedReader reader = null;
 		try {

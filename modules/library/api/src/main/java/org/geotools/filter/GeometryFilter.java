@@ -43,7 +43,7 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
  *
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/filter/GeometryFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/GeometryFilter.java $
  * @version $Id: GeometryFilter.java 30642 2008-06-12 17:52:06Z acuster $
  *
  * @todo REVISIT: make this class (and all filters) immutable, implement

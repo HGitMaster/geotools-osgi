@@ -16,6 +16,8 @@
  */
 package org.geotools.renderer.lite;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 
 /**
  * This class is used to maintain a list of listeners, and
@@ -40,7 +42,8 @@ package org.geotools.renderer.lite;
  * }
  * </pre>
  * </p>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/ListenerList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/ListenerList.java $
+ * @deprecated Use {@link CopyOnWriteArrayList} instead, it's part of the JDK and it's more efficient
  */
 public final class ListenerList {
     /**

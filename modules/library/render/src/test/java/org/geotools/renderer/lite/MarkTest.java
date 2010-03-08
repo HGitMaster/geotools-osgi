@@ -19,7 +19,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import static java.awt.RenderingHints.*;
 
 public class MarkTest extends TestCase {
-    private static final long TIME = 1000;
+    private static final long TIME = 3000;
     FeatureSource<SimpleFeatureType, SimpleFeature> pointFS;
     FeatureSource<SimpleFeatureType, SimpleFeature> lineFS;
     ReferencedEnvelope bounds;
@@ -37,7 +37,7 @@ public class MarkTest extends TestCase {
         Font f = Font.createFont(Font.TRUETYPE_FONT, TestData.getResource(this, "recreate.ttf").openStream());
         FontCache.getDefaultInstance().registerFont(f);
         
-//        System.setProperty("org.geotools.test.interactive", "true");
+        // System.setProperty("org.geotools.test.interactive", "true");
     }
     
     public void testCircle() throws Exception {

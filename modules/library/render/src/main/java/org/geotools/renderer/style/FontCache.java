@@ -40,6 +40,8 @@ import java.util.logging.Logger;
  * 
  * @author Andrea Aime - TOPP
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/FontCache.java $
  */
 public class FontCache {
     /** The logger for the rendering module. */

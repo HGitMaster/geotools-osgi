@@ -67,7 +67,7 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  * factory will takes advantage of the aliases table.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/DatumAliases.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/DatumAliases.java $
  * @version $Id: DatumAliases.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Rueben Schulz
  * @author Martin Desruisseaux

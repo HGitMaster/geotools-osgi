@@ -31,7 +31,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  * Creates ConnectionPool objects for a certain JDBC database instance.
  * @author Rob Atkinson rob@socialchange.net.NOSPAM.au
  * @author Gary Sheppard garysheppard@psu.edu
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/JDBCConnectionFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/JDBCConnectionFactory.java $
  */
 public class JDBCConnectionFactory {
 

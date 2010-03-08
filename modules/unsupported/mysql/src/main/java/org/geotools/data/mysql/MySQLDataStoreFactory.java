@@ -38,7 +38,7 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
  * </p>
  *
  * @author Andrea Aime, University of Modena and Reggio Emilia
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLDataStoreFactory.java $
  */
 public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(MySQLDataStoreFactory.class.getName());

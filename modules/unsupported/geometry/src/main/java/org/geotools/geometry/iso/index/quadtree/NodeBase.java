@@ -28,6 +28,8 @@ import org.geotools.geometry.iso.topograph2D.Envelope;
 /**
  * The base class for nodes in a {@link Quadtree}.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/NodeBase.java $
  * @version 1.7.2
  */
 public abstract class NodeBase {

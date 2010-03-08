@@ -36,7 +36,7 @@ import org.opengis.filter.BinaryComparisonOperator;
  * simplify/make meaningful filter logic.
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/filter/CompareFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/CompareFilter.java $
  * @version $Id: CompareFilter.java 30642 2008-06-12 17:52:06Z acuster $
  *
  * @deprecated use {@link org.opengis.filter.BinaryComparisonOperator}

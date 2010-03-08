@@ -152,7 +152,13 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
      * @required
      * @readonly
      */
-    List classpathElements; 
+    List classpathElements;
+    
+    /**
+     * Flag to control whether to include GML libraries on classpath when running.
+     * @parameter expression="true"
+     */
+    boolean includeGML;
     
     protected XSDSchema schema() {
     
@@ -176,27 +182,29 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 		
 		//build an "extended" classloader for "well-known
 		List artifacts = new ArrayList();
-		artifacts.add( 
-			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-gml2", "2.6-SNAPSHOT", "compile", "jar"
-
-            )
-		);
-		artifacts.add( 
-			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-gml3", "2.6-SNAPSHOT", "compile", "jar"
-			) 
-		);
-		artifacts.add( 
-			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-filter", "2.6-SNAPSHOT", "compile", "jar"
-			) 
-		);
-		artifacts.add( 
-			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-sld","2.6-SNAPSHOT", "compile", "jar"
-			) 
-		);
+		if (includeGML) {
+        		artifacts.add( 
+        			artifactFactory.createArtifact( 
+        				"org.geotools", "gt2-xml-gml2", "2.6-SNAPSHOT", "compile", "jar"
+        
+                    )
+        		);
+        		artifacts.add( 
+        			artifactFactory.createArtifact( 
+        				"org.geotools", "gt2-xml-gml3", "2.6-SNAPSHOT", "compile", "jar"
+        			) 
+        		);
+        		artifacts.add( 
+        			artifactFactory.createArtifact( 
+        				"org.geotools", "gt2-xml-filter", "2.6-SNAPSHOT", "compile", "jar"
+        			) 
+        		);
+        		artifacts.add( 
+        			artifactFactory.createArtifact( 
+        				"org.geotools", "gt2-xml-sld","2.6-SNAPSHOT", "compile", "jar"
+        			) 
+        		);
+		}
 	
 		Set urls = new HashSet();
 		for ( Iterator a = artifacts.iterator(); a.hasNext(); ) {
@@ -210,7 +218,7 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 				
 				for ( Iterator ra = resolvedArtifacts.iterator(); ra.hasNext(); ) {
 				    Artifact resolvedArtifact = (Artifact) ra.next();
-				    urls.add( resolvedArtifact.getFile().toURL() );    
+				    urls.add( resolvedArtifact.getFile().toURI().toURL() );    
 				}
 				
 			} 
@@ -233,10 +241,13 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 		final List xsds = new ArrayList();
                 xsds.add( "org.geotools.xml.XML" );
                 xsds.add( "org.geotools.xlink.XLINK" );
-                xsds.add( "org.geotools.gml2.GML" );
-		xsds.add( "org.geotools.gml3.GML" );
-		xsds.add( "org.geotools.filter.v1_0.OGC" );
-		xsds.add( "org.geotools.filter.v1_1.OGC" );
+                
+                if (includeGML) {
+                    xsds.add( "org.geotools.gml2.GML" );
+                    xsds.add( "org.geotools.gml3.GML" );
+                    xsds.add( "org.geotools.filter.v1_0.OGC" );
+                    xsds.add( "org.geotools.filter.v1_1.OGC" );
+                }
 		
 		for ( int i = 0; i < xsds.size(); i++ ) {
 			String className = (String) xsds.get( i );

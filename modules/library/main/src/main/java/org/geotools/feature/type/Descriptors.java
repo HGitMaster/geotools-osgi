@@ -27,7 +27,6 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.Name;
 
 /**
  * Helper methods for dealing with Descriptor.
@@ -40,6 +39,8 @@ import org.opengis.feature.type.Name;
  * @author Justin Deoliveira
  * 
  * @since 2.5
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/Descriptors.java $
  */
 public class Descriptors {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(Descriptors.class.getPackage().getName());
@@ -508,11 +509,11 @@ public class Descriptors {
                 LOGGER.warning("node has no name set, try to fix! " + node);
                 Name name2 = node.getType().getName();
                 if (null == name.getNamespaceURI()) {
-                    if (name.getLocalPart().equals(nodeName.getLocalPart())) {
+                    if (name.getLocalPart().equals(name2.getLocalPart())) {
                         return node;
                     }
-                } else if (nodeName.getNamespaceURI().equals(name.getNamespaceURI())
-                        && nodeName.getLocalPart().equals(name.getLocalPart())) {
+                } else if (name2.getNamespaceURI().equals(name.getNamespaceURI())
+                        && name2.getLocalPart().equals(name.getLocalPart())) {
                     return node;
                 }
             } else {

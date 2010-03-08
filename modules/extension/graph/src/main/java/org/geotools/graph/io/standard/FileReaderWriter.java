@@ -23,7 +23,7 @@ import org.geotools.graph.io.GraphReaderWriter;
  *  
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/io/standard/FileReaderWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/io/standard/FileReaderWriter.java $
  */
 public interface FileReaderWriter extends GraphReaderWriter {
   

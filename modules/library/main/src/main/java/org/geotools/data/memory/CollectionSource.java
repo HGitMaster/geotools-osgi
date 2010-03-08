@@ -36,6 +36,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Please note that this is read-only access.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/memory/CollectionSource.java $
  */
 public final class CollectionSource {
 

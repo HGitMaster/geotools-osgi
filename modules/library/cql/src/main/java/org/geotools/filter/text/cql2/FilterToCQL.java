@@ -298,21 +298,13 @@ class FilterToCQL implements FilterVisitor, ExpressionVisitor {
         String pattern = LikeFilterImpl.convertToSQL92(esc, multi, single, matchCase, 
             filter.getLiteral());
 
-        if (!matchCase) {
-            output.append(" UPPER(");
-        }
-
         PropertyName propertyName = (PropertyName) filter.getExpression();
         propertyName.accept(this, output);
 
-        if (!matchCase){
-            output.append(") LIKE '");
-        } else {
-            output.append(" LIKE '");
-        }
+        output.append(" LIKE '");
 
         output.append(pattern);
-        output.append("' ");
+        output.append("'");
         
         return output;
     }

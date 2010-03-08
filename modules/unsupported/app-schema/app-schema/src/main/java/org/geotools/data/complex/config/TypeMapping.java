@@ -27,7 +27,8 @@ import org.geotools.util.CheckedArrayList;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: TypeMapping.java 31514 2008-09-15 08:36:50Z bencd $
+ * @author Russell Petty, GSV
+ * @version $Id: TypeMapping.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/TypeMapping.java $
  * @since 2.4
@@ -39,7 +40,15 @@ public class TypeMapping implements Serializable {
     private String sourceDataStore;
 
     private String sourceTypeName;
+  
+    private String itemXpath;
 
+    /**
+      * True if we don't want to create a new feature, but want to add attributes to the feature
+      * returned from the backend Data access.
+      */
+    private boolean isXmlDataStore;
+  
     private String targetElementName;
 
     private List attributeMappings = Collections.EMPTY_LIST;
@@ -82,7 +91,23 @@ public class TypeMapping implements Serializable {
     public void setTargetElementName(String targetElementName) {
         this.targetElementName = targetElementName;
     }
+    
+    public String getItemXpath() {
+        return itemXpath;
+    }
 
+    public void setItemXpath(String itemXpath) {
+        this.itemXpath = itemXpath;
+    }
+
+    public void setXmlDataStore(String isXmlDataStore) {
+        this.isXmlDataStore = Boolean.valueOf(isXmlDataStore).booleanValue();
+    }
+
+    public boolean isXmlDataStore() {
+        return isXmlDataStore;
+    }
+    
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("TypeMappingDTO[").append("sourceDataStore=").append(sourceDataStore).append(

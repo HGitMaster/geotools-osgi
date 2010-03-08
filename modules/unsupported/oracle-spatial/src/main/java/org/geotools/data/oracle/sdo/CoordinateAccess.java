@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
  * </p>
  *
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/sdo/CoordinateAccess.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/sdo/CoordinateAccess.java $
  */
  public interface CoordinateAccess extends CoordinateSequence {
     /**

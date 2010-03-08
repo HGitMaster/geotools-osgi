@@ -36,7 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Access CRS information from the Oracle MD_SYS.CS_SRS view.
  * 
  * @author Andrea Aime - TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/referencing/OracleAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/referencing/OracleAuthorityFactory.java $
  */
 public class OracleAuthorityFactory extends JDBCAuthorityFactory {
 

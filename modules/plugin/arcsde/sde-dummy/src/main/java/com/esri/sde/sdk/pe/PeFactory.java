@@ -12,7 +12,7 @@ public class PeFactory {
         // TODO Auto-generated method stub
         return null;
     }
-    public static PeCoordinateSystem geogcs(int seEpsgCode)throws PeProjectionException {
+    public static PeGeographicCS geogcs(int seEpsgCode)throws PeProjectionException {
         // TODO Auto-generated method stub
         return null;
     }

@@ -23,7 +23,7 @@ import java.util.Collection;
  * A basic implementation of FeatureType.
  *
  * @author Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/main/java/org/geotools/feature/SimpleFeatureType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/SimpleFeatureType.java $
  * @version $Id: SimpleFeatureType.java 30647 2008-06-12 18:58:42Z acuster $
  * @deprecated use {@link SimpleFeatureType}.
  */

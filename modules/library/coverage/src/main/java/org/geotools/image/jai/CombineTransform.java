@@ -29,7 +29,7 @@ package org.geotools.image.jai;
  * values by their logarithm.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/image/jai/CombineTransform.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/image/jai/CombineTransform.java $
  * @version $Id: CombineTransform.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

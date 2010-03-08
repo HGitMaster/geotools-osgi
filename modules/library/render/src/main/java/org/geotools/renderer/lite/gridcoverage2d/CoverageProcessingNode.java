@@ -38,6 +38,8 @@ import org.opengis.util.InternationalString;
  * 
  * @author Simone Giannecchini, GeoSolutions.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/CoverageProcessingNode.java $
  */
 public interface CoverageProcessingNode {
 

@@ -20,16 +20,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.geotools.TestData;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.TestData;
 
 /**
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/ServiceTest.java $
- * @version $Id: ServiceTest.java 30670 2008-06-12 23:59:23Z acuster $
+ * @version $Id: ServiceTest.java 33948 2009-09-22 06:55:55Z jive $
  * @author ian
  */
 public class ServiceTest extends TestCaseSupport {

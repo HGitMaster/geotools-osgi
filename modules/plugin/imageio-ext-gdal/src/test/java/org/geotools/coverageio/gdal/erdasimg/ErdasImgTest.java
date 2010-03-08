@@ -21,29 +21,39 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.coverageio.gdal.BaseGDALGridCoverage2DReader;
+import org.geotools.coverageio.gdal.GDALTestCase;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.test.TestData;
+import org.junit.Assert;
+import org.junit.Test;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 /**
  * @author Daniele Romagnoli, GeoSolutions
  * @author Simone Giannecchini (simboss), GeoSolutions
  *
  * Testing {@link ErdasImgReader}
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/erdasimg/ErdasImgTest.java $
  */
-public final class ErdasImgTest extends AbstractErdasImgTestCase {
+public final class ErdasImgTest extends GDALTestCase {
     protected final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
     "org.geotools.coverageio.gdal.erdasimg");
     
@@ -57,14 +67,39 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
      *
      * @param name
      */
-    public ErdasImgTest(String name) {
-        super(name);
+    public ErdasImgTest() {
+        super("ErdasImagine", new ErdasImgFormatFactory());
     }
 
-    public static final void main(String[] args) throws Exception {
-        junit.textui.TestRunner.run(ErdasImgTest.class);
-    }
+  
 
+    @Test
+    public void testIsAvailable() throws NoSuchAuthorityCodeException, FactoryException {
+        if (!testingEnabled()) {
+            return;
+        }
+
+        GridFormatFinder.scanForPlugins();
+
+        Iterator list = GridFormatFinder.getAvailableFormats().iterator();
+        boolean found = false;
+        GridFormatFactorySpi fac = null;
+
+        while (list.hasNext()) {
+            fac = (GridFormatFactorySpi) list.next();
+
+            if (fac instanceof ErdasImgFormatFactory) {
+                found = true;
+
+                break;
+            }
+        }
+
+        Assert.assertTrue("ErdasImgFormatFactory not registered", found);
+        Assert.assertTrue("ErdasImgFormatFactory not available", fac.isAvailable());
+        Assert.assertNotNull(new ErdasImgFormatFactory().createFormat());
+    }
+    @Test
     public void test() throws Exception {
         if (!testingEnabled()) {
             return;
@@ -78,8 +113,12 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
         hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, l));
 
         File file = null;
-            file =new File("/media/ext_hd_01/data/corine/IFMAP_up_landcover.img");
-       
+        try{
+            file = TestData.file(this, fileName);
+        }catch (FileNotFoundException fnfe){
+            LOGGER.warning("test-data not found: " + fileName + "\nTests are skipped");
+            return;
+        }
         
         final BaseGDALGridCoverage2DReader reader = new ErdasImgReader(file, hints);
 
@@ -89,7 +128,7 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
         //
         // /////////////////////////////////////////////////////////////////////
         GridCoverage2D gc = (GridCoverage2D) reader.read(null);
-//        forceDataLoading(gc);
+        forceDataLoading(gc);
 
         // /////////////////////////////////////////////////////////////////////
         //
@@ -99,7 +138,7 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
         final double cropFactor = 2.0;
         final int oldW = gc.getRenderedImage().getWidth();
         final int oldH = gc.getRenderedImage().getHeight();
-        final Rectangle range = reader.getOriginalGridRange().toRectangle();
+        final Rectangle range = ((GridEnvelope2D)reader.getOriginalGridRange());
         final GeneralEnvelope oldEnvelope = reader.getOriginalEnvelope();
         final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] {
                     oldEnvelope.getLowerCorner().getOrdinate(0)
@@ -117,8 +156,9 @@ public final class ErdasImgTest extends AbstractErdasImgTestCase {
         final ParameterValue gg = (ParameterValue) ((AbstractGridFormat) reader.getFormat()).READ_GRIDGEOMETRY2D
             .createValue();
         gg.setValue(new GridGeometry2D(
-                new GeneralGridRange(
-                    new Rectangle(0,0,512,512)), oldEnvelope));
+                new GridEnvelope2D(
+                    new Rectangle(0, 0, (int) (range.width / 2.0 / cropFactor),
+                        (int) (range.height / 2.0 / cropFactor))), cropEnvelope));
         gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg });
         forceDataLoading(gc);
     }

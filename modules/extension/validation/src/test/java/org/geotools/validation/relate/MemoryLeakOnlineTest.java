@@ -61,7 +61,7 @@ import org.geotools.validation.ValidationResults;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/test/java/org/geotools/validation/relate/MemoryLeakOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/relate/MemoryLeakOnlineTest.java $
  */
 public class MemoryLeakOnlineTest extends DataTestCase {
     

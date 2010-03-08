@@ -34,7 +34,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
- * @version $Id: BuildResultStack.java 31937 2008-12-01 13:54:45Z mauricio.pazos $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/commons/BuildResultStack.java $
+ * @version $Id: BuildResultStack.java 34126 2009-10-12 06:35:18Z mbedward $
  * @since 2.4
  */
 public final class BuildResultStack {

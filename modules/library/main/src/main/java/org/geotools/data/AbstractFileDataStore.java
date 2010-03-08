@@ -33,15 +33,17 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author dzwiers
  *
  * @see AbstractDataStore
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/AbstractFileDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/AbstractFileDataStore.java $
  */
-public abstract class AbstractFileDataStore extends AbstractDataStore {
+public abstract class AbstractFileDataStore extends AbstractDataStore implements FileDataStore {
     /**
      * Singular version, returns the FeatureType for the url being read.
      *
      * @see org.geotools.data.DataStore#getSchema(java.lang.String)
      */
-    public abstract SimpleFeatureType getSchema() throws IOException;
+    public SimpleFeatureType getSchema() throws IOException {
+        return this.getSchema( getTypeNames()[0] );
+    }
 
     /**
      * Singular version, which must be implemented to represent a Reader  for
@@ -49,8 +51,10 @@ public abstract class AbstractFileDataStore extends AbstractDataStore {
      *
      * @see org.geotools.data.DataStore#getFeatureReader(java.lang.String)
      */
-    protected abstract  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader()
-        throws IOException;
+    public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader()
+        throws IOException{
+        return getFeatureReader( getTypeNames()[0] );
+    }
 
     /**
      * Singular version, calls parent with getSchema().getTypeName()

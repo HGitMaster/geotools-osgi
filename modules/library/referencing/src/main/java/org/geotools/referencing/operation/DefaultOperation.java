@@ -53,8 +53,8 @@ import org.geotools.util.UnsupportedImplementationException;
  * to overrides the {@link #getParameterValues} method.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultOperation.java $
- * @version $Id: DefaultOperation.java 31000 2008-07-10 21:11:13Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultOperation.java $
+ * @version $Id: DefaultOperation.java 34046 2009-10-02 08:48:13Z aaime $
  * @author Martin Desruisseaux (IRD)
  *
  * @see DefaultOperationMethod
@@ -275,8 +275,14 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
              *
              * As a safety, we still compare the name. But I'm not completly sure that it is
              * necessary.
+             * 
+             * AA: this comparison was removed to allow the common case of Conformal 1SP vs
+             * conformal 2SP equivalence to succeed a equalsIgnoreMetadata comparison. Extensive tests
+             * revealed no regressions, as it was noted above, there is no proof this is actually
+             * necessary
              */
-            return nameMatches(this.method, that.method);
+            // return nameMatches(this.method, that.method);
+            return true;
         }
         return false;
     }

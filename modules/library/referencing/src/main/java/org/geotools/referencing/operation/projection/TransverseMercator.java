@@ -20,25 +20,26 @@
  */
 package org.geotools.referencing.operation.projection;
 
+import static java.lang.Math.*;
+
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.CylindricalProjection;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.ReferenceIdentifier;
+
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-
-import static java.lang.Math.*;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.ReferenceIdentifier;
+import org.opengis.referencing.operation.CylindricalProjection;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -89,8 +90,8 @@ import static java.lang.Math.*;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">"Transverse_Mercator" on RemoteSensing.org</A>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/TransverseMercator.java $
- * @version $Id: TransverseMercator.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/TransverseMercator.java $
+ * @version $Id: TransverseMercator.java 34438 2009-11-22 17:21:43Z aaime $
  * @author André Gosselin
  * @author Martin Desruisseaux (PMO, IRD)
  * @author Rueben Schulz
@@ -130,29 +131,6 @@ public class TransverseMercator extends MapProjection {
      */
     private final double ml0;
 
-     /**
-     * Constant needed for the <code>mlfn<code> method.
-     * Setup at construction time.
-     */
-    private final double en0,en1,en2,en3,en4;
-
-    /**
-     * Constants used to calculate {@link #en0}, {@link #en1},
-     * {@link #en2}, {@link #en3}, {@link #en4}.
-     */
-    private static final double C00= 1.0,
-                                C02= 0.25,
-                                C04= 0.046875,
-                                C06= 0.01953125,
-                                C08= 0.01068115234375,
-                                C22= 0.75,
-                                C44= 0.46875,
-                                C46= 0.01302083333333333333,
-                                C48= 0.00712076822916666666,
-                                C66= 0.36458333333333333333,
-                                C68= 0.00569661458333333333,
-                                C88= 0.3076171875;
-
     /**
      * Contants used for the forward and inverse transform for the eliptical
      * case of the Transverse Mercator.
@@ -175,21 +153,11 @@ public class TransverseMercator extends MapProjection {
     protected TransverseMercator(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
-        //Fetch parameters
+        // Fetch parameters
         super(parameters);
 
         //  Compute constants
         esp = excentricitySquared / (1.0 - excentricitySquared);
-
-        double t;
-        en0 = C00 - excentricitySquared  *  (C02 + excentricitySquared  *
-             (C04 + excentricitySquared  *  (C06 + excentricitySquared  * C08)));
-        en1 =       excentricitySquared  *  (C22 - excentricitySquared  *
-             (C04 + excentricitySquared  *  (C06 + excentricitySquared  * C08)));
-        en2 =  (t = excentricitySquared  *         excentricitySquared) *
-             (C44 - excentricitySquared  *  (C46 + excentricitySquared  * C48));
-        en3 = (t *= excentricitySquared) *  (C66 - excentricitySquared  * C68);
-        en4 =   t * excentricitySquared  *  C88;
         ml0 = mlfn(latitudeOfOrigin, sin(latitudeOfOrigin), cos(latitudeOfOrigin));
     }
 
@@ -300,7 +268,7 @@ public class TransverseMercator extends MapProjection {
      * Provides the transform equations for the spherical case of the
      * TransverseMercator projection.
      *
-     * @version $Id: TransverseMercator.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: TransverseMercator.java 34438 2009-11-22 17:21:43Z aaime $
      * @author André Gosselin
      * @author Martin Desruisseaux (PMO, IRD)
      * @author Rueben Schulz
@@ -403,55 +371,7 @@ public class TransverseMercator extends MapProjection {
         }
     }
 
-
-    /**
-     * Calculates the meridian distance. This is the distance along the central
-     * meridian from the equator to {@code phi}. Accurate to < 1e-5 meters
-     * when used in conjuction with typical major axis values.
-     *
-     * @param phi latitude to calculate meridian distance for.
-     * @param sphi sin(phi).
-     * @param cphi cos(phi).
-     * @return meridian distance for the given latitude.
-     */
-    private final double mlfn(final double phi, double sphi, double cphi) {
-        cphi *= sphi;
-        sphi *= sphi;
-        return en0 * phi - cphi *
-              (en1 + sphi *
-              (en2 + sphi *
-              (en3 + sphi *
-              (en4))));
-    }
-
-    /**
-     * Calculates the latitude ({@code phi}) from a meridian distance.
-     * Determines phi to {@link #ITERATION_TOLERANCE} radians, about
-     * 1e-6 seconds.
-     *
-     * @param  arg meridian distance to calulate latitude for.
-     * @return the latitude of the meridian distance.
-     * @throws ProjectionException if the iteration does not converge.
-     */
-    private final double inv_mlfn(double arg) throws ProjectionException {
-        double s, t, phi, k = 1.0/(1.0 - excentricitySquared);
-        int i;
-        phi = arg;
-        for (i=MAXIMUM_ITERATIONS; true;) { // rarely goes over 5 iterations
-            if (--i < 0) {
-                throw new ProjectionException(ErrorKeys.NO_CONVERGENCE);
-            }
-            s = sin(phi);
-            t = 1.0 - excentricitySquared * s * s;
-            t = (mlfn(phi, s, cos(phi)) - arg) * (t * sqrt(t)) * k;
-            phi -= t;
-            if (abs(t) < ITERATION_TOLERANCE) {
-                return phi;
-            }
-        }
-    }
-
-    /**
+     /**
      * Convenience method computing the zone code from the central meridian.
      * Information about zones convention must be specified in argument. Two
      * widely set of arguments are of Universal Transverse Mercator (UTM) and
@@ -587,7 +507,7 @@ public class TransverseMercator extends MapProjection {
      * 9807).
      *
      * @since 2.1
-     * @version $Id: TransverseMercator.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: TransverseMercator.java 34438 2009-11-22 17:21:43Z aaime $
      * @author Martin Desruisseaux (PMO, IRD)
      * @author Rueben Schulz
      *
@@ -695,7 +615,7 @@ public class TransverseMercator extends MapProjection {
      * correction.
      *
      * @since 2.2
-     * @version $Id: TransverseMercator.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: TransverseMercator.java 34438 2009-11-22 17:21:43Z aaime $
      * @author Martin Desruisseaux (PMO, IRD)
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory

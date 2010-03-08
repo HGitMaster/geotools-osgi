@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: LineStringImpl.java 28567 2007-12-31 19:23:18Z desruisseaux $
+ ** $Id: LineStringImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/geometry/LineStringImpl.java,v $
  **
@@ -35,6 +35,8 @@ import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
  * 
  * @author SYS Technologies
  * @author crossley
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/geometry/LineStringImpl.java $
  * @version $Revision $
  */
 public class LineStringImpl extends GenericCurveImpl 

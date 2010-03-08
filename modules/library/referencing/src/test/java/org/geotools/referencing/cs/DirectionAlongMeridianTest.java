@@ -25,7 +25,9 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link DirectionAlongMeridian} class.
  *
- * @version $Id: DirectionAlongMeridianTest.java 30641 2008-06-12 17:42:27Z acuster $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/cs/DirectionAlongMeridianTest.java $
+ * @version $Id: DirectionAlongMeridianTest.java 34126 2009-10-12 06:35:18Z mbedward $
  * @author Martin Desruisseaux
  */
 public final class DirectionAlongMeridianTest {

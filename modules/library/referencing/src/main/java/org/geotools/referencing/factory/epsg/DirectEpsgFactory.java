@@ -115,8 +115,8 @@ import org.geotools.util.logging.Logging;
  * {@link #isPrimaryKey} method.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DirectEpsgFactory.java $
- * @version $Id: DirectEpsgFactory.java 32615 2009-03-09 16:59:33Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DirectEpsgFactory.java $
+ * @version $Id: DirectEpsgFactory.java 34665 2009-12-13 12:40:59Z aaime $
  * @author Yann Cézard
  * @author Martin Desruisseaux (IRD)
  * @author Rueben Schulz
@@ -468,8 +468,9 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      */
     public synchronized Citation getAuthority() {
         if (authority == null) try {
+            // we sort on version_number too since in v7.4 they had two entries with the same version date
             final String query = adaptSQL("SELECT VERSION_NUMBER, VERSION_DATE FROM [Version History]" +
-                                          " ORDER BY VERSION_DATE DESC");
+                                          " ORDER BY VERSION_DATE DESC, VERSION_NUMBER DESC");
             final DatabaseMetaData metadata  = getConnection().getMetaData();
             final Statement        statement = getConnection().createStatement();
             final ResultSet        result    = statement.executeQuery(query);
@@ -1668,10 +1669,14 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 } catch (NoSuchElementException exception) {
                     if (orientation.equalsIgnoreCase("Geocentre > equator/PM")) {
                         direction = AxisDirection.OTHER; // TODO: can we choose a more accurate direction?
-                    } else if (orientation.equalsIgnoreCase("Geocentre > equator/90dE")) {
-                        direction = AxisDirection.EAST;
+                    } else if (orientation.equalsIgnoreCase("Geocentre > equator/90dE") || 
+                            orientation.equalsIgnoreCase("Geocentre > equator/90°E")) {
+                        direction = AxisDirection.GEOCENTRIC_Y;
+                    } else if (orientation.equalsIgnoreCase("Geocentre > equator/0dE") || 
+                            orientation.equalsIgnoreCase("Geocentre > equator/0°E")) {
+                        direction = AxisDirection.GEOCENTRIC_X;
                     } else if (orientation.equalsIgnoreCase("Geocentre > north pole")) {
-                        direction = AxisDirection.NORTH;
+                        direction = AxisDirection.GEOCENTRIC_Z;
                     } else {
                         throw new FactoryException(exception);
                     }

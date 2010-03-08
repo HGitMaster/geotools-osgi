@@ -26,6 +26,8 @@ import org.opengis.filter.Id;
  * Quick check to see if an ID filter is found.
  * <p>
  * Example:<code>found = (Boolean) filter.accept( new IdFinderFilter(), null )</code>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/IdFinderFilterVisitor.java $
  */
 public class IdFinderFilterVisitor extends AbstractFinderFilterVisitor {
 

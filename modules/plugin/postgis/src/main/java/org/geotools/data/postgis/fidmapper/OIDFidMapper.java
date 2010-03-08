@@ -39,6 +39,8 @@ import org.postgresql.PGStatement;
  * index is not present.
  * 
  * @author wolf
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/fidmapper/OIDFidMapper.java $
  */
 public class OIDFidMapper extends AbstractFIDMapper {
 

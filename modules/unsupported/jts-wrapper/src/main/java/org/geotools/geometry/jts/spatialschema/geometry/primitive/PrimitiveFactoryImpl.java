@@ -1,5 +1,5 @@
 /*******************************************************************************
- * $ * * $Id: PrimitiveFactoryImpl.java 28439 2007-12-20 12:14:28Z desruisseaux $ * *
+ * $ * * $Id: PrimitiveFactoryImpl.java 34133 2009-10-12 08:14:05Z mbedward $ * *
  * $Source:
  * /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/PrimitiveFactoryImpl.java,v $ * *
  * Copyright (C) 2003 Open GIS Consortium, Inc. All Rights Reserved.
@@ -39,6 +39,8 @@ import org.opengis.geometry.primitive.SurfacePatch;
 /**
  * Factory that knows how to create instances of the 19107 primitives as
  * implemented in LiteGO1.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/PrimitiveFactoryImpl.java $
  */
 public class PrimitiveFactoryImpl implements PrimitiveFactory {
 

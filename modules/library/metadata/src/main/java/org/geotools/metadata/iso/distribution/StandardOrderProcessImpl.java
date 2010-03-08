@@ -29,7 +29,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  * Common ways in which the resource may be obtained or received, and related instructions
  * and fee information.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/distribution/StandardOrderProcessImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/distribution/StandardOrderProcessImpl.java $
  * @version $Id: StandardOrderProcessImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Jody Garnett

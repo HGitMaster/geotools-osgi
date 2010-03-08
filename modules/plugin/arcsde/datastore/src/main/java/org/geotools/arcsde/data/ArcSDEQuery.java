@@ -17,6 +17,9 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.opengis.filter.sort.SortBy.NATURAL_ORDER;
+import static org.opengis.filter.sort.SortBy.REVERSE_ORDER;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,13 +32,15 @@ import java.util.logging.Logger;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.data.FIDReader.SdeManagedFidReader;
+import org.geotools.arcsde.data.FIDReader.UserManagedFidReader;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
-import org.geotools.arcsde.data.versioning.AutoCommitDefaultVersionHandler;
 import org.geotools.arcsde.filter.FilterToSQLSDE;
 import org.geotools.arcsde.filter.GeometryEncoderException;
 import org.geotools.arcsde.filter.GeometryEncoderSDE;
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.Command;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.SdeRow;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -49,18 +54,20 @@ import org.geotools.filter.visitor.SimplifyingFilterVisitor.FIDValidator;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeFilter;
 import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeSqlConstruct;
-import com.esri.sde.sdk.client.SeState;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -72,7 +79,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/ArcSDEQuery.java $
- * @version $Id: ArcSDEQuery.java 32709 2009-03-26 16:08:09Z groldan $
+ * @version $Id: ArcSDEQuery.java 34355 2009-11-09 19:05:33Z groldan $
  */
 class ArcSDEQuery {
     /** Shared package's logger */
@@ -93,7 +100,7 @@ class ArcSDEQuery {
      * less attributes than the ones of the actual table schema, in which case only those attributes
      * will be requested.
      */
-    private SimpleFeatureType schema;
+    private final SimpleFeatureType schema;
 
     /**
      * The query built using the constraints given by the geotools Query. It must not be accessed
@@ -110,12 +117,13 @@ class ArcSDEQuery {
     /** The lazyly calculated result count */
     private int resultCount = -1;
 
-    /** DOCUMENT ME! */
-    private FIDReader fidReader;
+    private final FIDReader fidReader;
 
     private Object[] previousRowValues;
 
-    private ArcSdeVersionHandler versioningHandler;
+    private final ArcSdeVersionHandler versioningHandler;
+
+    private final String sortByClause;
 
     /**
      * Creates a new SDEQuery object.
@@ -134,13 +142,14 @@ class ArcSDEQuery {
      * @see prepareQuery
      */
     private ArcSDEQuery(final ISession session, final SimpleFeatureType schema,
-            final FilterSet filterSet, final FIDReader fidReader,
+            final FilterSet filterSet, final String sortByClause, final FIDReader fidReader,
             ArcSdeVersionHandler versioningHandler) throws DataSourceException {
         this.session = session;
         this.schema = schema;
         this.filters = filterSet;
         this.fidReader = fidReader;
         this.versioningHandler = versioningHandler;
+        this.sortByClause = sortByClause;
     }
 
     /**
@@ -167,14 +176,22 @@ class ArcSDEQuery {
         LOGGER.fine("Creating new ArcSDEQuery");
 
         final String typeName = fullSchema.getTypeName();
-        final SeLayer sdeLayer = session.getLayer(typeName);
+        final SeTable sdeTable = session.getTable(typeName);
+        final SeLayer sdeLayer;
+        if (fullSchema.getGeometryDescriptor() == null) {
+            sdeLayer = null;
+        } else {
+            sdeLayer = session.getLayer(typeName);
+        }
         final SimpleFeatureType querySchema = getQuerySchema(query, fullSchema);
         // create the set of filters to work over
-        final ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeLayer, filter,
+        final ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeTable, sdeLayer, filter,
                 querySchema, null, null, fidReader);
 
+        final String sortByClause = buildSortByClause(fullSchema, query.getSortBy(), fidReader);
         final ArcSDEQuery sdeQuery;
-        sdeQuery = new ArcSDEQuery(session, querySchema, filters, fidReader, versioningHandler);
+        sdeQuery = new ArcSDEQuery(session, querySchema, filters, sortByClause, fidReader,
+                versioningHandler);
         return sdeQuery;
     }
 
@@ -194,7 +211,6 @@ class ArcSDEQuery {
 
         final Filter filter = query.getFilter();
         final FIDReader fidReader = FIDReader.NULL_READER;
-        final SeLayer sdeLayer;
 
         // the first table has to be the main layer
         final SeSqlConstruct construct;
@@ -213,15 +229,21 @@ class ArcSDEQuery {
         if (layerName.indexOf(" AS") > 0) {
             layerName = layerName.substring(0, layerName.indexOf(" AS"));
         }
-        sdeLayer = session.getLayer(layerName);
+        final SeTable sdeTable = session.getTable(layerName);
+        final SeLayer sdeLayer;
+        if (fullSchema.getGeometryDescriptor() == null) {
+            sdeLayer = null;
+        } else {
+            sdeLayer = session.getLayer(layerName);
+        }
 
         final SimpleFeatureType querySchema = getQuerySchema(query, fullSchema);
         // create the set of filters to work over
-        final ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeLayer, filter,
+        final ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeTable, sdeLayer, filter,
                 querySchema, definitionQuery, viewSelectStatement, fidReader);
 
         final ArcSDEQuery sdeQuery;
-        sdeQuery = new ArcSDEQuery(session, querySchema, filters, fidReader,
+        sdeQuery = new ArcSDEQuery(session, querySchema, filters, null, fidReader,
                 ArcSdeVersionHandler.NONVERSIONED_HANDLER);
         return sdeQuery;
     }
@@ -307,12 +329,15 @@ class ArcSDEQuery {
         return this.fidReader;
     }
 
-    public static ArcSDEQuery.FilterSet createFilters(SeLayer layer, SimpleFeatureType schema,
-            Filter filter, SeQueryInfo qInfo, PlainSelect viewSelect, FIDReader fidReader)
-            throws NoSuchElementException, IOException {
+    public static ArcSDEQuery.FilterSet createFilters(SeTable table, SeLayer layer,
+            SimpleFeatureType schema, Filter filter, SeQueryInfo qInfo, PlainSelect viewSelect,
+            FIDReader fidReader) throws NoSuchElementException, IOException {
+        assert table != null;
+        assert schema != null;
+        assert filter != null;
 
-        ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(layer, filter, schema, qInfo,
-                viewSelect, fidReader);
+        ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(table, layer, filter, schema,
+                qInfo, viewSelect, fidReader);
 
         return filters;
     }
@@ -362,20 +387,25 @@ class ArcSDEQuery {
                     + "'");
         }
 
-        final SeQuery seQuery = session.createSeQuery();
-        setQueryVersionState(seQuery);
-
         final SeQueryInfo qInfo = filters.getQueryInfo(propertyNames);
+        if (sortByClause != null) {
+            qInfo.setByClause(sortByClause);
+        }
+
         final SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
         if (LOGGER.isLoggable(Level.FINER)) {
             String msg = "ArcSDE query is: " + toString(qInfo);
             LOGGER.finer(msg);
         }
-        // try {
-        session.issue(new Command<Void>() {
+
+        final SeQuery seQuery;
+
+        seQuery = session.issue(new Command<SeQuery>() {
             @Override
-            public Void execute(ISession session, SeConnection connection) throws SeException,
+            public SeQuery execute(ISession session, SeConnection connection) throws SeException,
                     IOException {
+                final SeQuery seQuery = new SeQuery(connection);
+                setQueryVersionState(seQuery);
                 seQuery.prepareQueryInfo(qInfo);
 
                 if (spatialConstraints.length > 0) {
@@ -384,33 +414,54 @@ class ArcSDEQuery {
                             spatialConstraints);
                 }
 
-                return null;
+                return seQuery;
             }
         });
-        // } catch (SeException e) {
-        // // HACK: a DATABASE LEVEL ERROR (code -51) occurs when using
-        // // prepareQueryInfo but the geometry att is not required in the list
-        // // of properties to retrieve, and thus propertyNames contains
-        // // SHAPE.fid as a last resort to get a fid
-        // if (-51 == e.getSeError().getSdeError()) {
-        // seQuery.close();
-        // seQuery = session.createSeQuery(propertyNames,
-        // filters.getSeSqlConstruct());
-        // setQueryVersionState(seQuery);
-        // seQuery.prepareQuery();
-        // } else {
-        // throw new ArcSdeException(e);
-        // }
-        // }
 
-        // if (spatialConstraints.length > 0) {
-        // final boolean setReturnGeometryMasks = false;
-        // seQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE,
-        // setReturnGeometryMasks,
-        // spatialConstraints);
-        // }
-        //
         return seQuery;
+    }
+
+    private static String buildSortByClause(final SimpleFeatureType fullSchema,
+            final SortBy[] sortByAttributes, final FIDReader fidReader) {
+
+        if (sortByAttributes == null || sortByAttributes.length == 0) {
+            return null;
+        }
+
+        StringBuilder byClause = new StringBuilder("ORDER BY ");
+        for (int i = 0; i < sortByAttributes.length; i++) {
+            SortBy sortAtt = sortByAttributes[i];
+            if (sortAtt == NATURAL_ORDER || sortAtt == REVERSE_ORDER) {
+                if (fidReader instanceof SdeManagedFidReader
+                        || fidReader instanceof UserManagedFidReader) {
+                    byClause.append(fidReader.getFidColumn()).append(" ");
+                    byClause.append(sortAtt == NATURAL_ORDER ? "ASC" : "DESC");
+                } else {
+                    throw new IllegalArgumentException(sortAtt
+                            + " sorting is not supported for featureclasses"
+                            + " with no primary key");
+                }
+            } else {
+                final PropertyName propertyName = sortAtt.getPropertyName();
+                final String attName = propertyName.getPropertyName();
+                final AttributeDescriptor descriptor = fullSchema.getDescriptor(attName);
+                if (descriptor == null) {
+                    throw new IllegalArgumentException(attName
+                            + " does not exist. Can't sort by it");
+                }
+                if (descriptor instanceof GeometryDescriptor) {
+                    throw new IllegalArgumentException(attName
+                            + " is a geometry attribute. Can't sort by it");
+                }
+
+                byClause.append(attName).append(" ");
+                byClause.append(sortAtt.getSortOrder() == SortOrder.ASCENDING ? "ASC" : "DESC");
+            }
+            if (i < sortByAttributes.length - 1) {
+                byClause.append(", ");
+            }
+        }
+        return byClause.toString();
     }
 
     private String toString(SeQueryInfo qInfo) {
@@ -513,7 +564,11 @@ class ArcSDEQuery {
             final ArcSdeVersionHandler versioningHandler) throws IOException {
 
         final SimpleFeatureType fullSchema = typeInfo.getFeatureType();
-        final String defaultGeomAttName = fullSchema.getGeometryDescriptor().getLocalName();
+        final GeometryDescriptor geometryDescriptor = fullSchema.getGeometryDescriptor();
+        if (geometryDescriptor == null) {
+            return null;
+        }
+        final String defaultGeomAttName = geometryDescriptor.getLocalName();
 
         // we're calculating the bounds, so we'd better be sure and add the
         // spatial column to the query's propertynames
@@ -528,7 +583,8 @@ class ArcSDEQuery {
             boundsQuery = createInprocessViewQuery(session, fullSchema, realQuery, definitionQuery,
                     viewSelectStatement);
         } else {
-            boundsQuery = createQuery(session, fullSchema, realQuery, FIDReader.NULL_READER,
+            final FIDReader fidStrategy = typeInfo.getFidStrategy();
+            boundsQuery = createQuery(session, fullSchema, realQuery, fidStrategy,
                     versioningHandler);
         }
 
@@ -554,23 +610,27 @@ class ArcSDEQuery {
      * ERROR OCURRED"</code> exception. So, in this case, a query over the shape field is made and the result is
      * traversed counting the number of rows inside a while loop
      * 
-     * @return DOCUMENT ME!
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
      */
     public int calculateResultCount() throws IOException {
+
+        final SimpleFeatureType schema = this.schema;
+        final GeometryDescriptor geometryDescriptor = schema.getGeometryDescriptor();
+
+        final String colName;
+        if (geometryDescriptor == null) {
+            // gemetryless type, use any other column for the query
+            colName = schema.getDescriptor(0).getLocalName();
+        } else {
+            colName = geometryDescriptor.getLocalName();
+        }
+        final SeQueryInfo qInfo = filters.getQueryInfo(new String[] { colName });
+
+        final SeFilter[] spatialFilters = filters.getSpatialFilters();
 
         final Command<Integer> countCmd = new Command<Integer>() {
             @Override
             public Integer execute(ISession session, SeConnection connection) throws SeException,
                     IOException {
-                final String colName = ArcSDEQuery.this.schema.getGeometryDescriptor().getName()
-                        .getLocalPart();
-                final SeQueryInfo qInfo = filters.getQueryInfo(new String[] { colName });
-
-                final SeFilter[] spatialFilters = filters.getSpatialFilters();
 
                 SeQuery query = new SeQuery(connection);
                 try {
@@ -595,95 +655,61 @@ class ArcSDEQuery {
         return count.intValue();
     }
 
-    public int _calculateResultCount() throws IOException {
-
-        final Command<Integer> countCmd = new Command<Integer>() {
-            @Override
-            public Integer execute(ISession session, SeConnection connection) throws SeException,
-                    IOException {
-                final String colName = ArcSDEQuery.this.schema.getGeometryDescriptor().getName()
-                        .getLocalPart();
-                final SeQueryInfo queryInfo = filters.getQueryInfo(new String[] { colName });
-
-                final String[] columns = { "*" };
-                final SeFilter[] spatialFilters = filters.getSpatialFilters();
-
-                SeSqlConstruct sql = new SeSqlConstruct();
-                String[] tables = filters.getSeSqlConstruct().getTables();
-                sql.setTables(tables);
-                String whereClause = filters.getSeSqlConstruct().getWhere();
-                if (whereClause != null) {
-                    sql.setWhere(whereClause);
-                }
-                SeQuery query = new SeQuery(connection, columns, sql);
-                setQueryVersionState(query);
-
-                SeQueryInfo qInfo = new SeQueryInfo();
-                qInfo.setConstruct(sql);
-
-                if (spatialFilters != null && spatialFilters.length > 0) {
-                    query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true, spatialFilters);
-                }
-
-                SeTable.SeTableStats tableStats = query.calculateTableStatistics("*",
-                        SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
-
-                int actualCount = tableStats.getCount();
-                query.close();
-                return new Integer(actualCount);
-            }
-        };
-
-        final Integer count = session.issue(countCmd);
-        return count.intValue();
-    }
-
     /**
      * Returns the envelope for all features within the layer that pass any SQL construct, state, or
      * spatial constraints for the stream.
-     * 
-     * @return DOCUMENT ME!
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
      */
     public Envelope calculateQueryExtent() throws IOException {
-        Envelope envelope = null;
 
         LOGGER.fine("Building a new SeQuery to consult it's resulting envelope");
 
-        final SeQuery extentQuery = session.createSeQuery();
-        setQueryVersionState(extentQuery);
-
-        final String[] spatialCol = { schema.getGeometryDescriptor().getLocalName() };
-        final SeQueryInfo sdeQueryInfo = filters.getQueryInfo(spatialCol);
-        final SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
-
-        if (LOGGER.isLoggable(Level.FINER)) {
-            String msg = "ArcSDE query is: " + toString(sdeQueryInfo);
-            LOGGER.finer(msg);
-        }
+        final SeExtent extent;
         try {
-            envelope = session.issue(new Command<Envelope>() {
+            extent = session.issue(new Command<SeExtent>() {
                 @Override
-                public Envelope execute(ISession session, SeConnection connection)
+                public SeExtent execute(ISession session, SeConnection connection)
                         throws SeException, IOException {
 
-                    // extentQuery.prepareQueryInfo(sdeQueryInfo);
-                    if (spatialConstraints.length > 0) {
-                        extentQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, false,
-                                spatialConstraints);
+                    final String[] spatialCol = { schema.getGeometryDescriptor().getLocalName() };
+                    // fullConstruct may hold information about multiple tables in case of an
+                    // in-process view
+                    final SeSqlConstruct fullConstruct = filters.getQueryInfo(spatialCol)
+                            .getConstruct();
+                    String whereClause = fullConstruct.getWhere();
+                    if (whereClause == null) {
+                        /*
+                         * we really need a where clause or will get a famous -51 DATABASE LEVEL
+                         * ERROR with no other explanation on some oracle databases
+                         */
+                        whereClause = "1 = 1";
+                    }
+                    final SeFilter[] spatialConstraints = filters.getSpatialFilters();
+
+                    SeExtent extent;
+
+                    final SeQuery extentQuery = new SeQuery(connection);
+                    try {
+                        setQueryVersionState(extentQuery);
+
+                        if (spatialConstraints.length > 0) {
+                            extentQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, false,
+                                    spatialConstraints);
+                        }
+
+                        SeSqlConstruct sqlCons = new SeSqlConstruct();
+                        sqlCons.setTables(fullConstruct.getTables());
+                        sqlCons.setWhere(whereClause);
+
+                        final SeQueryInfo seQueryInfo = new SeQueryInfo();
+                        seQueryInfo.setColumns(spatialCol);
+                        seQueryInfo.setConstruct(sqlCons);
+
+                        extent = extentQuery.calculateLayerExtent(seQueryInfo);
+                    } finally {
+                        extentQuery.close();
                     }
 
-                    SeExtent extent = extentQuery.calculateLayerExtent(sdeQueryInfo);
-
-                    Envelope envelope = new Envelope(extent.getMinX(), extent.getMaxX(), extent
-                            .getMinY(), extent.getMaxY());
-                    if (LOGGER.isLoggable(Level.FINE)) {
-                        LOGGER.fine("got extent: " + extent + ", built envelope: " + envelope);
-                    }
-                    return envelope;
+                    return extent;
                 }
             });
         } catch (IOException ex) {
@@ -704,10 +730,13 @@ class ArcSDEQuery {
             LOGGER.log(Level.SEVERE, "***********************\ntables: " + tables + "\nfilter: "
                     + this.filters.getGeometryFilter() + "\nSQL: " + sql, ex);
             throw ex;
-        } finally {
-            close(extentQuery, session);
         }
 
+        Envelope envelope = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(),
+                extent.getMaxY());
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("got extent: " + extent + ", built envelope: " + envelope);
+        }
         return envelope;
     }
 
@@ -781,20 +810,20 @@ class ArcSDEQuery {
 
         final SeQuery seQuery = getSeQuery();
         // commented out while SeToJTSGeometryFactory is in development
-        // if(currentRow == null){
+        // if (currentRow == null) {
         // GeometryFactory geomFac = new SeToJTSGeometryFactory();
         // currentRow = new SdeRow(geomFac);
         // int geometryIndex = -1;
-        // for(int i = 0; i < schema.getAttributeCount(); i++){
-        // if(schema.getDescriptor(i) instanceof GeometryDescriptor){
+        // for (int i = 0; i < schema.getAttributeCount(); i++) {
+        // if (schema.getDescriptor(i) instanceof GeometryDescriptor) {
         // geometryIndex = i;
         // break;
         // }
         // }
         // currentRow.setGeometryIndex(geometryIndex);
         // }
-        // try {
         // currentRow = session.fetch(seQuery, currentRow);
+
         try {
             currentRow = session.fetch(seQuery);
         } catch (IOException e) {
@@ -851,29 +880,30 @@ class ArcSDEQuery {
      * DOCUMENT ME!
      * 
      * @author $author$
+     * 
+     * @source $URL:
+     *         http://svn.osgeo.org/geotools/trunk/modules/plugin/arcsde/datastore/src/main/java
+     *         /org/geotools/arcsde/data/ArcSDEQuery.java $
      * @version $Revision: 1.9 $
      */
     public static class FilterSet {
-        /** DOCUMENT ME! */
+
         private SeQueryInfo definitionQuery;
 
         private PlainSelect layerSelectStatement;
 
         private FIDReader fidReader;
 
-        /** DOCUMENT ME! */
         private final SeLayer sdeLayer;
 
-        /** DOCUMENT ME! */
+        private final SeTable sdeTable;
+
         private final Filter sourceFilter;
 
-        /** DOCUMENT ME! */
         private Filter _sqlFilter;
 
-        /** DOCUMENT ME! */
         private Filter geometryFilter;
 
-        /** DOCUMENT ME! */
         private Filter unsupportedFilter;
 
         private FilterToSQLSDE _sqlEncoder;
@@ -900,12 +930,16 @@ class ArcSDEQuery {
          * @param sourceFilter
          *            DOCUMENT ME!
          */
-        public FilterSet(SeLayer sdeLayer, Filter sourceFilter, SimpleFeatureType ft,
-                SeQueryInfo definitionQuery, PlainSelect layerSelectStatement, FIDReader fidReader) {
-            assert sdeLayer != null;
+        public FilterSet(SeTable table, SeLayer sdeLayer, Filter sourceFilter,
+                SimpleFeatureType ft, SeQueryInfo definitionQuery,
+                PlainSelect layerSelectStatement, FIDReader fidReader) {
+            assert table != null;
+            // sdeLayer may be null if it is a registered, non spatial table
+            // assert sdeLayer != null;
             assert sourceFilter != null;
             assert ft != null;
 
+            this.sdeTable = table;
             this.sdeLayer = sdeLayer;
             this.sourceFilter = sourceFilter;
             this.featureType = ft;
@@ -980,7 +1014,7 @@ class ArcSDEQuery {
 
             try {
                 if (definitionQuery == null) {
-                    tables = new String[] { this.sdeLayer.getQualifiedName() };
+                    tables = new String[] { this.sdeTable.getQualifiedName() };
                 } else {
                     tables = definitionQuery.getConstruct().getTables();
                     String joinWhere = definitionQuery.getConstruct().getWhere();
@@ -1038,14 +1072,8 @@ class ArcSDEQuery {
          */
         public SeSqlConstruct getSeSqlConstruct() throws DataSourceException {
             if (this.sdeSqlConstruct == null) {
-                final String layerName;
-                try {
-                    layerName = this.sdeLayer.getQualifiedName();
-                    this.sdeSqlConstruct = new SeSqlConstruct(layerName);
-                } catch (SeException e) {
-                    throw new ArcSdeException("Can't create SQL construct for "
-                            + sdeLayer.getName(), e);
-                }
+                final String layerName = this.sdeTable.getQualifiedName();
+                this.sdeSqlConstruct = new SeSqlConstruct(layerName);
 
                 Filter sqlFilter = getSqlFilter();
 
@@ -1130,13 +1158,7 @@ class ArcSDEQuery {
 
         private FilterToSQLSDE getSqlEncoder() {
             if (_sqlEncoder == null) {
-                final String layerName;
-                try {
-                    layerName = sdeLayer.getQualifiedName();
-                } catch (SeException e) {
-                    throw (RuntimeException) new RuntimeException(
-                            "error getting layer's qualified name").initCause(e);
-                }
+                final String layerName = sdeTable.getQualifiedName();
                 String fidColumn = fidReader.getFidColumn();
                 _sqlEncoder = new FilterToSQLSDE(layerName, fidColumn, featureType,
                         layerSelectStatement);

@@ -26,7 +26,7 @@ import java.util.Date;
 
 /**
  * A Default class that represents a Temporal attribute.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/main/java/org/geotools/feature/type/TemporalAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/type/TemporalAttributeType.java $
  */
 public class TemporalAttributeType extends DefaultAttributeType implements PrimativeAttributeType {
     // this might be right, maybe not, but anyway, its a default formatting

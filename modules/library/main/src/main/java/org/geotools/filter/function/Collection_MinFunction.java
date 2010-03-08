@@ -42,7 +42,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * and Expression.
  *
  * @author James
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/function/Collection_MinFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/Collection_MinFunction.java $
  */
 public class Collection_MinFunction extends FunctionExpressionImpl
     implements FunctionExpression {

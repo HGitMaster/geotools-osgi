@@ -27,8 +27,9 @@ import java.util.Map;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AttributeMapping.java 32633 2009-03-16 01:44:12Z ang05a $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AttributeMapping.java $
+ * @author Russell Petty, GSV
+ * @version $Id: AttributeMapping.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AttributeMapping.java $
  * @since 2.4
  */
 public class AttributeMapping implements Serializable {
@@ -44,6 +45,10 @@ public class AttributeMapping implements Serializable {
      */
     private String inputAttributePath;
     /**
+     * XPath expression indicating the node in xml of an individual feature.
+     */ 
+    private String identifierPath;
+    /**
      * Expression whose evaluation result against a Feature of the source FeatureType is going to be
      * the value of the target attribute in output FeatureType.
      * 
@@ -53,6 +58,26 @@ public class AttributeMapping implements Serializable {
      */
     private String sourceExpression;
 
+    /**
+     * Label used to refer to an attribute.
+     */
+    private String label;
+
+    /**
+     * Reference to other attribute identified with 'label'.
+     */
+    private String parentLabel;
+
+    /**
+     * Filters will refer to this element via this label.
+     */
+    private String targetQueryString;
+    
+    /**
+     * Reference to instance xpath.
+     */
+    private String instancePath;
+    
     /**
      * Name of the linked element type of which this attribute is nesting/targeting.
      */
@@ -142,7 +167,47 @@ public class AttributeMapping implements Serializable {
     public void setInputAttributePath(String inputAttributePath) {
         this.inputAttributePath = inputAttributePath;
     }
+    
+    public String getLabel() {
+        return label;
+    }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getParentLabel() {
+        return parentLabel;
+    }
+
+    public void setParentLabel(String parentLabel) {
+        this.parentLabel = parentLabel;
+    }
+    
+    public String getTargetQueryString() {
+        return targetQueryString;
+    }
+
+    public void setTargetQueryString(String targetQueryString) {
+        this.targetQueryString = targetQueryString;
+    }
+
+    public String getInstancePath() {
+        return instancePath;
+    }
+
+    public void setInstancePath(String instancePath) {
+        this.instancePath = instancePath;
+    }
+    
+    public String getIdentifierPath() {
+        return identifierPath;
+    }
+
+    public void setIdentifierPath(String identifierPath) {
+        this.identifierPath = identifierPath;
+    }  
+    
     /**
      * Returns the name of the linked element type of which this attribute is nesting/targeting.
      * 

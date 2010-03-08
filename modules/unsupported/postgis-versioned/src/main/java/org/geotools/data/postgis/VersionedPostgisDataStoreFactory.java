@@ -34,6 +34,8 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  * @author aaime
  * @since 2.4
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/VersionedPostgisDataStoreFactory.java $
  */
 public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
     

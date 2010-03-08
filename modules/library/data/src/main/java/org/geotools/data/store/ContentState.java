@@ -16,7 +16,9 @@
  */
 package org.geotools.data.store;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,12 +30,12 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Transaction;
 import org.geotools.data.FeatureEvent.Type;
-import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.data.Transaction.State;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.identity.FeatureId;
 
 /**
@@ -80,14 +82,17 @@ import org.opengis.filter.identity.FeatureId;
  * 
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentState.java $
  */
 public class ContentState {
-	
+
     /**
      * Transaction the state works from.
      */
     protected Transaction tx;
-	/**
+
+    /**
      * cached feature type
      */
     protected SimpleFeatureType featureType;
@@ -106,17 +111,34 @@ public class ContentState {
      * entry maintaining the state
      */
     protected ContentEntry entry;
-    
+
     /**
      * Even used for batch notification; used to collect the bounds and feature ids generated
      * over the course of a transaction.
      */
     protected BatchFeatureEvent batchFeatureEvent;
-    
+
     /**
      * observers
      */
-    protected List<FeatureListener> listeners;
+    protected List<FeatureListener> listeners = Collections.synchronizedList(new ArrayList<FeatureListener>());
+
+    /**
+     * Callback used to issue batch feature events when commit/rollback issued
+     * on the transaction.
+     */
+    protected State callback = new State(){
+        public void setTransaction(Transaction transaction) {
+        }  
+        public void addAuthorization(String AuthID) throws IOException {
+        }
+        public void commit() throws IOException {
+            fireBatchFeatureEvent(true);
+        }
+        public void rollback() throws IOException {
+            fireBatchFeatureEvent(false);
+        }
+    };
     
     /**
      * Creates a new state.
@@ -125,7 +147,6 @@ public class ContentState {
      */
     public ContentState(ContentEntry entry) {
         this.entry = entry;
-        this.listeners = new ArrayList<FeatureListener>(2);
     }
     
     /**
@@ -144,7 +165,8 @@ public class ContentState {
         count = state.count;
         bounds = state.bounds == null ? 
                 null : new ReferencedEnvelope( state.bounds );
-	}
+        batchFeatureEvent = null;
+   }
 
     /**
      * The entry which maintains the state.
@@ -165,6 +187,9 @@ public class ContentState {
      */
     public void setTransaction(Transaction tx) {
         this.tx = tx;
+        if( tx != Transaction.AUTO_COMMIT ){
+            tx.putState( this.entry, callback );
+        }
     }
     
     /**
@@ -249,10 +274,7 @@ public class ContentState {
             ReferencedEnvelope before) {
         if( listeners.isEmpty() && tx != Transaction.AUTO_COMMIT) return;
         
-        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
-        Set<FeatureId> fids = new HashSet<FeatureId>();
-        fids.add( feature.getIdentifier() );
-        Filter filter = ff.id( fids );
+        Filter filter = idFilter(feature);
         ReferencedEnvelope bounds = new ReferencedEnvelope( feature.getBounds() );
         bounds.expandToInclude( before );
         
@@ -268,10 +290,7 @@ public class ContentState {
     public final void fireFeatureAdded( FeatureSource<?,?> source, Feature feature ){
         if( listeners.isEmpty() && tx != Transaction.AUTO_COMMIT) return;
         
-        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
-        Set<FeatureId> fids = new HashSet<FeatureId>();
-        fids.add( feature.getIdentifier() );
-        Filter filter = ff.id( fids );
+        Filter filter = idFilter(feature);
         ReferencedEnvelope bounds = new ReferencedEnvelope( feature.getBounds() );
         
         FeatureEvent event = new FeatureEvent(source, Type.ADDED, bounds, filter );
@@ -282,15 +301,22 @@ public class ContentState {
     public void fireFeatureRemoved(FeatureSource<?,?> source, Feature feature) {
         if( listeners.isEmpty() && tx != Transaction.AUTO_COMMIT) return;
         
-        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
-        Set<FeatureId> fids = new HashSet<FeatureId>();
-        fids.add( feature.getIdentifier() );
-        Filter filter = ff.id( fids );
+        Filter filter = idFilter(feature);
         ReferencedEnvelope bounds = new ReferencedEnvelope( feature.getBounds() );
         
         FeatureEvent event = new FeatureEvent(source, Type.REMOVED, bounds, filter );
         
         fireFeatureEvent( event );        
+    }
+
+    /**
+     * Helper method or building fid filters.
+     */
+    Filter idFilter( Feature feature ) {
+        FilterFactory ff = this.entry.dataStore.getFilterFactory();
+        Set<FeatureId> fids = new HashSet<FeatureId>();
+        fids.add( feature.getIdentifier() );
+        return ff.id( fids );
     }
 
     /**
@@ -399,5 +425,5 @@ public class ContentState {
     public ContentState copy() {
         return new ContentState( this );
     }
-
+    
 }

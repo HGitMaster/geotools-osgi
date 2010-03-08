@@ -30,7 +30,7 @@ import java.io.IOException;
  * small portion of an image. However it is needed in some case, typically to represent an image
  * before a mosaic is built from it.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/LargeTile.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/LargeTile.java $
  * @version $Id: LargeTile.java 31996 2008-12-11 14:33:48Z desruisseaux $
  * @author Martin Desruisseaux
  */

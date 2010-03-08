@@ -11,11 +11,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import junit.framework.TestCase;
+
 import org.geotools.xml.StreamingParser;
 import org.opengis.feature.simple.SimpleFeature;
 import org.w3c.dom.Document;
-
-import junit.framework.TestCase;
 
 public class GML3ParsingTest extends TestCase {
 

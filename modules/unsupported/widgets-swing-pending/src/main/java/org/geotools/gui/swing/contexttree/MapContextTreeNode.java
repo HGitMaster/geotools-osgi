@@ -25,6 +25,8 @@ import org.geotools.map.MapContext;
  * a specific mutabletreenode for jcontexttree
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/MapContextTreeNode.java $
  */
 public final class MapContextTreeNode extends ContextTreeNode {
 

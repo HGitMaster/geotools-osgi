@@ -25,7 +25,7 @@ import java.util.HashSet;
  *
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/path/Path.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/path/Path.java $
  */
 public class Path extends Walk {
 

@@ -31,7 +31,7 @@ import org.opengis.filter.expression.Expression;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/visitor/AverageVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/AverageVisitor.java $
  */
 public class AverageVisitor implements FeatureCalc {
     private Expression expr;
@@ -103,13 +103,12 @@ public class AverageVisitor implements FeatureCalc {
     private static AverageStrategy createStrategy(Class type) {
         if (type == Integer.class) {
             return new IntegerAverageStrategy();
-        } else if (type == Double.class) {
-            return new DoubleAverageStrategy();
         } else if (type == Long.class) {
             return new LongAverageStrategy();
         } else if (type == Float.class) {
             return new FloatAverageStrategy();
-        }
+        } else if (Number.class.isAssignableFrom(type))
+            return new DoubleAverageStrategy();
 
         return null;
     }

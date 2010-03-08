@@ -54,7 +54,7 @@ import javax.media.jai.RenderedOp;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverageWriter;
@@ -63,10 +63,10 @@ import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.coverage.processing.operation.Resample;
 import org.geotools.coverage.processing.operation.SelectSampleDimension;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.Format;
@@ -74,8 +74,6 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
 
 import com.sun.media.jai.operator.ImageWriteDescriptor;
 
@@ -191,13 +189,7 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 				destination = null;
 			}
 
-			try {
-				temp = new File(URLDecoder.decode(url.getFile(), "UTF-8)"));
-			} catch (UnsupportedEncodingException e) {
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				final DataSourceException ex = new DataSourceException(e);
-				throw ex;
-			}
+			temp = DataUtilities.urlToFile(url);
 
 			if (temp.exists() && !temp.isDirectory()) {
 				destination = null;
@@ -505,10 +497,8 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	*/
 	
 			// calculating the physical resolution over x and y.
-			final int geometryWidth = gc.getGridGeometry().getGridRange()
-					.getLength(0);
-			final int geometryHeight = gc.getGridGeometry().getGridRange()
-					.getLength(1);
+			final int geometryWidth = gc.getGridGeometry().getGridRange().getSpan(0);
+			final int geometryHeight = gc.getGridGeometry().getGridRange().getSpan(1);
 	
 			if (dest instanceof File) {
 	
@@ -811,11 +801,8 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		}
 
 		// new grid range
-		final GeneralGridRange newGridrange = new GeneralGridRange(new int[] {
-				0, 0 }, new int[] { GIF_WIDTH, GIF_HEIGHT });
-
-		final GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,
-				gc.getEnvelope());
+		final GeneralGridEnvelope newGridrange = new GeneralGridEnvelope(new int[] {0, 0 }, new int[] { GIF_WIDTH, GIF_HEIGHT });
+		final GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,gc.getEnvelope());
 
 		// resample this coverage
 		final ParameterValueGroup pvg= resampleFactory.getParameters();

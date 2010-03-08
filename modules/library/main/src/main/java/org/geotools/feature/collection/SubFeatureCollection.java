@@ -17,27 +17,24 @@
 package org.geotools.feature.collection;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.feature.visitor.BoundsVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.util.ProgressListener;
+import org.geotools.util.NullProgressListener;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
+import org.opengis.geometry.BoundingBox;
 
 /**
  * Used as a reasonable default implementation for subCollection.
@@ -48,7 +45,7 @@ import org.opengis.filter.sort.SortBy;
  * 
  * @author Jody Garnett, Refractions Research, Inc.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/collection/SubFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/collection/SubFeatureCollection.java $
  */
 public class SubFeatureCollection extends AbstractFeatureCollection {
     
@@ -211,5 +208,21 @@ public class SubFeatureCollection extends AbstractFeatureCollection {
     public FeatureCollection<SimpleFeatureType, SimpleFeature> collection() throws IOException {
         return this;
     }
+
+	/**
+	 * Calculates the bounds of the features without caching.
+	 *  
+	 * TODO Have some pro look at this code.
+	 * author by Stefan Krueger 
+	 */
+	@Override
+	public ReferencedEnvelope getBounds() {
+	    BoundsVisitor bounds = new BoundsVisitor();
+	    try {
+                accepts( bounds, new NullProgressListener() );
+            } catch (IOException e) {
+            }
+            return bounds.getBounds();
+	}
 
 }

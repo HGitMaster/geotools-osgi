@@ -43,6 +43,8 @@ import org.geotools.xs.XS;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/bindings/XSNonNegativeIntegerBinding.java $
  */
 public class XSNonNegativeIntegerBinding implements SimpleBinding {
     final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
@@ -119,7 +121,7 @@ public class XSNonNegativeIntegerBinding implements SimpleBinding {
     public String encode(Object object, String value) throws Exception {
         Number number = (Number) object;
 
-        if (number.intValue() < 0) {
+        if (number.longValue() < 0) {
             throw new IllegalArgumentException("Value '" + number
                 + "' must be non-negative (0 or above).");
         }

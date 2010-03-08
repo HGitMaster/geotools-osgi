@@ -47,6 +47,8 @@ import org.geotools.geometry.iso.topograph2D.NodeMap;
  * interior of line segments) have their topology determined implicitly, without
  * creating a Node object to represent them.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/relate/RelateNodeGraph.java $
  * @version 1.7.2
  */
 public class RelateNodeGraph {

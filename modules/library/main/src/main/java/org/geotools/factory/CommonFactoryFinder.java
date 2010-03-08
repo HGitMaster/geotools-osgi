@@ -46,7 +46,7 @@ import org.opengis.filter.expression.Function;
  * factories from a central point.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/factory/CommonFactoryFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/factory/CommonFactoryFinder.java $
  * @version $Id: CommonFactoryFinder.java 30990 2008-07-10 09:15:29Z aaime $
  * @author Martin Desruisseaux
  * @author Jody Garnett

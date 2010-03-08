@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  * Tests the {@link AuthorityFactoryProxy} implementation.
  *
  * @author Martin Desruisseaux
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/factory/AuthorityFactoryProxyTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/factory/AuthorityFactoryProxyTest.java $
  * @version $Id: AuthorityFactoryProxyTest.java 30641 2008-06-12 17:42:27Z acuster $
  */
 public final class AuthorityFactoryProxyTest {

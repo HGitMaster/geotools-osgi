@@ -38,6 +38,8 @@ import org.opengis.feature.type.FeatureType;
  * <p>To ensure all data has been written flush() should be called.</p>
  * 
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/store/BufferedDiskStorage.java $
  */
 public class BufferedDiskStorage implements Storage {
     public final static String BUFFER_SIZE_PROPERTY = "BufferedDiskStorage.BufferSize";

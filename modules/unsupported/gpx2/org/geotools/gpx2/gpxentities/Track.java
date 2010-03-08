@@ -25,6 +25,8 @@ import java.util.*;
  * @see SimpleWaypoint
  * @see BasicTrack
  * @see BasicTrackSegment
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/gpx2/org/geotools/gpx2/gpxentities/Track.java $
  */
 public interface Track 
 {

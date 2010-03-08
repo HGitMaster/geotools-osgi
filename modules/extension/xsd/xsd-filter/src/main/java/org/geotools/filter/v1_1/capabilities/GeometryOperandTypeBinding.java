@@ -59,6 +59,8 @@ import org.geotools.xs.bindings.XSQNameBinding;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_1/capabilities/GeometryOperandTypeBinding.java $
  */
 public class GeometryOperandTypeBinding extends AbstractSimpleBinding {
     NamespaceContext namespaceContext;

@@ -24,6 +24,8 @@ import static org.junit.Assert.*;
  * Simple deadlock tests for {@link ObjectCacheEntry}.
  *
  * @author Cory Horner (Refractions Research)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/ObjectCacheEntryTest.java $
  */
 public final class ObjectCacheEntryTest {
 

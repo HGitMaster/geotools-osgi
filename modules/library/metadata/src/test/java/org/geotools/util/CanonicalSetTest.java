@@ -26,8 +26,8 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link CanonicalSet}. A standard {@link HashSet} object is used for comparaison purpose.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/util/CanonicalSetTest.java $
- * @version $Id: CanonicalSetTest.java 30640 2008-06-12 17:34:32Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/CanonicalSetTest.java $
+ * @version $Id: CanonicalSetTest.java 34661 2009-12-13 11:01:50Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public final class CanonicalSetTest {
@@ -121,9 +121,9 @@ public final class CanonicalSetTest {
                 assertTrue("containsAll:", weakSet.containsAll(strongSet));
             }
             // Do our best to lets GC finish its work.
-            for (int i=0; i<4; i++) {
-                Thread.sleep(50);
-                System.gc();
+            for (int i=0; i<20; i++) {
+                Runtime.getRuntime().gc();
+                Runtime.getRuntime().runFinalization();
             }
             assertEquals("equals:", strongSet, weakSet);
         }

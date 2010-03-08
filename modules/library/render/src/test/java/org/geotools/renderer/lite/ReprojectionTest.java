@@ -19,6 +19,7 @@ package org.geotools.renderer.lite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 
 import junit.framework.TestCase;
 
@@ -49,6 +50,8 @@ import com.vividsolutions.jts.geom.LineString;
  * 
  * @author wolf
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/ReprojectionTest.java $
  */
 public class ReprojectionTest extends TestCase {
 
@@ -109,6 +112,7 @@ public class ReprojectionTest extends TestCase {
 
 		// setup the renderer and listen for errors
 		StreamingRenderer sr = new StreamingRenderer();
+		sr.setRendererHints(Collections.singletonMap(sr.OPTIMIZED_DATA_LOADING_KEY, Boolean.FALSE));
 		sr.setContext(mapContext);
 		sr.addRenderListener(new RenderListener() {
 			public void featureRenderer(SimpleFeature feature) {

@@ -36,7 +36,7 @@ public class URConverterFactoryTest extends TestCase {
         assertNotNull( c );
         
         assertEquals( new URL( "http://foo.com" ), c.convert( "http://foo.com", URL.class ) );
-        assertEquals( new File( "/foo/bar").toURL() , c.convert( "/foo/bar", URL.class ) );
+        assertEquals( new File( "/foo/bar").toURI().toURL() , c.convert( "/foo/bar", URL.class ) );
     }
     
     public void testStringToURI() throws Exception {
@@ -61,7 +61,7 @@ public class URConverterFactoryTest extends TestCase {
     }
 //JD: enable when factory registered
 //    public void testRegistered() throws Exception {
-//        assertEquals( new File( "/foo/bar").toURL() , Converters.convert( "/foo/bar", URL.class ));
+//        assertEquals( new File( "/foo/bar").toURI().toURL() , Converters.convert( "/foo/bar", URL.class ));
 //    }
     
 }

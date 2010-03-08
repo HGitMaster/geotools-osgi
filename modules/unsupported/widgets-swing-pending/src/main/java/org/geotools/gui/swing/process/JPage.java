@@ -24,6 +24,8 @@ import javax.swing.JPanel;
  * This is a descriptor; identifying a page by id (and lazily creating it as needed).
  * 
  * @author Jody, gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/JPage.java $
  */
 public abstract class JPage {
     /**

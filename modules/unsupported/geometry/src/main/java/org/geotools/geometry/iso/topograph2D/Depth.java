@@ -21,6 +21,8 @@ package org.geotools.geometry.iso.topograph2D;
 /**
  * A Depth object records the topological depth of the sides of an Edge for up
  * to two Geometries.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Depth.java $
  */
 public class Depth {
 

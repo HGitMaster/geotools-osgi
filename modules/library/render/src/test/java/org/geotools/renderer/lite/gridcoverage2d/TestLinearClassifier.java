@@ -51,6 +51,8 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Simone Giannecchini, GeoSolutions
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/gridcoverage2d/TestLinearClassifier.java $
  */
 public class TestLinearClassifier extends TestCase {
 

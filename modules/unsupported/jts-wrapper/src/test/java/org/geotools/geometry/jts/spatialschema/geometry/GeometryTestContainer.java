@@ -27,6 +27,8 @@ import java.util.ArrayList;
  * 
  * @author Jody Garnett
  * @author Joel Skelton
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/test/java/org/geotools/geometry/jts/spatialschema/geometry/GeometryTestContainer.java $
  */
 public class GeometryTestContainer {
     private List testCases;

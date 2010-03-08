@@ -28,7 +28,7 @@ import org.geotools.resources.i18n.Errors;
  * A scale where {@linkplain #getDenominator denominator} = {@code 1 / scale}.
  * This implementation is set up as a {@linkplain Number number} - because it is.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/identification/RepresentativeFractionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/identification/RepresentativeFractionImpl.java $
  * @version $Id: RepresentativeFractionImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Jody Garnett
  *

@@ -22,17 +22,21 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.xml.resolver.Catalog;
+import org.apache.xml.resolver.CatalogManager;
 
 /**
  * Implementation help for use of OASIS catalog.
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: CatalogUtilities.java 31815 2008-11-10 07:53:14Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/CatalogUtilities.java $
+ * @version $Id: CatalogUtilities.java 33534 2009-07-09 08:31:36Z bencaradocdavies $
+ * @source $URL:
+ *         http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main
+ *         /java/org/geotools/data/complex/config/CatalogUtilities.java $
  * @since 2.6
  */
 public class CatalogUtilities {
@@ -44,7 +48,7 @@ public class CatalogUtilities {
      * Return schema location resolved to local file if possible.
      * 
      * @param catalog
-     *                can be null if no catalog
+     *            can be null if no catalog
      * @param location
      * @return null if catalog is null or location not found in catalog
      */
@@ -82,6 +86,36 @@ public class CatalogUtilities {
             }
             return schemaLocation;
         }
+    }
+
+    /**
+     * Build a private {@link Catalog}, that is, not the static instance that {@link CatalogManager}
+     * returns by default.
+     * 
+     * <p>
+     * 
+     * Care must be taken to use only private {@link Catalog} instances if there will ever be more
+     * than one OASIS Catalog used in a single class loader (i.e. a single maven test run),
+     * otherwise {@link Catalog} contents will be an amalgam of the entries of both OASIS Catalog
+     * files, with likely unintended or incorrect results. See GEOT-2497.
+     * 
+     * @param catalogLocation
+     *            URL of OASIS Catalog
+     * @return a private Catalog
+     */
+    public static Catalog buildPrivateCatalog(URL catalogLocation) {
+        CatalogManager catalogManager = new CatalogManager();
+        catalogManager.setUseStaticCatalog(false);
+        catalogManager.setVerbosity(0);
+        catalogManager.setIgnoreMissingProperties(true);
+        Catalog catalog = catalogManager.getCatalog();
+        try {
+            catalog.parseCatalog(catalogLocation);
+        } catch (IOException e) {
+            throw new RuntimeException("Error trying to load OASIS catalog from URL "
+                    + catalogLocation.toString(), e);
+        }
+        return catalog;
     }
 
 }

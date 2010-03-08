@@ -55,9 +55,10 @@ import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.geometry.Envelope;
 
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.coverage.processing.CannotReprojectException;
@@ -86,8 +87,8 @@ import org.geotools.resources.coverage.CoverageUtilities;
  * way to check if a grid coverages is a result of a resample operation.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Resampler2D.java $
- * @version $Id: Resampler2D.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Resampler2D.java $
+ * @version $Id: Resampler2D.java 33828 2009-09-03 06:44:06Z mbedward $
  * @author Martin Desruisseaux (IRD)
  */
 final class Resampler2D extends GridCoverage2D {
@@ -235,8 +236,8 @@ final class Resampler2D extends GridCoverage2D {
             automaticGG = true;
             automaticGR = true;
         } else {
-            automaticGR = !targetGG.isDefined(GridGeometry2D.GRID_RANGE);
-            if (!automaticGR || targetGG.isDefined(GridGeometry2D.GRID_TO_CRS)) {
+            automaticGR = !targetGG.isDefined(GridGeometry2D.GRID_RANGE_BITMASK);
+            if (!automaticGR || targetGG.isDefined(GridGeometry2D.GRID_TO_CRS_BITMASK)) {
                 automaticGG = false;
             } else {
                 /*
@@ -246,7 +247,7 @@ final class Resampler2D extends GridCoverage2D {
                  * envelope using the same "grid to CRS" transform than the original coverage.
                  * The result may be an image with a different size.
                  */
-                if (targetGG.isDefined(GridGeometry2D.ENVELOPE)) {
+                if (targetGG.isDefined(GridGeometry2D.ENVELOPE_BITMASK)) {
                     final Envelope       envelope = targetGG.getEnvelope();
                     final GridGeometry2D sourceGG = sourceCoverage.getGridGeometry();
                     final MathTransform  gridToCRS;
@@ -332,7 +333,7 @@ final class Resampler2D extends GridCoverage2D {
              * Note: targetGG should not be null, otherwise 'existingCoverage(...)' should
              *       have already detected that this resample is not doing anything.
              */
-            if (!targetGG.isDefined(GridGeometry2D.GRID_TO_CRS)) {
+            if (!targetGG.isDefined(GridGeometry2D.GRID_TO_CRS_BITMASK)) {
                 step1    = sourceGG.getGridToCRS(CORNER); // Really sourceGG, not targetGG
                 step2    = IdentityTransform.create(step1.getTargetDimensions());
                 step3    = step1.inverse();
@@ -343,7 +344,7 @@ final class Resampler2D extends GridCoverage2D {
                 step2    = IdentityTransform.create(step1.getTargetDimensions());
                 step3    = sourceGG.getGridToCRS(CORNER).inverse();
                 allSteps = mtFactory.createConcatenatedTransform(step1, step3);
-                if (!targetGG.isDefined(GridGeometry2D.GRID_RANGE)) {
+                if (!targetGG.isDefined(GridGeometry2D.GRID_RANGE_BITMASK)) {
                     /*
                      * If the target grid range was not explicitely specified, a grid range will be
                      * automatically computed in such a way that it will maps to the same envelope
@@ -352,7 +353,7 @@ final class Resampler2D extends GridCoverage2D {
                     Envelope gridRange;
                     gridRange = toEnvelope(sourceGG.getGridRange());
                     gridRange = CRS.transform(allSteps.inverse(), gridRange);
-                    targetGG  = new GridGeometry2D(new GeneralGridRange(gridRange,
+                    targetGG  = new GridGeometry2D(new GeneralGridEnvelope(gridRange,
                             PixelInCell.CELL_CORNER), step1, targetCRS);
                 }
             }
@@ -388,18 +389,18 @@ final class Resampler2D extends GridCoverage2D {
              */
             if (targetGG == null) {
                 final GridEnvelope targetGR;
-                targetGR = force2D ? new GeneralGridRange(sourceGG.getGridRange2D()) : sourceGG.getGridRange();
+                targetGR = force2D ? new GridEnvelope2D(sourceGG.getGridRange2D()) : sourceGG.getGridRange();
                 targetGG = new GridGeometry2D(targetGR, targetEnvelope);
                 step1    = targetGG.getGridToCRS(CORNER);
-            } else if (!targetGG.isDefined(GridGeometry2D.GRID_TO_CRS)) {
+            } else if (!targetGG.isDefined(GridGeometry2D.GRID_TO_CRS_BITMASK)) {
                 targetGG = new GridGeometry2D(targetGG.getGridRange(), targetEnvelope);
                 step1    = targetGG.getGridToCRS(CORNER);
             } else {
                 step1 = targetGG.getGridToCRS(CORNER);
-                if (!targetGG.isDefined(GridGeometry2D.GRID_RANGE)) {
+                if (!targetGG.isDefined(GridGeometry2D.GRID_RANGE_BITMASK)) {
                     GeneralEnvelope gridRange = CRS.transform(step1.inverse(), targetEnvelope);
                     // According OpenGIS specification, GridGeometry maps pixel's center.
-                    targetGG = new GridGeometry2D(new GeneralGridRange(gridRange,
+                    targetGG = new GridGeometry2D(new GeneralGridEnvelope(gridRange,
                             PixelInCell.CELL_CENTER), step1, targetCRS);
                 }
             }
@@ -651,7 +652,7 @@ final class Resampler2D extends GridCoverage2D {
         lower[targetGG.gridDimensionY] = targetImage.getMinY();
         upper[targetGG.gridDimensionX] = targetImage.getMaxX();
         upper[targetGG.gridDimensionY] = targetImage.getMaxY();
-        final GridEnvelope actualGR = new GeneralGridRange(lower, upper);
+        final GridEnvelope actualGR = new GeneralGridEnvelope(lower, upper);
         if (!targetGR.equals(actualGR)) {
             MathTransform gridToCRS = targetGG.getGridToCRS(CORNER);
             targetGG = new GridGeometry2D(actualGR, gridToCRS, targetCRS);
@@ -814,15 +815,15 @@ final class Resampler2D extends GridCoverage2D {
         if (targetGG == null || targetGG.equals(sourceGG)) {
             return true;
         }
-        if (targetGG.isDefined(GridGeometry2D.GRID_RANGE) &&
-            sourceGG.isDefined(GridGeometry2D.GRID_RANGE))
+        if (targetGG.isDefined(GridGeometry2D.GRID_RANGE_BITMASK) &&
+            sourceGG.isDefined(GridGeometry2D.GRID_RANGE_BITMASK))
         {
             if (!targetGG.getGridRange().equals(sourceGG.getGridRange())) {
                 return false;
             }
         }
-        if (targetGG.isDefined(GridGeometry2D.GRID_TO_CRS) &&
-            sourceGG.isDefined(GridGeometry2D.GRID_TO_CRS))
+        if (targetGG.isDefined(GridGeometry2D.GRID_TO_CRS_BITMASK) &&
+            sourceGG.isDefined(GridGeometry2D.GRID_TO_CRS_BITMASK))
         {
             // No needs to ask for a transform relative to a corner
             // since we will not apply a transformation here.

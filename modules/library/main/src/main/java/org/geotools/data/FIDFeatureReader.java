@@ -49,7 +49,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/FIDFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FIDFeatureReader.java $
  * @version $Id: FIDFeatureReader.java 30889 2008-07-04 15:16:12Z aaime $
  */
 public class FIDFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {

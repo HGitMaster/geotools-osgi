@@ -31,8 +31,8 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/DisplacementImpl.java $
- * @version $Id: DisplacementImpl.java 32784 2009-04-13 10:50:27Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/DisplacementImpl.java $
+ * @version $Id: DisplacementImpl.java 33813 2009-08-28 14:45:11Z jive $
  */
 public class DisplacementImpl implements Displacement, Cloneable {
     /** The logger for the default core module. */
@@ -81,7 +81,14 @@ public class DisplacementImpl implements Displacement, Cloneable {
     public void setDisplacementX(Expression displacementX) {
         this.displacementX = displacementX;
     }
-
+    /**
+     * Set displacement x to the provided literal.
+     *
+     * @param displacementX New value of property displacementX.
+     */
+    public void setDisplacementX(double displacementX ){
+        this.displacementX = filterFactory.literal( displacementX );
+    }
     /**
      * Setter for property displacementY.
      *
@@ -89,6 +96,14 @@ public class DisplacementImpl implements Displacement, Cloneable {
      */
     public void setDisplacementY(Expression displacementY) {
         this.displacementY = displacementY;
+    }
+    /**
+     * Set displacement y to the provided literal.
+     *
+     * @param displacementY New value of property displacementX.
+     */
+    public void setDisplacementY(double displacementY ){
+        this.displacementY = filterFactory.literal( displacementY );
     }
 
     /**
@@ -162,6 +177,20 @@ public class DisplacementImpl implements Displacement, Cloneable {
         }
 
         return result;
+    }
+
+    static DisplacementImpl cast(org.opengis.style.Displacement displacement) {
+        if (displacement == null) {
+            return null;
+        } else if (displacement instanceof DisplacementImpl) {
+            return (DisplacementImpl) displacement;
+        } else {
+            DisplacementImpl copy = new DisplacementImpl();
+            copy.setDisplacementX(displacement.getDisplacementX());
+            copy.setDisplacementY(displacement.getDisplacementY());
+
+            return copy;
+        }
     }
     
 }

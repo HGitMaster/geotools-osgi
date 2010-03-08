@@ -31,7 +31,7 @@ import org.opengis.referencing.operation.CylindricalProjection;
 /**
  * Base class for cylindrical map projections.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultCylindricalProjection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultCylindricalProjection.java $
  * @version $Id: DefaultCylindricalProjection.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

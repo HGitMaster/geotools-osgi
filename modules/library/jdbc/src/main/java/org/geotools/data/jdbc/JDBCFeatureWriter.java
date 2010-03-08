@@ -43,7 +43,9 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * JDBCDataStore implementation of the FeatureWriter interface
  *
  * @author aaime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureWriter.java $
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class JDBCFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
     /** The logger for the jdbc module. */

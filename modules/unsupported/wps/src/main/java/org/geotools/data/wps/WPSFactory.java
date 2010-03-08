@@ -21,99 +21,114 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.opengis.wps10.DescriptionType;
 import net.opengis.wps10.ProcessDescriptionType;
 
 import org.geotools.data.Parameter;
 import org.geotools.process.Process;
-import org.geotools.process.impl.AbstractProcessFactory;
+import org.geotools.process.impl.SingleProcessFactory;
 import org.geotools.text.Text;
 import org.opengis.util.InternationalString;
 
 /**
- * This class acts as a ProcessFactory for any process.  It handles converting
- * related bean structures into a ProcessFactory object, and can be created from
- * a describeprocess response and can be passed around as a process encompassing
- * object for ease of use.  This factory can make a representation of a process 
- * and its "execute" method will actually build a request to the server to 
- * execute the process and return the results.
+ * This class acts as a ProcessFactory for any process. It handles converting related bean
+ * structures into a ProcessFactory object, and can be created from a describeprocess response and
+ * can be passed around as a process encompassing object for ease of use. This factory can make a
+ * representation of a process and its "execute" method will actually build a request to the server
+ * to execute the process and return the results.
  * 
  * @author GDavis
+ * 
  *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wps/src/main/java/org/geotools/data/wps/WPSFactory.java $
  */
-public class WPSFactory extends AbstractProcessFactory {
-	
-	private ProcessDescriptionType pdt;
-	private URL serverUrl;
-	private String version;
-	private String title;
-	private String identifier;
-	private String description;
-	private Map<String,Parameter<?>> parameterInfo = new TreeMap<String,Parameter<?>>();
-	private Map<String,Parameter<?>> resultInfo = new TreeMap<String,Parameter<?>>();
-	
-	public WPSFactory(ProcessDescriptionType pdt, URL serverUrl) {
-		this.pdt = pdt;
-		this.serverUrl = serverUrl;
-		buildValuesFromProcessDescriptionType();
-	}
+public class WPSFactory extends SingleProcessFactory {
 
-	/**
-	 * Go through the ProcessDescriptionType object tree and set this factory's
-	 * values based on it.
-	 * @param pdt
-	 */
-	private void buildValuesFromProcessDescriptionType() {
-		this.version = this.pdt.getProcessVersion();
-		this.title = this.pdt.getTitle().getValue();
-		this.identifier = this.pdt.getIdentifier().getValue();
-		this.description = this.pdt.getAbstract().getValue();
-		this.parameterInfo = WPSUtils.createInputParamMap(this.pdt, this.parameterInfo);
-		this.resultInfo = WPSUtils.createOutputParamMap(this.pdt, this.resultInfo);
-	}
+    private ProcessDescriptionType pdt;
 
-	/** 
-	 * Create a representation of a process
-	 */
-	public Process create() {
-		return new WPSProcess(this);
-	}
+    private URL serverUrl;
 
-	public InternationalString getDescription() {
-		return Text.text(description);
-	}
+    private String version;
 
-	public Map<String, Parameter<?>> getParameterInfo() {
-		return Collections.unmodifiableMap( parameterInfo );
-	}
+    private String title;
 
-	public Map<String, Parameter<?>> getResultInfo(
-			Map<String, Object> parameters) throws IllegalArgumentException {
-		return Collections.unmodifiableMap( resultInfo );
-	}
+    private String identifier;
 
-	public InternationalString getTitle() {
-		return Text.text(title);
-	}
-	
-	public String getIdentifier() {
-		return identifier;
-	}	
+    private String description;
 
-	public String getVersion() {
-		return version;
-	}
+    private Map<String, Parameter<?>> parameterInfo = new TreeMap<String, Parameter<?>>();
 
-	public boolean supportsProgress() {
-		// unknown, so return false
-		return false;
-	}
-	
-	public ProcessDescriptionType getProcessDescriptionType() {
-		return this.pdt;
-	}
+    private Map<String, Parameter<?>> resultInfo = new TreeMap<String, Parameter<?>>();
 
-	public URL getServerURL() {
-		return this.serverUrl;
-	}
+    public WPSFactory(ProcessDescriptionType pdt, URL serverUrl) {
+        this.pdt = pdt;
+        this.serverUrl = serverUrl;
+        buildValuesFromProcessDescriptionType();
+    }
+
+    /**
+     * Go through the ProcessDescriptionType object tree and set this flactory's values based on it.
+     * 
+     * @param pdt
+     */
+    private void buildValuesFromProcessDescriptionType() {
+        this.version = this.pdt.getProcessVersion();
+        this.title = this.pdt.getTitle().getValue();
+        this.identifier = this.pdt.getIdentifier().getValue();
+        this.description = isAbstractNull( this.pdt)  ? "" : this.pdt.getAbstract().getValue();
+        this.parameterInfo = WPSUtils.createInputParamMap(this.pdt, this.parameterInfo);
+        this.resultInfo = WPSUtils.createOutputParamMap(this.pdt, this.resultInfo);
+    }
+
+    private boolean isAbstractNull(DescriptionType description ) {
+        if( this.pdt.getAbstract() == null ) return true;
+        if( this.pdt.getAbstract().getValue() == null ) return true;
+        return false;
+    }
+
+    /**
+     * Create a representation of a process
+     */
+    public Process create() {
+        return new WPSProcess(this);
+    }
+
+    public InternationalString getDescription() {
+        return Text.text(description);
+    }
+
+    public Map<String, Parameter<?>> getParameterInfo() {
+        return Collections.unmodifiableMap(parameterInfo);
+    }
+
+    public Map<String, Parameter<?>> getResultInfo(Map<String, Object> parameters)
+            throws IllegalArgumentException {
+        return Collections.unmodifiableMap(resultInfo);
+    }
+
+    public InternationalString getTitle() {
+        return Text.text(title);
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public boolean supportsProgress() {
+        // unknown, so return false
+        return false;
+    }
+
+    public ProcessDescriptionType getProcessDescriptionType() {
+        return this.pdt;
+    }
+
+    public URL getServerURL() {
+        return this.serverUrl;
+    }
 
 }

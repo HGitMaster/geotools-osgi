@@ -18,7 +18,6 @@ package org.geotools.geometry.jts;
 
 import java.awt.Rectangle;
 
-import org.geotools.referencing.operation.matrix.AffineTransform2D;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -38,9 +37,11 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/Decimator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/Decimator.java $
  */
 public final class Decimator {
+    
+    private static final double EPS = 1e-9; 
 
 	private double spanx = -1;
 
@@ -151,7 +152,7 @@ public final class Decimator {
 		} else if (geometry instanceof Point) {
 			LiteCoordinateSequence seq = (LiteCoordinateSequence) ((Point) geometry)
 					.getCoordinateSequence();
-			decimateTransformGeneralize(seq, transform);
+			decimateTransformGeneralize(seq, transform, false);
 		} else if (geometry instanceof Polygon) {
 			Polygon polygon = (Polygon) geometry;
 			decimateTransformGeneralize(polygon.getExteriorRing(), transform);
@@ -161,9 +162,18 @@ public final class Decimator {
 						transform);
 			}
 		} else if (geometry instanceof LineString) {
-			LiteCoordinateSequence seq = (LiteCoordinateSequence) ((LineString) geometry)
-					.getCoordinateSequence();
-			decimateTransformGeneralize(seq, transform);
+			LineString ls = (LineString) geometry;
+            LiteCoordinateSequence seq = (LiteCoordinateSequence) ls.getCoordinateSequence();
+            boolean loop = ls instanceof LinearRing;
+            if(!loop && seq.size() > 1) {
+                double x0 = seq.getOrdinate(0, 0);
+                double y0 = seq.getOrdinate(0, 1);
+                double x1 = seq.getOrdinate(seq.size() - 1, 0);
+                double y1 = seq.getOrdinate(seq.size() - 1, 1);
+                loop = Math.abs(x0 - x1) < EPS && 
+                               Math.abs(y0 - y1) < EPS;
+            }
+			decimateTransformGeneralize(seq, transform, loop);
 		}
 	}
 
@@ -264,7 +274,7 @@ public final class Decimator {
 	 * @param tranform
 	 */
 	private final void decimateTransformGeneralize(LiteCoordinateSequence seq,
-			MathTransform transform) throws TransformException {
+			MathTransform transform, boolean ring) throws TransformException {
 		// decimates before XFORM
 		int ncoords = seq.size();
 		double coords[] = seq.getXYArray(); // 2*#of points
@@ -275,7 +285,7 @@ public final class Decimator {
 				// double[] newCoordsXformed2 = new double[2];
 			    if(transform != null) {
 			        transform.transform(coords, 0, coords, 0, 1);
-			        seq.setArray(coords);
+			        seq.setArray(coords, 2);
 			    }
 				return;
 			} else
@@ -288,7 +298,7 @@ public final class Decimator {
             // do the xform if needed
             if ((transform != null) && (!transform.isIdentity())) {
                 transform.transform(coords, 0, coords, 0, ncoords);
-                seq.setArray(coords);
+                seq.setArray(coords, 2);
             }
             return;
         }
@@ -309,6 +319,24 @@ public final class Decimator {
 				actualCoords++;
 			}
 		}
+		
+		// handle rings
+		if(ring && actualCoords <= 3) {
+		    if(coords.length > 6) {
+		        // normal rings
+    			coords[2] = coords[2];
+    			coords[3] = coords[3];
+    			coords[4] = coords[4];
+    			coords[5] = coords[5];
+    			actualCoords = 3;
+		    } else if(coords.length > 4){
+		        // invalid rings, they do A-B-A, that is, two overlapping lines
+		        coords[2] = coords[2];
+                coords[3] = coords[3];
+                actualCoords = 2;
+		    }
+		}
+		
 		// always have last one
 		coords[actualCoords * 2] = coords[(ncoords - 1) * 2];
 		coords[actualCoords * 2 + 1] = coords[(ncoords - 1) * 2 + 1];
@@ -321,39 +349,13 @@ public final class Decimator {
 		    transform.transform(coords, 0, coords, 0, actualCoords);
 		}
 
-		int actualCoordsGen = 1;
-		if(!(transform instanceof AffineTransform2D)) {
-        		// GENERALIZE again -- we should be in screen space so spanx=spany=1.0
-        		for (int t = 1; t < (actualCoords - 1); t++) {
-        			// see if this one should be added
-        			double x = coords[t * 2];
-        			double y = coords[t * 2 + 1];
-        			if ((Math.abs(x - lastX) > 0.75) || (Math.abs(y - lastY)) > 0.75) // 0.75
-        			// instead of 1 just because it tends to look nicer for slightly
-        			// more work. magic number.
-        			{
-        			    coords[actualCoordsGen * 2] = x;
-        			    coords[actualCoordsGen * 2 + 1] = y;
-        				lastX = x;
-        				lastY = y;
-        				actualCoordsGen++;
-        			}
-        		}
-        		// always have last one
-        		coords[actualCoordsGen * 2] = coords[(actualCoords - 1) * 2];
-        		coords[actualCoordsGen * 2 + 1] = coords[(actualCoords - 1) * 2 + 1];
-        		actualCoordsGen++;
+		// stick back into the coordinate sequence
+		if(actualCoords * 2 < coords.length) {
+		    double[] seqDouble = new double[2 * actualCoords];
+		    System.arraycopy(coords, 0, seqDouble, 0, actualCoords * 2);
+		    seq.setArray(seqDouble, 2);
 		} else {
-		    actualCoordsGen = actualCoords;
-		}
-
-		// stick back in
-		if(actualCoordsGen * 2 < coords.length) {
-		    double[] seqDouble = new double[2 * actualCoordsGen];
-		    System.arraycopy(coords, 0, seqDouble, 0, actualCoordsGen * 2);
-		    seq.setArray(seqDouble);
-		} else {
-		    seq.setArray(coords);
+		    seq.setArray(coords, 2);
 		}
 	}
 

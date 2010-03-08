@@ -25,7 +25,9 @@ import org.geotools.filter.text.generated.parsers.ParseException;
  *
  * @author Mauricio Pazos (Axios Engineering)
  * 
- * @version $Id: CQLException.java 31632 2008-10-07 19:32:57Z mauricio.pazos $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQLException.java $
+ * @version $Id: CQLException.java 34126 2009-10-12 06:35:18Z mbedward $
  * @since 2.4
  */
 public class CQLException extends ParseException {

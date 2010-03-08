@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/spatial/LineCoveredByFeatureLineValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/spatial/LineCoveredByFeatureLineValidation.java $
  * @version $Id: LineCoveredByFeatureLineValidation.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class LineCoveredByFeatureLineValidation

@@ -38,7 +38,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
  * </TD></TR></TABLE>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultCompoundCS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultCompoundCS.java $
  * @version $Id: DefaultCompoundCS.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

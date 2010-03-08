@@ -19,9 +19,7 @@ package org.geotools.coverage.grid.io;
 
 import java.io.IOException;
 
-import org.geotools.factory.Factory;
 import org.geotools.factory.OptionalFactory;
-import org.opengis.coverage.grid.Format;
 
 
 /**
@@ -53,7 +51,7 @@ import org.opengis.coverage.grid.Format;
  *
  * @author Jody Garnett, Refractions Research
  * @author Simone Giannecchini, GeoSolutions
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/GridFormatFactorySpi.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/GridFormatFactorySpi.java $
  */
 @SuppressWarnings("deprecation")
 public interface GridFormatFactorySpi extends OptionalFactory {
@@ -65,7 +63,7 @@ public interface GridFormatFactorySpi extends OptionalFactory {
      *                     if there were any problems creating or connecting
      *                     the datasource.
      */
-    Format createFormat();
+    AbstractGridFormat createFormat();
 
 
 

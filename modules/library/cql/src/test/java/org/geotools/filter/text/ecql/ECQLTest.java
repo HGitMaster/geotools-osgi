@@ -60,6 +60,8 @@ import org.opengis.filter.spatial.Intersects;
  * @author Jody Garnett 
  * @author Mauricio Pazos (Axios Engineering)
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLTest.java $
  * @version Revision: 1.9
  * @since 2.6
  */

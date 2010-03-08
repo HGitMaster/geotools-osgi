@@ -30,6 +30,8 @@ import org.opengis.filter.capability.Functions;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/capability/FunctionsImpl.java $
  */
 public class FunctionsImpl implements Functions {
 

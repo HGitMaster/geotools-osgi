@@ -81,10 +81,10 @@ import org.opengis.filter.expression.Expression;
  * </li>
  * </ul>
  * </p>
- * $Id: TextSymbolizer.java 32919 2009-05-03 14:18:31Z jive $
+ * $Id: TextSymbolizer.java 34564 2009-11-30 16:08:45Z aaime $
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/TextSymbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/TextSymbolizer.java $
  */
 public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symbolizer {
     /**
@@ -116,6 +116,12 @@ public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symboli
     Font getFont();
     
     /**
+     * Font used when rendering this symbolizer.
+     * @param font
+     */
+    public void setFont( org.opengis.style.Font font );
+    
+    /**
      * sets a list of device independent Font objects to be used to render the
      * label.
      *
@@ -133,7 +139,7 @@ public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symboli
      * A LabelPlacement specifies how a text element should be rendered
      * relative to its geometric point or line.
      */
-    void setLabelPlacement(LabelPlacement labelPlacement);
+    void setLabelPlacement(org.opengis.style.LabelPlacement labelPlacement);
 
     /**
      * A LabelPlacement specifies how a text element should be rendered
@@ -161,7 +167,7 @@ public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symboli
      * A halo fills an extended area outside the glyphs of a rendered text
      * label to make the label easier to read over a background.
      */
-    void setHalo(Halo halo);
+    void setHalo(org.opengis.style.Halo halo);
 
     /**
      * Returns the object that indicates how the text will be filled.
@@ -173,24 +179,7 @@ public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symboli
      * Sets the object that indicates how the text will be filled. See {@link
      * #getFill} for details.
      */
-    void setFill(Fill fill);
-
-    /**
-     * This property defines the geometry to be used for styling.<br>
-     * The property is optional and if it is absent (null) then the "default"
-     * geometry property of the feature should be used.  Geometry types other
-     * than inherently point types can be used.  The geometryPropertyName is
-     * the name of a geometry property in the Feature being styled.
-     * Typically, features only have one geometry so, in general, the need to
-     * select one is not required. Note: this moves a little away from the SLD
-     * spec which provides an XPath reference to a Geometry object, but does
-     * follow it in spirit.
-     *
-     * @param name The name of the attribute in the feature being styled  that
-     *        should be used.  If null then the default geometry should be
-     *        used.
-     */
-    void setGeometryPropertyName(String name);
+    void setFill(org.opengis.style.Fill fill);
 
     /**
      * Priority -- null = use the default labeling priority Expression =

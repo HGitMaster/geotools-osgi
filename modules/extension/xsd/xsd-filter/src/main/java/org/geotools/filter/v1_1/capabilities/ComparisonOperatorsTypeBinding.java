@@ -42,6 +42,8 @@ import org.geotools.xml.*;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_1/capabilities/ComparisonOperatorsTypeBinding.java $
  */
 public class ComparisonOperatorsTypeBinding extends AbstractComplexBinding {
     FilterFactory factory;

@@ -37,7 +37,7 @@ import org.opengis.util.Cloneable;
  * through a set of three-dimensional points.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/math/Plane.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/math/Plane.java $
  * @version $Id: Plane.java 31073 2008-07-25 08:14:47Z desruisseaux $
  * @author Martin Desruisseaux (PMO, IRD)
  * @author Howard Freeland, for algorithmic inspiration

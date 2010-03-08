@@ -45,6 +45,9 @@
 			<uri>http://www.opengis.net/sensorML/1.0.1</uri>
 		</Namespace>
 	</namespaces>
+	<includedTypes>
+        <Include>ControlledConcept.xml</Include>
+    </includedTypes>
 	<sourceDataStores>
 		<DataStore>
 			<id>CompositionPart</id>
@@ -66,7 +69,7 @@
 				may be absolute URL's. Imports and includes at the schemas will be
 				followed as long as they're relative paths.
 			-->
-			<schemaUri>commonSchemas_new/GeoSciML/geosciml.xsd</schemaUri>
+			<schemaUri>http://schemas.opengis.net/GeoSciML/geosciml.xsd</schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>
@@ -89,7 +92,7 @@
 					<sourceExpression>
 						<OCQL>PROPORTION</OCQL>
 						<linkElement>gsml:CGI_TermValue</linkElement>
-						<linkField>gml:name</linkField>
+						<linkField>FEATURE_LINK</linkField>
 					</sourceExpression>
 				</AttributeMapping>
 				<AttributeMapping>
@@ -97,13 +100,13 @@
 					<sourceExpression>
 						<OCQL>strTrim(getId())</OCQL>
 						<linkElement>gsml:ControlledConcept</linkElement>
-						<linkField>gml:name[2]</linkField>
+						<linkField>FEATURE_LINK</linkField>
 					</sourceExpression>
 					<isMultiple>true</isMultiple>
 				</AttributeMapping>
 				<AttributeMapping>
 					<targetAttribute>
-					    gml:name
+					    FEATURE_LINK
 		            </targetAttribute>
 					<sourceExpression>
 						<OCQL>strTrim(getId())</OCQL>

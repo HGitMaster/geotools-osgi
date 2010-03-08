@@ -40,7 +40,7 @@ package org.geotools.styling;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/ImageOutline.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/ImageOutline.java $
  */
 public interface ImageOutline {
     /**

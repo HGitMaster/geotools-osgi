@@ -25,6 +25,8 @@ import org.geotools.geometry.iso.util.Assert;
  * A robust version of {@link LineIntersector}.
  * 
  * @see RobustDeterminant
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/RobustLineIntersector.java $
  */
 public class RobustLineIntersector extends LineIntersector {
 

@@ -38,7 +38,7 @@ import org.geotools.factory.AbstractFactory;
  * </p>
  *
  * @author Rob Atkinson, Social Change Online
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/JDBCDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/JDBCDataStoreFactory.java $
  */
 public class JDBCDataStoreFactory extends AbstractFactory
     implements org.geotools.data.DataStoreFactorySpi {

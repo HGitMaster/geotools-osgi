@@ -30,8 +30,8 @@
 		<complexContent>
 			<extension base="gml:AbstractTopologyType">
 				<sequence>
-					<element ref="gml:isolated" minOccurs="0" maxOccurs="unbounded"/>
-					<element ref="gml:container" minOccurs="0"/>
+					<!--element ref="gml:isolated" minOccurs="0" maxOccurs="unbounded"/>
+					<element ref="gml:container" minOccurs="0"/-->
 				</sequence>
 			</extension>
 		</complexContent>
@@ -129,7 +129,7 @@
 		<complexContent>
 			<extension base="gml:AbstractTopoPrimitiveType">
 				<sequence>
-					<element ref="gml:directedNode" minOccurs="2" maxOccurs="2"/>
+					<!--element ref="gml:directedNode" minOccurs="2" maxOccurs="2"/-->
 					<element ref="gml:directedFace" minOccurs="0" maxOccurs="unbounded"/>
 					<element ref="gml:curveProperty" minOccurs="0"/>
 				</sequence>
@@ -168,8 +168,8 @@
 		<complexContent>
 			<extension base="gml:AbstractTopoPrimitiveType">
 				<sequence>
-					<element ref="gml:directedEdge" maxOccurs="unbounded"/>
-					<element ref="gml:directedTopoSolid" minOccurs="0" maxOccurs="2"/>
+					<!--element ref="gml:directedEdge" maxOccurs="unbounded"/-->
+					<!--element ref="gml:directedTopoSolid" minOccurs="0" maxOccurs="2"/-->
 					<element ref="gml:surfaceProperty" minOccurs="0"/>
 				</sequence>
 			</extension>
@@ -344,9 +344,9 @@ is the start Node of the next directedEdge of the TopoCurveType in document orde
 		<complexContent>
 			<extension base="gml:AbstractTopologyType">
 				<sequence>
-					<element ref="gml:maximalComplex"/>
+					<!--element ref="gml:maximalComplex"/>
 					<element ref="gml:superComplex" minOccurs="0" maxOccurs="unbounded"/>
-					<element ref="gml:subComplex" minOccurs="0" maxOccurs="unbounded"/>
+					<element ref="gml:subComplex" minOccurs="0" maxOccurs="unbounded"/-->
 					<element ref="gml:topoPrimitiveMember" minOccurs="0" maxOccurs="unbounded"/>
 					<element ref="gml:topoPrimitiveMembers" minOccurs="0"/>
 				</sequence>

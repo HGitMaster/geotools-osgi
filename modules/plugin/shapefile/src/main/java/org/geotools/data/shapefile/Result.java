@@ -24,6 +24,8 @@ package org.geotools.data.shapefile;
  * @param <S>
  *                The state of the return for example this may be a an enum that
  *                Provides state values such as NONE, FAILURE, etc..
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/Result.java $
  */
 public class Result<V, S> {
 

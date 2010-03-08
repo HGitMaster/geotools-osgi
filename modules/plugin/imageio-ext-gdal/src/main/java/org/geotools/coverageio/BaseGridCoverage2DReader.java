@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,10 +36,12 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.media.jai.JAI;
 
 import org.geotools.coverage.CoverageFactoryFinder;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultResourceInfo;
 import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.PrjFileReader;
@@ -82,7 +83,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
     	try {
     		ImageReadDescriptorMT.register(JAI.getDefaultInstance());
     	}
-    	catch (Exception e) {
+    	catch (Throwable e) {
     		if(LOGGER.isLoggable(Level.FINE))
     			LOGGER.log(Level.FINE,e.getLocalizedMessage(),e);
 		}
@@ -102,8 +103,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
      * Implement this method to setup the coverage properties (Envelope, CRS,
      * GridRange) using the provided {@code ImageReader}
      */
-    protected abstract void setCoverageProperties(ImageReader reader)
-            throws IOException;
+    protected abstract void setCoverageProperties(ImageReader reader) throws IOException;
 
     // ////////////////////////////////////////////////////////////////////////
     //  
@@ -132,7 +132,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
     /**
      * The base {@link GridRange} for the {@link GridCoverage2D} of this reader.
      */
-    private GeneralGridRange nativeGridRange = null;
+    private GridEnvelope2D nativeGridRange = null;
 
     /** Absolute path to the parent dir for this coverage. */
     private String parentPath;
@@ -174,10 +174,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
 
             if (hints != null)
                 this.hints.add(hints);
-
-            this.coverageFactory = CoverageFactoryFinder
-                    .getGridCoverageFactory(this.hints);
-
+            this.coverageFactory = CoverageFactoryFinder.getGridCoverageFactory(this.hints);
             readerSPI = formatSpecificSpi;
             worldFileExt = worldFileExtension;
 
@@ -296,8 +293,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
             this.source = sourceURL;
 
             if (sourceURL.getProtocol().compareToIgnoreCase("file") == 0) {
-                this.inputFile = new File(URLDecoder.decode(
-                        sourceURL.getFile(), "UTF-8"));
+                this.inputFile = DataUtilities.urlToFile(sourceURL);
                 input = this.inputFile;
             } else {
                 throw new IllegalArgumentException("Unsupported input type");
@@ -365,10 +361,9 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
         // resolution
         //
         // //
-        final Rectangle originalDim = new Rectangle(0, 0, reader.getWidth(0),
-                reader.getHeight(0));
+        final Rectangle originalDim = new Rectangle(0, 0, reader.getWidth(0), reader.getHeight(0));
         if (getCoverageGridRange() == null) {
-            setCoverageGridRange(new GeneralGridRange(originalDim));
+            setCoverageGridRange(new GridEnvelope2D(originalDim));
         }
 
         // ///
@@ -376,14 +371,10 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
         // setting the higher resolution available for this coverage
         //
         // ///
-        highestRes = CoverageUtilities
-                .getResolution((AffineTransform) raster2Model);
+        highestRes = CoverageUtilities.getResolution((AffineTransform) raster2Model);
 
         if (LOGGER.isLoggable(Level.FINE))
-            LOGGER
-                    .fine(new StringBuffer("Highest Resolution = [").append(
-                            highestRes[0]).append(",").append(highestRes[1])
-                            .toString());
+            LOGGER.fine(new StringBuffer("Highest Resolution = [").append( highestRes[0]).append(",").append(highestRes[1]).toString());
     }
 
     /**
@@ -394,7 +385,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
      *                a {@code GeneralParameterValue} array to customize the
      *                read operation.
      */
-    public GridCoverage read(GeneralParameterValue[] params)
+    public GridCoverage2D read(GeneralParameterValue[] params)
             throws IllegalArgumentException, IOException {
 
         // Setup a new coverage request
@@ -402,7 +393,10 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
         
 
         // compute the request.
-        return (GridCoverage2D) requestCoverage(request).getGridCoverage();
+        final RasterLayerResponse response = requestCoverage(request);
+        if(response!=null)
+        	return (GridCoverage2D) response.getGridCoverage();
+        return null;
     }
 
     /**
@@ -413,8 +407,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
         String prjPath = null;
 
         setCoverageCRS(null);
-        prjPath = new StringBuilder(this.parentPath).append(File.separatorChar)
-                .append(coverageName).append(".prj").toString();
+        prjPath = new StringBuilder(this.parentPath).append(File.separatorChar) .append(coverageName).append(".prj").toString();
 
         // read the prj serviceInfo from the file
         PrjFileReader projReader = null;
@@ -423,8 +416,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
             final File prj = new File(prjPath);
 
             if (prj.exists()) {
-                projReader = new PrjFileReader(new FileInputStream(prj)
-                        .getChannel());
+                projReader = new PrjFileReader(new FileInputStream(prj).getChannel());
                 setCoverageCRS(projReader.getCoordinateReferenceSystem());
             }
             // If some exception occurs, warn about the error but proceed
@@ -461,9 +453,8 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
      * @throws IllegalStateException
      * @throws IOException
      */
-    protected void parseWorldFile() throws IOException {
-        final String worldFilePath = new StringBuffer(this.parentPath).append(
-                GridCoverageUtilities.SEPARATOR).append(coverageName).toString();
+    protected void parseWorldFile() {
+        final String worldFilePath = new StringBuffer(this.parentPath).append(GridCoverageUtilities.SEPARATOR).append(coverageName).toString();
 
         File file2Parse = null;
         boolean worldFileExists = false;
@@ -488,23 +479,23 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
         }
 
         if (worldFileExists) {
-            final WorldFileReader reader = new WorldFileReader(file2Parse);
-            raster2Model = reader.getTransform();
 
-            // //
-            //
-            // In case we read from a real world file we have together the
-            // envelope. World file transformation assumes to work in the
-            // CELL_CENTER condition
-            //
-            // //
-            MathTransform tempTransform =PixelTranslation.translate(raster2Model, PixelInCell.CELL_CENTER, PixelInCell.CELL_CORNER);
             try {
-                final Envelope gridRange = new GeneralEnvelope(
-                        getCoverageGridRange().toRectangle());
-                final GeneralEnvelope coverageEnvelope = CRS.transform(
-                		tempTransform, gridRange);
+                final WorldFileReader reader = new WorldFileReader(file2Parse);
+                raster2Model = reader.getTransform();
+
+                // //
+                //
+                // In case we read from a real world file we have together the
+                // envelope. World file transformation assumes to work in the
+                // CELL_CENTER condition
+                //
+                // //
+                MathTransform tempTransform =PixelTranslation.translate(raster2Model, PixelInCell.CELL_CENTER, PixelInCell.CELL_CORNER);            	
+                final Envelope gridRange = new GeneralEnvelope(getCoverageGridRange());
+                final GeneralEnvelope coverageEnvelope = CRS.transform(tempTransform, gridRange);
                 setCoverageEnvelope(coverageEnvelope);
+                return;
             } catch (TransformException e) {
                 if (LOGGER.isLoggable(Level.WARNING)) {
                     LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
@@ -513,8 +504,14 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
                 if (LOGGER.isLoggable(Level.WARNING)) {
                     LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                 }
-            }
+            } catch (IOException e) {
+                if (LOGGER.isLoggable(Level.WARNING)) {
+                    LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+                }
+			}
         }
+        // if we got here we did not find a suitable transform
+        raster2Model=null;
     }
 
     /**
@@ -586,8 +583,7 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
      * @todo Future versions may cache requestes<->responses using hashing
      */
     private RasterLayerResponse requestCoverage(RasterLayerRequest request) {
-        final RasterLayerResponse response = new RasterLayerResponse(request,
-                coverageFactory, readerSPI);
+        final RasterLayerResponse response = new RasterLayerResponse(request,coverageFactory, readerSPI);
         try {
             response.compute();
         } catch (IOException e) {
@@ -631,14 +627,14 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
      * @param nativeGridRange
      *                the nativeGridRange to set
      */
-    protected void setCoverageGridRange(GeneralGridRange coverageGridRange) {
+    protected void setCoverageGridRange(GridEnvelope2D coverageGridRange) {
         this.nativeGridRange = coverageGridRange;
     }
 
     /**
      * @return the nativeGridRange
      */
-    protected GeneralGridRange getCoverageGridRange() {
+    protected GridEnvelope2D getCoverageGridRange() {
         return nativeGridRange;
     }
 

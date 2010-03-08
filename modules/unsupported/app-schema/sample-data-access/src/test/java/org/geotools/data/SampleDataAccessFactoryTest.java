@@ -31,7 +31,7 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @version $Id: SampleDataAccessFactoryTest.java 32071 2008-12-24 03:03:33Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/sample-data-access/src/test/java/org/geotools/data/SampleDataAccessFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/sample-data-access/src/test/java/org/geotools/data/SampleDataAccessFactoryTest.java $
  * @since 2.6
  */
 public class SampleDataAccessFactoryTest extends TestCase {

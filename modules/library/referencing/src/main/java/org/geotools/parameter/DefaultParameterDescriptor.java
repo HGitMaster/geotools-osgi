@@ -24,18 +24,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.measure.unit.Unit;
 
-import org.opengis.util.CodeList;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValue;
+import javax.measure.unit.Unit;
 
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.util.Utilities;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.util.CodeList;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -55,8 +56,8 @@ import org.geotools.util.Utilities;
  * @param <T> The type of elements to be returned by {@link ParameterValue#getValue}.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/parameter/DefaultParameterDescriptor.java $
- * @version $Id: DefaultParameterDescriptor.java 31552 2008-09-18 19:57:08Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/DefaultParameterDescriptor.java $
+ * @version $Id: DefaultParameterDescriptor.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *
  * @see Parameter
@@ -120,194 +121,6 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
         unit         = descriptor.getUnit();
     }
 
-    /**
-     * Constructs a mandatory parameter for a range of integer values.
-     *
-     * @param name The parameter name.
-     * @param defaultValue The default value for the parameter.
-     * @param minimum The minimum parameter value, or {@link Integer#MIN_VALUE} if none.
-     * @param maximum The maximum parameter value, or {@link Integer#MAX_VALUE} if none.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    public DefaultParameterDescriptor(final String name,
-                                      final int defaultValue,
-                                      final int minimum,
-                                      final int maximum)
-    {
-        this(Collections.singletonMap(NAME_KEY, name),
-             defaultValue, minimum, maximum, true);
-    }
-
-    /**
-     * Constructs a parameter for a range of integer values.
-     *
-     * @param properties The parameter properties (name, identifiers, alias...).
-     * @param defaultValue The default value for the parameter.
-     * @param minimum The minimum parameter value, or {@link Integer#MIN_VALUE} if none.
-     * @param maximum The maximum parameter value, or {@link Integer#MAX_VALUE} if none.
-     * @param required {@code true} if this parameter is required, {@code false} otherwise.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    public DefaultParameterDescriptor(final Map<String,?> properties,
-                                      final int defaultValue,
-                                      final int minimum,
-                                      final int maximum,
-                                      final boolean required)
-    {
-        this(properties, required, (Class<T>) Integer.class, null, (T) (Object) defaultValue,
-             (Comparable<T>) (minimum == Integer.MIN_VALUE ? null : minimum),
-             (Comparable<T>) (maximum == Integer.MAX_VALUE ? null : maximum), null);
-    }
-
-    /**
-     * Constructs a mandatory parameter for a range of floating point values.
-     *
-     * @param name    The parameter name.
-     * @param defaultValue The default value for the parameter, or {@link Double#NaN} if none.
-     * @param minimum The minimum parameter value, or {@link Double#NEGATIVE_INFINITY} if none.
-     * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
-     * @param unit    The unit for default, minimum and maximum values.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    public DefaultParameterDescriptor(final String name,
-                                      final double defaultValue,
-                                      final double minimum,
-                                      final double maximum,
-                                      final Unit<?> unit)
-    {
-        this(Collections.singletonMap(NAME_KEY, name),
-             defaultValue, minimum, maximum, unit, true);
-    }
-
-    /**
-     * Constructs a parameter for a range of floating point values.
-     *
-     * @param properties The parameter properties (name, identifiers, alias...).
-     * @param defaultValue The default value for the parameter, or {@link Double#NaN} if none.
-     * @param minimum The minimum parameter value, or {@link Double#NEGATIVE_INFINITY} if none.
-     * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
-     * @param unit    The unit for default, minimum and maximum values.
-     * @param required {@code true} if this parameter is required, {@code false} otherwise.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    public DefaultParameterDescriptor(final Map<String,?> properties,
-                                      final double  defaultValue,
-                                      final double  minimum,
-                                      final double  maximum,
-                                      final Unit<?> unit,
-                                      final boolean required)
-    {
-        this(properties, required, (Class<T>) Double.class, null,
-             (T) (Double.isNaN(defaultValue)          ? null : defaultValue),
-             (Comparable<T>) (minimum == Double.NEGATIVE_INFINITY ? null : minimum),
-             (Comparable<T>) (maximum == Double.POSITIVE_INFINITY ? null : maximum), unit);
-    }
-
-    /**
-     * Constructs a parameter for a name and a default value. The parameter type will
-     * be assumed the same than the default value class.
-     *
-     * @param name         The parameter name.
-     * @param remarks      An optional description as a {@link String} or an
-     *                     {@link org.opengis.util.InternationalString}, or {@code null} if none.
-     * @param defaultValue The default value.
-     * @param required     {@code true} if this parameter is required, {@code false} otherwise.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    public DefaultParameterDescriptor(final String       name,
-                                      final CharSequence remarks,
-                                      final T            defaultValue,
-                                      final boolean      required)
-    {
-        this(toMap(name, remarks),
-             (Class<T>) defaultValue.getClass(),
-             (T[]) ((defaultValue instanceof CodeList) ? getCodeLists((Class) defaultValue.getClass()) : null),
-             defaultValue,
-             null,
-             null,
-             null,
-             required);
-    }
-
-    /**
-     * Work around for RFE #4093999 in Sun's bug database
-     * ("Relax constraint on placement of this()/super() call in constructors").
-     */
-    private static final Map<String,?> toMap(final String name, final CharSequence remarks) {
-        if (remarks == null ){
-            return Collections.singletonMap(NAME_KEY, name);
-        }
-        final Map<String,Object> properties = new HashMap<String,Object>(4);
-        properties.put(NAME_KEY,    name);
-        properties.put(REMARKS_KEY, remarks);
-        return properties;
-    }
-
-    /**
-     * Constructs a parameter for a {@linkplain CodeList code list} (or enumeration).
-     *
-     * @param name         The parameter name.
-     * @param defaultValue The default value.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    public DefaultParameterDescriptor(final String   name,
-                                      final CodeList defaultValue)
-    {
-        this(name, (Class<T>) defaultValue.getClass(), defaultValue);
-    }
-
-    /**
-     * Constructs a parameter for a {@linkplain CodeList code list} (or enumeration). This
-     * constructor is used by the {@link #DefaultParameterDescriptor(String,CodeList)} constructor.
-     *
-     * @param name         The parameter name.
-     * @param valueClass   The class that describe the type of the parameter.
-     *                     Must be a subclass of {@link CodeList}.
-     * @param defaultValue The default value, or {@code null}.
-     *
-     * @deprecated This constructor can not ensure type safety with parameterized types.
-     *             Use the static {@code create} methods instead.
-     */
-    @Deprecated
-    DefaultParameterDescriptor(final String   name,
-                               final Class<T> valueClass,
-                               final CodeList defaultValue)
-    {
-        this(name, valueClass, (T[]) getCodeLists(valueClass.asSubclass(CodeList.class)), (T) defaultValue);
-    }
-
-    /**
-     * Returns the enumeration found in the specified {@code CodeList} class.
-     * Returns {@code null} if no values were found.
-     */
-    @SuppressWarnings("unchecked")
-    private static <T extends CodeList> T[] getCodeLists(final Class<T> type) {
-        try {
-            return (T[]) type.getMethod("values", (Class<?>[]) null).invoke(null, (Object[]) null);
-        } catch (Exception exception) {
-            // No code list defined. Not a problem; we will just
-            // not provide any set of code to check against.
-            return null;
-        }
-    }
 
     /**
      * Constructs a mandatory parameter for a set of predefined values.
@@ -485,8 +298,9 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
     {
         return new DefaultParameterDescriptor<Integer>(properties, required,
                  Integer.class, null, Integer.valueOf(defaultValue),
-                 Integer.valueOf(minimum == Integer.MIN_VALUE ? null : minimum),
-                 Integer.valueOf(maximum == Integer.MAX_VALUE ? null : maximum), null);
+                 minimum == Integer.MIN_VALUE ? null :Integer.valueOf( minimum),
+                 maximum == Integer.MAX_VALUE ? null : Integer.valueOf(maximum), 
+                		 null);
     }
 
     /**

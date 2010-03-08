@@ -20,16 +20,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.AssertionFailedError;
 
+import org.geotools.TestData;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.TestData;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -39,7 +42,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/ShapefileReadWriteTest.java $
- * @version $Id: ShapefileReadWriteTest.java 31878 2008-11-19 08:40:38Z aaime $
+ * @version $Id: ShapefileReadWriteTest.java 33948 2009-09-22 06:55:55Z jive $
  * @author Ian Schneider
  */
 public class ShapefileReadWriteTest extends TestCaseSupport {
@@ -200,8 +203,10 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 
         ShapefileDataStore shapefile;
         String typeName;
-        shapefile = (ShapefileDataStore) maker.createDataStore(tmp.toURL(),
-                memorymapped);
+        Map<String,Serializable> params = new HashMap<String,Serializable>();
+        params.put(ShapefileDataStoreFactory.URLP.key, tmp.toURI().toURL());
+        params.put(ShapefileDataStoreFactory.MEMORY_MAPPED.key, memorymapped);
+        shapefile = (ShapefileDataStore) maker.createDataStore(params);
         if(charset != null)
             shapefile.setStringCharset(charset);
 
@@ -219,9 +224,9 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
             // review open
             ShapefileDataStore review;
             if(charset == null) 
-                review = new ShapefileDataStore(tmp.toURL(), tmp.toURI(), memorymapped);
+                review = new ShapefileDataStore(tmp.toURI().toURL(), tmp.toURI(), memorymapped);
             else
-                review = new ShapefileDataStore(tmp.toURL(), tmp.toURI(), memorymapped, charset);
+                review = new ShapefileDataStore(tmp.toURI().toURL(), tmp.toURI(), memorymapped, charset);
             typeName = review.getTypeNames()[0];
             FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = review.getFeatureSource(typeName);
             FeatureCollection<SimpleFeatureType, SimpleFeature> again = featureSource.getFeatures();

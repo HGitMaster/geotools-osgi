@@ -31,6 +31,8 @@ import org.geotools.feature.FeatureTypes;
  * ServiceInfo for ShapefileDataStore.
  * 
  * @author Jody Garnett (Refractions Reserach)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileFileServiceInfo.java $
  */
 public class ShapefileFileServiceInfo implements ServiceInfo {
     private final ShapefileDataStore shapefile;

@@ -19,7 +19,6 @@ package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
 
-
 /**
  * A Mark element defines a "shape" which has coloring applied to it.
  *
@@ -64,8 +63,8 @@ import org.opengis.filter.expression.Expression;
  * </p>
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Mark.java $
- * @version $Id: Mark.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Mark.java $
+ * @version $Id: Mark.java 33898 2009-09-13 15:39:05Z jive $
  */
 public interface Mark extends org.opengis.style.Mark, Symbol {
     public static final Mark[] MARKS_EMPTY = new Mark[0];
@@ -105,7 +104,7 @@ public interface Mark extends org.opengis.style.Mark, Symbol {
      *
      * @param stroke The Stroke definition to use when rendering the Mark.
      */
-    void setStroke(Stroke stroke);
+    void setStroke(org.opengis.style.Stroke stroke);
 
     /**
      * This parameter defines which fill style to use when rendering the Mark.
@@ -119,7 +118,7 @@ public interface Mark extends org.opengis.style.Mark, Symbol {
      *
      * @param fill the Fill definition to use when rendering the Mark.
      */
-    void setFill(Fill fill);
+    void setFill(org.opengis.style.Fill fill);
 
     /**
      * @return size of mark
@@ -146,5 +145,20 @@ public interface Mark extends org.opengis.style.Mark, Symbol {
      */
     void setRotation(Expression rotation);
 
+    /**
+     * Mark defined by an external resource.
+     *
+     * @return ExternalMark or null if WellKNownName is being used
+     */
+    ExternalMark getExternalMark();
+    
+    /**
+     * Mark defined by an external resource.
+     * 
+     * @param externalMark Indicate an mark defined by an external resource
+     */
+    void setExternalMark(org.opengis.style.ExternalMark externalMark);
+
+    
     void accept(org.geotools.styling.StyleVisitor visitor);
 }

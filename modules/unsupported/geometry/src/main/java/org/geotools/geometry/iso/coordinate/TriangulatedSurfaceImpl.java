@@ -32,6 +32,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * triangulation is derived.
  * 
  * @author Jackson Roehrig & Sanjay Jena
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/TriangulatedSurfaceImpl.java $
  */
 public class TriangulatedSurfaceImpl extends PolyhedralSurfaceImpl implements
 		TriangulatedSurface {

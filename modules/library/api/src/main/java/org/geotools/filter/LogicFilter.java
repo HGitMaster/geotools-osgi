@@ -28,7 +28,7 @@ import org.opengis.filter.BinaryLogicOperator;
  *
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/filter/LogicFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/LogicFilter.java $
  * @version $Id: LogicFilter.java 30642 2008-06-12 17:52:06Z acuster $
  *
  * @deprecated use {@link org.opengis.filter.BinaryLogicOperator}

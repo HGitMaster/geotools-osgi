@@ -88,7 +88,7 @@ public class QuadTree {
         this.maxDepth = maxDepth;
 
         if (maxBounds != null)
-            this.root = new Node(new Envelope(maxBounds), 0, null);
+            this.root = new Node(new Envelope(maxBounds), 0);
 
         if (maxDepth < 1) {
             /*
@@ -177,10 +177,10 @@ public class QuadTree {
 
             if (quad1.contains(bounds) || quad2.contains(bounds)
                     || quad3.contains(bounds) || quad4.contains(bounds)) {
-                node.addSubNode(new Node(quad1, 0, node));
-                node.addSubNode(new Node(quad2, 1, node));
-                node.addSubNode(new Node(quad3, 2, node));
-                node.addSubNode(new Node(quad4, 3, node));
+                node.addSubNode(new Node(quad1, 0));
+                node.addSubNode(new Node(quad2, 1));
+                node.addSubNode(new Node(quad3, 2));
+                node.addSubNode(new Node(quad4, 3));
 
                 // recurse back on this node now that it has subnodes
                 this.insert(node, recno, bounds, md);

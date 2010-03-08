@@ -24,7 +24,7 @@ import org.geotools.graph.traverse.GraphTraversal;
 
 
 /**
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/DirectedDepthFirstIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/DirectedDepthFirstIterator.java $
  */
 public class DirectedDepthFirstIterator extends DepthFirstIterator {
 

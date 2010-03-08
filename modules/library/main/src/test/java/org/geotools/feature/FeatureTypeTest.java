@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  * @author  en
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/feature/FeatureTypeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/feature/FeatureTypeTest.java $
  */
 public class FeatureTypeTest extends DataTestCase {
   

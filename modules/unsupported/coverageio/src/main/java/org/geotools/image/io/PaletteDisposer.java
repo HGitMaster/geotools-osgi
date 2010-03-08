@@ -26,8 +26,8 @@ import java.util.Set;
  * Allows garbage-collection of {@link Palette} after their index color model has been
  * garbage collected.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/PaletteDisposer.java $
- * @version $Id: PaletteDisposer.java 30679 2008-06-13 10:19:41Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/PaletteDisposer.java $
+ * @version $Id: PaletteDisposer.java 34711 2009-12-21 08:22:45Z aaime $
  * @author Martin Desruisseaux
  */
 final class PaletteDisposer extends Thread {
@@ -81,7 +81,8 @@ final class PaletteDisposer extends Thread {
         while (true) {
             final Reference ref;
             try {
-                ref = (Reference) queue.remove();
+                // IBM JDK5 would not allow direct cast, resulting in a compile error
+                ref = (Reference) ((Object) queue.remove());
             } catch (InterruptedException e) {
                 continue;
             }

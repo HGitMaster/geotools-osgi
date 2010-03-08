@@ -78,7 +78,7 @@ public final class JP2KFormatFactory extends BaseGridFormatFactorySPI implements
      *
      * @return A {@link JP2KFormat}.;
      */
-    public Format createFormat() {
+    public JP2KFormat createFormat() {
         return new JP2KFormat();
     }
 }

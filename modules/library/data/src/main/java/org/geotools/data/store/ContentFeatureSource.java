@@ -40,8 +40,15 @@ import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.function.Collection_AverageFunction;
+import org.geotools.filter.function.Collection_BoundsFunction;
+import org.geotools.filter.function.Collection_CountFunction;
+import org.geotools.filter.function.Collection_MaxFunction;
+import org.geotools.filter.function.Collection_UniqueFunction;
 import org.geotools.filter.visitor.PropertyNameResolvingVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.NullProgressListener;
+import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
@@ -74,6 +81,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentFeatureSource.java $
  */
 public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
     /**
@@ -445,44 +454,8 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
     public final ContentFeatureCollection getFeatures(Query query)
         throws IOException {
         query = joinQuery( query );
+        
         return new ContentFeatureCollection( this, query );
-    
-//        ContentFeatureCollection features = getFeatures(query.getFilter(),query.getSortBy());
-//        features.setHints( query.getHints() );
-//        
-//        if (query.getCoordinateSystemReproject() != null) {
-//            // features = features.reproject( query.getCoordinateSystemReproject() );
-//        }
-//
-//        if (query.getCoordinateSystem() != null) {
-//            // features = features.toCRS( query.getCoordinateSystem() );
-//        }
-//
-//        if (query.getMaxFeatures() != Integer.MAX_VALUE) {
-//            // features = (FeatureCollection<SimpleFeatureType, SimpleFeature>) features.sort(
-//            //		SortBy.NATURAL_ORDER).subList(0, query.getMaxFeatures());
-//        }
-//
-//        if (query.getNamespace() != null) {
-//            // features = features.toNamespace( query.getNamespace() );
-//        }
-//
-//        if (query.getPropertyNames() != Query.ALL_NAMES) {
-//            //do a check for the case were all the names are still specified, 
-//            // manually
-//            SimpleFeatureType schema = getSchema();
-//            boolean same = schema.getAttributeCount() == query.getPropertyNames().length;
-//            for ( int i = 0; i < schema.getAttributeCount() && same; i++ ) {
-//                same = schema.getAttribute(i).getLocalName().equals( 
-//                    query.getPropertyNames()[i]);
-//            }
-//            if ( !same ) {
-//                SimpleFeatureType retyped = SimpleFeatureTypeBuilder.retype(getSchema(), query.getPropertyNames());
-//                features = new ReTypingFeatureCollection( features, retyped );    
-//            }
-//        }
-//        
-//        return features;
     }
 
     /**
@@ -569,6 +542,80 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
         }
         
         return reader;
+    }
+    
+    /**
+     * Visit the features matching the provided query.
+     * <p>
+     * The default information will use getReader( query ) and pass each feature to the provided visitor.
+     * Subclasses should override this method to optimise common visitors:
+     * <ul>
+     * <li> {@link Collection_AverageFunction}
+     * <li> {@link Collection_BoundsFunction}
+     * <li> (@link Collection_CountFunction}
+     * <li> {@link Collection_MaxFunction}
+     * <li> {@link Collection_MedianFunction}
+     * <li> {@link Collection_MinFunction}
+     * <li> {@link Collection_SumFunction}
+     * <li> {@link Collection_UniqueFunction}
+     * </ul>
+     * Often in the case of Filter.INCLUDES the information can be determined from a file header or metadata table.
+     * <p>
+     * 
+     * @param visitor Visitor called for each feature 
+     * @param progress Used to report progress; and errors on a feature by feature basis
+     * @throws IOException
+     */
+    public void accepts( Query query, org.opengis.feature.FeatureVisitor visitor,
+            org.opengis.util.ProgressListener progress) throws IOException {
+        
+        if( progress == null ) {
+            progress = new NullProgressListener();
+        }
+        
+
+        if ( handleVisitor(query,visitor) ) {
+            //all good, subclass handled
+            return;
+        }
+
+        //subclass could not handle, resort to manually walkign through
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReader(query);
+        try{
+            float size = progress instanceof NullProgressListener ? 0.0f : (float) getCount( query );
+            float position = 0;
+            progress.started();
+            while( reader.hasNext() ){
+                if (size > 0) progress.progress( position++/size );
+                try {
+                    SimpleFeature feature = reader.next();
+                    visitor.visit(feature);
+                }
+                catch( Exception erp ){
+                    progress.exceptionOccurred( erp );
+                }
+            }
+        }
+        finally {
+            progress.complete();            
+            reader.close();
+        }
+    }
+    
+    /**
+     * Subclass method which allows subclasses to natively handle a visitor.
+     * <p>
+     * Subclasses would override this method and return true in cases where the specific 
+     * visitor could be handled without iterating over the entire result set of query. An 
+     * example would be handling visitors that calculate aggregate values.
+     * </p>
+     * @param query The query being made.
+     * @param visitor The visitor to 
+     * 
+     * @return true if the visitor can be handled natively, otherwise false. 
+     */
+    protected boolean handleVisitor( Query query, FeatureVisitor visitor ) throws IOException {
+        return false;
     }
     
     /**
@@ -846,6 +893,8 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
         newQuery.setFilter( resolved );
         return newQuery;
     }
+    
+    /** Transform provided filter; resolving property names */
     protected Filter resolvePropertyNames( Filter filter ) {
         if ( filter == null || filter == Filter.INCLUDE || filter == Filter.EXCLUDE ) {
             return filter;

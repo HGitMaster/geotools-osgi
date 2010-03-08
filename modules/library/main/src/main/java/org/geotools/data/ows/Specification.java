@@ -54,7 +54,7 @@ import java.net.URL;
  *
  * @author Jody Garnett, Refractions Reasearch
  * @author rgould
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/ows/Specification.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ows/Specification.java $
  */
 public abstract class Specification {
 

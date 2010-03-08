@@ -29,7 +29,6 @@ import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
@@ -88,7 +87,7 @@ public final class ErdasImgFormat extends BaseGDALGridFormat implements Format {
     /**
      * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object, Hints)
      */
-    public GridCoverageReader getReader(Object source, Hints hints) {
+    public ErdasImgReader getReader(Object source, Hints hints) {
         try {
             return new ErdasImgReader(source, hints);
         } catch (MismatchedDimensionException e) {

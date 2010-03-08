@@ -44,7 +44,7 @@ import org.geotools.image.io.metadata.Band;
  *       convert them.</li>
  * </ul>
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio-netcdf/src/main/java/org/geotools/image/io/netcdf/VariableMetadata.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio-netcdf/src/main/java/org/geotools/image/io/netcdf/VariableMetadata.java $
  * @version $Id: VariableMetadata.java 30680 2008-06-13 10:22:22Z acuster $
  * @author Martin Desruisseaux
  */

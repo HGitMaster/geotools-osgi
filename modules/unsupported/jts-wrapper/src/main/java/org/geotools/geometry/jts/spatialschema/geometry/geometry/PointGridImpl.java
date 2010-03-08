@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: PointGridImpl.java 28567 2007-12-31 19:23:18Z desruisseaux $
+ ** $Id: PointGridImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/geometry/PointGridImpl.java,v $
  **
@@ -25,6 +25,8 @@ import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
  * @UML datatype GM_PointGrid
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/geometry/PointGridImpl.java $
  * @version 2.0
  */
 public class PointGridImpl implements PointGrid {

@@ -31,11 +31,11 @@ import org.opengis.filter.expression.PropertyName;
  * A simple visitor that extracts every attribute used by a filter or an expression
  *
  * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterAttributeExtractor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterAttributeExtractor.java $
  */
 public class FilterAttributeExtractor extends DefaultFilterVisitor {
     /** Last set visited */
-    protected Set attributeNames = new HashSet();
+    protected Set<String> attributeNames = new HashSet<String>();
     /** feature type to evaluate against */
     protected SimpleFeatureType featureType;
 
@@ -59,7 +59,7 @@ public class FilterAttributeExtractor extends DefaultFilterVisitor {
      *
      * @return an unmofiable set of the attribute names found so far during the visit
      */
-    public Set getAttributeNameSet() {
+    public Set<String> getAttributeNameSet() {
         return Collections.unmodifiableSet(attributeNames);
     }
 
@@ -76,12 +76,12 @@ public class FilterAttributeExtractor extends DefaultFilterVisitor {
      * Resets the attributes found so that a new attribute search can be performed
      */
     public void clear() {
-        attributeNames = new HashSet();
+        attributeNames = new HashSet<String>();
     }
 
     public Object visit( PropertyName expression, Object data ) {
         if( data != null && data != attributeNames ){
-            attributeNames = (Set) data;
+            attributeNames = (Set<String>) data;
         }
         if (featureType != null) {
             //evaluate against the feature type instead of using straight name

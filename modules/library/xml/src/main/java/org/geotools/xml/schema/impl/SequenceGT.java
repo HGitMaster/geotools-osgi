@@ -28,7 +28,7 @@ import org.geotools.xml.schema.Sequence;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/SequenceGT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/SequenceGT.java $
  */
 public class SequenceGT implements Sequence {
     private ElementGrouping[] children;

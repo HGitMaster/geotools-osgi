@@ -17,38 +17,32 @@
 package org.geotools.data.memory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 
 import org.geotools.data.AbstractDataStore;
-import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureVisitor;
+import org.opengis.feature.IllegalAttributeException;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -72,11 +66,11 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/memory/MemoryDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/memory/MemoryDataStore.java $
  */
 public class MemoryDataStore extends AbstractDataStore {
     /** Memory holds Map of Feature by fid by typeName. */
-    protected Map<String,Map<String,SimpleFeature>> memory = new HashMap<String,Map<String,SimpleFeature>>();
+    protected Map<String,Map<String,SimpleFeature>> memory = new LinkedHashMap<String,Map<String,SimpleFeature>>();
 
     /** Schema holds FeatureType by typeName */
     protected Map<String,SimpleFeatureType> schema = new HashMap<String,SimpleFeatureType>();
@@ -90,7 +84,7 @@ public class MemoryDataStore extends AbstractDataStore {
      * @param schema An empty feature collection of this type will be made available
      */
     public MemoryDataStore(SimpleFeatureType featureType) {
-        Map<String,SimpleFeature> featureMap = new HashMap<String,SimpleFeature>();
+        Map<String,SimpleFeature> featureMap = new LinkedHashMap<String,SimpleFeature>();
         String typeName = featureType.getTypeName();
         schema.put(typeName, featureType);
         memory.put(typeName, featureMap);
@@ -165,7 +159,7 @@ public class MemoryDataStore extends AbstractDataStore {
     public void addFeatures(FeatureIterator<SimpleFeature> reader) throws IOException {
         try {
             SimpleFeatureType featureType;
-            Map<String,SimpleFeature> featureMap = new HashMap<String,SimpleFeature>();
+            Map<String,SimpleFeature> featureMap = new LinkedHashMap<String,SimpleFeature>();
             String typeName;
             SimpleFeature feature;
 
@@ -203,13 +197,13 @@ public class MemoryDataStore extends AbstractDataStore {
      *
      * @throws IllegalArgumentException If provided collection is empty
      */
-    public void addFeatures(Collection collection) {
+    public void addFeatures(Collection<?> collection) {
         if ((collection == null) || collection.isEmpty()) {
             throw new IllegalArgumentException("Provided FeatureCollection<SimpleFeatureType, SimpleFeature> is empty");
         }
 
         synchronized (memory) {
-            for (Iterator i = collection.iterator(); i.hasNext();) {
+            for (Iterator<?> i = collection.iterator(); i.hasNext();) {
                 addFeatureInternal((SimpleFeature) i.next());
             }
         }
@@ -280,7 +274,7 @@ public class MemoryDataStore extends AbstractDataStore {
 
         String typeName = featureType.getTypeName();
 
-        Map featuresMap;
+        Map<String,SimpleFeature> featuresMap;
 
         if (!memory.containsKey(typeName)) {
             try {
@@ -292,7 +286,7 @@ public class MemoryDataStore extends AbstractDataStore {
             }
         }
 
-        featuresMap = (Map) memory.get(typeName);
+        featuresMap = memory.get(typeName);
         featuresMap.put(feature.getID(), feature);
     }
 
@@ -305,10 +299,10 @@ public class MemoryDataStore extends AbstractDataStore {
      *
      * @throws IOException If typeName cannot be found
      */
-    protected Map features(String typeName) throws IOException {
+    protected Map<String,SimpleFeature> features(String typeName) throws IOException {
         synchronized (memory) {
             if (memory.containsKey(typeName)) {
-                return (Map) memory.get(typeName);
+                return memory.get(typeName);
             }
         }
 
@@ -327,8 +321,8 @@ public class MemoryDataStore extends AbstractDataStore {
             String[] types = new String[schema.size()];
             int index = 0;
 
-            for (Iterator i = schema.keySet().iterator(); i.hasNext(); index++) {
-                types[index] = (String) i.next();
+            for (Iterator<String> i = schema.keySet().iterator(); i.hasNext(); index++) {
+                types[index] = i.next();
             }
 
             return types;
@@ -350,7 +344,7 @@ public class MemoryDataStore extends AbstractDataStore {
     public SimpleFeatureType getSchema(String typeName) throws IOException {
         synchronized (memory) {
             if (schema.containsKey(typeName)) {
-                return (SimpleFeatureType) schema.get(typeName);
+                return schema.get(typeName);
             }
                 throw new SchemaNotFoundException(typeName);
         }
@@ -378,7 +372,7 @@ public class MemoryDataStore extends AbstractDataStore {
             throw new IOException(typeName + " already exists");
         }
             // insertion order preserving map
-            Map featuresMap = new LinkedHashMap();
+            Map<String,SimpleFeature> featuresMap = new LinkedHashMap<String,SimpleFeature>();
             schema.put(typeName, featureType);
             memory.put(typeName, featuresMap);
     }
@@ -402,7 +396,7 @@ public class MemoryDataStore extends AbstractDataStore {
         throws IOException {
         return new FeatureReader<SimpleFeatureType, SimpleFeature>() {
                 SimpleFeatureType featureType = getSchema(typeName);
-                Iterator iterator = features(typeName).values().iterator();
+                Iterator<SimpleFeature> iterator = features(typeName).values().iterator();
 
                 public SimpleFeatureType getFeatureType() {
                     return featureType;
@@ -457,8 +451,8 @@ public class MemoryDataStore extends AbstractDataStore {
         throws IOException {
         return new FeatureWriter<SimpleFeatureType, SimpleFeature>() {
                 SimpleFeatureType featureType = getSchema(typeName);
-                Map contents = features(typeName);
-                Iterator iterator = contents.values().iterator();
+                Map<String,SimpleFeature> contents = features(typeName);
+                Iterator<SimpleFeature> iterator = contents.values().iterator();
                 SimpleFeature live = null;
 
                 SimpleFeature current = null; // current Feature returned to user        
@@ -470,7 +464,7 @@ public class MemoryDataStore extends AbstractDataStore {
                 public SimpleFeature next() throws IOException, NoSuchElementException {
                     if (hasNext()) {
                         // existing content
-                        live = (SimpleFeature) iterator.next();
+                        live = iterator.next();
 
                         try {
                             current = SimpleFeatureBuilder.copy(live);
@@ -589,25 +583,25 @@ public class MemoryDataStore extends AbstractDataStore {
     protected ReferencedEnvelope getBounds(Query query)
         throws IOException {
         String typeName = query.getTypeName();
-        Map contents = features(typeName);
-        Iterator iterator = contents.values().iterator();
+        Map<String,SimpleFeature> contents = features(typeName);
+        Iterator<SimpleFeature> iterator = contents.values().iterator();
 
+        CoordinateReferenceSystem coordinateSystem = query.getCoordinateSystem();
         ReferencedEnvelope envelope = null;
-
-        if (iterator.hasNext()) {
-            int count = 1;
-            Filter filter = query.getFilter();
-            SimpleFeature first = (SimpleFeature) iterator.next();
-            Envelope env = ((Geometry) first.getDefaultGeometry()).getEnvelopeInternal();
-			envelope = new ReferencedEnvelope(env, first.getType().getCoordinateReferenceSystem());
-
-            while (iterator.hasNext() && (count < query.getMaxFeatures())) {
-                SimpleFeature feature = (SimpleFeature) iterator.next();
-
-                if (filter.evaluate(feature)) {
-                    count++;
-                    envelope.expandToInclude(((Geometry) feature.getDefaultGeometry()).getEnvelopeInternal());
+        
+        Filter filter = query.getFilter();
+        
+        int count = 0;
+        while(iterator.hasNext() && (count < query.getMaxFeatures())) {
+            count ++;
+            SimpleFeature feature = iterator.next();
+            if(filter.evaluate(feature)) {
+                count++;
+                Envelope env = ((Geometry) feature.getDefaultGeometry()).getEnvelopeInternal();
+                if (null == envelope) {
+                    envelope = new ReferencedEnvelope(coordinateSystem);
                 }
+                envelope.expandToInclude(env);
             }
         }
 
@@ -620,15 +614,15 @@ public class MemoryDataStore extends AbstractDataStore {
     protected int getCount(Query query)
         throws IOException {
         String typeName = query.getTypeName();
-        Map contents = features(typeName);
-        Iterator iterator = contents.values().iterator();
+        Map<String,SimpleFeature> contents = features(typeName);
+        Iterator<SimpleFeature> iterator = contents.values().iterator();
 
         int count = 0;
 
         Filter filter = query.getFilter();
 
         while (iterator.hasNext() && (count < query.getMaxFeatures())) {
-            if (filter.evaluate((SimpleFeature) iterator.next())) {
+            if (filter.evaluate(iterator.next())) {
                 count++;
             }
         }

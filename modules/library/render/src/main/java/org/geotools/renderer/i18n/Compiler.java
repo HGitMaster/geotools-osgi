@@ -24,7 +24,9 @@ import org.geotools.resources.IndexedResourceCompiler;
 /**
  * Resource compiler.
  * 
- * @version $Id: Compiler.java 30649 2008-06-12 19:44:08Z acuster $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/i18n/Compiler.java $
+ * @version $Id: Compiler.java 34126 2009-10-12 06:35:18Z mbedward $
  * @author Simone Giannecchini
  */
 public final class Compiler {

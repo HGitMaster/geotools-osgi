@@ -19,7 +19,7 @@ package org.geotools.feature.visitor;
 
 /**
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/visitor/CalcUtil.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/CalcUtil.java $
  */
 public class CalcUtil {
 
@@ -253,7 +253,7 @@ public class CalcUtil {
             return new Double(0);
         } else if (bestClass == Float.class) {
             return new Float(0);
-        } else if (bestClass == Float.class) {
+        } else if (bestClass == Long.class) {
             return new Long(0);
         } else if (bestClass == Integer.class) {
             return new Integer(0);

@@ -29,7 +29,9 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link CartesianCS} class.
  *
- * @version $Id: DefaultCartesianCSTest.java 30760 2008-06-18 14:28:24Z desruisseaux $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/cs/DefaultCartesianCSTest.java $
+ * @version $Id: DefaultCartesianCSTest.java 34126 2009-10-12 06:35:18Z mbedward $
  * @author Martin Desruisseaux
  */
 public final class DefaultCartesianCSTest {

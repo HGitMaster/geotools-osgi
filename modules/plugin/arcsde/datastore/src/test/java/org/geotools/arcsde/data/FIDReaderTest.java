@@ -24,7 +24,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,7 +38,11 @@ import com.esri.sde.sdk.client.SeTable;
 
 /**
  * @author Gabriel Roldan (TOPP)
- * @version $Id: FIDReaderTest.java 32669 2009-03-23 16:12:41Z groldan $
+ * 
+ * @source $URL:
+ *         http://svn.osgeo.org/geotools/trunk/modules/plugin/arcsde/datastore/src/test/java/org
+ *         /geotools/arcsde/data/FIDReaderTest.java $
+ * @version $Id: FIDReaderTest.java 34355 2009-11-09 19:05:33Z groldan $
  * @since 2.5.x
  */
 public class FIDReaderTest {
@@ -86,7 +90,7 @@ public class FIDReaderTest {
 
     /**
      * Test method for
-     * {@link org.geotools.arcsde.data.FIDReader#getFidReader(org.geotools.arcsde.pool.ISession, com.esri.sde.sdk.client.SeTable, com.esri.sde.sdk.client.SeLayer, com.esri.sde.sdk.client.SeRegistration)}
+     * {@link org.geotools.arcsde.data.FIDReader#getFidReader(org.geotools.arcsde.session.ISession, com.esri.sde.sdk.client.SeTable, com.esri.sde.sdk.client.SeLayer, com.esri.sde.sdk.client.SeRegistration)}
      * .
      * 
      * @throws IOException
@@ -110,14 +114,15 @@ public class FIDReaderTest {
         assertNotNull(fidReader);
         assertTrue(fidReader instanceof FIDReader.ShapeFidReader);
         assertEquals(-1, fidReader.getColumnIndex());
-        //use toUpperCase, case may be different depending on the backend rdbms
+        // use toUpperCase, case may be different depending on the backend rdbms
         assertEquals("GEOM.FID", fidReader.getFidColumn().toUpperCase());
     }
 
     private FIDReader getFidReader(String tableName) throws IOException {
         FIDReader fidReader;
         String dbName = session.getDatabaseName();
-        tableName = ((dbName == null || "".equals(dbName)) ? "" : (dbName + ".")) + session.getUser() + "." + tableName;
+        tableName = ((dbName == null || "".equals(dbName)) ? "" : (dbName + "."))
+                + session.getUser() + "." + tableName;
         tableName = tableName.toUpperCase();
 
         SeTable table = session.getTable(tableName);

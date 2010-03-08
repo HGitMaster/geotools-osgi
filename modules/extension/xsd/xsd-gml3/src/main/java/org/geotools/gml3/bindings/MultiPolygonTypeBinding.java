@@ -54,6 +54,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/MultiPolygonTypeBinding.java $
  */
 public class MultiPolygonTypeBinding extends AbstractComplexBinding implements Comparable {
     GeometryFactory gFactory;

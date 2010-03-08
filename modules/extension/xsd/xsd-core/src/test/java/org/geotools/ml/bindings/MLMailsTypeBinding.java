@@ -41,6 +41,8 @@ import org.geotools.xml.Node;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/test/java/org/geotools/ml/bindings/MLMailsTypeBinding.java $
  */
 public class MLMailsTypeBinding extends AbstractComplexBinding {
     /**

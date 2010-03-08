@@ -24,6 +24,8 @@ import org.opengis.filter.expression.Expression;
 
 /**
  * Symbol handler for a Mark.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/MarkFactory.java $
  */
 public interface MarkFactory {
     /**

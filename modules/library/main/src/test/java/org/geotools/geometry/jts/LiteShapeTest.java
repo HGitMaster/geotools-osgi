@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.TopologyException;
 /**
  * 
  * @author jamesm,iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/geometry/jts/LiteShapeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/geometry/jts/LiteShapeTest.java $
  */
 public class LiteShapeTest extends TestCase {
 	private java.net.URL base = getClass().getResource("testData/");

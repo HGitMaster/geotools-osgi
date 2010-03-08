@@ -40,6 +40,8 @@ import org.opengis.filter.sort.SortBy;
  * Implement a feature collection just based on provision of iterator.
  * 
  * @author Jody Garnett (Refractions Research Inc)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/collection/AbstractFeatureCollection.java $
  */
 public abstract class AbstractFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
     /**

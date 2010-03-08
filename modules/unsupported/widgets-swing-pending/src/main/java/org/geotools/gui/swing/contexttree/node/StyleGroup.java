@@ -35,6 +35,8 @@ import org.geotools.styling.Symbolizer;
  * subnode showing styles
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/node/StyleGroup.java $
  */
 public class StyleGroup implements SubNodeGroup {
 

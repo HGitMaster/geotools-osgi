@@ -75,7 +75,7 @@ public final class ECWFormatFactory extends BaseGridFormatFactorySPI implements 
      *
      * @return A {@link ECWFormat}
      */
-    public Format createFormat() {
+    public ECWFormat createFormat() {
         return new ECWFormat();
     }
 }

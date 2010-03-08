@@ -39,7 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Access CRS informationj from the PostGIS SPATIAL_REF_SYS table.
  * 
  * @author Jesse Eichar
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/referencing/PostgisAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/referencing/PostgisAuthorityFactory.java $
  */
 public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
     

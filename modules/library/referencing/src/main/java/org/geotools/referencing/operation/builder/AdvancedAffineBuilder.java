@@ -38,7 +38,7 @@ import org.geotools.referencing.operation.transform.ProjectiveTransform;
  * 
  * @author jezekjan
  * @since
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/AdvancedAffineBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/AdvancedAffineBuilder.java $
  * @version $Id: AdvancedAffineBuilder.java 31099 2008-07-29 09:31:53Z desruisseaux $
  */
 public class AdvancedAffineBuilder extends MathTransformBuilder {

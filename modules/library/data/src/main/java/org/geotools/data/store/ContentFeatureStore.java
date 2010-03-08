@@ -77,6 +77,8 @@ import org.opengis.filter.identity.FeatureId;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentFeatureStore.java $
  */
 public abstract class ContentFeatureStore extends ContentFeatureSource implements
         FeatureStore<SimpleFeatureType, SimpleFeature>,
@@ -210,6 +212,9 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
                 
                 //add the id to the set of inserted
                 ids.add( toWrite.getIdentifier() );
+                
+                //copy any metadata from teh feature that was actually written
+                feature.getUserData().putAll( toWrite.getUserData() );
             }
         } 
         finally {

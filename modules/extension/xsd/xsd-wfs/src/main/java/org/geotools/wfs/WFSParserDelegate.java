@@ -23,6 +23,8 @@ import org.geotools.xml.XSDParserDelegate;
  * 
  * @author Justin Deoliveira, OpenGEO
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/WFSParserDelegate.java $
  */
 public class WFSParserDelegate extends XSDParserDelegate {
 

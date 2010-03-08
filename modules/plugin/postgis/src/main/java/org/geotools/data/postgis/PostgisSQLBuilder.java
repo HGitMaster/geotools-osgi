@@ -20,17 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.geotools.data.Query;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
-import org.geotools.data.jdbc.fidmapper.AutoIncrementFIDMapper;
-import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper;
-import org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper;
-import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
-import org.geotools.data.postgis.fidmapper.OIDFidMapper;
-import org.geotools.data.postgis.fidmapper.PostGISAutoIncrementFIDMapper;
+import org.geotools.factory.Hints;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
@@ -46,7 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Builds sql for postgis.
  *
  * @author Chris Holmes
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisSQLBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisSQLBuilder.java $
  */
 public class PostgisSQLBuilder extends DefaultSQLBuilder {
     /** If true, WKB format is used instead of WKT */
@@ -182,7 +175,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
                 if (attribute instanceof GeometryDescriptor) {   
                     GeometryDescriptor geometryAttribute = (GeometryDescriptor) attribute;
                     CoordinateReferenceSystem crs = geometryAttribute.getCoordinateReferenceSystem();
-                    final int D = crs == null ? 2 : crs.getCoordinateSystem().getDimension();
+                    final int D = isForce2D() ? 2 : -1;
                     
                     if (WKBEnabled) {
                         if(byteaEnabled) {
@@ -207,11 +200,10 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
                 GeometryDescriptor geometryAttribute, final int D) {
             
             sql.append("encode(");
-            if( D == 3 ){
-                sql.append("asEWKB(");
-            }
-            else {
+            if( D == 2 ) {
                 sql.append("asBinary(");
+            } else {
+                sql.append("asEWKB(");
             }
             columnGeometry(sql, geometryAttribute.getLocalName(), D );
             sql.append(",'XDR'),'base64')");
@@ -258,15 +250,8 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
         private void columnGeometry(StringBuffer sql,String geomName, final int D) {
             if (D == 2 || isForce2D() ){ 
                 sql.append("force_2d(\"" + geomName + "\")");
-            }
-            else if( D == 3 ){
-                sql.append("force_3d(\"" + geomName + "\")");
-            }
-            else {
-                // D = 4?
-                // force 2D is the default behaviour until you report
-                // this as a bug and are willing to test with real data!
-                sql.append("force_2d(\"" + geomName + "\")" );
+            } else {
+                sql.append("\"" + geomName + "\"" );
             }
         }
         

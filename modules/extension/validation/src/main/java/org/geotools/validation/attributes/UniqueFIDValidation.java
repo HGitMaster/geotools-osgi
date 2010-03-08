@@ -53,7 +53,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/attributes/UniqueFIDValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/attributes/UniqueFIDValidation.java $
  * @version $Id: UniqueFIDValidation.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class UniqueFIDValidation extends DefaultIntegrityValidation {

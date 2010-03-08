@@ -30,7 +30,7 @@ import org.geotools.data.DataStoreFinder;
  * 
  * @author aaime
  * @author $Author: jive $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/postgis-versioned/src/test/java/org/geotools/data/postgis/VersiondPostgisDataStoreFactoryOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/test/java/org/geotools/data/postgis/VersiondPostgisDataStoreFactoryOnlineTest.java $
  * @version $Id: VersiondPostgisDataStoreFactoryOnlineTest.java 30682 2008-06-13 10:30:18Z acuster $
  */
 public class VersiondPostgisDataStoreFactoryOnlineTest extends TestCase {

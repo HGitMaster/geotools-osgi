@@ -30,6 +30,8 @@ import junit.framework.TestSuite;
  * the {@code GeometryTest} class is a container that holds a {@code List} of
  * {@code GeometryTestCase}s and provides a way to execute them all.
  * @author <a href="mailto:joel@lggi.com">Joel Skelton</a>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/xml/GeometryTestContainer.java $
  */
 public class GeometryTestContainer {
     private List<GeometryTestCase> testCases;

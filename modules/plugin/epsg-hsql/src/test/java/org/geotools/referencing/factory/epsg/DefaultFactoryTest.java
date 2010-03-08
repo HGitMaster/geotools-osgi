@@ -57,8 +57,8 @@ import static org.junit.Assert.*;
  * MS-Access database. Otherwise, the default will probably be the one backed by the HSQL
  * database, since this test live in the {@code epsg-hsql} module.
  *
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/DefaultFactoryTest.java $
- * @version $Id: DefaultFactoryTest.java 32864 2009-04-25 20:37:10Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/DefaultFactoryTest.java $
+ * @version $Id: DefaultFactoryTest.java 33776 2009-08-20 13:42:09Z aaime $
  * @author Martin Desruisseaux
  * @author Vadim Semenov
  *
@@ -320,7 +320,7 @@ public class DefaultFactoryTest {
          * Tests fetching an object with name containing semi-colon.
          */
         final IdentifiedObject cs = factory.createCoordinateSystem(
-                "Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east.  UoM: DMS");
+                "Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: DMS");
         assertEquals("6411", getIdentifier(cs));
         /*
          * Tests with a unknown name. The exception should be NoSuchAuthorityCodeException

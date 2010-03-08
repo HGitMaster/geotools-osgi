@@ -38,13 +38,13 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.ServiceInfo;
-import org.geotools.data.complex.config.EmfAppSchemaReader;
+import org.geotools.data.complex.config.NonFeatureTypeProxy;
 import org.geotools.data.complex.filter.UnmappingFilterVisitor;
+import org.geotools.data.complex.filter.UnmappingFilterVistorFactory;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Types;
-import org.geotools.feature.type.NonFeatureTypeProxy;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
@@ -66,8 +66,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AppSchemaDataAccess.java 32633 2009-03-16 01:44:12Z ang05a $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccess.java $
+ * @version $Id: AppSchemaDataAccess.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccess.java $
  * @since 2.4
  */
 public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
@@ -95,35 +95,9 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
             // a fake feature type, so attributes can be chained/nested
             AttributeType type = mapping.getTargetFeature().getType();
             if (!(type instanceof FeatureType)) {
-                createNonFeatureTypeProxy(type, mapping);
+                type = new NonFeatureTypeProxy((ComplexType) type, mapping);
             }
         }
-    }
-
-    /**
-     * Wrap a non feature type with a fake feature type, so they can be nested/chained.
-     * 
-     * @param type
-     *            Non feature attribute type
-     * @param mapping
-     *            Feature type mapping
-     */
-    private void createNonFeatureTypeProxy(AttributeType type, final FeatureTypeMapping mapping) {
-        assert type instanceof ComplexType;
-
-        EmfAppSchemaReader reader = EmfAppSchemaReader.newInstance();
-        AttributeType fakeFeatureType = new NonFeatureTypeProxy(type);
-
-        int maxOccurs = mapping.getTargetFeature().getMaxOccurs();
-        int minOccurs = mapping.getTargetFeature().getMinOccurs();
-        boolean nillable = mapping.getTargetFeature().isNillable();
-        Object defaultValue = mapping.getTargetFeature().getDefaultValue();
-        Name name = mapping.getTargetFeature().getName();
-
-        // create a new descriptor with the wrapped type and set it to the mapping
-        AttributeDescriptor descriptor = reader.getTypeFactory().createAttributeDescriptor(
-                fakeFeatureType, name, minOccurs, maxOccurs, nillable, defaultValue);
-        mapping.setTargetFeature(descriptor);
     }
 
     /**
@@ -352,7 +326,7 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      * @return TODO: implement filter unrolling
      */
     public static Filter unrollFilter(Filter complexFilter, FeatureTypeMapping mapping) {
-        UnmappingFilterVisitor visitor = new UnmappingFilterVisitor(mapping);
+        UnmappingFilterVisitor visitor = UnmappingFilterVistorFactory.getInstance(mapping);
         Filter unrolledFilter = (Filter) complexFilter.accept(visitor, null);
         return unrolledFilter;
     }

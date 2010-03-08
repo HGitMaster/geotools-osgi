@@ -33,7 +33,7 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
  * @author Jody Garnett
  *
  * @deprecated Now replaced by {@link CRSAuthorityFactory}.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/crs/CRSAuthoritySpi.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/crs/CRSAuthoritySpi.java $
  */
 public interface CRSAuthoritySpi extends Factory {
     /**

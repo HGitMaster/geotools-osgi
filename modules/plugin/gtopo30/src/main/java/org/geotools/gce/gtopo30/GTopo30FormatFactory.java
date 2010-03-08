@@ -23,7 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
-import org.opengis.coverage.grid.Format;
 
 /**
  * The GTopo30FormatFactory will be discovered by the GridFormatFinder. Use the
@@ -46,7 +45,7 @@ public class GTopo30FormatFactory implements GridFormatFactorySpi {
 	 * @return an instance of GTopo30Format
 	 */
 	@SuppressWarnings("deprecation")
-        public Format createFormat() {
+        public GTopo30Format createFormat() {
 		return new GTopo30Format();
 	}
 

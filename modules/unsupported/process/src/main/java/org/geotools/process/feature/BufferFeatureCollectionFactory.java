@@ -19,7 +19,6 @@ package org.geotools.process.feature;
 import java.util.Map;
 
 import org.geotools.data.Parameter;
-import org.geotools.process.Process;
 import org.geotools.text.Text;
 import org.opengis.util.InternationalString;
 
@@ -28,8 +27,10 @@ import org.opengis.util.InternationalString;
  * 
  * @author Justin Deoliveira, OpenGEO
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/feature/BufferFeatureCollectionFactory.java $
  */
-public class BufferFeatureCollectionFactory extends AbstractFeatureCollectionProcessFactory {
+public class BufferFeatureCollectionFactory extends FeatureToFeatureProcessFactory {
 
     /** Buffer amount */
     static final Parameter<Double> BUFFER = new Parameter<Double>("buffer",
@@ -48,7 +49,7 @@ public class BufferFeatureCollectionFactory extends AbstractFeatureCollectionPro
         parameters.put(BUFFER.key, BUFFER);
     }
     
-    public Process create() throws IllegalArgumentException {
-        return new BufferFeatureCollectionProcess();
+    public BufferFeatureCollectionProcess create() throws IllegalArgumentException {
+        return new BufferFeatureCollectionProcess(this);
     }
 }

@@ -40,6 +40,8 @@ import java.util.Properties;
  * @copyright Copyright (C) 2002  Navel Ltd.
  * Modified by Christophe Rousson
  * Modified by Emily Gouge
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/SpatialIndex.java $
  */
 public interface SpatialIndex {
     public static final String INDEX_TYPE_PROPERTY = "SpatialIndex.Type";

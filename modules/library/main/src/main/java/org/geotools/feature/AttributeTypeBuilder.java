@@ -89,6 +89,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/AttributeTypeBuilder.java $
  */
 public class AttributeTypeBuilder {
 

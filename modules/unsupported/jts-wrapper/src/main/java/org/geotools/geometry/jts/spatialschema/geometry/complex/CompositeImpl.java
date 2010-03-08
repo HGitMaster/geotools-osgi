@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: CompositeImpl.java 28267 2007-12-06 02:11:00Z desruisseaux $
+ ** $Id: CompositeImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/complex/CompositeImpl.java,v $
  **
@@ -25,6 +25,8 @@ import org.opengis.geometry.primitive.Primitive;
  * @UML type GM_Composite
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/complex/CompositeImpl.java $
  * @version 2.0
  */
 public abstract class CompositeImpl 

@@ -29,7 +29,7 @@ import org.opengis.feature.type.FeatureType;
  * be a drop in replacement when Geotools is able to upgrade to Java 5.
  * </p>
  * @author Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/collection/FeatureIteratorImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/collection/FeatureIteratorImpl.java $
  */
 public class FeatureIteratorImpl<F extends Feature> implements FeatureIterator<F> {
     /** The iterator from the FeatureCollection<SimpleFeatureType, SimpleFeature> to return features from. */

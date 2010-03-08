@@ -30,7 +30,7 @@ import org.geotools.resources.ClassChanger;
  * @param <T> The type of range elements as a subclass of {@link Number}.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/MeasurementRange.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/MeasurementRange.java $
  * @version $Id: MeasurementRange.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux
  */

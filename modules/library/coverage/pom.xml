@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>library</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
 
 
@@ -27,7 +27,7 @@
   <artifactId>gt-coverage</artifactId>
   <packaging>jar</packaging>
   <name>Grid Coverage module</name>
-  <url>http://maven.geotools.fr/reports/modules/library/coverage/</url>
+  
 
   <scm>
     <connection>
@@ -55,6 +55,18 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
+      <name>Simone Giannecchini</name>
+      <id>simboss</id>
+      <email>simone.giannecchini@geo-solutions.it</email>
+      <organization>GeoSolutions S.A.S.</organization>
+      <organizationUrl>http://www.geo-solutions.it</organizationUrl>
+      <roles>
+        <role>Java Developer</role>
+        <role>Documentation</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>  
+    <developer>
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
@@ -62,8 +74,21 @@
       <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <timezone>+1</timezone>
       <roles>
-        <role>Module Maintainer</role>
+        <role>retired Module Maintainer</role>
+        <role>retired Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Michael Bedward</name>
+      <id>mbedward</id>
+      <email>michael.bedward@gmail.com</email>
+      <organization>Dept Environment and Climate Change</organization>
+      <organizationUrl>http://www.environment.nsw.gov.au</organizationUrl>
+      <timezone>+10</timezone>
+      <roles>
         <role>Java Developer</role>
+        <role>Documentation</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
     <developer>
@@ -78,18 +103,9 @@
     <developer>
       <name>Alessio Fabiani</name>
       <id>alfa</id>
-      <email>alessio.fabiani@gmail.com</email>
+      <email>alessio.fabiani@geo-solutions.it</email>
       <roles>
         <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Simone Giannecchini</name>
-      <id>simboss</id>
-      <email>simboss1@gmail.com</email>
-      <roles>
-        <role>Java Developer</role>
-        <role>Documentation</role>
       </roles>
     </developer>
   </developers>

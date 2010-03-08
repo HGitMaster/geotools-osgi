@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.gml2.FeatureTypeCache;
+import org.geotools.gml3.XSDIdRegistry;
 import org.geotools.gml3.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.BindingWalkerFactory;
@@ -65,18 +66,23 @@ import org.w3c.dom.Element;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/AbstractFeatureTypeBinding.java $
  */
 public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
     FeatureTypeCache ftCache;
+    XSDIdRegistry idSet;
     BindingWalkerFactory bwFactory;
     SchemaIndex schemaIndex;
     Configuration configuration;
     
-    public AbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory, SchemaIndex schemaIndex, Configuration configuration) {
+    public AbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory,
+            SchemaIndex schemaIndex, Configuration configuration, XSDIdRegistry idRegistry) {
         this.ftCache = ftCache;
         this.bwFactory = bwFactory;
         this.schemaIndex = schemaIndex;
         this.configuration = configuration;
+        this.idSet = idRegistry;
     }
 
     /**
@@ -126,18 +132,12 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
 
     public Element encode(Object object, Document document, Element value)
         throws Exception {
-        return GML3EncodingUtils.AbstractFeatureType_encode(object,document,value);
+        return GML3EncodingUtils.AbstractFeatureType_encode(object,document,value,idSet);
     }
 
-    public Object getProperty(Object object, QName name)
-        throws Exception {
-        
-        return GML3EncodingUtils.AbstractFeatureType_getProperty(object,name,configuration);
-    }
-    
     @Override
-    public List getProperties(Object object, XSDElementDeclaration element)
-            throws Exception {
-        return GML3EncodingUtils.AbstractFeatureType_getProperties(object, element, schemaIndex);
+    public List getProperties(Object object, XSDElementDeclaration element) throws Exception {
+        return GML3EncodingUtils.AbstractFeatureType_getProperties(object, element, schemaIndex,
+                configuration);
     }
 }

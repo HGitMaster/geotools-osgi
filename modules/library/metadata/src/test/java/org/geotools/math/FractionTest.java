@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link Fraction} class.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/math/FractionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/math/FractionTest.java $
  * @version $Id: FractionTest.java 30725 2008-06-13 19:29:06Z desruisseaux $
  * @author Martin Desruisseaux (Geomatys)
  */

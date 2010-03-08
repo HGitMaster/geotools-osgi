@@ -37,8 +37,8 @@ import org.geotools.util.Utilities;
  * used when the {@linkplain #getGreenwichLongitude greenwich longitude} value is
  * zero.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultPrimeMeridian.java $
- * @version $Id: DefaultPrimeMeridian.java 31000 2008-07-10 21:11:13Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultPrimeMeridian.java $
+ * @version $Id: DefaultPrimeMeridian.java 34044 2009-10-02 08:41:31Z aaime $
  * @author Martin Desruisseaux (IRD)
  *
  * @since 2.1
@@ -171,12 +171,12 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
         if (super.equals(object, compareMetadata)) {
             final DefaultPrimeMeridian that = (DefaultPrimeMeridian) object;
             if (compareMetadata) {
-                return Double.doubleToLongBits(this.greenwichLongitude) ==
-                       Double.doubleToLongBits(that.greenwichLongitude) &&
+                return Utilities.equals(this.greenwichLongitude, that.greenwichLongitude) &&
                        Utilities.equals(this.angularUnit, that.angularUnit);
             } else {
-                return Double.doubleToLongBits(this.getGreenwichLongitude(NonSI.DEGREE_ANGLE)) ==
-                       Double.doubleToLongBits(that.getGreenwichLongitude(NonSI.DEGREE_ANGLE));
+                return Utilities.equals(this.getGreenwichLongitude(NonSI.DEGREE_ANGLE), 
+                        that.getGreenwichLongitude(NonSI.DEGREE_ANGLE));
+                
                 /*
                  * Note: if compareMetadata==false, we relax the unit check because EPSG uses
                  *       sexagesimal degrees for the Greenwich meridian. Requirying the same

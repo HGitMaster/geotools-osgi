@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  *
  * @author Chris Holmes
  * @author Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/gml/producer/CoordinateWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/producer/CoordinateWriter.java $
  */
 public class CoordinateWriter {
     

@@ -46,7 +46,7 @@ import static org.geotools.image.io.mosaic.Tile.MASK;
  * Note that the {@link #compareTo} method is inconsistent with {@link #equals}. It should
  * be considered as an implementation details exposed because this class is not public.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/GridNode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/GridNode.java $
  * @version $Id: GridNode.java 31341 2008-09-01 18:38:10Z desruisseaux $
  * @author Martin Desruisseaux
  */

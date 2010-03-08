@@ -21,7 +21,7 @@ package org.geotools.referencing.operation.builder;
  * Thrown when it is unable to generate TIN.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/TriangulationException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/TriangulationException.java $
  * @version $Id: TriangulationException.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Jan Jezek
  */

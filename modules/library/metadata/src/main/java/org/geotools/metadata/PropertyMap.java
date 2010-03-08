@@ -31,7 +31,7 @@ import org.geotools.util.Utilities;
  * are the value returned by the {@code getFoo()} method using reflection.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/PropertyMap.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/PropertyMap.java $
  * @version $Id: PropertyMap.java 30852 2008-07-03 15:59:42Z desruisseaux $
  * @author Martin Desruisseaux (Geomatys)
  *

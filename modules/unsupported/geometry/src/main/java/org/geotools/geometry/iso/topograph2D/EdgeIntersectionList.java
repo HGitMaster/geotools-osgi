@@ -27,6 +27,8 @@ import java.util.TreeMap;
 /**
  * A list of edge intersections along an {@link Edge}. Implements splitting an
  * edge with intersections into multiple resultant edges.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/EdgeIntersectionList.java $
  */
 public class EdgeIntersectionList {
 	

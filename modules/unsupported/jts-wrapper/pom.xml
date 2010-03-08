@@ -3,7 +3,7 @@
          Project configuration file for the Geotools 2 project
          http://www.geotools.org/
 
-         Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $
+         Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $
      =========================================================================== -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>unsupported</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
 
   <properties>
@@ -29,7 +29,7 @@
   <artifactId>gt-jts-wrapper</artifactId>
   <packaging>jar</packaging>
   <name>ISO 19107 implementation using JTS</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/jts-wrapper/</url>
+  
 
   <scm>
     <connection>

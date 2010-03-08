@@ -19,9 +19,30 @@ package org.geotools.filter.visitor;
 import java.util.logging.Logger;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.Not;
+import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
+import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.NilExpression;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.expression.Subtract;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.Contains;
@@ -45,9 +66,13 @@ import com.vividsolutions.jts.geom.Geometry;
  * <ul>
  * <li>all the literal geometry instances involved if spatial operations - using
  * geom.getEnvelopeInternal().
- * <li>Filter.EXCLUDES will result in <code>null</code>
+ * <li>Filter.EXCLUDES will result in an empty envelope
  * <li>Filter.INCLUDES will result in a "world" envelope with range Double.NEGATIVE_INFINITY to
  * Double.POSITIVE_INFINITY for each axis.
+ * <li>all other non spatial filters will result in a world envelope
+ * <li>combinations in and will return the intersection of the envelopes, or an empty envelope
+ *     if an exclude is in the mix, or null if the and is mixing non spatial filters</li>
+ * <li>combinations in or will return the intersection of 
  * </ul>
  * Since geometry literals do not contains CRS information we can only produce a ReferencedEnvelope
  * without CRS information. You can call this function with an existing ReferencedEnvelope 
@@ -62,6 +87,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * This is a replacement for FilterConsumer.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/ExtractBoundsFilterVisitor.java $
  */
 public class ExtractBoundsFilterVisitor extends NullFilterVisitor {
     static public NullFilterVisitor BOUNDS_VISITOR = new ExtractBoundsFilterVisitor();
@@ -101,29 +128,30 @@ public class ExtractBoundsFilterVisitor extends NullFilterVisitor {
     }
 
     public Object visit( ExcludeFilter filter, Object data ) {
-        return null;
+        return new Envelope();
     }
 
     public Object visit( IncludeFilter filter, Object data ) {
-        if( data == null ) return null;
-        ReferencedEnvelope bbox = bbox( data );
-        
-        // also consider making use of CRS extent?
-        Envelope world = new Envelope(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
-                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        bbox.expandToInclude( world );
-        return bbox;
+        return infinity();
     }
 
+	Envelope infinity() {
+		return new Envelope(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
+                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+	}
+
     public Object visit( BBOX filter, Object data ) {
-        if( data == null ) return null;
         ReferencedEnvelope bbox = bbox( data );
                 
         // consider doing reprojection here into data CRS?
         Envelope bounds = new Envelope(filter.getMinX(), filter.getMaxX(), filter.getMinY(), filter
                 .getMaxY());
-        bbox.expandToInclude(bounds);
-        return bbox;
+        if(bbox != null) {
+        	bbox.expandToInclude(bounds);
+        	return bbox;
+        } else {
+        	return bbox(bounds);
+        }
     }
     /**
      * Please note we are only visiting literals involved in spatial operations.
@@ -133,7 +161,6 @@ public class ExtractBoundsFilterVisitor extends NullFilterVisitor {
      * @return ReferencedEnvelope updated to reflect literal
      */
     public Object visit( Literal expression, Object data ) {        
-        if( data == null ) return null;
         ReferencedEnvelope bbox = bbox( data );
 
         Object value = expression.getValue();
@@ -142,17 +169,53 @@ public class ExtractBoundsFilterVisitor extends NullFilterVisitor {
             Geometry geometry = (Geometry) value;
             Envelope bounds = geometry.getEnvelopeInternal();
             
-            bbox.expandToInclude(bounds);
+            if(bbox != null) {
+            	bbox.expandToInclude(bounds);
+            	return bbox;
+            } else {
+            	return bbox(bounds);
+            }
         } else {
             LOGGER.finer("LiteralExpression ignored!");
         }
         return bbox;
     }
+    
+	@Override
+	public Object visit(And filter, Object data) {
+		Envelope mixed = infinity();
+		for (Filter f : filter.getChildren()) {
+			Envelope env = (Envelope) f.accept(this, data);
+    		mixed = mixed.intersection(env);
+		}
+		return mixed;
+	}
+	
+	public Object visit(Not filter, Object data) {
+		// no matter what we have to return an infinite envelope
+		// rationale
+		// !(finite envelope) -> an unbounded area -> infinite
+		// !(non spatial filter) -> infinite (no spatial concern)
+		// !(infinite) -> ... infinite, as the first infinite could be the result 
+		// of !(finite envelope) 
+		
+		return infinity();
+	}
+	
+	@Override
+	public Object visit(Or filter, Object data) {
+		Envelope mixed = new Envelope();
+		for (Filter f : filter.getChildren()) {
+			Envelope env = (Envelope) f.accept(this, data);
+		    mixed.expandToInclude(env);
+		}
+		return mixed;
+	}
+
 
     public Object visit( Beyond filter, Object data ) {
-        data = filter.getExpression1().accept(this, data);
-        data = filter.getExpression2().accept(this, data);
-        return data;
+        // beyond a certain distance from a finite object, no way to limit it
+    	return infinity();
     }
 
     public Object visit( Contains filter, Object data ) {
@@ -212,5 +275,97 @@ public class ExtractBoundsFilterVisitor extends NullFilterVisitor {
         
         return data;
     }
+
+	@Override
+	public Object visit(Add expression, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(Divide expression, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(Function expression, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(Id filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(Multiply expression, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(NilExpression expression, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyIsBetween filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyIsEqualTo filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyIsGreaterThan filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyIsGreaterThanOrEqualTo filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyIsLessThan filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyIsLessThanOrEqualTo filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyIsLike filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyIsNotEqualTo filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyIsNull filter, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visit(PropertyName expression, Object data) {
+		return null;
+	}
+
+	@Override
+	public Object visit(Subtract expression, Object data) {
+		return infinity();
+	}
+
+	@Override
+	public Object visitNullFilter(Object data) {
+		return infinity();
+	}
+    
+    
     
 }

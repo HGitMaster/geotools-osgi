@@ -158,7 +158,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Chris Holmes, TOPP
  * @author David Zwiers, Refractions
  * @author Jody Garnett, Refractions
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/main/java/org/geotools/feature/FeatureType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/FeatureType.java $
  * @version $Id: FeatureType.java 30921 2008-07-05 07:51:23Z jgarnett $
  * @see org.geotools.feature.Feature
  * @see org.geotools.feature.FeatureTypeFactory

@@ -83,7 +83,7 @@ import org.geotools.util.Utilities;
  * </ul>
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/GridToEnvelopeMapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/GridToEnvelopeMapper.java $
  * @version $Id: GridToEnvelopeMapper.java 30776 2008-06-20 17:00:11Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

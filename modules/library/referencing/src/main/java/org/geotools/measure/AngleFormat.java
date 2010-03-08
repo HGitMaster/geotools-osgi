@@ -26,6 +26,8 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Locale;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -83,8 +85,8 @@ import org.geotools.math.XMath;
  * @see Longitude
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/measure/AngleFormat.java $
- * @version $Id: AngleFormat.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/measure/AngleFormat.java $
+ * @version $Id: AngleFormat.java 34518 2009-11-27 00:09:17Z mbedward $
  * @author Martin Desruisseaux (PMO, IRD)
  */
 public class AngleFormat extends Format {
@@ -285,6 +287,143 @@ public class AngleFormat extends Format {
      */
     public static AngleFormat getInstance(final Locale locale) {
         return new AngleFormat("D\u00B0MM.m'", locale);
+    }
+
+    /**
+     * Set the rounding method to use when the last significant digit
+     * in a value is 5.
+     * <p>
+     * Options are:
+     * <ul>
+     * <li> {@linkplain AngleFormat.RoundingMethod#ROUND_HALF_EVEN}
+     * <li> {@linkplain AngleFormat.RoundingMethod#ROUND_HALF_UP}
+     * <li> {@linkplain AngleFormat.RoundingMethod#ROUND_HALF_DOWN}
+     * </ul>
+     */
+    public static enum RoundingMethod {
+        /**
+         * Round towards the even neighbour: e.g. {@code 2.5 => 2, 3.5 => 4}.
+         * This method minimizes cumulative error over many values.
+         */
+        ROUND_HALF_EVEN,
+
+        /**
+         * Always round upwards: e.g. {@code 2.5 => 3, 3.5 => 4}.
+         */
+        ROUND_HALF_UP,
+
+        /**
+         * Always round downwards: e.g. {@code 2.5 => 2, 3.5 => 3}.
+         */
+        ROUND_HALF_DOWN;
+    }
+
+    /**
+     * The default rounding method ({@linkplain AngleFormat.RoundingMethod#ROUND_HALF_EVEN}).
+     */
+    public static final RoundingMethod DEFAULT_ROUNDING_METHOD = RoundingMethod.ROUND_HALF_EVEN;
+
+    /**
+     * Global rounding method
+     */
+    private static RoundingMethod defaultRoundingMethod = DEFAULT_ROUNDING_METHOD;
+
+    /**
+     * Per-instance rounding method. If this differs to {@code defaultRoundingMethod}
+     * it will be used instead.
+     */
+    private RoundingMethod instanceRoundingMethod = defaultRoundingMethod;
+
+    /**
+     * Set the default rounding method for all instances of this class to use when
+     * the last significant digit of a value is 5.
+     * <p>
+     * Note: this will not affect the rounding method being used by instances of this
+     * class created previously.
+     *
+     * @param method one of {@linkplain AngleFormat.RoundingMethod} constants
+     *
+     * @see #setRoundingMethod
+     * @see #DEFAULT_ROUNDING_METHOD
+     */
+    public static synchronized void setDefaultRoundingMethod(RoundingMethod method) {
+        defaultRoundingMethod = method;
+    }
+
+    /**
+     * Get the default rounding method.
+     *
+     * @return the default rounding method.
+     */
+    public static synchronized RoundingMethod getDefaultRoundingMethod() {
+        return defaultRoundingMethod;
+    }
+
+    /**
+     * Set the rounding method for this instance to use when the last significant digit
+     * of a value is 5. If the rounding method has previously been set globally with the
+     * static {@linkplain #setDefaultRoundingMethod} method, setting a different method
+     * here will take precedence for this instance.
+     *
+     * @param method one of {@linkplain AngleFormat.RoundingMethod} constants
+     *
+     * @see #setDefaultRoundingMethod
+     * @see #DEFAULT_ROUNDING_METHOD
+     */
+    public synchronized void setRoundingMethod(RoundingMethod method) {
+        instanceRoundingMethod = method;
+    }
+
+    /**
+     * Get the rounding method being used by this instance.
+     *
+     * @return the rounding method for this instance
+     */
+    public static synchronized RoundingMethod getRoundingMethod() {
+        return defaultRoundingMethod;
+    }
+
+    /**
+     * Round a value according to the currently set rounding method for this class.
+     *
+     * @param value the value to round
+     * @param precision the number of decimal places to retain
+     *
+     * @return the rounded value
+     * @see AngleFormat.RoundingMethod
+     */
+    private synchronized double doRounding(double value, int precision) {
+        final double scale = XMath.pow10(precision);
+        final double eps = XMath.pow10(-precision - 2);
+        double scaledValue = scale * (value + eps);
+        long rounded;
+
+        if (Double.compare(scaledValue, Long.MAX_VALUE) < 0) {
+            RoundingMethod rm = instanceRoundingMethod;
+
+            if (rm == RoundingMethod.ROUND_HALF_EVEN) {
+                double d = scaledValue / 10d;
+                boolean even = ((int)((d - (int)d) * 10)) % 2 == 0;
+                rm = even ? RoundingMethod.ROUND_HALF_DOWN : RoundingMethod.ROUND_HALF_UP;
+            }
+                    
+            switch (rm) {
+                case ROUND_HALF_DOWN:
+                    rounded = Math.round(scaledValue - 0.5d);
+                    return rounded / scale;
+                    
+                case ROUND_HALF_UP:
+                    rounded = Math.round(scaledValue);
+                    return rounded / scale;
+            }
+        }
+
+        Logger logger = Logger.getLogger(AngleFormat.class.getName());
+        logger.log(Level.WARNING, String.format(
+                "Can't round the value %s to the given precision %d",
+                String.valueOf(value), precision));
+
+        return value;
     }
 
     /**
@@ -535,18 +674,9 @@ public class AngleFormat extends Format {
                     // Erreur d'arrondissement (parce que l'angle est trop élevé)
                     throw new IllegalArgumentException(Errors.format(ErrorKeys.ANGLE_OVERFLOW_$1, angle));
                 }
-                /*
-                 * On applique maintenant une correction qui tiendra
-                 * compte des problèmes d'arrondissements.
-                 */
-                final double puissance = XMath.pow10(widthDecimal);
-                secondes = Math.rint(secondes*puissance)/puissance;
                 tmp = (int) (secondes/60);
                 secondes -= 60*tmp;
                 minutes += tmp;
-            } else {
-                final double puissance = XMath.pow10(widthDecimal);
-                minutes = Math.rint(minutes*puissance)/puissance;
             }
             tmp = (int) (minutes/60); // Arrondie vers 0 même si négatif.
             minutes -= 60*tmp;
@@ -607,16 +737,21 @@ public class AngleFormat extends Format {
             numberFormat.setMinimumIntegerDigits(w);
             numberFormat.setMaximumFractionDigits(0);
             toAppendTo = numberFormat.format(value, toAppendTo, dummy);
-        } else if (decimalSeparator) {
-            numberFormat.setMinimumIntegerDigits(w);
-            numberFormat.setMinimumFractionDigits(widthDecimal);
-            numberFormat.setMaximumFractionDigits(widthDecimal);
-            toAppendTo = numberFormat.format(value, toAppendTo, dummy);
+
         } else {
-            value *= XMath.pow10(widthDecimal);
-            numberFormat.setMaximumFractionDigits(0);
-            numberFormat.setMinimumIntegerDigits(w+widthDecimal);
-            toAppendTo = numberFormat.format(value, toAppendTo, dummy);
+            value = doRounding(value, widthDecimal);
+            
+            if (decimalSeparator) {
+                numberFormat.setMinimumIntegerDigits(w);
+                numberFormat.setMinimumFractionDigits(widthDecimal);
+                numberFormat.setMaximumFractionDigits(widthDecimal);
+                toAppendTo = numberFormat.format(value, toAppendTo, dummy);
+            } else {
+                value *= XMath.pow10(widthDecimal);
+                numberFormat.setMaximumFractionDigits(0);
+                numberFormat.setMinimumIntegerDigits(w + widthDecimal);
+                toAppendTo = numberFormat.format(value, toAppendTo, dummy);
+            }
         }
         if (s!=null) {
             toAppendTo.append(s);

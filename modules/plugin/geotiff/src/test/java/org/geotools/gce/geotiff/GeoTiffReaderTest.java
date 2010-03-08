@@ -29,7 +29,6 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.IIOMetadataDumper;
 import org.geotools.factory.Hints;
 import org.geotools.test.TestData;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 /**
@@ -84,7 +83,7 @@ public class GeoTiffReaderTest extends TestCase {
 				o = files[i];
 			else
 				// testing url
-				o = files[i].toURL();
+				o = files[i].toURI().toURL();
 			if (format.accepts(o)) {
 				buffer.append("ACCEPTED").append("\n");
 

@@ -7,5 +7,6 @@
     <annotation>
         <documentation>[WARN-A001] - No package description in UML model</documentation>
     </annotation>
+    <import namespace="http://www.opengis.net/gml" schemaLocation="http://schemas.opengis.net/gml/3.1.1/base/gml.xsd"/>
     <include schemaLocation="minocc.xsd"/>
 </schema>

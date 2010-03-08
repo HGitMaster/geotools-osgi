@@ -48,6 +48,8 @@ import org.opengis.geometry.primitive.Ring;
  * </ul>
  * Instances of this class are not reentrant.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/PointLocator.java $
  */
 public class PointLocator {
 	private boolean isIn; // true if the point lies in or on any Geometry

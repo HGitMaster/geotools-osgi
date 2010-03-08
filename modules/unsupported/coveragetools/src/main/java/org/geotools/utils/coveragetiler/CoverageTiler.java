@@ -29,7 +29,6 @@ import javax.imageio.ImageWriteParam;
 import org.apache.commons.cli2.Option;
 import org.apache.commons.cli2.validation.InvalidArgumentException;
 import org.apache.commons.cli2.validation.Validator;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
@@ -47,6 +46,7 @@ import org.geotools.utils.progress.BaseArgumentsManager;
 import org.geotools.utils.progress.ExceptionEvent;
 import org.geotools.utils.progress.ProcessingEvent;
 import org.geotools.utils.progress.ProcessingEventListener;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -73,6 +73,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * 
  * @author Simone Giannecchini, GeoSolutions
  * @author Alessio Fabiani, GeoSolutions
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/coveragetiler/CoverageTiler.java $
  * @version 0.3
  * 
  */
@@ -336,9 +338,9 @@ public class CoverageTiler extends BaseArgumentsManager implements
 		// bigger than the original coverage size
 		//
 		// //
-		final GeneralGridRange range = inReader.getOriginalGridRange();
-		final int w = range.getLength(0);
-		final int h = range.getLength(1);
+		final GridEnvelope range = inReader.getOriginalGridRange();
+		final int w = range.getSpan(0);
+		final int h = range.getSpan(1);
 		tileWidth = tileWidth > w ? w : tileWidth;
 		tileHeight = tileHeight > h ? h : tileHeight;
 		message = new StringBuilder("Original range is ").append(range.toString());

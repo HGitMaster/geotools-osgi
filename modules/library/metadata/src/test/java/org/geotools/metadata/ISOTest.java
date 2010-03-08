@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
 /**
  * Tests every implementation in the {@link org.geotools.metadata.iso} package.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/metadata/ISOTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/metadata/ISOTest.java $
  * @version $Id: ISOTest.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (Geomatys)
  *

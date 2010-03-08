@@ -19,6 +19,7 @@ package org.geotools.gml3.v3_2;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,6 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.xsd.XSDSchema;
+import org.geotools.data.DataUtilities;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.xml.Parser;
@@ -53,7 +55,8 @@ public class GMLParsingTest extends TestCase {
         Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
             getClass().getResourceAsStream( "test.xml" )   
         );
-        dom.getDocumentElement().setAttribute( "xsi:schemaLocation", "http://www.geotools.org/test " + schema.getAbsolutePath() );
+        URL schemaURL = DataUtilities.fileToURL( schema.getAbsoluteFile() );        
+        dom.getDocumentElement().setAttribute( "xsi:schemaLocation", "http://www.geotools.org/test " + schemaURL.getFile() );
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         TransformerFactory.newInstance().newTransformer().transform( 
             new DOMSource( dom ), new StreamResult( out ) );

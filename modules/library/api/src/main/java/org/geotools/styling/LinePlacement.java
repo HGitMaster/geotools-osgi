@@ -46,13 +46,24 @@ import org.opengis.filter.expression.Expression;
  * </p>
  *
  * <p>
- * $Id: LinePlacement.java 32919 2009-05-03 14:18:31Z jive $
+ * $Id: LinePlacement.java 33813 2009-08-28 14:45:11Z jive $
  * </p>
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/LinePlacement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/LinePlacement.java $
  */
 public interface LinePlacement extends org.opengis.style.LinePlacement, LabelPlacement {
+    /**
+     * @deprecated
+     */
+    boolean IsAligned();
+    
+    /**
+     * Correct method name violation from GeoAPI.
+     * @return
+     */
+    boolean isAligned();
+    
     /**
      * Returns the expression that is used to compute how far from the lines
      * the text will be drawn.  The distance must evaluate to a non-negative
@@ -70,4 +81,9 @@ public interface LinePlacement extends org.opengis.style.LinePlacement, LabelPla
      */
     void setPerpendicularOffset(Expression offset);
     
+    public void setRepeated(boolean repeated);
+    public void setGeneralized(boolean generalized);
+    public void setAligned(boolean aligned);
+    public void setGap(Expression gap);
+    public void setInitialGap(Expression initialGap);
 }

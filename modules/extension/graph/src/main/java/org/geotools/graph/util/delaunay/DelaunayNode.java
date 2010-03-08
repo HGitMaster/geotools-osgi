@@ -22,6 +22,8 @@ import org.geotools.graph.structure.line.BasicXYNode;
 /**
  *
  * @author jfc173
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/util/delaunay/DelaunayNode.java $
  */
 public class DelaunayNode extends BasicXYNode{    
     

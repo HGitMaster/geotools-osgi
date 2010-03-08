@@ -17,6 +17,7 @@
 
 package org.geotools.filter.text.cql2;
 
+
 import org.geotools.filter.text.commons.CompilerUtil;
 import org.geotools.filter.text.commons.Language;
 import org.junit.Assert;
@@ -31,6 +32,7 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
+
 
 /**
  * Test Geo Operations.
@@ -58,7 +60,10 @@ import org.opengis.filter.spatial.Within;
  * 
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/cql2/CQLGeoOperationTest.java $
  */
+
 public class CQLGeoOperationTest {
 
     
@@ -70,6 +75,7 @@ public class CQLGeoOperationTest {
     public CQLGeoOperationTest(){
         
         this(Language.CQL);
+
     }
 
     /**
@@ -93,27 +99,74 @@ public class CQLGeoOperationTest {
         Assert.assertTrue("Disjoint was expected", resultFilter instanceof Disjoint);
     }
 
+    /**
+     * Intersects geooperation 
+     * 
+     * The INTERSECT syntax was changed in 2.0.2 specification. You should use INTERSECTS.
+     * @see intersects
+     * @throws CQLException
+     */
     @Test
     public void Intersects() throws CQLException {
-        Filter resultFilter = CompilerUtil.parseFilter(language,"INTERSECT(ATTR1, POINT(1 2))");
+        
+        Filter resultFilter;
+        
+        resultFilter = CompilerUtil.parseFilter(language,"INTERSECTS(ATTR1, POINT(1 2))");
 
         Assert.assertTrue("Intersects was expected", resultFilter instanceof Intersects);
         
         //test bug GEOT-1980
-        CompilerUtil.parseFilter(language,"INTERSECT(GEOLOC, POINT(615358 312185))");
+        CompilerUtil.parseFilter(language,"INTERSECTS(GEOLOC, POINT(615358 312185))");
         
+        Assert.assertTrue("Intersects was expected", resultFilter instanceof Intersects);
+
+        // INTERSECT is deprecated syntax
+        resultFilter = CompilerUtil.parseFilter(language,"INTERSECT(ATTR1, POINT(1 2))");
+
         Assert.assertTrue("Intersects was expected", resultFilter instanceof Intersects);
     }
 
+
+    /**
+     * TOUCHES geooperation
+     * 
+     * The TOUCH syntax was changed in 2.0.2 specification. You should use TOUCH.
+     * @throws CQLException
+     */
     @Test
     public void touches() throws CQLException{
-        Filter resultFilter = CompilerUtil.parseFilter(language,"TOUCH(ATTR1, POINT(1 2))");
+
+        Filter resultFilter;
+        
+        // TOUCHES 
+        resultFilter = CompilerUtil.parseFilter(language,"TOUCHES(ATTR1, POINT(1 2))");
+
+        Assert.assertTrue("Touches was expected", resultFilter instanceof Touches);
+
+        // TOUCH is deprecated syntax
+        resultFilter = CompilerUtil.parseFilter(language,"TOUCH(ATTR1, POINT(1 2))");
 
         Assert.assertTrue("Touches was expected", resultFilter instanceof Touches);
     }
 
+    /**
+     * CROSSES geooperation operation
+     * 
+     * The CROSS syntax was changed in 2.0.2 specification. You should use CROSSES.
+     * 
+     * @throws CQLException
+     */
+    @Test
     public void crosses() throws CQLException {
-        Filter resultFilter = CompilerUtil.parseFilter(language,"CROSS(ATTR1, POINT(1 2))");
+
+        Filter resultFilter;
+        
+        resultFilter = CompilerUtil.parseFilter(language,"CROSSES(ATTR1, POINT(1 2))");
+
+        Assert.assertTrue("Crosses was expected", resultFilter instanceof Crosses);
+
+        // CROSS is deprecated syntax
+        resultFilter = CompilerUtil.parseFilter(language,"CROSS(ATTR1, POINT(1 2))");
 
         Assert.assertTrue("Crosses was expected", resultFilter instanceof Crosses);
         
@@ -126,28 +179,58 @@ public class CQLGeoOperationTest {
         
     }
     
+    /**
+     * OVERLAPS geooperation operation test
+     * 
+     * The OVERLAP syntax was changed in 2.0.2 specification. You should use OVERLAPS.
+     * 
+     * @throws CQLException
+     */
     @Test
     public void overlaps() throws Exception {
         Filter resultFilter;
 
-
-        resultFilter = CompilerUtil.parseFilter(language,"OVERLAP(ATTR1, POINT(1 2))");
+        resultFilter = CompilerUtil.parseFilter(language,"OVERLAPS(ATTR1, POINT(1 2))");
 
         Assert.assertTrue("Overlaps was expected", resultFilter instanceof Overlaps);
 
-        
+        // OVERLAP is deprecated syntax
+        resultFilter = CompilerUtil.parseFilter(language,"OVERLAP(ATTR1, POINT(1 2))");
+
+        Assert.assertTrue("Overlaps was expected", resultFilter instanceof Overlaps);
     }
+    
+    /**
+     * EQULS geooperation operation test
+     * 
+     * The EQUAL syntax was changed in 2.0.2 specification. You should use EQUALS.
+     * 
+     * @throws CQLException
+     */
     @Test
     public void equals() throws CQLException{
+        Filter resultFilter;
+        
         // EQUALS
-        Filter resultFilter = CompilerUtil.parseFilter(language,"EQUAL(ATTR1, POINT(1 2))");
+        resultFilter = CompilerUtil.parseFilter(language,"EQUALS(ATTR1, POINT(1 2))");
 
         Assert.assertTrue("not an instance of Equals", resultFilter instanceof Equals);
 
-        resultFilter = CompilerUtil.parseFilter(language,"WITHIN(ATTR1, POLYGON((1 2, 1 10, 5 10, 1 2)) )");
+
+        // EQUAL is deprecated syntax
+        resultFilter = CompilerUtil.parseFilter(language,"EQUAL(ATTR1, POINT(1 2))");
+
+        Assert.assertTrue("not an instance of Equals", resultFilter instanceof Equals);
+
+    }
+    
+    
+    @Test
+    public void within() throws CQLException{
+        
+        Filter resultFilter = CompilerUtil.parseFilter(language,"WITHIN(ATTR1, POLYGON((1 2, 1 10, 5 10, 1 2)) )");
 
         Assert.assertTrue("Within was expected", resultFilter instanceof Within);
-        
     }
 
     @Test

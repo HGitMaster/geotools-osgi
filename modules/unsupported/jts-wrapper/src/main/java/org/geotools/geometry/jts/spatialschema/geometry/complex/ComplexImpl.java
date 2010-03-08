@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: ComplexImpl.java 25075 2007-04-09 19:20:46Z desruisseaux $
+ ** $Id: ComplexImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/complex/ComplexImpl.java,v $
  **
@@ -50,6 +50,8 @@ import org.opengis.geometry.complex.Complex;
  * @UML type GM_Complex
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/complex/ComplexImpl.java $
  * @version 2.0
  *
  * @revisit Some associations are commented out for now.

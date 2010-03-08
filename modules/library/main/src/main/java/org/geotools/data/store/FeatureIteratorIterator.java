@@ -28,6 +28,8 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  * @since 2.4
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/FeatureIteratorIterator.java $
  */
 public class FeatureIteratorIterator<F extends Feature> implements Iterator<F> {
 

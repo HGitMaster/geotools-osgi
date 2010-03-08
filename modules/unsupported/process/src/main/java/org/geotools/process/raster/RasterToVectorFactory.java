@@ -16,23 +16,24 @@
  */
 package org.geotools.process.raster;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.Parameter;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.process.Process;
-import org.geotools.process.ProcessFactory;
+import org.geotools.process.impl.SingleProcessFactory;
 import org.geotools.text.Text;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Polygon;
-import java.util.Collections;
-import java.util.TreeMap;
+import org.geotools.geometry.Envelope2D;
 
 
 /**
@@ -45,8 +46,10 @@ import java.util.TreeMap;
  * 
  * @author Michael Bedward, Jody Garnett
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/raster/RasterToVectorFactory.java $
  */
-public class RasterToVectorFactory implements ProcessFactory {
+public class RasterToVectorFactory extends SingleProcessFactory {
 
     private static final String VERSION_STRING = "0.0.3";
     
@@ -59,6 +62,14 @@ public class RasterToVectorFactory implements ProcessFactory {
     public static final Parameter<Integer> BAND = new Parameter<Integer>(
         "band", Integer.class, Text.text("Band"), Text.text("Index of band to vectorize"));
     
+    /**
+     * Bounds (in world coordinates) ot the area to vectorize; if {@code null}
+     * or absent the bounds of the coverage are used
+     */
+    public static final Parameter<Envelope2D> BOUNDS = new Parameter<Envelope2D>(
+        "bounds", Envelope2D.class, Text.text("Bounds"),
+        Text.text("Bounds of the area to vectorize"));
+
     /** 
      * The code(s) representing NODATA or outside the regions to be vectorized,
      * which will be supplied as a {@linkplain java.util.Collection} of Double values to the
@@ -74,6 +85,7 @@ public class RasterToVectorFactory implements ProcessFactory {
     static {
         parameterInfo.put(RASTER.key, RASTER);
         parameterInfo.put(BAND.key, BAND);
+        parameterInfo.put(BOUNDS.key, BOUNDS);
         parameterInfo.put(OUTSIDE.key, OUTSIDE);
     }
     
@@ -98,6 +110,10 @@ public class RasterToVectorFactory implements ProcessFactory {
 
         resultInfo.put(RESULT_FEATURES.key, RESULT_FEATURES);
     }
+    
+    public RasterToVectorFactory() {
+        super(new NameImpl(GT_NAMESPACE, "RasterToVectorProcess"));
+    }
 
     /**
      * Return a new instance of a RasterToVectorProcess
@@ -112,14 +128,6 @@ public class RasterToVectorFactory implements ProcessFactory {
      */
     public InternationalString getDescription() {
         return Text.text("Raster region to vector polygon conversion");
-    }
-
-    /**
-     * Get the name of this process
-     * @return the string: RasterToVectorProcess
-     */
-    public String getName() {
-        return "RasterToVectorProcess";
     }
 
     /**

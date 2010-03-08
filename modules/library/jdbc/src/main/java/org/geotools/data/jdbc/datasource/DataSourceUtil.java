@@ -27,6 +27,8 @@ import org.geotools.data.DataSourceException;
  * 
  * @author Andrea Aime - TOPP
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/DataSourceUtil.java $
  */
 public class DataSourceUtil {
     private DataSourceUtil() {

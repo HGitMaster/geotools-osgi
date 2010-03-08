@@ -28,7 +28,7 @@ import org.opengis.filter.Filter;
  * Test FilteredFeatureReader for conformance.
  * 
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/data/FilteringFeatureReaderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/FilteringFeatureReaderTest.java $
  */
 public class FilteringFeatureReaderTest extends DataTestCase {
      FeatureReader<SimpleFeatureType, SimpleFeature> roadReader;

@@ -34,7 +34,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * {@linkplain #getAxis axis}.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultUserDefinedCS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultUserDefinedCS.java $
  * @version $Id: DefaultUserDefinedCS.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

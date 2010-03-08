@@ -16,7 +16,6 @@
  */
 package org.geotools.gce.imagemosaic.jdbc;
 
-
 /**
  * This class is a dispatcher class for utility classes. This class is also the
  * main class in the produced jar file.
@@ -52,6 +51,5 @@ class Toolbox {
 			System.exit(1);
 		}
 	}
-
 
 }

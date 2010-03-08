@@ -59,6 +59,8 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 /**
  * @author Jackson Roehrig & Sanjay Jena
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/PrimitiveFactoryImpl.java $
  */
 public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFactory {
 

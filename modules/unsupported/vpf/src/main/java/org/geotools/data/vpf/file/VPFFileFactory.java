@@ -33,7 +33,7 @@ import org.geotools.data.DataStoreFactorySpi;
  * but is here for completeness.
  *
  * @author jeff yutzler
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/file/VPFFileFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/file/VPFFileFactory.java $
  */
 public class VPFFileFactory implements DataStoreFactorySpi {
     private final VPFFileStore store = new VPFFileStore();

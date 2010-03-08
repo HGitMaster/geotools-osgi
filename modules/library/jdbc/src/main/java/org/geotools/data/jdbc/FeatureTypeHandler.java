@@ -44,7 +44,9 @@ import org.opengis.feature.type.GeometryDescriptor;
  * make requests cached allowing at the same time to keep it in-line with a  changing database.
  *
  * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/FeatureTypeHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/FeatureTypeHandler.java $
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class FeatureTypeHandler {
     private FIDMapperFactory fmFactory;

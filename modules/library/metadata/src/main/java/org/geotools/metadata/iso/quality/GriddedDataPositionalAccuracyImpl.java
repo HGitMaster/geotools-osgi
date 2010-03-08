@@ -25,7 +25,7 @@ import org.opengis.metadata.quality.GriddedDataPositionalAccuracy;
 /**
  * Closeness of gridded data position values to values accepted as or being true.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/GriddedDataPositionalAccuracyImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/GriddedDataPositionalAccuracyImpl.java $
  * @version $Id: GriddedDataPositionalAccuracyImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

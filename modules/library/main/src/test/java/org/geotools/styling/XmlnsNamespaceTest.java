@@ -30,6 +30,8 @@ import org.geotools.test.TestData;
  * 
  * @author Vitalus
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/XmlnsNamespaceTest.java $
  */
 public class XmlnsNamespaceTest extends TestCase {
     

@@ -17,6 +17,7 @@
 package org.geotools.geometry.text;
 
 
+import org.geotools.geometry.GeometryBuilder;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Geometry;
 import org.opengis.geometry.PositionFactory;
@@ -86,7 +87,9 @@ import java.util.Set;
  * @author Jody Garnett
  * @author Joel Skelton
  * @since 2.5
- * @version $Id: WKTParser.java 32621 2009-03-10 10:26:23Z jive $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/text/WKTParser.java $
+ * @version $Id: WKTParser.java 34126 2009-10-12 06:35:18Z mbedward $
  */
 public class WKTParser {
 
@@ -101,6 +104,9 @@ public class WKTParser {
     private AggregateFactory aggregateFactory;
 
 
+    public WKTParser(GeometryBuilder builder) {
+        this( builder.getGeometryFactory(), builder.getPrimitiveFactory(), builder.getPositionFactory(), builder.getAggregateFactory() );
+    }
     /**
      * Constructor takes pre-created geometry and primitive factories that will be used to
      * parse the Well Known Text (WKT). The geometries created from the WKT will be created

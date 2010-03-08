@@ -31,7 +31,7 @@ import org.opengis.filter.expression.Expression;
  *  &lt;/xs:complexType&gt;
  *  &lt;/xs:element&gt;
  *  </pre>
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/ColorMapEntry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/ColorMapEntry.java $
  */
 public interface ColorMapEntry {
     /** Label for this Color Map Entry */

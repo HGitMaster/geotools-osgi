@@ -68,7 +68,7 @@ import org.geotools.test.TestData;
  *     </ol>
  *   </li>
  * </ul>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/test/java/org/geotools/data/vpf/io/TableColumnDefTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/test/java/org/geotools/data/vpf/io/TableColumnDefTest.java $
  */
 public class TableColumnDefTest extends TestCase
   implements DataTypesDefinition, FileConstants 

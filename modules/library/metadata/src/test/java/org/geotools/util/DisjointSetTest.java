@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link DisjointSet} class.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/util/DisjointSetTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/DisjointSetTest.java $
  * @version $Id: DisjointSetTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

@@ -38,9 +38,7 @@ import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,6 +51,7 @@ import javax.imageio.stream.ImageInputStream;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.adapters.GeoTiffIIOMetadataDecoder;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
@@ -73,6 +72,7 @@ import org.opengis.referencing.operation.MathTransform;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffFormat.java $
  */
+@SuppressWarnings("deprecation")
 public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	private final static TIFFImageReaderSpi spi = new TIFFImageReaderSpi();
 
@@ -84,15 +84,12 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 */
 	public GeoTiffFormat() {
 		writeParameters = null;
-		mInfo = new HashMap();
+		mInfo = new HashMap<String, String>();
 		mInfo.put("name", "GeoTIFF");
-		mInfo.put("description",
-				"Tagged Image File Format with Geographic information");
+		mInfo.put("description","Tagged Image File Format with Geographic information");
 		mInfo.put("vendor", "Geotools");
 		mInfo.put("version", "1.1");
-		mInfo
-				.put("docURL",
-						"http://www.remotesensing.org:16080/websites/geotiff/geotiff.html");
+		mInfo.put("docURL",	"http://www.remotesensing.org/geotiff/spec/geotiffhome.html");
 
 		// reading parameters
 		readParameters = new ParameterGroup(
@@ -140,7 +137,7 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 				// /////////////////////////////////////////////////////////////
 				final URL url = (URL) o;
 				if (url.getProtocol().equalsIgnoreCase("file"))
-					o = new File(URLDecoder.decode(url.getFile(), "UTF-8"));
+					o = DataUtilities.urlToFile(url);
 				else {
 					if (url.getProtocol().equalsIgnoreCase("http")
 							|| url.getProtocol().equalsIgnoreCase("ftp")) {
@@ -218,7 +215,7 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 * 
 	 * @return a GeoTiffReader object initialized to the specified File.
 	 */
-	public GridCoverageReader getReader(Object source) {
+	public GeoTiffReader getReader(Object source) {
 		return getReader(source, null);
 	}
 
@@ -234,7 +231,7 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 * 
 	 * @return a GeoTiffReader object initialized to the specified File.
 	 */
-	public GridCoverageReader getReader(Object source, Hints hints) {
+	public GeoTiffReader getReader(Object source, Hints hints) {
 		// if (source instanceof CatalogEntry) {
 		// source = ((CatalogEntry) source).resource();
 		// }
@@ -243,14 +240,8 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 			URL url = (URL) source;
 
 			try {
-				final String pathname = URLDecoder.decode(url.getFile(),
-						"UTF-8");
-
-				return new GeoTiffReader(new File(pathname), hints);
-			} catch (UnsupportedEncodingException e) {
-				if (LOGGER.isLoggable(Level.WARNING))
-					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-				return null;
+				final File file = DataUtilities.urlToFile(url); 
+				return new GeoTiffReader(file, hints);
 			} catch (DataSourceException e) {
 				if (LOGGER.isLoggable(Level.WARNING))
 					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);

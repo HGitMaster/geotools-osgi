@@ -16,7 +16,9 @@
  */
 package org.geotools.data.shapefile;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.PRJ;
+import static org.geotools.data.shapefile.ShpFileType.SHP;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -38,7 +40,7 @@ public class StorageFileTest extends TestCase implements FileReader {
         Map<ShpFileType, File> files1 = ShpFilesTest.createFiles("Files1",
                 ShpFileType.values(), false);
         Map<ShpFileType, File> files2 = ShpFilesTest.createFiles("Files2",
-                ShpFileType.values(), false);
+        		ShpFileType.values(), false);
 
         shpFiles1 = new ShpFiles(files1.get(SHP));
         shpFiles2 = new ShpFiles(files2.get(SHP));
@@ -48,14 +50,21 @@ public class StorageFileTest extends TestCase implements FileReader {
         ShpFiles files1 = shpFiles1;
         ShpFileType type = PRJ;
         StorageFile storagePRJ1 = files1.getStorageFile(type);
-        String writtenToStorageFile = "Copy";
-
-        writeData(storagePRJ1, writtenToStorageFile);
-
-        storagePRJ1.replaceOriginal();
-        assertEquals(0, files1.numberOfLocks());
-
-        assertCorrectData(files1, type, writtenToStorageFile);
+        File original = storagePRJ1.getFile();
+        
+        try {
+	        String writtenToStorageFile = "Copy";
+	
+	        writeData(storagePRJ1, writtenToStorageFile);
+	
+	        storagePRJ1.replaceOriginal();
+	        assertEquals(0, files1.numberOfLocks());
+	
+	        assertCorrectData(files1, type, writtenToStorageFile);
+        } catch(Exception e) {
+        	storagePRJ1.getFile().delete();
+        	original.delete();
+        }
     }
 
     private void writeData(StorageFile storage, String writtenToStorageFile)
@@ -91,27 +100,33 @@ public class StorageFileTest extends TestCase implements FileReader {
         StorageFile storagePRJ2 = shpFiles2.getStorageFile(PRJ);
         StorageFile storageSHP2 = shpFiles2.getStorageFile(SHP);
 
-        String sPRJ1 = "storagePRJ1";
-        String sSHP1 = "storageSHP1";
-        String sPRJ2 = "storagePRJ2";
-        String sSHP2 = "storageSHP2";
-
-        writeData(storagePRJ1, sPRJ1);
-        writeData(storageSHP1, sSHP1);
-        writeData(storagePRJ2, sPRJ2);
-        writeData(storageSHP2, sSHP2);
-
-        StorageFile.replaceOriginals(storagePRJ1, storagePRJ2, storageSHP1,
-                storageSHP2, storageSHP2);
-
-        this.assertCorrectData(shpFiles1, PRJ, sPRJ1);
-        this.assertCorrectData(shpFiles1, SHP, sSHP1);
-        this.assertCorrectData(shpFiles2, PRJ, sPRJ2);
-        this.assertCorrectData(shpFiles2, SHP, sSHP2);
-
-        assertEquals(0, shpFiles1.numberOfLocks());
-        assertEquals(0, shpFiles2.numberOfLocks());
-
+        try {
+	        String sPRJ1 = "storagePRJ1";
+	        String sSHP1 = "storageSHP1";
+	        String sPRJ2 = "storagePRJ2";
+	        String sSHP2 = "storageSHP2";
+	
+	        writeData(storagePRJ1, sPRJ1);
+	        writeData(storageSHP1, sSHP1);
+	        writeData(storagePRJ2, sPRJ2);
+	        writeData(storageSHP2, sSHP2);
+	
+	        StorageFile.replaceOriginals(storagePRJ1, storagePRJ2, storageSHP1,
+	                storageSHP2, storageSHP2);
+	
+	        this.assertCorrectData(shpFiles1, PRJ, sPRJ1);
+	        this.assertCorrectData(shpFiles1, SHP, sSHP1);
+	        this.assertCorrectData(shpFiles2, PRJ, sPRJ2);
+	        this.assertCorrectData(shpFiles2, SHP, sSHP2);
+	
+	        assertEquals(0, shpFiles1.numberOfLocks());
+	        assertEquals(0, shpFiles2.numberOfLocks());
+        } finally {
+        	storagePRJ1.getFile().delete();
+        	storagePRJ2.getFile().delete();
+        	storageSHP1.getFile().delete();
+        	storageSHP2.getFile().delete();
+        }
     }
 
     public void testReplaceOriginalsEmptyArgs() throws Exception {
@@ -126,17 +141,24 @@ public class StorageFileTest extends TestCase implements FileReader {
         StorageFile storagePRJ2 = shpFiles2.getStorageFile(PRJ);
         StorageFile storageSHP2 = shpFiles2.getStorageFile(SHP);
 
-        assertFalse(storagePRJ1.compareTo(storageSHP1) == 0);
-        assertFalse(storagePRJ1.compareTo(storagePRJ2) == 0);
-
-        StorageFile[] array = new StorageFile[] { storagePRJ1, storagePRJ2,
-                storageSHP1, storageSHP2 };
-
-        Arrays.sort(array);
-
-        assertFalse(array[0].compareTo(array[1]) == 0);
-        assertFalse(array[2].compareTo(array[3]) == 0);
-        assertFalse(array[1].compareTo(array[2]) == 0);
+        try {
+	        assertFalse(storagePRJ1.compareTo(storageSHP1) == 0);
+	        assertFalse(storagePRJ1.compareTo(storagePRJ2) == 0);
+	
+	        StorageFile[] array = new StorageFile[] { storagePRJ1, storagePRJ2,
+	                storageSHP1, storageSHP2 };
+	
+	        Arrays.sort(array);
+	
+	        assertFalse(array[0].compareTo(array[1]) == 0);
+	        assertFalse(array[2].compareTo(array[3]) == 0);
+	        assertFalse(array[1].compareTo(array[2]) == 0);
+        } finally {
+        	storagePRJ1.getFile().delete();
+        	storagePRJ2.getFile().delete();
+        	storageSHP1.getFile().delete();
+        	storageSHP2.getFile().delete();
+        }
     }
 
     public String id() {

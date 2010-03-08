@@ -18,7 +18,10 @@ package org.geotools.filter.function;
 
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Function;
+import org.opengis.filter.spatial.Equals;
 
 
 public class GeometryFunctionFilterTest extends FunctionTestSupport {
@@ -45,6 +48,19 @@ public class GeometryFunctionFilterTest extends FunctionTestSupport {
         	SimpleFeature feature = iter.next();
             feature.setAttribute("geom",null);
             assertNull( exp.evaluate(feature) );
+        }
+        
+        iter.close();
+    }
+    
+    public void testFilterEqualsTest() throws Exception {
+        Function exp = ff.function("geometryType", ff.property("geom"));
+        PropertyIsEqualTo filter = ff.equals(exp, ff.literal("Point"));
+        
+        FeatureIterator<SimpleFeature> iter=featureCollection.features();
+        while( iter.hasNext() ){
+            SimpleFeature feature = iter.next();
+            assertTrue( filter.evaluate( feature ));
         }
         
         iter.close();

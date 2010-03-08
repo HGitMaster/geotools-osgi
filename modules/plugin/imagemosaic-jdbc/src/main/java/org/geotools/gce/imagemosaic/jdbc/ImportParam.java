@@ -15,7 +15,6 @@
  *    Lesser General Public License for more details.
  */
 
-
 package org.geotools.gce.imagemosaic.jdbc;
 
 import java.net.URL;
@@ -24,13 +23,18 @@ import org.geotools.gce.imagemosaic.jdbc.Import.ImportTyp;
 
 public class ImportParam {
 
-	  private String spatialTableName;
-	  private String tileTableName;
-	  private URL sourceURL;
-	  private String sourceParam;
-	  private ImportTyp typ;
-	  
-	public ImportParam(String spatialTableName, String tileTableName, URL sourceURL, String sourceParam, ImportTyp typ) {
+	private String spatialTableName;
+
+	private String tileTableName;
+
+	private URL sourceURL;
+
+	private String sourceParam;
+
+	private ImportTyp typ;
+
+	public ImportParam(String spatialTableName, String tileTableName,
+			URL sourceURL, String sourceParam, ImportTyp typ) {
 		super();
 		this.spatialTableName = spatialTableName;
 		this.tileTableName = tileTableName;

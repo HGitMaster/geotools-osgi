@@ -23,7 +23,7 @@ import java.io.IOException;
  * VPFDataException.java Created: Mon Mar 03 21:32:32 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/exc/VPFDataException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/exc/VPFDataException.java $
  * @version $Id: VPFDataException.java 30687 2008-06-13 11:03:06Z acuster $
  */
 public class VPFDataException extends IOException {

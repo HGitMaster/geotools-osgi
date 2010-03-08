@@ -19,12 +19,11 @@ package org.geotools.gce.imagepyramid;
 import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
+import java.nio.channels.Channels;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -32,7 +31,7 @@ import java.util.logging.Logger;
 
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
-import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.PrjFileReader;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
@@ -42,6 +41,8 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -49,31 +50,56 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * This class implements the basic format capabilities for a coverage format.
  * 
  * @author Simone Giannecchini (simboss)
+ * @author Stefan Alfons Krueger (alfonx), Wikisquare.de : Support for jar:file:foo.jar/bar.properties like URLs
  */
-public final class ImagePyramidFormat extends AbstractGridFormat implements
-		Format {
+@SuppressWarnings("deprecation")
+public final class ImagePyramidFormat extends AbstractGridFormat implements Format {
 
 	/** Logger. */
 	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.imagepyramid");
-
 	
-	/** Control the transparency of the output coverage. */
-	public static final DefaultParameterDescriptor OUTPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor(
-			"OutputTransparentColor", Color.class, null,null);
-	
-	/** Control the type of the final mosaic. */
-	public static final DefaultParameterDescriptor FADING = new DefaultParameterDescriptor(
-			"Fading", Boolean.class, null, Boolean.FALSE);
+    /** The {@code String} representing the parameter to customize tile sizes */
+    private static final String SUGGESTED_TILESIZE = "SUGGESTED_TILE_SIZE";
 
-	/** Control the transparency of the output coverage. */
-	public static final DefaultParameterDescriptor INPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor(
-			"InputTransparentColor", Color.class, null, null);
+    /**
+     * This {@link GeneralParameterValue} can be provided to the
+     * {@link GridCoverageReader}s through the
+     * {@link GridCoverageReader#read(GeneralParameterValue[])} method in order
+     * to specify the suggested size of tiles to avoid long time reading
+     * occurring with JAI ImageRead on striped images. (Images with tiles Nx1)
+     * Value should be a String in the form of "W,H" (without quotes) where W is
+     * a number representing the suggested tileWidth and H is a number
+     * representing the suggested tileHeight.
+     */
+    public static final DefaultParameterDescriptor<String> SUGGESTED_TILE_SIZE = new DefaultParameterDescriptor<String>(
+    		SUGGESTED_TILESIZE, String.class, null, "512,512");
 
-	/** Control the thresholding on the input coverage */
-	public static final DefaultParameterDescriptor INPUT_IMAGE_THRESHOLD_VALUE = new DefaultParameterDescriptor(
-			"InputImageThresholdValue", Double.class, null, new Double(
-					Double.NaN));
+    public static final String TILE_SIZE_SEPARATOR = ",";
+    
+    /** Control the type of the final mosaic. */
+    public static final ParameterDescriptor<Boolean> FADING = new DefaultParameterDescriptor<Boolean>(
+            "Fading", Boolean.class, new Boolean[]{Boolean.TRUE,Boolean.FALSE}, Boolean.FALSE);
 
+    /** Control the transparency of the input coverages. */
+    public static final ParameterDescriptor<Color> INPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor<Color>(
+            "InputTransparentColor", Color.class, null, null);
+
+    /** Control the transparency of the output coverage. */
+    public static final ParameterDescriptor<Color> OUTPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor<Color>(
+            "OutputTransparentColor", Color.class, null, null);
+
+    /** Control the thresholding on the input coverage */
+    public static final ParameterDescriptor<Integer> MAX_ALLOWED_TILES = new DefaultParameterDescriptor<Integer>(
+            "MaxAllowedTiles", Integer.class, null, Integer.MAX_VALUE);
+    
+    /** Control the threading behavior for this plugin. This parameter contains the number of thread that we should use to load the granules. Default value is 0 which means not additional thread, max value is 8.*/
+    public static final ParameterDescriptor<Boolean> ALLOW_MULTITHREADING = new DefaultParameterDescriptor<Boolean>(
+            "AllowMultithreading", Boolean.class, new Boolean[]{Boolean.TRUE,Boolean.FALSE}, Boolean.FALSE);
+    
+    /** Control the background values for the output coverage */
+    public static final ParameterDescriptor<double[]> BACKGROUND_VALUES = new DefaultParameterDescriptor<double[]>(
+            "BackgroundValues", double[].class, null, null);
+    
 	/**
 	 * Creates an instance and sets the metadata.
 	 */
@@ -85,8 +111,7 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 	 * Sets the metadata information for this format
 	 */
 	private void setInfo() {
-		HashMap info = new HashMap();
-
+		HashMap<String, String> info = new HashMap<String, String>();
 		info.put("name", "ImagePyramid");
 		info.put("description", "Image pyramidal plugin");
 		info.put("vendor", "Geotools");
@@ -94,12 +119,17 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 		info.put("version", "1.0");
 		mInfo = info;
 
-		// reading parameters
-		readParameters = new ParameterGroup(
-				new DefaultParameterDescriptorGroup(mInfo,
-						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D,
-						INPUT_TRANSPARENT_COLOR,
-								INPUT_IMAGE_THRESHOLD_VALUE ,OUTPUT_TRANSPARENT_COLOR}));
+        // reading parameters
+        readParameters = new ParameterGroup(new DefaultParameterDescriptorGroup(mInfo,
+                new GeneralParameterDescriptor[]{
+        		READ_GRIDGEOMETRY2D,
+        		INPUT_TRANSPARENT_COLOR,
+                OUTPUT_TRANSPARENT_COLOR,
+                USE_JAI_IMAGEREAD,
+                BACKGROUND_VALUES,
+                SUGGESTED_TILE_SIZE,
+                ALLOW_MULTITHREADING,
+                MAX_ALLOWED_TILES}));
 
 		// reading parameters
 		writeParameters = null;
@@ -114,7 +144,7 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 	 * @return An {@link ImagePyramidReader} if the provided object can be read
 	 *         using this plugin or null.
 	 */
-	public GridCoverageReader getReader(Object source) {
+	public ImagePyramidReader getReader(Object source) {
 		return getReader(source, null);
 	}
 
@@ -134,30 +164,20 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 	public boolean accepts(Object source) {
 		try {
 
-			File sourceFile;
-			// /////////////////////////////////////////////////////////////////////
-			//
-			// Check source
-			//
-			// /////////////////////////////////////////////////////////////////////
-			if (source instanceof File)
-				sourceFile = (File) source;
-			else if (source instanceof URL) {
-
-				final URL sourceURL = (URL) source;
-				if (sourceURL.getProtocol() != "file")
-					return false;
-
-				final String temp = URLDecoder.decode(sourceURL.getFile(),
-						"UTF8");
-
-				sourceFile = new File(temp);
-			} else if (source instanceof String) {
-				sourceFile = new File((String) source);
-				if (!sourceFile.exists())
-					return false;
-			} else
-				return false;
+		    // /////////////////////////////////////////////////////////////////////
+            //
+            // Check source
+            //
+            // /////////////////////////////////////////////////////////////////////
+			URL sourceURL = Utils.checkSource(source);
+			if(sourceURL == null)
+			    return false;
+            try {
+                sourceURL.openStream().close();
+            } catch (Throwable e) {
+                return false;
+            }
+			
 			// ///////////////////////////////////////////////////////////////////
 			//
 			// Trying to load informations
@@ -169,30 +189,18 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 			// get the crs if able to
 			//
 			// //
-			String fileName = sourceFile.getAbsolutePath();
-			final int index = fileName.lastIndexOf('.');
-			if (index != -1)
-				fileName = fileName.substring(0, index);
+			final URL prjURL = DataUtilities.changeUrlExt(sourceURL, "prj"); 
 			PrjFileReader crsReader;
 			try {
-				crsReader = new PrjFileReader(new RandomAccessFile(
-						new StringBuffer(fileName).append(".prj").toString(),
-						"r").getChannel());
+				crsReader = new PrjFileReader(Channels.newChannel(prjURL.openStream()));
 			} catch (FactoryException e) {
-				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
-				throw new DataSourceException(e);
+				return false;
 			}
 			CoordinateReferenceSystem tempcrs = crsReader.getCoordinateReferenceSystem();
 			if (tempcrs == null) {
 				// use the default crs
 				tempcrs = AbstractGridFormat.getDefaultCRS();
-				LOGGER
-						.log(
-								Level.FINE,
-								new StringBuffer(
-										"Unable to find a CRS for this coverage, using a default one: ")
-										.append(tempcrs.toWKT()).toString());
+				LOGGER.log(Level.FINE,new StringBuffer("Unable to find a CRS for this coverage, using a default one: ").append(tempcrs.toWKT()).toString());
 			}
 			//
 			// ///////////////////////////////////////////////////////////////////
@@ -204,14 +212,19 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 			// property file
 			final Properties properties = new Properties();
 			BufferedInputStream propertyStream = null;
+			if(!sourceURL.getPath().endsWith(".properties"))
+				return false;
+			final InputStream openStream = sourceURL.openStream();
 			try {
-				propertyStream = new BufferedInputStream(
-				new FileInputStream(sourceFile));
+				propertyStream = new BufferedInputStream(openStream);
 				properties.load(propertyStream);
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				if(propertyStream!=null)
 					propertyStream.close();
 				return false;
+			} finally {
+				if (openStream != null) 
+					openStream.close();
 			}
 
 			// load the envelope
@@ -227,14 +240,12 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 			}
 
 			// overviews dir
-			int numOverviews = Integer.parseInt(properties
-					.getProperty("LevelsNum")) - 1;
+			int numOverviews = Integer.parseInt(properties.getProperty("LevelsNum")) - 1;
 
 			// resolutions levels
 			final String levels = properties.getProperty("Levels");
 			pairs = levels.split(" ");
-			double[][] overViewResolutions = numOverviews >= 1 ? new double[numOverviews][2]
-					: null;
+			double[][] overViewResolutions = numOverviews >= 1 ? new double[numOverviews][2]: null;
 			pair = pairs[0].split(",");
 			double[] highestRes = new double[2];
 			highestRes[0] = Double.parseDouble(pair[0]);
@@ -274,7 +285,7 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 	 * @return An {@link ImagePyramidReader} if the provided object can be read
 	 *         using this plugin or null.
 	 */
-	public GridCoverageReader getReader(Object source, Hints hints) {
+	public ImagePyramidReader getReader(Object source, Hints hints) {
 		try {
 
 			return new ImagePyramidReader(source, hints);

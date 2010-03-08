@@ -47,7 +47,7 @@ import org.geotools.resources.i18n.Errors;
  * Operation applied only on image's colors. This operation work only for source
  * image using an {@link IndexColorModel}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/IndexColorOperation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/IndexColorOperation.java $
  * @version $Id: IndexColorOperation.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux
  *

@@ -30,7 +30,7 @@ package org.geotools.renderer.i18n;
  *
  * @see org.geotools.resources.IndexedResourceBundle
  * @see org.geotools.resources.IndexedResourceCompiler
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/i18n/VocabularyKeys.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/i18n/VocabularyKeys.java $
  */
 public final class VocabularyKeys {
     private VocabularyKeys() {

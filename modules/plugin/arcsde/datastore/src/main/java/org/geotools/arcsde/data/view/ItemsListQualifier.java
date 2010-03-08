@@ -28,13 +28,13 @@ import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 /**
  * Seems to visit a list and update the entries and fill in the blanks qualifying them.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ItemsListQualifier.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ItemsListQualifier.java 33451 2009-07-02 17:53:36Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/view/ItemsListQualifier.java $

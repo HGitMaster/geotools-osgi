@@ -36,6 +36,8 @@ import org.opengis.util.InternationalString;
  * 
  * @author gabriel
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/FeatureTypeImpl.java $
  */
 public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	

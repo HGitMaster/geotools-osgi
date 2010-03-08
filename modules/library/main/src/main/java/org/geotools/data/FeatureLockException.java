@@ -24,7 +24,7 @@ import java.io.IOException;
  * out Authroization.
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/FeatureLockException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FeatureLockException.java $
  */
 public class FeatureLockException extends IOException {
     private static final long serialVersionUID = 1L;

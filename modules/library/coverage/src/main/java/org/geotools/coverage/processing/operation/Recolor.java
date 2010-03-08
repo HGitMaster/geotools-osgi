@@ -36,7 +36,7 @@ import org.geotools.parameter.DefaultParameterDescriptorGroup;
  * {@link ColorMap}.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Recolor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Recolor.java $
  * @version $Id: Recolor.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux
  *

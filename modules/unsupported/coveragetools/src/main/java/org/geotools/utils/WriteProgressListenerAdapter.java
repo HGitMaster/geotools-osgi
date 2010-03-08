@@ -28,6 +28,8 @@ import javax.imageio.event.IIOWriteWarningListener;
  * @see IIOWriteProgressListener
  * @see IIOWriteWarningListener
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/WriteProgressListenerAdapter.java $
  */
 public class WriteProgressListenerAdapter implements IIOWriteProgressListener,
 		IIOWriteWarningListener {

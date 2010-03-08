@@ -27,6 +27,8 @@ import org.opengis.util.InternationalString;
 
 /**
  * AttributeType for hold geometry implementations, maintains CRS information.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/GeometryTypeImpl.java $
  */
 public class GeometryTypeImpl extends AttributeTypeImpl implements GeometryType {
 

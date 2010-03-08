@@ -26,7 +26,7 @@ import org.opengis.metadata.content.Band;
 /**
  * Range of wavelengths in the electromagnetic spectrum.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/content/BandImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/content/BandImpl.java $
  * @version $Id: BandImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

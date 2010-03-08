@@ -45,7 +45,7 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
  * <p></p>
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/filter/GeometryDistanceFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/GeometryDistanceFilter.java $
  * @version $Id: GeometryDistanceFilter.java 30642 2008-06-12 17:52:06Z acuster $
  *
  * @task REVISIT: add units for distance.  Should it just be a string?  Or

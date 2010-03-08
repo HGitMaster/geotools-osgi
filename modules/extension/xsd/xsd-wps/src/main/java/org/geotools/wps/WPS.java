@@ -31,6 +31,8 @@ import org.geotools.xml.XSD;
  * attributes in the http://www.opengis.net/wps/1.0.0 schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wps/src/main/java/org/geotools/wps/WPS.java $
  */
 public final class WPS extends XSD {
 

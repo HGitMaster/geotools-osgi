@@ -21,10 +21,12 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.geotools.renderer.style.shape.ExplicitBoundsShape;
 import org.opengis.feature.Feature;
 import org.opengis.filter.expression.Expression;
 
@@ -43,7 +45,10 @@ public class ShapeMarkFactory implements MarkFactory {
        shapes.put("horline", new Line2D.Double(-0.5, 0, 0.5, 0));
        shapes.put("slash", new Line2D.Double(-0.5, -0.5, 0.5, 0.5));
        shapes.put("backslash", new Line2D.Double(-0.5, 0.5, 0.5, -0.5));
-       shapes.put("dot", new Ellipse2D.Double(-0.000001, -0.000001, 0.000001, 0.000001));
+       
+       ExplicitBoundsShape dotShape = new ExplicitBoundsShape(new Ellipse2D.Double(-0.000001, -0.000001, 0.000001, 0.000001));
+       dotShape.setBounds(new Rectangle2D.Double(-0.5,0.5,1.0,1.0));
+       shapes.put("dot", dotShape);
        
        GeneralPath gp = new GeneralPath();
        gp.moveTo(-0.5f, 0);

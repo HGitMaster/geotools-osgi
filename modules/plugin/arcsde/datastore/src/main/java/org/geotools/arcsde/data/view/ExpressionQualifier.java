@@ -59,14 +59,14 @@ import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 /**
  * Qualifies the column references (aliased or not) the ArcSDE "table.user." prefix as required by
  * the ArcSDE java api to not get confused when using joined tables.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ExpressionQualifier.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ExpressionQualifier.java 33451 2009-07-02 17:53:36Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/view/ExpressionQualifier.java $

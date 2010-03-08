@@ -39,7 +39,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * </p>
  * @author jgarnett
  * @since 2.1.RC0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/store/FeatureWriterIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/FeatureWriterIterator.java $
  */
 final class FeatureWriterIterator implements Iterator<SimpleFeature> {
     FeatureWriter<SimpleFeatureType, SimpleFeature> writer;    

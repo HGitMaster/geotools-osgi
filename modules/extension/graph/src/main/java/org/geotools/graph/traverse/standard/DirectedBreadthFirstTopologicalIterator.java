@@ -30,7 +30,7 @@ import org.geotools.graph.util.Queue;
 
 
 /**
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/DirectedBreadthFirstTopologicalIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/DirectedBreadthFirstTopologicalIterator.java $
  */
 public class DirectedBreadthFirstTopologicalIterator 
   extends AbstractGraphIterator {

@@ -40,6 +40,8 @@ import org.geotools.xml.Schemas;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/BindingPropertyExtractor.java $
  */
 public class BindingPropertyExtractor implements PropertyExtractor {
     Encoder encoder;
@@ -76,7 +78,8 @@ O:
             //get the object(s) for this element 
             GetPropertyExecutor executor = new GetPropertyExecutor(object, child);
 
-            encoder.getBindingWalker().walk(element, executor, context);
+            BindingVisitorDispatch.walk(object, encoder.getBindingWalker(), element, executor,
+                    context);
 
             if (executor.getChildObject() != null) {
                 properties.add(new Object[] { particle, executor.getChildObject() });
@@ -85,7 +88,8 @@ O:
 
         //second, get the properties which cannot be infereed from the schema
         GetPropertiesExecutor executor = new GetPropertiesExecutor(object,element);
-        encoder.getBindingWalker().walk(element, executor, context);
+
+        BindingVisitorDispatch.walk(object, encoder.getBindingWalker(), element, executor, context);
 
         if (!executor.getProperties().isEmpty()) {
             //group into a map of name, list

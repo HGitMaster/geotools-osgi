@@ -62,7 +62,7 @@ import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
  * process from the super-class is used as a fallback.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/AuthorityBackedFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/AuthorityBackedFactory.java $
  * @version $Id: AuthorityBackedFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

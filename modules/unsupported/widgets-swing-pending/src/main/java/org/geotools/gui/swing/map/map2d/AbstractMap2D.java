@@ -36,6 +36,8 @@ import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
  * Default implementation of Map2D
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/AbstractMap2D.java $
  */
 public abstract class AbstractMap2D extends JPanel implements Map2D {
 

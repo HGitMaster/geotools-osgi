@@ -31,6 +31,8 @@ import org.opengis.referencing.datum.GeodeticDatum;
  * OracleDialectEpsgFactory when the buffer needs to be fed.
  * 
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/epsg/oracle/ThreadedOracleEpsgAuthorityOnlineTest.java $
  */
 public class ThreadedOracleEpsgAuthorityOnlineTest extends OracleOnlineTestCase {
 

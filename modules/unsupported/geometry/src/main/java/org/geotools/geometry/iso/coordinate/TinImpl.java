@@ -31,6 +31,8 @@ import org.opengis.geometry.primitive.SurfacePatch;
  * networks satisfy the Delaunay criterion away from the modifications: For each
  * triangle in the network, the circle passing through its vertexes does not
  * contain, in its interior, the vertex of any other triangle.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/TinImpl.java $
  */
 public class TinImpl extends TriangulatedSurfaceImpl {
 

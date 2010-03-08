@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: RingImpl.java 25075 2007-04-09 19:20:46Z desruisseaux $
+ ** $Id: RingImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/RingImpl.java,v $
  **
@@ -47,6 +47,8 @@ import com.vividsolutions.jts.geom.LineString;
  * @UML type GM_Ring
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/RingImpl.java $
  * @version 2.0
  *
  * @see SurfaceBoundary

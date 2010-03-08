@@ -23,6 +23,8 @@ import junit.framework.TestCase;
  * Quick test case to see if the functions defined by this module work.
  * 
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/filter/FunctionTest.java $
  */
 public class FunctionTest extends TestCase {
 	

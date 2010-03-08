@@ -55,7 +55,7 @@ import org.geotools.util.logging.Logging;
  * collection of {@link Tile} objects, organized in a {@link TileManager}.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageReader.java $
  * @version $Id: MosaicImageReader.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux
  */
@@ -1450,7 +1450,7 @@ public class MosaicImageReader extends ImageReader {
      * Service provider for {@link MosaicImageReader}.
      *
      * @since 2.5
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageReader.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageReader.java $
      * @version $Id: MosaicImageReader.java 31445 2008-09-07 18:14:23Z desruisseaux $
      * @author Martin Desruisseaux
      */

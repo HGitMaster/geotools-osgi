@@ -28,7 +28,7 @@ import java.net.URL;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/FileDataStoreFactorySpi.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FileDataStoreFactorySpi.java $
  */
 public interface FileDataStoreFactorySpi extends DataStoreFactorySpi {
     /**
@@ -64,7 +64,7 @@ public interface FileDataStoreFactorySpi extends DataStoreFactorySpi {
      *
      * @see AbstractFileDataStore
      */
-    public DataStore createDataStore(URL url) throws IOException;
+    public FileDataStore createDataStore(URL url) throws IOException;
 
     /**
      * The typeName represented by the provided url.

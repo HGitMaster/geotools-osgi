@@ -50,7 +50,7 @@ import org.geotools.resources.image.ColorUtilities;
  * {@link org.geotools.coverage.processing.operation.Recolor} operation.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/ColorMap.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/ColorMap.java $
  * @version $Id: ColorMap.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux
  *

@@ -28,7 +28,7 @@ import javax.imageio.event.IIOReadProgressListener;
  *
  * @since 2.1
  * @author Martin Desruisseaux (IRD)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/image/io/IIOReadProgressAdapter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/image/io/IIOReadProgressAdapter.java $
  * @version $Id: IIOReadProgressAdapter.java 30643 2008-06-12 18:27:03Z acuster $
  */
 public class IIOReadProgressAdapter implements IIOReadProgressListener {

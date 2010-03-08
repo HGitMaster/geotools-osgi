@@ -43,7 +43,7 @@ import org.opengis.referencing.operation.Projection;
  *  <code>"false_northing"</code> (default to 0).</P>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultProjection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultProjection.java $
  * @version $Id: DefaultProjection.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

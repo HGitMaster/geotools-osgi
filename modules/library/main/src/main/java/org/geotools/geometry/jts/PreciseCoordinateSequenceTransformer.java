@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
  *
  * @todo Not yet implemented.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/PreciseCoordinateSequenceTransformer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/PreciseCoordinateSequenceTransformer.java $
  */
 public class PreciseCoordinateSequenceTransformer implements CoordinateSequenceTransformer {
     CoordinateSequenceFactory csFactory;

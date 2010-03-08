@@ -16,6 +16,8 @@
  */
 package org.geotools.styling;
 
+import java.util.List;
+
 
 
 /**
@@ -72,7 +74,7 @@ package org.geotools.styling;
  * @author Ian Turton, CCG
  * @author James Macgill, CCG
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/StyledLayerDescriptor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/StyledLayerDescriptor.java $
  * @version SLD 1.0
  *
  * @since GeoTools 2.0
@@ -83,6 +85,12 @@ public interface StyledLayerDescriptor {
     public void setStyledLayers(StyledLayer[] layers);
 
     public void addStyledLayer(StyledLayer layer);
+    
+    /**
+     * Direct access to layers list.
+     * @return Direct access to layers list.
+     */
+	public List<StyledLayer> layers();
 
     /**
      * Getter for property name.

@@ -24,6 +24,8 @@ import org.geotools.caching.spatialindex.Visitor;
 /**
  * This visitor makes nodes as valid.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/featurecache/ValidatingVisitor.java $
  */
 public class ValidatingVisitor implements Visitor {
     private Region region;

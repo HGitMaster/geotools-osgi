@@ -22,6 +22,8 @@ import java.util.List;
  * Represents a base object for a Capabilities document
  *
  * @author rgould
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ows/Capabilities.java $
  */
 public class Capabilities {
     private Service service;

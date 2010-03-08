@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * To change the template for this generated type comment go to
  * Window>Preferences>Java>Code Generation>Code and Comments
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/sdo/TT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/sdo/TT.java $
  */
 public interface TT 
 {

@@ -59,6 +59,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.3.x/module/main/src/org/geotools/data/coverage/grid/AbstractGridFormat.java $
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractGridFormat implements Format {
 
 	/**
@@ -197,8 +198,7 @@ public abstract class AbstractGridFormat implements Format {
 	 *            The source object to parse.
 	 * @return A reader for this {@link Format} or null.
 	 */
-	@SuppressWarnings("deprecation")
-        abstract public GridCoverageReader getReader(Object source);
+	abstract public AbstractGridCoverage2DReader getReader(Object source);
 
 	/**
 	 * 
@@ -217,8 +217,7 @@ public abstract class AbstractGridFormat implements Format {
 	 *            reader.
 	 * @return A reader for this {@link Format} or null.
 	 */
-	@SuppressWarnings("deprecation")
-        abstract public GridCoverageReader getReader(Object source, Hints hints);
+	abstract public AbstractGridCoverage2DReader getReader(Object source, Hints hints);
 
 	/**
 	 * Retrieves a {@link GridCoverageWriter} suitable for writing to the
@@ -232,8 +231,7 @@ public abstract class AbstractGridFormat implements Format {
 	 * @return A {@link GridCoverageWriter} suitable for writing to the provided
 	 *         <code>destination</code> with this format.
 	 */
-	@SuppressWarnings("deprecation")
-        abstract public GridCoverageWriter getWriter(Object destination);
+	abstract public GridCoverageWriter getWriter(Object destination);
 
 	/**
 	 * Tells me if this {@link Format} can read the provided <code>input</code>.
@@ -248,7 +246,6 @@ public abstract class AbstractGridFormat implements Format {
 	/**
 	 * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)
 	 */
-	@SuppressWarnings("deprecation")
         public boolean equals(Format f) {
 		if (f.getClass() == getClass()) {
 			return true;

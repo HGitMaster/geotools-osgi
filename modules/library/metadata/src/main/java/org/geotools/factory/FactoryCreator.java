@@ -36,7 +36,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * previously created factory can fit.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/FactoryCreator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/FactoryCreator.java $
  * @version $Id: FactoryCreator.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  * @author Jody Garnett

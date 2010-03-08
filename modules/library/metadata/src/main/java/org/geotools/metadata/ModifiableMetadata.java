@@ -70,7 +70,7 @@ import org.geotools.resources.UnmodifiableArrayList;
  * </pre></blockquote>
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/ModifiableMetadata.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/ModifiableMetadata.java $
  * @version $Id: ModifiableMetadata.java 30852 2008-07-03 15:59:42Z desruisseaux $
  * @author Martin Desruisseaux
  */

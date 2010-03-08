@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 0.9.0
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/test/java/org/geotools/renderer/lite/LabelingTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/LabelingTest.java $
  */
 public class LabelingTest extends TestCase {
 
@@ -75,21 +75,21 @@ public class LabelingTest extends TestCase {
 		super.tearDown();
 	}
 	
-	public void testPointLabeling() throws Exception{
-		FeatureCollection collection=createPointFeatureCollection();
-		Style style=loadStyle("PointStyle.sld");
-		assertNotNull(style);
-		MapContext map = new DefaultMapContext();
-        map.addLayer(collection, style);
+        public void testPointLabeling() throws Exception {
+            FeatureCollection collection = createPointFeatureCollection();
+            Style style = loadStyle("PointStyle.sld");
+            assertNotNull(style);
+            MapContext map = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+            map.addLayer(collection, style);
 
-        StreamingRenderer renderer=new StreamingRenderer();
-        renderer.setContext(map);
-        ReferencedEnvelope env = map.getLayerBounds();
-        int boundary=10;
-        env = new ReferencedEnvelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
-        		env.getMinY() - boundary, env.getMaxY() + boundary, null);
-        RendererBaseTest.showRender("testPointLabeling", renderer, timout, env);
-	}
+            StreamingRenderer renderer = new StreamingRenderer();
+            renderer.setContext(map);
+            ReferencedEnvelope env = map.getLayerBounds();
+            int boundary = 10;
+            env = new ReferencedEnvelope(env.getMinX() - boundary, env.getMaxX() + boundary,
+                    env.getMinY() - boundary, env.getMaxY() + boundary, null);
+            RendererBaseTest.showRender("testPointLabeling", renderer, timout, env);
+        }
 
 	private Style loadStyle(String sldFilename) throws IOException {
         StyleFactory factory = StyleFactoryFinder.createStyleFactory();
@@ -138,7 +138,7 @@ public class LabelingTest extends TestCase {
 		FeatureCollection collection=createLineFeatureCollection();
 		Style style=loadStyle("LineStyle.sld");
 		assertNotNull(style);
-		MapContext map = new DefaultMapContext();
+		MapContext map = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         map.addLayer(collection, style);
 
         StreamingRenderer renderer=new StreamingRenderer();
@@ -188,7 +188,7 @@ public class LabelingTest extends TestCase {
 		FeatureCollection collection=createPolyFeatureCollection();
 		Style style=loadStyle("PolyStyle.sld");
 		assertNotNull(style);
-		MapContext map = new DefaultMapContext();
+		MapContext map = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         map.addLayer(collection, style);
         StreamingRenderer renderer=new StreamingRenderer();
         renderer.setContext(map);

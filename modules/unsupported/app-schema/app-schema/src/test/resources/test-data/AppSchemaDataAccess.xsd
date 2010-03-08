@@ -22,6 +22,7 @@
     </annotation>
     <sequence>
       <element name="namespaces" type="as:NamespacesPropertyType" />
+      <element name="includedTypes" type="as:IncludesPropertyType" minOccurs="0" />
       <element name="sourceDataStores" type="as:SourceDataStoresPropertyType" />
       <element name="catalog" type="string" minOccurs="0">
         <annotation>
@@ -81,6 +82,29 @@
         </complexType>
       </element>
     </sequence>
+  </complexType>
+  
+  <complexType name="IncludesPropertyType">
+	<annotation>
+		<documentation>
+        <![CDATA[
+      This is only needed if this type has related types that do not have their own 
+      Geoserver configuration, ie. not published in Geoserver. The type might be
+      mapped separately so they can be reusable (feature chaining concept), e.g. 
+      If feature type A contains data type B, and feature type C also contains
+      data type B, we only want to have one mapping file for data type B. 
+ 
+      The purpose of this is so that the parent type (this mapping) can find the
+      related features.
+      The type might not be visible on their own because it's not a feature type
+      (e.g. a data type), therefore shouldn't appear in requests such as GetCapabilities,
+      DescribeFeatureType etc. 
+    ]]>
+		</documentation>
+	</annotation>
+	<sequence>
+		<element name="Include" minOccurs="0" maxOccurs="unbounded" />
+	</sequence>
   </complexType>
 
   <complexType name="SourceDataStoresPropertyType">
@@ -209,6 +233,21 @@
                 </documentation>
               </annotation>
             </element>
+            <element name="itemXpath" type="string" minOccurs="0">
+              <annotation>
+                <documentation>
+                  The xpath that identifies separate features in the xml returned from an xml datastore.
+                </documentation>
+              </annotation>
+            </element>
+            <element name="isXmlDataStore" type="boolean" default="false" minOccurs="0">
+              <annotation>
+                <documentation>
+                  <![CDATA[ 
+                  Flag to indicate that we want to connect to an xml data source]]>
+                </documentation>
+              </annotation>
+            </element>  
             <element name="groupBy" minOccurs="0" maxOccurs="1">
               <annotation>
                 <documentation>
@@ -344,6 +383,20 @@
       </documentation>
     </annotation>
     <sequence>
+      <element name="label" type="string" minOccurs="0">
+        <annotation>
+          <documentation>
+            <![CDATA[ Name by which other attributes can uniquely refer to this attribute. (Used in xml datastores.) ]]>
+          </documentation>
+        </annotation>
+      </element>
+      <element name="parentLabel" type="string" minOccurs="0" >
+        <annotation>
+          <documentation>
+            <![CDATA[ A reference to another attribute which has a label tag. The parentLabel has the name contained in the other attributes label tag. (Used in xml datastores.) ]]>
+          </documentation>
+        </annotation>
+      </element>      
       <element name="targetAttribute" type="string">
         <annotation>
           <documentation>
@@ -351,6 +404,13 @@
           </documentation>
         </annotation>
       </element>
+      <element name="targetQueryString" type="string" minOccurs="0">
+          <annotation>
+          <documentation>
+            <![CDATA[ Used to translate a reference to an attribute in an incoming filter to the element used in an xml datastore.]]>
+          </documentation>
+        </annotation>
+      </element>      
       <element name="idExpression" minOccurs="0" type="as:AttributeExpressionMappingType">
         <annotation>
           <documentation>
@@ -366,6 +426,13 @@
             <![CDATA[ CQL Expression whose evaluated value over the Feature(s) of the 
             surrogate datastore is to be used as the value for the target schema attribute 
             this AttributeMapping refers to ]]>
+          </documentation>
+        </annotation>
+      </element>
+      <element name="instancePath" type="string" minOccurs="0">
+        <annotation>
+          <documentation>
+            <![CDATA[ When counting how many complex types to create in a label/parentlabel tree, this is the path to use to count instances in the input data. ]]>
           </documentation>
         </annotation>
       </element>

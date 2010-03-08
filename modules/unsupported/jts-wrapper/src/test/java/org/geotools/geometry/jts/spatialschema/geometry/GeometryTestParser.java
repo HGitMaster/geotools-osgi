@@ -45,6 +45,8 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 /**
  * @author Jody Garnett
  * @author Joel Skelton
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/test/java/org/geotools/geometry/jts/spatialschema/geometry/GeometryTestParser.java $
  */
 public class GeometryTestParser {
     private static final Log LOG = LogFactory.getLog(GeometryTestParser.class);

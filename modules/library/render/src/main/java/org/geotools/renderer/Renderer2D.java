@@ -27,7 +27,7 @@ import java.awt.geom.AffineTransform;
  * bounding box, size, and style from the {@linkplain org.geotools.map.Context context}.
  *
  * @author Cameron Shorter
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/Renderer2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/Renderer2D.java $
  * @version $Id: Renderer2D.java 30649 2008-06-12 19:44:08Z acuster $
  *
  * @task REVISIT Renderer2D should extend Renderer once Renderer has been

@@ -34,6 +34,8 @@ import org.junit.Test;
 /**
  * Simple TestCase for      {@link RootNode}      class.
  * @author       Simone Giannecchini, GeoSolutions
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/gridcoverage2d/RootNodeTest.java $
  */
 public class RootNodeTest{
 

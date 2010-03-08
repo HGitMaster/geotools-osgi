@@ -31,8 +31,10 @@ import org.opengis.feature.type.PropertyType;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/PropertyImpl.java $
  */
-public class PropertyImpl implements Property {
+public abstract class PropertyImpl implements Property {
     /**
      * content of the property
      */

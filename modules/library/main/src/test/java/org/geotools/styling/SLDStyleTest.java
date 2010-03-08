@@ -31,6 +31,8 @@ import junit.framework.TestSuite;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.filter.IsEqualsToImpl;
+import org.geotools.filter.function.FilterFunction_buffer;
+import org.geotools.filter.function.math.FilterFunction_abs;
 import org.geotools.test.TestData;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -54,7 +56,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Try out our SLD parser and see how well it does.
  *
  * @author jamesm
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/styling/SLDStyleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/SLDStyleTest.java $
  */
 public class SLDStyleTest extends TestCase {
     StyleFactory sf = CommonFactoryFinder.getStyleFactory( GeoTools.getDefaultHints() );
@@ -267,7 +269,7 @@ public class SLDStyleTest extends TestCase {
 //        assertTrue(result);
         
         //everything is equal
-        assertTrue(sld2.equals(sld));
+        assertEquals(sld2, sld);
     }
 
     public void testSLDTransformerIndentation() throws Exception {
@@ -596,5 +598,50 @@ public class SLDStyleTest extends TestCase {
 		}
          
          
+    }
+    
+    public void testParseGeometryExpressions() throws Exception {
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
+        java.net.URL surl = TestData.getResource(this, "geometryTransformation.sld");
+        SLDParser stylereader = new SLDParser(factory, surl);
+       
+        Style[] styles = stylereader.readXML();
+        assertEquals(1, styles.length);
+        assertEquals(1, styles[0].featureTypeStyles().size());
+        assertEquals(1, styles[0].featureTypeStyles().get(0).rules().size());
+        
+        Rule r = styles[0].featureTypeStyles().get(0).rules().get(0);
+        assertEquals(1, r.getSymbolizers().length);
+        
+        PolygonSymbolizer ps = (PolygonSymbolizer) r.getSymbolizers()[0];
+        Expression geom = ps.getGeometry();
+        assertNotNull(geom);
+        assertTrue(geom instanceof FilterFunction_buffer);
+        FilterFunction_buffer buf = (FilterFunction_buffer) geom;
+        assertTrue(buf.getParameters().get(0) instanceof PropertyName);
+        assertTrue(buf.getParameters().get(1) instanceof Literal);
+    }
+    
+    public void testParsePlainGeometryExpression() throws Exception {
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
+        java.net.URL surl = TestData.getResource(this, "geometryPlain.sld");
+        SLDParser stylereader = new SLDParser(factory, surl);
+       
+        Style[] styles = stylereader.readXML();
+        assertEquals(1, styles.length);
+        assertEquals(1, styles[0].featureTypeStyles().size());
+        assertEquals(1, styles[0].featureTypeStyles().get(0).rules().size());
+        
+        Rule r = styles[0].featureTypeStyles().get(0).rules().get(0);
+        assertEquals(1, r.getSymbolizers().length);
+        
+        PolygonSymbolizer ps = (PolygonSymbolizer) r.getSymbolizers()[0];
+        Expression geom = ps.getGeometry();
+        assertNotNull(geom);
+        assertTrue(geom instanceof PropertyName);
+        PropertyName pn = (PropertyName) geom;
+        assertEquals("the_geom", pn.getPropertyName());
+        assertEquals("the_geom", ps.getGeometryPropertyName());
+
     }
 }

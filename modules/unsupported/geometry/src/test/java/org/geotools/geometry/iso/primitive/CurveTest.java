@@ -52,6 +52,8 @@ import org.picocontainer.defaults.DefaultPicoContainer;
 /**
  * @author sanjay
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/iso/primitive/CurveTest.java $
  */
 public class CurveTest extends TestCase {
 	

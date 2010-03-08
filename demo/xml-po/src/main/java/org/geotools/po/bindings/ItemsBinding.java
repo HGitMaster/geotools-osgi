@@ -59,6 +59,8 @@ import javax.xml.namespace.QName;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/xml-po/src/main/java/org/geotools/po/bindings/ItemsBinding.java $
  */
 public class ItemsBinding extends AbstractComplexBinding {
 

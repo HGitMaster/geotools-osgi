@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>library</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
 
 
@@ -27,7 +27,7 @@
   <artifactId>gt-main</artifactId>
   <packaging>jar</packaging>
   <name>Main module</name>
-  <url>http://maven.geotools.fr/reports/modules/library/main/</url>
+  
 
   <scm>
     <connection>
@@ -249,24 +249,6 @@
   <!-- =========================================================== -->
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.geotools.maven</groupId>
-        <artifactId>jjtree-javacc</artifactId>
-        <version>${project.version}</version>
-        <configuration>
-          <sourceDirectory>${basedir}/src/main/java</sourceDirectory> <!-- Where to search for .jjt files -->
-          <nodeDirectory>${basedir}/modified-src</nodeDirectory>  <!-- Where to search for Node.java  -->
-          <nodePackage>org.geotools.filter.parser</nodePackage>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      
       <!-- build test jar so that tests can be shared with legacy feature model module -->
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>

@@ -34,7 +34,7 @@ import org.opengis.filter.expression.Literal;
 /**
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/brewer/src/main/java/org/geotools/brewer/color/PaletteFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/brewer/color/PaletteFunction.java $
  */
 public class PaletteFunction extends FunctionExpressionImpl implements FunctionExpression {
     ClassificationFunction classifier;

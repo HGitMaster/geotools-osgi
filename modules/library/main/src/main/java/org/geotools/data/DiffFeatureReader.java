@@ -25,17 +25,13 @@ import java.util.Set;
 
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.Expression;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LiteralExpression;
 import org.opengis.feature.Feature;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.opengis.filter.spatial.Contains;
 import org.opengis.filter.spatial.Crosses;
 import org.opengis.filter.spatial.Overlaps;
@@ -256,22 +252,22 @@ public class DiffFeatureReader<T extends FeatureType, F extends Feature> impleme
     
     protected List getIndexedFeatures() {
         // TODO: check geom is default geom.
-        Envelope env = extractBboxForSpatialIndexQuery((GeometryFilter) filter);
+    	Envelope env = null;
+    	env = extractBboxForSpatialIndexQuery((BinarySpatialOperator)filter);
         return diff.queryIndex(env);
     }
-
-    protected Envelope extractBboxForSpatialIndexQuery(GeometryFilter f) {
-        GeometryFilter geomFilter = (GeometryFilter) f;
-        Expression leftGeometry = geomFilter.getLeftGeometry();
-        Expression rightGeometry = geomFilter.getRightGeometry();
-        
-        Geometry g;
-        if( leftGeometry instanceof LiteralExpression ){
-        	g=(Geometry) ((LiteralExpression) leftGeometry).getLiteral();
-        }else{
-        	g=(Geometry) ((LiteralExpression) rightGeometry).getLiteral();
-        }
-        return g.getEnvelopeInternal();
+    
+    protected Envelope extractBboxForSpatialIndexQuery(BinarySpatialOperator filter){
+    	org.opengis.filter.expression.Expression leftGeom = filter.getExpression1();
+    	org.opengis.filter.expression.Expression rightGeom = filter.getExpression2();
+    	
+    	Geometry g ;
+    	if (leftGeom instanceof org.opengis.filter.expression.Literal){
+    		g = (Geometry)((org.opengis.filter.expression.Literal)leftGeom).getValue();
+    	}else{
+    		g = (Geometry)((org.opengis.filter.expression.Literal)rightGeom).getValue(); 
+    	}
+    	return g.getEnvelopeInternal();
     }
     
     protected boolean isDefaultGeometry(AttributeExpression ae) {

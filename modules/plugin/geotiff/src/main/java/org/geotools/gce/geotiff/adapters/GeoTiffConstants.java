@@ -21,7 +21,7 @@ import it.geosolutions.imageio.plugins.tiff.TIFFTag;
 /**
  * @author simone
  * 
- * @source $URL: http://svn.geotools.org/branches/2.5.x/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/IIOMetadataAdpaters/utils/GeoTiffConstants.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/adapters/GeoTiffConstants.java $
  */
 public final class GeoTiffConstants {
     

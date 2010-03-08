@@ -34,7 +34,7 @@ import net.sf.jsqlparser.statement.select.SelectBody;
  *
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id: SqlParser.java 30709 2008-06-13 16:22:32Z acuster $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/sql-datastore/src/org/geotools/data/sql/SqlParser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/sql-datastore/src/org/geotools/data/sql/SqlParser.java $
  * @since 2.3.x
   */
 public class SqlParser {

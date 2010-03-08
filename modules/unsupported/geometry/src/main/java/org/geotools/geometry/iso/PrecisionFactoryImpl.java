@@ -22,6 +22,8 @@ import org.opengis.geometry.PrecisionType;
 
 /**
  * Implementation set up to create PrecisionModel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/PrecisionFactoryImpl.java $
  */
 public class PrecisionFactoryImpl implements PrecisionFactory {
 

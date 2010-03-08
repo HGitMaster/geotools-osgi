@@ -23,7 +23,7 @@ import java.awt.image.BufferedImage;
  * A style class used to depict a point, polygon centroid or line with a small graphic icon
  *
  * @author Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/GraphicStyle2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/GraphicStyle2D.java $
  * @version $Id: GraphicStyle2D.java 30649 2008-06-12 19:44:08Z acuster $
  */
 public class GraphicStyle2D extends Style2D {

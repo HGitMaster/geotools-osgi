@@ -24,6 +24,8 @@ package org.geotools.xml.impl;
  * </p>
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/InstanceBinding.java $
  */
 public interface InstanceBinding {
 

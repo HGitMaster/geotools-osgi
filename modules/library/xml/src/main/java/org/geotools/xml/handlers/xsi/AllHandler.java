@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/AllHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/AllHandler.java $
  * @version $Id: AllHandler.java 30650 2008-06-12 19:53:40Z acuster $
  */
 public class AllHandler extends ElementGroupingHandler {

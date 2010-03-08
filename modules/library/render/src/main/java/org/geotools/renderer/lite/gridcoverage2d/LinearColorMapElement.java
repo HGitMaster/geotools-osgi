@@ -36,6 +36,8 @@ import org.opengis.referencing.operation.MathTransform1D;
  * @see LinearColorMap
  * @see LinearColorMap.LinearColorMapType
  * @author      Simone Giannecchini, GeoSolutions
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/LinearColorMapElement.java $
  */
 public class LinearColorMapElement extends DefaultLinearPiecewiseTransform1DElement
 		implements PiecewiseTransform1DElement, ColorMapTransformElement {

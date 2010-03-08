@@ -49,6 +49,23 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
 	 * @parameter
 	 */
 	String[] imports;
+	/**
+         * Flag controlling wether paths are printed out as the generator recurses 
+         * through the schema.
+         * @parameter expression="false"
+         */
+	boolean printRecursionPaths;
+	/**
+	 * Controls how far the generator will recurse into the schema.
+	 * @parameter
+	 */
+	int maxRecursionDepth;
+	/**
+	 * List of explicit bindings from XSD type to fully-qualified class name.
+	 * Namespace defaults to the target schema namespace.
+	 * @parameter
+	 */
+	private TypeBinding[] typeBindings;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
     	XSDSchema schema = schema();
@@ -66,6 +83,9 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
         generator.setResourceLocation(((Resource)project.getBuild().getResources().get( 0 )).getDirectory());
 		generator.setFollowComplexTypes(followComplexTypes);
 		generator.setIncludes( includes );
+        generator.setMaxRecursionDepth(maxRecursionDepth);
+        generator.setPrintRecursionPaths(printRecursionPaths);
+        generator.setTypeBindings(typeBindings);
 		
 		if (imports != null) {
 		    //build a url classload from dependencies
@@ -78,7 +98,7 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
                 );
 	            try {
 	                artifactResolver.resolve( artifact, remoteRepositories, localRepository );
-	                urls.add( artifact.getFile().toURL() );
+	                urls.add( artifact.getFile().toURI().toURL() );
 	            } 
 	            catch( Exception e ) {
 	                getLog().error( "Unable to resolve " + artifact.getId() );
@@ -87,7 +107,7 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
 	        
 	        //add compiled classes to classloader
 	        try {
-	            urls.add( new File(project.getBuild().getOutputDirectory()).toURL() );    
+	            urls.add( new File(project.getBuild().getOutputDirectory()).toURI().toURL() );    
 	        }
 	        catch( MalformedURLException e ) {
 	            getLog().error("Bad url: " + project.getBuild().getOutputDirectory() );

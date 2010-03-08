@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>plugin</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
 
 
@@ -27,7 +27,7 @@
   <artifactId>gt-gtopo30</artifactId>
   <packaging>jar</packaging>
   <name>GTopo30 datasource module</name>
-  <url>http://maven.geotools.fr/reports/modules/plugin/gtopo30/</url>
+  
 
   <scm>
     <connection>
@@ -54,23 +54,26 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
+      <name>Simone Giannecchini</name>
+      <id>simboss</id>
+      <email>simone.giannecchini@geo-solutions.it</email>
+      <organization>GeoSolutions S.A.S.</organization>
+      <organizationUrl>http://www.geo-solutions.it</organizationUrl>
+      <roles>
+        <role>Java Developer</role>
+        <role>Documentation</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>   
+    <developer>
       <name>Andrea Aime</name>
       <id>iant</id>
       <email>aaime@users.sourceforge.net</email>
       <organization>University of Modena and Reggio Emilia</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
-    <developer>
-      <name>Simone Giannecchini</name>
-      <id>simboss</id>
-      <email>simboss1@gmail.com</email>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>    
   </developers>
 
 

@@ -18,14 +18,14 @@
  */
 package org.geotools.styling;
 
+import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-
+import org.geotools.util.Utilities;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
-import org.opengis.style.Description;
 import org.opengis.style.OverlapBehavior;
 import org.opengis.style.StyleVisitor;
 
@@ -34,22 +34,19 @@ import org.opengis.style.StyleVisitor;
  *
  * @author iant
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/RasterSymbolizerImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/RasterSymbolizerImpl.java $
  */
-public class RasterSymbolizerImpl implements RasterSymbolizer {
+public class RasterSymbolizerImpl extends AbstractSymbolizer implements RasterSymbolizer {
     
-    private final Description description;
-    private final String name;
-    private final Unit uom;
-    private final OverlapBehavior behavior;
+    private OverlapBehavior behavior;
     
     // TODO: make container ready
     private FilterFactory filterFactory;
     private ChannelSelection channelSelection = new ChannelSelectionImpl();
-    private ColorMap colorMap = new ColorMapImpl();
-    private ContrastEnhancement contrastEnhancement = new ContrastEnhancementImpl();
-    private ShadedRelief shadedRelief = new ShadedReliefImpl();
-    private String geometryName = "raster";
+    private ColorMapImpl colorMap = new ColorMapImpl();
+    private ContrastEnhancementImpl contrastEnhancement = new ContrastEnhancementImpl();
+    private ShadedReliefImpl shadedRelief = new ShadedReliefImpl();
+    private String geometryName = "geom";
     private Symbolizer symbolizer;
     private Expression opacity;
     private Expression overlap;
@@ -62,40 +59,87 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
         this(factory,null,null,null,null);   
     }
     
-    public RasterSymbolizerImpl(FilterFactory factory, Description desc, String name, Unit uom, OverlapBehavior behavior) {
+    public RasterSymbolizerImpl(FilterFactory factory, Description desc, String name, Unit<Length> uom, OverlapBehavior behavior) {
+        super(name, desc, "raster", uom);
         this.filterFactory = factory;
         this.opacity = filterFactory.literal(1.0);
         this.overlap = filterFactory.literal(OverlapBehavior.RANDOM);
-        this.description = desc;
-        this.name = name;
-        this.uom = uom;
         this.behavior = behavior;
     }
     
 
-    public String getName() {
-        return name;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((behavior == null) ? 0 : behavior.hashCode());
+        result = prime * result + ((channelSelection == null) ? 0 : channelSelection.hashCode());
+        result = prime * result + ((colorMap == null) ? 0 : colorMap.hashCode());
+        result = prime * result
+                + ((contrastEnhancement == null) ? 0 : contrastEnhancement.hashCode());
+        result = prime * result + ((filterFactory == null) ? 0 : filterFactory.hashCode());
+        result = prime * result + ((opacity == null) ? 0 : opacity.hashCode());
+        result = prime * result + ((overlap == null) ? 0 : overlap.hashCode());
+        result = prime * result + ((shadedRelief == null) ? 0 : shadedRelief.hashCode());
+        result = prime * result + ((symbolizer == null) ? 0 : symbolizer.hashCode());
+        return result;
     }
 
-    public Description getDescription() {
-        return description;
-    }
-    
-    public Unit getUnitOfMeasure() {
-        return uom;
-    }
-    
-    public int hashcode() {
-        int key = 0;
-        key = channelSelection.hashCode();
-        key = (key * 13) + colorMap.hashCode();
-        key = (key * 13) + contrastEnhancement.hashCode();
-        key = (key * 13) + shadedRelief.hashCode();
-        key = (key * 13) + opacity.hashCode();
-        key = (key * 13) + overlap.hashCode();
-        key = (key * 13) + geometryName.hashCode();
-
-        return key;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RasterSymbolizerImpl other = (RasterSymbolizerImpl) obj;
+        if (behavior == null) {
+            if (other.behavior != null)
+                return false;
+        } else if (!behavior.equals(other.behavior))
+            return false;
+        if (channelSelection == null) {
+            if (other.channelSelection != null)
+                return false;
+        } else if (!channelSelection.equals(other.channelSelection))
+            return false;
+        if (colorMap == null) {
+            if (other.colorMap != null)
+                return false;
+        } else if (!colorMap.equals(other.colorMap))
+            return false;
+        if (contrastEnhancement == null) {
+            if (other.contrastEnhancement != null)
+                return false;
+        } else if (!contrastEnhancement.equals(other.contrastEnhancement))
+            return false;
+        if (filterFactory == null) {
+            if (other.filterFactory != null)
+                return false;
+        } else if (!filterFactory.equals(other.filterFactory))
+            return false;
+        if (opacity == null) {
+            if (other.opacity != null)
+                return false;
+        } else if (!opacity.equals(other.opacity))
+            return false;
+        if (overlap == null) {
+            if (other.overlap != null)
+                return false;
+        } else if (!overlap.equals(other.overlap))
+            return false;
+        if (shadedRelief == null) {
+            if (other.shadedRelief != null)
+                return false;
+        } else if (!shadedRelief.equals(other.shadedRelief))
+            return false;
+        if (symbolizer == null) {
+            if (other.symbolizer != null)
+                return false;
+        } else if (!symbolizer.equals(other.symbolizer))
+            return false;
+        return true;
     }
 
     /**
@@ -131,7 +175,7 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @return the ColorMap for the raster
      */
-    public ColorMap getColorMap() {
+    public ColorMapImpl getColorMap() {
         return colorMap;
     }
 
@@ -153,22 +197,10 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @return the ContrastEnhancement
      */
-    public ContrastEnhancement getContrastEnhancement() {
+    public ContrastEnhancementImpl getContrastEnhancement() {
         return contrastEnhancement;
     }
 
-    /**
-     * The interpretation of Geometry is system-dependent, as raster data may
-     * be organized differently from feature data, though omitting this
-     * element selects the default raster-data source.  Geometry-type
-     * transformations are also system-dependent and it is assumed that this
-     * capability will be little used.
-     *
-     * @return the name of the geometry
-     */
-    public String getGeometryPropertyName() {
-        return geometryName;
-    }
 
     /**
      * The ImageOutline element specifies that individual source rasters in a
@@ -228,6 +260,10 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
     public OverlapBehavior getOverlapBehavior() {
         return behavior;
     }
+    
+    public void setOverlapBehavior(OverlapBehavior overlapBehavior) {
+        this.behavior = overlapBehavior;
+    }
 
     /**
      * The ShadedRelief element selects the application of relief shading (or
@@ -245,7 +281,7 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @return the shadedrelief object
      */
-    public ShadedRelief getShadedRelief() {
+    public ShadedReliefImpl getShadedRelief() {
         return shadedRelief;
     }
 
@@ -262,12 +298,11 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @param channel the channel selected
      */
-    @Deprecated
-    public void setChannelSelection(ChannelSelection channel) {
+    public void setChannelSelection(org.opengis.style.ChannelSelection channel) {
         if (this.channelSelection == channel) {
             return;
         }
-        this.channelSelection = channel;
+        this.channelSelection = ChannelSelectionImpl.cast( channel );
     }
 
     /**
@@ -286,12 +321,11 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @param colorMap the ColorMap for the raster
      */
-    @Deprecated
-    public void setColorMap(ColorMap colorMap) {
+    public void setColorMap(org.opengis.style.ColorMap colorMap) {
         if (this.colorMap == colorMap) {
             return;
         }
-        this.colorMap = colorMap;
+        this.colorMap = ColorMapImpl.cast( colorMap );
     }
 
     /**
@@ -312,29 +346,11 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @param contrastEnhancement the contrastEnhancement
      */
-    @Deprecated
-    public void setContrastEnhancement(ContrastEnhancement contrastEnhancement) {
+    public void setContrastEnhancement(org.opengis.style.ContrastEnhancement contrastEnhancement) {
         if (this.contrastEnhancement == contrastEnhancement) {
             return;
         }
-        this.contrastEnhancement = contrastEnhancement;
-    }
-
-    /**
-     * The interpretation of Geometry is system-dependent, as raster data may
-     * be organized differently from feature data, though omitting this
-     * element selects the default raster-data source.  Geometry-type
-     * transformations are also system-dependent and it is assumed that this
-     * capability will be little used.
-     *
-     * @param geometryName the name of the Geometry
-     */
-    @Deprecated
-    public void setGeometryPropertyName(String geometryName) {
-        if (this.geometryName == geometryName) {
-            return;
-        }
-        this.geometryName = geometryName;
+        this.contrastEnhancement = ContrastEnhancementImpl.cast( contrastEnhancement );
     }
 
     /**
@@ -363,8 +379,7 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    @Deprecated
-    public void setImageOutline(Symbolizer symbolizer) {
+    public void setImageOutline(org.opengis.style.Symbolizer symbolizer) {
         if( symbolizer == null ){
             this.symbolizer = null;
         }
@@ -373,7 +388,7 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
             if (this.symbolizer == symbolizer) {
                 return;
             }
-            this.symbolizer = symbolizer;
+            this.symbolizer = StyleFactoryImpl2.cast( symbolizer );
         } else {
             throw new IllegalArgumentException(
                 "Only a line or polygon symbolizer may be used to outline a raster");
@@ -385,7 +400,6 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @param opacity An expression which evaluates to the the opacity (0-1)
      */
-    @Deprecated
     public void setOpacity(Expression opacity) {
         if (this.opacity == opacity) {
             return;
@@ -432,12 +446,11 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @param shadedRelief the shadedrelief object
      */
-    @Deprecated
-    public void setShadedRelief(ShadedRelief shadedRelief) {
+    public void setShadedRelief(org.opengis.style.ShadedRelief shadedRelief) {
         if (this.shadedRelief == shadedRelief) {
             return;
         }
-        this.shadedRelief = shadedRelief;
+        this.shadedRelief = ShadedReliefImpl.cast( shadedRelief );
     }
 
     public Object accept(StyleVisitor visitor,Object data) {
@@ -469,6 +482,31 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
         return clone;
     }
 
-
+    static RasterSymbolizerImpl cast(org.opengis.style.Symbolizer symbolizer) {
+        if( symbolizer == null ){
+            return null;
+        }
+        if( symbolizer instanceof RasterSymbolizerImpl ){
+            return (RasterSymbolizerImpl) symbolizer;
+        }
+        else if (symbolizer instanceof org.opengis.style.RasterSymbolizer ){
+            org.opengis.style.RasterSymbolizer rasterSymbolizer = (org.opengis.style.RasterSymbolizer) symbolizer;
+            RasterSymbolizerImpl copy = new RasterSymbolizerImpl();
+            copy.setChannelSelection( rasterSymbolizer.getChannelSelection());
+            copy.setColorMap( rasterSymbolizer.getColorMap() );
+            copy.setContrastEnhancement( rasterSymbolizer.getContrastEnhancement() );
+            copy.setDescription( rasterSymbolizer.getDescription());
+            copy.setGeometryPropertyName( rasterSymbolizer.getGeometryPropertyName() );
+            copy.setImageOutline( rasterSymbolizer.getImageOutline() );
+            copy.setName( rasterSymbolizer.getName());
+            copy.setOpacity( rasterSymbolizer.getOpacity());
+            copy.setOverlapBehavior( rasterSymbolizer.getOverlapBehavior() );
+            copy.setShadedRelief( rasterSymbolizer.getShadedRelief());
+            copy.setUnitOfMeasure( rasterSymbolizer.getUnitOfMeasure());
+            
+            return copy;
+        }
+        return null; // must not be a raster symbolizer
+    }
 
 }

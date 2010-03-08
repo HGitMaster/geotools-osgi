@@ -29,6 +29,8 @@ import org.geotools.geometry.iso.util.Assert;
  * the input coordinates have been made precise by scaling them to an integer
  * grid.)
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/LineIntersector.java $
  */
 public abstract class LineIntersector {
 

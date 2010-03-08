@@ -22,6 +22,8 @@ package org.geotools.caching.spatialindex;
  *
  * @author crousson
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/RegionNodeIdentifier.java $
  */
 public final class RegionNodeIdentifier extends NodeIdentifier {
     private static final long serialVersionUID = 6630434291791608926L;

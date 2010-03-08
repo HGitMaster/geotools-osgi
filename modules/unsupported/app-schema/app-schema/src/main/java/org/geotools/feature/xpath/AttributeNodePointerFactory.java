@@ -38,6 +38,8 @@ import org.opengis.feature.type.AttributeType;
  * @author Justin Deoliveira, The Open Planning Project
  * @author Gabriel Roldan, Axios Engineering
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributeNodePointerFactory.java $
  */
 public class AttributeNodePointerFactory implements NodePointerFactory {
 

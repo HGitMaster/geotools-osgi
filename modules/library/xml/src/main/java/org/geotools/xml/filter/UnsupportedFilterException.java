@@ -22,6 +22,8 @@ package org.geotools.xml.filter;
  *
  * @author Jesse
  * @since 2.2.1
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/filter/UnsupportedFilterException.java $
  */
 public class UnsupportedFilterException extends RuntimeException {
     private static final long serialVersionUID = 1522023598004933175L;

@@ -34,6 +34,8 @@ import org.opengis.feature.type.Name;
  * different data accesses to be accessed globally.
  * 
  * @author Rini Angreani, Curtin University of Technology
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/DataAccessRegistry.java $
  */
 public class DataAccessRegistry extends ArrayList<DataAccess<FeatureType, Feature>> {
     /**
@@ -88,6 +90,16 @@ public class DataAccessRegistry extends ArrayList<DataAccess<FeatureType, Featur
         registry.remove(dataAccess);
     }
 
+    /**
+     * Unregister all data accesses in the registry. This is may be needed to prevent unit tests
+     * from conflicting with data accesses with the same type name registered for other tests.
+     */
+    public static synchronized void unregisterAll() {
+        if (registry != null) {
+            registry.clear();
+        }
+    }
+    
     public static boolean hasName(Name featureTypeName) throws IOException {
         if (registry == null) {
             // nothing's been registered, but it's OK, return false

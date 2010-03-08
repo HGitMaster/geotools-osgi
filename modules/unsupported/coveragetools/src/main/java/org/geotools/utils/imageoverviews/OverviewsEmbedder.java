@@ -23,12 +23,18 @@ import org.geotools.utils.progress.ExceptionEvent;
 import org.geotools.utils.progress.ProcessingEvent;
 import org.geotools.utils.progress.ProcessingEventListener;
 
+import it.geosolutions.imageio.plugins.tiff.BaselineTIFFTagSet;
+import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageMetadata;
+import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageWriter;
+
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -39,8 +45,10 @@ import java.util.logging.Logger;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.BorderExtender;
@@ -77,6 +85,8 @@ import org.geotools.resources.image.ImageUtilities;
  *  &#064;since 2.3.x
  *  &#064;version 0.3
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/imageoverviews/OverviewsEmbedder.java $
  */
 public class OverviewsEmbedder extends BaseArgumentsManager implements
 		Runnable, ProcessingEventListener {
@@ -159,14 +169,15 @@ public class OverviewsEmbedder extends BaseArgumentsManager implements
 	private final OverviewsEmbedderWriteProgressListener writeProgressListener = new OverviewsEmbedderWriteProgressListener();
 
 	/** Static immutable ap for scaling algorithms. */
-	private static Set<String> scalingAlgorithms;
+	public static final List<String> scalingAlgorithms;
 	static {
-		scalingAlgorithms = new HashSet<String>();
-		scalingAlgorithms.add("nn");
-		scalingAlgorithms.add("bil");
-		scalingAlgorithms.add("bic");
-		scalingAlgorithms.add("avg");
-		scalingAlgorithms.add("filt");
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("nn");
+		list.add("bil");
+		list.add("bic");
+		list.add("avg");
+		list.add("filt");
+		scalingAlgorithms=Collections.unmodifiableList(list);
 	}
 
 	private final static String NAME = "OverviewsEmbedder";
@@ -923,9 +934,15 @@ public class OverviewsEmbedder extends BaseArgumentsManager implements
 					else
 						throw new IllegalStateException();
 
-					// write out
-					writer.writeInsert(-1, new IIOImage(newImage, null, null),
-							param);
+					IIOMetadata imageMetadata = null;
+                                        
+                    if (writer instanceof TIFFImageWriter){
+                       imageMetadata = writer.getDefaultImageMetadata(new ImageTypeSpecifier(newImage), param);
+                       if (imageMetadata != null)
+                            ((TIFFImageMetadata)imageMetadata).addShortOrLongField(BaselineTIFFTagSet.TAG_NEW_SUBFILE_TYPE, BaselineTIFFTagSet.NEW_SUBFILE_TYPE_REDUCED_RESOLUTION);
+                    }
+                    // write out
+                    writer.writeInsert(-1, new IIOImage(newImage, null, imageMetadata), param);
 
 					message = new StringBuffer("Step ").append(
 							overviewInProcess).append(" of image  ").append(
@@ -1158,5 +1175,53 @@ public class OverviewsEmbedder extends BaseArgumentsManager implements
 
 	public final void setCompressionScheme(String compressionScheme) {
 		this.compressionScheme = compressionScheme;
+	}
+
+	public int getTileW() {
+		return tileW;
+	}
+
+	public void setTileW(int tileW) {
+		this.tileW = tileW;
+	}
+
+	public int getTileH() {
+		return tileH;
+	}
+
+	public void setTileH(int tileH) {
+		this.tileH = tileH;
+	}
+
+	public String getScaleAlgorithm() {
+		return scaleAlgorithm;
+	}
+
+	public void setScaleAlgorithm(String scaleAlgorithm) {
+		this.scaleAlgorithm = scaleAlgorithm;
+	}
+
+	public int getNumSteps() {
+		return numSteps;
+	}
+
+	public void setNumSteps(int numSteps) {
+		this.numSteps = numSteps;
+	}
+
+	public OverviewsEmbedderWriteProgressListener getWriteProgressListener() {
+		return writeProgressListener;
+	}
+
+	public String getWildcardString() {
+		return wildcardString;
+	}
+
+	public static List<String> getScalingAlgorithms() {
+		return scalingAlgorithms;
+	}
+
+	public Interpolation getInterp() {
+		return interp;
 	}
 }

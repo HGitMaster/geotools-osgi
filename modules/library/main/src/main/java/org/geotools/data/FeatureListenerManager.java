@@ -44,7 +44,7 @@ import org.opengis.feature.type.FeatureType;
  * in order to cut down on memory leaks.
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/FeatureListenerManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FeatureListenerManager.java $
  */
 public class FeatureListenerManager {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");	

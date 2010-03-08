@@ -45,6 +45,8 @@ import com.vividsolutions.jts.io.WKTReader;
 
 /**
  * @author David Blasby (The Open Planning Project)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/StaticGeometry.java $
  */
  public class StaticGeometry {
 
@@ -438,6 +440,26 @@ import com.vividsolutions.jts.io.WKTReader;
      static public String strToUpperCase(String s1)
      {
         return s1.toUpperCase();
+     }
+     
+     static public String strCapitalize(String s)
+     {
+        int strLength = s.length();
+        StringBuilder sb = new StringBuilder(strLength);
+        boolean titleCaseNext = true;
+        for (int i = 0; i < strLength; i++) {
+            char ch = s.charAt(i);
+            if (Character.isWhitespace(ch)) {
+                sb.append(ch);
+                titleCaseNext = true;
+            } else if (titleCaseNext) {
+                sb.append(Character.toTitleCase(ch));
+                titleCaseNext = false;
+            } else {
+                sb.append(Character.toLowerCase(ch));
+            }
+        }
+        return sb.toString();
      }
      
      static public boolean strMatches(String s1,String s2)

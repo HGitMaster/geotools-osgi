@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: BearingImpl.java 25075 2007-04-09 19:20:46Z desruisseaux $
+ ** $Id: BearingImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/BearingImpl.java,v $
  **
@@ -22,6 +22,8 @@ import org.opengis.geometry.primitive.Bearing;
  * @UML datatype Bearing
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/BearingImpl.java $
  * @version 2.0
  *
  * @revisit Should we move this interface elsewhere (e.g. in some kind of units package)?

@@ -102,7 +102,7 @@ import org.geotools.util.CanonicalSet;
  * transform object to keep information on its source and target coordinate systems.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultMathTransformFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultMathTransformFactory.java $
  * @version $Id: DefaultMathTransformFactory.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

@@ -41,6 +41,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * contain either a direct position or a point.
  * 
  * @author Jackson Roehrig & Sanjay Jena
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/PointArrayImpl.java $
  */
 
 public class PointArrayImpl extends ArrayList<Position> implements PointArray {

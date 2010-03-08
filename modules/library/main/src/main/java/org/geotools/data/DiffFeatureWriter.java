@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Jody Garnett, Refractions Research
  *
  * @see TransactionStateDiff
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/DiffFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/DiffFeatureWriter.java $
  */
 public abstract class DiffFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
     protected  FeatureReader<SimpleFeatureType, SimpleFeature> reader;

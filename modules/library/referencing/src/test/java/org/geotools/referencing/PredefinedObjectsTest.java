@@ -45,7 +45,7 @@ import static org.junit.Assert.*;
 /**
  * Tests <cite>Well Know Text</cite> (WKT) formatting for some hard-coded, predefined objects.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/PredefinedObjectsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/PredefinedObjectsTest.java $
  * @version $Id: PredefinedObjectsTest.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

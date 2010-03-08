@@ -21,14 +21,14 @@ import java.util.EventObject;
 import org.geotools.map.MapContext;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 
 /**
  * Event object for MapContext area of interest and coordinate system changes.
  *
  * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/map/event/MapBoundsEvent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/event/MapBoundsEvent.java $
  */
 public class MapBoundsEvent extends EventObject {
     /** Area of interest changed */
@@ -43,24 +43,25 @@ public class MapBoundsEvent extends EventObject {
     /** Holds value of property type. */
     private int type;
 
-    /** Holds value of property oldCoordinateReferenceSystem. */
-    private CoordinateReferenceSystem oldCoordinateReferenceSystem;
-
-    /** Holds value of property oldAreaOfInterest. */
-    private Envelope oldAreaOfInterest;
+    private ReferencedEnvelope oldAreaOfInterest;
+    private ReferencedEnvelope newAreaOfInterest;
 
     /**
      * Creates a new instance of BoundsEvent
      *
-     * @param source DOCUMENT ME!
-     * @param type DOCUMENT ME!
-     * @param oldAreaOfInterest DOCUMENT ME!
-     * @param oldCoordinateReferenceSystem DOCUMENT ME!
+     * @param source the map context reporting the change
      *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param type the type of change indicated by one or both of the bit masks
+     *        {@linkplain #AREA_OF_INTEREST_MASK} and {@linkplain #COORDINATE_SYSTEM_MASK}
+     *
+     * @param oldAreaOfInterest the context's previous area of interest
+     *
+     * @param newAreaOfInterest the context's new area of interest
+     *
+     * @throws IllegalArgumentException if type is invalid
      */
-    public MapBoundsEvent(MapContext source, int type, Envelope oldAreaOfInterest,
-        CoordinateReferenceSystem oldCoordinateReferenceSystem) {
+    public MapBoundsEvent(MapContext source, int type,
+            ReferencedEnvelope oldAreaOfInterest, ReferencedEnvelope newAreaOfInterest) {
         super(source);
 
         if (type >= NEXT_FLAG) {
@@ -70,7 +71,7 @@ public class MapBoundsEvent extends EventObject {
 
         this.type = type;
         this.oldAreaOfInterest = oldAreaOfInterest;
-        this.oldCoordinateReferenceSystem = oldCoordinateReferenceSystem;
+        this.newAreaOfInterest = newAreaOfInterest;
     }
 
     /**
@@ -83,20 +84,38 @@ public class MapBoundsEvent extends EventObject {
     }
 
     /**
-     * Getter for property oldCoordinateReferenceSystem.
+     * Get the previous coordinate reference system. This is a convenience
+     * method equivalent to
+     * {@linkplain #getOldAreaOfInterest()}.getCoordinateReferenceSystem()
      *
-     * @return Value of property oldCoordinateReferenceSystem.
+     * @return the previous CoordinateReferenceSystem object
      */
     public CoordinateReferenceSystem getOldCoordinateReferenceSystem() {
-        return this.oldCoordinateReferenceSystem;
+        return oldAreaOfInterest.getCoordinateReferenceSystem();
     }
 
     /**
-     * Getter for property oldAreaOfInterest.
+     * Get the new coordinate reference system. This is a convenience
+     * method equivalent to
+     * {@linkplain #getNewAreaOfInterest()}.getCoordinateReferenceSystem()
      *
-     * @return Value of property oldAreaOfInterest.
+     * @return the new CoordinateReferenceSystem object
      */
-    public Envelope getOldAreaOfInterest() {
+    public CoordinateReferenceSystem getNewCoordinateReferenceSystem() {
+        return newAreaOfInterest.getCoordinateReferenceSystem();
+    }
+
+    /**
+     * Get the old area of interest
+     */
+    public ReferencedEnvelope getOldAreaOfInterest() {
         return this.oldAreaOfInterest;
     }
+
+    /**
+     * Get the new area of interest
+     */
+    public ReferencedEnvelope getNewAreaOfInterest() {
+        return this.newAreaOfInterest;
+}
 }

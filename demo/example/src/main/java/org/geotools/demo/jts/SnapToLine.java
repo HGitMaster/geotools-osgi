@@ -54,6 +54,8 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  * </p>
  * 
  * @author Jody Garnett (Refractions Research)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/jts/SnapToLine.java $
  */
 public class SnapToLine {
     
@@ -79,7 +81,7 @@ public class SnapToLine {
             }
         }
         else {
-            params.put("url", file.toURL() );            
+            params.put("url", file.toURI().toURL() );            
         }        
         DataStore data = DataStoreFinder.getDataStore(params);        
         List<Name> names = data.getNames();

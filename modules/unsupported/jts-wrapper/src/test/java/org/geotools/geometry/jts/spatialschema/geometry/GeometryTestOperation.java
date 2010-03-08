@@ -30,6 +30,8 @@ import java.util.HashMap;
 /**
  * @author Jody Garnett
  * @author Joel Skelton
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/test/java/org/geotools/geometry/jts/spatialschema/geometry/GeometryTestOperation.java $
  */
 public class GeometryTestOperation {
     private String operation;

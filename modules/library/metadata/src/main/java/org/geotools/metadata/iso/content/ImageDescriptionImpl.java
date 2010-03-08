@@ -27,7 +27,7 @@ import org.opengis.metadata.content.ImagingCondition;
 /**
  * Information about an image's suitability for use.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/content/ImageDescriptionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/content/ImageDescriptionImpl.java $
  * @version $Id: ImageDescriptionImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

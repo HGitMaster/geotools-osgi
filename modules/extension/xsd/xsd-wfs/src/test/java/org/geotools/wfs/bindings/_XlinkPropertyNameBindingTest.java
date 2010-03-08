@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * @author Gabriel Roldan (TOPP)
  * @version $Id: _XlinkPropertyNameBindingTest.java 30665 2008-06-12 22:48:07Z acuster $
  * @since 2.5.x
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/xsd/xsd-wfs/src/test/java/org/geotools/wfs/bindings/_XlinkPropertyNameBindingTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/test/java/org/geotools/wfs/bindings/_XlinkPropertyNameBindingTest.java $
  */
 public class _XlinkPropertyNameBindingTest extends WFSTestSupport {
     public _XlinkPropertyNameBindingTest() {

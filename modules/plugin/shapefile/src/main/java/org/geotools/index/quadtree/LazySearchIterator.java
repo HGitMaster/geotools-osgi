@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Stack;
 
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.index.Data;
@@ -36,6 +37,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * on the same tree then they can interfere with each other.
  * 
  * @author Jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/index/quadtree/LazySearchIterator.java $
  */
 public class LazySearchIterator implements Iterator<Data> {
 
@@ -60,6 +63,8 @@ public class LazySearchIterator implements Iterator<Data> {
     Iterator data;
 
     private IndexFile indexfile;
+    
+    ArrayList<Node> parents = new ArrayList<Node>();
 
     public LazySearchIterator(Node root, IndexFile indexfile, Envelope bounds) {
         super();
@@ -78,6 +83,7 @@ public class LazySearchIterator implements Iterator<Data> {
         if (data != null && data.hasNext()) {
             next = (Data) data.next();
         } else {
+            data = null;
             fillCache();
             if (data != null && data.hasNext())
                 next = (Data) data.next();
@@ -86,8 +92,8 @@ public class LazySearchIterator implements Iterator<Data> {
     }
 
     private void fillCache() {
-        List indices = new ArrayList();
-        ArrayList dataList = new ArrayList();
+        List indices = new ArrayList(MAX_INDICES);
+        ArrayList dataList = null;
         try {
             while (indices.size() < MAX_INDICES && current != null) {
                 if (idIndex < current.getNumShapeIds() && !current.isVisited()
@@ -95,26 +101,38 @@ public class LazySearchIterator implements Iterator<Data> {
                     indices.add(new Integer(current.getShapeId(idIndex)));
                     idIndex++;
                 } else {
+                    // free the shapes id array of the current node and prepare to move to the next
                     current.setShapesId(new int[0]);
                     idIndex = 0;
+                    
                     boolean foundUnvisited = false;
                     for (int i = 0; i < current.getNumSubNodes(); i++) {
                         Node node = current.getSubNode(i);
                         if (!node.isVisited()
                                 && node.getBounds().intersects(bounds)) {
                             foundUnvisited = true;
+                            parents.add(current);
                             current = node;
                             break;
                         }
                     }
                     if (!foundUnvisited) {
+                        // mark as visited and free the subnodes
                         current.setVisited(true);
-                        current = current.getParent();
+                        current.clearSubNodes();
+                        
+                        // move up to parent
+                        if(parents.isEmpty())
+                            current = null;
+                        else
+                            current = parents.remove(parents.size() - 1);
                     }
                 }
             }
+            
             // sort so offset lookup is faster
             Collections.sort(indices);
+            dataList = new ArrayList(indices.size());
             for (Iterator iter = indices.iterator(); iter.hasNext();) {
                 Integer recno = (Integer) iter.next();
                 Data data = new Data(DATA_DEFINITION);

@@ -42,6 +42,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * @author sanjay
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/iso/primitive/BoundaryTest.java $
  */
 public class BoundaryTest extends TestCase {
 	

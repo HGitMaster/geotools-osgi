@@ -29,7 +29,7 @@ import java.net.URL;
  * "GetCapabilities".
  *
  * @author rgould
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/ows/AbstractGetCapabilitiesRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ows/AbstractGetCapabilitiesRequest.java $
  */
 public abstract class AbstractGetCapabilitiesRequest extends AbstractRequest implements GetCapabilitiesRequest{
     /** Represents the SERVICE parameter */

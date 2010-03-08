@@ -28,7 +28,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Information on the range of each dimension of a cell measurement value.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/content/RangeDimensionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/content/RangeDimensionImpl.java $
  * @version $Id: RangeDimensionImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

@@ -47,7 +47,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * implementation.
  * 
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FeatureStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FeatureStore.java $
  */
 public class DB2FeatureStore extends JDBCFeatureStore{
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(

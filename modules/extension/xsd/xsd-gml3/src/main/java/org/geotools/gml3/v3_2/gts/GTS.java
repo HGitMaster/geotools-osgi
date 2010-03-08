@@ -27,6 +27,8 @@ import org.geotools.gml3.v3_2.gco.GCO;
  * attributes in the http://www.isotc211.org/2005/gts schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/v3_2/gts/GTS.java $
  */
 public final class GTS extends StubbedGMLXSD {
 

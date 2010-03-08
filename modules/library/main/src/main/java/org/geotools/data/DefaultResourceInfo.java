@@ -29,6 +29,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Default implementation of ResourceInfo; a simple java bean.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/DefaultResourceInfo.java $
  */
 public class DefaultResourceInfo implements ResourceInfo {
 

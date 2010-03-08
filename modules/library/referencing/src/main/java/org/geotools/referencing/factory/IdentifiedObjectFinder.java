@@ -51,7 +51,7 @@ import org.geotools.util.logging.Logging;
  * element in <cite>Well Known Text</cite> terminology.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/IdentifiedObjectFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/IdentifiedObjectFinder.java $
  * @version $Id: IdentifiedObjectFinder.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux
  */

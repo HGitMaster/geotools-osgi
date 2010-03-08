@@ -83,7 +83,7 @@ import org.opengis.filter.spatial.Within;
  * @deprecated Please use DefaultFilterVisitor (to stick with only opengis Filter)
  * @author James Macgill, Penn State
  * @author Justin Deoliveira, The Open Planning Project
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/visitor/AbstractFilterVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/AbstractFilterVisitor.java $
  */
 public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor, FilterVisitor {
     

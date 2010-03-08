@@ -92,7 +92,7 @@ import java.util.logging.Logger;
  * </p>
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/filter/SQLEncoderDB2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/filter/SQLEncoderDB2.java $
  */
 public class SQLEncoderDB2 extends FilterToSQL{
 //	public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {

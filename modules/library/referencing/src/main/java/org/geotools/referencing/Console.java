@@ -108,8 +108,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * </table>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/Console.java $
- * @version $Id: Console.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/Console.java $
+ * @version $Id: Console.java 34041 2009-10-02 08:36:24Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class Console extends AbstractConsole {
@@ -612,7 +612,7 @@ public class Console extends AbstractConsole {
                               targetPosition.getOrdinate(i))
                   <= tolerance[Math.min(i, tolerance.length-1)]))
             {
-                throw new TransformException(Errors.format(ErrorKeys.UNEXPECTED_TRANSFORM_RESULT));
+                throw new TransformException("Expected " + targetPosition + " but got " + transformedSource);
             }
         }
     }

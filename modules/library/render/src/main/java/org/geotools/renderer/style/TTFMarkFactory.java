@@ -33,6 +33,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
+import org.geotools.renderer.style.shape.ExplicitBoundsShape;
 import org.opengis.feature.Feature;
 import org.opengis.filter.expression.Expression;
 
@@ -46,6 +47,8 @@ import org.opengis.filter.expression.Expression;
  * 
  * @author Andrea Aime - TOPP
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/TTFMarkFactory.java $
  */
 public class TTFMarkFactory implements MarkFactory {
 
@@ -114,7 +117,9 @@ public class TTFMarkFactory implements MarkFactory {
         // other marks convention
         tx.scale(1 / max, -1 / max);
         tx.translate(-bounds.getCenterX(), -bounds.getCenterY());
-        return tx.createTransformedShape(s);
+        ExplicitBoundsShape shape = new ExplicitBoundsShape(tx.createTransformedShape(s));
+        shape.setBounds(new Rectangle2D.Double(-0.5,0.5,1.0,1.0));
+        return shape;
     }
 
     public static void main(String[] args) {

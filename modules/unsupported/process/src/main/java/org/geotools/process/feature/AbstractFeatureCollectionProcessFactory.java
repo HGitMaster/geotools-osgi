@@ -16,23 +16,18 @@
  */
 package org.geotools.process.feature;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.Parameter;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.process.ProcessFactory;
-import org.geotools.process.impl.AbstractProcessFactory;
+import org.geotools.process.impl.SingleProcessFactory;
 import org.geotools.text.Text;
 
 /**
  * Base class for process factories which perform an operation on each feature in a feature 
  * collection.
- * <p>
- * <b>Note</b>: This base class is intended to be used for processes which operate on each feature in a feature 
- * collection, resulting in a new feature collection which has the same schema as the original.
- * </p>
  * <p>
  * Subclasses must implement:
  * <ul>
@@ -45,21 +40,14 @@ import org.geotools.text.Text;
  * 
  * @author Justin Deoliveira, OpenGEO
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/feature/AbstractFeatureCollectionProcessFactory.java $
  */
-public abstract class AbstractFeatureCollectionProcessFactory extends AbstractProcessFactory {
+public abstract class AbstractFeatureCollectionProcessFactory extends SingleProcessFactory {
     /** Features for operation */
-    static final Parameter<FeatureCollection> FEATURES = new Parameter<FeatureCollection>(
+    public static final Parameter<FeatureCollection> FEATURES = new Parameter<FeatureCollection>(
         "features", FeatureCollection.class, Text.text("Features"), Text.text("Features to process"));
 
-    /** Result of operation */
-    static final Parameter<FeatureCollection> RESULT = new Parameter<FeatureCollection>(
-            "result", FeatureCollection.class, Text.text("Result"), Text
-                    .text("Buffered features"));
-    static final Map<String,Parameter<?>> resultInfo = new HashMap<String, Parameter<?>>();
-    static {
-        resultInfo.put( RESULT.key, RESULT );
-    }
-    
     /**
      * Adds the {@link #FEATURES} parameter and then delegates to {@link #addParameters(Map)}.
      */
@@ -84,19 +72,4 @@ public abstract class AbstractFeatureCollectionProcessFactory extends AbstractPr
      * 
      */
     protected abstract void addParameters( Map<String,Parameter<?>> parameters );
-
-    public final Map<String, Parameter<?>> getResultInfo(
-            Map<String, Object> parameters) throws IllegalArgumentException {
-        return Collections.unmodifiableMap( resultInfo );
-    }
-    
-    public final boolean supportsProgress() {
-        return true;
-    }
-    
-    public String getVersion() {
-        return "1.0.0";
-    }
-
-    
 }

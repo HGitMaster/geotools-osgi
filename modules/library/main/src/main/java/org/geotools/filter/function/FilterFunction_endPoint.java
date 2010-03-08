@@ -22,6 +22,7 @@ import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public class FilterFunction_endPoint extends FunctionExpressionImpl implements
         FunctionExpression {
@@ -38,7 +39,7 @@ public class FilterFunction_endPoint extends FunctionExpressionImpl implements
         Geometry arg0;
 
         try { // attempt to get value and perform conversion
-            arg0 = (Geometry) getExpression(0).evaluate(feature);
+            arg0 = (Geometry) getExpression(0).evaluate(feature, LineString.class);
         } catch (Exception e) // probably a type error
         {
             throw new IllegalArgumentException(

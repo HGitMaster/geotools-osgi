@@ -50,6 +50,7 @@ import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.Utilities;
 import org.geotools.util.logging.Logging;
 
 import static java.lang.Math.*;
@@ -70,8 +71,8 @@ import static java.lang.Math.*;
  * WKT (Well Know Text) or XML (not yet implemented) are more appropriate.
  *
  * @since 2.0
- * @version $Id: MapProjection.java 31445 2008-09-07 18:14:23Z desruisseaux $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/MapProjection.java $
+ * @version $Id: MapProjection.java 34438 2009-11-22 17:21:43Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/MapProjection.java $
  * @author André Gosselin
  * @author Martin Desruisseaux (PMO, IRD)
  * @author Rueben Schulz
@@ -110,11 +111,34 @@ public abstract class MapProjection extends AbstractMathTransform
      * Difference allowed in iterative computations.
      */
     private static final double ITERATION_TOLERANCE = 1E-10;
+    
+    /**
+     * Relative iteration precision used in the <code>mlfn<code> method
+     */
+    private static final double MLFN_TOL = 1E-11;
+
 
     /**
      * Maximum number of iterations for iterative computations.
      */
     private static final int MAXIMUM_ITERATIONS = 15;
+    
+    /**
+     * Constants used to calculate {@link #en0}, {@link #en1},
+     * {@link #en2}, {@link #en3}, {@link #en4}.
+     */
+    private static final double C00= 1.0,
+                                C02= 0.25,
+                                C04= 0.046875,
+                                C06= 0.01953125,
+                                C08= 0.01068115234375,
+                                C22= 0.75,
+                                C44= 0.46875,
+                                C46= 0.01302083333333333333,
+                                C48= 0.00712076822916666666,
+                                C66= 0.36458333333333333333,
+                                C68= 0.00569661458333333333,
+                                C88= 0.3076171875;
 
     /**
      * Ellipsoid excentricity, equals to <code>sqrt({@link #excentricitySquared})</code>.
@@ -122,7 +146,7 @@ public abstract class MapProjection extends AbstractMathTransform
      *
      * @see #excentricitySquared
      * @see #isSpherical
-     */
+     */ 
     protected final double excentricity;
 
     /**
@@ -215,6 +239,12 @@ public abstract class MapProjection extends AbstractMathTransform
      * The inverse of this map projection. Will be created only when needed.
      */
     private transient MathTransform2D inverse;
+    
+    /**
+     * Constant needed for the <code>mlfn<code> method.
+     * Setup at construction time.
+     */
+    protected double en0,en1,en2,en3,en4;
 
     /**
      * When different than {@link #globalRangeCheckSemaphore}, coordinate ranges will be
@@ -282,6 +312,17 @@ public abstract class MapProjection extends AbstractMathTransform
         globalScale         = scaleFactor * semiMajor;
         ensureLongitudeInRange(AbstractProvider.CENTRAL_MERIDIAN,   centralMeridian,  true);
         ensureLatitudeInRange (AbstractProvider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, true);
+        
+        //  Compute constants for the mlfn
+        double t;
+        en0 = C00 - excentricitySquared  *  (C02 + excentricitySquared  *
+             (C04 + excentricitySquared  *  (C06 + excentricitySquared  * C08)));
+        en1 =       excentricitySquared  *  (C22 - excentricitySquared  *
+             (C04 + excentricitySquared  *  (C06 + excentricitySquared  * C08)));
+        en2 =  (t = excentricitySquared  *         excentricitySquared) *
+             (C44 - excentricitySquared  *  (C46 + excentricitySquared  * C48));
+        en3 = (t *= excentricitySquared) *  (C66 - excentricitySquared  * C68);
+        en4 =   t * excentricitySquared  *  C88;
     }
 
     /**
@@ -925,7 +966,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * {@link MapProjection#inverseTransformNormalized} instead of
      * {@link MapProjection#transformNormalized}.
      *
-     * @version $Id: MapProjection.java 31445 2008-09-07 18:14:23Z desruisseaux $
+     * @version $Id: MapProjection.java 34438 2009-11-22 17:21:43Z aaime $
      * @author Martin Desruisseaux (PMO, IRD)
      */
     private final class Inverse extends AbstractMathTransform.Inverse implements MathTransform2D {
@@ -1223,7 +1264,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * Two {@link Double#NaN NaN} values are considered equals.
      */
     static boolean equals(final double value1, final double value2) {
-        return Double.doubleToLongBits(value1) == Double.doubleToLongBits(value2);
+        return Utilities.equals(value1, value2); 
     }
 
 
@@ -1273,8 +1314,52 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         return tan(0.5 * (PI/2 - phi)) / pow((1 - sinphi) / (1 + sinphi), 0.5*excentricity);
     }
-
-
+    
+    /**
+     * Calculates the meridian distance. This is the distance along the central 
+     * meridian from the equator to {@code phi}. Accurate to < 1e-5 meters 
+     * when used in conjuction with typical major axis values.
+     *
+     * @param phi latitude to calculate meridian distance for.
+     * @param sphi sin(phi).
+     * @param cphi cos(phi).
+     * @return meridian distance for the given latitude.
+     */
+    protected final double mlfn(final double phi, double sphi, double cphi) {        
+        cphi *= sphi;
+        sphi *= sphi;
+        return en0 * phi - cphi *
+              (en1 + sphi *
+              (en2 + sphi *
+              (en3 + sphi *
+              (en4))));
+    }
+    
+    /**
+     * Calculates the latitude ({@code phi}) from a meridian distance.
+     * Determines phi to TOL (1e-11) radians, about 1e-6 seconds.
+     * 
+     * @param arg meridian distance to calulate latitude for.
+     * @return the latitude of the meridian distance.
+     * @throws ProjectionException if the itteration does not converge.
+     */
+    protected final double inv_mlfn(double arg) throws ProjectionException {
+        double s, t, phi, k = 1.0/(1.0 - excentricitySquared);
+        int i;
+        phi = arg;
+        for (i=MAXIMUM_ITERATIONS; true;) { // rarely goes over 5 iterations
+            if (--i < 0) {
+                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
+            }
+            s = Math.sin(phi);
+            t = 1.0 - excentricitySquared * s * s;
+            t = (mlfn(phi, s, Math.cos(phi)) - arg) * (t * Math.sqrt(t)) * k;
+            phi -= t;
+            if (Math.abs(t) < MLFN_TOL) {
+                return phi;
+            }
+        }
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -1286,7 +1371,7 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * The base provider for {@link MapProjection}s.
      *
-     * @version $Id: MapProjection.java 31445 2008-09-07 18:14:23Z desruisseaux $
+     * @version $Id: MapProjection.java 34438 2009-11-22 17:21:43Z aaime $
      * @author Martin Desruisseaux (PMO, IRD)
      */
     public static abstract class AbstractProvider extends MathTransformProvider {

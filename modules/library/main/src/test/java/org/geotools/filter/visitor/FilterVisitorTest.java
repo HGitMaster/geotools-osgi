@@ -47,6 +47,8 @@ import junit.framework.TestCase;
  * </ul>
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/visitor/FilterVisitorTest.java $
  */
 public class FilterVisitorTest extends TestCase {
 
@@ -104,32 +106,7 @@ public class FilterVisitorTest extends TestCase {
         Set set2 = (Set) myFilter.accept(allFids, null); // set2 will be null
         assertNull( set2 );
     }
-    public void testBoundsFilterVisitor() {
-        Filter filter = ff.isNull(ff.property("name"));
-        
-        assertNull( filter.accept( ExtractBoundsFilterVisitor.BOUNDS_VISITOR, null ) );
-        
-        ReferencedEnvelope bbox = (ReferencedEnvelope) filter.accept( ExtractBoundsFilterVisitor.BOUNDS_VISITOR, new ReferencedEnvelope() );
-        
-        assertNotNull( bbox );
-        assertTrue( bbox.isNull() );
-        
-        filter = ff.bbox("name", 0, 0, 10, 10, "EPSG:4326" );
-        bbox = (ReferencedEnvelope) filter.accept( ExtractBoundsFilterVisitor.BOUNDS_VISITOR, new ReferencedEnvelope() );
-        
-        assertNotNull( bbox );
-        assertEquals( 10, (int) bbox.getLength(0) );
-        assertEquals( 10, (int) bbox.getLength(1) );
-        
-        Coordinate[] coords = new Coordinate[]{new Coordinate(0,0), new Coordinate(10,10)};
-        LineString lineString = gf.createLineString( coords );
-        filter = ff.touches( ff.property("name"), ff.literal( lineString ) );
-        bbox = (ReferencedEnvelope) filter.accept( ExtractBoundsFilterVisitor.BOUNDS_VISITOR, new ReferencedEnvelope() );
-        
-        assertNotNull( bbox );
-        assertEquals( 10, (int) bbox.getLength(0) );
-        assertEquals( 10, (int) bbox.getLength(1) );
-    }
+
     public void testIdFinderFilterVisitor(){
         Filter filter = ff.isNull(ff.property("name"));
         boolean found = (Boolean) filter.accept( new IdFinderFilterVisitor(), null );

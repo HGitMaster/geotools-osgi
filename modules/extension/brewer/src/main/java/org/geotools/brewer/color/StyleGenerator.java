@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * WARNING: this is unstable and subject to radical change.
  *
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/brewer/src/main/java/org/geotools/brewer/color/StyleGenerator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/brewer/color/StyleGenerator.java $
  */
 public class StyleGenerator {
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.brewer.color");
@@ -378,10 +378,10 @@ public class StyleGenerator {
         // create the rule
         Rule rule = sb.createRule(symb);
 
-        if (filters.size() > 1) {
-            rule.setFilter(filters.get(0));
-        } else {
-            rule.setFilter(ff.or(filters));
+        if (filters.size() == 1){
+        	rule.setFilter(filters.get(0));
+        }else if (filters.size() > 1){
+        	rule.setFilter(ff.or(filters));
         }
 
         rule.setTitle(title);
@@ -511,7 +511,7 @@ public class StyleGenerator {
         // prepare the styleExpressions (fix out if they are ranged, and if so
         // their min and max values too
         boolean[] isRangedExpr = new boolean[styleExpression.length];
-        List min = new ArrayList();
+        List<String> min = new ArrayList<String>();
         String[] max = new String[styleExpression.length];
 
         for (int i = 0; i < styleExpression.length; i++) {

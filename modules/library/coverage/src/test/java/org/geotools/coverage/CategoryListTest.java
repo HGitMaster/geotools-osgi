@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link CategoryList} implementation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/CategoryListTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/CategoryListTest.java $
  * @version $Id: CategoryListTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

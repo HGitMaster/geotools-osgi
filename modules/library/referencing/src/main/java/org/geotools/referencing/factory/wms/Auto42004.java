@@ -47,8 +47,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * ${central_meridian}  = ${lon0}
  * </pre>
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Auto42004.java $
- * @version $Id: Auto42004.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Auto42004.java $
+ * @version $Id: Auto42004.java 34859 2010-02-03 19:30:23Z aaime $
  * @author Jody Garnett
  * @author Rueben Schulz
  * @author Martin Desruisseaux
@@ -83,7 +83,7 @@ final class Auto42004 extends Factlet {
      * {@inheritDoc}
      */
     public String getClassification() {
-        return "Equirectangular";
+        return "Equidistant_Cylindrical";
     }
 
     /**

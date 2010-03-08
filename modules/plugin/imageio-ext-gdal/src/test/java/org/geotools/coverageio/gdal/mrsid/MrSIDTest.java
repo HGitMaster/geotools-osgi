@@ -25,31 +25,36 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.coverageio.gdal.BaseGDALGridFormat;
+import org.geotools.coverageio.gdal.GDALTestCase;
 import org.geotools.data.ServiceInfo;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.test.TestData;
-import org.opengis.coverage.grid.Format;
+import org.junit.Assert;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 /**
  * @author Daniele Romagnoli, GeoSolutions
  * @author Simone Giannecchini (simboss), GeoSolutions
  * 
  * Testing {@link MrSIDReader}
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/mrsid/MrSIDTest.java $
  */
-public final class MrSIDTest extends AbstractMrSIDTestCase {
+public final class MrSIDTest extends GDALTestCase {
     /**
      * file name of a valid MrSID sample data to be used for tests.
      * 
@@ -70,8 +75,8 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
      * 
      * @param name
      */
-    public MrSIDTest(String name) {
-        super(name);
+    public MrSIDTest() {
+        super("MrSID", new MrSIDFormatFactory());
     }
 
     /**
@@ -79,6 +84,7 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
      * 
      * @throws Exception
      */
+    @org.junit.Test
     public void test() throws Exception {
         if (!testingEnabled()) {
             return;
@@ -123,7 +129,7 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
         // /////////////////////////////////////////////////////////////////////
         final int originalW = gc.getRenderedImage().getWidth();
         final int originalH = gc.getRenderedImage().getHeight();
-        final Rectangle range = reader.getOriginalGridRange().toRectangle();
+        final Rectangle range = ((GridEnvelope2D)reader.getOriginalGridRange());
         final GeneralEnvelope originalEnvelope = reader.getOriginalEnvelope();
         final GeneralEnvelope reducedEnvelope = new GeneralEnvelope(new double[] {
                 originalEnvelope.getLowerCorner().getOrdinate(0),
@@ -134,19 +140,19 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
 
         final ParameterValue gg = (ParameterValue) ((AbstractGridFormat) reader
                 .getFormat()).READ_GRIDGEOMETRY2D.createValue();
-        gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
+        gg.setValue(new GridGeometry2D(new GridEnvelope2D(new Rectangle(0, 0,
                 (int) (range.width / 2.0),
                 (int) (range.height / 2.0))), reducedEnvelope));
         gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg });
-        assertNotNull(gc);
+        Assert.assertNotNull(gc);
         // NOTE: in some cases might be too restrictive
-        assertTrue(reducedEnvelope.equals(gc.getEnvelope(), XAffineTransform
+        Assert.assertTrue(reducedEnvelope.equals(gc.getEnvelope(), XAffineTransform
                 .getScale(((AffineTransform) ((GridGeometry2D) gc
                         .getGridGeometry()).getGridToCRS2D())) / 2, true));
         // this should be fine since we give 1 pixel tolerance
-        assertEquals(originalW / 2.0 , gc.getRenderedImage()
+        Assert.assertEquals(originalW / 2.0 , gc.getRenderedImage()
                 .getWidth(), 1);
-        assertEquals(originalH / 2.0 , gc.getRenderedImage()
+        Assert.assertEquals(originalH / 2.0 , gc.getRenderedImage()
                 .getHeight(), 1);
 
         forceDataLoading(gc);
@@ -191,14 +197,14 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
         gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg,
                 policy, mt, tilesize, useJaiRead });
         
-        assertNotNull(gc);
+        Assert.assertNotNull(gc);
         // NOTE: in some cases might be too restrictive
-        assertTrue(reducedEnvelope.equals(gc.getEnvelope(), XAffineTransform
+        Assert.assertTrue(reducedEnvelope.equals(gc.getEnvelope(), XAffineTransform
                 .getScale(((AffineTransform) ((GridGeometry2D) gc
                         .getGridGeometry()).getGridToCRS2D())) / 2, true));
         // this should be fine since we give 1 pixel tolerance
-        assertEquals(originalW / 2, gc.getRenderedImage().getWidth(), 1);
-        assertEquals(originalH / 2, gc.getRenderedImage().getHeight(), 1);
+        Assert.assertEquals(originalW / 2, gc.getRenderedImage().getWidth(), 1);
+        Assert.assertEquals(originalH / 2, gc.getRenderedImage().getHeight(), 1);
 
         forceDataLoading(gc);
 
@@ -214,6 +220,7 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
      * 
      * @throws Exception
      */
+    @org.junit.Test
     public void test2() throws Exception {
         if (!testingEnabled()) {
             return;
@@ -234,13 +241,13 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
         final MrSIDFormatFactory factory = new MrSIDFormatFactory();
         final BaseGDALGridFormat format = (BaseGDALGridFormat) factory.createFormat();
         
-        assertTrue(format.accepts(file));
+        Assert.assertTrue(format.accepts(file));
         MrSIDReader reader = (MrSIDReader) format.getReader(file);
         
         final int numImages = reader.getGridCoverageCount();
         final boolean hasMoreGridCoverages = reader.hasMoreGridCoverages();
-        assertEquals(1, numImages);
-        assertEquals(false, hasMoreGridCoverages);
+        Assert.assertEquals(1, numImages);
+        Assert.assertEquals(false, hasMoreGridCoverages);
         
         final ServiceInfo serviceInfo = reader.getInfo();
         reader.getInfo("coverage");
@@ -253,18 +260,17 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
         }catch (UnsupportedOperationException uoe){
             writersAvailable = false;
         }
-        assertFalse(writersAvailable);
+        Assert.assertFalse(writersAvailable);
 
         try{
             format.getDefaultImageIOWriteParameters();
         }catch (UnsupportedOperationException uoe){
             hasWriteParams = false;
         }
-        assertFalse(hasWriteParams);
+        Assert.assertFalse(hasWriteParams);
 
         // Testing sections of code involving URLs
-        final StringBuilder sb = new StringBuilder("file:///").append(file.getAbsolutePath());
-        final URL url = new URL(sb.toString());
+        final URL url = new URL("file://"+file.getAbsolutePath());
         reader = (MrSIDReader) format.getReader(url);
         reader.getInfo();
         reader.dispose();
@@ -274,19 +280,33 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
         reader.dispose();
     }
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
+    @org.junit.Test
+    public void testIsAvailable() throws NoSuchAuthorityCodeException, FactoryException {
+	    if (!testingEnabled()) {
+	        return;
+	    }
+	    GridFormatFinder.scanForPlugins();
+	
+	    Iterator list = GridFormatFinder.getAvailableFormats().iterator();
+	    boolean found = false;
+	    GridFormatFactorySpi fac = null;
+	
+	    while (list.hasNext()) {
+	        fac = (GridFormatFactorySpi) list.next();
+	
+	        if (fac instanceof MrSIDFormatFactory) {
+	            found = true;
+	
+	            break;
+	        }
+	    }
+	
+	    Assert.assertTrue("MrSIDFormatFactory not registered", found);
+	    Assert.assertTrue("MrSIDFormatFactory not available", fac.isAvailable());
+	    Assert.assertNotNull(new MrSIDFormatFactory().createFormat());
+	}
 
-        // Test read exploiting common JAI operations (Crop-Translate-Rotate)
-        suite.addTest(new MrSIDTest("test"));
-        
-        suite.addTest(new MrSIDTest("test2"));
 
-        return suite;
-    }
 
-    public static void main(java.lang.String[] args) {
-        junit.textui.TestRunner.run(suite());
-        
-    }
+
 }

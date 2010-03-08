@@ -79,7 +79,7 @@ public final class NITFFormatFactory extends BaseGridFormatFactorySPI  implement
 	 * 
 	 * @return A {@link NITFFormat}
 	 */
-	public Format createFormat() {
+	public NITFFormat createFormat() {
 		return new NITFFormat();
 	}
 }

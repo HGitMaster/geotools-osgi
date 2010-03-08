@@ -25,7 +25,7 @@ import org.geotools.resources.XArray;
 /**
  * The list of registered {@linkplain FactoryIteratorProvider factory iterator providers}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/FactoryIteratorProviders.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/FactoryIteratorProviders.java $
  * @version $Id: FactoryIteratorProviders.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  *

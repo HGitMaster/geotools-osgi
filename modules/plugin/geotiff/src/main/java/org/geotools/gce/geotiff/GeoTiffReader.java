@@ -49,7 +49,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,12 +66,14 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.TypeMap;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.PrjFileReader;
 import org.geotools.data.WorldFileReader;
 import org.geotools.factory.Hints;
@@ -94,6 +95,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -110,18 +112,8 @@ import org.opengis.referencing.operation.TransformException;
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/coverages_branch/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffReader.java $
  */
-public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
-		GridCoverageReader {
-
-	/**
-	 * Number of coverages for this reader is 1
-	 * 
-	 * @return the number of coverages for this reader.
-	 */
-	@Override
-	public int getGridCoverageCount() {
-		return 1;
-	}
+@SuppressWarnings("deprecation")
+public final class GeoTiffReader extends AbstractGridCoverage2DReader implements GridCoverageReader {
 
 	/** Logger for the {@link GeoTiffReader} class. */
 	private Logger LOGGER = org.geotools.util.logging.Logging.getLogger(GeoTiffReader.class.toString());
@@ -208,8 +200,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 						new RuntimeException(e);
 					}
 				} else if (sourceURL.getProtocol().equalsIgnoreCase("file"))
-					source = new File(URLDecoder.decode(sourceURL.getFile(),
-							"UTF-8"));
+					source = DataUtilities.urlToFile(sourceURL);
 			}
 
 			closeMe = true;
@@ -344,7 +335,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		int hrWidth = reader.getWidth(0);
 		int hrHeight = reader.getHeight(0);
 		final Rectangle actualDim = new Rectangle(0, 0, hrWidth, hrHeight);
-		originalGridRange = new GeneralGridRange(actualDim);
+		originalGridRange = new GridEnvelope2D(actualDim);
 
 		if (!useWorldFile && gtcs != null) {
 		    this.raster2Model = gtcs.getRasterToModel(metadata);
@@ -379,8 +370,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		if (numOverviews >= 1) {
 			overViewResolutions = new double[numOverviews][2];
 			for (int i = 0; i < numOverviews; i++) {
-				overViewResolutions[i][0] = (highestRes[0]*this.originalGridRange.getLength(0))/reader.getWidth(i+1);
-				overViewResolutions[i][1] = (highestRes[1]*this.originalGridRange.getLength(1))/reader.getHeight(i+1);
+				overViewResolutions[i][0] = (highestRes[0]*this.originalGridRange.getSpan(0))/reader.getWidth(i+1);
+				overViewResolutions[i][1] = (highestRes[1]*this.originalGridRange.getSpan(1))/reader.getHeight(i+1);
 			}
 		} else
 			overViewResolutions = null;
@@ -406,48 +397,41 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	 * @throws IOException
 	 *             on any IO related troubles
 	 */
-	public GridCoverage read(GeneralParameterValue[] params) throws IOException {
+	@SuppressWarnings("unchecked")
+	public GridCoverage2D read(GeneralParameterValue[] params) throws IOException {
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
 		OverviewPolicy overviewPolicy=null;
 		if (params != null) {
-			// /////////////////////////////////////////////////////////////////////
+
 			//
 			// Checking params
 			//
-			// /////////////////////////////////////////////////////////////////////
 			if (params != null) {
 				for (int i = 0; i < params.length; i++) {
 					final ParameterValue param = (ParameterValue) params[i];
-					final String name = param.getDescriptor().getName().getCode();
-					if (name.equals(
-							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-									.toString())) {
-						final GridGeometry2D gg = (GridGeometry2D) param
-								.getValue();
-						requestedEnvelope = new GeneralEnvelope((Envelope) gg
-								.getEnvelope2D());
+					final ReferenceIdentifier name = param.getDescriptor().getName();
+					if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName())) {
+						final GridGeometry2D gg = (GridGeometry2D) param.getValue();
+						requestedEnvelope = new GeneralEnvelope((Envelope) gg.getEnvelope2D());
 						dim = gg.getGridRange2D().getBounds();
 						continue;
 					}
-					if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
-							.getName().toString())) {
+					if (name.equals(AbstractGridFormat.OVERVIEW_POLICY.getName())) {
 						overviewPolicy=(OverviewPolicy) param.getValue();
 						continue;
 					}					
 				}
 			}
 		}
-		// /////////////////////////////////////////////////////////////////////
+
 		//
 		// set params
 		//
-		// /////////////////////////////////////////////////////////////////////
 		Integer imageChoice = new Integer(0);
 		final ImageReadParam readP = new ImageReadParam();
 		try {
-			imageChoice = setReadParams(overviewPolicy, readP,
-					requestedEnvelope, dim);
+			imageChoice = setReadParams(overviewPolicy, readP,requestedEnvelope, dim);
 		} catch (TransformException e) {
 			new DataSourceException(e);
 		}
@@ -499,8 +483,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
                 final int ssWidth = coverageRaster.getWidth();
                 final int ssHeight = coverageRaster.getHeight();
                 if (LOGGER.isLoggable(Level.FINE)) {
-                        LOGGER.log(Level.FINE, "Coverage read: width = " + ssWidth
-                                        + " height = " + ssHeight);
+                        LOGGER.log(Level.FINE, "Coverage read: width = " + ssWidth+ " height = " + ssHeight);
                 }
 
                 // //
@@ -515,8 +498,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
                 // image sizes.
                 //
                 // //
-                final double scaleX = originalGridRange.getLength(0) / (1.0 * ssWidth);
-                final double scaleY = originalGridRange.getLength(1) / (1.0 * ssHeight);
+                final double scaleX = originalGridRange.getSpan(0) / (1.0 * ssWidth);
+                final double scaleY = originalGridRange.getSpan(1) / (1.0 * ssHeight);
                 final AffineTransform tempRaster2Model = new AffineTransform((AffineTransform) raster2Model);
                 tempRaster2Model.concatenate(new AffineTransform(scaleX, 0, 0, scaleY, 0, 0));
                 return createCoverage(coverageRaster, ProjectiveTransform.create((AffineTransform) tempRaster2Model));
@@ -549,8 +532,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
          * @return a {@link GridCoverage}
          * @throws IOException
          */
-        protected final GridCoverage createCoverage(PlanarImage image,
-                        MathTransform raster2Model) throws IOException {
+        protected final GridCoverage2D createCoverage(PlanarImage image, MathTransform raster2Model) throws IOException {
 
                 // creating bands
         final SampleModel sm = image.getSampleModel();
@@ -578,11 +560,9 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
                 }
                 // creating coverage
                 if (raster2Model != null) {
-                        return coverageFactory.create(coverageName, image, crs,
-                                        raster2Model, bands, null, null);
+                        return coverageFactory.create(coverageName, image, crs,raster2Model, bands, null, null);
                 }
-                return coverageFactory.create(coverageName, image, new GeneralEnvelope(
-                                originalEnvelope), bands, null, null);
+                return coverageFactory.create(coverageName, image, new GeneralEnvelope(originalEnvelope), bands, null, null);
 
         }
 	
@@ -640,8 +620,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
                             // warn about the error but proceed, it is not fatal
                             // we have at least the default crs to use
                             LOGGER
-                                    .log(Level.SEVERE, e.getLocalizedMessage(),
-                                            e);
+                                    .log(Level.SEVERE, e.getLocalizedMessage(),e);
                         }
                 }
 
@@ -693,5 +672,15 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
         }
         return raster2Model;
     }
+
+	/**
+	 * Number of coverages for this reader is 1
+	 * 
+	 * @return the number of coverages for this reader.
+	 */
+	@Override
+	public int getGridCoverageCount() {
+		return 1;
+	}
 
 }

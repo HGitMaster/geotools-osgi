@@ -53,7 +53,7 @@ import org.opengis.referencing.FactoryException;
  * <p>
  * 
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/HsqlEpsgDatabase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/HsqlEpsgDatabase.java $
  * @version $Id: HsqlEpsgDatabase.java 30656 2008-06-12 20:32:50Z acuster $
  * @author Jody Garnett
  *

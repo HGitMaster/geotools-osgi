@@ -16,7 +16,7 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.FIX;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,6 +34,8 @@ import org.geotools.resources.NIOUtilities;
  * The Writer writes out the fid and record number of features to the fid index file.
  * 
  * @author Jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/IndexedFidWriter.java $
  */
 public class IndexedFidWriter implements FileWriter {
     public static final int HEADER_SIZE = 13;

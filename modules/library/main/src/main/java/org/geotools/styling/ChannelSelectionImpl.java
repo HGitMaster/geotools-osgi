@@ -16,6 +16,7 @@
  */
 package org.geotools.styling;
 
+import org.geotools.util.Utilities;
 import org.opengis.style.StyleVisitor;
 
 
@@ -23,7 +24,7 @@ import org.opengis.style.StyleVisitor;
  * ChannelSelectionImpl
  *
  * @author iant
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/ChannelSelectionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/ChannelSelectionImpl.java $
  */
 public class ChannelSelectionImpl 
     implements ChannelSelection {
@@ -116,4 +117,67 @@ public class ChannelSelectionImpl
 	public void accept(org.opengis.style.StyleVisitor visitor) {
 		visitor.visit( this,null );
 	}
+	
+    @Override
+    public int hashCode() {
+        final int PRIME = 1000003;
+        int result = 0;
+
+        if (gray != null){
+            result = (PRIME * result) + gray.hashCode();
+        }
+
+        if (red != null) {
+            result = (PRIME * result) + red.hashCode();
+        }
+        
+        if (blue != null) {
+            result = (PRIME * result) + blue.hashCode();
+        }
+
+        if (green != null) {
+            result = (PRIME * result) + green.hashCode();
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof ChannelSelectionImpl) {
+        	ChannelSelectionImpl other = (ChannelSelectionImpl) obj;
+
+            return Utilities.equals(gray, other.gray)
+            && Utilities.equals(red, other.red)
+            && Utilities.equals(blue, other.blue)
+            && Utilities.equals(green, other.green);
+        }
+
+        return false;
+    }
+
+    static ChannelSelectionImpl cast(org.opengis.style.ChannelSelection channel) {
+        if( channel == null ){
+            return null;
+        }
+        else if( channel instanceof ChannelSelectionImpl){
+            return (ChannelSelectionImpl) channel;
+        }
+        else {
+            ChannelSelectionImpl copy = new ChannelSelectionImpl();
+            if( channel.getGrayChannel() != null ){
+                copy.setGrayChannel( channel.getGrayChannel());
+            }
+            else {
+                org.opengis.style.SelectedChannelType[] rgb = channel.getRGBChannels();
+                copy.setRGBChannels( rgb[0], rgb[1], rgb[2]);
+            }
+            return copy;
+        }
+    }
+
 }

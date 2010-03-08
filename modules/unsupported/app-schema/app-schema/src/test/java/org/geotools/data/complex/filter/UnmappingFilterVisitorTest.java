@@ -17,6 +17,13 @@
 
 package org.geotools.data.complex.filter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,13 +34,12 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.TestCase;
-
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.AppSchemaDataAccess;
 import org.geotools.data.complex.AttributeMapping;
+import org.geotools.data.complex.DataAccessRegistry;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.complex.TestData;
 import org.geotools.data.complex.filter.XPath.Step;
@@ -48,6 +54,10 @@ import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.gml3.GML;
 import org.geotools.xlink.XLINK;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -82,12 +92,12 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: UnmappingFilterVisitorTest.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
+ * @version $Id: UnmappingFilterVisitorTest.java 34511 2009-11-26 05:34:06Z bencaradocdavies $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/filter/UnmappingFilterVisitorTest.java $
  * @since 2.4
  */
-public class UnmappingFilterVisitorTest extends TestCase {
+public class UnmappingFilterVisitorTest {
 
     private static FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
 
@@ -101,16 +111,31 @@ public class UnmappingFilterVisitorTest extends TestCase {
 
     FeatureType targetType;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+    private static DataAccess<FeatureType, Feature> mappingDataStore;
+
+    @Before
+    public void setUp() throws Exception {
         dataStore = TestData.createDenormalizedWaterQualityResults();
         mapping = TestData.createMappingsGroupByStation(dataStore);
         visitor = new UnmappingFilterVisitor(mapping);
         targetDescriptor = mapping.getTargetFeature();
     }
+    
+    @BeforeClass
+    public static void oneTimeSetUp() throws IOException {
+        final String schemaBase = "/test-data/";
+        final Map dsParams = new HashMap();
+        final URL url = UnmappingFilterVisitorTest.class.getResource(schemaBase
+                + "BoreholeTest_properties.xml");
+        dsParams.put("dbtype", "app-schema");
+        dsParams.put("url", url.toExternalForm());
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
+        mappingDataStore = DataAccessFinder.getDataStore(dsParams);
+    }
+
+    @AfterClass
+    public static void oneTimeTearDown() {
+        DataAccessRegistry.unregisterAll();
     }
 
     /**
@@ -164,6 +189,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
      * Mapping specifies station_no --> wq_plus/@id. A FidFilter over wq_plus type should result in
      * a compare equals filter over the station_no attribute of wq_ir_results simple type.
      */
+    @Test
     public void testUnrollFidMappedToAttribute() throws Exception {
         String fid = "station_no.1";
         Id fidFilter = ff.id(Collections.singleton(ff.featureId(fid)));
@@ -202,10 +228,30 @@ public class UnmappingFilterVisitorTest extends TestCase {
      * originating feature source is used. In such a case, an unrolled FidFilter should stay being a
      * FidFilter.
      */
+    @Test
     public void testUnrollFidToFid() throws Exception {
+        checkUnrollIdExpression(Expression.NIL);
+    }
 
+    /**
+     * If a getId() idExpression is used for the for the mapping, the same feature id from the
+     * originating feature source is used. In such a case, an unrolled FidFilter should stay being a
+     * FidFilter.
+     */
+    @Test
+    public void testUnrollGetidToGetid() throws Exception {
+        checkUnrollIdExpression(CommonFactoryFinder.getFilterFactory(null).function("getID",
+                new org.opengis.filter.expression.Expression[0]));
+    }
+    
+    /**
+     * Implementation for tests of fid -> fid unmapping.
+     * 
+     * @param idExpression
+     * @throws Exception
+     */
+    private void checkUnrollIdExpression(Expression idExpression) throws Exception {
         AttributeMapping featureMapping = null;
-
         Name featurePath = mapping.getTargetFeature().getName();
         QName featureName = Types.toQName(featurePath);
         for (Iterator it = mapping.getAttributeMappings().iterator(); it.hasNext();) {
@@ -220,21 +266,15 @@ public class UnmappingFilterVisitorTest extends TestCase {
                 break;
             }
         }
-
-        featureMapping.setIdentifierExpression(Expression.NIL);
-
+        featureMapping.setIdentifierExpression(idExpression);
         this.visitor = new UnmappingFilterVisitor(this.mapping);
-
         FeatureCollection<SimpleFeatureType, SimpleFeature> content = mapping.getSource()
                 .getFeatures();
         Iterator iterator = content.iterator();
         Feature sourceFeature = (Feature) iterator.next();
         content.close(iterator);
-
         String fid = sourceFeature.getIdentifier().toString();
-
         Id fidFilter = ff.id(Collections.singleton(ff.featureId(fid)));
-
         Filter unrolled = (Filter) fidFilter.accept(visitor, null);
         assertNotNull(unrolled);
         assertTrue(unrolled instanceof Id);
@@ -247,7 +287,8 @@ public class UnmappingFilterVisitorTest extends TestCase {
         results.close(iterator);
         assertEquals(fid, unmappedFeature.getID());
     }
-
+    
+    @Test
     public void testPropertyName() throws Exception {
         PropertyName ae = ff.property("/wq_plus/measurement/result");
         List unrolled = (List) ae.accept(visitor, null);
@@ -293,18 +334,13 @@ public class UnmappingFilterVisitorTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testPropertyNameWithXlinkAttribute() throws Exception {
-        final String schemaBase = "/test-data/";
-        final Map dsParams = new HashMap();
-        final URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
-        dsParams.put("dbtype", "app-schema");
-        dsParams.put("url", url.toExternalForm());
-
         final String XMMLNS = "http://www.opengis.net/xmml";
         final Name typeName = new NameImpl(XMMLNS, "Borehole");
-
-        DataAccess<FeatureType, Feature> mappingDataStore = DataAccessFinder.getDataStore(dsParams);
+        
         AppSchemaDataAccess complexDs = (AppSchemaDataAccess) mappingDataStore;
+        
         mapping = complexDs.getMapping(typeName);
 
         NamespaceSupport namespaces = new NamespaceSupport();
@@ -322,10 +358,9 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertNotNull(unrolled);
         assertEquals(1, unrolled.size());
         assertTrue(unrolled.get(0) instanceof Expression);
-
-        mappingDataStore.dispose();
     }
 
+    @Test
     public void testBetweenFilter() throws Exception {
         PropertyIsBetween bf = ff.between(ff.property("measurement/result"), ff.literal(1), ff
                 .literal(2));
@@ -335,11 +370,9 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertTrue(att instanceof PropertyName);
         String propertyName = ((PropertyName) att).getPropertyName();
         assertEquals("results_value", propertyName);
-    }
+    }       
 
-    /**
-     * 
-     */
+    @Test
     public void testCompareFilter() throws Exception {
         PropertyIsEqualTo complexFilter = ff.equals(ff.property("measurement/result"), ff
                 .literal(1.1));
@@ -382,17 +415,11 @@ public class UnmappingFilterVisitorTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testCompareFilterMultipleMappingsPerPropertyName() throws Exception {
-        final String schemaBase = "/test-data/";
-        final Map dsParams = new HashMap();
-        final URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
-        dsParams.put("dbtype", "app-schema");
-        dsParams.put("url", url.toExternalForm());
-
         final String XMMLNS = "http://www.opengis.net/xmml";
         final Name typeName = new NameImpl(XMMLNS, "Borehole");
-
-        DataAccess<FeatureType, Feature> mappingDataStore = DataAccessFinder.getDataStore(dsParams);
+        
         AppSchemaDataAccess complexDs = (AppSchemaDataAccess) mappingDataStore;
         mapping = complexDs.getMapping(typeName);
 
@@ -439,13 +466,9 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertEquals("BGS_ID", ((PropertyName) filter2.getExpression1()).getPropertyName());
         assertEquals("NAME", ((PropertyName) filter3.getExpression1()).getPropertyName());
         assertEquals("ORIGINAL_N", ((PropertyName) filter4.getExpression1()).getPropertyName());        
-
-        mappingDataStore.dispose();
     }
 
-    /**
-     * 
-     */
+    @Test
     public void testLogicFilterAnd() throws Exception {
         PropertyIsEqualTo equals = ff.equals(ff.property("measurement/result"), ff.literal(1.1));
         PropertyIsGreaterThan greater = ff.greater(ff
@@ -484,6 +507,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertEquals("desc1", ((Literal) right).getValue());
     }
 
+    @Test
     public void testFunction() throws Exception {
         Function fe = ff.function("strIndexOf",
                 ff.property("/measurement/determinand_description"), ff
@@ -499,6 +523,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertEquals("determinand_description", ((PropertyName) params.get(0)).getPropertyName());
     }
 
+    @Test
     public void testGeometryFilter() throws Exception {
         mapping = createSampleDerivedAttributeMappings();
         visitor = new UnmappingFilterVisitor(mapping);
@@ -528,6 +553,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertEquals("location", ((PropertyName) arg0).getPropertyName());
     }
 
+    @Test
     public void testLikeFilter() throws Exception {
         final String wildcard = "%";
         final String single = "?";
@@ -545,7 +571,8 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertTrue(unmappedExpr instanceof PropertyName);
         assertEquals("determinand_description", ((PropertyName) unmappedExpr).getPropertyName());
     }
-
+    
+    @Test
     public void testLiteralExpression() throws Exception {
         Expression literal = ff.literal(new Integer(0));
         List unrolledExpressions = (List) literal.accept(visitor, null);
@@ -553,6 +580,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertSame(literal, unrolledExpressions.get(0));
     }
 
+    @Test
     public void testLogicFilter() throws Exception {
         testLogicFilter(And.class);
         testLogicFilter(Or.class);
@@ -601,6 +629,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
                 .getValue());
     }
 
+    @Test
     public void testMathExpression() throws Exception {
         Literal literal = ff.literal(new Integer(2));
         Multiply mathExp = ff.multiply(ff.property("measurement/result"), literal);
@@ -617,6 +646,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertSame(literal, mathUnmapped.getExpression2());
     }
 
+    @Test
     public void testNullFilter() throws Exception {
         PropertyIsNull nullFilter = ff.isNull(ff.property("measurement/result"));
 

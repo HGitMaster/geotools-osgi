@@ -31,7 +31,7 @@ import javax.media.jai.CRIFImpl;
  * The image factory for the {@link Combine} operation.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/image/jai/CombineCRIF.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/image/jai/CombineCRIF.java $
  * @version $Id: CombineCRIF.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)

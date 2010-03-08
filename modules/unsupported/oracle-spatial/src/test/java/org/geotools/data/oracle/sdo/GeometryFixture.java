@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 * 
 * @see net.refractions.jspatial.jts
 * @author jgarnett, Refractions Reasearch Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/sdo/GeometryFixture.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/sdo/GeometryFixture.java $
 * @version CVS Version
 */
 public class GeometryFixture {

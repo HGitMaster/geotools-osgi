@@ -16,10 +16,13 @@
  */
 package org.geotools.data.shapefile.shp;
 
+import org.geotools.factory.Hints;
+import org.opengis.feature.type.GeometryDescriptor;
+
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -41,8 +44,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  */
 public class JTSUtilities {
 
-    static final CGAlgorithms cga = new RobustCGAlgorithms();
-    static final GeometryFactory factory = new GeometryFactory();
+    static final CGAlgorithms cga = new CGAlgorithms();
 
     private JTSUtilities() {
     }
@@ -166,14 +168,21 @@ public class JTSUtilities {
      * @return A new ring with the reversed Coordinates.
      */
     public static final LinearRing reverseRing(LinearRing lr) {
-        int numPoints = lr.getNumPoints() - 1;
-        Coordinate[] newCoords = new Coordinate[numPoints + 1];
+        GeometryFactory gf = lr.getFactory();
+        CoordinateSequenceFactory csf = gf.getCoordinateSequenceFactory();
+        
+        CoordinateSequence csOrig = lr.getCoordinateSequence();
+		int numPoints = csOrig.size();
+		int dimensions = csOrig.getDimension();
+		CoordinateSequence csNew = csf.create(numPoints, dimensions);
 
-        for (int t = numPoints; t >= 0; t--) {
-            newCoords[t] = lr.getCoordinateN(numPoints - t);
-        }
+		for (int i = 0; i < numPoints; i++) {
+			for (int j = 0; j < dimensions; j++) {
+				csOrig.getOrdinate(i, j);
+			}
+		}
 
-        return factory.createLinearRing(newCoords);
+        return gf.createLinearRing(csNew);
     }
 
     /**
@@ -185,7 +194,8 @@ public class JTSUtilities {
      * @return The "nice" Polygon.
      */
     public static final Polygon makeGoodShapePolygon(Polygon p) {
-        LinearRing outer;
+        GeometryFactory factory = p.getFactory();
+    	LinearRing outer;
         LinearRing[] holes = new LinearRing[p.getNumInteriorRing()];
         Coordinate[] coords;
 
@@ -226,7 +236,7 @@ public class JTSUtilities {
             ps[t] = makeGoodShapePolygon((Polygon) mp.getGeometryN(t));
         }
 
-        result = factory.createMultiPolygon(ps);
+        result = mp.getFactory().createMultiPolygon(ps);
 
         return result;
     }
@@ -256,6 +266,11 @@ public class JTSUtilities {
 
     public static Geometry convertToCollection(Geometry geom, ShapeType type) {
         Geometry retVal = null;
+        
+        if(geom == null)
+        	return null;
+        
+    	GeometryFactory factory = geom.getFactory();
 
         if (type.isPointType()) {
             if ((geom instanceof Point)) {
@@ -420,6 +435,51 @@ public class JTSUtilities {
             throw new ShapefileException("Cannot handle geometry class : "
                     + (featureClass == null ? "null" : featureClass.getName()));
         }
+        return type;
+    }
+    
+    /**
+     * Determine the default ShapeType using the descriptor and eventually the
+     * geometry to guess the coordinate dimensions if not reported in the descriptor
+     * hints
+     * @param gd
+     * @param g
+     * @return
+     */
+    public static final ShapeType getShapeType(GeometryDescriptor gd) throws ShapefileException {
+        Class featureClass = gd.getType().getBinding();
+        Integer dimension = (Integer) gd.getUserData().get(Hints.COORDINATE_DIMENSION);
+        
+        ShapeType type = null;
+        if (Point.class.equals(featureClass)) {
+            if(dimension != null && dimension == 3)
+                type = ShapeType.POINTZ;
+            else
+                type = ShapeType.POINT;
+        } else if (MultiPoint.class.equals(featureClass)) {
+            if(dimension != null && dimension == 3)
+                type = ShapeType.MULTIPOINTZ;
+            else
+                type = ShapeType.MULTIPOINT;
+        } else if (Polygon.class.equals(featureClass)
+                || MultiPolygon.class.equals(featureClass)) {
+            if(dimension != null && dimension == 3)
+                type = ShapeType.POLYGON;
+            else
+                type = ShapeType.POLYGONZ;
+        } else if (LineString.class.equals(featureClass)
+                || MultiLineString.class.equals(featureClass)) {
+            if(dimension != null && dimension == 3)
+                type = ShapeType.ARC;
+            else
+                type = ShapeType.ARCZ;
+        }
+        
+        if (type == null) {
+            throw new ShapefileException("Cannot handle geometry class : "
+                    + (featureClass == null ? "null" : featureClass.getName()));
+        }
+        
         return type;
     }
 

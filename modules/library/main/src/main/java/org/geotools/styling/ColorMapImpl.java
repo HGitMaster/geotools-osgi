@@ -18,6 +18,8 @@ package org.geotools.styling;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.geotools.util.Utilities;
 import org.opengis.filter.expression.Function;
 import org.opengis.style.StyleVisitor;
 
@@ -27,7 +29,7 @@ import org.opengis.style.StyleVisitor;
  *
  * @author iant
  * @author aaime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/ColorMapImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/ColorMapImpl.java $
  */
 public class ColorMapImpl implements ColorMap {
     private final Function function;
@@ -92,4 +94,53 @@ public class ColorMapImpl implements ColorMap {
         visitor.visit(this);
     }
     
+   
+    @Override
+    public int hashCode() {
+        final int PRIME = 1000003;
+        int result = 0;
+
+        if (function != null){
+            result = (PRIME * result) + function.hashCode();
+        }
+
+        if (list != null) {
+            result = (PRIME * result) + list.hashCode();
+        }
+        
+        result = (PRIME * result) + type;
+        result = (PRIME * result) + (extendedColors ? 1 : 0);
+        
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof ColorMapImpl) {
+        	ColorMapImpl other = (ColorMapImpl) obj;
+
+            return Utilities.equals(function, other.function)
+            && Utilities.equals(list, other.list)
+            && Utilities.equals(type, other.type)
+            && Utilities.equals(extendedColors, other.extendedColors);
+        }
+
+        return false;
+    }
+
+    static ColorMapImpl cast(org.opengis.style.ColorMap colorMap) {
+        if( colorMap == null ){
+            return null;            
+        }
+        else if ( colorMap instanceof ColorMapImpl){
+            return (ColorMapImpl) colorMap;
+        }
+        else {
+            return null; // unable to handle the translation at this time
+        }
+    }
 }

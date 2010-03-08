@@ -19,6 +19,7 @@ package org.geotools.data.complex.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +36,10 @@ import org.xml.sax.SAXException;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: XMLConfigDigester.java 32633 2009-03-16 01:44:12Z ang05a $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/XMLConfigDigester.java $
+ * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ * @author Russell Petty, GSV
+ * @version $Id: XMLConfigDigester.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/XMLConfigDigester.java $
  * @since 2.4
  */
 public class XMLConfigDigester {
@@ -89,12 +92,24 @@ public class XMLConfigDigester {
             throw new NullPointerException("datastore config url");
         }
 
-        InputStream configStream = dataStoreConfigUrl.openStream();
-
-        if (configStream == null) {
-            throw new IOException("Can't open datastore config file " + dataStoreConfigUrl);
+        // read mapping file into configString and interpolate properties
+        InputStream configStream = null;
+        String configString = null;
+        try {
+            configStream = dataStoreConfigUrl.openStream();
+            if (configStream == null) {
+                throw new IOException("Can't open datastore config file " + dataStoreConfigUrl);
+            } else {
+               configString = PropertyInterpolationUtils.interpolate(PropertyInterpolationUtils
+                        .loadProperties(AppSchemaDataAccessFactory.DBTYPE_STRING),
+                        PropertyInterpolationUtils.readAll(configStream));
+            }
+        } finally {
+            if (configStream != null) {
+                configStream.close();
+            }
         }
-
+        
         XMLConfigDigester.LOGGER.fine("parsing complex datastore config: "
                 + dataStoreConfigUrl.toExternalForm());
 
@@ -116,6 +131,8 @@ public class XMLConfigDigester {
         try {
             setNamespacesRules(digester);
 
+            setIncludedTypesRules(digester);
+            
             setSourceDataStoresRules(digester);
 
             setTargetSchemaUriRules(digester);
@@ -129,7 +146,7 @@ public class XMLConfigDigester {
         }
 
         try {
-            digester.parse(configStream);
+            digester.parse(new StringReader(configString));
         } catch (SAXException e) {
             e.printStackTrace();
             XMLConfigDigester.LOGGER.log(Level.SEVERE, "parsing " + dataStoreConfigUrl, e);
@@ -157,13 +174,33 @@ public class XMLConfigDigester {
         digester.addCallParam(typeMapping + "/sourceType", 0);
         digester.addCallMethod(typeMapping + "/targetElement", "setTargetElementName", 1);
         digester.addCallParam(typeMapping + "/targetElement", 0);
-
+        digester.addCallMethod(typeMapping + "/itemXpath", "setItemXpath", 1);
+        digester.addCallParam(typeMapping + "/itemXpath", 0);
+        
+        // isXmlDataStore is a flag to denote that AppSchema needs to process
+        //the data from the datastore differently as it returns xml rather than features.        
+        digester.addCallMethod(typeMapping + "/isXmlDataStore", "setXmlDataStore", 1);
+        digester.addCallParam(typeMapping + "/isXmlDataStore", 0);
+        
         // create attribute mappings
         final String attMappings = typeMapping + "/attributeMappings";
         digester.addObjectCreate(attMappings, XMLConfigDigester.CONFIG_NS_URI, ArrayList.class);
 
         final String attMap = attMappings + "/AttributeMapping";
         digester.addObjectCreate(attMap, XMLConfigDigester.CONFIG_NS_URI, AttributeMapping.class);
+
+        digester.addCallMethod(attMap + "/label", "setLabel", 1);
+        digester.addCallParam(attMap + "/label", 0);
+
+        digester.addCallMethod(attMap + "/parentLabel", "setParentLabel", 1);
+        digester.addCallParam(attMap + "/parentLabel", 0);
+        
+        digester.addCallMethod(attMap + "/targetQueryString", "setTargetQueryString", 1);
+        digester.addCallParam(attMap + "/targetQueryString", 0);
+        
+        digester.addCallMethod(attMap + "/instancePath", "setInstancePath", 1);
+        digester.addCallParam(attMap + "/instancePath", 0);
+        
 
         digester.addCallMethod(attMap + "/isMultiple", "setMultiple", 1);
         digester.addCallParam(attMap + "/isMultiple", 0);
@@ -180,7 +217,10 @@ public class XMLConfigDigester {
 
         digester.addCallMethod(attMap + "/sourceExpression/OCQL", "setSourceExpression", 1);
         digester.addCallParam(attMap + "/sourceExpression/OCQL", 0);
-        
+
+        digester.addCallMethod(attMap + "/idExpression/inputAttribute", "setIdentifierPath", 1);
+        digester.addCallParam(attMap + "/idExpression/inputAttribute", 0);
+
         // if the source is a data access, then the input is in XPath expression
         digester.addCallMethod(attMap + "/sourceExpression/inputAttribute", "setInputAttributePath", 1);
         digester.addCallParam(attMap + "/sourceExpression/inputAttribute", 0);
@@ -262,5 +302,15 @@ public class XMLConfigDigester {
         digester.addCallParam(ns + "/Namespace/prefix", 0);
         digester.addCallParam(ns + "/Namespace/uri", 1);
         digester.addSetNext(ns, "setNamespaces");
+    }
+    
+    private void setIncludedTypesRules(Digester digester) {
+        final String includes = "AppSchemaDataAccess/includedTypes";
+        digester.addObjectCreate(includes, XMLConfigDigester.CONFIG_NS_URI, ArrayList.class);
+        // point to related type config path relative to this mapping file location
+        final String includePath = includes + "/Include";
+        digester.addCallMethod(includePath, "add", 1);
+        digester.addCallParam(includePath, 0);
+        digester.addSetNext(includes, "setIncludedTypes");
     }
 }

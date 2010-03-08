@@ -40,7 +40,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * automatically disposed after a timeout and recreated when needed again.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/DeferredAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/DeferredAuthorityFactory.java $
  * @version $Id: DeferredAuthorityFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

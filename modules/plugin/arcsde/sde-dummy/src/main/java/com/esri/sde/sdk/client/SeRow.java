@@ -43,5 +43,8 @@ public class SeRow {
         // TODO Auto-generated method stub
         return null;
     }
-	
+    public ByteArrayInputStream getClob(int i) {return null;}
+    public void setClob(int i, ByteArrayInputStream clobVal) {}
+    public ByteArrayInputStream getNClob(int i) {return null;}
+    public void setNClob(int i, ByteArrayInputStream clobVal) {}
 }

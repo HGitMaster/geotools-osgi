@@ -38,7 +38,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @author James Macgill
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/function/EqualIntervalFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/EqualIntervalFunction.java $
  */
 public class EqualIntervalFunction extends ClassificationFunction {
 	

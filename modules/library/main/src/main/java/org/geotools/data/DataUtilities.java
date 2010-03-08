@@ -20,6 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -38,10 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.StringTokenizer;
-import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.factory.CommonFactoryFinder;
@@ -61,16 +61,16 @@ import org.geotools.feature.type.AttributeTypeImpl;
 import org.geotools.feature.type.GeometryDescriptorImpl;
 import org.geotools.feature.type.GeometryTypeImpl;
 import org.geotools.filter.FilterAttributeExtractor;
-import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.util.Converters;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureVisitor;
-import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -78,46 +78,10 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.filter.And;
-import org.opengis.filter.ExcludeFilter;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.FilterVisitor;
-import org.opengis.filter.Id;
-import org.opengis.filter.IncludeFilter;
-import org.opengis.filter.Not;
-import org.opengis.filter.Or;
-import org.opengis.filter.PropertyIsBetween;
-import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.PropertyIsGreaterThan;
-import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
-import org.opengis.filter.PropertyIsLessThan;
-import org.opengis.filter.PropertyIsLessThanOrEqualTo;
-import org.opengis.filter.PropertyIsLike;
-import org.opengis.filter.PropertyIsNotEqualTo;
-import org.opengis.filter.PropertyIsNull;
-import org.opengis.filter.expression.Add;
-import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.ExpressionVisitor;
-import org.opengis.filter.expression.Function;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.Multiply;
-import org.opengis.filter.expression.NilExpression;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.filter.expression.Subtract;
-import org.opengis.filter.spatial.BBOX;
-import org.opengis.filter.spatial.Beyond;
-import org.opengis.filter.spatial.Contains;
-import org.opengis.filter.spatial.Crosses;
-import org.opengis.filter.spatial.DWithin;
-import org.opengis.filter.spatial.Disjoint;
-import org.opengis.filter.spatial.Equals;
-import org.opengis.filter.spatial.Intersects;
-import org.opengis.filter.spatial.Overlaps;
-import org.opengis.filter.spatial.Touches;
-import org.opengis.filter.spatial.Within;
-import org.opengis.metadata.Identifier;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -140,7 +104,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * TODO: Move FeatureType manipulation to feature package
  * </p>
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/DataUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/DataUtilities.java $
  */
 public class DataUtilities {
     
@@ -221,6 +185,42 @@ public class DataUtilities {
     }
     
     /**
+     * A replacement for File.toURI().toURL().
+     * <p>
+     * The handling of file.toURL() is broken; the handling of file.toURI().toURL() is known
+     * to be broken on a few platforms like mac. We have the urlToFile( URL ) method that
+     * is able to untangle both these problems and we use it in the geotools library.
+     * <p>
+     * However occasionally we need to pick up a file and hand it to a third party library
+     * like EMF; this method performs a couple of sanity checks which we can use to prepare
+     * a good URL reference to a file in these situtations.
+     * 
+     * @param file
+     * @return URL
+     */
+    public static URL fileToURL(File file) {
+        try {
+            URL url = file.toURI().toURL();
+            String string = url.toExternalForm();
+            if( string.contains("+")){
+                // this represents an invalid URL created using either
+                // file.toURL(); or
+                // file.toURI().toURL() on a specific version of Java 5 on Mac
+                string = string.replace("+","%2B");
+            }
+            if( string.contains(" ")){
+                // this represents an invalid URL created using either
+                // file.toURL(); or
+                // file.toURI().toURL() on a specific version of Java 5 on Mac
+                string = string.replace(" ","%20");
+            }
+            return new URL( string );
+        } catch (MalformedURLException e) {
+            return null;
+        }
+    }
+    
+    /**
      * Takes a URL and converts it to a File. The attempts to deal with 
      * Windows UNC format specific problems, specifically files located
      * on network shares and different drives.
@@ -238,31 +238,44 @@ public class DataUtilities {
      * @return a File that corresponds to the URL's location
      */
     public static File urlToFile(URL url) {
+        if( !"file".equals(url.getProtocol())){
+            return null; // not a File URL
+        }
         String string = url.toExternalForm();
-
+        if( string.contains("+")){
+            // this represents an invalid URL created using either
+            // file.toURL(); or
+            // file.toURI().toURL() on a specific version of Java 5 on Mac
+            string = string.replace("+","%2B");
+        }
         try {
             string = URLDecoder.decode(string, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            // Shouldn't happen
+            throw new RuntimeException("Could not decode the URL to UTF-8 format", e);
         }
         
         String path3;
+
         String simplePrefix = "file:/";
-        String standardPrefix = simplePrefix+"/";
+        String standardPrefix = "file://";
+        String os = System.getProperty("os.name");
         
-        if( string.startsWith(standardPrefix) ){
-            path3 = string.substring(standardPrefix.length());
-        } else if( string.startsWith(simplePrefix)){
-            path3 = string.substring(simplePrefix.length()-1);            
-        } else {
-        String auth = url.getAuthority();
-        String path2 = url.getPath().replace("%20", " ");
-        File f = null;
-        if (auth != null && !auth.equals("")) {
-            path3 = "//" + auth + path2;
-        } else {
-            path3 = path2;
+        if (os.toUpperCase().contains("WINDOWS") && string.startsWith(standardPrefix)) {
+        	// win32: host/share reference
+        	path3 = string.substring(standardPrefix.length()-2);
         }
+        else if( string.startsWith(standardPrefix) ){
+            path3 = string.substring( standardPrefix.length() );
+        } else if( string.startsWith(simplePrefix)){
+            path3 = string.substring( simplePrefix.length()-1 );            
+        } else {
+            String auth = url.getAuthority();
+            String path2 = url.getPath().replace("%20", " ");
+            if (auth != null && !auth.equals("")) {
+                path3 = "//" + auth + path2;
+            } else {
+                path3 = path2;
+            }
         }
         
         return new File(path3);
@@ -532,7 +545,7 @@ public class DataUtilities {
         // I don't expect Features to contain these often
         // (eveything is still nice and recursive)
         //
-        Class type = src.getClass();
+        Class<? extends Object> type = src.getClass();
 
         if (type.isArray() && type.getComponentType().isPrimitive()) {
             int length = Array.getLength(src);
@@ -555,7 +568,7 @@ public class DataUtilities {
 
         if (src instanceof List) {
             List list = (List) src;
-            List copy = new ArrayList(list.size());
+            List<Object> copy = new ArrayList<Object>(list.size());
 
             for (Iterator i = list.iterator(); i.hasNext();) {
                 copy.add(duplicate(i.next()));
@@ -755,6 +768,12 @@ public class DataUtilities {
         if( type==Float.class ){
             return new Float(0.0f);
         }
+        if( type==BigDecimal.class){
+            return BigDecimal.valueOf(0);
+        }
+        if( type==BigInteger.class){
+            return BigInteger.valueOf(0);
+        }
         if( type==Character.class ){
             return new Character(' ');
         }
@@ -949,7 +968,7 @@ public class DataUtilities {
      */
     public static  FeatureReader<SimpleFeatureType, SimpleFeature> reader(Collection<SimpleFeature> collection)
         throws IOException {
-        return reader((SimpleFeature[]) collection.toArray(
+        return reader(collection.toArray(
                 new SimpleFeature[collection.size()]));
     }
     /**
@@ -962,7 +981,7 @@ public class DataUtilities {
      */   
     public static FeatureReader<SimpleFeatureType, SimpleFeature> reader(
             FeatureCollection<SimpleFeatureType,SimpleFeature> collection) throws IOException {
-        return reader((SimpleFeature[]) collection
+        return reader(collection
                 .toArray(new SimpleFeature[collection.size()]));
     }
 
@@ -1420,21 +1439,19 @@ public class DataUtilities {
      *
      * @return The string "specification" for the featureType
      */
-    public static String spec(SimpleFeatureType featureType) {
-        List types = featureType.getAttributeDescriptors();
-
+    public static String spec(FeatureType featureType) {
+        Collection<PropertyDescriptor> types = featureType.getDescriptors();
         StringBuffer buf = new StringBuffer();
-
-        for (int i = 0; i < types.size(); i++) {
-            AttributeDescriptor type = (AttributeDescriptor) types.get( i ); 
-            buf.append(type.getLocalName());
+        
+        for( PropertyDescriptor type : types ){
+            buf.append(type.getName().getLocalPart());
             buf.append(":");
             buf.append(typeMap(type.getType().getBinding()));
             if(type instanceof GeometryDescriptor) {
                 GeometryDescriptor gd = (GeometryDescriptor) type;
                 if(gd.getCoordinateReferenceSystem() != null && gd.getCoordinateReferenceSystem().getIdentifiers() != null) {                    
                     for (Iterator<ReferenceIdentifier> it = gd.getCoordinateReferenceSystem().getIdentifiers().iterator(); it.hasNext();) {
-                        ReferenceIdentifier id = (ReferenceIdentifier) it.next();
+                        ReferenceIdentifier id = it.next();
 
                         if ((id.getAuthority() != null)
                                 && id.getAuthority().getTitle().equals(Citations.EPSG.getTitle())) {
@@ -1445,18 +1462,16 @@ public class DataUtilities {
                     }
                 }
             }
-
-            if (i < (types.size() - 1)) {
-                buf.append(",");
-            }
+            buf.append(",");            
         }
+        buf.delete(buf.length()-1,buf.length()); // remove last ","
 
         return buf.toString();
     }
 
     static Class type(String typeName) throws ClassNotFoundException {
         if (typeMap.containsKey(typeName)) {
-            return (Class) typeMap.get(typeName);
+            return typeMap.get(typeName);
         }
 
         return Class.forName(typeName);
@@ -1626,7 +1641,7 @@ public class DataUtilities {
         	return null;
         }
         
-        List atts = new LinkedList();
+        List<String> atts = new LinkedList<String>();
 
         if (atts1 != null) {
             atts.addAll(Arrays.asList(atts1));
@@ -1758,24 +1773,105 @@ public class DataUtilities {
     }
 
     /**
-	 * Manually calculates the bounds of a feature collection.
-	 * @param collection
-	 * @return
+     * Manually calculates the bounds of a feature collection.
+     * 
+     * @param collection
+     * @return
+     */
+    public static Envelope bounds(
+            FeatureCollection<? extends FeatureType, ? extends Feature> collection) {
+        FeatureIterator<? extends Feature> i = collection.features();
+        try {
+            ReferencedEnvelope bounds = new ReferencedEnvelope(collection.getSchema()
+                    .getCoordinateReferenceSystem());
+            if (!i.hasNext()) {
+                bounds.setToNull();
+                return bounds;
+            }
+
+            bounds.init(((SimpleFeature) i.next()).getBounds());
+            return bounds;
+        } finally {
+            i.close();
+        }
+    }
+    
+
+	/**
+	 * Changes the ending (e.g. ".sld") of a {@link URL}
+	 * 
+	 * @param url
+	 *            {@link URL} like <code>file:/sds/a.bmp</code> or
+	 *            <code>http://www.some.org/foo/bar.shp</code>
+	 * @param postfix
+	 *            New file extension for the {@link URL} without <code>.</code>
+	 * 
+	 * @return A new {@link URL} with new extension.
+	 * 
+	 * @throws {@link MalformedURLException} if the new {@link URL} can not be
+	 *         created.
 	 */
-	public static Envelope bounds( FeatureCollection<? extends FeatureType, ? extends Feature> collection ) {
-		FeatureIterator<? extends Feature> i = collection.features();
+	public static URL changeUrlExt(final URL url, final String postfix)
+			throws IllegalArgumentException {
+		String a = url.toExternalForm();
+		final int lastDotPos = a.lastIndexOf('.');
+		if (lastDotPos >= 0)
+			a = a.substring(0, lastDotPos);
+		a = a + "." + postfix;
 		try {
-			ReferencedEnvelope bounds = new ReferencedEnvelope(collection.getSchema().getCoordinateReferenceSystem());
-			if ( !i.hasNext() ) {
-				bounds.setToNull();
-				return bounds;
-			}
-			
-			bounds.init( ( (SimpleFeature) i.next() ).getBounds() );
-			return bounds;
-		}
-		finally {
-		    i.close();
+			return new URL(a);
+		} catch (final MalformedURLException e) {
+			throw new IllegalArgumentException("can't create a new URL for "+ url + " with new extension " + postfix, e);
 		}
 	}
+
+	/**
+	 * The function is supposed to be equivalent to {@link File}.getParent().
+	 * The {@link URL} is converted to a String, truncated to the last / and
+	 * then recreated as a new URL.
+	 * 
+	 * @throws {@link MalformedURLException} if the parent {@link URL} can not
+	 *         be created.
+	 */
+	public static URL getParentUrl(final URL url) throws MalformedURLException {
+		String a = url.toExternalForm();
+		final int lastDotPos = a.lastIndexOf('/');
+		if (lastDotPos >= 0)
+			a = a.substring(0, lastDotPos);
+		
+		/**
+		 * The parent of jar:file:some!/bar.file is jar:file:some!/, not jar:file:some!  
+		 */
+		if (a.endsWith("!")) a+="/";
+		
+		return new URL(a);
+	}
+
+	/**
+	 * Extends an {@link URL}.
+	 * 
+	 * @param base
+	 *            Has to be a {@link URL} pointing to a directory. If it doesn't
+	 *            end with a <code>/</code> it will be added automatically.
+	 * @param extension
+	 *            The part that will be added to the {@link URL}
+	 * 
+	 * @throws MalformedURLException
+	 *             if the new {@link URL} can not be created.
+	 */
+	public static URL extendURL(URL base, String extension)
+			throws MalformedURLException {
+		if(base==null)
+			throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"base"));
+		if(extension==null)
+			throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"extension"));
+		String a = base.toExternalForm();
+		if (!a.endsWith("/"))
+			a += "/";
+		a += extension;
+		return new URL(a);
+	}
+
+
+
 }

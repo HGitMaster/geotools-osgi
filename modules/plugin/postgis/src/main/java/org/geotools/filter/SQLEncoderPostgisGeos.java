@@ -22,7 +22,7 @@ package org.geotools.filter;
  *
  * @deprecated use SQLEncoderPostgis with setSupportsGEOS(true)
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/filter/SQLEncoderPostgisGeos.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/filter/SQLEncoderPostgisGeos.java $
  * @version $Id: SQLEncoderPostgisGeos.java 30669 2008-06-12 23:36:58Z acuster $
  */
 public class SQLEncoderPostgisGeos extends SQLEncoderPostgis

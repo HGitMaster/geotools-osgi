@@ -24,6 +24,8 @@ import org.geotools.filter.v1_0.OGC;
  * XSD for wfs 1.0.
  * 
  * @author Justin Deoliveira, OpenGEO
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/v1_0/WFS.java $
  */
 public final class WFS extends org.geotools.wfs.WFS {
 

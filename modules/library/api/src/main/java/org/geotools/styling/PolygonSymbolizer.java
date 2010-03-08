@@ -16,6 +16,7 @@
  */
 package org.geotools.styling;
 
+import org.opengis.filter.expression.Expression;
 
 /**
  * A symbolizer describes how a polygon feature should appear on a map.
@@ -77,8 +78,8 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/PolygonSymbolizer.java $
- * @version $Id: PolygonSymbolizer.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/PolygonSymbolizer.java $
+ * @version $Id: PolygonSymbolizer.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public interface PolygonSymbolizer extends org.opengis.style.PolygonSymbolizer,Symbolizer {
     /**
@@ -97,7 +98,7 @@ public interface PolygonSymbolizer extends org.opengis.style.PolygonSymbolizer,S
      *
      * @param fill The Fill style to use when rendering the area.
      */
-    void setFill(Fill fill);
+    void setFill(org.opengis.style.Fill fill);
 
     /**
      * Provides the graphical-symbolization parameter to use for the outline of
@@ -113,23 +114,26 @@ public interface PolygonSymbolizer extends org.opengis.style.PolygonSymbolizer,S
      *
      * @param stroke The Stroke style to use when rendering lines.
      */
-    void setStroke(Stroke stroke);
+    void setStroke(org.opengis.style.Stroke stroke);
+    
+    /**
+     * PerpendicularOffset works as defined for LineSymbolizer, allowing to draw polygons
+     * smaller or larger than their actual geometry.
+     * 
+     * @param offset Offset from the edge polygon positive outside; negative to the inside with a default of 0.
+     */
+    public void setPerpendicularOffset(Expression offset);
+    
+    /**
+     * Displacement from the original geometry in pixels.
+     *
+     * @return Displacement above and to the right of the indicated point; default x=0, y=0
+     */
+    public Displacement getDisplacement();
 
     /**
-     * This property defines the geometry to be used for styling.<br>
-     * The property is optional and if it is absent (null) then the "default"
-     * geometry property of the feature should be used.  Geometry types other
-     * than inherently area types can be used.   If a line is used then the
-     * line string is closed for filling (only) by connecting its end point to
-     * its start point. The geometryPropertyName is the name of a geometry
-     * property in the Feature being styled.  Typically, features only have
-     * one geometry so, in general, the need to select one is not required.
-     * Note: this moves a little away from the SLD spec which provides an
-     * XPath reference to a Geometry object, but does follow it  in spirit.
-     *
-     * @param geometryPropertyName The name of the attribute in the feature
-     *        being styled  that should be used.  If null then the default
-     *        geometry should be used.
+     * Provide x / y offset in pixels used to crate shadows.
+     * @param displacement
      */
-    void setGeometryPropertyName(String geometryPropertyName);
+    public void setDisplacement(org.opengis.style.Displacement displacement);    
 }

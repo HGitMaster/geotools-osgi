@@ -32,9 +32,12 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FunctionImpl;
 import org.geotools.filter.LikeFilterImpl;
+import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.PrimaryKey;
 import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
@@ -139,14 +142,32 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     /** where to write the constructed string from visiting the filters. */
     protected Writer out;
 
-    /** the fid mapper used to encode the fid filters */
+    /** 
+     * the fid mapper used to encode the fid filters
+     * @deprecated use {@link #primaryKey}  
+     */
     protected FIDMapper mapper;
 
+    /**
+     * The primary key corresponding to the table the filter is being encoded
+     * against.  
+     */
+    protected PrimaryKey primaryKey;
+    
+    /** The schema that contains the table the filter being encoded against. */
+    protected String databaseSchema;
+    
     /** the schmema the encoder will be used to be encode sql for */
     protected SimpleFeatureType featureType;
 
     /** flag which indicates that the encoder is currently encoding a function */
     protected boolean encodingFunction = false;
+    
+    /** the geometry descriptor corresponding to the current binary spatial filter being encoded */
+    protected GeometryDescriptor currentGeometry;
+    
+    /** the srid corresponding to the current binary spatial filter being encoded */
+    protected Integer currentSRID;
      
     /**
      * Default constructor
@@ -264,15 +285,35 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
      * must be a FIDMapper in order to invoke the FIDFilter encoder.
      *
      * @param mapper
+     * @deprecated use {@link #setPrimaryKey(PrimaryKey)}
      */
     public void setFIDMapper(FIDMapper mapper) {
         this.mapper = mapper;
     }
 
+    /**
+     * @deprecated use {@link #getPrimaryKey()}
+     */
     public FIDMapper getFIDMapper() {
         return this.mapper;
     }
 
+    public PrimaryKey getPrimaryKey() {
+        return primaryKey;
+    }
+    
+    public void setPrimaryKey(PrimaryKey primaryKey) {
+        this.primaryKey = primaryKey;
+    }
+    
+    public String getDatabaseSchema() {
+        return databaseSchema;
+    }
+    
+    public void setDatabaseSchema(String databaseSchema) {
+        this.databaseSchema = databaseSchema;
+    }
+    
     /**
      * Sets the capabilities of this filter.
      *
@@ -777,10 +818,59 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         return visitBinarySpatialOperator((BinarySpatialOperator)filter, extraData);
     }
     
-    /**
-     * @see {@link FilterVisitor#visit()}
-     */
-    protected Object visitBinarySpatialOperator(BinarySpatialOperator filter, Object extraData) {
+    protected Object visitBinarySpatialOperator(BinarySpatialOperator filter,
+            Object extraData) {
+        // basic checks
+        if (filter == null)
+            throw new NullPointerException(
+                    "Filter to be encoded cannot be null");
+        if (!(filter instanceof BinaryComparisonOperator))
+            throw new IllegalArgumentException(
+                    "This filter is not a binary comparison, "
+                            + "can't do SDO relate against it: "
+                            + filter.getClass());
+
+        // extract the property name and the geometry literal
+        PropertyName property;
+        Literal geometry;
+        BinaryComparisonOperator op = (BinaryComparisonOperator) filter;
+        if (op.getExpression1() instanceof PropertyName
+                && op.getExpression2() instanceof Literal) {
+            property = (PropertyName) op.getExpression1();
+            geometry = (Literal) op.getExpression2();
+        } else if (op.getExpression2() instanceof PropertyName
+                && op.getExpression1() instanceof Literal) {
+            property = (PropertyName) op.getExpression2();
+            geometry = (Literal) op.getExpression1();
+        } else {
+            throw new IllegalArgumentException(
+                    "Can only encode spatial filters that do "
+                            + "compare a property name and a geometry");
+        }
+
+        // handle native srid
+        currentGeometry = null;
+        currentSRID = null;
+        if (featureType != null) {
+            // going thru evaluate ensures we get the proper result even if the
+            // name has
+            // not been specified (convention -> the default geometry)
+            AttributeDescriptor descriptor = (AttributeDescriptor) property
+                    .evaluate(featureType);
+            if (descriptor instanceof GeometryDescriptor) {
+                currentGeometry = (GeometryDescriptor) descriptor;
+                currentSRID = (Integer) descriptor.getUserData().get(
+                        JDBCDataStore.JDBC_NATIVE_SRID);
+            }
+        }
+
+        return visitBinarySpatialOperator(filter, property, geometry, filter
+                .getExpression1() instanceof Literal, extraData);
+    }
+
+    protected Object visitBinarySpatialOperator(BinarySpatialOperator filter,
+            PropertyName property, Literal geometry, boolean swapped,
+            Object extraData) {
         throw new RuntimeException(
             "Subclasses must implement this method in order to handle geometries");
     }

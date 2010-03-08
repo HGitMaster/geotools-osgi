@@ -12,17 +12,12 @@ package org.geotools.demo.example;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-import org.geotools.gui.swing.JMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -35,6 +30,7 @@ import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
+import org.geotools.swing.JMapFrame;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -44,6 +40,8 @@ import org.opengis.filter.FilterFactory2;
  * This example also works against a local geoserver.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/example/SLDExample.java $
  */
 public class SLDExample {
 
@@ -101,28 +99,20 @@ public class SLDExample {
 		
 		return style;
 	}
-	public static void show(FeatureSource<SimpleFeatureType, SimpleFeature> source, Style style) throws Exception {
-		    JFrame frame = new JFrame("FOSS4G");
-	        frame.setBounds(20,20,450,200);
-	        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		    
-	        JMapPane mp = new JMapPane();
-	        frame.getContentPane().add( mp);
-		    mp.setMapArea(source.getBounds());
-		    
+
+    public static void show(FeatureSource<SimpleFeatureType, SimpleFeature> source, Style style) throws Exception {
 		    MapContext context = new DefaultMapContext( DefaultGeographicCRS.WGS84 );
 		    context.setAreaOfInterest(source.getBounds(), DefaultGeographicCRS.WGS84 );
 		    context.addLayer( source, style );
-		    //context.getLayerBounds();
-		    
+            context.setTitle("FOSS4G");
+
 		    GTRenderer renderer = new StreamingRenderer();
 		    HashMap hints = new HashMap();
 		    hints.put("memoryPreloadingEnabled", Boolean.TRUE);
 		    renderer.setRendererHints( hints );
 
-		    mp.setRenderer(renderer);
-		    mp.setContext(context);
-		    
+            JMapFrame frame = new JMapFrame(context, renderer);
+            frame.enableToolBar(true);
 		    frame.setVisible(true);
 	}
 }

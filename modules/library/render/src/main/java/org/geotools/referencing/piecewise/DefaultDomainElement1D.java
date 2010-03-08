@@ -26,6 +26,8 @@ import org.opengis.util.InternationalString;
 /**
  * This class implements the   {@link DomainElement1D}   interface in order to provide basic capabilities for   {@link DomainElement1D}   subclasses.
  * @author   Simone Giannecchini, GeoSolutions.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/referencing/piecewise/DefaultDomainElement1D.java $
  */
 public class DefaultDomainElement1D implements DomainElement1D {
 

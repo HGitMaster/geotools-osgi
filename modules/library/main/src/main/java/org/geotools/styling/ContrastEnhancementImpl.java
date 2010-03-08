@@ -19,7 +19,7 @@
 package org.geotools.styling;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
+import org.geotools.util.Utilities;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
@@ -175,5 +175,57 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
 
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
+    }
+    
+    @Override
+    public int hashCode() {
+        final int PRIME = 1000003;
+        int result = 0;
+
+        if (gamma != null){
+            result = (PRIME * result) + gamma.hashCode();
+        }
+
+        if (type != null) {
+            result = (PRIME * result) + type.hashCode();
+        }
+        
+        if (method != null) {
+            result = (PRIME * result) + method.hashCode();
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof ContrastEnhancementImpl) {
+        	ContrastEnhancementImpl other = (ContrastEnhancementImpl) obj;
+
+            return Utilities.equals(gamma, other.gamma)
+            && Utilities.equals(type, other.type)
+            && Utilities.equals(method, other.method);
+        }
+
+        return false;
+    }
+
+    static ContrastEnhancementImpl cast(org.opengis.style.ContrastEnhancement enhancement) {
+        if( enhancement == null ){
+            return null;
+        }
+        else if (enhancement instanceof ContrastEnhancementImpl){
+            return (ContrastEnhancementImpl) enhancement;
+        }
+        else {
+            ContrastEnhancementImpl copy = new ContrastEnhancementImpl();
+            copy.setGammaValue( enhancement.getGammaValue() );
+            copy.setMethod( enhancement.getMethod() );
+            return copy;
+        }
     }
 }

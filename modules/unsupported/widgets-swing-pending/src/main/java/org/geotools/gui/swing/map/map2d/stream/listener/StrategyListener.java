@@ -24,6 +24,8 @@ import org.geotools.gui.swing.map.map2d.stream.event.StrategyEvent;
  * StrategyListener used to listen to RenderingStrategy events 
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/listener/StrategyListener.java $
  */
 public interface StrategyListener extends EventListener{
 

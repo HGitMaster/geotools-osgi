@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.LineString;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/spatial/LineIntersectsLineWithNodeValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/spatial/LineIntersectsLineWithNodeValidation.java $
  * @version $Id: LineIntersectsLineWithNodeValidation.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class LineIntersectsLineWithNodeValidation

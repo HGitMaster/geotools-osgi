@@ -31,6 +31,8 @@ import org.xml.sax.SAXException;
  * </p>
  * @author Justin Deoliveira, OpenGEO
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/XSDParserDelegate.java $
  */
 public class XSDParserDelegate implements ParserDelegate {
 

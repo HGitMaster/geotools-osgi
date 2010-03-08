@@ -26,6 +26,8 @@ import java.util.concurrent.Future;
  * description.
  * 
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/Progress.java $
  */
 public interface Progress extends Future<Map<String,Object>> {
     /**

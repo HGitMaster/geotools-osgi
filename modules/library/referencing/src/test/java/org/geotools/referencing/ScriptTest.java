@@ -31,8 +31,8 @@ import static org.junit.Assert.*;
  * <p>
  * This is probably the most important test case for the whole CRS module.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/ScriptTest.java $
- * @version $Id: ScriptTest.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/ScriptTest.java $
+ * @version $Id: ScriptTest.java 34723 2009-12-22 10:55:34Z aaime $
  * @author Yann Cézard
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)
@@ -190,6 +190,24 @@ public final class ScriptTest {
     @Test
     public void testKrovak() throws Exception {
     	runScript("scripts/Krovak.txt");
+    }
+    
+    /**
+     * Run "EquidistantConic.txt"
+     * @throws Exception
+     */
+    @Test
+    public void testEquidistantConic() throws Exception {
+        runScript("scripts/EquidistantConic.txt");
+    }
+    
+    /**
+     * Run "Polyconic.txt"
+     * @throws Exception
+     */
+    @Test
+    public void testPolyconic() throws Exception {
+        runScript("scripts/Polyconic.txt");
     }
 
     /**

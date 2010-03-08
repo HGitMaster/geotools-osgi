@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.geotools.factory.FactoryRegistryException;
@@ -63,7 +64,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Jody Garnett, Refractions Research
  * @since 2.1.M3
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/feature/FeatureTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/FeatureTypes.java $
  */
 public class FeatureTypes {
 
@@ -440,30 +441,62 @@ public class FeatureTypes {
 
     /** Exact equality based on typeNames, namespace, attributes and ancestors */
     public static boolean equals( SimpleFeatureType typeA, SimpleFeatureType typeB ) {
+        return equals(typeA, typeB, false);
+    }
+    
+    /** Exact equality based on typeNames, namespace, attributes and ancestors, including the user maps contents */
+    public static boolean equalsExact( SimpleFeatureType typeA, SimpleFeatureType typeB ) {
+        return equals(typeA, typeB, true);
+    }
+    
+    /** Exact equality based on typeNames, namespace, attributes and ancestors */
+    static boolean equals( SimpleFeatureType typeA, SimpleFeatureType typeB, boolean compareUserMaps) {
         if (typeA == typeB)
             return true;
 
         if (typeA == null || typeB == null) {
             return false;
         }
+        
+        if(compareUserMaps) {
+            if(!equals(typeA.getUserData(), typeB.getUserData()))
+                return false;
+        }
+        
         return equalsId(typeA, typeB)
-                && equals(typeA.getAttributeDescriptors(), typeB.getAttributeDescriptors()) &&
+                && equals(typeA.getAttributeDescriptors(), typeB.getAttributeDescriptors(), compareUserMaps) &&
                 equalsAncestors( typeA, typeB );
     }
-
-    public static boolean equals( List attributesA, List attributesB ) {
+    
+    static boolean equals( List attributesA, List attributesB, boolean compareUserMaps) {
         return equals(
             (AttributeDescriptor[]) attributesA.toArray(new AttributeDescriptor[attributesA.size()]),
-            (AttributeDescriptor[]) attributesB.toArray(new AttributeDescriptor[attributesB.size()])
-        );
+            (AttributeDescriptor[]) attributesB.toArray(new AttributeDescriptor[attributesB.size()]), 
+            compareUserMaps);
     }
 
+    public static boolean equals( List attributesA, List attributesB) {
+        return equals(attributesA, attributesB, false);
+    }
+    
+    public static boolean equalsExact( List attributesA, List attributesB) {
+        return equals(attributesA, attributesB, true);
+    }
+    
     public static boolean equals( AttributeDescriptor attributesA[], AttributeDescriptor attributesB[] ) {
+        return equals(attributesA, attributesB, false);
+    }
+    
+    public static boolean equalsExact( AttributeDescriptor attributesA[], AttributeDescriptor attributesB[] ) {
+        return equals(attributesA, attributesB, true);
+    }
+
+    static boolean equals( AttributeDescriptor attributesA[], AttributeDescriptor attributesB[], boolean compareUserMaps ) {
         if (attributesA.length != attributesB.length)
             return false;
 
         for( int i = 0, length = attributesA.length; i < length; i++ ) {
-            if (!equals(attributesA[i], attributesB[i]))
+            if (!equals(attributesA[i], attributesB[i], compareUserMaps))
                 return false;
         }
         return true;
@@ -478,7 +511,7 @@ public class FeatureTypes {
      * @param typeB
      */
     public static boolean equalsAncestors( SimpleFeatureType typeA, SimpleFeatureType typeB ) {
-        return ancestors( typeA ).equals( typeB );
+        return ancestors( typeA ).equals( ancestors(typeB) );
     }
 
     public static Set ancestors( SimpleFeatureType featureType ) {
@@ -487,10 +520,58 @@ public class FeatureTypes {
         }
         return new HashSet(getAncestors(featureType));
     }
-
-    public static boolean equals( AttributeDescriptor a, AttributeDescriptor b ) {
-        return a == b || (a != null && a.equals(b));
+    
+    public static boolean equals( AttributeDescriptor a, AttributeDescriptor b) {
+        return equals(a, b, false);
     }
+    
+    public static boolean equalsExact( AttributeDescriptor a, AttributeDescriptor b) {
+        return equals(a, b, true);
+    }
+
+    static boolean equals( AttributeDescriptor a, AttributeDescriptor b, boolean compareUserMaps) {
+        if(a == b)
+            return true;
+        
+        if(a == null)
+            return true;
+        
+        if(!a.equals(b))
+            return false;
+        
+        if(compareUserMaps) {
+            if(!equals(a.getUserData(), b.getUserData()))
+                return false;
+            if(!equals(a.getType().getUserData(), b.getType().getUserData()))
+                return false;
+        }
+        
+        return true;
+            
+    }
+    
+    /**
+     * Tolerant map comparison. Two maps are considered to be equal if they express the
+     * same content. So for example two null maps are equal, but also a null and an 
+     * empty one are
+     */
+    static boolean equals(Map a, Map b) {
+        if(a == b)
+            return true;
+        
+        // null == null handled above
+        if(a == null || b == null)
+            return false;
+        
+        if(a != null && a.size() == 0 && b == null)
+            return true;
+        
+        if(b != null && b.size() == 0 && a == null)
+            return true;
+        
+        return a.equals(b);
+    }
+    
     /** Quick check of namespace and typename */
     public static boolean equalsId( SimpleFeatureType typeA, SimpleFeatureType typeB ) {
         if (typeA == typeB)
@@ -509,6 +590,9 @@ public class FeatureTypes {
 
         String namespaceA = typeA.getName().getNamespaceURI();
         String namespaceB = typeB.getName().getNamespaceURI();
+        if(namespaceA == null && namespaceB == null)
+            return true;
+        
         if (namespaceA == null && namespaceB != null)
             return false;
         else if (!namespaceA.equals(namespaceB))

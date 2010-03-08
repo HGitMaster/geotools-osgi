@@ -64,6 +64,8 @@ import org.opengis.filter.expression.Expression;
  * @author Mauricio Pazos (Axios Engineering)
  * 
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/ecql/ECQL.java $
  */
 public class ECQL {
 

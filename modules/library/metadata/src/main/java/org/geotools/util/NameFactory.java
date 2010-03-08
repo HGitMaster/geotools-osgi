@@ -31,7 +31,7 @@ import org.geotools.resources.Classes;
  * A factory for {@link GenericName} objects.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/NameFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/NameFactory.java $
  * @version $Id: NameFactory.java 30640 2008-06-12 17:34:32Z acuster $
  * @author  Martin Desruisseaux
  */

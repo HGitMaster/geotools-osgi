@@ -25,7 +25,7 @@ package org.geotools.filter;
  * @see <a href="http://schemas.opengis.net/filter/1.1.0/sort.xsd">GeoAPI Filter sort.xsd</a>
  * @author Jody Garnett, Refractions Research.
  * @since GeoTools 2.2, Filter 1.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/filter/SortOrder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/SortOrder.java $
  */
 public final class SortOrder extends Object {
     /** Can now use the geoapi SortOrder directly */

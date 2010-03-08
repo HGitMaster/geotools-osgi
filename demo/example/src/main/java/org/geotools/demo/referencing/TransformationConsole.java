@@ -55,8 +55,8 @@ import org.opengis.referencing.operation.TransformException;
  *
  * To exit from the application, enter "exit".
  *
- * @source $URL: http://svn.geotools.org/branches/2.5.x/demo/referencing/src/main/java/org/geotools/demo/referencing/TransformationConsole.java $
- * @version $Id: TransformationConsole.java 30628 2008-06-12 10:06:17Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/referencing/TransformationConsole.java $
+ * @version $Id: TransformationConsole.java 34132 2009-10-12 07:45:46Z mbedward $
  * @author Martin Desruisseaux
  */
 public class TransformationConsole {

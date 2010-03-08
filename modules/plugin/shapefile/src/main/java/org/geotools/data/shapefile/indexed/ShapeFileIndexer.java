@@ -19,29 +19,28 @@ package org.geotools.data.shapefile.indexed;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.logging.Logger;
 
 import org.geotools.data.shapefile.FileWriter;
+import org.geotools.data.shapefile.ShpFileType;
 import org.geotools.data.shapefile.ShpFiles;
 import org.geotools.data.shapefile.StorageFile;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.ShapefileHeader;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileReader.Record;
-import org.geotools.index.Data;
-import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;
 import org.geotools.index.TreeException;
 import org.geotools.index.quadtree.QuadTree;
 import org.geotools.index.quadtree.StoreException;
 import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.quadtree.fs.IndexHeader;
-import org.geotools.index.rtree.PageStore;
-import org.geotools.index.rtree.RTree;
-import org.geotools.index.rtree.cachefs.FileSystemPageStore;
 import org.geotools.util.NullProgressListener;
+import org.geotools.util.logging.Logging;
 import org.opengis.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * Utility class for Shapefile spatial indexing
@@ -51,12 +50,11 @@ import com.vividsolutions.jts.geom.Envelope;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/ShapeFileIndexer.java $
  */
 public class ShapeFileIndexer implements FileWriter {
-    private IndexType idxType;
-    private int max = 50;
-    private int min = 25;
-    private short split = PageStore.SPLIT_QUADRATIC;
+    private static final Logger LOGGER = Logging.getLogger(ShapeFileIndexer.class);
+    
+    private int max = -1;
     private String byteOrder;
-
+    private boolean interactive = false;
     private ShpFiles shpFiles;
 
     public static void main(String[] args) throws IOException {
@@ -67,16 +65,15 @@ public class ShapeFileIndexer implements FileWriter {
         long start = System.currentTimeMillis();
 
         ShapeFileIndexer idx = new ShapeFileIndexer();
+        idx.interactive = true;
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-t")) {
-                idx.setIdxType(IndexType.valueOf(args[++i]));
+                // idx.setIdxType(IndexType.valueOf(args[++i]));
+                // just skip it for backwards compatibility
+                i++;
             } else if (args[i].equals("-M")) {
                 idx.setMax(Integer.parseInt(args[++i]));
-            } else if (args[i].equals("-m")) {
-                idx.setMin(Integer.parseInt(args[++i]));
-            } else if (args[i].equals("-s")) {
-                idx.setSplit(Short.parseShort(args[++i]));
             } else if (args[i].equals("-b")) {
                 idx.setByteOrder(args[++i]);
             } else {
@@ -106,9 +103,9 @@ public class ShapeFileIndexer implements FileWriter {
     }
 
     private static void usage() {
-        System.out.println("Usage: ShapeFileIndexer " + "-t <QIX | GRX> "
+        System.out.println("Usage: ShapeFileIndexer " + "-t <QIX> "
                 + "[-M <max entries per node>] "
-                + "[-m <min entries per node>] " + "[-s <split algorithm>] "
+                + "[-s <split algorithm>] "
                 + "[-b <byte order NL | NM>] " + "<shape file>");
 
         System.out.println();
@@ -151,7 +148,7 @@ public class ShapeFileIndexer implements FileWriter {
     public int index(boolean verbose, ProgressListener listener)
             throws MalformedURLException, IOException, TreeException,
             StoreException, LockTimeoutException {
-
+        
         if (this.shpFiles == null) {
             throw new IOException("You have to set a shape file name!");
         }
@@ -161,24 +158,29 @@ public class ShapeFileIndexer implements FileWriter {
         ShapefileReader reader = null;
 
         // Temporary file for building...
-        StorageFile storage = shpFiles.getStorageFile(this.idxType.shpFileType);
+        StorageFile storage = shpFiles.getStorageFile(ShpFileType.QIX);
         File treeFile = storage.getFile();
 
         try {
-            reader = new ShapefileReader(shpFiles, true, false);
-
-            switch (idxType) {
-            case EXPERIMENTAL_UNSUPPORTED_GRX:
-                cnt = this.buildRTree(reader, treeFile, verbose);
-                break;
-            case QIX:
-                cnt = this.buildQuadTree(reader, treeFile, verbose);
-                break;
-
-            default:
-                throw new IllegalArgumentException(
-                        "NONE is not a legal index choice");
+            reader = new ShapefileReader(shpFiles, true, false, new GeometryFactory());
+            
+            if(max == -1) {
+                // compute a reasonable index max depth, considering a fully developed
+                // 10 levels one already contains 200k index nodes, good for indexing up
+                // to 3M features without consuming too much memory
+                int features = reader.getCount(0);
+                max = 1;
+                int nodes = 1;
+                while(nodes * 8 < features) {
+                    max++;
+                    nodes *= 4;
+                }
+                
+                reader.close();
+                reader = new ShapefileReader(shpFiles, true, false, new GeometryFactory());
             }
+            
+            cnt = this.buildQuadTree(reader, treeFile, verbose);
         } finally {
             if (reader != null)
                 reader.close();
@@ -190,43 +192,10 @@ public class ShapeFileIndexer implements FileWriter {
         return cnt;
     }
 
-    private int buildRTree(ShapefileReader reader, File rtreeFile,
-            boolean verbose) throws TreeException, LockTimeoutException,
-            IOException {
-        DataDefinition keyDef = new DataDefinition("US-ASCII");
-        keyDef.addField(Integer.class);
-        keyDef.addField(Long.class);
-
-        FileSystemPageStore fps = new FileSystemPageStore(rtreeFile, keyDef,
-                this.max, this.min, this.split);
-        RTree rtree = new RTree(fps);
-
-        Record record = null;
-        Data data = null;
-
-        int cnt = 0;
-
-        while (reader.hasNext()) {
-            record = reader.nextRecord();
-            data = new Data(keyDef);
-            data.addValue(new Integer(++cnt));
-            data.addValue(new Long(record.offset()));
-
-            rtree.insert(new Envelope(record.minX, record.maxX, record.minY,
-                    record.maxY), data);
-
-            if (verbose && ((cnt % 500) == 0)) {
-                System.out.print('.');
-            }
-        }
-
-        rtree.close();
-
-        return cnt;
-    }
-
     private int buildQuadTree(ShapefileReader reader, File file, boolean verbose)
             throws IOException, StoreException {
+        LOGGER.fine("Building quadtree spatial index with depth " +  max + " for file " + file.getAbsolutePath());
+        
         byte order = 0;
 
         if ((this.byteOrder == null) || this.byteOrder.equalsIgnoreCase("NM")) {
@@ -283,39 +252,12 @@ public class ShapeFileIndexer implements FileWriter {
     /**
      * DOCUMENT ME!
      * 
-     * @param i
-     */
-    public void setMin(int i) {
-        min = i;
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param s
-     */
-    public void setSplit(short s) {
-        split = s;
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
      * @param shpFiles
      */
     public void setShapeFileName(ShpFiles shpFiles) {
         this.shpFiles = shpFiles;
     }
 
-    /**
-     * Sets the type of index to create
-     * 
-     * @param indexType
-     *                The idxType to set.
-     */
-    public void setIdxType(IndexType indexType) {
-        this.idxType = indexType;
-    }
 
     /**
      * DOCUMENT ME!

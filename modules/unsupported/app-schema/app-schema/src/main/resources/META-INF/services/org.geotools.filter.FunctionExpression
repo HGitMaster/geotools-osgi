@@ -1,3 +1,2 @@
 org.geotools.filter.IDFunctionExpression
 org.geotools.filter.AsMultiGeometryFunctionExpression
-org.geotools.data.complex.FeatureChainingTest$ContainsTextFunctionExpression

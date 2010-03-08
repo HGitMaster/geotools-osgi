@@ -36,6 +36,8 @@ import com.vividsolutions.jts.io.WKTWriter;
  * Use JTS it works! Leave ISO Geometry for experimenta only.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/jts/GeometryExample.java $
  */
 public class GeometryExample {
 

@@ -27,7 +27,7 @@ import java.util.Collection;
  * @param <E> The type of elements in the collection.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/CheckedCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/CheckedCollection.java $
  * @version $Id: CheckedCollection.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux
  */

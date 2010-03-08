@@ -50,7 +50,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * the translator public so it can be used by others as well.
  *
  * @author Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/xml/transform/TransformerBase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/xml/transform/TransformerBase.java $
  */
 public abstract class TransformerBase {
     private int indentation = -1;

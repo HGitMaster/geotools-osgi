@@ -19,15 +19,8 @@ package org.geotools.styling;
 
 import javax.swing.Icon;
 
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
-
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Expression;
 import org.opengis.metadata.citation.OnLineResource;
-import org.opengis.style.ExternalMark;
 import org.opengis.style.StyleVisitor;
-import org.opengis.util.Cloneable;
 
 
 /**
@@ -36,15 +29,14 @@ import org.opengis.util.Cloneable;
  * @source $URL: http://svn.geotools.org/trunk/modules/library/main/src/main/java/org/geotools/styling/MarkImpl.java $
  * @version $Id: MarkImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
  */
-public class ExternalMarkImpl implements ExternalMark {
+public class ExternalMarkImpl implements org.geotools.styling.ExternalMark {
 
     private OnLineResource onlineResource;
     private Icon inlineContent;
     private int index;
     private String format;
 
-    public ExternalMarkImpl() {
-        
+    public ExternalMarkImpl() {        
     }
     
     public ExternalMarkImpl(Icon icon) {
@@ -81,4 +73,32 @@ public class ExternalMarkImpl implements ExternalMark {
         return visitor.visit( this, extraData );
     }
 
+    public void getInlineContent(Icon inline) {
+        this.inlineContent = inline;
+    }
+
+    public void setFormat(String mimeType) {
+        this.format = mimeType;
+    }
+
+    public void setMarkIndex(int markIndex) {
+        this.index = markIndex;
+    }
+
+    public void setOnlineResource(OnLineResource resource) {
+        this.onlineResource = resource;
+    }
+    static ExternalMarkImpl cast(org.opengis.style.ExternalMark mark) {
+        if (mark == null) {
+            return null;
+        } else if (mark instanceof ExternalMarkImpl) {
+            return (ExternalMarkImpl) mark;
+        } else {
+            ExternalMarkImpl copy = new ExternalMarkImpl();
+            copy.setFormat( mark.getFormat() );
+            copy.setMarkIndex( mark.getMarkIndex() );
+            copy.setOnlineResource( mark.getOnlineResource() );
+            return copy;
+        }
+    }
 }

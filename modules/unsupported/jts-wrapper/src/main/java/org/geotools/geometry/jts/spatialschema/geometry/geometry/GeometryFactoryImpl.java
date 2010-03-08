@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: GeometryFactoryImpl.java 26899 2007-09-10 22:44:28Z jgarnett $
+ ** $Id: GeometryFactoryImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/geometry/GeometryFactoryImpl.java,v $
  **
@@ -54,6 +54,8 @@ import org.opengis.geometry.primitive.SurfaceBoundary;
  * 
  * @author SYS Technologies
  * @author crossley
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/geometry/GeometryFactoryImpl.java $
  * @version $Revision $
  * @deprecated Use GeometryFactoryFinder
  */

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -64,7 +64,7 @@ import org.geotools.resources.Utilities;
  * </li>
  * </ul>
  * </p>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/StyledLayerDescriptorImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/StyledLayerDescriptorImpl.java $
  */
 public class StyledLayerDescriptorImpl implements StyledLayerDescriptor {
     /** The logger for the default core module. */
@@ -127,9 +127,13 @@ public class StyledLayerDescriptorImpl implements StyledLayerDescriptor {
         LOGGER.fine("StyleLayerDescriptorImpl added " + this.layers.size()
             + " styled layers");
     }
+    
+    public List<StyledLayer> layers() {
+        return layers;
+    }
 
     public void addStyledLayer(StyledLayer layer) {
-        layers.add(layer);
+        layers.add( (StyledLayerImpl) layer);
     }
 
     /**

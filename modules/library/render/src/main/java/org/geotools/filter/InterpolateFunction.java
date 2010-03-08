@@ -50,6 +50,8 @@ import org.opengis.filter.expression.Literal;
  * In reality any expression will do.
  * 
  * @author Johann Sorel (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/filter/InterpolateFunction.java $
  */
 public class InterpolateFunction implements Function {
 

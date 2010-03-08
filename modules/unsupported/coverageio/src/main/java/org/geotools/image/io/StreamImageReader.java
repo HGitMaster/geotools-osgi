@@ -36,7 +36,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * handled.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/StreamImageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/StreamImageReader.java $
  * @version $Id: StreamImageReader.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  */
@@ -272,7 +272,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
      * Service provider interface (SPI) for {@link StreamImageReader}s.
      *
      * @since 2.4
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/StreamImageReader.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/StreamImageReader.java $
      * @version $Id: StreamImageReader.java 30679 2008-06-13 10:19:41Z acuster $
      * @author Martin Desruisseaux (IRD)
      */

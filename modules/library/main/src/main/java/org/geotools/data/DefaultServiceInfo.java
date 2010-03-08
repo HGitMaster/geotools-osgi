@@ -25,6 +25,8 @@ import java.util.Set;
  * Implementation of DefaultServiceInfo as a java bean.
  * 
  * @author Jody Garnett (Refractions Research)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/DefaultServiceInfo.java $
  */
 public class DefaultServiceInfo implements ServiceInfo, Serializable {    
     private static final long serialVersionUID = 7975308744804800859L;

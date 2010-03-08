@@ -46,7 +46,7 @@ import org.geotools.graph.structure.Node;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/io/standard/SerializedReaderWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/io/standard/SerializedReaderWriter.java $
  */
 public class SerializedReaderWriter extends AbstractReaderWriter
   implements FileReaderWriter {

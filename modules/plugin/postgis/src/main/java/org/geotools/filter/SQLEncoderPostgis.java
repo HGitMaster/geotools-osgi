@@ -58,7 +58,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  *       reason to have two different classes.  We just need to do testing to
  *       make sure both handle everything.  At the very least have the geos
  *       one extend more intelligently.
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/postgis/src/main/java/org/geotools/filter/SQLEncoderPostgis.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/filter/SQLEncoderPostgis.java $
  */
 public class SQLEncoderPostgis extends SQLEncoder implements
         org.geotools.filter.FilterVisitor {

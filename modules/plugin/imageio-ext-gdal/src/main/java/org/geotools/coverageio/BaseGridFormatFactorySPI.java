@@ -20,6 +20,7 @@ import java.awt.RenderingHints.Key;
 import java.util.Collections;
 import java.util.Map;
 
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 import org.geotools.coverage.grid.io.UnknownFormat;
 import org.opengis.coverage.grid.Format;
@@ -34,7 +35,7 @@ import org.opengis.coverage.grid.Format;
 @SuppressWarnings("deprecation")
 public class BaseGridFormatFactorySPI implements GridFormatFactorySpi {
 
-	public Format createFormat() {
+	public AbstractGridFormat createFormat() {
 		return new UnknownFormat();
 	}
 

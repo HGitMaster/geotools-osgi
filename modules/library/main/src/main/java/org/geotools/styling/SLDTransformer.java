@@ -16,6 +16,7 @@
  */
 package org.geotools.styling;
 
+import java.awt.Color;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -25,6 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+
+import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
@@ -52,7 +56,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * Produces SLD to an output stream.
  *
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/SLDTransformer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/SLDTransformer.java $
  */
 public class SLDTransformer extends TransformerBase {
     /** The logger for this package. */
@@ -135,7 +139,7 @@ public class SLDTransformer extends TransformerBase {
      *             DOCUMENT ME!
      */
     public static final void main(String[] args) throws Exception {
-        java.net.URL url = new java.io.File(args[0]).toURL();
+        java.net.URL url = new java.io.File(args[0]).toURI().toURL();
         SLDParser s = new SLDParser( CommonFactoryFinder.getStyleFactory( null), url);
         SLDTransformer transformer = new SLDTransformer();
         transformer.setIndentation(4);
@@ -179,6 +183,33 @@ public class SLDTransformer extends TransformerBase {
             addNamespaceDeclarations(filterTranslator);
         }
         
+        boolean isNull( Expression expr ){
+            if( expr == null ) return true;
+            if( expr == Expression.NIL ) return true;
+            if( expr instanceof Literal ){
+                Literal literal = (Literal) expr;
+                return literal.getValue() == null;
+            }
+            return false; // must be some other non null thing
+        }
+            
+        boolean isDefault( Expression expr, Object defaultValue ){
+            if( defaultValue == null ) return isNull( expr );
+            
+            if( expr == null ) return false;
+            if( expr == Expression.NIL ) return false;
+            if( expr instanceof Literal ){
+                Literal literal = (Literal) expr;
+                if( defaultValue.equals( literal.getValue() )){
+                    return true;
+                }
+                if( defaultValue.toString().equals( literal.getValue().toString() ) ){
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         /**
          * Utility method used to quickly package up the provided expression.
          * @param element
@@ -215,7 +246,9 @@ public class SLDTransformer extends TransformerBase {
             start("LabelPlacement");
             start("PointPlacement");
             pp.getAnchorPoint().accept(this);
-            pp.getDisplacement().accept(this);
+            
+            visit( pp.getDisplacement() );
+
             element("Rotation", pp.getRotation());
             end("PointPlacement");
             end("LabelPlacement");
@@ -245,16 +278,16 @@ public class SLDTransformer extends TransformerBase {
 
             float[] dash = stroke.getDashArray();
 
-            //            if (dash != null) {
-            StringBuffer sb = new StringBuffer();
-
-            for (int i = 0; i < dash.length; i++) {
-                sb.append(dash[i] + " ");
+            if (dash != null) {
+                StringBuffer sb = new StringBuffer();
+    
+                for (int i = 0; i < dash.length; i++) {
+                    sb.append(dash[i] + " ");
+                }
+    
+                encodeCssParam("stroke-dasharray", sb.toString());
+    
             }
-
-            encodeCssParam("stroke-dasharray", sb.toString());
-
-            //            }
             end("Stroke");
         }
 
@@ -278,11 +311,15 @@ public class SLDTransformer extends TransformerBase {
                 return;
             }
 
-            start("TextSymbolizer");
+            // adds the uom attribute according to the OGC SE specification
+            AttributesImpl atts = new AttributesImpl();
+        	Unit<Length> uom = text.getUnitOfMeasure();
+			if(uom != null)
+				atts.addAttribute("", "uom", "uom", "", UomOgcMapping.get(uom).getSEString());
 
-            if (text.getGeometryPropertyName() != null) {
-                encodeGeometryProperty(text.getGeometryPropertyName());
-            }
+            start("TextSymbolizer", atts);
+
+            encodeGeometryExpression(text.getGeometry());
 
             if (text.getLabel() != null) {
                 element("Label", text.getLabel());
@@ -320,9 +357,7 @@ public class SLDTransformer extends TransformerBase {
             }
             
             if (text.getPriority() != null) {
-                start("Priority");
-                element("PropertyName", text.getPriority());
-                end("Priority");
+                element("Priority", text.getPriority());
             }
             
             end("TextSymbolizer");
@@ -333,11 +368,15 @@ public class SLDTransformer extends TransformerBase {
 				return;
 			}
 
-			start("RasterSymbolizer");
+			// adds the uom attribute according to the OGC SE specification
+            AttributesImpl atts = new AttributesImpl();
+        	Unit<Length> uom = raster.getUnitOfMeasure();
+			if(uom != null)
+				atts.addAttribute("", "uom", "uom", "", UomOgcMapping.get(uom).getSEString());
 
-			if (raster.getGeometryPropertyName() != null) {
-				encodeGeometryProperty(raster.getGeometryPropertyName());
-			}
+			start("RasterSymbolizer", atts);
+
+			encodeGeometryExpression(raster.getGeometry());
 
 			if (raster.getOpacity() != null) {
 				element("Opacity", raster.getOpacity());
@@ -415,15 +454,27 @@ public class SLDTransformer extends TransformerBase {
 			end("RasterSymbolizer");
 		}
 
-        public void visit(ColorMap colorMap) {
-        	ColorMapEntry[] mapEntries = colorMap.getColorMapEntries();
-    		start("ColorMap");
-    		for (int i = 0; i < mapEntries.length; i++) {
-    			mapEntries[i].accept(this);
-    		}
-    		end("ColorMap");
+         public void visit(ColorMap colorMap) {
+                // The type of the ColorMap is stored in an attribute "type" and may store
+                // string-values: "ramp", "intervals" or "values".
+                AttributesImpl atts = new AttributesImpl();
+                String typeString;
+                if (colorMap.getType() == ColorMap.TYPE_INTERVALS)
+                	typeString = "intervals";
+                else if (colorMap.getType() == ColorMap.TYPE_VALUES)
+                	typeString = "values";
+                else
+                	typeString = "ramp"; // Also the default in the parser
+                atts.addAttribute("", "type", "type", "", typeString);
+
+                start("ColorMap", atts);
+                ColorMapEntry[] mapEntries = colorMap.getColorMapEntries();
+                for (int i = 0; i < mapEntries.length; i++) {
+                	mapEntries[i].accept(this);
+                }
+                end("ColorMap");
         }
-        
+
         public void visit(ColorMapEntry colorEntry) {
         	if (colorEntry != null) {
                 AttributesImpl atts = new AttributesImpl();
@@ -452,8 +503,15 @@ public class SLDTransformer extends TransformerBase {
         }
 
         public void visit(PolygonSymbolizer poly) {
-            start("PolygonSymbolizer");
-            encodeGeometryProperty(poly.getGeometryPropertyName());
+        	
+        	// adds the uom attribute according to the OGC SE specification
+            AttributesImpl atts = new AttributesImpl();
+        	Unit<Length> uom = poly.getUnitOfMeasure();
+			if(uom != null)
+				atts.addAttribute("", "uom", "uom", "", UomOgcMapping.get(uom).getSEString());
+
+            start("PolygonSymbolizer", atts);
+            encodeGeometryExpression(poly.getGeometry());
 
             if (poly.getFill() != null) {
                 poly.getFill().accept(this);
@@ -485,9 +543,15 @@ public class SLDTransformer extends TransformerBase {
         }
 
         public void visit(LineSymbolizer line) {
-            start("LineSymbolizer");
 
-            encodeGeometryProperty(line.getGeometryPropertyName());
+        	// adds the uom attribute according to the OGC SE specification
+            AttributesImpl atts = new AttributesImpl();
+        	Unit<Length> uom = line.getUnitOfMeasure();
+			if(uom != null)
+				atts.addAttribute("", "uom", "uom", "", UomOgcMapping.get(uom).getSEString());
+
+        	start("LineSymbolizer", atts);
+            encodeGeometryExpression(line.getGeometry());
 
             if( line.getStroke() != null ){
                 line.getStroke().accept(this);
@@ -577,9 +641,16 @@ public class SLDTransformer extends TransformerBase {
         }
 
         public void visit(PointSymbolizer ps) {
-            start("PointSymbolizer");
 
-            encodeGeometryProperty(ps.getGeometryPropertyName());
+            // adds the uom attribute according to the OGC SE specification
+            AttributesImpl atts = new AttributesImpl();
+        	Unit<Length> uom = ps.getUnitOfMeasure();
+			if(uom != null)
+				atts.addAttribute("", "uom", "uom", "", UomOgcMapping.get(uom).getSEString());
+
+            start("PointSymbolizer", atts);
+
+            encodeGeometryExpression(ps.getGeometry());
 
             ps.getGraphic().accept(this);
             end("PointSymbolizer");
@@ -612,6 +683,7 @@ public class SLDTransformer extends TransformerBase {
             element("Opacity", gr.getOpacity());
             element("Size", gr.getSize());
             element("Rotation", gr.getRotation());
+            visit(gr.getDisplacement());
 
             end("Graphic");
         }
@@ -826,6 +898,9 @@ public class SLDTransformer extends TransformerBase {
                 start("UserStyle");
                 element("Name", style.getName());
                 element("Title", style.getTitle());
+                if(style.isDefault()) {
+                    element("IsDefault", "true");
+                }
                 elementSafe("Abstract", style.getAbstract());
                 FeatureTypeStyle[] fts = style.getFeatureTypeStyles();
                 for (int i = 0; i < fts.length; i++) {
@@ -871,6 +946,24 @@ public class SLDTransformer extends TransformerBase {
         }
 
         public void visit(Displacement dis) {
+            if (dis == null){
+                return;
+            }
+
+            // We don't want to get huge SLDs with default values. So if displacement = 0 and 0 we
+            // drop it.
+            Expression dx = dis.getDisplacementX();
+            Expression dy = dis.getDisplacementY();
+            if( isNull(dx) && isNull(dy)){
+                return;
+            }
+            if( isDefault(dx,0) && isDefault(dy,0)){
+                return;
+            }
+//            if (dis.getDisplacementX().toString().equals("0")
+//                    && dis.getDisplacementY().toString().equals("0"))
+//                return;
+
             start("Displacement");
             element("DisplacementX", dis.getDisplacementX());
             element("DisplacementY", dis.getDisplacementY());
@@ -887,6 +980,17 @@ public class SLDTransformer extends TransformerBase {
             
             start("Geometry");
             filterTranslator.encode(expression);
+            end("Geometry");
+            
+        }
+        
+        void encodeGeometryExpression(Expression geom) {
+            if ((geom == null)) {
+                return;
+            }
+            
+            start("Geometry");
+            filterTranslator.encode(geom);
             end("Geometry");
             
         }

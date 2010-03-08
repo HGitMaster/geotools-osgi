@@ -28,7 +28,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Reference date and event used to describe it.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/CitationDateImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/CitationDateImpl.java $
  * @version $Id: CitationDateImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

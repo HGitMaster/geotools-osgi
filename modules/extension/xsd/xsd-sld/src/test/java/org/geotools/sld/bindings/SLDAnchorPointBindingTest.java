@@ -16,6 +16,7 @@
  */
 package org.geotools.sld.bindings;
 
+import org.geotools.filter.Filters;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.geotools.styling.AnchorPoint;
@@ -32,8 +33,8 @@ public class SLDAnchorPointBindingTest extends SLDTestSupport {
         AnchorPoint point = (AnchorPoint) parse();
         assertNotNull(point);
 
-        assertEquals(org.geotools.styling.SLD.intValue(point.getAnchorPointX()), 1);
-        assertEquals(org.geotools.styling.SLD.intValue(point.getAnchorPointY()), 2);
+        assertEquals(Filters.asInt(point.getAnchorPointX()), 1);
+        assertEquals(Filters.asInt(point.getAnchorPointY()), 2);
     }
 
     public void testNoY() throws Exception {
@@ -45,7 +46,7 @@ public class SLDAnchorPointBindingTest extends SLDTestSupport {
         AnchorPoint point = (AnchorPoint) parse();
         assertNotNull(point);
 
-        assertEquals(org.geotools.styling.SLD.intValue(point.getAnchorPointX()), 1);
+        assertEquals(Filters.asInt(point.getAnchorPointX()), 1);
         assertNull(point.getAnchorPointY());
     }
 }

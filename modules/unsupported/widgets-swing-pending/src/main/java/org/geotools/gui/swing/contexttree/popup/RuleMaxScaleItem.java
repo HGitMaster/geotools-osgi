@@ -28,6 +28,8 @@ import org.geotools.styling.Rule;
  * max scale rule item
  * 
  * @author  Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/popup/RuleMaxScaleItem.java $
  */
 public class RuleMaxScaleItem extends javax.swing.JPanel implements TreePopupItem{
     

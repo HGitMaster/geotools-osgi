@@ -29,7 +29,7 @@ import org.geotools.resources.XArray;
  * other EOL explicitly set at construction time. This writer also remove trailing blanks before
  * end of lines, but this behavior can be changed by overriding {@link #isWhitespace}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/io/LineWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/io/LineWriter.java $
  * @version $Id: LineWriter.java 31049 2008-07-22 20:27:03Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

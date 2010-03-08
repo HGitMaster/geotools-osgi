@@ -41,7 +41,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * description, and number of source grid coverages required for the operation.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/AbstractOperation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/AbstractOperation.java $
  * @version $Id: AbstractOperation.java 30892 2008-07-04 15:17:36Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

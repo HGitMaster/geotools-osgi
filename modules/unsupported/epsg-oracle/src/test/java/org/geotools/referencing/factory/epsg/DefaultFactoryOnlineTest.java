@@ -62,7 +62,7 @@ import org.geotools.resources.Arguments;
  * Tests transformations from CRS and/or operations created from the EPSG factory, using
  * the default plugin.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/epsg/DefaultFactoryOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/epsg/DefaultFactoryOnlineTest.java $
  * @version $Id: DefaultFactoryOnlineTest.java 30802 2008-06-25 12:25:58Z desruisseaux $
  * @author Martin Desruisseaux
  * @author Vadim Semenov

@@ -43,8 +43,8 @@ import org.geotools.metadata.iso.spatial.PixelTranslation;
  * context is ambiguous, an explicit {@code isHighIncluded} argument is required.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GeneralGridEnvelope.java $
- * @version $Id: GeneralGridEnvelope.java 30776 2008-06-20 17:00:11Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GeneralGridEnvelope.java $
+ * @version $Id: GeneralGridEnvelope.java 33009 2009-05-14 19:40:06Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *
  * @see GridEnvelope2D
@@ -115,41 +115,8 @@ public class GeneralGridEnvelope implements GridEnvelope, Serializable {
             index[i + dimension] = envelope.getHigh(i) + 1;
         }
         checkCoherence();
-    }
-
-    /**
-     * Constructs a new grid envelope.
-     *
-     * @param low
-     *          The valid minimum inclusive grid coordinate. The array contains a minimum
-     *          value (inclusive) for each dimension of the grid coverage. The lowest valid
-     *          grid coordinate is often zero, but this is not mandatory.
-     * @param high
-     *          The valid maximum grid coordinate. The array contains a maximum
-     *          value for each dimension of the grid coverage.
-     * @param isHighIncluded
-     *          {@code true} if the {@code high} values are inclusive (as in ISO 19123
-     *          specification), or {@code false} if they are exclusive (as in Java usage).
-     *          This argument does not apply to low values, which are always inclusive.
-     *
-     * @see #getLow
-     * @see #getHigh
-     */
-    public GeneralGridEnvelope(final int[] low, final int[] high, final boolean isHighIncluded) {
-        if (low.length != high.length) {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.MISMATCHED_DIMENSION_$2, low.length, high.length));
-        }
-        index = new int[low.length + high.length];
-        System.arraycopy(low,  0, index, 0,           low.length);
-        System.arraycopy(high, 0, index, low.length, high.length);
-        if (isHighIncluded) {
-            for (int i=low.length; i<index.length; i++) {
-                index[i]++;
-            }
-        }
-        checkCoherence();
-    }
+    } 
+    
 
     /**
      * Constructs a multi-dimensional grid envelope defined by a {@link Rectangle}.
@@ -158,6 +125,11 @@ public class GeneralGridEnvelope implements GridEnvelope, Serializable {
      * [{@linkplain Rectangle#y y} .. y+{@linkplain Rectangle#height height}-1]
      * inclusive ranges respectively.
      * Extra dimensions (if any) are set to the [0..0] inclusive range.
+     * 
+     * <p>
+     * Notice that this method ensure interoperability between {@link Raster} dimensions in Java2D style and 
+     * {@link GridEnvelope} dimensions in ISO 19123 style providing that the user remember to add 1 to the 
+     * {@link GridEnvelope#getHigh(int)} values.
      *
      * @param rect The grid coordinates as a rectangle.
      * @param dimension Number of dimensions for this grid envelope.
@@ -165,6 +137,24 @@ public class GeneralGridEnvelope implements GridEnvelope, Serializable {
      */
     public GeneralGridEnvelope(final Rectangle rect, final int dimension) {
         this(rect.x, rect.y, rect.width, rect.height, dimension);
+    }
+    
+    /**
+     * Constructs a 2D grid envelope defined by a {@link Rectangle}.
+     * The 2 dimensions are set to the
+     * [{@linkplain Rectangle#x x} .. x+{@linkplain Rectangle#width width}-1] and
+     * [{@linkplain Rectangle#y y} .. y+{@linkplain Rectangle#height height}-1]
+     * inclusive ranges respectively.
+     * 
+     * <p>
+     * Notice that this method ensure interoperability between {@link Raster} dimensions in Java2D style and 
+     * {@link GridEnvelope} dimensions in ISO 19123 style providing that the user remember to add 1 to the 
+     * {@link GridEnvelope#getHigh(int)} values.
+     *
+     * @param rect The grid coordinates as a rectangle.
+     */
+    public GeneralGridEnvelope(final Rectangle rect) {
+        this(rect.x, rect.y, rect.width, rect.height, 2);
     }
 
     /**
@@ -175,6 +165,11 @@ public class GeneralGridEnvelope implements GridEnvelope, Serializable {
      * inclusive ranges respectively.
      * Extra dimensions (if any) are set to the [0..0] inclusive range.
      *
+     * <p>
+     * Notice that this method ensure interoperability between {@link Raster} dimensions in Java2D style and 
+     * {@link GridEnvelope} dimensions in ISO 19123 style providing that the user remember to add 1 to the 
+     * {@link GridEnvelope#getHigh(int)} values.
+     * 
      * @param raster The raster for which to construct a grid envelope.
      * @param dimension Number of dimensions for this grid envelope.
      *        Must be equals or greater than 2.
@@ -190,6 +185,11 @@ public class GeneralGridEnvelope implements GridEnvelope, Serializable {
      * [{@linkplain RenderedImage#getMinY y} .. y+{@linkplain RenderedImage#getHeight height}-1]
      * inclusive ranges respectively.
      * Extra dimensions (if any) are set to the [0..0] inclusive range.
+     *
+     * <p>
+     * Notice that this method ensure interoperability between {@link Raster} dimensions in Java2D style and 
+     * {@link GridEnvelope} dimensions in ISO 19123 style providing that the user remember to add 1 to the 
+     * {@link GridEnvelope#getHigh(int)} values.
      *
      * @param image The image for which to construct a grid envelope.
      * @param dimension Number of dimensions for this grid envelope.
@@ -218,6 +218,48 @@ public class GeneralGridEnvelope implements GridEnvelope, Serializable {
         checkCoherence();
     }
 
+    /**
+     * Casts the specified envelope into a grid envelope. This is sometime useful after an
+     * envelope has been transformed from "real world" coordinates to grid coordinates using the
+     * {@linkplain org.opengis.coverage.grid.GridGeometry#getGridToCRS grid to CRS} transform.
+     * The floating point values are rounded toward the nearest integers.
+     * <p>
+     * <strong>Notice that highest values are interpreted as inclusive</strong>
+     * 
+     * <p>
+     * <b>Anchor</b><br>
+     * According OpenGIS specification, {@linkplain org.opengis.coverage.grid.GridGeometry grid
+     * geometry} maps pixel's center. But envelopes typically encompass all pixels. This means
+     * that grid coordinates (0,0) has an envelope starting at (-0.5, -0.5). In order to revert
+     * back such envelope to a grid envelope, it is necessary to add 0.5 to every coordinates
+     * (including the maximum value since it is exclusive in a grid envelope). This offset is
+     * applied only if {@code anchor} is {@link PixelInCell#CELL_CENTER}. Users who don't want
+     * such offset should specify {@link PixelInCell#CELL_CORNER}.
+     * <p>
+     * The convention is specified as a {@link PixelInCell} code instead than the more detailed
+     * {@link org.opengis.metadata.spatial.PixelOrientation} because the latter is restricted to
+     * the two-dimensional case while the former can be used for any number of dimensions.
+     *
+     * @param envelope
+     *          The envelope to use for initializing this grid envelope.
+     * @param anchor
+     *          Whatever envelope coordinates map to pixel center or pixel corner. Should be
+     *          {@link PixelInCell#CELL_CENTER} for OGC convention (an offset of 0.5 will be
+     *          added to every envelope coordinate values), or {@link PixelInCell#CELL_CORNER}
+     *          for Java2D/JAI convention (no offset will be added).
+     * @throws IllegalArgumentException
+     *          If {@code anchor} is not valid.
+     *
+     * @see org.geotools.referencing.GeneralEnvelope#GeneralEnvelope(GridEnvelope, PixelInCell,
+     *      org.opengis.referencing.operation.MathTransform,
+     *      org.opengis.referencing.crs.CoordinateReferenceSystem)
+     */
+    public GeneralGridEnvelope(final Envelope envelope, final PixelInCell anchor)
+            throws IllegalArgumentException
+    {
+        this(envelope,anchor,false);
+    }
+    
     /**
      * Casts the specified envelope into a grid envelope. This is sometime useful after an
      * envelope has been transformed from "real world" coordinates to grid coordinates using the
@@ -289,6 +331,66 @@ public class GeneralGridEnvelope implements GridEnvelope, Serializable {
     }
 
     /**
+	 * Constructs a new grid envelope.
+	 *
+	 * @param low
+	 *          The valid minimum inclusive grid coordinate. The array contains a minimum
+	 *          value (inclusive) for each dimension of the grid coverage. The lowest valid
+	 *          grid coordinate is often zero, but this is not mandatory.
+	 * @param high
+	 *          The valid maximum grid coordinate. The array contains a maximum
+	 *          value for each dimension of the grid coverage.
+	 * @param isHighIncluded
+	 *          {@code true} if the {@code high} values are inclusive (as in ISO 19123
+	 *          specification), or {@code false} if they are exclusive (as in Java usage).
+	 *          This argument does not apply to low values, which are always inclusive.
+	 *
+	 * @see #getLow
+	 * @see #getHigh
+	 */
+	public GeneralGridEnvelope(final int[] low, final int[] high, final boolean isHighIncluded) {
+	    if (low.length != high.length) {
+	        throw new IllegalArgumentException(Errors.format(
+	                ErrorKeys.MISMATCHED_DIMENSION_$2, low.length, high.length));
+	    }
+	    index = new int[low.length + high.length];
+	    System.arraycopy(low,  0, index, 0,           low.length);
+	    System.arraycopy(high, 0, index, low.length, high.length);
+	    if (isHighIncluded) {
+	        for (int i=low.length; i<index.length; i++) {
+	            index[i]++;
+	        }
+	    }
+	    checkCoherence();
+	}
+	
+    /**
+     * Constructs a new grid envelope.
+     * 
+     * <p>
+     * Notice that this constructor has been added for compatibility with JAVA2D, which means 
+     * that the high coords are intepreted as EXCLUSIVE
+     *
+     * @param low
+     *          The valid minimum inclusive grid coordinate. The array contains a minimum
+     *          value (inclusive) for each dimension of the grid coverage. The lowest valid
+     *          grid coordinate is often zero, but this is not mandatory.
+     * @param high
+     *          The valid maximum grid coordinate. The array contains a maximum
+     *          value for each dimension of the grid coverage.
+     * @param isHighIncluded
+     *          {@code true} if the {@code high} values are inclusive (as in ISO 19123
+     *          specification), or {@code false} if they are exclusive (as in Java usage).
+     *          This argument does not apply to low values, which are always inclusive.
+     *
+     * @see #getLow
+     * @see #getHigh
+     */
+    public GeneralGridEnvelope(final int[] low, final int[] high) {
+        this(low,high,false);
+    }
+    
+	/**
      * Returns the number of dimensions.
      */
     public int getDimension() {

@@ -33,6 +33,8 @@ import org.opengis.filter.expression.Function;
  * 
  * @author gabriel
  * @deprecated use the following property expression instead: <code>@gml:id</code>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/filter/IDFunctionExpressionTest.java $
  */
 public class IDFunctionExpressionTest extends TestCase {
 

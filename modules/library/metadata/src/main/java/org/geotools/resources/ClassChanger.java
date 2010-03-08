@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </pre></blockquote>
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/resources/ClassChanger.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/ClassChanger.java $
  * @version $Id: ClassChanger.java 31015 2008-07-15 11:29:32Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

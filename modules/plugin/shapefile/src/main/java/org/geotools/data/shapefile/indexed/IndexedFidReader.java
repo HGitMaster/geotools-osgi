@@ -39,6 +39,8 @@ import org.geotools.resources.NIOUtilities;
  * This object reads from a file the fid of a feature in a shapefile.
  * 
  * @author Jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/IndexedFidReader.java $
  */
 public class IndexedFidReader implements FIDReader, FileReader {
     private static final Logger LOGGER = org.geotools.util.logging.Logging

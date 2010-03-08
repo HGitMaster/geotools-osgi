@@ -164,7 +164,7 @@ import org.geotools.graph.structure.Graphable;
  * @see GraphTraversal
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/traverse/GraphIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/traverse/GraphIterator.java $
  */
 public interface GraphIterator {
   

@@ -32,7 +32,7 @@ import org.geotools.graph.structure.opt.OptNode;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/build/opt/OptGraphBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/build/opt/OptGraphBuilder.java $
  */
 public class OptGraphBuilder extends BasicGraphBuilder {
  

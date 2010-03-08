@@ -21,8 +21,8 @@ package org.geotools.referencing;
  * Predefined CRS as WKT strings. Hard-coded constants are more convenient for debugging
  * than strings read from a file.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/WKT.java $
- * @version $Id: WKT.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/WKT.java $
+ * @version $Id: WKT.java 34842 2010-01-27 16:44:20Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public final class WKT {
@@ -83,6 +83,18 @@ public final class WKT {
     public static final String WGS84 =
             "GEOGCS[\"WGS84\",\n"                                   +
             "  DATUM[\"WGS84\",\n"                                  +
+            "    SPHEROID[\"WGS84\", 6378137.0, 298.257223563]],\n" +
+            "  PRIMEM[\"Greenwich\", 0.0],\n"                       +
+            "  UNIT[\"degree\", 0.017453292519943295],\n"+""        +
+            "  AXIS[\"Longitude\",EAST],"                           +
+            "  AXIS[\"Latitude\",NORTH]]";
+    
+    /**
+     * Geographic CRS (EPSG:4326) with a different datum name
+     */
+    public static final String WGS84_ALTERED =
+            "GEOGCS[\"WGS84\",\n"                                   +
+            "  DATUM[\"WGS84_altered\",\n"                          +
             "    SPHEROID[\"WGS84\", 6378137.0, 298.257223563]],\n" +
             "  PRIMEM[\"Greenwich\", 0.0],\n"                       +
             "  UNIT[\"degree\", 0.017453292519943295],\n"+""        +

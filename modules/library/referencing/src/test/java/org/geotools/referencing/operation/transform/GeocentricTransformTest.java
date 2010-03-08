@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
  *   <li>{@link DefaultEllipsoid}</li>
  * </ul>
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/GeocentricTransformTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/GeocentricTransformTest.java $
  * @version $Id: GeocentricTransformTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

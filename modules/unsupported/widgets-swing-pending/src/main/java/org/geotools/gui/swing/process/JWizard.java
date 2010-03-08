@@ -46,6 +46,8 @@ import javax.swing.border.EmptyBorder;
  * with Java</a>.
  * 
  * @author Jody, gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/JWizard.java $
  */
 public class JWizard extends JDialog {
     private static final long serialVersionUID = 1L;

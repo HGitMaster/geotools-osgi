@@ -53,6 +53,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/AbstractFeatureCollectionTypeBinding.java $
  */
 public class AbstractFeatureCollectionTypeBinding extends AbstractComplexBinding {
     /**
@@ -80,7 +82,11 @@ public class AbstractFeatureCollectionTypeBinding extends AbstractComplexBinding
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = DefaultFeatureCollections.newCollection();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = 
+            (FeatureCollection<SimpleFeatureType, SimpleFeature>) node.getChildValue(FeatureCollection.class);
+        if (featureCollection == null) {
+            featureCollection = DefaultFeatureCollections.newCollection();
+        }
 
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="gml:featureMember"/&gt;
         featureCollection.addAll(node.getChildValues(SimpleFeature.class));

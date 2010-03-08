@@ -46,8 +46,8 @@ import org.geotools.resources.i18n.Errors;
  * for interoperability with GeoAPI.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/geometry/jts/ReferencedEnvelope.java $
- * @version $Id: ReferencedEnvelope.java 30848 2008-07-03 09:25:49Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/geometry/jts/ReferencedEnvelope.java $
+ * @version $Id: ReferencedEnvelope.java 33956 2009-09-23 00:49:00Z mbedward $
  * @author Jody Garnett
  * @author Martin Desruisseaux
  * @author Simone Giannecchini
@@ -58,33 +58,75 @@ import org.geotools.resources.i18n.Errors;
  */
 public class ReferencedEnvelope extends Envelope implements org.opengis.geometry.Envelope,
     BoundingBox {
-	/** A ReferencedEnvelope containing "everything" */
-	public static ReferencedEnvelope EVERYTHING = new ReferencedEnvelope(
-			Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY,
-			Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY,null){
-	    private static final long serialVersionUID = -3188702602373537164L;		
-		public boolean contains(BoundingBox bbox) {
-			return true;
-		}
-		public boolean contains(Coordinate p) {
-			return true;			
-		}
-		public boolean contains(DirectPosition pos) {
-			return true;
-		}
-		public boolean contains(double x, double y) {
-			return true;
-		}
-		public boolean contains(Envelope other) {
-			return true;
-		}	
-		public boolean isEmpty() {
-			return false;
-		}
-		public boolean isNull() {
-			return true;
-		}		
-	};
+    
+    /** A ReferencedEnvelope containing "everything" */
+    public static ReferencedEnvelope EVERYTHING = new ReferencedEnvelope(Double.NEGATIVE_INFINITY,
+            Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, null) {
+        private static final long serialVersionUID = -3188702602373537164L;
+
+        public boolean contains(BoundingBox bbox) {
+            return true;
+        }
+
+        public boolean contains(Coordinate p) {
+            return true;
+        }
+
+        public boolean contains(DirectPosition pos) {
+            return true;
+        }
+
+        public boolean contains(double x, double y) {
+            return true;
+        }
+
+        public boolean contains(Envelope other) {
+            return true;
+        }
+
+        public boolean isEmpty() {
+            return false;
+        }
+
+        public boolean isNull() {
+            return true;
+        }
+        
+        public double getArea() {
+            //return super.getArea();
+            return Double.POSITIVE_INFINITY;
+        }
+        
+        public void setBounds(BoundingBox arg0) {
+            throw new IllegalStateException("Cannot modify ReferencedEnvelope.EVERYTHING");
+        }
+        public Coordinate centre() {
+            return new Coordinate();
+        }
+        public void setToNull() {
+            // um ignore this as we are already "null"
+        }
+        public boolean equals(Object obj) {
+            if( obj == EVERYTHING ){
+                return true;
+            }
+            if( obj instanceof ReferencedEnvelope ){
+                ReferencedEnvelope other = (ReferencedEnvelope) obj;
+                if( other.crs != EVERYTHING.crs ) return false;
+                if( other.getMinX() != EVERYTHING.getMinX() ) return false;
+                if( other.getMinY() != EVERYTHING.getMinY() ) return false;
+                if( other.getMaxX() != EVERYTHING.getMaxX() ) return false;
+                if( other.getMaxY() != EVERYTHING.getMaxY() ) return false;
+                
+                return true;
+            }
+            return super.equals(obj);
+        }
+        
+        public String toString() {
+            return "ReferencedEnvelope.EVERYTHING";
+        }
+    };
     /**
      * Serial number for compatibility with different versions.
      */
@@ -218,9 +260,12 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * Returns the specified bounding box as a JTS envelope.
      */
     private static Envelope getJTSEnvelope(final BoundingBox bbox) {
+        if( bbox == null ){
+            throw new NullPointerException("Provided bbox envelope was null");
+        }
         if (bbox instanceof Envelope) {
             return (Envelope) bbox;
-        }
+        }        
         return new ReferencedEnvelope(bbox);
     }
 
@@ -244,7 +289,7 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
 
     /**
      * Make sure that the specified bounding box uses the same CRS than this one.
-     *
+     * 
      * @param  bbox The other bounding box to test for compatibility.
      * @throws MismatchedReferenceSystemException if the CRS are incompatibles.
      */
@@ -260,7 +305,7 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
             }
         }
     }
-
+    
     /**
      * Returns the coordinate reference system associated with this envelope.
      */
@@ -445,17 +490,44 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
 
         return super.intersects(getJTSEnvelope(bbox));
     }
-
+    /**
+     * Check if this bounding box intersects the provided bounds.
+     */    
+    @Override
+    public Envelope intersection(Envelope env) {
+        if( env instanceof BoundingBox ){
+            BoundingBox bbox = (BoundingBox) env;
+            ensureCompatibleReferenceSystem( bbox );
+        }
+        return super.intersection(env);
+    }    
     /**
      * Include the provided bounding box, expanding as necessary.
      *
      * @since 2.4
      */
     public void include(final BoundingBox bbox) {
-        ensureCompatibleReferenceSystem(bbox);
-        super.expandToInclude(getJTSEnvelope(bbox));
+        if( crs == null ){
+            this.crs = bbox.getCoordinateReferenceSystem();
+        }
+        else {
+            ensureCompatibleReferenceSystem(bbox);
+        }
+        super.expandToInclude(getJTSEnvelope(bbox));        
     }
 
+    /**
+     * Include the provided envelope, expanding as necessary.
+     */
+    @Override
+    public void expandToInclude(Envelope other) {
+        if( other instanceof BoundingBox ){
+            BoundingBox bbox = (BoundingBox) other;
+            ensureCompatibleReferenceSystem( bbox );
+        }
+        super.expandToInclude(other);
+    }
+    
     /**
      * Include the provided coordinates, expanding as necessary.
      *
@@ -592,6 +664,45 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
             return Utilities.equals(crs, otherCRS);
         }
         return false;
+    }
+
+    /**
+     * Compare the bounds of this envelope with those of another.
+     * <p>
+     * Note: in this test:
+     * <ul>
+     * <li> the coordinate reference systems of the envelopes are not examined
+     * <li> only the first two dimensions of the envelopes are compared
+     * <li> it is assumed that each dimension equates to the same axis for both envelopes
+     * </ul>
+     * 
+     * @param other other envelope
+     * @param eps a small tolerance factor (e.g. 1.0e-6d) which will be scaled 
+     *        relative to this envlope's width and height
+     * 
+     * @return true if all bounding coordinates are equal within the set tolerance;
+     *         false otherwise
+     */
+
+    public boolean boundsEquals2D(final org.opengis.geometry.Envelope other, double eps) {
+        eps *= 0.5*(getWidth() + getHeight());
+
+        double[] delta = new double[4];
+        delta[0] = getMinimum(0) - other.getMinimum(0);
+        delta[1] = getMaximum(0) - other.getMaximum(0);
+        delta[2] = getMinimum(1) - other.getMinimum(1);
+        delta[3] = getMaximum(1) - other.getMaximum(1);
+
+        for (int i = 0; i < delta.length; i++) {
+            /*
+             * As per Envelope2D#boundsEquals we use ! here to
+             * catch any NaN values
+             */
+            if (!(Math.abs(delta[i]) <= eps)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

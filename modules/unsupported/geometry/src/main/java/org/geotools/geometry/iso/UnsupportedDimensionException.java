@@ -23,6 +23,8 @@ package org.geotools.geometry.iso;
  * 
  * @author Sanjay Dominik Jena
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/UnsupportedDimensionException.java $
  */
 public class UnsupportedDimensionException extends Exception {
 

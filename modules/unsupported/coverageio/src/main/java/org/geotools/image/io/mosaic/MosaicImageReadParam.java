@@ -54,7 +54,7 @@ import javax.imageio.IIOParamController;
  * and can be queried once the reading is finished.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageReadParam.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageReadParam.java $
  * @version $Id: MosaicImageReadParam.java 30729 2008-06-16 09:26:48Z desruisseaux $
  * @author Martin Desruisseaux
  */

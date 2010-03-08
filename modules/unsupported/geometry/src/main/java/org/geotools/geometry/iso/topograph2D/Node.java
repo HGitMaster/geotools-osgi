@@ -24,6 +24,8 @@ import java.util.Iterator;
  * A node in a {@link PlanarGraph}is a location where 0 or more {@link Edge}s
  * meet. A node is connected to each of its incident Edges via an outgoing
  * DirectedEdge.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Node.java $
  */
 public class Node extends GraphComponent {
 

@@ -65,7 +65,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * discarted (and recreated on the fly if needed) otherwise.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/ThreadedAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/ThreadedAuthorityFactory.java $
  * @version $Id: ThreadedAuthorityFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

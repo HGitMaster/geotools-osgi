@@ -58,7 +58,7 @@ import org.geotools.util.Utilities;
  * Instances of {@link CategoryList} are immutable and thread-safe.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/CategoryList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/CategoryList.java $
  * @version $Id: CategoryList.java 31549 2008-09-18 13:25:07Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

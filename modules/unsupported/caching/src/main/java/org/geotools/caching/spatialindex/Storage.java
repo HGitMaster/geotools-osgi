@@ -25,6 +25,8 @@ import org.opengis.feature.type.FeatureType;
 /**
  * Interface for cache storage options.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/Storage.java $
  */
 public interface Storage {
     

@@ -20,8 +20,6 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.Icon;
-
 import org.geotools.data.DataSourceException;
 import org.geotools.data.ResourceInfo;
 import org.geotools.feature.FeatureTypes;
@@ -32,6 +30,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Information about the contents of a shapefile.
  * 
  * @author Jody Garnett (Refractions Reserach Inc)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileURLResourceInfo.java $
  */
 public class ShapefileURLResourceInfo implements ResourceInfo {
 

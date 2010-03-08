@@ -25,7 +25,7 @@ package org.geotools.geometry.jts.coordinatesequence;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/coordinatesequence/CSBuilderFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/coordinatesequence/CSBuilderFactory.java $
  */
 public class CSBuilderFactory {
 	private static Class defaultBuilderClass;

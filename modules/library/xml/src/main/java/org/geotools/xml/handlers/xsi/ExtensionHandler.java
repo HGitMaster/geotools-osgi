@@ -31,7 +31,7 @@ import org.xml.sax.SAXNotRecognizedException;
  * </p>
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/ExtensionHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/ExtensionHandler.java $
  */
 public class ExtensionHandler extends XSIElementHandler {
     /** 'extension' */

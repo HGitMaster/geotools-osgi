@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link WebCRSFactory}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/factory/wms/CRSTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/factory/wms/CRSTest.java $
  * @version $Id: CRSTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux
  */

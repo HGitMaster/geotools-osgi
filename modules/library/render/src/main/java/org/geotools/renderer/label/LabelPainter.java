@@ -56,6 +56,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  * @author Andrea Aime
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/label/LabelPainter.java $
  */
 public class LabelPainter {
 
@@ -126,6 +128,7 @@ public class LabelPainter {
             TextLayout layout = new TextLayout(text, labelItem.getTextStyle().getFont(), frc);
             LineInfo line = new LineInfo(text, layoutSentence(text, labelItem), layout);
             labelBounds = line.gv.getVisualBounds();
+            normalizeBounds(labelBounds);
             lines = Collections.singletonList(line);
             return;
         } 
@@ -220,7 +223,19 @@ public class LabelPainter {
             }
             info.y = labelY;
         }
-        
+        normalizeBounds(labelBounds);
+    }
+
+    /**
+     * If, for any reason, a font size of 0 is provided to the renderer, resulting bounds
+     * will become empty and this will ruin most geometric computations dealing with spacing
+     * and orientations. Enlarge the envelope a tiny bit
+     * @param bounds
+     */
+    void normalizeBounds(Rectangle2D bounds) {
+        if(bounds.isEmpty()) {
+            bounds.setRect(bounds.getCenterX() -1 , bounds.getCenterY() -1, 2, 2);
+        }
     }
 
     /**
@@ -313,6 +328,8 @@ public class LabelPainter {
                     + bounds.getMinY() - bounds.getHeight() / 2, area.getWidth(), area.getHeight());
             bounds = bounds.createUnion(shieldBounds);
         }
+        
+        normalizeBounds(bounds);
 
         return bounds;
     }
@@ -359,6 +376,10 @@ public class LabelPainter {
                         .getGraphic(), 5.0);
                 // graphics.setTransform(transform);
             }
+            
+            // 0 is unfortunately an acceptable value if people only want to draw shields
+            if(labelItem.getTextStyle().getFont().getSize() == 0)
+                return;
 
             // draw the label
             if (lines.size() == 1) {
@@ -442,6 +463,10 @@ public class LabelPainter {
      * @param cursor
      */
     public void paintCurvedLabel(LineStringCursor cursor) {
+        // 0 is unfortunately an acceptable value if people only want to draw shields
+        if(labelItem.getTextStyle().getFont().getSize() == 0)
+            return;
+        
         GlyphVector glyphVector = lines.get(0).gv;
         AffineTransform oldTransform = graphics.getTransform();
         try {
@@ -515,8 +540,13 @@ public class LabelPainter {
         TextStyle2D textStyle = getLabel().getTextStyle();
         LineMetrics lm = textStyle.getFont().getLineMetrics(textStyle.getLabel(),
                 graphics.getFontRenderContext());
-        return (Math.abs(lm.getStrikethroughOffset()) + lm.getDescent() + lm.getLeading() / 2)
-                / lm.getHeight();
+        
+        // gracefully handle font size = 0
+        if(lm.getHeight() > 0)
+            return (Math.abs(lm.getStrikethroughOffset()) + lm.getDescent() + lm.getLeading() / 2)
+                    / lm.getHeight();
+        else 
+            return 0;
     }
 
     /**

@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link FactoryIteratorProvider} addition in {@link FactoryIteratorProviders}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/factory/FactoryIteratorProviderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/factory/FactoryIteratorProviderTest.java $
  * @version $Id: FactoryIteratorProviderTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link ViewsManager} class.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/grid/ViewsManagerTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/grid/ViewsManagerTest.java $
  * @version $Id: ViewsManagerTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux
  */

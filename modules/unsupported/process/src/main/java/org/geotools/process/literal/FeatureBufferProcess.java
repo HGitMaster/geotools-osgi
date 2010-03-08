@@ -34,6 +34,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * XXX Untested Buffer a Feature and return the result
  *
  * @author Lucas Reed, Refractions Research Inc
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/literal/FeatureBufferProcess.java $
  */
 public class FeatureBufferProcess extends AbstractProcess
 {

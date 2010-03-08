@@ -106,6 +106,8 @@ import org.opengis.filter.expression.Function;
  * filter was in error.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/Capabilities.java $
  */
 public class Capabilities {    
     private static Map<Class<?>,String> scalarNames;

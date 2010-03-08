@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  *
  * @author jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/test/java/org/geotools/feature/AttributeTypeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/test/java/org/geotools/feature/AttributeTypeTest.java $
  */
 public class AttributeTypeTest extends TestCase {
     

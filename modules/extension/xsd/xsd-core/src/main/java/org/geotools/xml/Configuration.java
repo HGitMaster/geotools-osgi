@@ -16,31 +16,32 @@
  */
 package org.geotools.xml;
 
-import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
-import org.eclipse.xsd.util.XSDSchemaLocator;
-import org.picocontainer.ComponentAdapter;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.defaults.DecoratingComponentAdapter;
-import org.picocontainer.defaults.DefaultPicoContainer;
-import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
-import org.picocontainer.defaults.InstanceComponentAdapter;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.Stack;
+
 import javax.xml.namespace.QName;
-import org.geotools.resources.Utilities;
+
+import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.util.XSDSchemaLocationResolver;
+import org.eclipse.xsd.util.XSDSchemaLocator;
+import org.geotools.util.Utilities;
 import org.geotools.xml.impl.PicoMap;
 import org.geotools.xs.XSConfiguration;
+import org.picocontainer.ComponentAdapter;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
+import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
 
 
 /**
@@ -209,6 +210,8 @@ import org.geotools.xs.XSConfiguration;
  *
  * @author Justin Deoliveira,Refractions Research Inc.,jdeolive@refractions.net
  * @see org.geotools.xml.BindingConfiguration
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/Configuration.java $
  */
 public abstract class Configuration {
     /**
@@ -324,6 +327,47 @@ public abstract class Configuration {
             }
         }
 
+        if (unpacked.size() < 2) {
+            return unpacked;
+        }
+        
+        //create a graph of the dependencies
+        DepGraph g = new DepGraph();
+        for (Configuration c : (List<Configuration>)unpacked) {
+            for (Configuration d : (List<Configuration>)c.getDependencies()) {
+                g.addEdge(c, d);
+            }
+        }
+        
+        PriorityQueue<DepNode> q = new PriorityQueue<DepNode>(g.nodes.size(), new Comparator<DepNode>() {
+            public int compare(DepNode o1, DepNode o2) {
+                return Integer.valueOf(o1.outgoing().size()).compareTo(o2.outgoing().size());
+            }
+        });
+        for (DepNode n : g.nodes.values()) {
+            q.add(n);
+        }
+        
+        unpacked = new LinkedList();
+        while(!q.isEmpty()) {
+            DepNode n = q.remove();
+            if (n.outgoing().size() != 0) {
+                throw new IllegalStateException();
+            }
+            
+            unpacked.add(n.config);
+            for (DepNode i : n.incoming()) {
+                g.removeEdge(i.config, n.config);
+                /*
+                 * PriorityQueue.remove(Object) is broken in Java 5
+                 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6207984
+                 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6268068
+                 */
+                q.removeAll(Collections.singletonList(i));;
+                q.add(i);
+            }
+        }
+        
         return unpacked;
     }
 
@@ -622,5 +666,108 @@ public abstract class Configuration {
         }
 
         return 0;
+    }
+    
+    static class DepGraph {
+        Map<Configuration,DepNode> nodes = new HashMap();
+        
+        public void addEdge(Configuration from, Configuration to) {
+            DepNode src = addNode(from);
+            DepNode dst = addNode(to);
+            
+            DepEdge dep = src.getEdge(dst);
+            if (dep != null) {
+                return;
+            }
+            
+            //ensure two configurations not dependent on each other
+            if (dst.getEdge(src) != null) {
+                throw new IllegalArgumentException("Cycle between " + from + ", " + to );
+            }
+            
+            dep = new DepEdge(src, dst);
+            src.edges.add(dep);
+            dst.edges.add(dep);
+        }
+        
+        public void removeEdge(Configuration from, Configuration to) {
+            DepNode src = addNode(from);
+            DepNode dst = addNode(to);
+            
+            DepEdge dep = src.getEdge(dst);
+            if (dep == null) {
+                throw new IllegalStateException("No such edge: " + from + "," + to);
+            }
+            
+            src.edges.remove(dep);
+            dst.edges.remove(dep);
+        }
+        
+        DepNode addNode(Configuration config) {
+            DepNode node = nodes.get(config);
+            if (node == null) {
+                node = new DepNode(config);
+                nodes.put(config, node);
+            }
+            return node;
+        }
+    }
+    
+    static class DepNode {
+        Configuration config;
+        List<DepEdge> edges = new ArrayList();
+        
+        DepNode(Configuration config) {
+            this.config = config;
+        }
+        
+        DepEdge getEdge(DepNode node) {
+            for (DepEdge edge: edges) {
+                if (edge.src == this && edge.dst == node) {
+                    return edge;
+                }
+            }
+            
+            return null;
+        }
+        
+        public List<DepNode> incoming() {
+            List<DepNode> incoming = new ArrayList();
+            for (DepEdge edge : edges) {
+                if (edge.dst == this) {
+                    incoming.add(edge.src);
+                }
+            }
+            return incoming;
+        }
+        
+        public List<DepNode> outgoing() {
+            List<DepNode> outgoing = new ArrayList();
+            for (DepEdge edge : edges) {
+                if (edge.src == this) {
+                    outgoing.add(edge.dst);
+                }
+            }
+            return outgoing;
+        }
+        
+        @Override
+        public String toString() {
+            return config.toString();
+        }
+    }
+    
+    static class DepEdge {
+        DepNode src, dst;
+        
+        DepEdge(DepNode src, DepNode dst) {
+            this.src = src;
+            this.dst = dst;
+        }
+        
+        @Override
+        public String toString() {
+            return "[" + src.toString() + ", " + dst.toString() + "]";
+        }
     }
 }

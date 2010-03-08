@@ -59,8 +59,8 @@ import org.geotools.util.Utilities;
  * Conversely, these names shall not be used in any other context.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultCoordinateSystemAxis.java $
- * @version $Id: DefaultCoordinateSystemAxis.java 31000 2008-07-10 21:11:13Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultCoordinateSystemAxis.java $
+ * @version $Id: DefaultCoordinateSystemAxis.java 34025 2009-10-01 07:54:00Z aaime $
  * @author Martin Desruisseaux (IRD)
  *
  * @see AbstractCS
@@ -588,7 +588,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      */
     private static boolean nameMatchesXY(String xy, final String name) {
         xy = xy.trim();
-        if (xy.length() == 0) {
+        if (xy.length() == 1) {
             final DefaultCoordinateSystemAxis axis;
             switch (Character.toLowerCase(xy.charAt(0))) {
                 case 'x': axis=EASTING;  break;

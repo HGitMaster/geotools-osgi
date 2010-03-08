@@ -26,6 +26,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * @author roehrig
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/aggregate/MultiPointImpl.java $
  */
 public class MultiPointImpl extends MultiPrimitiveImpl implements MultiPoint {
     private static final long serialVersionUID = -1251341764107281100L;

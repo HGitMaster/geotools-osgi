@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * <p>
  * 
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/TouchesIntegrity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/TouchesIntegrity.java $
  */
 public class TouchesIntegrity extends RelationIntegrity {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.validation");

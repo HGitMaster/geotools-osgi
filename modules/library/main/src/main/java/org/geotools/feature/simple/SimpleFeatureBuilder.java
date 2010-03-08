@@ -125,6 +125,8 @@ import com.vividsolutions.jts.geom.Geometry;
  *  
  * @author Justin Deoliveira
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/simple/SimpleFeatureBuilder.java $
  */
 public class SimpleFeatureBuilder {
     /**

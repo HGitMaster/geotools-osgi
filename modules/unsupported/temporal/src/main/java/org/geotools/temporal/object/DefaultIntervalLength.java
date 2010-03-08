@@ -25,6 +25,8 @@ import org.opengis.temporal.IntervalLength;
  * terms of a specified multiple of a single unit of time.
  * 
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultIntervalLength.java $
  */
 public class DefaultIntervalLength extends DefaultDuration implements IntervalLength {
 

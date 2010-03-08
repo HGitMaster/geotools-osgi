@@ -18,7 +18,6 @@ package org.geotools.process.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.geotools.process.ProcessFactory;
 import org.geotools.util.NullProgressListener;
@@ -29,6 +28,8 @@ import org.opengis.util.ProgressListener;
  * is not going to need to report progress as it goes).
  * 
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/impl/SimpleProcess.java $
  */
 public abstract class SimpleProcess extends AbstractProcess {
     /** Can only run once... should not need to check this but we are being careful */

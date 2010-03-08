@@ -31,7 +31,7 @@ import org.opengis.referencing.operation.PlanarProjection;
 /**
  * Base class for for azimuthal (or planar) map projections.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultPlanarProjection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultPlanarProjection.java $
  * @version $Id: DefaultPlanarProjection.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

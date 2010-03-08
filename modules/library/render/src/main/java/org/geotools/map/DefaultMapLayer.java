@@ -30,7 +30,6 @@ import org.geotools.data.Query;
 import org.geotools.data.memory.CollectionSource;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.event.MapLayerEvent;
@@ -42,6 +41,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
@@ -49,7 +49,7 @@ import org.opengis.referencing.operation.TransformException;
  * Default implementation of the MapLayer implementation
  * 
  * @author wolf
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/map/DefaultMapLayer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/DefaultMapLayer.java $
  */
 public class DefaultMapLayer implements MapLayer {
     
@@ -184,15 +184,34 @@ public class DefaultMapLayer implements MapLayer {
 	 * @param coverage
 	 *            The new layer that has been added.
 	 * @param style
-	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
 	 * @throws FactoryRegistryException 
 	 * @throws TransformException 
 	 */
-	public DefaultMapLayer(GridCoverage coverage, Style style) throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
+	public DefaultMapLayer(GridCoverage coverage, Style style) throws TransformException, FactoryRegistryException, SchemaException {
 
 		this(FeatureUtilities.wrapGridCoverage((GridCoverage2D) coverage), style, "");
 
+	}
+	
+	/**
+	 * Constructor which adds a new layer and trigger a {@link LayerListEvent}.
+	 * 
+	 * @param reader
+	 *            a reader with the new layer that will be added.
+	 * @param style
+	 * @param title
+	 * @param params GeneralParameterValue[] that describe how the {@link AbstractGridCoverage2DReader} shall read the images
+	 * 
+	 * @throws SchemaException 
+	 * @throws FactoryRegistryException 
+	 * @throws TransformException 
+	 */
+	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style, String title, GeneralParameterValue[] params)
+	throws TransformException, FactoryRegistryException, SchemaException {
+	    
+	    this(FeatureUtilities.wrapGridCoverageReader(reader,params), style, title);
+	    
 	}
 
 	/**
@@ -203,15 +222,14 @@ public class DefaultMapLayer implements MapLayer {
 	 * @param style
 	 * @param title
 	 * 
-	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
 	 * @throws FactoryRegistryException 
 	 * @throws TransformException 
 	 */
 	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style, String title)
-			throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
+			throws TransformException, FactoryRegistryException, SchemaException {
 
-		this(FeatureUtilities.wrapGridCoverageReader(reader), style, title);
+		this(FeatureUtilities.wrapGridCoverageReader(reader,null), style, title);
 
 	}
 
@@ -223,7 +241,6 @@ public class DefaultMapLayer implements MapLayer {
 	 *            a reader with the new layer that will be added
 	 * @param style
 	 * 
-	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
 	 * @throws FactoryRegistryException 
 	 * @throws TransformException 
@@ -231,10 +248,9 @@ public class DefaultMapLayer implements MapLayer {
 	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style) 
 	  throws TransformException, 
 	         FactoryRegistryException, 
-	         SchemaException, 
-	         IllegalAttributeException {
+	         SchemaException {
 
-		this(FeatureUtilities.wrapGridCoverageReader(reader), style, "");
+		this(FeatureUtilities.wrapGridCoverageReader(reader,null), style, "");
 
 	}
 
@@ -245,13 +261,12 @@ public class DefaultMapLayer implements MapLayer {
 	 *            The new layer that has been added.
 	 * @param style
 	 * @param title
-	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
 	 * @throws FactoryRegistryException 
 	 * @throws TransformException 
 	 */
 	public DefaultMapLayer(GridCoverage coverage, Style style, String title)
-			throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
+			throws TransformException, FactoryRegistryException, SchemaException {
 
 		this(FeatureUtilities.wrapGridCoverage((GridCoverage2D) coverage), style, title);
 

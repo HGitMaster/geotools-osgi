@@ -36,6 +36,7 @@ import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
 import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.CoordinateOperation;
@@ -86,10 +87,24 @@ import org.geotools.util.UnsupportedImplementationException;
  * <ul>
  *   <li>{@code CoordinateReferenceSystem parseXML(String)}</li>
  * </ul>
+ * <p>
+ * When using {@link CoordinateReferenceSystem} matching methods of this class 
+ * ({@link #equalsIgnoreMetadata(Object, Object)},{@link #lookupIdentifier(IdentifiedObject, boolean)}, 
+ * {@link #lookupEpsgCode(CoordinateReferenceSystem, boolean)}, 
+ * {@link #lookupIdentifier(IdentifiedObject, boolean)}, 
+ * {@link #lookupIdentifier(Citation, CoordinateReferenceSystem, boolean)})
+ * against objects derived from a database other than the 
+ * official EPSG one it may be advisable to set a non zero comparison tolerance with 
+ * {@link Hints#putSystemDefault(java.awt.RenderingHints.Key, Object)} using
+ * the {@link Hints#COMPARISON_TOLERANCE} key. A value of 10e-9 has proved to give satisfactory 
+ * results with definitions commonly found in .prj files accompaining shapefiles and georeferenced images.<br>
+ * <b>Warning</b>: the tolerance value is used in all internal comparison, this will also change 
+ * the way math transforms are setup. Use with care.
+ * 
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/CRS.java $
- * @version $Id: CRS.java 32191 2009-01-09 11:19:41Z jesseeichar $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/CRS.java $
+ * @version $Id: CRS.java 34842 2010-01-27 16:44:20Z aaime $
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
  * @author Andrea Aime
@@ -599,6 +614,10 @@ public final class CRS {
                 if (base instanceof GeographicCRS) {
                     return (SingleCRS) crs; // Really returns 'crs', not 'base'.
                 }
+                // cartesian are certainly valid horizontal CRS
+                if (base.getCoordinateSystem() instanceof CartesianCS) {
+                    return (SingleCRS) crs; // Really returns 'crs', not 'base'.
+                }
             } else if (dimension >= 3 && crs instanceof GeographicCRS) {
                 /*
                  * For three-dimensional Geographic CRS, extracts the axis having a direction
@@ -675,6 +694,24 @@ search:             if (DefaultCoordinateSystemAxis.isCompassDirection(axis.getD
                 }
             }
         }
+        return null;
+    }
+
+    /**
+     * Returns the {@link MapProjection} driving the specified crs, or {@code null} if none could
+     * be found.
+     * @param crs The coordinate reference system, or {@code null}.
+     * @return The {@link MapProjection}, or {@code null} if none.
+     */
+    public static MapProjection getMapProjection(final CoordinateReferenceSystem crs) {
+        ProjectedCRS projectedCRS = CRS.getProjectedCRS(crs);
+        if(projectedCRS == null)
+            return null;
+        
+        MathTransform mt = projectedCRS.getConversionFromBase().getMathTransform();
+        if(mt instanceof MapProjection)
+            return (MapProjection) mt;
+        
         return null;
     }
 
@@ -1045,6 +1082,10 @@ search:             if (DefaultCoordinateSystemAxis.isCompassDirection(axis.getD
                     }
                     if (!operation.getMathTransform().isIdentity()) {
                         envelope = transform(operation, envelope);
+                    } else if(!equalsIgnoreMetadata(envelope.getCoordinateReferenceSystem(), targetCRS)) {
+                        GeneralEnvelope tx = new GeneralEnvelope(envelope);
+                        tx.setCoordinateReferenceSystem(targetCRS);
+                        envelope = tx;
                     }
                 }
                 assert equalsIgnoreMetadata(envelope.getCoordinateReferenceSystem(), targetCRS);
@@ -1506,7 +1547,7 @@ search:             if (DefaultCoordinateSystemAxis.isCompassDirection(axis.getD
         final CoordinateReferenceSystem sourceCRS = operation.getSourceCRS();
         if (sourceCRS != null) {
             final CoordinateSystem cs = sourceCRS.getCoordinateSystem();
-            if (cs != null || cs.getDimension() != 2) { // Paranoiac check.
+            if (cs != null && cs.getDimension() == 2) { // Paranoiac check.
                 CoordinateSystemAxis axis = cs.getAxis(0);
                 double min = envelope.getMinX();
                 double max = envelope.getMaxX();
@@ -1626,12 +1667,17 @@ search:             if (DefaultCoordinateSystemAxis.isCompassDirection(axis.getD
             final String aspect = tokens.nextToken().trim();
             final boolean all = aspect.equalsIgnoreCase("all");
             if (all || aspect.equalsIgnoreCase("plugins")) {
+                ReferencingFactoryFinder.reset();
                 ReferencingFactoryFinder.scanForPlugins();
             }
             if (all || aspect.equalsIgnoreCase("warnings")) {
                 MapProjection.resetWarnings();
             }
         }
+        defaultFactory = null;
+        xyFactory = null;
+        strictFactory = null;
+        lenientFactory = null;
     }
 
     /**

@@ -41,7 +41,7 @@ import org.geotools.util.CheckedCollection;
  * @param <E> The type of elements in the list.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/resources/UnmodifiableArrayList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/UnmodifiableArrayList.java $
  * @version $Id: UnmodifiableArrayList.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

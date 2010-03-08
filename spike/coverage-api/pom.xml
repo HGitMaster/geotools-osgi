@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31224 2008-08-25 08:01:23Z simboss $              
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>library</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
   
 
@@ -27,7 +27,7 @@
   <artifactId>gt-coverage-api</artifactId>
   <packaging>jar</packaging>
   <name>API interfaces</name>
-  <url>http://maven.geotools.fr/reports/modules/library/coverage-api/</url>
+  
 
   <scm>
     <connection>

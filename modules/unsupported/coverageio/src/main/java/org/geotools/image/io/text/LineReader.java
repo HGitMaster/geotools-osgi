@@ -26,7 +26,7 @@ import java.io.Reader;
  * and stream position. This class can't be public for now, because I
  * can't figure out how to implement reliably {@link #readLine}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/LineReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/LineReader.java $
  * @version $Id: LineReader.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

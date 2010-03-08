@@ -37,14 +37,15 @@ import org.opengis.referencing.operation.MathTransform;
 import org.geotools.factory.Hints;
 import org.geotools.factory.GeoTools;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
 
 
 /**
  * Tests if the CRS utility class is functioning correctly when using HSQL datastore.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/CRSTest.java $
- * @version $Id: CRSTest.java 31491 2008-09-10 10:24:17Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/CRSTest.java $
+ * @version $Id: CRSTest.java 34717 2009-12-21 17:58:58Z aaime $
  * @author Jody Garnett
  * @author Martin Desruisseaux
  * @author Andrea Aime
@@ -319,6 +320,34 @@ public class CRSTest extends TestCase {
     public void test4269Lower() throws FactoryException {
         CoordinateReferenceSystem crs = CRS.decode("epsg:4269");
         assertNotNull(crs);
+    }
+    
+    /**
+     * Check that a code with a axis direction with a reference to W works
+     * @throws FactoryException
+     */
+    public void testWestDirection() throws FactoryException {
+        // see GEOT-2901
+        CoordinateReferenceSystem crs = CRS.decode("EPSG:3573");
+        assertNotNull(crs);
+    }
+    
+    /**
+     * Check we support Plate Carré projection
+     * @throws FactoryException
+     */
+    public void testPlateCarre() throws Exception {
+        CoordinateReferenceSystem crs = CRS.decode("EPSG:32662");
+        assertNotNull(crs);
+        
+        MathTransform mt = CRS.findMathTransform(DefaultGeographicCRS.WGS84, crs);
+        double[] source = new double[] {-20, 35};
+        double[] dest = new double[2];
+        mt.transform(source, 0, dest, 0, 1);
+        
+        // reference values computed using cs2cs +init=epsg:4326 +to +init=epsg:32662
+        assertEquals(-2226389.82, dest[0], 0.01);
+        assertEquals(3896182.18, dest[1], 0.01);
     }
 
     /**

@@ -26,10 +26,62 @@ import org.opengis.temporal.TemporalPrimitive;
  * An abstract class that represents a non-decomposed element of geometry or topology of time.
  * 
  * @author Mehdi Sidhoum (Geomatys)
+ * @author Simone Giannecchini, GeoSolutions SAS
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultTemporalPrimitive.java $
  */
-public abstract class DefaultTemporalPrimitive extends DefaultTemporalObject implements TemporalPrimitive, TemporalOrder {
+public abstract class DefaultTemporalPrimitive extends DefaultTemporalObject implements TemporalPrimitive, TemporalOrder, Comparable<TemporalPrimitive> {
 
-    /**
+    public int compareTo(TemporalPrimitive that) {
+		if (that==null)
+			throw new IllegalArgumentException("Provided temporal object is null");
+		final RelativePosition pos= this.relativePosition(that);
+		if(pos==null)
+			throw new ClassCastException("The provided object cannot be compared to this one");
+		if(pos==RelativePosition.BEFORE)
+			return -1;
+		if(pos==RelativePosition.AFTER)
+			return +1;
+		
+		if(pos==RelativePosition.EQUALS)
+			return 0;
+		
+		// TODO rethink this since it looks like it is a pretty dirty hack
+        if (this instanceof Period && that instanceof Instant||
+        		this instanceof Instant && that instanceof Period) {
+            if(pos==RelativePosition.ENDED_BY||
+            		pos==RelativePosition.BEGUN_BY||
+            		pos==RelativePosition.CONTAINS)
+            	return 0;
+        }		
+        
+        // TODO rethink this since it looks like it is a pretty dirty hack
+        if (this instanceof Period && that instanceof Period) {
+            if(pos==RelativePosition.MEETS)
+            	return -1;
+            if(pos==RelativePosition.BEGINS)
+            	return -1;
+            if(pos==RelativePosition.BEGUN_BY)
+            	return +1;            
+            if(pos==RelativePosition.ENDS)
+            	return +1;
+            if(pos==RelativePosition.ENDED_BY)
+            	return -1;            
+            if(pos==RelativePosition.OVERLAPS)
+            	return -1;
+            if(pos==RelativePosition.OVERLAPPED_BY)
+            	return +1;   
+            if(pos==RelativePosition.DURING||
+            		pos==RelativePosition.CONTAINS||
+            		pos==RelativePosition.EQUALS)
+            	return 0;              
+        }
+
+		throw new IllegalStateException("Unable to compare the provided object with this one");
+	}
+
+
+	/**
      * Returns a value for relative position which are provided by the enumerated data type TM_RelativePosition 
      * and are based on the 13 temporal relationships identified by Allen (1983).
      * @param other TemporalPrimitive

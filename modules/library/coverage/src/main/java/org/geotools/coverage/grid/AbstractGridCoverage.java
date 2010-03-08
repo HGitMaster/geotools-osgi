@@ -48,8 +48,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Base class for Geotools implementation of grid coverage.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/grid/AbstractGridCoverage.java $
- * @version $Id: AbstractGridCoverage.java 30910 2008-07-04 16:18:47Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/AbstractGridCoverage.java $
+ * @version $Id: AbstractGridCoverage.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */
 public abstract class AbstractGridCoverage extends AbstractCoverage implements GridCoverage {
@@ -463,31 +463,6 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
                 toString(point, locale));
     }
 
-    /**
-     * Constructs an error message for a point outside the coverage.
-     * This is used for formatting error messages.
-     *
-     * @param  point The coordinate point to format.
-     * @return An error message.
-     *
-     * @deprecated Replaced by {@link #formatEvaluateError}.
-     */
-    protected String pointOutsideCoverage(final Point2D point) {
-        return formatEvaluateError(point, true);
-    }
-
-    /**
-     * Constructs an error message for a point outside the coverage.
-     * This is used for formatting error messages.
-     *
-     * @param  point The coordinate point to format.
-     * @return An error message.
-     *
-     * @deprecated Replaced by {@link #formatEvaluateError}.
-     */
-    protected String pointOutsideCoverage(final DirectPosition point) {
-        return formatEvaluateError(point, true);
-    }
 
     /**
      * Constructs a string for the specified point.

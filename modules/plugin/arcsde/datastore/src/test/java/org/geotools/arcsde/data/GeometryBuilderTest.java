@@ -26,12 +26,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.SdeRow;
 import org.geotools.data.DataSourceException;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.esri.sde.sdk.client.SDEPoint;
@@ -60,8 +61,9 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/GeometryBuilderTest.java $
- * @version $Id: GeometryBuilderTest.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: GeometryBuilderTest.java 34115 2009-10-10 01:09:29Z groldan $
  */
+@SuppressWarnings("unchecked")
 public class GeometryBuilderTest {
 
     static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(GeometryBuilderTest.class
@@ -95,14 +97,11 @@ public class GeometryBuilderTest {
                         .read("LINESTRING (60 380, 60 20, 200 400, 280 20, 360 400, 420 20, 500 400, 580 20, 620 400)") };
 
         testPolygons = new Geometry[] {
-        // wktReader
-        // .read("POLYGON ((0 0, 0 10, 10 10, 10 0, 0 0), (3 3, 3 6, 6 6, 6 3, 3 3), (7 7, 7 8, 8 8,
-        // 8 7, 7 7)), ((-1 -1, -1 -3, -3 -3, -3 -1, -1 -1))"),
-        // wktReader
-        // .read("POLYGON ((140 380, 140 390, 1290 380, 140 300, 40 300, 60 400, 140 380))"),
-        // wktReader.read("POLYGON ((280 380, 280 200, 60 200, 60 380, 180 220, 280 380))"),
-        wktReader
-                .read("POLYGON ((280 380, 280 200, 60 200, 60 380, 180 220, 280 380), (40 160, 260 160, 240 60, 20 80, 40 160))") };
+                wktReader
+                        .read("POLYGON ((0 0, 0 10, 10 10, 10 0, 0 0), (3 3, 3 6, 6 6, 6 3, 3 3), (7 7, 7 8, 8 8, 8 7, 7 7))"),
+                wktReader
+                        .read("POLYGON ((140 380, 140 390, 1290 380, 140 300, 40 300, 60 400, 140 380))"),
+                wktReader.read("POLYGON ((280 380, 280 200, 60 200, 60 380, 180 220, 280 380))") };
 
         testMultiPoints = new Geometry[] {
                 wktReader.read("MULTIPOINT (180 90, -180 -90, 0 0, 180 -90)"),
@@ -136,11 +135,7 @@ public class GeometryBuilderTest {
         this.wktReader = null;
     }
 
-    /**
-     * TODO: resurrect testInsertGeometries
-     */
     @Test
-    @Ignore
     public void testInsertGeometries() throws Exception {
         TestData testData = new TestData();
         testData.setUp();
@@ -159,7 +154,7 @@ public class GeometryBuilderTest {
         testInsertGeometries(testMultiPolygons, testData);
     }
 
-    public void testInsertGeometries(Geometry[] original, TestData testData) throws Exception {
+    private void testInsertGeometries(Geometry[] original, TestData testData) throws Exception {
         testData.truncateTempTable();
         ISession session = testData.getConnectionPool().getSession();
         SeLayer layer = testData.getTempLayer(session);
@@ -181,7 +176,7 @@ public class GeometryBuilderTest {
                 assertNotNull(shape);
                 Class clazz = ArcSDEAdapter.getGeometryTypeFromSeShape(shape);
                 ArcSDEGeometryBuilder builder = ArcSDEGeometryBuilder.builderFor(clazz);
-                fetched[i] = builder.construct(shape);
+                fetched[i] = builder.construct(shape, new GeometryFactory());
                 i++;
                 row = session.fetch(query);
             }
@@ -193,9 +188,6 @@ public class GeometryBuilderTest {
         for (int i = 0; i < fetched.length; i++) {
             final Geometry expected = original[i];
             final Geometry actual = fetched[i];
-            System.out.println(expected);
-            System.out.println(actual);
-            System.out.println("*****");
             assertEquals(expected, actual, 1E-6);
         }
     }
@@ -203,9 +195,32 @@ public class GeometryBuilderTest {
     private void assertEquals(Geometry g1, Geometry g2, double tolerance) {
         g1.normalize();
         g2.normalize();
-        Assert.assertEquals("geometry dimension", g1.getDimension(), g2.getDimension());
-        Assert.assertEquals("number of geometries", g1.getNumGeometries(), g2.getNumGeometries());
-        Assert.assertEquals("number of points", g1.getNumPoints(), g2.getNumPoints());
+        StringBuilder wkt = new StringBuilder();
+        wkt.append("expected: ").append(g1).append(", actual: ").append(g2);
+        Assert.assertEquals("geometry dimension " + wkt, g1.getDimension(), g2.getDimension());
+        Assert.assertEquals("number of geometries " + wkt, g1.getNumGeometries(), g2
+                .getNumGeometries());
+        Assert.assertEquals("number of points " + wkt, g1.getNumPoints(), g2.getNumPoints());
+    }
+
+    @Test
+    public void testBuilderRespectsGeometryFactory() throws Exception {
+        testBuilderRespectsGeometryFactory(this.testLineStrings);
+        testBuilderRespectsGeometryFactory(this.testPoints);
+        testBuilderRespectsGeometryFactory(this.testPolygons);
+        testBuilderRespectsGeometryFactory(this.testMultiLineStrings);
+        testBuilderRespectsGeometryFactory(this.testMultiPoints);
+        testBuilderRespectsGeometryFactory(this.testMultiPolygons);
+    }
+
+    private void testBuilderRespectsGeometryFactory(final Geometry[] testData) throws SeException,
+            IOException, DataSourceException {
+        final GeometryFactory geometryFactory = new GeometryFactory(
+                new LiteCoordinateSequenceFactory());
+        Geometry[] geoms = buildJTSgeometriesFromShapes(testData, geometryFactory);
+        for (int i = 0; i < geoms.length; i++) {
+            Assert.assertSame(geometryFactory, geoms[i].getFactory());
+        }
     }
 
     @Test
@@ -272,7 +287,6 @@ public class GeometryBuilderTest {
      * TODO: resurrect testConstructShapePolygon
      */
     @Test
-    @Ignore
     public void testConstructShapePolygon() throws Exception {
         testBuildSeShapes(testPolygons);
     }
@@ -342,7 +356,7 @@ public class GeometryBuilderTest {
                 + equivalentShape.getNumOfPoints());
 
         LOGGER.finer("generating an SeShape's equivalent Geometry");
-        equivalentGeometry = builder.construct(equivalentShape);
+        equivalentGeometry = builder.construct(equivalentShape, new GeometryFactory());
 
         LOGGER.fine("now testing both geometries for equivalence: " + geometry + " -- "
                 + equivalentGeometry);
@@ -390,11 +404,28 @@ public class GeometryBuilderTest {
      */
     private void testBuildJTSGeometries(final Geometry[] expectedGeometries) throws Exception {
 
+        Geometry createdGeometry;
+        Geometry expectedGeometry;
+        Geometry[] createdGeometries = buildJTSgeometriesFromShapes(expectedGeometries,
+                new GeometryFactory());
+
+        for (int i = 0; i < createdGeometries.length; i++) {
+            expectedGeometry = expectedGeometries[i];
+            createdGeometry = createdGeometries[i];
+            Assert.assertEquals(expectedGeometry.getClass(), createdGeometry.getClass());
+        }
+    }
+
+    private Geometry[] buildJTSgeometriesFromShapes(final Geometry[] expectedGeometries,
+            final GeometryFactory geometryFactory) throws SeException, IOException,
+            DataSourceException {
+
         Class<? extends Geometry> geometryClass = expectedGeometries[0].getClass();
         final ArcSDEGeometryBuilder geometryBuilder = ArcSDEGeometryBuilder
                 .builderFor(geometryClass);
         LOGGER.fine("created " + geometryBuilder.getClass().getName());
 
+        Geometry[] createdGeometries = new Geometry[expectedGeometries.length];
         Geometry createdGeometry;
         Geometry expectedGeometry;
         double[][][] sdeCoords;
@@ -411,9 +442,10 @@ public class GeometryBuilderTest {
             // just for testing purposes. Instead,
             // geometryBuilder.construct(SeShape)
             // must be used
-            createdGeometry = geometryBuilder.newGeometry(sdeCoords);
-            Assert.assertEquals(expectedGeometry.getClass(), createdGeometry.getClass());
+            createdGeometry = geometryBuilder.newGeometry(sdeCoords, geometryFactory);
+            createdGeometries[i] = createdGeometry;
         }
+        return createdGeometries;
     }
 
     /**

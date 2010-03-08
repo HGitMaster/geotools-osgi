@@ -24,6 +24,8 @@ import org.opengis.filter.Filter;
  * client and the server is unaware of it. For example PostGIS would not need to create one.
  * 
  * @author Jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/ClientTransactionAccessor.java $
  */
 public interface ClientTransactionAccessor {
 

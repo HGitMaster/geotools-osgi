@@ -29,6 +29,8 @@ import org.geotools.ows.ServiceException;
  * parse the Capabilities document in inputStream in the constructor. 
  * 
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wps/src/main/java/org/geotools/data/ows/AbstractWPSGetCapabilitiesResponse.java $
  */
 public abstract class AbstractWPSGetCapabilitiesResponse extends Response {
 

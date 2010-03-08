@@ -28,6 +28,8 @@ import org.geotools.geometry.iso.topograph2D.IntersectionMatrix;
  * are maintained in CCW order (starting with the positive x-axis) around the
  * node for efficient lookup and topology building.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/relate/EdgeEndBundleStar.java $
  * @version 1.7.2
  */
 public class EdgeEndBundleStar extends EdgeEndStar {

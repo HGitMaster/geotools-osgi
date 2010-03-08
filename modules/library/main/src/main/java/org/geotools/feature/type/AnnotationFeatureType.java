@@ -47,7 +47,7 @@ import org.opengis.feature.type.FeatureTypeFactory;
  * </p>
  *
  * @author John Meagher
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/type/AnnotationFeatureType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/AnnotationFeatureType.java $
  */
 public class AnnotationFeatureType
 {

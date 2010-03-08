@@ -43,11 +43,16 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.media.jai.*;
 import javax.media.jai.operator.*;
+
+import com.sun.media.imageioimpl.common.BogusColorSpace;
+import com.sun.media.imageioimpl.common.PackageUtil;
+import com.sun.media.imageioimpl.plugins.jpeg.CLibJPEGImageWriterSpi;
 import com.sun.media.jai.util.ImageUtil;
 
 import org.geotools.factory.Hints;
@@ -69,8 +74,8 @@ import org.geotools.resources.image.ImageUtilities;
  * is left in an undetermined state and should not be used anymore.
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
- * @version $Id: ImageWorker.java 32888 2009-04-30 16:16:22Z simonegiannecchini $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
+ * @version $Id: ImageWorker.java 34937 2010-02-22 12:30:31Z danieleromagnoli $
  * @author Simone Giannecchini
  * @author Bryce Nordgren
  * @author Martin Desruisseaux
@@ -202,29 +207,6 @@ public class ImageWorker {
         	worker.commonHints = hints;
         }
         return worker;
-    }
-
-    /**
-     * Loads an image using the provided file name and the provided hints, which
-     * are used to control caching and layout.
-     *
-     * @param source      The source image.
-     * @param hints       The hints to use.
-     * @param imageChoice For multipage images.
-     * @return The loaded image.
-     *
-     * @deprecated Use #load instead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static PlanarImage loadPlanarImageImage(final String source,
-                    final RenderingHints hints, final int imageChoice,
-                    final boolean readMetadata)
-    {
-        final ImageWorker worker = new ImageWorker();
-        worker.commonHints = new RenderingHints((java.util.Map) hints);
-        worker.load(source, imageChoice, readMetadata);
-        return worker.getPlanarImage();
     }
 
     /**
@@ -503,17 +485,32 @@ public class ImageWorker {
          * Creates the new color model.
          */
         final ColorModel oldCm = image.getColorModel();
-        final ColorModel newCm= new ComponentColorModel(
-                oldCm.getColorSpace(),
-                oldCm.hasAlpha(),               // If true, supports transparency.
-                oldCm.isAlphaPremultiplied(),   // If true, alpha is premultiplied.
-                oldCm.getTransparency(),        // What alpha values can be represented.
-                type);                          // Type of primitive array used to represent pixel.
-        /*
-         * Creating the final image layout which should allow us to change color model.
-         */
-        layout.setColorModel(newCm);
-        layout.setSampleModel(newCm.createCompatibleSampleModel(image.getWidth(), image.getHeight()));
+        if(oldCm!=null){
+	        final ColorModel newCm= new ComponentColorModel(
+	                oldCm.getColorSpace(),
+	                oldCm.hasAlpha(),               // If true, supports transparency.
+	                oldCm.isAlphaPremultiplied(),   // If true, alpha is premultiplied.
+	                oldCm.getTransparency(),        // What alpha values can be represented.
+	                type);                          // Type of primitive array used to represent pixel.
+	        /*
+	         * Creating the final image layout which should allow us to change color model.
+	         */
+	        layout.setColorModel(newCm);
+	        layout.setSampleModel(newCm.createCompatibleSampleModel(image.getWidth(), image.getHeight()));
+        }else{
+        	final int numBands=image.getSampleModel().getNumBands();
+        	final ColorModel newCm= new ComponentColorModel(
+	                new BogusColorSpace(numBands),
+	                false,               		// If true, supports transparency.
+	                false,   					// If true, alpha is premultiplied.
+	                Transparency.OPAQUE,        // What alpha values can be represented.
+	                type);                      // Type of primitive array used to represent pixel.
+	        /*
+	         * Creating the final image layout which should allow us to change color model.
+	         */
+	        layout.setColorModel(newCm);
+	        layout.setSampleModel(newCm.createCompatibleSampleModel(image.getWidth(), image.getHeight()));
+        }
         hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
         return hints;
     }
@@ -692,7 +689,10 @@ public class ImageWorker {
      * @see #forceColorSpaceRGB
      */
     public final boolean isColorSpaceRGB() {
-        return image.getColorModel().getColorSpace().getType() == ColorSpace.TYPE_RGB;
+    	final ColorModel cm = image.getColorModel();
+    	if(cm==null)
+    		return false;
+        return cm.getColorSpace().getType() == ColorSpace.TYPE_RGB;
     }
 
     /**
@@ -704,7 +704,10 @@ public class ImageWorker {
      * @see #forceColorSpaceGRAYScale
      */
     public final boolean isColorSpaceGRAYScale() {
-        return image.getColorModel().getColorSpace().getType() == ColorSpace.TYPE_GRAY;
+    	final ColorModel cm = image.getColorModel();
+    	if(cm==null)
+    		return false;
+        return cm.getColorSpace().getType() == ColorSpace.TYPE_GRAY;
     }
 
     /**
@@ -749,17 +752,41 @@ public class ImageWorker {
         final int length = extrema[0].length;
         final double[] scale  = new double[length];
         final double[] offset = new double[length];
+        boolean computeRescale=false;
         for (int i=0; i<length; i++) {
             final double delta = extrema[1][i] - extrema[0][i];
-            scale [i] = 255 / delta;
-            offset[i] = -scale[i] * extrema[0][i];
+            if(Math.abs(delta)>1E-6			//maximum and minimum does not coincide
+            		&&
+              ((extrema[1][i]-255>1E-6)		//the maximum is greater than 255
+              		|| 
+              (extrema[0][i]<-1E-6)))		//the minimum is smaller than 0
+            {
+            	// we need to rescale
+            	computeRescale=true;
+            	
+            	// rescale factors
+                scale [i] = 255 / delta;
+                offset[i] = -scale[i] * extrema[0][i];            	
+            }
+            else
+            {
+            	// we do not rescale explicitly bu in case we have to, we relay on the clamping capabilities of the format operator
+                scale [i] = 1;
+                offset[i] = 0; 
+            }
         }
         final RenderingHints hints = getRenderingHints(DataBuffer.TYPE_BYTE);
-        image = RescaleDescriptor.create(
-                image,      // The source image.
-                scale,      // The per-band constants to multiply by.
-                offset,     // The per-band offsets to be added.
-                hints);     // The rendering hints.
+        if(computeRescale)
+	        image = RescaleDescriptor.create(
+	                image,      // The source image.
+	                scale,      // The per-band constants to multiply by.
+	                offset,     // The per-band offsets to be added.
+	                hints);     // The rendering hints.
+        else
+        	image= FormatDescriptor.create(
+        			image,      			// The source image.
+        			DataBuffer.TYPE_BYTE,	// The destination image data type (BYTE)
+        			hints);					// The rendering hints.
         invalidateStatistics(); // Extremas are no longer valid.
 
         // All post conditions for this method contract.
@@ -935,26 +962,34 @@ public class ImageWorker {
             hints.put(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
             image = LookupDescriptor.create(image, lookupTable, hints);
         } else {
-            /*
-             * The image is not indexed. Getting the alpha channel.
+        	
+        	// force component color model first
+        	forceComponentColorModel(true);
+			/*
+             * The image is not indexed. 
              */
-            RenderedImage alphaChannel = null;
             if (cm.hasAlpha()) {
+            	//Getting the alpha channel.
                 tileCacheEnabled(false);
                 int numBands = getNumBands();
                 final RenderingHints hints = getRenderingHints();
-                alphaChannel = BandSelectDescriptor.create(image,
+
+                final RenderedOp alphaChannel = BandSelectDescriptor.create(image,
                                 new int[] { --numBands }, hints);
                 retainBands(numBands);
                 forceIndexColorModel(errorDiffusion);
                 tileCacheEnabled(true);
+                
+
+                /*
+                 * Adding transparency if needed, which means using the alpha
+                 * channel to build a new color model. The method call below implies
+                 * 'forceColorSpaceRGB()' and 'forceIndexColorModel()' method calls.
+                 */
+                addTransparencyToIndexColorModel(alphaChannel, false, transparent, errorDiffusion);
             }
-            /*
-             * Adding transparency if needed, which means using the alpha
-             * channel to build a new color model. The method call below implies
-             * 'forceColorSpaceRGB()' and 'forceIndexColorModel()' method calls.
-             */
-            addTransparencyToIndexColorModel(alphaChannel, false, transparent, errorDiffusion);
+            else
+                forceIndexColorModel(errorDiffusion);
         }
         // All post conditions for this method contract.
         assert isIndexed();
@@ -1048,14 +1083,13 @@ public class ImageWorker {
      * This code is adapted from jai-interests mailing list archive.
      *
      * @param checkTransparent
-     *            tells this method to not consider fully transparent pixels
-     *            when optimizing grayscale palettes.
-     *
+     * @param optimizeGray
+     * 
      * @return this {@link ImageWorker}.
      *
      * @see FormatDescriptor
      */
-    public final ImageWorker forceComponentColorModel(boolean checkTransparent) {
+    public final ImageWorker forceComponentColorModel(boolean checkTransparent, boolean optimizeGray) {
     	final ColorModel cm = image.getColorModel();
         if (cm instanceof ComponentColorModel) {
             // Already an component color model - nothing to do.
@@ -1066,7 +1100,7 @@ public class ImageWorker {
             final IndexColorModel icm = (IndexColorModel) cm;
             final SampleModel sm=this.image.getSampleModel();
             final int datatype =sm.getDataType();
-            final boolean gray     = ColorUtilities.isGrayPalette(icm, checkTransparent);
+            final boolean gray     = ColorUtilities.isGrayPalette(icm, checkTransparent)&optimizeGray;
             final boolean alpha    = icm.hasAlpha();
             /*
              * If the image is grayscale, retain only the needed bands.
@@ -1132,7 +1166,7 @@ public class ImageWorker {
 						Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"lut"));
             /*
              * Get the default hints, which usually contains only informations
-             * about tiling. If the user overrode the rendering hints with an
+             * about tiling. If the user override the rendering hints with an
              * explicit color model, keep the user's choice.
              */
             final RenderingHints hints = (RenderingHints) getRenderingHints();
@@ -1156,7 +1190,7 @@ public class ImageWorker {
             				bits,
                     		alpha,
                     		cm.isAlphaPremultiplied(),
-                    		cm.getTransparency(),
+                    		alpha?Transparency.TRANSLUCENT:Transparency.OPAQUE,
                     		datatype);
             final SampleModel destinationSampleModel=destinationColorModel.createCompatibleSampleModel(image.getWidth(), image.getHeight());
             layout.setColorModel(destinationColorModel);
@@ -1165,8 +1199,7 @@ public class ImageWorker {
 
         } else {
             // Most of the code adapted from jai-interests is in 'getRenderingHints(int)'.
-            final int type = (cm instanceof DirectColorModel) ?
-                    DataBuffer.TYPE_BYTE : image.getSampleModel().getTransferType();
+            final int type = (cm instanceof DirectColorModel) ?DataBuffer.TYPE_BYTE : image.getSampleModel().getTransferType();
             final RenderingHints hints = getRenderingHints(type);
             image = FormatDescriptor.create(image, type, hints);
         }
@@ -1175,6 +1208,27 @@ public class ImageWorker {
         // All post conditions for this method contract.
         assert image.getColorModel() instanceof ComponentColorModel;
         return this;
+    }
+
+    /**
+     * Reformats the {@linkplain ColorModel color model} to a
+     * {@linkplain ComponentColorModel component color model} preserving
+     * transparency. This is used especially in order to go from
+     * {@link PackedColorModel} to {@link ComponentColorModel}, which seems to
+     * be well accepted from {@code PNGEncoder} and {@code TIFFEncoder}.
+     * <p>
+     * This code is adapted from jai-interests mailing list archive.
+     *
+     * @param checkTransparent
+     *            tells this method to not consider fully transparent pixels
+     *            when optimizing grayscale palettes.
+     *
+     * @return this {@link ImageWorker}.
+     *
+     * @see FormatDescriptor
+     */
+    public final ImageWorker forceComponentColorModel(boolean checkTransparent) {
+        return forceComponentColorModel(checkTransparent,true);
     }
 
     /**
@@ -1290,7 +1344,9 @@ public class ImageWorker {
 	 */
 	public final ImageWorker addBand(RenderedImage image, boolean before) {
 
-		this.image = BandMergeDescriptor.create(this.image, image, this.getRenderingHints());
+		this.image = before?
+						BandMergeDescriptor.create(image, this.image, this.getRenderingHints()):
+						BandMergeDescriptor.create(this.image, image, this.getRenderingHints());
 		invalidateStatistics();
 
 		return this;
@@ -1722,13 +1778,12 @@ public class ImageWorker {
      *     "BandSelect" --> "Lookup" --> "BandCombine" --> "Extrema" --> "Binarize" -->
      *     "Format" --> "BandSelect" (one more time) --> "Multiply" --> "BandMerge".
      *
-     * I would expect more speed and memory efficiency by writting our own JAI operation (PointOp
-     * subclass) doing that in one step. It would also be more determinist (our "binarize" method
+     * I would expect more speed and memory efficiency by writing our own JAI operation (PointOp
+     * subclass) doing that in one step. It would also be more deterministic (our "binarize" method
      * depends on statistics on pixel values) and avoid unwanted side-effect like turning black
      * color (RGB = 0,0,0) to transparent one. It would also be easier to maintain I believe.
      */
     @Deprecated
-    @SuppressWarnings("fallthrough")
     public final ImageWorker maskComponentColorModelByte(final Color transparentColor) {
         assert image.getColorModel() instanceof ComponentColorModel;
         assert image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE;
@@ -2189,6 +2244,8 @@ public class ImageWorker {
         LOGGER.finer("Setting write parameters for this writer");
         ImageWriteParam iwp = null;
         final ImageOutputStream memOutStream = ImageIO.createImageOutputStream(destination);
+        if(memOutStream==null)
+        	throw new IIOException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"stream"));        
         if (nativeAcc && writer.getClass().getName().equals(
                 "com.sun.media.imageioimpl.plugins.png.CLibPNGImageWriter"))
         {
@@ -2218,12 +2275,27 @@ public class ImageWorker {
             iwp.setCompressionMode(ImageWriteParam.MODE_DEFAULT);
         }
         LOGGER.finer("About to write png image");
-        writer.setOutput(memOutStream);
-        writer.write(null, new IIOImage(image, null, null), iwp);
-        tileCacheEnabled(true);
-        memOutStream.flush();
-        writer.dispose();
-        memOutStream.close();
+        try{
+	        writer.setOutput(memOutStream);
+	        writer.write(null, new IIOImage(image, null, null), iwp);
+	        tileCacheEnabled(true);
+        }
+        finally{
+        	try{
+        		writer.dispose();
+        	}catch (Throwable e) {
+        		if(LOGGER.isLoggable(Level.FINEST))
+					LOGGER.log(Level.FINEST,e.getLocalizedMessage(),e);
+			}
+        	try{
+        		memOutStream.close();
+        	}catch (Throwable e) {
+        		if(LOGGER.isLoggable(Level.FINEST))
+					LOGGER.log(Level.FINEST,e.getLocalizedMessage(),e);
+			}        	
+            
+            
+        }
     }
 
     /**
@@ -2279,16 +2351,31 @@ public class ImageWorker {
             throw new IIOException(Errors.format(ErrorKeys.NO_IMAGE_WRITER));
         }
         final ImageOutputStream stream = ImageIO.createImageOutputStream(destination);
+        if(stream==null)
+        	throw new IIOException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"stream"));
         final ImageWriter       writer = spi.createWriterInstance();
         final ImageWriteParam   param  = writer.getDefaultWriteParam();
         param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
         param.setCompressionType(compression);
         param.setCompressionQuality(compressionRate);
 
-        writer.setOutput(stream);
-        writer.write(null, new IIOImage(image, null, null), param);
-        stream.close();
-        writer.dispose();
+        try{
+	        writer.setOutput(stream);
+	        writer.write(null, new IIOImage(image, null, null), param);
+        }finally{
+        	try{
+        		stream.close();
+        	}catch (Throwable e) {
+				if(LOGGER.isLoggable(Level.FINEST))
+					LOGGER.log(Level.FINEST,e.getLocalizedMessage(),e);
+			}
+        	try{
+    	        writer.dispose();
+        	}catch (Throwable e) {
+				if(LOGGER.isLoggable(Level.FINEST))
+					LOGGER.log(Level.FINEST,e.getLocalizedMessage(),e);
+			}        	
+        }
         return this;
     }
 
@@ -2317,24 +2404,27 @@ public class ImageWorker {
             throws IOException
     {
         // Reformatting this image for jpeg.
-        LOGGER.finer("Encoding input image to write out as JPEG.");
-        tileCacheEnabled(false);
+        if(LOGGER.isLoggable(Level.FINER))
+        	LOGGER.finer("Encoding input image to write out as JPEG.");
+
+             	
+        rescaleToBytes();
         final ColorModel cm = image.getColorModel();
         final boolean indexColorModel = image.getColorModel() instanceof IndexColorModel;
-        final int numBands = image.getSampleModel().getNumBands();
         final boolean hasAlpha = cm.hasAlpha();
-        if (indexColorModel || hasAlpha) {
-            if (indexColorModel) {
+        if (indexColorModel) {
                 forceComponentColorModel();
-            }
-            if (hasAlpha) {
-                retainBands(numBands - 1);
-            }
         }
-        tileCacheEnabled(true);
+
+        final int numBands = image.getSampleModel().getNumBands();
+        if (hasAlpha) {
+            retainBands(numBands - 1);
+        }
+        
 
         // Getting a writer.
-        LOGGER.finer("Getting a JPEG writer and configuring it.");
+        if(LOGGER.isLoggable(Level.FINER))
+        	LOGGER.finer("Getting a JPEG writer and configuring it.");
         final Iterator<ImageWriter> it = ImageIO.getImageWritersByFormatName("JPEG");
         if (!it.hasNext()) {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_WRITER));
@@ -2345,14 +2435,22 @@ public class ImageWorker {
         {
             writer = it.next();
         }
-
+        if((!PackageUtil.isCodecLibAvailable()||!(writer.getOriginatingProvider() instanceof CLibJPEGImageWriterSpi))
+        		&&
+        		compression.equals("JPEG-LS")
+        	)
+        		throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,"compression","JPEG-LS"));
+        
         // Compression is available on both lib
         final ImageWriteParam iwp = writer.getDefaultWriteParam();
         final ImageOutputStream outStream = ImageIO.createImageOutputStream(destination);
+        final ImageOutputStream stream = ImageIO.createImageOutputStream(destination);
+        if(stream==null)
+        	throw new IIOException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"stream"));
+         
         iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
         iwp.setCompressionType(compression);        // Lossy compression.
         iwp.setCompressionQuality(compressionRate); // We can control quality here.
-        writer.setOutput(outStream);
         if (iwp instanceof JPEGImageWriteParam) {
             final JPEGImageWriteParam param = (JPEGImageWriteParam) iwp;
             param.setOptimizeHuffmanTables(true);
@@ -2363,12 +2461,55 @@ public class ImageWorker {
                 // TODO: inline cause when we will be allowed to target Java 6.
             }
         }
-        LOGGER.finer("Writing out...");
-        writer.write(null, new IIOImage(image, null, null), iwp);
-        outStream.flush();
-        writer.dispose();
-        outStream.close();
+
+        if(LOGGER.isLoggable(Level.FINER))
+        	LOGGER.finer("Writing out...");
+        
+        try{
+
+            writer.setOutput(outStream);
+        	 // the JDK writer has problems with images that do not  start at minx==miny==0
+            if (!nativeAcc&&(image.getMinX()!=0 || image.getMinY()!=0)) {
+          
+                      
+//                     final WritableRaster raster= RasterFactory.createWritableRaster(
+//                     		image.getSampleModel().createCompatibleSampleModel(image.getWidth(), image.getHeight()), 
+//                     		new Point(0,0)); 
+                 	final BufferedImage finalImage= new BufferedImage(
+                 			image.getColorModel(),
+//                 			raster,
+                 			((WritableRaster)image.getData()).createWritableTranslatedChild(0,0),
+                 			image.getColorModel().isAlphaPremultiplied(),null);
+//                 	final Graphics2D g2D= finalImage.createGraphics();
+//                 	g2D.drawRenderedImage(image, AffineTransform.getTranslateInstance());
+//                 	g2D.dispose();
+                 	
+                    writer.write(null, new IIOImage(finalImage, null, null), iwp);
+
+             }       
+            else
+            	writer.write(null, new IIOImage(image, null, null), iwp);
+        }
+        finally{
+        	try{
+        		writer.dispose();
+        	}catch (Throwable e) {
+        		if(LOGGER.isLoggable(Level.FINEST))
+					LOGGER.log(Level.FINEST,e.getLocalizedMessage(),e);
+			}
+        	try{
+        		outStream.close();
+        	}catch (Throwable e) {
+        		if(LOGGER.isLoggable(Level.FINEST))
+					LOGGER.log(Level.FINEST,e.getLocalizedMessage(),e);
+			}        	
+            
+            
+        }
+       
+
     }
+
 
     /**
      * Writes the {@linkplain #image} to the specified output, trying all

@@ -37,6 +37,8 @@ import java.util.List;
  * @see <a href="http://www.w3.org/TR/xmlschema-2/#rf-whiteSpace">This web page</a>
  * @author jgarnett
  * @since 1.0.0
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/facets/Whitespace.java $
  */
 public abstract class Whitespace implements Comparable {
     /**

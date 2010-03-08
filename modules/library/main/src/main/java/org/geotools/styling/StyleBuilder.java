@@ -37,7 +37,7 @@ import org.opengis.filter.expression.PropertyName;
  * An utility class designed to ease style building by convinience methods.
  *
  * @author aaime
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/StyleBuilder.java $
  */
 public class StyleBuilder {
     private static final java.util.logging.Logger LOGGER =

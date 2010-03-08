@@ -16,23 +16,19 @@
  */
 package org.geotools.process;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryFinder;
 import org.geotools.factory.FactoryRegistry;
-import org.geotools.factory.FactoryRegistryException;
 import org.geotools.resources.LazySet;
 import org.geotools.util.NullProgressListener;
+import org.opengis.feature.type.Name;
 
 
 /**
@@ -42,6 +38,8 @@ import org.geotools.util.NullProgressListener;
  * Defines static methods used to access the application's default process factory implementations.
  *
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/Processors.java $
  */
 public class Processors extends FactoryFinder {
     /**
@@ -61,12 +59,9 @@ public class Processors extends FactoryFinder {
      * time this method is invoked.
      */
     private static FactoryRegistry getServiceRegistry() {
-        if (registry == null) {
-            synchronized ( Processors.class ) {
-                if ( registry == null ) {
-                    registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
-                            ProcessFactory.class}));    
-                }
+        synchronized (Processors.class) {
+            if (registry == null) {
+                registry = new FactoryCreator(Arrays.asList(new Class<?>[]{ProcessFactory.class}));
             }
         }
         return registry;
@@ -87,9 +82,9 @@ public class Processors extends FactoryFinder {
      * @param name Name of Factory
      * @return ProcessFactory with matching name
      */
-    public static synchronized ProcessFactory createProcessFactory( String name){
-        for( ProcessFactory factory : getProcessFactories() ){
-            if( name.equals( factory.getName() )){
+    public static synchronized ProcessFactory createProcessFactory(Name name){
+        for( ProcessFactory factory : getProcessFactories() ) {
+            if(factory.getNames().contains(name)) {
                 return factory;
             }
         }
@@ -99,11 +94,11 @@ public class Processors extends FactoryFinder {
     /**
      * Look up an implementation of the named process on the classpath.
      */
-    public static synchronized Process createProcess(String name){
+    public static synchronized Process createProcess(Name name){
         ProcessFactory factory = createProcessFactory( name );
         if( factory == null ) return null;
         
-        return factory.create();
+        return factory.create(name);
     }
     
     /**

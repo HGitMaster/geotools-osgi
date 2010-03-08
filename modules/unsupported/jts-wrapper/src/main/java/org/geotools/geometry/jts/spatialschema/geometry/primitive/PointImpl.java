@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: PointImpl.java 32736 2009-04-04 06:51:02Z jive $
+ ** $Id: PointImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/PointImpl.java,v $
  **
@@ -51,6 +51,8 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @author SYS Technologies
  * @author crossley
  * @author cdillard
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/PointImpl.java $
  * @version $Revision $
  */
 public class PointImpl extends GeometryImpl implements Point {

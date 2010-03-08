@@ -32,6 +32,8 @@ import org.geotools.styling.Symbolizer;
  * Component used to present style glyph
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/column/StyleComponent.java $
  */
 public final class StyleComponent extends org.geotools.gui.swing.contexttree.renderer.RenderAndEditComponent {
     

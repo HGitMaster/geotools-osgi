@@ -27,7 +27,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * A matrix of fixed {@value #SIZE}&times;{@value #SIZE} size.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/Matrix2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/Matrix2.java $
  * @version $Id: Matrix2.java 31531 2008-09-16 19:37:27Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

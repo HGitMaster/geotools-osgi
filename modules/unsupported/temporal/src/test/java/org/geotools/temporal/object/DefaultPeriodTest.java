@@ -29,6 +29,8 @@ import org.opengis.temporal.Period;
 /**
  *
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/test/java/org/geotools/temporal/object/DefaultPeriodTest.java $
  */
 public class DefaultPeriodTest {
 

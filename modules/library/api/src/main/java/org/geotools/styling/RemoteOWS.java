@@ -44,7 +44,7 @@ package org.geotools.styling;
  * <p></p>
  *
  * @author James Macgill
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/RemoteOWS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/RemoteOWS.java $
  */
 public interface RemoteOWS {
     String getService();

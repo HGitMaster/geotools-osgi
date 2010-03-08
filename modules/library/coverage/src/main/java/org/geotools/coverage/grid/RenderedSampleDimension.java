@@ -47,7 +47,7 @@ import org.geotools.util.SimpleInternationalString;
  * Describes the band values for a grid coverage.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/grid/RenderedSampleDimension.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/RenderedSampleDimension.java $
  * @version $Id: RenderedSampleDimension.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

@@ -72,7 +72,7 @@ class FactoryAdapter {
         if (File.class.isAssignableFrom(fileParam.type))
             params.put(fileParam.key, curr);
         else if (URL.class.isAssignableFrom(fileParam.type))
-            params.put(fileParam.key, curr.toURL());
+            params.put(fileParam.key, curr.toURI().toURL());
 
         try {
             if (factory.canProcess(params))

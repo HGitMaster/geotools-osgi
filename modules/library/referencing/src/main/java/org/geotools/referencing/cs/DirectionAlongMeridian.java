@@ -19,6 +19,7 @@ package org.geotools.referencing.cs;
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.opengis.referencing.cs.AxisDirection;
 
 
@@ -27,8 +28,8 @@ import org.opengis.referencing.cs.AxisDirection;
  * "<cite>South along 90 deg East</cite>". Those directions are
  * used in the EPSG database for polar stereographic projections.
  *
- * @version $Id: DirectionAlongMeridian.java 30641 2008-06-12 17:42:27Z acuster $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DirectionAlongMeridian.java $
+ * @version $Id: DirectionAlongMeridian.java 34713 2009-12-21 16:57:52Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DirectionAlongMeridian.java $
  * @author Martin Desruisseaux
  */
 final class DirectionAlongMeridian implements Comparable, Serializable {
@@ -49,11 +50,11 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
      * "<cite>South along 90 deg East</cite>"
      */
     private static final Pattern EPSG = Pattern.compile(
-            "(\\p{Graph}+)\\s+along\\s+([\\-\\p{Digit}\\.]+)\\s+deg\\s*(\\p{Graph}+)?",
+            "(\\p{Graph}+)\\s+along\\s+([\\-\\p{Digit}\\.]+)\\s*(deg|°)\\s*(\\p{Graph}+)?",
             Pattern.CASE_INSENSITIVE);
 
     /**
-     * The base directions we are interrested in. Any direction not in
+     * The base directions we are interested in. Any direction not in
      * this group will be rejected by our parser.
      */
     private static final AxisDirection[] BASE_DIRECTIONS = new AxisDirection[] {
@@ -130,7 +131,7 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
             // Meridian is NaN or is not in the valid range.
             return null;
         }
-        group = m.group(3);
+        group = m.group(4);
         if (group != null) {
             final AxisDirection sign = findDirection(BASE_DIRECTIONS, group);
             final AxisDirection abs = sign.absolute();
@@ -154,6 +155,18 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
             final String name = candidate.name();
             if (direction.equalsIgnoreCase(name)) {
                 return candidate;
+            } 
+            
+            // check for common abbreviations
+            if(direction.length() == 1) {
+                if(candidate == AxisDirection.NORTH && direction.equals("N"))
+                    return candidate;
+                if(candidate == AxisDirection.SOUTH && direction.equals("S"))
+                    return candidate;
+                if(candidate == AxisDirection.WEST && direction.equals("W"))
+                    return candidate;
+                if(candidate == AxisDirection.EAST && direction.equals("E"))
+                    return candidate;
             }
         }
         return null;

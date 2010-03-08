@@ -41,7 +41,7 @@ import org.opengis.filter.FilterVisitor;
  * to simplify/make meaningful filter logic.
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/CompareFilterImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/CompareFilterImpl.java $
  * @version $Id: CompareFilterImpl.java 31681 2008-10-18 19:02:26Z aaime $
  */
 public abstract class CompareFilterImpl extends BinaryComparisonAbstract

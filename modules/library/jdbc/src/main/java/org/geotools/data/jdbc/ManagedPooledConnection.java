@@ -32,8 +32,10 @@ import javax.sql.PooledConnection;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: cholmesny $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/ManagedPooledConnection.java $
- * @version $Id: ManagedPooledConnection.java 30646 2008-06-12 18:48:06Z acuster $ Last Modified: $Date: 2003/09/22 18:54:39 $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/ManagedPooledConnection.java $
+ * @version $Id: ManagedPooledConnection.java 33484 2009-07-06 02:17:34Z jdeolive $ Last Modified: $Date: 2003/09/22 18:54:39 $
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 final class ManagedPooledConnection {
     /** The timestamp the last use of the connection */

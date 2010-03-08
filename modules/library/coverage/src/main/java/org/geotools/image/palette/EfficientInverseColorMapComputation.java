@@ -16,6 +16,7 @@
  */
 package org.geotools.image.palette;
 
+
 /**
  * This class is responsible for computing efficiently an inverse color map for
  * a given color map.
@@ -24,7 +25,7 @@ package org.geotools.image.palette;
  * This algorithm is adapted from the algorithm found in Graphics Gems volume 2
  * by Spencer W. Thomas "Efficient Inverse Color Map Computation".
  * 
- * @author Simone Giannecchini. GeoSOlutions
+ * @author Simone Giannecchini, GeoSolutions SAS
  * 
  */
 public final class EfficientInverseColorMapComputation {
@@ -69,10 +70,10 @@ public final class EfficientInverseColorMapComputation {
 		redQuantizationMask = (greenQuantizationMask << bits);
 		final int maximumQuantizationValue = 1 << bits;
 		final int numberOfColors = colorMap[0].length;
-		mapBuf = new byte[maximumQuantizationValue * maximumQuantizationValue
-				* maximumQuantizationValue];
-		final int[] distBuf = new int[maximumQuantizationValue
-				* maximumQuantizationValue * maximumQuantizationValue];
+		mapBuf = new byte[maximumQuantizationValue * maximumQuantizationValue* maximumQuantizationValue];
+		if(mapBuf.length<=0)
+			throw new IllegalArgumentException("Illegal number of quantization colors");
+		final int[] distBuf = new int[maximumQuantizationValue* maximumQuantizationValue * maximumQuantizationValue];
 
 		final int x = (1 << truncationBits);
 		final int xsqr = x * x;

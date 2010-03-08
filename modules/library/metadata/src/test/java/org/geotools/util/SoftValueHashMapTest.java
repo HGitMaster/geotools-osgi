@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.ConcurrentModificationException;
+import java.util.logging.Logger;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -28,8 +29,8 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link SoftValueHashMap}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/util/SoftValueHashMapTest.java $
- * @version $Id: SoftValueHashMapTest.java 30640 2008-06-12 17:34:32Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/SoftValueHashMapTest.java $
+ * @version $Id: SoftValueHashMapTest.java 34667 2009-12-13 16:37:14Z aaime $
  * @author Martin Desruisseaux
  */
 public final class SoftValueHashMapTest {
@@ -44,9 +45,11 @@ public final class SoftValueHashMapTest {
      */
     @Test
     public void testStrongReferences() {
-        final Random random = new Random();
+        final Random random = getRandom();
         for (int pass=0; pass<4; pass++) {
-            final SoftValueHashMap<Integer,Integer> softMap = new SoftValueHashMap<Integer,Integer>();
+            // make sure we can keep as many strong references as the sample, since there is no guarantee
+            // the distribution of random.nextBoolean() is uniform in the short term 
+            final SoftValueHashMap<Integer,Integer> softMap = new SoftValueHashMap<Integer,Integer>(SAMPLE_SIZE);
             final HashMap<Integer,Integer>        strongMap = new HashMap<Integer,Integer>();
             for (int i=0; i<SAMPLE_SIZE; i++) {
                 final Integer key   = random.nextInt(SAMPLE_SIZE);
@@ -57,6 +60,7 @@ public final class SoftValueHashMapTest {
                                                  softMap.containsValue(value));
                 assertSame  ("get:",           strongMap.get(key),
                                                  softMap.get(key));
+                assertEquals("equals:", strongMap, softMap);
                 if (random.nextBoolean()) {
                     // Test addition.
                     assertSame("put:", strongMap.put(key, value),
@@ -78,7 +82,7 @@ public final class SoftValueHashMapTest {
      */
     @Test
     public void testSoftReferences() throws InterruptedException {
-        final Random random = new Random();
+        final Random random = getRandom();
         final SoftValueHashMap<Integer,Integer> softMap = new SoftValueHashMap<Integer,Integer>();
         final HashMap<Integer,Integer> strongMap = new HashMap<Integer,Integer>();
         for (int pass=0; pass<2; pass++) {
@@ -122,9 +126,9 @@ public final class SoftValueHashMapTest {
                 assertTrue("containsAll:", softMap.entrySet().containsAll(strongMap.entrySet()));
             }
             // Do our best to lets GC finish its work.
-            for (int i=0; i<4; i++) {
-                Thread.sleep(50);
-                System.gc();
+            for (int i=0; i<20; i++) {
+                Runtime.getRuntime().gc();
+                Runtime.getRuntime().runFinalization();
             }
             assertTrue(softMap.isValid());
             assertTrue("size:", softMap.size() <= count);
@@ -143,5 +147,12 @@ public final class SoftValueHashMapTest {
                 assertNotNull(value);
             }
         }
+    }
+    
+    private Random getRandom() {
+    	long seed = System.currentTimeMillis() + hashCode();
+    	Random random = new Random(seed);
+    	Logger.getLogger(this.getClass().getName()).info("Using Random Seed: "+seed);
+    	return random;
     }
 }

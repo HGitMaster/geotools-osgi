@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id: TestData.java 31743 2008-10-31 06:28:54Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/TestData.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/TestData.java $
  * @since 2.4
  */
 public class TestData {

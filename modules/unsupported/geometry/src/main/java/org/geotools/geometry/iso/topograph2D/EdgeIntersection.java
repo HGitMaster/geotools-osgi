@@ -26,6 +26,8 @@ import java.io.PrintStream;
  * case this point is the start of the line segment) The intersection point must
  * be precise.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/EdgeIntersection.java $
  */
 public class EdgeIntersection implements Comparable {
 

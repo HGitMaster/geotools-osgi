@@ -26,7 +26,7 @@ import org.geotools.data.vpf.ifc.VPFRow;
  * SpatialIndexInputStream.java Created: Mon Feb 24 22:25:15 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/SpatialIndexInputStream.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/SpatialIndexInputStream.java $
  * @version $Id: SpatialIndexInputStream.java 30687 2008-06-13 11:03:06Z acuster $
  */
 public class SpatialIndexInputStream extends VPFInputStream {

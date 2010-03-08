@@ -33,6 +33,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Jesse
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/index/quadtree/LazySearchCollection.java $
  */
 public class LazySearchCollection extends AbstractCollection<Data> implements
         CloseableCollection<Data> {

@@ -34,7 +34,7 @@ import org.geotools.data.DataStoreFinder;
 /**
  *
  * @author ian
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/geometryless/src/test/java/org/geotools/data/geometryless/ServiceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/test/java/org/geotools/data/geometryless/ServiceTest.java $
  */
 public class ServiceTest extends TestCase {
   

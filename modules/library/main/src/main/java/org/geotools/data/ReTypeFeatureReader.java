@@ -18,6 +18,8 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.resources.Classes;
 import org.opengis.feature.IllegalAttributeException;
@@ -53,7 +55,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * on descriptor name.
  * 
  * @author Jody Garnett (Refractions Research)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/ReTypeFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ReTypeFeatureReader.java $
  */
 public class ReTypeFeatureReader implements DelegatingFeatureReader<SimpleFeatureType,SimpleFeature> {
     
@@ -118,7 +120,7 @@ public class ReTypeFeatureReader implements DelegatingFeatureReader<SimpleFeatur
      */
     protected AttributeDescriptor[] typeAttributes(SimpleFeatureType target,
         SimpleFeatureType origional) {
-        if (target.equals(origional)) {
+        if (FeatureTypes.equalsExact(origional, target)) {
             throw new IllegalArgumentException(
                 "FeatureReader allready produces contents with the correct schema");
         }

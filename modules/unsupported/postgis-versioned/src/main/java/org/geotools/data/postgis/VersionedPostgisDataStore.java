@@ -99,6 +99,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author aaime
  * @since 2.4
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/VersionedPostgisDataStore.java $
  */
 public class VersionedPostgisDataStore implements VersioningDataStore {
 

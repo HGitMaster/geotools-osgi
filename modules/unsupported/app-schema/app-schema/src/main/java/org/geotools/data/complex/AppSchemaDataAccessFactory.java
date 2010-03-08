@@ -17,9 +17,13 @@
 
 package org.geotools.data.complex;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +31,7 @@ import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFactory;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
 import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
 import org.geotools.data.complex.config.XMLConfigDigester;
@@ -41,8 +46,8 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AppSchemaDataAccessFactory.java 32633 2009-03-16 01:44:12Z ang05a $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccessFactory.java $
+ * @version $Id: AppSchemaDataAccessFactory.java 33774 2009-08-20 08:46:45Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccessFactory.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessFactory implements DataAccessFactory {
@@ -65,6 +70,27 @@ public class AppSchemaDataAccessFactory implements DataAccessFactory {
         URL configFileUrl = (URL) AppSchemaDataAccessFactory.URL.lookUp(params);
         XMLConfigDigester configReader = new XMLConfigDigester();
         AppSchemaDataAccessDTO config = configReader.parse(configFileUrl);
+        
+        // load related types that are mapped separately, and not visible on their own
+        // this is when the related types are not feature types, so they don't appear
+        // on getCapabilities, and getFeature also shouldn't return anything etc. 
+        List<String> includes = config.getIncludes();
+        for (Iterator<String> it = includes.iterator(); it.hasNext();) {
+            String parentLocation;
+            parentLocation = DataUtilities.urlToFile(configFileUrl).getParent();
+            File includedConfig = new File(parentLocation, it.next());
+            if (!includedConfig.exists()) {
+                throw new RuntimeException(
+                        "Please check that the includedTypes location is correct: \n '"
+                                + includedConfig.getPath() + "' doesn't exist!");
+            }
+
+            URL relatedConfigURL = DataUtilities.fileToURL(includedConfig);
+            params.put("url", relatedConfigURL);
+            // this will register the related data access, to enable feature chaining
+            createDataStore(params);
+        }
+
         mappings = AppSchemaDataAccessConfigurator.buildMappings(config);
 
         dataStore = new AppSchemaDataAccess(mappings);

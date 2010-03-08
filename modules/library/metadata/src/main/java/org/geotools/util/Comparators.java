@@ -28,7 +28,7 @@ import java.io.Serializable;
  * General purpose comparators.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/Comparators.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/Comparators.java $
  * @version $Id: Comparators.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux
  */

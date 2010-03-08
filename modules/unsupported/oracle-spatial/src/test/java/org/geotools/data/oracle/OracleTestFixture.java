@@ -31,7 +31,7 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
  * to the database.
  * </p>
  * @author jgarnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/OracleTestFixture.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/OracleTestFixture.java $
  */
 public class OracleTestFixture {	
 	    public Connection connection;

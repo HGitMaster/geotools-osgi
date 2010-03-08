@@ -81,8 +81,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <code>{@linkplain ReferencingFactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/ThreadedEpsgFactory.java $
- * @version $Id: ThreadedEpsgFactory.java 32612 2009-03-09 16:32:57Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/ThreadedEpsgFactory.java $
+ * @version $Id: ThreadedEpsgFactory.java 34799 2010-01-15 14:10:52Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class ThreadedEpsgFactory extends DeferredAuthorityFactory
@@ -96,7 +96,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      *
      * @see #createDataSource
      */
-    public static final String DATASOURCE_NAME = "jdbc/EPSG";
+    public static final String DATASOURCE_NAME = "java:comp/env/jdbc/EPSG";
 
     /**
      * {@code true} if automatic registration of {@link #datasourceName} is allowed.
@@ -297,17 +297,14 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
         try {
             context = GeoTools.getInitialContext(new Hints(hints));
             source = (DataSource) context.lookup(datasourceName);
+        } catch (IllegalArgumentException exception) {
+         // Fall back on 'return null' below.
         } catch (NoInitialContextException exception) {
             // Fall back on 'return null' below.
-        } catch (NameNotFoundException exception) {
+        } catch (NamingException exception) {
             registerInto = context;
             // Fall back on 'return null' below.
-        } catch (NamingException exception) {
-            SQLException e = new SQLException(Errors.format(
-                    ErrorKeys.CANT_GET_DATASOURCE_$1, datasourceName));
-            e.initCause(exception);
-            throw e;
-        }
+        } 
         return source;
     }
 

@@ -54,6 +54,8 @@ import org.geotools.xml.*;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/_ServiceProviderBinding.java $
  */
 public class _ServiceProviderBinding extends AbstractComplexEMFBinding {
     public _ServiceProviderBinding(Ows10Factory factory) {

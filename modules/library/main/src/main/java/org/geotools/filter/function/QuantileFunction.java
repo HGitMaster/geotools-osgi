@@ -34,7 +34,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Breaks a FeatureCollection<SimpleFeatureType, SimpleFeature> into classes with an equal number of items in each.
  * 
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/function/QuantileFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/QuantileFunction.java $
  */
 public class QuantileFunction extends ClassificationFunction {
 
@@ -112,11 +112,12 @@ public class QuantileFunction extends ClassificationFunction {
                 if (localMax[i].compareTo(new Double(((Number) globalMax).doubleValue())) < 0)
                     localMax[i] = new Double(fixRound(((Number) localMax[i]).doubleValue(), decPlaces, true));
             }
-            //synchronize min with previous max
-            if ((i != 0) && (!localMin[i].equals(localMax[i-1]))) {
-                if (!localMin[i].equals(localMax[i])) //only if the range contains more than 1 value
-                    localMin[i] = localMax[i-1];
+
+            //synchronize previous max with current min; the ranged classifier is min <= x < y;
+            if (i != 0){
+            	localMax[i-1] = localMin[i];
             }
+            
         }
         //TODO: disallow having 2 identical bins (ie 0..0, 0..0, 0..0, 0..100)
         return new RangedClassifier(localMin, localMax);

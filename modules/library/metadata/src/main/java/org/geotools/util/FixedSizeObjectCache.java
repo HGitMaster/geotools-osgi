@@ -36,7 +36,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 
  * @since 2.5
  * @version $Id: FixedSizeObjectCache.java 31618 2008-10-03 20:30:40Z egouge $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/FixedSizeObjectCache.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/FixedSizeObjectCache.java $
  * @author Jody Garnett (Refractions Research)
  */
 final class FixedSizeObjectCache implements ObjectCache {

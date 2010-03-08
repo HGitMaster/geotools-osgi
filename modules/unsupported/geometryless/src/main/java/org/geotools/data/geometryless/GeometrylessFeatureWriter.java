@@ -49,7 +49,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  *
  * @author wolf
  * @author Gary Sheppard garysheppard@psu.edu
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/GeometrylessFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/GeometrylessFeatureWriter.java $
  */
 public class GeometrylessFeatureWriter extends JDBCTextFeatureWriter {
     private static WKTWriter geometryWriter = new WKTWriter();

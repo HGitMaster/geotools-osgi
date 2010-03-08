@@ -32,6 +32,7 @@ import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
@@ -56,8 +57,8 @@ import org.opengis.filter.Filter;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: MappingFeatureSource.java 32538 2009-02-23 04:14:22Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureSource.java $
+ * @version $Id: MappingFeatureSource.java 34495 2009-11-25 12:24:06Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureSource.java $
  * @since 2.4
  */
 class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
@@ -98,6 +99,7 @@ class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
         DefaultQuery namedQuery = namedQuery(query.getFilter(), query.getMaxFeatures());
         namedQuery.setPropertyNames(query.getPropertyNames());
         namedQuery.setCoordinateSystem(query.getCoordinateSystem());
+        namedQuery.setCoordinateSystemReproject(query.getCoordinateSystemReproject());
         namedQuery.setHandle(query.getHandle());
         namedQuery.setMaxFeatures(query.getMaxFeatures());
         namedQuery.setSortBy(query.getSortBy());
@@ -112,7 +114,19 @@ class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
     public int getCount(Query query) throws IOException {
         DefaultQuery namedQuery = namedQuery(query);
         int count = store.getCount(namedQuery);
-        return count;
+        if (count >= 0) {
+            // normal case
+            return count;
+        } else {
+            // count < 0 indicates broken a datastore, such as PropertyDataStore.
+            // If the data store cannot count its own features, we have to do it.
+            int featureCount = 0;
+            for (FeatureIterator<Feature> features = getFeatures(namedQuery).features(); features
+                    .hasNext(); features.next()) {
+                featureCount++;
+            }
+            return featureCount;
+        }
     }
 
     public DataAccess<FeatureType, Feature> getDataStore() {
@@ -123,6 +137,10 @@ class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
         return (FeatureType) mapping.getTargetFeature().getType();
     }
 
+    protected FeatureTypeMapping getMapping() {
+        return mapping;
+    }
+    
     public FeatureCollection<FeatureType, Feature> getFeatures(Query query) throws IOException {
         return new MappingFeatureCollection(store, mapping, namedQuery(query));
     }

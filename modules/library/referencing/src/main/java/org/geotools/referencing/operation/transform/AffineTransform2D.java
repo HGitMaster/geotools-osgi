@@ -39,6 +39,7 @@ import org.geotools.referencing.wkt.Symbols;
 import org.geotools.resources.Formattable;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -47,8 +48,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * used as a bridge between Java2D and the referencing module.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/AffineTransform2D.java $
- * @version $Id: AffineTransform2D.java 31456 2008-09-08 15:33:08Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/AffineTransform2D.java $
+ * @version $Id: AffineTransform2D.java 34082 2009-10-06 11:00:21Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class AffineTransform2D extends XAffineTransform
@@ -241,5 +242,21 @@ public class AffineTransform2D extends XAffineTransform
     @Override
     public String toString() {
         return toWKT();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AffineTransform)) {
+            return false;
+        }
+
+        AffineTransform a = (AffineTransform) obj;
+        
+        return Utilities.equals(getScaleX(), a.getScaleX()) &&
+            Utilities.equals(getScaleY(), a.getScaleY()) &&
+            Utilities.equals(getShearX(), a.getShearX()) &&
+            Utilities.equals(getShearY(), a.getShearY()) &&
+            Utilities.equals(getTranslateX(), a.getTranslateX()) &&
+            Utilities.equals(getTranslateY(), a.getTranslateY());
     }
 }

@@ -35,7 +35,7 @@ import static java.lang.Math.*;
  * {@linkplain #latitudeOfOrigin latitude of origin} == 0.0.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/EquatorialStereographic.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/EquatorialStereographic.java $
  * @version $Id: EquatorialStereographic.java 30641 2008-06-12 17:42:27Z acuster $
  * @author André Gosselin
  * @author Martin Desruisseaux (PMO, IRD)

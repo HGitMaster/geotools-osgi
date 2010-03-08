@@ -43,6 +43,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * Forms JTS LineStrings out of a the graph of {@link DirectedEdge}s created by
  * an {@link OverlayOp}.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/overlay/LineBuilder.java $
  */
 public class LineBuilder {
 	private OverlayOp op;

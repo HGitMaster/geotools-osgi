@@ -23,7 +23,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/DefaultFeatureResults.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/DefaultFeatureResults.java $
  */
 public final class DefaultFeatureResults implements ValidationResults {
 	Validation trial;

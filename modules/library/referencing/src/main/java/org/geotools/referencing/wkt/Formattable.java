@@ -35,7 +35,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Known Text</cite> (WKT)</A>.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Formattable.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Formattable.java $
  * @version $Id: Formattable.java 31531 2008-09-16 19:37:27Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

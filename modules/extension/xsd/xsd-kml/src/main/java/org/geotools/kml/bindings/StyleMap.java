@@ -31,6 +31,8 @@ import org.geotools.styling.FeatureTypeStyle;
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/bindings/StyleMap.java $
  */
 public class StyleMap {
     protected Map map = Collections.synchronizedMap(new HashMap());

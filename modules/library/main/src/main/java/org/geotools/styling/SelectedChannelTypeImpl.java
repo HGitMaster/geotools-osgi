@@ -17,6 +17,7 @@
 package org.geotools.styling;
 
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.util.Utilities;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.style.StyleVisitor;
@@ -24,7 +25,7 @@ import org.opengis.style.StyleVisitor;
 /**
  * Default implementation of SelectedChannelType.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/SelectedChannelTypeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/SelectedChannelTypeImpl.java $
  */
 public class SelectedChannelTypeImpl implements SelectedChannelType {
     private FilterFactory filterFactory;
@@ -66,8 +67,8 @@ public class SelectedChannelTypeImpl implements SelectedChannelType {
         this.name = name;
     }
 
-    public void setContrastEnhancement(ContrastEnhancement enhancement) {
-        this.contrastEnhancement = enhancement;
+    public void setContrastEnhancement(org.opengis.style.ContrastEnhancement enhancement) {
+        this.contrastEnhancement = ContrastEnhancementImpl.cast( enhancement );
     }
 
     public void setContrastEnhancement(Expression gammaValue) {
@@ -88,5 +89,37 @@ public class SelectedChannelTypeImpl implements SelectedChannelType {
      public void accept(org.geotools.styling.StyleVisitor visitor) {
         visitor.visit(this);
     }
+
+     @Override
+     public int hashCode() {
+         final int PRIME = 1000003;
+         int result = 0;
+
+         if (name != null){
+             result = (PRIME * result) + name.hashCode();
+         }
+
+         if (contrastEnhancement != null) {
+             result = (PRIME * result) + contrastEnhancement.hashCode();
+         }
+         
+         return result;
+     }
+     
+     @Override
+     public boolean equals(Object obj) {
+     	if (this == obj) {
+             return true;
+         }
+
+         if (obj instanceof SelectedChannelTypeImpl) {
+        	 SelectedChannelTypeImpl other = (SelectedChannelTypeImpl) obj;
+
+             return Utilities.equals(name, other.name)
+             && Utilities.equals(contrastEnhancement, other.contrastEnhancement);
+         }
+
+         return false;
+     }
 
 }

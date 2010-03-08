@@ -30,6 +30,8 @@ import org.opengis.geometry.TransfiniteSet;
 
 /**
  * @author <a href="mailto:joel@lggi.com">Joel Skelton</a>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/xml/GeometryTestOperation.java $
  */
 public class GeometryTestOperation extends Assert {
     private String operation;

@@ -42,7 +42,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Base class for <cite>Well Know Text</cite> (WKT) parser.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/AbstractParser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/AbstractParser.java $
  * @version $Id: AbstractParser.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)

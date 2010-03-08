@@ -22,9 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
-import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
+import org.geotools.arcsde.session.Command;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.UnavailableConnectionException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -46,7 +46,7 @@ import com.esri.sde.sdk.client.SeTable;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/InProcessViewSupportTestData.java $
- * @version $Id: InProcessViewSupportTestData.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: InProcessViewSupportTestData.java 33585 2009-07-17 23:39:49Z groldan $
  * @since 2.4.x
  */
 public class InProcessViewSupportTestData {
@@ -75,7 +75,7 @@ public class InProcessViewSupportTestData {
     public static final String typeName = "MasterChildTest";
 
     public static void setUp(ISession session, TestData td) throws IOException,
-            UnavailableArcSDEConnectionException {
+            UnavailableConnectionException {
 
         testCrs = DefaultGeographicCRS.WGS84;
 
@@ -100,7 +100,7 @@ public class InProcessViewSupportTestData {
     }
 
     private static void createMasterTable(final ISession session, final TestData td)
-            throws IOException, UnavailableArcSDEConnectionException {
+            throws IOException, UnavailableConnectionException {
 
         final SeTable table = session.createSeTable(MASTER);
 
@@ -147,7 +147,7 @@ public class InProcessViewSupportTestData {
     }
 
     private static void createChildTable(final ISession session, final TestData td)
-            throws IOException, UnavailableArcSDEConnectionException {
+            throws IOException, UnavailableConnectionException {
         final SeTable table = session.createSeTable(CHILD);
         Command<Void> createCmd = new Command<Void>() {
 

@@ -24,8 +24,11 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.collection.AbstractFeatureVisitor;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.visitor.BoundsVisitor;
 import org.geotools.filter.function.Classifier;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.NullProgressListener;
+import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory2;
@@ -54,6 +57,8 @@ import com.vividsolutions.jts.geom.Point;
  * to use keyword "new" (and instead make use of a Factory).
  * </p>
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/main/FeatureCollectionExampleTest.java $
  */
 public class FeatureCollectionExampleTest extends TestCase {
     private FeatureCollection<SimpleFeatureType, SimpleFeature> features;
@@ -64,7 +69,7 @@ public class FeatureCollectionExampleTest extends TestCase {
         super.setUp();
         GeometryFactory geomFactory = new GeometryFactory();
         
-        SimpleFeatureType type = DataUtilities.createType("location","geom:Point,name:String,age:Integer");
+        SimpleFeatureType type = DataUtilities.createType("location","the_geom:Point:srid=4326,name:String,age:Integer");
         List<SimpleFeature> list = new ArrayList<SimpleFeature>();
         Point point1 = geomFactory.createPoint( new Coordinate(40,50));
         feature1 = SimpleFeatureBuilder.build( type, new Object[]{ point1, "name1", 17}, null );
@@ -134,20 +139,19 @@ public class FeatureCollectionExampleTest extends TestCase {
     
     /** The easiest way to work with data */
     public void testFeatureVisitor(){
-        CoordinateReferenceSystem crs = features.getSchema().getCoordinateReferenceSystem();
-        final BoundingBox bounds = new ReferencedEnvelope( crs );
+        SimpleFeatureType schema = features.getSchema();
+        CoordinateReferenceSystem crs = schema.getCoordinateReferenceSystem();
         
+        BoundsVisitor visitor = new BoundsVisitor();
+        assertNull( visitor.getBounds().getCoordinateReferenceSystem() );
         try {
-            features.accepts( new AbstractFeatureVisitor(){
-                public void visit( org.opengis.feature.Feature feature ) {
-                    bounds.include( feature.getBounds() );
-                }            
-            }, null );
+            features.accepts( visitor, new NullProgressListener() );
         } 
         catch (IOException e) {
             fail( e.getLocalizedMessage() );
         }
-        assertFalse( bounds.isEmpty() );
+        assertFalse( visitor.getBounds().isEmpty() );
+        assertEquals( crs, visitor.getBounds().getCoordinateReferenceSystem() );
     }
     
     /** IMPORTANT - You must close your iterator */

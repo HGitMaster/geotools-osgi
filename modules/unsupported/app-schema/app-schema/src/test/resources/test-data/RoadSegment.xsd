@@ -22,9 +22,30 @@
             </xs:complexType>
           </xs:element>
           <xs:element name="the_geom" type="gml:LineStringPropertyType" />
+
+			<!-- test case for specialisation  -->
+			<xs:element ref="sco:broadTypeEl"/>          
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+
+<xs:element name="broadTypeEl" type="sco:broadType"/>
+<xs:complexType name="broadType">
+   <xs:sequence>
+          <xs:element name="name" type="xs:string" maxOccurs="unbounded"/> 
+   </xs:sequence> 	
+</xs:complexType>
+
+<xs:element name="narrowTypeEl" type="sco:narrowType" substitutionGroup="sco:broadTypeEl"/>
+<xs:complexType name="narrowType">
+<xs:complexContent>
+ <xs:restriction base="sco:broadType">
+   <xs:sequence>
+          <xs:element name="name" type="xs:string" maxOccurs="1"/> 
+   </xs:sequence> 
+   </xs:restriction>
+   </xs:complexContent>	
+</xs:complexType>
 
 </xs:schema>

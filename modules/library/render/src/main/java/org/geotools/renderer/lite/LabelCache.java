@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author jeichar
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCache.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCache.java $
  */
 public interface LabelCache {
 	/**

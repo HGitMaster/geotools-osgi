@@ -32,6 +32,8 @@ import org.jdom.input.SAXBuilder;
  * 
  * @author rgould
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ows/ServiceExceptionParser.java $
  */
 public class ServiceExceptionParser {
 

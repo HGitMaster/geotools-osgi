@@ -59,7 +59,8 @@ import org.opengis.filter.Filter;
  * </p>
  *
  * @author David Zwiers, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/directory/src/main/java/org/geotools/data/dir/DirectoryDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/directory/src/main/java/org/geotools/data/dir/DirectoryDataStore.java $
+ * @deprecated Use {@link org.geotools.data.directory.DirectoryDataStore} instead
  */
 public class DirectoryDataStore implements DataStore, LockingManager {
 
@@ -119,7 +120,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
         for (int i = 0; i < children.length; i++) {
             if (children[i].isFile()) {
                 AbstractFileDataStore afds = (AbstractFileDataStore) FileDataStoreFinder
-                    .getDataStore(children[i].toURL());
+                    .getDataStore(children[i].toURI().toURL());
 
                 if (afds != null) {
                     dataStores.put(afds.getTypeNames()[0], afds);
@@ -183,7 +184,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
 
             if (!f.exists()) {
                 AbstractFileDataStore afds = (AbstractFileDataStore) FileDataStoreFinder
-                    .getDataStore(f.toURL());
+                    .getDataStore(f.toURI().toURL());
 
                 if (afds != null) {
                     afds.createSchema(featureType);

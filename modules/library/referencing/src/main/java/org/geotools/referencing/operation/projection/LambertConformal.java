@@ -67,7 +67,7 @@ import static java.lang.Math.*;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp_belgium.html">lambert_conic_conformal_2sp_belgium</A>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertConformal.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertConformal.java $
  * @version $Id: LambertConformal.java 30641 2008-06-12 17:42:27Z acuster $
  * @author André Gosselin
  * @author Martin Desruisseaux (PMO, IRD)

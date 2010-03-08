@@ -100,7 +100,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * database.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/epsg-oracle/src/main/java/org/geotools/referencing/factory/epsg/ThreadedOracleEpsgFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/main/java/org/geotools/referencing/factory/epsg/ThreadedOracleEpsgFactory.java $
  * @version $Id: ThreadedOracleEpsgFactory.java 30691 2008-06-13 13:20:02Z acuster $
  * @author Didier Richard
  * @author Martin Desruisseaux

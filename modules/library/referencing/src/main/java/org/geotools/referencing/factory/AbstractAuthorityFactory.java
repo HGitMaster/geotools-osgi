@@ -60,7 +60,7 @@ import org.geotools.util.NameFactory;
  * However, other methods may be overridden as well for better performances.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/AbstractAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/AbstractAuthorityFactory.java $
  * @version $Id: AbstractAuthorityFactory.java 31148 2008-08-07 13:37:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

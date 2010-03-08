@@ -42,7 +42,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </ul>
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/XAffineTransform.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/XAffineTransform.java $
  * @version $Id: XAffineTransform.java 31486 2008-09-09 20:46:25Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini

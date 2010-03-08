@@ -25,6 +25,8 @@ import org.geotools.xml.XSD;
  * http://mails/refractions/net schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/test/java/org/geotools/ml/bindings/ML.java $
  */
 public class ML extends XSD {
     /**

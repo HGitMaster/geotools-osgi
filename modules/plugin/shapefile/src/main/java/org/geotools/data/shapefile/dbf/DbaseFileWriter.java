@@ -19,6 +19,9 @@
  */
 package org.geotools.data.shapefile.dbf;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -140,11 +143,21 @@ public class DbaseFileWriter {
         for (int i = 0; i < header.getNumFields(); i++) {
             String fieldString = fieldString(record[i], i);
             if (header.getFieldLength(i) != fieldString.getBytes(charset.name()).length) {
-                // System.out.println(i + " : " + header.getFieldName(i)+" value
-                // = "+fieldString+"");
                 buffer.put(new byte[header.getFieldLength(i)]);
             } else {
-                buffer.put(fieldString.getBytes(charset.name()));
+                if ( Boolean.getBoolean("org.geotools.shapefile.datetime")
+                     &&  header.getFieldType(i) == '@')       
+                {
+                    // Adding the charset to getBytes causes the output to
+                    // get altered for the '@: Timestamp' field.
+                	// And using getBytes returns a different array in 64-bit platforms
+                	// so we expect chars and cast to byte just before writing.
+                    for (char c:  fieldString.toCharArray()){
+                    	buffer.put((byte) c);
+                    }                        	
+                }else{
+                    buffer.put(fieldString.getBytes(charset.name()));   
+                }
             }
 
         }
@@ -194,6 +207,12 @@ public class DbaseFileWriter {
             o = formatter
                     .getFieldString((Date) (obj == null ? NULL_DATE : obj));
             break;
+        case '@':
+               o = 
+                 formatter.getFieldStringDateTime(
+                     (Date) (obj == null ? new Date(NULL_DATE.getTime()): obj)
+                 );
+            break;   
         default:
             throw new RuntimeException("Unknown type "
                     + header.getFieldType(col));
@@ -235,6 +254,8 @@ public class DbaseFileWriter {
         private NumberFormat numFormat = NumberFormat
                 .getNumberInstance(Locale.US);
         private Calendar calendar = Calendar.getInstance(Locale.US);
+        private final long MILLISECS_PER_DAY = 24*60*60*1000;
+
         private String emptyString;
         private static final int MAXCHARS = 255;
         private Charset charset;
@@ -296,7 +317,7 @@ public class DbaseFileWriter {
 
             if (d != null) {
                 buffer.delete(0, buffer.length());
-
+                
                 calendar.setTime(d);
                 int year = calendar.get(Calendar.YEAR);
                 int month = calendar.get(Calendar.MONTH) + 1; // returns 0
@@ -332,6 +353,41 @@ public class DbaseFileWriter {
             return buffer.toString();
         }
 
+        public String getFieldStringDateTime(Date d) {
+              
+            // Sanity check
+            if (d == null) return null;
+            
+            final long difference = d.getTime() - DbaseFileHeader.MILLIS_SINCE_4713;
+            
+            final int days = (int) (difference / MILLISECS_PER_DAY);
+            final int time = (int) (difference % MILLISECS_PER_DAY);
+            
+            try{
+                ByteArrayOutputStream o_bytes = new ByteArrayOutputStream();
+                DataOutputStream o_stream;
+                o_stream = new DataOutputStream(new BufferedOutputStream(o_bytes));
+                o_stream.writeInt(days);
+                o_stream.writeInt(time);
+                o_stream.flush();                       
+                byte[] bytes = o_bytes.toByteArray();
+                // Cast the byte values to char as a workaround for erroneous byte
+                // array retrieval in 64-bit machines
+                char[] out = {
+                    // Days, after reverse.
+                    (char) bytes[3], (char) bytes[2],(char)  bytes[1], (char) bytes[0], 
+                    // Time in millis, after reverse.
+                    (char) bytes[7], (char) bytes[6], (char) bytes[5], (char) bytes[4],
+                };
+
+                return  new String(out);   
+            }catch(IOException e){
+                // This is always just a int serialization, 
+                // there is no way to recover from here.
+                return null;
+            }       
+        }
+        
         public String getFieldString(int size, int decimalPlaces, Number n) {
             buffer.delete(0, buffer.length());
 

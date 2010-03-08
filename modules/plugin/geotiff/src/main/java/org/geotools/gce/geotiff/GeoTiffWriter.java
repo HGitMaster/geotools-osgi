@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.List;
 
 import javax.imageio.IIOException;
@@ -41,12 +40,13 @@ import javax.imageio.stream.ImageOutputStream;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverageWriter;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
+import org.geotools.data.DataUtilities;
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.adapters.CRS2GeoTiffMetadataAdapter;
 import org.geotools.gce.geotiff.adapters.GeoTiffConstants;
@@ -64,7 +64,6 @@ import org.jdom.output.DOMOutputter;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
-import org.opengis.coverage.grid.GridRange;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
@@ -72,10 +71,13 @@ import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.operation.TransformException;
 
 /**
- * @author Simone Giannecchini
+ * {@link AbstractGridCoverageWriter} implementation for the geotiff format.
+ * 
+ * @author Simone Giannecchini, GeoSolutions SAS
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffWriter.java $
  */
+@SuppressWarnings("deprecation")
 public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		GridCoverageWriter {
 
@@ -108,8 +110,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		else if (destination instanceof URL) {
 			final URL dest = (URL) destination;
 			if (dest.getProtocol().equalsIgnoreCase("file")) {
-				final File destFile = new File(URLDecoder.decode(
-						dest.getFile(), "UTF-8"));
+				final File destFile = DataUtilities.urlToFile(dest);
 				this.outStream = ImageIO.createImageOutputStream(destFile);
 			}
 
@@ -156,6 +157,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.opengis.coverage.grid.GridCoverage,
 	 *      org.opengis.parameter.GeneralParameterValue[])
 	 */
+	@SuppressWarnings("unchecked")
 	public void write(final GridCoverage gc,
 			final GeneralParameterValue[] params)
 			throws IllegalArgumentException, IOException,
@@ -173,9 +175,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 				final int length = params.length;
 				for (int i = 0; i < length; i++) {
 					param = (Parameter) params[i];
-					if (param.getDescriptor().getName().getCode().equals(
-							AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName()
-									.toString())) {
+					if (param.getDescriptor().getName().equals(AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName())) {
 						gtParams = (GeoToolsWriteParams) param.getValue();
 					}
 				}
@@ -190,38 +190,32 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final GridGeometry2D gg = (GridGeometry2D) gc.getGridGeometry();
-		GridRange range = gg.getGridRange2D();
+		GridEnvelope2D range = gg.getGridRange2D();
 		final Rectangle sourceRegion = gtParams.getSourceRegion();
 		if (sourceRegion != null)
-			range = new GeneralGridRange(sourceRegion);
+			range = new GridEnvelope2D(sourceRegion);
 		final AffineTransform tr = (AffineTransform) gg.getGridToCRS2D();
-		final CoordinateReferenceSystem crs = gg
-				.getCoordinateReferenceSystem2D();
-
+		final CoordinateReferenceSystem crs = gg.getCoordinateReferenceSystem2D();
 		final double inNoData = getCandidateNoData(gc);
 		
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// we handle just projected andgeographic crs
+		// we handle just projected and geographic crs
 		//
 		// /////////////////////////////////////////////////////////////////////
 		if (crs instanceof ProjectedCRS || crs instanceof GeographicCRS) {
 
 			// creating geotiff metadata
-			final CRS2GeoTiffMetadataAdapter adapter = (CRS2GeoTiffMetadataAdapter) CRS2GeoTiffMetadataAdapter
-					.get(crs);
-			final GeoTiffIIOMetadataEncoder metadata = adapter
-					.parseCoordinateReferenceSystem();
-
-                        if (!Double.isNaN(inNoData)) 
-		                metadata.setNoData(inNoData);
+			final CRS2GeoTiffMetadataAdapter adapter = (CRS2GeoTiffMetadataAdapter) CRS2GeoTiffMetadataAdapter.get(crs);
+			final GeoTiffIIOMetadataEncoder metadata = adapter.parseCoordinateReferenceSystem();
+            if (!Double.isNaN(inNoData)) 
+            	metadata.setNoData(inNoData);
 			
 			// setting georeferencing
 			setGeoReference(crs, metadata, tr, range);
 
 			// writing ALWAYS the geophysics vew of the data
-			writeImage(((GridCoverage2D) gc).geophysics(true)
-					.getRenderedImage(), this.outStream, metadata, gtParams);
+			writeImage(((GridCoverage2D) gc).geophysics(true).getRenderedImage(), this.outStream, metadata, gtParams);
 
 		} else
 			throw new GeoTiffException(
@@ -260,7 +254,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	 */
 	private void setGeoReference(final CoordinateReferenceSystem crs,
 			final GeoTiffIIOMetadataEncoder metadata,
-			final AffineTransform rasterToModel, GridRange range)
+			final AffineTransform rasterToModel, GridEnvelope2D range)
 			throws IndexOutOfBoundsException, IOException {
 
 		// /////////////////////////////////////////////////////////////////////
@@ -270,7 +264,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final AffineTransform modifiedRasterToModel;
-		int minx = range.getLower(0), miny = range.getLower(1);
+		int minx = range.getLow(0), miny = range.getLow(1);
 		if (minx != 0 || miny != 0) {
 			// //
 			//
@@ -370,37 +364,52 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 			final GeoTiffIIOMetadataEncoder geoTIFFMetadata,
 			GeoToolsWriteParams gtParams) throws IOException {
 		if (image == null || outputStream == null) {
-			throw new IllegalArgumentException("some parameters are null");
+			throw new NullPointerException("Some input parameters are null");
 		}
 		final ImageWriteParam params = gtParams.getAdaptee();
-		// /////////////////////////////////////////////////////////////////////
+		
 		//
 		// GETTING READER AND METADATA
 		//
-		// /////////////////////////////////////////////////////////////////////
 		final ImageWriter writer = tiffWriterFactory.createWriterInstance();
-		final IIOMetadata metadata = createGeoTiffIIOMetadata(writer,
-				ImageTypeSpecifier.createFromRenderedImage(image),
-				geoTIFFMetadata, params);
+		final IIOMetadata metadata = createGeoTiffIIOMetadata(writer,ImageTypeSpecifier.createFromRenderedImage(image),geoTIFFMetadata, params);
 
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// IMAGEWRITE
-		//
-		// /////////////////////////////////////////////////////////////////////
-		writer.setOutput(outputStream);
-		writer.write(writer.getDefaultStreamMetadata(params), new IIOImage(
-				image, null, metadata), params);
 
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// release resources
-		//
-		// /////////////////////////////////////////////////////////////////////
-		outputStream.flush();
-		if (!(destination instanceof ImageOutputStream))
-			outputStream.close();
-		writer.dispose();
+		try{
+
+			//
+			// IMAGEWRITE
+			//			
+			writer.setOutput(outputStream);
+			writer.write(writer.getDefaultStreamMetadata(params), new IIOImage(image, null, metadata), params);
+
+
+
+		}finally{
+			//
+			// release resources
+			//
+			try{
+				if(outputStream!=null)
+					outputStream.flush();
+			}catch (Throwable e) {
+				// eat me
+			}
+			
+			try{
+				if (!(destination instanceof ImageOutputStream)&&outputStream!=null)
+					outputStream.close();
+			}catch (Throwable e) {
+				// eat me
+			}
+			
+			try{
+				if (writer!=null)
+					writer.dispose();
+			}catch (Throwable e) {
+				// eat me
+			}			
+		}
 
 		return true;
 	}

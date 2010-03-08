@@ -35,6 +35,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * little else.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/aggregate/JTSAggregateFactory.java $
  */
 public class JTSAggregateFactory implements Factory,  AggregateFactory {
     private CoordinateReferenceSystem crs;

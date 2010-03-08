@@ -23,13 +23,13 @@ import net.sf.jsqlparser.statement.select.ColumnReference;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.OrderByVisitor;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 /**
  * Qualifies a column reference in an order by clause
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: OrderByElementQualifier.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: OrderByElementQualifier.java 33451 2009-07-02 17:53:36Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/view/OrderByElementQualifier.java $

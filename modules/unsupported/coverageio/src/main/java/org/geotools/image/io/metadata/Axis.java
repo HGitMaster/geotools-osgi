@@ -25,7 +25,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * {@linkplain GeographicMetadataFormat geographic metadata format}.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/Axis.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/Axis.java $
  * @version $Id: Axis.java 30775 2008-06-20 15:50:30Z cedricbr $
  * @author Martin Desruisseaux
  *

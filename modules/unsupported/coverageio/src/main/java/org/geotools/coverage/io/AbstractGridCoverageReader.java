@@ -30,33 +30,33 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
-// OpenGIS dependencoes
-import org.opengis.coverage.grid.GridRange;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.geometry.Envelope;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// Geotools dependencies
-import org.geotools.factory.Hints;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GridCoverageFactory;
+import org.geotools.factory.Hints;
 import org.geotools.image.io.RawBinaryImageReadParam;
-import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.io.LineWriter;
 import org.geotools.io.TableWriter;
-import org.geotools.util.logging.Logging;
-import org.geotools.resources.i18n.Errors;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.util.logging.Logging;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridEnvelope;
+import org.opengis.coverage.grid.GridRange;
+import org.opengis.geometry.Envelope;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -83,8 +83,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * on the result.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/AbstractGridCoverageReader.java $
- * @version $Id: AbstractGridCoverageReader.java 30679 2008-06-13 10:19:41Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/AbstractGridCoverageReader.java $
+ * @version $Id: AbstractGridCoverageReader.java 34079 2009-10-05 20:41:26Z jive $
  * @author Martin Desruisseaux (IRD)
  */
 public abstract class AbstractGridCoverageReader implements GridCoverageReader {
@@ -435,7 +435,7 @@ public abstract class AbstractGridCoverageReader implements GridCoverageReader {
         }
         return name;
     }
-
+    
     /**
      * Returns the coordinate reference system for the {@link GridCoverage} to be read.
      *
@@ -475,7 +475,7 @@ public abstract class AbstractGridCoverageReader implements GridCoverageReader {
      * @throws IndexOutOfBoundsException if the supplied index is out of bounds.
      * @throws IOException if an error occurs reading the width information from the input source.
      */
-    public synchronized GridRange getGridRange(final int index) throws IOException {
+    public synchronized GridEnvelope getGridRange(final int index) throws IOException {
         checkImageIndex(index);
         final int dimension = getCoordinateReferenceSystem(index).getCoordinateSystem().getDimension();
         final int[]   lower = new int[dimension];
@@ -483,7 +483,7 @@ public abstract class AbstractGridCoverageReader implements GridCoverageReader {
         Arrays.fill(upper, 1);
         upper[0] = reader.getWidth(index);
         upper[1] = reader.getHeight(index);
-        return new GeneralGridRange(lower, upper);
+        return new GeneralGridEnvelope(lower, upper);
     }
 
     /**
@@ -534,8 +534,8 @@ public abstract class AbstractGridCoverageReader implements GridCoverageReader {
         final ImageReadParam param = reader.getDefaultReadParam();
         if (param instanceof RawBinaryImageReadParam) {
             final RawBinaryImageReadParam rawParam = (RawBinaryImageReadParam) param;
-            final GridRange range = getGridRange(index);
-            final Dimension  size = new Dimension(range.getLength(0), range.getLength(1));
+            final GridEnvelope range = getGridRange(index);
+            final Dimension  size = new Dimension(range.getSpan(0), range.getSpan(1));
             rawParam.setStreamImageSize(size);
         }
         final String                   name = getName(index);

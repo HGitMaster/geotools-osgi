@@ -21,8 +21,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.geotools.data.Parameter;
+import org.geotools.feature.NameImpl;
 import org.geotools.process.Process;
-import org.geotools.process.impl.AbstractProcessFactory;
+import org.geotools.process.impl.SingleProcessFactory;
 import org.geotools.text.Text;
 import org.opengis.util.InternationalString;
 
@@ -34,8 +35,10 @@ import com.vividsolutions.jts.geom.Geometry;
  * This process is based on the SFSQL specification and implemented by the JTS Topology Suite
  * 
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/literal/BufferFactory.java $
  */
-public class BufferFactory extends AbstractProcessFactory {
+public class BufferFactory extends SingleProcessFactory {
     // making parameters available as static constants to help java programmers
     /** Geometry for operation */
     static final Parameter<Geometry> GEOM1 =
@@ -66,6 +69,10 @@ public class BufferFactory extends AbstractProcessFactory {
         resultInfo.put( RESULT.key, RESULT );
     }
     
+    public BufferFactory() {
+        super(new NameImpl(GT_NAMESPACE, "buffer"));
+    }
+    
 	public Process create(Map<String, Object> parameters)
 			throws IllegalArgumentException {
 		return new BufferProcess( this );
@@ -94,10 +101,6 @@ public class BufferFactory extends AbstractProcessFactory {
 	    return new BufferProcess( this );
 	}
 
-	public String getName() {
-		return "buffer";
-	}
-	
 	public boolean supportsProgress() {
 		return true;
 	} 	  

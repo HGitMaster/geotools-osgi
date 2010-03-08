@@ -33,7 +33,7 @@ import org.geotools.util.Utilities;
  * {@link Category#getSampleToGeophysics} transform is thread-safe too.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/GeophysicsCategoryList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/GeophysicsCategoryList.java $
  * @version $Id: GeophysicsCategoryList.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

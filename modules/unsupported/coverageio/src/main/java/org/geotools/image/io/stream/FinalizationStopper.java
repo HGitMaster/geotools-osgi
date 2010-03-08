@@ -30,7 +30,7 @@ import java.util.TimerTask;
  * <p>
  * Most of the time, interruptions are never performed.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/stream/FinalizationStopper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/stream/FinalizationStopper.java $
  * @version $Id: FinalizationStopper.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

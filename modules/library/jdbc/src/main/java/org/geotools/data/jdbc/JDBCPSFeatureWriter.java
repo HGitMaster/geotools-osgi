@@ -49,6 +49,8 @@ import org.opengis.feature.type.GeometryDescriptor;
  * @author Andrea Aime
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCPSFeatureWriter.java $
+ *         
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
     /** The logger for the jdbc module. */

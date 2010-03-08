@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author David Blasby
  * @author Simone Giannecchini
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/GTRenderer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/GTRenderer.java $
  */
 
 public interface GTRenderer {

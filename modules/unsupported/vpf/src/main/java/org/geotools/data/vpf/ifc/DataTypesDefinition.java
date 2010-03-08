@@ -20,7 +20,7 @@ package org.geotools.data.vpf.ifc;
  * DataTypesDefinition.java Created: Thu Jan 02 17:26:02 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/DataTypesDefinition.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/DataTypesDefinition.java $
  * @version $Id: DataTypesDefinition.java 30687 2008-06-13 11:03:06Z acuster $
  */
 public interface DataTypesDefinition {

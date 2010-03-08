@@ -17,6 +17,7 @@
  */
 package org.geotools.gce.arcgrid;
 
+import java.awt.RenderingHints;
 import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import org.opengis.coverage.grid.Format;
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
  */
+@SuppressWarnings("deprecation")
 public final class ArcGridFormatFactory implements GridFormatFactorySpi {
 	/** Logger. */
 	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.arcgrid");
@@ -51,8 +53,7 @@ public final class ArcGridFormatFactory implements GridFormatFactorySpi {
 
 			Class.forName("javax.media.jai.JAI");
 			Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
-			Class
-					.forName("it.geosolutions.imageio.plugins.arcgrid.AsciiGridsImageMetadata");
+			Class.forName("it.geosolutions.imageio.plugins.arcgrid.AsciiGridsImageMetadata");
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("ArcGridFormatFactory is availaible.");
 		} catch (ClassNotFoundException cnf) {
@@ -69,7 +70,7 @@ public final class ArcGridFormatFactory implements GridFormatFactorySpi {
 	 * 
 	 * @return An {@link ArcGridFormat}.;
 	 */
-	public Format createFormat() {
+	public ArcGridFormat createFormat() {
 		return new ArcGridFormat();
 	}
 
@@ -79,7 +80,7 @@ public final class ArcGridFormatFactory implements GridFormatFactorySpi {
 	 * 
 	 * @return DOCUMENT ME!
 	 */
-	public Map getImplementationHints() {
-		return Collections.EMPTY_MAP;
+	public Map<RenderingHints.Key, ?> getImplementationHints() {
+		return Collections.emptyMap();
 	}
 }

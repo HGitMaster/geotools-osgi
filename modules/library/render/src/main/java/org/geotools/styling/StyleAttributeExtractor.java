@@ -20,41 +20,6 @@ import java.net.MalformedURLException;
 
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.renderer.style.ExpressionExtractor;
-import org.geotools.styling.AnchorPoint;
-import org.geotools.styling.ChannelSelection;
-import org.geotools.styling.ColorMap;
-import org.geotools.styling.ColorMapEntry;
-import org.geotools.styling.ContrastEnhancement;
-import org.geotools.styling.Displacement;
-import org.geotools.styling.ExternalGraphic;
-import org.geotools.styling.FeatureTypeConstraint;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Fill;
-import org.geotools.styling.Font;
-import org.geotools.styling.Graphic;
-import org.geotools.styling.Halo;
-import org.geotools.styling.ImageOutline;
-import org.geotools.styling.LinePlacement;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.Mark;
-import org.geotools.styling.NamedLayer;
-import org.geotools.styling.OverlapBehavior;
-import org.geotools.styling.PointPlacement;
-import org.geotools.styling.PointSymbolizer;
-import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.RasterSymbolizer;
-import org.geotools.styling.Rule;
-import org.geotools.styling.SelectedChannelType;
-import org.geotools.styling.ShadedRelief;
-import org.geotools.styling.Stroke;
-import org.geotools.styling.StyleVisitor;
-import org.geotools.styling.StyledLayer;
-import org.geotools.styling.StyledLayerDescriptor;
-import org.geotools.styling.Symbol;
-import org.geotools.styling.Symbolizer;
-import org.geotools.styling.TextSymbolizer;
-import org.geotools.styling.TextSymbolizer2;
-import org.geotools.styling.UserLayer;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.ExpressionVisitor;
@@ -66,17 +31,9 @@ import org.opengis.filter.expression.Literal;
  * Style, that is, those that the Style expects to find in order to work
  * properly
  *
- * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/styling/StyleAttributeExtractor.java $
+ * @author Andrea Aime - OpenGeo
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/styling/StyleAttributeExtractor.java $
  */
-
-
-/**
- * A simple visitor whose purpose is to extract the set of attributes used by a Style, that is, those that the Style expects to find in order to work properly
- * @author  wolf
- * @source  $URL: http://svn.geotools.org/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleAttributeExtractor.java 
- */
-
 public class StyleAttributeExtractor extends FilterAttributeExtractor
     implements StyleVisitor {
 
@@ -228,13 +185,8 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
     }
 
     public void visit(RasterSymbolizer rs) {
-        if (rs.getGeometryPropertyName() != null) {
-            attributeNames.add(rs.getGeometryPropertyName());
-
-            // FIXME
-            // LiteRenderer2 trhwos an Exception:
-            //  Do not know how to deep copy org.geotools.coverage.grid.GridCoverage2D
-            // attributeNames.add("grid");
+        if (rs.getGeometry() != null) {
+            rs.getGeometry().accept(this, null);
         }
 
         if (rs.getImageOutline() != null) {
@@ -250,11 +202,9 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
      * @see org.geotools.styling.StyleVisitor#visit(org.geotools.styling.PointSymbolizer)
      */
     public void visit(PointSymbolizer ps) {
-        if (ps.getGeometryPropertyName() != null) {
-            attributeNames.add(ps.getGeometryPropertyName());
-        }
-        else
-        {
+        if (ps.getGeometry() != null) {
+            ps.getGeometry().accept(this, null);
+        }   else {
             this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
 
@@ -268,11 +218,9 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
      * @see org.geotools.styling.StyleVisitor#visit(org.geotools.styling.LineSymbolizer)
      */
     public void visit(LineSymbolizer line) {
-        if (line.getGeometryPropertyName() != null) {
-            attributeNames.add(line.getGeometryPropertyName());
-        }
-        else
-        {
+        if (line.getGeometry() != null) {
+            line.getGeometry().accept(this, null);
+        } else {
             this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
 
@@ -285,11 +233,9 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
      * @see org.geotools.styling.StyleVisitor#visit(org.geotools.styling.PolygonSymbolizer)
      */
     public void visit(PolygonSymbolizer poly) {
-        if (poly.getGeometryPropertyName() != null) {
-            attributeNames.add(poly.getGeometryPropertyName());
-        }
-        else
-        {
+        if (poly.getGeometry() != null) {
+            poly.getGeometry().accept(this, null);
+        } else {
             this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
 
@@ -306,11 +252,9 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
      * @see org.geotools.styling.StyleVisitor#visit(org.geotools.styling.TextSymbolizer)
      */
     public void visit(TextSymbolizer text) {
-        if (text.getGeometryPropertyName() != null) {
-            attributeNames.add(text.getGeometryPropertyName());
-        }
-        else
-        {
+        if (text.getGeometry() != null) {
+            text.getGeometry().accept(this, null);
+        } else {
             this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
 

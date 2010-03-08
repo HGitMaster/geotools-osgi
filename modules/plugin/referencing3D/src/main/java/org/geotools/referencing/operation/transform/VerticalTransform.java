@@ -26,7 +26,7 @@ import org.opengis.referencing.operation.TransformException;
  * transformations are usually backed by some ellipsoid-dependent database.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/VerticalTransform.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/VerticalTransform.java $
  * @version $Id: VerticalTransform.java 30658 2008-06-12 21:00:20Z acuster $
  * @author Martin Desruisseaux
  */

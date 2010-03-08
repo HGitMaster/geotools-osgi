@@ -36,7 +36,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * </p>
  * @author jgarnett
  * @since 2.1.RC0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/store/NoContentIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/NoContentIterator.java $
  */
 public class NoContentIterator implements Iterator<SimpleFeature> {
     Throwable origionalProblem;

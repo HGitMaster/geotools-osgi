@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
  * <A HREF="http://jakarta.apache.org/commons/logging/">Commons-logging</A> framework.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/logging/CommonsLogger.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/logging/CommonsLogger.java $
  * @version $Id: CommonsLogger.java 30937 2008-07-07 16:19:04Z acuster $
  * @author Martin Desruisseaux
  * @author Saul Farber (MassGIS)

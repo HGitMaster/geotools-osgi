@@ -41,7 +41,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </table>
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/console/CommandLine.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/console/CommandLine.java $
  * @version $Id: CommandLine.java 30742 2008-06-16 19:48:45Z desruisseaux $
  * @author Martin Desruisseaux
  * @author Cédric Briançon

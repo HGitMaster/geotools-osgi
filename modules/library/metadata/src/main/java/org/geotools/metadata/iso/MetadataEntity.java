@@ -31,7 +31,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * <A HREF="http://geoapi.sourceforge.net">GeoAPI</A>.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/MetadataEntity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/MetadataEntity.java $
  * @version $Id: MetadataEntity.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Jody Garnett
  * @author Martin Desruisseaux

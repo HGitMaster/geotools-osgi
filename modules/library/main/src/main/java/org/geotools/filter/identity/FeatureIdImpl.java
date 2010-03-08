@@ -28,6 +28,8 @@ import org.opengis.filter.identity.FeatureId;
  * <p>
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/identity/FeatureIdImpl.java $
  */
 public class FeatureIdImpl implements FeatureId {
 

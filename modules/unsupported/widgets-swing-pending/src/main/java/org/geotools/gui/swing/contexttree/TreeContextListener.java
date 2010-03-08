@@ -22,6 +22,8 @@ import java.util.EventListener;
  * Listener for ContextTreeModel
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/TreeContextListener.java $
  */
 public interface TreeContextListener extends EventListener{
         

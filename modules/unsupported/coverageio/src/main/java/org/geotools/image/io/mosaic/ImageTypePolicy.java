@@ -21,7 +21,7 @@ package org.geotools.image.io.mosaic;
  * The policy for {@link MosaicImageReader#getImageTypes computing image types} in a mosaic.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/ImageTypePolicy.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/ImageTypePolicy.java $
  * @version $Id: ImageTypePolicy.java 30729 2008-06-16 09:26:48Z desruisseaux $
  * @author Martin Desruisseaux
  *

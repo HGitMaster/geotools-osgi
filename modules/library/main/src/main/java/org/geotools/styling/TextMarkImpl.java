@@ -26,7 +26,7 @@ import org.opengis.filter.expression.Expression;
  * DOCUMENT ME!
  *
  * @author iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/TextMarkImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/TextMarkImpl.java $
  */
 public class TextMarkImpl extends MarkImpl implements TextMark {
     /** The logger for the default core module. */

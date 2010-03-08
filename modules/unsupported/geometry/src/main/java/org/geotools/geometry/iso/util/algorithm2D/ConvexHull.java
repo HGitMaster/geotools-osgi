@@ -65,6 +65,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * smallest convex Geometry that contains all the points in the input Geometry.
  * <p>
  * Uses the Graham Scan algorithm. Asymptotic running time: O(n*log(n))
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/ConvexHull.java $
  */
 public class ConvexHull {
 	//private FeatGeomFactoryImpl geomFactory;

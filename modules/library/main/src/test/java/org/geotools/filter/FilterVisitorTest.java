@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
 /**
  *
  * @author  jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/filter/FilterVisitorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/FilterVisitorTest.java $
  */
 public class FilterVisitorTest extends TestCase implements FilterVisitor {
     int checkcode;

@@ -21,7 +21,7 @@ package org.geotools.coverage.processing;
  * Throws when a "scale" operation has been requested
  * but the specified grid coverage can't be scaled.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/CannotScaleException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/CannotScaleException.java $
  * @version $Id: CannotScaleException.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Simone Giannecchini
  *

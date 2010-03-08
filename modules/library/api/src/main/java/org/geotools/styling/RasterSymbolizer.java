@@ -17,6 +17,7 @@
 package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
+import org.opengis.style.OverlapBehavior;
 
 
 /**
@@ -112,24 +113,13 @@ import org.opengis.filter.expression.Expression;
  *   &lt;/ContrastEnhancement&gt;
  * &lt;/RasterSymbolizer&gt;
  * </PRE>
- * $Id: RasterSymbolizer.java 32919 2009-05-03 14:18:31Z jive $
+ * $Id: RasterSymbolizer.java 34564 2009-11-30 16:08:45Z aaime $
  * </p>
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/RasterSymbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/RasterSymbolizer.java $
  */
 public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Symbolizer {
-    /**
-     * The interpretation of Geometry is system-dependent, as raster data may
-     * be organized differently from feature data, though omitting this
-     * element selects the default raster-data source.  Geometry-type
-     * transformations are also system-dependent and it is assumed that this
-     * capability will be little used.
-     *
-     * @param geometryPropertyName the name of the Geometry
-     */
-    void setGeometryPropertyName(String geometryPropertyName);
-
     /**
      * sets the opacity for the coverage, it has the usual meaning.
      *
@@ -150,7 +140,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      *
      * @param channel the channel selected
      */
-    void setChannelSelection(ChannelSelection channel);
+    void setChannelSelection(org.opengis.style.ChannelSelection channel);
 
     /**
      * The ChannelSelection element specifies the false-color channel selection
@@ -202,6 +192,13 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
     Expression getOverlap();
 
     /**
+     * Set the overlap behavior.
+     * @param overlapBehavior
+     */
+    void setOverlapBehavior(OverlapBehavior overlapBehavior);
+
+
+    /**
      * The ColorMap element defines either the colors of a palette-type raster
      * source or the mapping of fixed-numeric pixel values to colors. For
      * example, a DEM raster giving elevations in meters above sea level can
@@ -217,7 +214,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      *
      * @param colorMap the ColorMap for the raster
      */
-    void setColorMap(ColorMap colorMap);
+    void setColorMap(org.opengis.style.ColorMap colorMap);
 
     /**
      * The ColorMap element defines either the colors of a palette-type raster
@@ -255,7 +252,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      *
      * @param ce the contrastEnhancement
      */
-    void setContrastEnhancement(ContrastEnhancement ce);
+    void setContrastEnhancement(org.opengis.style.ContrastEnhancement ce);
 
     /**
      * The ContrastEnhancement element defines contrast enhancement for a
@@ -293,7 +290,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      *
      * @param relief the shadedrelief object
      */
-    void setShadedRelief(ShadedRelief relief);
+    void setShadedRelief(org.opengis.style.ShadedRelief relief);
 
     /**
      * The ShadedRelief element selects the application of relief shading (or
@@ -337,7 +334,7 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      *        polygon or a line symbolizer an unexpected argument exception
      *        may be thrown by an implementing class.
      */
-    void setImageOutline(Symbolizer symbolizer);
+    void setImageOutline(org.opengis.style.Symbolizer symbolizer);
 
     /**
      * The ImageOutline element specifies that individual source rasters in a
@@ -362,4 +359,5 @@ public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Sym
      * @return The relevent symbolizer
      */
     Symbolizer getImageOutline();
+   
 }

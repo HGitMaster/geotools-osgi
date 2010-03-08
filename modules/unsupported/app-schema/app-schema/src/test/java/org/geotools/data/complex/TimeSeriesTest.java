@@ -30,20 +30,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.apache.xml.resolver.Catalog;
-import org.apache.xml.resolver.tools.ResolvingXMLReader;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
 import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
+import org.geotools.data.complex.config.CatalogUtilities;
 import org.geotools.data.complex.config.EmfAppSchemaReader;
+import org.geotools.data.complex.config.FeatureTypeRegistry;
 import org.geotools.data.complex.config.XMLConfigDigester;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.NameImpl;
@@ -51,6 +52,7 @@ import org.geotools.feature.Types;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.gml3.GML;
 import org.geotools.xlink.XLINK;
+import org.geotools.xml.SchemaIndex;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -68,8 +70,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: TimeSeriesTest.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
+ * @version $Id: TimeSeriesTest.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
  * @since 2.4
  */
 public class TimeSeriesTest extends TestCase {
@@ -125,19 +127,15 @@ public class TimeSeriesTest extends TestCase {
      * 
      * @param location
      *            schema location path discoverable through getClass().getResource()
+     * @return 
      * 
      * @throws IOException
      *             DOCUMENT ME!
      */
-    private void loadSchema(URL location) throws IOException {
+    private SchemaIndex loadSchema(URL location) throws IOException {
         URL catalogLocation = getClass().getResource(schemaBase + "observations.oasis.xml");
-        Catalog catalog = new ResolvingXMLReader().getCatalog();
-        catalog.getCatalogManager().setVerbosity(9);
-        catalog.parseCatalog(catalogLocation);
-
-        reader.setCatalog(catalog);
-
-        reader.parse(location);
+        reader.setCatalog(CatalogUtilities.buildPrivateCatalog(catalogLocation));
+        return reader.parse(location, null);
     }
 
     /**
@@ -147,27 +145,22 @@ public class TimeSeriesTest extends TestCase {
      * @throws Exception
      */
     public void testParseSchema() throws Exception {
+        SchemaIndex schemaIndex;
         try {
             String schemaLocation = schemaBase + "commonSchemas_new/awdip.xsd";
             URL location = getClass().getResource(schemaLocation);
             assertNotNull(location);
-            loadSchema(location);
+            schemaIndex = loadSchema(location);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
 
-        final Map typeRegistry = reader.getTypeRegistry();
+        final FeatureTypeRegistry typeRegistry = new FeatureTypeRegistry();
+        typeRegistry.addSchemas(schemaIndex);
 
         final Name typeName = Types.typeName(AWNS, "SiteSinglePhenomTimeSeriesType");
-        final ComplexType testType = (ComplexType) typeRegistry.get(typeName);
-
-        List names = new ArrayList(typeRegistry.keySet());
-        Collections.sort(names, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                return o1.toString().compareTo(o2.toString());
-            }
-        });
+        final ComplexType testType = (ComplexType) typeRegistry.getAttributeType(typeName);
 
         assertNotNull(testType);
         assertTrue(testType instanceof FeatureType);
@@ -341,9 +334,7 @@ public class TimeSeriesTest extends TestCase {
 
         attMapping = (AttributeMapping) attributeMappings.get(1);
         assertNotNull(attMapping);
-        // note the mapping says SiteSinglePhenomTimeSeries/gml:name[1] but
-        // attMapping.getTargetXPath().toString() results in a simplyfied form
-        assertEquals("gml:name", attMapping.getTargetXPath().toString());
+        assertEquals("gml:name[1]", attMapping.getTargetXPath().toString());
 
         attMapping = (AttributeMapping) attributeMappings.get(2);
         assertNotNull(attMapping);
@@ -470,7 +461,7 @@ public class TimeSeriesTest extends TestCase {
         features.close(it);
 
         count = 0;
-        Iterator simpleIterator = ((MappingFeatureIterator) features.iterator()).sourceFeatureIterator;
+        Iterator simpleIterator = ((AbstractMappingFeatureIterator) features.iterator()).getSourceFeatureIterator();
         for (; simpleIterator.hasNext();) {
             feature = (Feature) simpleIterator.next();
             count++;
@@ -496,12 +487,18 @@ public class TimeSeriesTest extends TestCase {
                 Object valueContent = geom.getValue();
                 Date sampleTimePosition = (Date) valueContent;
                 Calendar cal = Calendar.getInstance();
+                // property file dates appear to be parsed as being in UTC
+                cal.setTimeZone(TimeZone.getTimeZone("UTC"));
                 cal.setTime(sampleTimePosition);
                 // see row TS2.22
                 assertEquals(2007, cal.get(Calendar.YEAR));
                 assertEquals(Calendar.JANUARY, cal.get(Calendar.MONTH));
                 assertEquals(21, cal.get(Calendar.DAY_OF_MONTH));
-            }
+                // sanity (timezone handling has been bungled one time too many)
+                assertEquals(0, cal.get(Calendar.HOUR_OF_DAY));
+                assertEquals(0, cal.get(Calendar.MINUTE));
+                assertEquals(0, cal.get(Calendar.SECOND));
+           }
         }
 
         mappingDataStore.dispose();

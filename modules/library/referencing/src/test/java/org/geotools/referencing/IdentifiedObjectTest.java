@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the creation of {@link AbstractIdentifiedObject} and a few subclasses.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/IdentifiedObjectTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/IdentifiedObjectTest.java $
  * @version $Id: IdentifiedObjectTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

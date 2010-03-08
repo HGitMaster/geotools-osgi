@@ -27,6 +27,8 @@ import org.geotools.styling.PolygonSymbolizer;
  * interface for map2d widget who handle Edition
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/EditableMap2D.java $
  */
 public interface EditableMap2D extends SelectableMap2D {
 

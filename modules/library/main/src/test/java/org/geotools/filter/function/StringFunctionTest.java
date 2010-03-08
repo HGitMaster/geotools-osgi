@@ -16,19 +16,21 @@
  */
 package org.geotools.filter.function;
 
-import junit.framework.TestCase;
+import static junit.framework.Assert.assertEquals;
 
 import org.geotools.factory.CommonFactoryFinder;
+import org.junit.Test;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 
-public class StringFunctionTest extends TestCase {
+public class StringFunctionTest  {
+    
+    FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
+    @Test
     public void testStrReplace() {
-        
-        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         Literal foo = ff.literal("foo");
         Literal o = ff.literal("o");
         Literal bar = ff.literal("bar");
@@ -42,9 +44,17 @@ public class StringFunctionTest extends TestCase {
         assertEquals( "fbaro", s );
     }
     
+    @Test
     public void testParseLong() {
-        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         assertEquals(Long.MAX_VALUE , ff.function("parseLong", ff.literal(Long.MAX_VALUE + "")).evaluate(null));
         assertEquals(5l , ff.function("parseLong", ff.literal("5.0")).evaluate(null));
     }
+    
+    @Test
+    public void testCapitalize() {
+        assertEquals("United Kingdom", ff.function("strCapitalize", ff.literal("UNITED KINGDOM")).evaluate(null));
+        assertEquals("United Kingdom", ff.function("strCapitalize", ff.literal("UnItEd kInGdOm")).evaluate(null));
+    }
+    
+    
 }

@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * other, simpler iterator to carry on its duties.
  *
  * @author Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/GeomCollectionIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/GeomCollectionIterator.java $
  * @version $Id: GeomCollectionIterator.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public final class GeomCollectionIterator extends AbstractLiteIterator {

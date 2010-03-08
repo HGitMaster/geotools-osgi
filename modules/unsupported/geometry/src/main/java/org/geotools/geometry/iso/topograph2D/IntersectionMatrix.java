@@ -36,6 +36,8 @@ package org.geotools.geometry.iso.topograph2D;
  * HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple Features
  * Specification for SQL</A> .
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/IntersectionMatrix.java $
  */
 public class IntersectionMatrix implements Cloneable {
 	/**

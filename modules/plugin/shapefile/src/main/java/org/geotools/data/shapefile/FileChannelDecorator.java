@@ -31,6 +31,8 @@ import java.nio.channels.WritableByteChannel;
  * release the lock on the URL.
  * 
  * @author jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/FileChannelDecorator.java $
  */
 public class FileChannelDecorator extends FileChannel implements
         ReadableByteChannel {

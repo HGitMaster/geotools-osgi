@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
  * </p>
  * @author jeichar
  * @since 0.6.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/geometry/jts/coordinatesequence/InPlaceCoordinateSequenceTransformer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/coordinatesequence/InPlaceCoordinateSequenceTransformer.java $
  */
 public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceTransformer {
 

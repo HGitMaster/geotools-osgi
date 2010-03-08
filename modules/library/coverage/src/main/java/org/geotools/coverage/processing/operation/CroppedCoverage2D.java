@@ -39,7 +39,6 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.GridRange2D;
 import org.geotools.coverage.processing.CannotCropException;
 import org.geotools.coverage.processing.OperationJAI;
 import org.geotools.factory.GeoTools;
@@ -165,7 +164,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 		final RenderedImage sourceImage = sourceCoverage.getRenderedImage();
 		final Envelope2D sourceEnvelope = sourceCoverage.getEnvelope2D();
 		final GridGeometry2D sourceGridGeometry = ((GridGeometry2D) sourceCoverage.getGridGeometry());
-		final GridRange2D sourceGridRange = sourceGridGeometry.getGridRange2D();
+		final GridEnvelope2D sourceGridRange = sourceGridGeometry.getGridRange2D();
 
 
 		// /////////////////////////////////////////////////////////////////////

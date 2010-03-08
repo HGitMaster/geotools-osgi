@@ -28,7 +28,7 @@ import java.beans.PropertyDescriptor;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/spatial/PolygonNotOverlappingLineValidationBeanInfo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/spatial/PolygonNotOverlappingLineValidationBeanInfo.java $
  * @version $Id: PolygonNotOverlappingLineValidationBeanInfo.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class PolygonNotOverlappingLineValidationBeanInfo extends PolygonLineAbstractValidationBeanInfo{

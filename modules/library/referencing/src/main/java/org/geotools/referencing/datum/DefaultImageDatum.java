@@ -35,7 +35,7 @@ import org.geotools.util.Utilities;
  * context only. For an image datum, the anchor point is usually either the centre of the image
  * or the corner of the image.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultImageDatum.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultImageDatum.java $
  * @version $Id: DefaultImageDatum.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

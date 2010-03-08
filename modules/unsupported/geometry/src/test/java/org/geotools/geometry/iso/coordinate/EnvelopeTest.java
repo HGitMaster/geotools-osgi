@@ -29,6 +29,8 @@ import org.opengis.geometry.DirectPosition;
 /**
  * @author sanjay
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/iso/coordinate/EnvelopeTest.java $
  */
 public class EnvelopeTest extends TestCase {
 	

@@ -30,6 +30,8 @@ import org.opengis.referencing.datum.GeodeticDatum;
  * No cache or buffer was harmed in the making of these tests.
  *  
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/epsg/oracle/FactoryUsingOracleSQLOnlineTest.java $
  */
 public class FactoryUsingOracleSQLOnlineTest extends OracleOnlineTestCase {
 

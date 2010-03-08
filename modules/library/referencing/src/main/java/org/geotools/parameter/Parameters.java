@@ -75,7 +75,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * parameter), the parameter name is a suffisient key.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/parameter/Parameters.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/Parameters.java $
  * @version $Id: Parameters.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux

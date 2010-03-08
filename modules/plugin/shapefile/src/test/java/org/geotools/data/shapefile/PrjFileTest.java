@@ -17,13 +17,14 @@
 package org.geotools.data.shapefile;
 
 import java.io.IOException;
+
 import org.geotools.data.shapefile.prj.PrjFileReader;
 
 /**
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/PrjFileTest.java $
- * @version $Id: PrjFileTest.java 30670 2008-06-12 23:59:23Z acuster $
+ * @version $Id: PrjFileTest.java 33948 2009-09-22 06:55:55Z jive $
  * @author Ian Schneider
  * @author James Macgill
  */

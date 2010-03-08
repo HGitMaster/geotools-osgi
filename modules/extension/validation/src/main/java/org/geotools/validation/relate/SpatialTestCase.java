@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.LineString;
  * SpatialTestCase<br>
  * @author bowens<br>
  * Created Apr 29, 2004<br>
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/SpatialTestCase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/SpatialTestCase.java $
  * @version <br>
  *
  * <b>Puropse:</b><br>

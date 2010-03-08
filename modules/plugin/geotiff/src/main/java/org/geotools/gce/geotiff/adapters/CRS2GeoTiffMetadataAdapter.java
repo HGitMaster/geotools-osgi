@@ -45,6 +45,7 @@ import org.geotools.referencing.operation.projection.LambertConformal;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.referencing.operation.projection.Mercator;
 import org.geotools.referencing.operation.projection.ObliqueMercator;
+import org.geotools.referencing.operation.projection.ObliqueStereographic;
 import org.geotools.referencing.operation.projection.Orthographic;
 import org.geotools.referencing.operation.projection.PolarStereographic;
 import org.geotools.referencing.operation.projection.Stereographic;
@@ -302,8 +303,8 @@ public final class CRS2GeoTiffMetadataAdapter {
 
 		// name of the user defined projected crs
 		// key 3073
-		metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, projectedCRS
-				.getName().getCode());
+//		metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, projectedCRS
+//				.getName().getCode());
 
 		// projection
 		parseProjection(projectedCRS, metadata);
@@ -443,7 +444,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 					.addGeoShortParam(
 							GeoTiffPCSCodes.ProjCoordTransGeoKey,
 							GeoTiffCoordinateTransformationsCodes.CT_TransverseMercator);
-			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjNatOriginLongGeoKey,
@@ -472,7 +473,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 			// key 3075
 			metadata.addGeoShortParam(GeoTiffPCSCodes.ProjCoordTransGeoKey,
 					GeoTiffCoordinateTransformationsCodes.CT_Mercator);
-			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
 			List<GeneralParameterValue> values = parameters.values();
@@ -516,7 +517,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 					.addGeoShortParam(
 							GeoTiffPCSCodes.ProjCoordTransGeoKey,
 							GeoTiffCoordinateTransformationsCodes.CT_LambertConfConic_Helmert);
-			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjNatOriginLongGeoKey,
@@ -546,7 +547,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 					.addGeoShortParam(
 							GeoTiffPCSCodes.ProjCoordTransGeoKey,
 							GeoTiffCoordinateTransformationsCodes.CT_LambertConfConic_2SP);
-			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjNatOriginLongGeoKey,
@@ -602,7 +603,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 			// key 3075
 			metadata.addGeoShortParam(GeoTiffPCSCodes.ProjCoordTransGeoKey,
 					GeoTiffCoordinateTransformationsCodes.CT_Stereographic);
-			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjNatOriginLongGeoKey,
@@ -632,7 +633,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 					.addGeoShortParam(
 							GeoTiffPCSCodes.ProjCoordTransGeoKey,
 							GeoTiffCoordinateTransformationsCodes.CT_PolarStereographic);
-			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjNatOriginLongGeoKey,
@@ -650,6 +651,34 @@ public final class CRS2GeoTiffMetadataAdapter {
 			return;
 
 		}
+		
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Oblique_Stereographic
+		//
+		// /////////////////////////////////////////////////////////////////////
+		if(projTransf instanceof ObliqueStereographic 
+				&& name.equalsIgnoreCase("Oblique_Stereographic")) {
+ 			metadata.addGeoShortParam(
+ 					GeoTiffPCSCodes.ProjCoordTransGeoKey,
+ 					GeoTiffCoordinateTransformationsCodes.CT_ObliqueStereographic);
+// 			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+ 			
+ 			// params			
+ 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjNatOriginLongGeoKey,
+ 					parameters.parameter("central_meridian").doubleValue());
+ 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjNatOriginLatGeoKey,
+ 					parameters.parameter("latitude_of_origin").doubleValue());
+ 			metadata.addGeoDoubleParam(
+ 					GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey, parameters
+ 							.parameter("scale_factor").doubleValue());
+ 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjFalseEastingGeoKey,
+ 					parameters.parameter("false_easting").doubleValue());
+ 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjFalseNorthingGeoKey,
+ 					parameters.parameter("false_northing").doubleValue());
+ 			return;
+ 		}
+				 		
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Oblique Mercator
@@ -662,7 +691,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 			// key 3075
 			metadata.addGeoShortParam(GeoTiffPCSCodes.ProjCoordTransGeoKey,
 					GeoTiffCoordinateTransformationsCodes.CT_ObliqueMercator);
-			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjCenterLongGeoKey,
@@ -692,7 +721,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 			// key 3075
 			metadata.addGeoShortParam(GeoTiffPCSCodes.ProjCoordTransGeoKey,
 					GeoTiffCoordinateTransformationsCodes.CT_AlbersEqualArea);
-			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjNatOriginLongGeoKey,
@@ -723,7 +752,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 			// key 3075
 			metadata.addGeoShortParam(GeoTiffPCSCodes.ProjCoordTransGeoKey,
 					GeoTiffCoordinateTransformationsCodes.CT_Orthographic);
-			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//			metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
 
 			// params
 			metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjCenterLongGeoKey,
@@ -748,7 +777,7 @@ public final class CRS2GeoTiffMetadataAdapter {
                 // key 3075
                     metadata.addGeoShortParam(GeoTiffPCSCodes.ProjCoordTransGeoKey,
                                     GeoTiffCoordinateTransformationsCodes.CT_LambertAzimEqualArea);
-                    metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
+//                    metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, name);
     
                     // params
                     metadata.addGeoDoubleParam(GeoTiffPCSCodes.ProjCenterLatGeoKey,
@@ -818,8 +847,8 @@ public final class CRS2GeoTiffMetadataAdapter {
 		parsePrimem((DefaultPrimeMeridian) datum.getPrimeMeridian(), metadata);
 
 		// linear unit
-		final Unit linearUnit = datum.getEllipsoid().getAxisUnit();
-		parseUnit(linearUnit, 1, metadata);
+//		final Unit linearUnit = datum.getEllipsoid().getAxisUnit();
+//		parseUnit(linearUnit, 1, metadata);
 
 	}
 
@@ -856,8 +885,8 @@ public final class CRS2GeoTiffMetadataAdapter {
 				32767);
 
 		// set the name
-		metadata.addGeoAscii(GeoTiffGCSCodes.GeogCitationGeoKey, datum
-				.getName().getCode());
+//		metadata.addGeoAscii(GeoTiffGCSCodes.GeogCitationGeoKey, datum
+//				.getName().getCode());
 
 		parseSpheroid((DefaultEllipsoid) datum.getEllipsoid(), metadata);
 
@@ -890,8 +919,8 @@ public final class CRS2GeoTiffMetadataAdapter {
 		// user defined ellipsoid
 		metadata.addGeoShortParam(GeoTiffGCSCodes.GeogEllipsoidGeoKey, 32767);
 		// setting the name
-		metadata.addGeoAscii(GeoTiffGCSCodes.GeogCitationGeoKey, ellipsoid
-				.getName().getCode());
+//		metadata.addGeoAscii(GeoTiffGCSCodes.GeogCitationGeoKey, ellipsoid
+//				.getName().getCode());
 
 		// setting semimajor axis
 		metadata.addGeoDoubleParam(GeoTiffGCSCodes.GeogSemiMajorAxisGeoKey,
@@ -931,8 +960,8 @@ public final class CRS2GeoTiffMetadataAdapter {
 					32767);
 
 			// citation
-			metadata.addGeoAscii(GeoTiffGCSCodes.GeogCitationGeoKey, pm
-					.getName().getCode());
+//			metadata.addGeoAscii(GeoTiffGCSCodes.GeogCitationGeoKey, pm
+//					.getName().getCode());
 
 			// longitude
 			metadata.addGeoDoubleParam(
@@ -972,8 +1001,8 @@ public final class CRS2GeoTiffMetadataAdapter {
 		// preparing the string to write here
 
 		// citation
-		metadata.addGeoAscii(GeoTiffGCSCodes.GeogCitationGeoKey, unit
-				.toString());// unitFormat.labelFor(unit)
+//		metadata.addGeoAscii(GeoTiffGCSCodes.GeogCitationGeoKey, unit
+//				.toString());// unitFormat.labelFor(unit)
 
 		Unit base = null;
 		if (SI.METER.isCompatible(unit)) {

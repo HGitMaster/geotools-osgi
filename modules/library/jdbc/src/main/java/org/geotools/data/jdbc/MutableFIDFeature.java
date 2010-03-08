@@ -28,9 +28,11 @@ import org.opengis.filter.identity.FeatureId;
 /**
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: aaime $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/MutableFIDFeature.java $
- * @version $Id: MutableFIDFeature.java 31072 2008-07-24 20:09:07Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/MutableFIDFeature.java $
+ * @version $Id: MutableFIDFeature.java 33484 2009-07-06 02:17:34Z jdeolive $
  * Last Modified: $Date: 2004/04/09 15:30:52 $ 
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class MutableFIDFeature extends SimpleFeatureImpl {
 

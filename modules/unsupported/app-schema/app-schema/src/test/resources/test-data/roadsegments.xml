@@ -67,6 +67,13 @@
             <OCQL>the_geom</OCQL>
           </sourceExpression>
         </AttributeMapping>
+        <AttributeMapping>
+          <targetAttribute>RoadSegment/sco:broadTypeEl</targetAttribute>
+         <sourceExpression>
+            <OCQL>'stuff'</OCQL>
+          </sourceExpression>
+         <targetAttributeNode>sco:narrowType</targetAttributeNode>
+          </AttributeMapping>
       </attributeMappings>
     </FeatureTypeMapping>
   </typeMappings>

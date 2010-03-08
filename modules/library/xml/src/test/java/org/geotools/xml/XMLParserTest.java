@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
  * @
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/test/java/org/geotools/xml/XMLParserTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/XMLParserTest.java $
  */
 public class XMLParserTest extends TestCase {
     public void testMail(){

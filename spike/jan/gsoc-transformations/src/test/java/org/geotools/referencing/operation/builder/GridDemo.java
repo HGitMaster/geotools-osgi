@@ -203,9 +203,9 @@ public class GridDemo {
 
             URL url = null;
 
-            url = new File("/home/jezekjan/tmp/testgeodata/rasters/p1010099.tif").toURL();
+            url = new File("/home/jezekjan/tmp/testgeodata/rasters/p1010099.tif").toURI().toURL();
 
-            // url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURL();
+            // url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURI().toURL();
 
             /* Open the file with Image */
             WorldImageReader reader = new WorldImageReader(url);
@@ -276,9 +276,9 @@ public class GridDemo {
                                 "/home/jezekjan/tmp/pp.png")));
                     writer.write(projected, null);
             
-                    url = new File("/home/jezekjan/tmp/pp.png").toURL();
+                    url = new File("/home/jezekjan/tmp/pp.png").toURI().toURL();
 
-                    // url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURL();
+                    // url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURI().toURL();
 
                     /* Open the file with Image */
                     WorldImageReader preader = new WorldImageReader(url);

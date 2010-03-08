@@ -76,7 +76,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/IntegrityValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/IntegrityValidation.java $
  */
 public interface IntegrityValidation extends Validation {
     /**

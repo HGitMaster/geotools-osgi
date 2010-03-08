@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
  * filtering whatsoever.</p>
  * 
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/filter/TestFilterHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/TestFilterHandler.java $
  * @version 0.9 beta, 11/01/01
  */
 public class TestFilterHandler 

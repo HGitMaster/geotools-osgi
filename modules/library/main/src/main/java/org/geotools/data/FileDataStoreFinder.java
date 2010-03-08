@@ -16,6 +16,7 @@
  */
 package org.geotools.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
@@ -41,7 +42,7 @@ import org.geotools.factory.CommonFactoryFinder;
  * @author dzwiers
  *
  * @see DataStoreFinder
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/FileDataStoreFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FileDataStoreFinder.java $
  */
 public class FileDataStoreFinder {
     /** The logger for the filter module. */
@@ -52,12 +53,9 @@ public class FileDataStoreFinder {
 
     /**
      * Checks each available datasource implementation in turn and returns the
-     * first one which claims to support the resource identified by the params
-     * object.
+     * first one which claims to support the given file..
      *
-     * @param url A Map object which contains a defenition of the resource to
-     *        connect to. for file based resources the property 'url' should
-     *        be set within this Map.
+     * @param file the file
      *
      * @return The first datasource which claims to process the required
      *         resource, returns null if none can be found.
@@ -65,15 +63,70 @@ public class FileDataStoreFinder {
      * @throws IOException If a suitable loader can be found, but it can not be
      *         attached to the specified resource without errors.
      */
-    public static DataStore getDataStore(URL url) throws IOException {
+    public static FileDataStore getDataStore(File file) throws IOException {
+        return getDataStore(file.toURI().toURL());
+    }
+
+    /**
+     * Checks each available datasource implementation in turn and returns the
+     * first one which claims to support the resource identified by the params
+     * object.
+     *
+     * @param url URL for the input resource
+     *
+     * @return The first datasource which claims to process the required
+     *         resource, returns null if none can be found.
+     *
+     * @throws IOException If a suitable loader can be found, but it can not be
+     *         attached to the specified resource without errors.
+     */
+    public static FileDataStore getDataStore(URL url) throws IOException {
         Iterator<FileDataStoreFactorySpi> ps = getAvailableDataStores();
 
         while (ps.hasNext()) {
             FileDataStoreFactorySpi fac = ps.next();
-
+            if( !fac.isAvailable() ){
+                continue;
+            }
             try {
                 if (fac.canProcess(url)) {
                     return fac.createDataStore(url);
+                }
+            } catch (Throwable t) {
+                /**
+                 * The logger for the filter module.
+                 */
+                LOGGER.log(Level.WARNING,
+                    "Could not aquire " + fac.getDescription() + ":" + t, t);
+
+                // Protect against DataStores that don't carefully
+                // code canProcess
+                continue;
+            }
+        }
+
+        return null;
+    }
+    
+    public static FileDataStoreFactorySpi getDataStoreFactory(String extension) {
+        String extension2 = null;
+        if( !extension.startsWith(".")){
+            extension2 = "."+extension;
+        }
+        Iterator<FileDataStoreFactorySpi> ps = getAvailableDataStores();
+        while (ps.hasNext()) {
+            FileDataStoreFactorySpi fac = ps.next();
+            if( !fac.isAvailable() ){
+                continue;
+            }
+            try {
+                for( String ext : fac.getFileExtensions() ){
+                    if( extension.equalsIgnoreCase(ext) ){
+                        return fac;
+                    }
+                    if( extension2 != null && extension2.equalsIgnoreCase(ext)){
+                        return fac;
+                    }
                 }
             } catch (Throwable t) {
                 /**

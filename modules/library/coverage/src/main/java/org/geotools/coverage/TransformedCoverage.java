@@ -19,23 +19,21 @@ package org.geotools.coverage;
 // J2SE and JAI dependencies
 import javax.media.jai.PropertySource;
 
-// OpenGIS dependencies
-import org.opengis.coverage.Coverage;
-import org.opengis.coverage.SampleDimension;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.geometry.Envelope;
+import org.opengis.coverage.Coverage;
+import org.opengis.coverage.PointOutsideCoverageException;
+import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.factory.Hints;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
 
 
 /**
@@ -47,8 +45,8 @@ import org.geotools.geometry.GeneralEnvelope;
  * <strong>Note:</strong> This class is not thread safe for performance reasons. If desired,
  * users should create one instance of {@code TransformedCoverage} for each thread.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/TransformedCoverage.java $
- * @version $Id: TransformedCoverage.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/TransformedCoverage.java $
+ * @version $Id: TransformedCoverage.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *
  * @since 2.1

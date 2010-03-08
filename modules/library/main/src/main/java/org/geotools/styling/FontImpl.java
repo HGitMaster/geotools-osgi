@@ -21,7 +21,6 @@ package org.geotools.styling;
 //import java.util.logging.Logger;
 // OpenGIS dependencies
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.geotools.util.Utilities;
@@ -35,8 +34,8 @@ import org.opengis.util.Cloneable;
  * Provides a Java representation of the Font element of an SLD.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/FontImpl.java $
- * @version $Id: FontImpl.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/FontImpl.java $
+ * @version $Id: FontImpl.java 33898 2009-09-13 15:39:05Z jive $
  */
 public class FontImpl implements Font, Cloneable {
     /** The logger for the default core module. */
@@ -68,7 +67,7 @@ public class FontImpl implements Font, Cloneable {
     }
 
     public List<Expression> getFamily() {
-        return Collections.unmodifiableList(fontFamily);
+        return fontFamily;
     }
 
     /**
@@ -235,7 +234,7 @@ public class FontImpl implements Font, Cloneable {
      * Utility method to capture the default font in one place.
      * @return
      */
-    public static Font createDefault( FilterFactory filterFactory ) {
+    static Font createDefault( FilterFactory filterFactory ) {
         Font font = new FontImpl();
         try {
             font.setSize(filterFactory.literal(
@@ -251,6 +250,23 @@ public class FontImpl implements Font, Cloneable {
 
     public Object accept(StyleVisitor visitor,Object data) {
         return visitor.visit(this,data);
+    }
+    
+    static FontImpl cast( org.opengis.style.Font font ){
+        if( font == null ) {
+            return null;
+        }
+        else if (font instanceof FontImpl ){
+            return (FontImpl) font;            
+        }
+        else {
+            FontImpl copy = new FontImpl();
+            copy.getFamily().addAll( font.getFamily() );
+            copy.setSize(font.getSize());
+            copy.setStyle(font.getStyle());
+            copy.setWeight(font.getWeight());
+            return copy;
+        }
     }
     
 }

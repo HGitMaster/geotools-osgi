@@ -20,6 +20,8 @@ package org.geotools.data.shapefile.indexed.attribute;
  * Record stored in attribute index file
  * 
  * @author Manuele Ventoruzzo
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/attribute/IndexRecord.java $
  */
 public class IndexRecord implements Comparable {
 

@@ -39,7 +39,7 @@ import static java.lang.Math.*;
  * is not really accurate for a class to be extended by {@link ObliqueStereographic}.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/StereographicUSGS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/StereographicUSGS.java $
  * @version $Id: StereographicUSGS.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Gerald I. Evenden (for original code in Proj4)
  * @author André Gosselin

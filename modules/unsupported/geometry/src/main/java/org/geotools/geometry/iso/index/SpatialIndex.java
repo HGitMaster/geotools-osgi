@@ -30,6 +30,8 @@ import org.geotools.geometry.iso.topograph2D.Envelope;
  * secondary filter may consist of other kinds of tests, such as testing other
  * spatial relationships.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/SpatialIndex.java $
  */
 public interface SpatialIndex {
 	/**

@@ -40,6 +40,8 @@ import org.opengis.filter.sort.SortBy;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/FilteringFeatureCollection.java $
  */
 public class FilteringFeatureCollection<T extends FeatureType, F extends Feature> extends DecoratingFeatureCollection<T, F>  {
 

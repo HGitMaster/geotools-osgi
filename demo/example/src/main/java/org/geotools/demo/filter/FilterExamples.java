@@ -26,6 +26,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * >FilterExamples</a>.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/filter/FilterExamples.java $
  */
 public class FilterExamples {
     FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;

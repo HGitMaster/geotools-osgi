@@ -94,7 +94,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * copied in a temporary file.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio-netcdf/src/main/java/org/geotools/image/io/netcdf/NetcdfImageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio-netcdf/src/main/java/org/geotools/image/io/netcdf/NetcdfImageReader.java $
  * @version $Id: NetcdfImageReader.java 31017 2008-07-15 13:56:22Z desruisseaux $
  * @author Antoine Hnawia
  * @author Martin Desruisseaux

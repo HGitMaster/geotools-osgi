@@ -25,7 +25,7 @@ import org.opengis.metadata.quality.TemporalAccuracy;
 /**
  * Accuracy of the temporal attributes and temporal relationships of features.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/TemporalAccuracyImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/TemporalAccuracyImpl.java $
  * @version $Id: TemporalAccuracyImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

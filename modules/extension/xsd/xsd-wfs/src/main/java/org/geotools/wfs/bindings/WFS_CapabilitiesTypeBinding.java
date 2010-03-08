@@ -68,6 +68,8 @@ import org.geotools.xml.Node;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/WFS_CapabilitiesTypeBinding.java $
  */
 public class WFS_CapabilitiesTypeBinding extends AbstractComplexEMFBinding {
     public WFS_CapabilitiesTypeBinding(WfsFactory factory) {

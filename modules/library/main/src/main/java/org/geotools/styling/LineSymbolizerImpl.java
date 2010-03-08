@@ -17,12 +17,10 @@
 package org.geotools.styling;
 
 
+import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
-import org.geotools.util.Utilities;
-
 import org.opengis.filter.expression.Expression;
-import org.opengis.style.Description;
 import org.opengis.style.StyleVisitor;
 import org.opengis.util.Cloneable;
 
@@ -33,18 +31,14 @@ import org.opengis.util.Cloneable;
  *
  * @author James Macgill
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/LineSymbolizerImpl.java $
- * @version $Id: LineSymbolizerImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/LineSymbolizerImpl.java $
+ * @version $Id: LineSymbolizerImpl.java 34564 2009-11-30 16:08:45Z aaime $
  */
-public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
+public class LineSymbolizerImpl extends AbstractSymbolizer implements LineSymbolizer, Cloneable {
     
-    private final Description description;
-    private final String name;
-    private final Expression offset;
-    private final Unit uom;
+    private Expression offset;
     
-    private Stroke stroke = null;
-    private String geometryName = null;
+    private StrokeImpl stroke = null;
 
     /**
      * Creates a new instance of DefaultLineSymbolizer
@@ -53,63 +47,16 @@ public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
         this(null,null,null,null,null,null);
     }
     
-    protected LineSymbolizerImpl(Stroke stroke, Expression offset, Unit uom, String geom, String name, Description desc){
-        this.stroke = stroke;
-        this.offset = offset;
-        this.uom = uom;
-        this.geometryName = geom;
-        this.name = name;
-        this.description = desc;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Description getDescription() {
-        return description;
-    }
-    
-    /**
-     * This property defines the geometry to be used for styling.<br>
-     * The property is optional and if it is absent (null) then the "default"
-     * geometry property of the feature should be used.  Geometry types other
-     * than inherently linear types can be used.  If a point geometry is used,
-     * it should be interpreted as a line of zero length and two end caps.  If
-     * a polygon is used (or other "area" type) then its closed outline should
-     * be used as the line string (with no end caps). The geometryPropertyName
-     * is the name of a geometry property in the Feature being styled.
-     * Typically, features only have one geometry so, in general, the need to
-     * select one is not required. Note: this moves a little away from the SLD
-     * spec which provides an XPath reference to a Geometry object, but does
-     * follow it in spirit.
-     *
-     * @return The name of the attribute in the feature being styled  that
-     *         should be used.  If null then the default geometry should be
-     *         used.
-     */
-    public String getGeometryPropertyName() {
-        return geometryName;
-    }
-
-    /**
-     * Sets the GeometryPropertyName.
-     *
-     * @param name The name of the geometryProperty.
-     *
-     * @see #LineSymbolizerImpl.geometryPropertyName()
-     */
-    @Deprecated
-    public void setGeometryPropertyName(String name) {
-        geometryName = name;
-    }
-
-    public Unit getUnitOfMeasure() {
-        return uom;
+    protected LineSymbolizerImpl(Stroke stroke, Expression offset, Unit<Length> uom, String geom, String name, Description desc) {
+        super(name, desc, geom, uom);
     }
 
     public Expression getPerpendicularOffset() {
         return offset;
+    }
+    
+    public void setPerpendicularOffset(Expression offset) {
+        this.offset = offset;
     }
 
     /**
@@ -118,7 +65,7 @@ public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
      *
      * @return The Stroke style to use when rendering lines.
      */
-    public Stroke getStroke() {
+    public StrokeImpl getStroke() {
         return stroke;
     }
 
@@ -128,12 +75,11 @@ public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
      *
      * @param stroke The Stroke style to use when rendering lines.
      */
-    @Deprecated
-    public void setStroke(Stroke stroke) {
+    public void setStroke(org.opengis.style.Stroke stroke) {
         if (this.stroke == stroke) {
             return;
         }
-        this.stroke = stroke;
+        this.stroke = StrokeImpl.cast( stroke );
     }
 
     /**
@@ -163,7 +109,7 @@ public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
             clone = (LineSymbolizerImpl) super.clone();
 
             if (stroke != null && stroke instanceof Cloneable) {
-                clone.stroke = (Stroke) ((Cloneable)stroke).clone();
+                clone.stroke = (StrokeImpl) ((Cloneable)stroke).clone();
             }
                         
         } catch (CloneNotSupportedException e) {
@@ -173,108 +119,67 @@ public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
         return clone;
     }
 
-    /**
-     * Generates a hashcode for the LineSymbolizerImpl.
-     *
-     * @return A hashcode.
-     */
-    public int hashCode() {
-        final int PRIME = 1000003;
-        int result = 0;
-
-        if (name != null) {
-            result = (PRIME * result) + name.hashCode();
-        }
-        
-        if (stroke != null) {
-            result = (PRIME * result) + stroke.hashCode();
-        }
-
-        if (geometryName != null) {
-            result = (PRIME * result) + geometryName.hashCode();
-        }
-
-        if(uom != null){
-            result = (PRIME * result) +  uom.hashCode();
-        }
-        
-        if(description != null){
-            result = (PRIME * result) +  description.hashCode();
-        }
-        
-        if(offset != null){
-            result = (PRIME * result) +  offset.hashCode();
-        }
-        
-        return result;
-    }
-
-    /**
-     * Compares this LineSymbolizerImpl with another for  equality.
-     * 
-     * <p>
-     * Two LineSymbolizerImpls are equal if they have the same
-     * geometryPropertyName and the same stroke.
-     * </p>
-     *
-     * @param oth The other LineSymbolizerImpl
-     *
-     * @return True if this and oth are equal.
-     */
-    public boolean equals(Object oth) {
-        if (this == oth) {
-            return true;
-        }
-
-        if (oth == null) {
-            return false;
-        }
-
-        if (oth.getClass() != getClass()) {
-            return false;
-        }
-
-        LineSymbolizerImpl other = (LineSymbolizerImpl) oth;
-
-        if (this.geometryName == null) {
-            if (other.geometryName != null) {
-                return false;
-            }
-        } else {
-            if (!this.geometryName.equals(other.geometryName)) {
-                return false;
-            }
-        }
-
-        if(!Utilities.equals( getStroke(), other.getStroke())){
-            return false;
-        }
-        
-        if(!Utilities.equals( uom, other.uom)){
-            return false;
-        }
-        
-        if(!Utilities.equals( description, other.description)){
-            return false;
-        }
-        
-        if(!Utilities.equals( offset, other.offset)){
-            return false;
-        }
-        
-        return true;
-    }
-    
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("<LineSymbolizerImp property=");
-        buf.append( geometryName );
+        buf.append( getGeometryPropertyName() );
+        buf.append( " uom=");
+        buf.append( unitOfMeasure );
         buf.append( " stroke=");
         buf.append( stroke );
         buf.append(">");
         return buf.toString();
     }
 
- 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((offset == null) ? 0 : offset.hashCode());
+        result = prime * result + ((stroke == null) ? 0 : stroke.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        LineSymbolizerImpl other = (LineSymbolizerImpl) obj;
+        if (offset == null) {
+            if (other.offset != null)
+                return false;
+        } else if (!offset.equals(other.offset))
+            return false;
+        if (stroke == null) {
+            if (other.stroke != null)
+                return false;
+        } else if (!stroke.equals(other.stroke))
+            return false;
+        return true;
+    }
+
+    static LineSymbolizerImpl cast(org.opengis.style.Symbolizer symbolizer) {
+        if (symbolizer == null) {
+            return null;
+        }
+        if (symbolizer instanceof LineSymbolizerImpl) {
+            return (LineSymbolizerImpl) symbolizer;
+        } else if (symbolizer instanceof org.opengis.style.LineSymbolizer) {
+            org.opengis.style.LineSymbolizer lineSymbolizer = (org.opengis.style.LineSymbolizer) symbolizer;
+            LineSymbolizerImpl copy = new LineSymbolizerImpl();
+            copy.setDescription(lineSymbolizer.getDescription());
+            copy.setGeometryPropertyName(lineSymbolizer.getGeometryPropertyName());
+            copy.setName(lineSymbolizer.getName());
+            copy.setPerpendicularOffset(lineSymbolizer.getPerpendicularOffset());
+            copy.setStroke(lineSymbolizer.getStroke());
+            copy.setUnitOfMeasure(lineSymbolizer.getUnitOfMeasure());
+            return copy;
+        }
+        return null; // not a line symbolizer
+    }
 
 }

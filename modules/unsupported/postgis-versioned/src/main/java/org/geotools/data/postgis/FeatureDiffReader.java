@@ -44,6 +44,8 @@ import org.opengis.filter.sort.SortOrder;
  * @author aaime
  * @since 2.4
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/FeatureDiffReader.java $
  */
 public class FeatureDiffReader {
 	/** The logger for the postgis module. */

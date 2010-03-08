@@ -63,8 +63,8 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessTest.java 31882 2008-11-20 07:20:42Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AppSchemaDataAccessTest.java $
+ * @version $Id: AppSchemaDataAccessTest.java 33432 2009-07-02 05:40:44Z robatkinson $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AppSchemaDataAccessTest.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessTest extends TestCase {
@@ -331,6 +331,20 @@ public class AppSchemaDataAccessTest extends TestCase {
 
         assertEquals(Point.class, fromNode.getType().getBinding());
         assertEquals(Point.class, toNode.getType().getBinding());
+
+        // test to see if the mapping can successfully substitute a valid narrower type 
+        Name subName = Types.typeName(nsUri, "broadTypeEl");
+        
+        descriptor = (AttributeDescriptor) Types.descriptor(type, subName);
+
+        ComplexType subbedType = (ComplexType) descriptor.getType();
+
+        AttributeDescriptor sub = (AttributeDescriptor) Types
+                .descriptor(subbedType, subName);
+ //       assertNotNull(sub);
+
+ //       assertEquals(Point.class, fromNode.getType().getBinding());
+ 
 
         FeatureCollection<FeatureType, Feature> content = source.getFeatures();
         Iterator<Feature> features = content.iterator();

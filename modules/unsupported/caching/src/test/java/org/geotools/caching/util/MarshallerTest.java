@@ -16,30 +16,20 @@
  */
 package org.geotools.caching.util;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import javax.xml.transform.TransformerException;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.gml.producer.FeatureTypeTransformer;
-import org.geotools.xml.SchemaFactory;
-import org.geotools.xml.gml.GMLComplexTypes;
-import org.geotools.xml.schema.Schema;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 public class MarshallerTest extends TestCase {

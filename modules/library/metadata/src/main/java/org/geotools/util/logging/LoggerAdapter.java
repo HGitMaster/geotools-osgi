@@ -85,7 +85,7 @@ import java.util.regex.Pattern;
  * this rule.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/logging/LoggerAdapter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/logging/LoggerAdapter.java $
  * @version $Id: LoggerAdapter.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  *

@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DOCUMENT ME!
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/data/collection/CollectionDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/collection/CollectionDataStoreTest.java $
  */
 public class CollectionDataStoreTest extends DataTestCase {
     CollectionDataStore data;

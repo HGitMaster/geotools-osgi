@@ -25,6 +25,8 @@ import java.util.Map;
  * 
  * @author Richard Gould
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/FlowHandler.java $
  */
 public interface FlowHandler {
     /**

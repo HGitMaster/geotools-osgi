@@ -55,6 +55,8 @@ import org.opengis.referencing.operation.TransformException;
  * RingImpl should be used which will validate when it is created.
  *
  * @author Graham Davis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/RingImplUnsafe.java $
  */
 public class RingImplUnsafe extends CompositeCurveImpl implements Ring {
 

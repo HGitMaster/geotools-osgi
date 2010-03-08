@@ -61,8 +61,8 @@ import org.geotools.util.NumberRange;
  * rigorous; must of them should be seen as temporary implementations.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/resources/coverage/CoverageUtilities.java $
- * @version $Id: CoverageUtilities.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/resources/coverage/CoverageUtilities.java $
+ * @version $Id: CoverageUtilities.java 33830 2009-09-03 07:40:44Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini
  */
@@ -91,7 +91,7 @@ public final class CoverageUtilities {
         if (coverage instanceof GridCoverage) {
             final GridGeometry2D geometry =
                     GridGeometry2D.wrap(((GridCoverage) coverage).getGridGeometry());
-            if (geometry.isDefined(GridGeometry2D.CRS)) {
+            if (geometry.isDefined(GridGeometry2D.CRS_BITMASK)) {
                 return geometry.getCoordinateReferenceSystem2D();
             } else try {
                 return geometry.reduce(coverage.getCoordinateReferenceSystem());
@@ -120,7 +120,7 @@ public final class CoverageUtilities {
         if (coverage instanceof GridCoverage) {
             final GridGeometry2D geometry =
                     GridGeometry2D.wrap(((GridCoverage) coverage).getGridGeometry());
-            if (geometry.isDefined(GridGeometry2D.CRS)) {
+            if (geometry.isDefined(GridGeometry2D.CRS_BITMASK)) {
             	returnedCRS= geometry.getCoordinateReferenceSystem2D();
             } else try {
             	returnedCRS= geometry.reduce(coverage.getCoordinateReferenceSystem());
@@ -155,7 +155,7 @@ public final class CoverageUtilities {
         if (coverage instanceof GridCoverage) {
             final GridGeometry2D geometry =
                     GridGeometry2D.wrap(((GridCoverage) coverage).getGridGeometry());
-            if (geometry.isDefined(GridGeometry2D.ENVELOPE)) {
+            if (geometry.isDefined(GridGeometry2D.ENVELOPE_BITMASK)) {
                 return geometry.getEnvelope2D();
             } else {
                 return geometry.reduce(coverage.getEnvelope());
@@ -172,7 +172,8 @@ public final class CoverageUtilities {
      * @param coverage to use for guessing background values.
      * @return an array of double values to use as a background.
      */
-    public static double[] getBackgroundValues(GridCoverage2D coverage) {
+    @SuppressWarnings("unchecked")
+	public static double[] getBackgroundValues(GridCoverage2D coverage) {
         /*
          * Get the sample value to use for background. We will try to fetch this
          * value from one of "no data" categories. For geophysics images, it is
@@ -290,31 +291,6 @@ public final class CoverageUtilities {
             return ((Integer) candidate).intValue();
         }
         return 0;
-    }
-
-    /**
-     * @deprecated Use {@link #preferredViewForOperation} instead.
-     *
-     * @return 0 if nothing has to be done on the provided coverage, 1 if a color expansion has to
-     *         be provided, 2 if we need to employ the geophysics view of the provided coverage,
-     *         3 if we suggest to employ the non-geophysics view of the provided coverage.
-     *
-     * @since 2.3.1
-     */
-    @Deprecated
-    public static int prepareSourcesForGCOperation(final GridCoverage2D coverage,
-            final Interpolation interpolation, final boolean hasFilter, final RenderingHints hints)
-    {
-        final ViewType type = preferredViewForOperation(coverage, interpolation, hasFilter, hints);
-        switch (type) {
-            case SAME:         return 0;
-            case PHOTOGRAPHIC: return 1;
-            case GEOPHYSICS:   return 2;
-            case RENDERED:
-            case PACKED:
-            case NATIVE:       return 3;
-            default: throw new AssertionError(type);
-        }
     }
 
     /**

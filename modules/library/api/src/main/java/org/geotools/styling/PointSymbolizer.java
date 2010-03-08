@@ -76,8 +76,8 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/PointSymbolizer.java $
- * @version $Id: PointSymbolizer.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/PointSymbolizer.java $
+ * @version $Id: PointSymbolizer.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public interface PointSymbolizer extends org.opengis.style.PointSymbolizer, Symbolizer {
     /**
@@ -92,31 +92,7 @@ public interface PointSymbolizer extends org.opengis.style.PointSymbolizer, Symb
      * Provides the graphical-symbolization parameter to use for the  point
      * geometry.
      */
-    void setGraphic(Graphic graphic);
+    void setGraphic(org.opengis.style.Graphic graphic);
 
-    /**
-     * This property defines the geometry to be used for styling.<br>
-     * The property is optional and if it is absent (null) then the "default"
-     * geometry property of the feature should be used.  Geometry types other
-     * than inherently point types can be used.  The geometryPropertyName is
-     * the name of a geometry property in the Feature being styled.
-     * Typically, features only have one geometry so, in general, the need to
-     * select one is not required. Note: this moves a little away from the SLD
-     * spec which provides an XPath reference to a Geometry object, but does
-     * follow it in spirit.
-     */
-    String getGeometryPropertyName();
-
-    /**
-     * This property defines the geometry to be used for styling.<br>
-     * The property is optional and if it is absent (null) then the "default"
-     * geometry property of the feature should be used.  Geometry types other
-     * than inherently point types can be used.  The geometryPropertyName is
-     * the name of a geometry property in the Feature being styled.
-     * Typically, features only have one geometry so, in general, the need to
-     * select one is not required. Note: this moves a little away from the SLD
-     * spec which provides an XPath reference to a Geometry object, but does
-     * follow it in spirit.
-     */
-    void setGeometryPropertyName(String geometryPropertyName);
+    
 }

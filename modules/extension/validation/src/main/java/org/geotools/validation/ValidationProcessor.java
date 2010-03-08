@@ -38,6 +38,7 @@ import org.geotools.validation.dto.TestSuiteDTO;
 import org.geotools.validation.xml.XMLReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 
 /**
  * ValidationProcessor Runs validation tests against Features and reports the
@@ -101,8 +102,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/ValidationProcessor.java $
- * @version $Id: ValidationProcessor.java 30662 2008-06-12 21:44:16Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/ValidationProcessor.java $
+ * @version $Id: ValidationProcessor.java 33031 2009-05-16 23:51:49Z jive $
  */
 public class ValidationProcessor {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
@@ -389,7 +390,7 @@ public class ValidationProcessor {
      * @throws Exception Throws an exception if the HashMap contains a value
      *         that is not a FeatureSource
      */
-    public void runIntegrityTests(Set typeRefs, Map stores, ReferencedEnvelope envelope,
+    public void runIntegrityTests(Set<Name> typeRefs, Map stores, ReferencedEnvelope envelope,
         ValidationResults results) throws Exception {
         if ((integrityLookup == null) || (integrityLookup.size() == 0)) {
             LOGGER.fine(
@@ -430,8 +431,9 @@ public class ValidationProcessor {
         //
         LOGGER.finer("Finding tests for modified typeRefs");
 
-        for (Iterator i = typeRefs.iterator(); i.hasNext();) {
-            String typeRef = (String) i.next();
+        for (Name name : typeRefs ) {
+            String typeRef = typeRef( name );
+            
             LOGGER.finer("Finding tests for typeRef:" + typeRef);
 
             List moreTests = (List) integrityLookup.get(typeRef);
@@ -478,7 +480,11 @@ public class ValidationProcessor {
             }
         }
     }
-
+    /** Convert a Name to a type reference (namespace ":" name) */
+    protected String typeRef( Name name ){
+        return name.getNamespaceURI()+":"+name.getLocalPart();
+    }
+    
     protected static final Set queryPlugInNames(Map testSuiteDTOs) {
         Set plugInNames = new HashSet();
 

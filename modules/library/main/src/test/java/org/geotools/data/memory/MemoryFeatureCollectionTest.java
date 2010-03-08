@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 import org.geotools.data.DataTestCase;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -74,6 +75,23 @@ public class MemoryFeatureCollectionTest extends DataTestCase {
         catch( IllegalStateException closed ){            
         }        
     }
+
+
+    public void testBounds() {
+        MemoryFeatureCollection rivers = new MemoryFeatureCollection(riverType);
+        ReferencedEnvelope expected = new ReferencedEnvelope();
+        for (int i = 0; i < riverFeatures.length; i++) {
+            rivers.add(riverFeatures[i]);
+            expected.include(riverFeatures[i].getBounds());
+        }
+        assertEquals(riverFeatures.length, rivers.size());
+
+        // Should not throw an UnsupportedOperationException
+        assertNotNull(rivers.getBounds());
+        assertEquals( expected, rivers.getBounds() );
+    }
+
+    
     public void testSubCollection(){
         FeatureCollection<SimpleFeatureType, SimpleFeature> sub = roads.subCollection( rd12Filter );
         assertEquals( 2, sub.size() );

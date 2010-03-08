@@ -65,6 +65,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * spatial data abstraction library
  * 
  * @author aaime
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/ogr/src/main/java/org/geotools/data/ogr/OGRDataStore.java $
  */
 public class OGRDataStore extends AbstractDataStore {
 	/** C compatible FALSE */

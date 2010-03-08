@@ -29,7 +29,7 @@ package org.geotools.styling;
  *
  * @author James Macgill
  * @author Ian Turton
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/styling/StyleVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/StyleVisitor.java $
  * @version $Id: StyleVisitor.java 30642 2008-06-12 17:52:06Z acuster $
  */
 public interface StyleVisitor {

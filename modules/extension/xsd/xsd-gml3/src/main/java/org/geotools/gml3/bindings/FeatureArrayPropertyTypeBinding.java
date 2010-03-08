@@ -20,6 +20,8 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.feature.DefaultFeatureCollections;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.gml3.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -47,6 +49,8 @@ import org.opengis.feature.simple.SimpleFeature;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/FeatureArrayPropertyTypeBinding.java $
  */
 public class FeatureArrayPropertyTypeBinding extends AbstractComplexBinding {
     /**
@@ -63,7 +67,7 @@ public class FeatureArrayPropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return SimpleFeature[].class;
+        return FeatureCollection.class;
     }
 
     /**
@@ -74,13 +78,19 @@ public class FeatureArrayPropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
+        FeatureCollection fc = (FeatureCollection) node.getChildValue(FeatureCollection.class);
+        if (fc != null) {
+            return fc;
+        }
+        
         List features = node.getChildValues(SimpleFeature.class);
-
-        return features.toArray(new SimpleFeature[features.size()]);
+        fc = DefaultFeatureCollections.newCollection();
+        fc.addAll(features);
+        return fc;
     }
 
     public Object getProperty(Object object, QName name) {
-        //passed in should be Feature[], just pass it back
+        //passed in should be FeatureCollection, just pass it back
         return object;
     }
 }

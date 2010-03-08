@@ -55,6 +55,8 @@ import org.geotools.xml.Node;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/OGCBinarySpatialOpTypeBinding.java $
  */
 public class OGCBinarySpatialOpTypeBinding extends AbstractComplexBinding {
     private FilterFactory2 factory;

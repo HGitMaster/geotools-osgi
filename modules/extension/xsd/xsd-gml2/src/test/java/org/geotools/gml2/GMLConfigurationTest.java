@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 
 import org.geotools.feature.FeatureCollections;
 import org.geotools.xlink.XLINKConfiguration;
+import org.geotools.xs.XSConfiguration;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 
@@ -47,7 +48,8 @@ public class GMLConfigurationTest extends TestCase {
 
     public void testDependencies() {
         assertEquals(2, configuration.getDependencies().size());
-        assertEquals(new XLINKConfiguration(), configuration.getDependencies().get(1));
+        assertTrue(configuration.getDependencies().contains(new XLINKConfiguration()));
+        assertTrue(configuration.getDependencies().contains(new XSConfiguration()));
     }
 
     public void testSchemaLocationResolver() {

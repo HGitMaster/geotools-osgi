@@ -60,7 +60,7 @@ import org.geotools.data.vpf.ifc.DataTypesDefinition;
  *     </ol>
  *   </li>
  * </ul>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/test/java/org/geotools/data/vpf/io/RowFieldTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/test/java/org/geotools/data/vpf/io/RowFieldTest.java $
  */
 public class RowFieldTest extends TestCase
   implements DataTypesDefinition

@@ -3,7 +3,8 @@ package com.esri.sde.sdk.client;
 
 public class SeRegistration {
 	
-	public static /* GEOT-947 final*/ int SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE = 0;
+    public static  int SE_REGISTRATION_ROW_ID_ALLOCATION_SINGLE = 0;
+    public static /* GEOT-947 final*/ int SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE = 0;
 	public static /* GEOT-947 final*/ int SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER = 1;
 	public static /* GEOT-947 final*/ int SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE = 2;
     
@@ -28,5 +29,17 @@ public class SeRegistration {
     public void getInfo() throws SeException{}
 
     public void setTableName(String tableName) {}
+
+    public int getRowIdAllocation() {
+        return 0;
+    }
+
+    public boolean isHidden() {
+        return false;
+    }
+
+    public boolean hasLayer() {
+        return false;
+    }
 
 }

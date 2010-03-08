@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.TopologyException;
  *
  * @author Ian Turton, CCG
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/gml/SubHandlerPolygon.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/SubHandlerPolygon.java $
  * @version $Id: SubHandlerPolygon.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public class SubHandlerPolygon extends SubHandler {

@@ -24,6 +24,7 @@ import java.util.Locale;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.io.LineFormat;
 import org.geotools.image.io.StreamImageReader;
 import org.geotools.resources.i18n.Vocabulary;
@@ -43,8 +44,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * method.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextImageReader.java $
- * @version $Id: TextImageReader.java 30679 2008-06-13 10:19:41Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextImageReader.java $
+ * @version $Id: TextImageReader.java 33694 2009-08-06 13:23:57Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public abstract class TextImageReader extends StreamImageReader {
@@ -260,7 +261,7 @@ public abstract class TextImageReader extends StreamImageReader {
         if (input instanceof File) {
             file = ((File) input).getName();
         } else if (input instanceof URL) {
-            file = ((URL) input).getFile();
+            file = DataUtilities.urlToFile((URL) input).getPath();
         } else {
             file = null;
         }
@@ -319,8 +320,8 @@ public abstract class TextImageReader extends StreamImageReader {
      * </pre></blockquote>
      *
      * @since 2.4
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextImageReader.java $
-     * @version $Id: TextImageReader.java 30679 2008-06-13 10:19:41Z acuster $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextImageReader.java $
+     * @version $Id: TextImageReader.java 33694 2009-08-06 13:23:57Z aaime $
      * @author Martin Desruisseaux (IRD)
      */
     public static abstract class Spi extends StreamImageReader.Spi {

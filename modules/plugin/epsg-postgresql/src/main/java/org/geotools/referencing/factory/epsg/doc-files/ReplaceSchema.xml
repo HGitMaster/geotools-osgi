@@ -14,7 +14,7 @@
   prefer a database in its own schema with more readable table names rather than the
   default structure.
 
-  $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-postgresql/src/main/java/org/geotools/referencing/factory/epsg/doc-files/ReplaceSchema.xml $
+  $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-postgresql/src/main/java/org/geotools/referencing/factory/epsg/doc-files/ReplaceSchema.xml $
   $Id: ReplaceSchema.xml 25542 2007-05-15 16:42:09Z desruisseaux $
   -->
 

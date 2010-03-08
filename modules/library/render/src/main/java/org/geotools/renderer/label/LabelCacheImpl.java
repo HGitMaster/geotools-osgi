@@ -54,6 +54,8 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 import com.vividsolutions.jts.operation.linemerge.LineMerger;
 import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
 
@@ -129,8 +131,11 @@ public final class LabelCacheImpl implements LabelCache {
     // by default, don't add space around labels
     public int DEFAULT_SPACE_AROUND = 0;
 
-    // default max displacement when labeling lines
-    public int DEFAULT_MAX_DISPLACEMENT = 50;
+    // default max displacement
+    public int DEFAULT_MAX_DISPLACEMENT = 0;
+    
+    // default max displacement when labeling points
+    public int DEFAULT_MAX_DISPLACEMENT_POINT = 0;
 
     // default min distance between labels in the same group (-1 means no min
     // distance)
@@ -173,7 +178,12 @@ public final class LabelCacheImpl implements LabelCache {
     static final boolean DEFAULT_CONFLICT_RESOLUTION = true;
     
     // Default value for the goodness of fit threshold
-    static final double DEFAULT_GOODNESS_OF_FIT = 0.7;
+    static final double DEFAULT_GOODNESS_OF_FIT = 0.5;
+    
+    // Anchor candidate values used when looping to find a point label that can be drawn
+    static final double[] RIGHT_ANCHOR_CANDIDATES = new double[] {0,0.5, 0,0, 0,1};
+    static final double[] MID_ANCHOR_CANDIDATES = new double[] {0.5,0.5, 0,0.5, 1,0.5};
+    static final double[] LEFT_ANCHOR_CANDIDATES = new double[] {1,0.5, 1,0, 1,1};
 
     /**
      * When true, the text is rendered as its GlyphVector outline (as a
@@ -396,6 +406,8 @@ public final class LabelCacheImpl implements LabelCache {
         item.setGoodnessOfFit(getDoubleOption(symbolizer, "goodnessOfFit", DEFAULT_GOODNESS_OF_FIT));
         return item;
     }
+    
+    
 
     private int getIntOption(TextSymbolizer symbolizer, String optionName, int defaultValue) {
         String value = symbolizer.getOption(optionName);
@@ -541,7 +553,7 @@ public final class LabelCacheImpl implements LabelCache {
         for (LabelCacheItem labelItem : items) {
             if (stop)
                 return;
-
+            
             painter.setLabel(labelItem);
             try {
                 // LabelCacheItem labelItem = (LabelCacheItem)
@@ -605,21 +617,19 @@ public final class LabelCacheImpl implements LabelCache {
      * @return
      */
     private double goodnessOfFit(LabelPainter painter, Rectangle2D glyphBounds,
-            Geometry representativeGeom) {
-        if (representativeGeom instanceof Point) {
+            PreparedGeometry representativeGeom) {
+        if (representativeGeom.getGeometry() instanceof Point) {
             return 1.0;
         }
-        if (representativeGeom instanceof LineString) {
+        if (representativeGeom.getGeometry() instanceof LineString) {
             return 1.0;
         }
-        if (representativeGeom instanceof Polygon) {
+        if (representativeGeom.getGeometry() instanceof Polygon) {
             try {
                 // do a sampling, how many points sitting on the labels are also
                 // within a certain distance of the polygon?
-                Polygon p = simplifyPoly((Polygon) representativeGeom);
                 int count = 0;
                 int n = 10;
-                double mindistance = painter.getLineHeight();
                 Coordinate c = new Coordinate();
                 Point pp = gf.createPoint(c);
                 for (int i = 1; i < (painter.getLineCount() + 1); i++) {
@@ -630,16 +640,15 @@ public final class LabelCacheImpl implements LabelCache {
                                 * (((double) j) / (n + 1));
                         c.y = y;
                         pp.geometryChanged();
-                        if (p.distance(pp) < mindistance)
+                        if (representativeGeom.contains(pp))
                             count++;
                     }
                 }
                 return ((double) count) / (n * painter.getLineCount());
             } catch (Exception e) {
-                representativeGeom.geometryChanged(); // djb -- jessie should
-                // do this during
-                // generalization
-                Envelope ePoly = representativeGeom.getEnvelopeInternal();
+                Geometry g = representativeGeom.getGeometry();
+                g.geometryChanged();
+                Envelope ePoly = g.getEnvelopeInternal();
                 Envelope eglyph = toEnvelope(glyphBounds);
                 Envelope inter = intersection(ePoly, eglyph);
                 if (inter != null)
@@ -649,28 +658,6 @@ public final class LabelCacheImpl implements LabelCache {
             }
         }
         return 0.0;
-    }
-
-    /**
-     * Remove holes from a polygon
-     * 
-     * @param polygon
-     */
-    private Polygon simplifyPoly(Polygon polygon) {
-        if (polygon.getNumInteriorRing() == 0)
-            return polygon;
-
-        LineString outer = polygon.getExteriorRing();
-        if (outer.getStartPoint().distance(outer.getEndPoint()) != 0) {
-            List<Coordinate> clist = new ArrayList<Coordinate>(Arrays
-                    .asList(outer.getCoordinates()));
-            clist.add(outer.getStartPoint().getCoordinate());
-            outer = outer.getFactory().createLinearRing(
-                    (Coordinate[]) clist.toArray(new Coordinate[clist.size()]));
-        }
-        LinearRing r = (LinearRing) outer;
-
-        return outer.getFactory().createPolygon(r, null);
     }
 
     private boolean paintLineLabels(LabelPainter painter, AffineTransform originalTransform,
@@ -689,7 +676,8 @@ public final class LabelCacheImpl implements LabelCache {
 
         // pre compute some labelling params
         final Rectangle2D textBounds = painter.getFullLabelBounds();
-        final double step = painter.getAscent();
+        // ... use at least a 2 pixel step, no matter what the label length is
+        final double step = painter.getAscent() > 2 ? painter.getAscent() : 2;
         int space = labelItem.getSpaceAround();
         int haloRadius = Math.round(labelItem.getTextStyle().getHaloFill() != null ? labelItem
                 .getTextStyle().getHaloRadius() : 0);
@@ -710,7 +698,7 @@ public final class LabelCacheImpl implements LabelCache {
             // we don't want very small segments to influence the character
             // orientation
             if (labelItem.isFollowLineEnabled())
-                line = decimateLineString(line, step / 2);
+                line = decimateLineString(line, step);
 
             // max distance between candidate label points, if any
             final double lineStringLength = line.getLength();
@@ -758,7 +746,7 @@ public final class LabelCacheImpl implements LabelCache {
 
                 // label displacement loop
                 boolean painted = false;
-                while (Math.abs(currOffset) < labelOffset * 2 && !painted) {
+                while (Math.abs(currOffset) <= labelOffset * 2 && !painted) {
                     // reset transform and other computation parameters
                     tx.setToIdentity();
                     Rectangle2D labelEnvelope;
@@ -794,7 +782,7 @@ public final class LabelCacheImpl implements LabelCache {
                     // try to paint the label, the condition under which this
                     // happens are complex
                     if (displayArea.contains(labelEnvelope)
-                            && !paintedBounds.labelsWithinDistance(labelEnvelope, extraSpace)
+                            && !(labelItem.isConflictResolutionEnabled() && paintedBounds.labelsWithinDistance(labelEnvelope, extraSpace))
                             && !groupLabels.labelsWithinDistance(labelEnvelope, minDistance)) {
                         if (labelItem.isFollowLineEnabled()) {
                             // for curved labels we never paint in case of
@@ -913,13 +901,6 @@ public final class LabelCacheImpl implements LabelCache {
                 + textStyle.getDisplacementX();
         double displacementY = (textStyle.getAnchorY() * (textBounds.getHeight()))
                 - textStyle.getDisplacementY() - textBounds.getHeight() + painter.getLineHeight();
-        if (!textStyle.isPointPlacement()) {
-            // lineplacement. We're cheating here, since we've reduced the
-            // polygon to a point, when we should be trying to do something
-            // a little smarter (like find its median axis!)
-            // just move it up (yes, its cheating)
-            displacementY -= textStyle.getPerpendicularOffset();
-        }
         tempTransform.translate(displacementX, displacementY);
     }
 
@@ -970,9 +951,10 @@ public final class LabelCacheImpl implements LabelCache {
     }
 
     /**
-     * Simple to paint a point (or set of points) Just choose the first one and
-     * paint it!
-     * 
+     * Gets a representative point and tries to place the label according to SLD.
+     * If a maxDisplacement has been set and the default position does not work
+     * a search for a better position is tried on concentric circles around the label
+     * up until the radius of the circle becomes bigger than the max displacement
      */
     private boolean paintPointLabel(LabelPainter painter, AffineTransform tempTransform,
             Rectangle displayArea, LabelIndex glyphs) throws Exception {
@@ -982,14 +964,108 @@ public final class LabelCacheImpl implements LabelCache {
         if (point == null)
             return false;
 
-        TextStyle2D textStyle = labelItem.getTextStyle();
+        // prepare for the search loop
+        TextStyle2D ts = labelItem.getTextStyle();
+        // ... use at least a 2 pixel step, no matter what the label length is
+        final double step = painter.getAscent() > 2 ? painter.getAscent() : 2;
+        double radius = Math.sqrt(ts.getDisplacementX() * ts.getDisplacementX() 
+            + ts.getDisplacementY() * ts.getDisplacementY());
+        AffineTransform tx = new AffineTransform(tempTransform);
+        
+        // if straight paint works we're good
+        if(paintPointLabelInternal(painter, tx, displayArea, glyphs, labelItem, point, ts))
+            return true;
+        
+        // get a cloned text style that we can modify without issues
+        TextStyle2D cloned = new TextStyle2D(ts);
+        // ... and the closest quadrant angle that we'll use to start the search from
+        int startAngle = getClosestStandardAngle(ts.getDisplacementX(), ts.getDisplacementY());
+        int angle = startAngle;
+        while(radius <= labelItem.maxDisplacement) {
+            // the offset is used to generate a x, -x, 2x, -2x, 3x, -3x sequence
+            for (int offset = 45; offset <= 360; offset = offset + 45) {
+                double dx = radius * Math.cos(Math.toRadians(angle));
+                double dy = radius * Math.sin(Math.toRadians(angle));
+                
+                // using dx and dy would be easy but due to numeric approximations, 
+                // it's actually very hard to get it right so we use the angle
+                double[] anchorPointCandidates;
+                // normalize the angle so that it's between 0 and 360
+                int normAngle = angle % 360;
+                if(normAngle < 0)
+                    normAngle = 360 + normAngle;
+                if(normAngle < 90 || normAngle > 270) {
+                    anchorPointCandidates = RIGHT_ANCHOR_CANDIDATES;
+                } else if(normAngle > 90 && normAngle < 270) {
+                    anchorPointCandidates = LEFT_ANCHOR_CANDIDATES;
+                } else {
+                    anchorPointCandidates = MID_ANCHOR_CANDIDATES;
+                }
+                
+                // try out various anchor point positions
+                for (int i = 0; i < anchorPointCandidates.length; i +=2) {
+                    double ax = anchorPointCandidates[i];
+                    double ay = anchorPointCandidates[i + 1];
+                    cloned.setAnchorX(ax);
+                    cloned.setAnchorY(ay);
+                    cloned.setDisplacementX(dx);
+                    cloned.setDisplacementY(dy);
+                    
+                    tx = new AffineTransform(tempTransform);
+                    if(paintPointLabelInternal(painter, tx, displayArea, glyphs, labelItem, point, cloned))
+                        return true;
+                }
+                
+                // make sure we do the jumps back and forth to generate the proper sequence
+                if(angle <= startAngle)
+                    angle = angle + offset;
+                else
+                    angle = angle - offset;
+            }
+            
+            // increase the radius and move forward
+            radius += step;
+        }
+        
+        // we tried, we failed...
+        return false;
+    }
+    
+    /**
+     * Returns the closest angle that is a multiple of 45°
+     * @param x
+     * @param y
+     * @return an angle in degrees
+     */
+    int getClosestStandardAngle(double x, double y) {
+        double angle = Math.toDegrees(Math.atan2(y, x));
+        return (int) Math.round(angle / 45.0) * 45;
+    }
+
+    /**
+     * Actually try to paint the label by setting up transformations, checking for
+     * conflicts and so on
+     * @param painter
+     * @param tempTransform
+     * @param displayArea
+     * @param glyphs
+     * @param labelItem
+     * @param point
+     * @param textStyle
+     * @return
+     * @throws Exception
+     */
+    private boolean paintPointLabelInternal(LabelPainter painter, AffineTransform tempTransform,
+            Rectangle displayArea, LabelIndex glyphs, LabelCacheItem labelItem, Point point,
+            TextStyle2D textStyle) throws Exception {
         setupPointTransform(tempTransform, point, textStyle, painter);
 
         // check for overlaps and paint
         Rectangle2D transformed = tempTransform
                 .createTransformedShape(painter.getFullLabelBounds()).getBounds2D();
         if (!displayArea.contains(transformed)
-                || glyphs.labelsWithinDistance(transformed, labelItem.getSpaceAround())) {
+                || (labelItem.isConflictResolutionEnabled() && 
+                        glyphs.labelsWithinDistance(transformed, labelItem.getSpaceAround()))) {
             return false;
         } else {
             // painter.graphics.setStroke(new BasicStroke());
@@ -1014,14 +1090,14 @@ public final class LabelCacheImpl implements LabelCache {
         Polygon geom = getPolySetRepresentativeLocation(labelItem.getGeoms(), displayArea);
         if (geom == null)
             return false;
-
+        
         Point centroid;
 
         try {
             centroid = geom.getCentroid();
-        } catch (Exception e) // generalized polygons causes problems - this
-        // tries to hid them.
-        {
+        } catch (Exception e) {
+            // generalized polygons causes problems - this
+            // tries to hid them.
             try {
                 centroid = geom.getExteriorRing().getCentroid();
             } catch (Exception ee) {
@@ -1032,28 +1108,106 @@ public final class LabelCacheImpl implements LabelCache {
                 }
             }
         }
+        
+        // check we're inside, if not, use a different approach
+        PreparedGeometry pg = PreparedGeometryFactory.prepare(geom);
+        if(!pg.contains(centroid)) {
+            Envelope env = geom.getEnvelopeInternal();
+            LineString bisector = geom.getFactory().createLineString(new Coordinate[] { 
+                new Coordinate(env.getMinX(), centroid.getY()),
+                new Coordinate(env.getMaxX(), centroid.getY()) });
+            Geometry intersection = bisector.intersection(geom);
+            Envelope widestEnv = widestGeometry(intersection).getEnvelopeInternal();
+            double midX = (widestEnv.getMinX() + widestEnv.getMaxX()) / 2;
+            centroid = geom.getFactory().createPoint(new Coordinate(midX, centroid.getY()));
+        }
 
         // compute the transformation used to position the label
-        TextStyle2D textStyle = labelItem.getTextStyle();
+        TextStyle2D textStyle = new TextStyle2D(labelItem.getTextStyle());
+        if(labelItem.getMaxDisplacement() > 0) {
+            textStyle.setDisplacementX(0);
+            textStyle.setDisplacementY(0);
+            textStyle.setAnchorX(0.5);
+            textStyle.setAnchorY(0.5);
+        }
+        AffineTransform tx = new AffineTransform(tempTransform);
+        if(paintPolygonLabelInternal(painter, tx, displayArea, glyphs, labelItem,
+                pg, centroid, textStyle))
+            return true;
+        
+        // candidate position was busy, let's circle out and find a good position
+        // ... use at least a 2 pixel step, no matter what the label length is
+        final double step = painter.getAscent() > 2 ? painter.getAscent() : 2;
+        double radius = step;
+        Coordinate c = new Coordinate(centroid.getCoordinate());
+        Coordinate cc = centroid.getCoordinate();
+        Point testPoint = centroid.getFactory().createPoint(c);
+        while(radius < labelItem.getMaxDisplacement()) {
+            for(int angle = 0; angle < 360; angle += 45) {
+                double dx = Math.cos(Math.toRadians(angle)) * radius;
+                double dy = Math.sin(Math.toRadians(angle)) * radius;
+                
+                c.x = cc.x + dx;
+                c.y = cc.y + dy;
+                testPoint.geometryChanged();
+                if(!pg.contains(testPoint))
+                    continue;
+                
+                textStyle.setDisplacementX(dx);
+                textStyle.setDisplacementY(dy);
+                
+                tx = new AffineTransform(tempTransform);
+                if(paintPolygonLabelInternal(painter, tx, displayArea, glyphs, labelItem,
+                        pg, centroid, textStyle))
+                    return true;
+            }
+            
+            radius += step;
+        }
+        
+        return false;
+        
+    }
+
+    private boolean paintPolygonLabelInternal(LabelPainter painter, AffineTransform tempTransform,
+            Rectangle displayArea, LabelIndex glyphs, LabelCacheItem labelItem, PreparedGeometry pg,
+            Point centroid, TextStyle2D textStyle) throws Exception {
         setupPointTransform(tempTransform, centroid, textStyle, painter);
 
         Rectangle2D transformed = tempTransform
                 .createTransformedShape(painter.getFullLabelBounds()).getBounds2D();
         if (!displayArea.contains(transformed)
-                || glyphs.labelsWithinDistance(transformed, labelItem.getSpaceAround())
-                || goodnessOfFit(painter, transformed, geom) < painter.getLabel().getGoodnessOfFit())
+                || (labelItem.isConflictResolutionEnabled() 
+                        && glyphs.labelsWithinDistance(transformed, labelItem.getSpaceAround()))
+                || goodnessOfFit(painter, transformed, pg) < painter.getLabel().getGoodnessOfFit())
             return false;
 
-        // painter.graphics.setStroke(new BasicStroke(2));
-        // painter.graphics.setColor(Color.BLACK);
-        // painter.graphics.draw(tempTransform.createTransformedShape(painter.getFullLabelBounds()));
-        // painter.graphics.setColor(Color.WHITE);
-        // painter.graphics.draw(new Line2D.Double(centroid.getX(),
-        // centroid.getY(), centroid.getX(), centroid.getY()));
         painter.paintStraightLabel(tempTransform);
         if(labelItem.isConflictResolutionEnabled())
             glyphs.addLabel(labelItem, transformed);
         return true;
+    }
+    
+    Geometry widestGeometry(Geometry geometry) {
+        if (!(geometry instanceof GeometryCollection)) {
+            return geometry;
+        }
+        return widestGeometry((GeometryCollection) geometry);
+    }
+
+    Geometry widestGeometry(GeometryCollection gc) {
+        if (gc.isEmpty()) {
+            return gc;
+        }
+
+        Geometry widest = gc.getGeometryN(0);
+        for (int i = 1; i < gc.getNumGeometries(); i++) {
+            Geometry curr = gc.getGeometryN(i);
+            if (curr.getEnvelopeInternal().getWidth() > widest.getEnvelopeInternal().getWidth()) {
+                widest = curr;
+            }
+        }
+        return widest;
     }
 
     /**

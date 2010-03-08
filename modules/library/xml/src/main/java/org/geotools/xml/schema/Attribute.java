@@ -26,7 +26,7 @@ import java.net.URI;
  * </p>
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/schema/Attribute.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/Attribute.java $
  */
 public interface Attribute {
     /**

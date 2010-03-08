@@ -31,8 +31,8 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/PointPlacementImpl.java $
- * @version $Id: PointPlacementImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/PointPlacementImpl.java $
+ * @version $Id: PointPlacementImpl.java 33833 2009-09-04 12:26:28Z jive $
  */
 public class PointPlacementImpl implements PointPlacement, Cloneable {
     /** The logger for the default core module. */
@@ -40,8 +40,8 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
 
     // TODO: make container ready
     private final FilterFactory filterFactory;
-    private AnchorPoint anchorPoint = new AnchorPointImpl();
-    private Displacement displacement = new DisplacementImpl();
+    private AnchorPointImpl anchorPoint = new AnchorPointImpl();
+    private DisplacementImpl displacement = new DisplacementImpl();
     private Expression rotation = null;
 
     public PointPlacementImpl(){
@@ -64,7 +64,7 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
      *
      * @return Label's AnchorPoint.
      */
-    public org.geotools.styling.AnchorPoint getAnchorPoint() {
+    public AnchorPointImpl getAnchorPoint() {
         return anchorPoint;
     }
 
@@ -73,12 +73,11 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
      *
      * @param anchorPoint New value of property anchorPoint.
      */
-    public void setAnchorPoint(org.geotools.styling.AnchorPoint anchorPoint) {
-        if (anchorPoint == null) {
-            this.anchorPoint = new AnchorPointImpl();
-        } else {
-            this.anchorPoint = anchorPoint;
+    public void setAnchorPoint(org.opengis.style.AnchorPoint anchorPoint) {
+        if( this.anchorPoint == anchorPoint ){
+            return;
         }
+        this.anchorPoint = AnchorPointImpl.cast( anchorPoint );
     }
 
     /**
@@ -96,12 +95,11 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
      *
      * @param displacement New value of property displacement.
      */
-    public void setDisplacement(Displacement displacement) {
-        if (displacement == null) {
-            this.displacement = new DisplacementImpl();
-        } else {
-            this.displacement = displacement;
+    public void setDisplacement(org.opengis.style.Displacement displacement) {
+        if (this.displacement == displacement) {
+            return;
         }
+        this.displacement = DisplacementImpl.cast( displacement );
     }
 
     /**
@@ -136,8 +134,8 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
     public Object clone() {
         try {
             PointPlacementImpl clone = (PointPlacementImpl) super.clone();
-            clone.anchorPoint = (AnchorPoint) ((Cloneable) anchorPoint).clone();
-            clone.displacement = (Displacement) ((Cloneable) displacement)
+            clone.anchorPoint = (AnchorPointImpl) ((Cloneable) anchorPoint).clone();
+            clone.displacement = (DisplacementImpl) ((Cloneable) displacement)
                 .clone();
 
             return clone;
@@ -187,5 +185,20 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
         return result;
     }
 
-
+    static PointPlacementImpl cast(org.opengis.style.LabelPlacement placement) {
+        if( placement == null ){
+            return null;
+        }
+        else if (placement instanceof PointPlacementImpl){
+            return (PointPlacementImpl) placement;
+        }
+        else if (placement instanceof org.opengis.style.PointPlacement){
+            org.opengis.style.PointPlacement pointPlacement = (org.opengis.style.PointPlacement) placement;
+            PointPlacementImpl copy = new PointPlacementImpl();
+            copy.setAnchorPoint( AnchorPointImpl.cast( pointPlacement.getAnchorPoint() ) );
+            copy.setDisplacement( DisplacementImpl.cast( pointPlacement.getDisplacement() ));
+            return copy;
+        }
+        return null;
+    }
 }

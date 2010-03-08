@@ -39,7 +39,7 @@ public class FilterTransformerTest extends TestCase {
         
         String output = transform.transform( filter );
         assertNotNull( "got xml", output );
-        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ogc:Filter xmlns=\"http://www.opengis.net/ogc\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"><ogc:FeatureId fid=\"FID.1\"/><ogc:FeatureId fid=\"FID.2\"/></ogc:Filter>";
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ogc:FeatureId xmlns=\"http://www.opengis.net/ogc\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\" fid=\"FID.1\"/><ogc:FeatureId fid=\"FID.2\"/>";
         assertEquals( "expected id filters", xml, output );
     }
 }

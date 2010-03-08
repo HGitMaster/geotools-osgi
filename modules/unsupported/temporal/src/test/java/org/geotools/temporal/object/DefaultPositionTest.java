@@ -31,6 +31,8 @@ import org.opengis.util.InternationalString;
 /**
  *
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/test/java/org/geotools/temporal/object/DefaultPositionTest.java $
  */
 public class DefaultPositionTest {
 
@@ -69,6 +71,7 @@ public class DefaultPositionTest {
         Date result = position1.getDate();
         assertFalse(position2.getDate().equals(result));
     }
+  
 
     /**
      * Test of getTime method, of class DefaultPosition.

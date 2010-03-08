@@ -33,6 +33,8 @@ import org.opengis.feature.simple.SimpleFeature;
  * 
  * @author Jesse Eichar, Refractions Research, Inc.
  * @author Cory Horner, Refractions Research, Inc.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/fidmapper/PostGISAutoIncrementFIDMapper.java $
  */
 public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
                 implements FIDMapper {

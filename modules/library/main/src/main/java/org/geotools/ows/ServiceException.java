@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/ows/ServiceException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/ows/ServiceException.java $
  */
 public class ServiceException extends SAXException {
 	/*

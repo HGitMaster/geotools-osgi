@@ -46,7 +46,7 @@ import org.geotools.resources.i18n.Errors;
  * </ul>
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/MetadataStandard.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/MetadataStandard.java $
  * @version $Id: MetadataStandard.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (Geomatys)
  */

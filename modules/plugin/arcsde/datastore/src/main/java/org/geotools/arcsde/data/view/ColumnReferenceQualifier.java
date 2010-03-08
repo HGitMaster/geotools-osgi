@@ -24,14 +24,14 @@ import net.sf.jsqlparser.statement.select.ColumnIndex;
 import net.sf.jsqlparser.statement.select.ColumnReference;
 import net.sf.jsqlparser.statement.select.ColumnReferenceVisitor;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 /**
  * Qualifies a column reference (aliased) the ArcSDE "table.user." prefix as required by the ArcSDE
  * java api to not get confused when using joined tables.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ColumnReferenceQualifier.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ColumnReferenceQualifier.java 33451 2009-07-02 17:53:36Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/view/ColumnReferenceQualifier.java $

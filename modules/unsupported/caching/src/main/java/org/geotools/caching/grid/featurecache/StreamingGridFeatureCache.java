@@ -42,6 +42,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Emily
  * @since 1.2.0
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/featurecache/StreamingGridFeatureCache.java $
  */
 public class StreamingGridFeatureCache extends GridFeatureCache {
 

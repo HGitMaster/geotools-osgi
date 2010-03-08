@@ -37,7 +37,7 @@ import org.opengis.filter.identity.FeatureId;
  * This is a starting point for providing your own FeatureStore implementation.
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/AbstractFeatureStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/AbstractFeatureStore.java $
  */
 public abstract class AbstractFeatureStore extends AbstractFeatureSource
     implements FeatureStore<SimpleFeatureType, SimpleFeature> {

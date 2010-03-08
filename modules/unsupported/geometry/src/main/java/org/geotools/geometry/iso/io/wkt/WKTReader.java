@@ -50,6 +50,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author sanjay
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/io/wkt/WKTReader.java $
  */
 public class WKTReader {
 

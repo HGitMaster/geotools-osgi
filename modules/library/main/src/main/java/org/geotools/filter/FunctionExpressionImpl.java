@@ -32,7 +32,7 @@ import org.opengis.filter.expression.Literal;
  * Abstract class for a function expression implementation
  *
  * @author James Macgill, PSU
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/FunctionExpressionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FunctionExpressionImpl.java $
  */
 public abstract class FunctionExpressionImpl
     extends org.geotools.filter.DefaultExpression implements FunctionExpression {

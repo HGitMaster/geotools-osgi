@@ -54,8 +54,10 @@ import org.opengis.filter.sort.SortOrder;
  * </p>
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/DefaultSQLBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/DefaultSQLBuilder.java $
  * @deprecated Use GeoAPISQLBuilder instead
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class DefaultSQLBuilder implements SQLBuilder {
     // The instance of the encoder to be used to generate the WHERE clause

@@ -43,6 +43,8 @@ import org.picocontainer.defaults.InstanceComponentAdapter;
  * </p>
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/PicoMap.java $
  */
 public class PicoMap implements Map, MutablePicoContainer {
 

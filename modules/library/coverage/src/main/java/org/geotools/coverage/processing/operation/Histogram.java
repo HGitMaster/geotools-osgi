@@ -70,6 +70,8 @@ import org.opengis.util.InternationalString;
  * @since 2.4
  * @see javax.media.jai.Histogram
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Histogram.java $
  */
 public class Histogram extends AbstractStatisticsOperationJAI {
 

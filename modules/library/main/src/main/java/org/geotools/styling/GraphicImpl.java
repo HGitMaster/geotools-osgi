@@ -19,16 +19,12 @@ package org.geotools.styling;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.filter.ConstantExpression;
 import org.geotools.util.Utilities;
-
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.style.AnchorPoint;
@@ -42,23 +38,23 @@ import org.opengis.util.Cloneable;
  *
  * @author Ian Turton, CCG
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/GraphicImpl.java $
- * @version $Id: GraphicImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/GraphicImpl.java $
+ * @version $Id: GraphicImpl.java 33974 2009-09-23 21:11:28Z jive $
  */
 public class GraphicImpl implements Graphic, Cloneable {
     /** The logger for the default core module. */
     //private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     
     private final List<GraphicalSymbol> graphics = new ArrayList<GraphicalSymbol>();
-    private final AnchorPoint anchor;
-    private final Expression gap;
-    private final Expression initialGap;
+    private AnchorPointImpl anchor;
+    private Expression gap;
+    private Expression initialGap;
     
     private FilterFactory filterFactory;
     private String geometryPropertyName = "";
     private Expression rotation = null;
     private Expression size = null;
-    private Displacement displacement = null;
+    private DisplacementImpl displacement = null;
     private Expression opacity = null;
 
     /**
@@ -74,7 +70,7 @@ public class GraphicImpl implements Graphic, Cloneable {
     
     public GraphicImpl(FilterFactory factory, AnchorPoint anchor,Expression gap, Expression initialGap) {
         filterFactory = factory;
-        this.anchor = anchor;
+        this.anchor = AnchorPointImpl.cast(anchor);
         
         if(gap == null) this.gap = ConstantExpression.constant(0);
         else this.gap = gap;
@@ -89,7 +85,7 @@ public class GraphicImpl implements Graphic, Cloneable {
     }
 
     public List<GraphicalSymbol> graphicalSymbols() {
-        return Collections.unmodifiableList(graphics);
+        return graphics;
     }
 
     /**
@@ -117,7 +113,13 @@ public class GraphicImpl implements Graphic, Cloneable {
 
     @Deprecated
     public void setExternalGraphics(ExternalGraphic[] externalGraphics) {
-        graphics.clear();
+    	Collection<GraphicalSymbol> currExternalGraphics = new ArrayList<GraphicalSymbol>();
+    	for(GraphicalSymbol s : graphics){
+            if (s instanceof ExternalGraphic){
+                currExternalGraphics.add(s);
+            }
+        }
+    	graphics.removeAll(currExternalGraphics);
         
         for(ExternalGraphic g : externalGraphics){
             graphics.add(g);
@@ -153,7 +155,13 @@ public class GraphicImpl implements Graphic, Cloneable {
 
     @Deprecated
     public void setMarks(Mark[] marks) {
-        graphics.clear();
+    	Collection<GraphicalSymbol> currMarks = new ArrayList<GraphicalSymbol>();
+    	for(GraphicalSymbol s : graphics){
+            if (s instanceof Mark){
+                currMarks.add(s);
+            }
+        }
+    	graphics.removeAll(currMarks);
         
         for(Mark g : marks){
             graphics.add(g);
@@ -184,7 +192,13 @@ public class GraphicImpl implements Graphic, Cloneable {
      */
     @Deprecated
     public Symbol[] getSymbols() {
-        return graphics.toArray(new Symbol[0]);
+        ArrayList<Symbol> symbols = new ArrayList<Symbol>();
+        for( GraphicalSymbol graphic : graphics ){
+            if( graphic instanceof Symbol ){
+                symbols.add( (Symbol) graphic );
+            }
+        }
+        return symbols.toArray(new Symbol[0]);
     }
     
 //    public List<Symbol> graphicalSymbols() {
@@ -205,8 +219,16 @@ public class GraphicImpl implements Graphic, Cloneable {
         graphics.add(symbol);
     }
     
-    public AnchorPoint getAnchorPoint() {
+    public AnchorPointImpl getAnchorPoint() {
         return anchor;
+    }
+
+    public void setAnchorPoint(org.geotools.styling.AnchorPoint anchor) {
+        this.anchor = AnchorPointImpl.cast( anchor );
+    }
+
+    public void setAnchorPoint(org.opengis.style.AnchorPoint anchorPoint) {
+        this.anchor = AnchorPointImpl.cast( anchorPoint );
     }
 
     /**
@@ -257,29 +279,35 @@ public class GraphicImpl implements Graphic, Cloneable {
         return size;
     }
 
-    public Displacement getDisplacement() {
+    public DisplacementImpl getDisplacement() {
         return displacement;
     }
 
     public Expression getInitialGap() {
         return initialGap;
     }
+    
+    public void setInitialGap( Expression initialGap ){
+        this.initialGap = initialGap;
+    }
 
     public Expression getGap() {
         return gap;
     }
     
-    @Deprecated
-    public void setDisplacement(Displacement offset) {
-        this.displacement = offset;
+    public void setGap(Expression gap) {
+        this.gap = gap;
+    }
+    
+    public void setDisplacement(org.opengis.style.Displacement offset) {
+        this.displacement = DisplacementImpl.cast( offset );
     }
 
     /**
-     * Setter for property opacity.
-     *
+     * Graphic opacity.
+     * 
      * @param opacity New value of property opacity.
      */
-    @Deprecated
     public void setOpacity(Expression opacity) {
         this.opacity = opacity;
     }
@@ -294,7 +322,6 @@ public class GraphicImpl implements Graphic, Cloneable {
      *
      * @param rotation New value of property rotation.
      */
-    @Deprecated
     public void setRotation(Expression rotation) {
         this.rotation = rotation;
     }
@@ -309,7 +336,6 @@ public class GraphicImpl implements Graphic, Cloneable {
      *
      * @param size New value of property size.
      */
-    @Deprecated
     public void setSize(Expression size) {
         this.size = size;
     }
@@ -450,6 +476,29 @@ public class GraphicImpl implements Graphic, Cloneable {
         return false;
     }
 
-
+    static GraphicImpl cast(org.opengis.style.Graphic graphic) {
+        if( graphic == null){
+            return null;
+        }
+        else if ( graphic instanceof GraphicImpl){
+            return (GraphicImpl) graphic;
+        }
+        else {
+            GraphicImpl copy = new GraphicImpl();            
+            copy.setAnchorPoint( graphic.getAnchorPoint() );
+            copy.setDisplacement( graphic.getDisplacement() );
+            if( graphic.graphicalSymbols() != null ){
+                for ( GraphicalSymbol item : graphic.graphicalSymbols()) {
+                    if( item instanceof org.opengis.style.ExternalGraphic){
+                        copy.graphicalSymbols().add( ExternalGraphicImpl.cast( item ));
+                    }
+                    else if( item instanceof org.opengis.style.Mark){
+                        copy.graphicalSymbols().add( MarkImpl.cast( item ));
+                    }
+                }
+            }
+            return copy;
+        }
+    }
 
 }

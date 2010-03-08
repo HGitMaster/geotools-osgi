@@ -22,6 +22,8 @@ package org.geotools.geometry.iso.util.algorithmND;
  * 
  * @author Jackson Roehrig and Sanjay Jena
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithmND/AlgoPointND.java $
  */
 public class AlgoPointND {
 

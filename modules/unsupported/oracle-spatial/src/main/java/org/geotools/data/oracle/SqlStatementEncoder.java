@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/SqlStatementEncoder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/SqlStatementEncoder.java $
  * @version $Id: SqlStatementEncoder.java 30921 2008-07-05 07:51:23Z jgarnett $ Last Modified: $Date: 2003/11/05 00:53:37 $
  */
 final class SqlStatementEncoder {

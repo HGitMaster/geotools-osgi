@@ -14,6 +14,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.IntersectionMatrix;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
@@ -86,6 +87,8 @@ import com.vividsolutions.jts.io.WKTWriter;
  *     retrived on 24 Sept 2005
  *
  * @author Adrian Custer
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/libraryJTS/src/main/java/org/geotools/demo/libraryJTS/DemoJTS.java $
  * @version 0.0.1   April 2006
  *
  */
@@ -272,5 +275,26 @@ public class DemoJTS {
 
     }
 
+    public static void codeExample(Geometry fire, Geometry cities, Geometry me, Geometry he, Geometry you){
+        // Create Geometry using other Geometry
+        Geometry smoke = fire.buffer( 10 );        
+        Geometry evacuate = cities.intersection( smoke );
+        
+        // test important relationships
+        boolean onFire = me.intersects( fire );
+        boolean thatIntoYou = he.disjoint( you );
+        boolean run = you.isWithinDistance( fire, 2 );
+        
+        // relationships actually captured as a fancy
+        // String called an intersection matrix
+        //
+        IntersectionMatrix matrix = he.relate( you );        
+        thatIntoYou = matrix.isDisjoint();
+        
+        // it really is a fancy string; you can do
+        // pattern matching to sort out what the geometry
+        // being compared are up to
+        boolean disjoint = matrix.matches("FF*FF****");        
+    }
 }
 

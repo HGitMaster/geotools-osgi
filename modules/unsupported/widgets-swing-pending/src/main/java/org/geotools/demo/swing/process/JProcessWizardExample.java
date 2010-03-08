@@ -10,7 +10,6 @@
 package org.geotools.demo.swing.process;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.geotools.gui.swing.process.JPage;
 import org.geotools.gui.swing.process.JWizard;
@@ -24,6 +23,8 @@ import org.geotools.gui.swing.process.JWizard;
  * parameters can be handled.
  * <p>
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/demo/swing/process/JProcessWizardExample.java $
  */
 public class JProcessWizardExample {
     public static void main( String args[] ){

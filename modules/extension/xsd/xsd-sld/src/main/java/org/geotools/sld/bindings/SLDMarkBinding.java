@@ -54,6 +54,8 @@ import org.picocontainer.MutablePicoContainer;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-sld/src/main/java/org/geotools/sld/bindings/SLDMarkBinding.java $
  */
 public class SLDMarkBinding extends AbstractComplexBinding {
     FilterFactory filterFactory;

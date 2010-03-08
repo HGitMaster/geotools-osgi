@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
  * @author dzwiers www.refractions.net
  *
  * @see Schema
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/xsi/XSISimpleTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/xsi/XSISimpleTypes.java $
  */
 public class XSISimpleTypes {
     private static Map m;
@@ -2466,10 +2466,10 @@ public class XSISimpleTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints) {
             if ((value.length == 1) && (value[0].getValue() != null)) {
-                java.lang.Boolean i = new java.lang.Boolean((java.lang.String) value[0]
-                        .getValue());
-
-                return i;
+                java.lang.String booleanValue = (java.lang.String) value[0].getValue();
+                java.lang.Boolean parsedValue = "1".equals(booleanValue) ? java.lang.Boolean.TRUE
+                        : java.lang.Boolean.valueOf(booleanValue);
+                return parsedValue;
             }
 
             return null;

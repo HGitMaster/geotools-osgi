@@ -31,7 +31,7 @@ import org.geotools.graph.structure.Graphable;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  * @see Graphable
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/structure/opt/OptGraphable.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/structure/opt/OptGraphable.java $
  */
 public abstract class OptGraphable implements Graphable, Serializable {
 

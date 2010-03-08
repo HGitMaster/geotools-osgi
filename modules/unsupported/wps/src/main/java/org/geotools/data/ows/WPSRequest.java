@@ -21,6 +21,8 @@ package org.geotools.data.ows;
  * Available WPS Operations are listed in a Request element.
  *
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wps/src/main/java/org/geotools/data/ows/WPSRequest.java $
  */
 public class WPSRequest {
     private OperationType getCapabilities;

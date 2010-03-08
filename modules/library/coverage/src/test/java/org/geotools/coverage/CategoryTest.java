@@ -26,8 +26,8 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link Category} implementation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/CategoryTest.java $
- * @version $Id: CategoryTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/CategoryTest.java $
+ * @version $Id: CategoryTest.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */
 public final class CategoryTest {
@@ -39,7 +39,6 @@ public final class CategoryTest {
     /**
      * Checks if a {@link Comparable} is a number identical to the supplied integer value.
      */
-    @SuppressWarnings("unchecked")
     private static void assertValueEquals(String message, Comparable<?> number, int expected) {
         assertTrue("Integer.class", number instanceof Integer);
         assertEquals(message, expected, ((Number) number).intValue());
@@ -48,7 +47,6 @@ public final class CategoryTest {
     /**
      * Checks if a {@link Comparable} is a number identical to the supplied float value.
      */
-    @SuppressWarnings("unchecked")
     private static void assertValueEquals(String message, Comparable<?> number, double expected, double EPS) {
         assertTrue("Double.class", number instanceof Double);
         final double actual = ((Number) number).doubleValue();
@@ -83,8 +81,8 @@ public final class CategoryTest {
                                                     category1.getSampleToGeophysics());
 
             assertEquals("<init>", category1, category2);
-            assertValueEquals("lower",  category1.geophysics(false).getRange().getMinValue(), sample);
-            assertValueEquals("upper",  category1.geophysics(false).getRange().getMaxValue(), sample);
+            assertValueEquals("lower",  category1.geophysics(false).getRange().getMinValue().intValue(), sample);
+            assertValueEquals("upper",  category1.geophysics(false).getRange().getMaxValue().intValue(), sample);
 
             assertNull("geophysics(false)", category1.geophysics(false).getSampleToGeophysics());
             assertNull("geophysics(true)",  category1.geophysics(true ).getSampleToGeophysics());
@@ -118,10 +116,10 @@ public final class CategoryTest {
             final double offset = 10*random.nextDouble() - 5.0;
             final Category category = new Category("Auto", null, lower, upper, scale, offset);
 
-            assertValueEquals("lower",  category.geophysics(false).getRange().getMinValue(), lower);
-            assertValueEquals("upper",  category.geophysics(false).getRange().getMaxValue(), upper);
-            assertValueEquals("minimum", category.geophysics(true).getRange().getMinValue(), lower*scale+offset, EPS);
-            assertValueEquals("maximum", category.geophysics(true).getRange().getMaxValue(), upper*scale+offset, EPS);
+            assertValueEquals("lower",  category.geophysics(false).getRange().getMinValue().intValue(), lower);
+            assertValueEquals("upper",  category.geophysics(false).getRange().getMaxValue().intValue(), upper);
+            assertValueEquals("minimum", category.geophysics(true).getRange().getMinValue().doubleValue(), lower*scale+offset, EPS);
+            assertValueEquals("maximum", category.geophysics(true).getRange().getMaxValue().doubleValue(), upper*scale+offset, EPS);
 
             for (int i=0; i<200; i++) {
                 final double x = 100*random.nextDouble();

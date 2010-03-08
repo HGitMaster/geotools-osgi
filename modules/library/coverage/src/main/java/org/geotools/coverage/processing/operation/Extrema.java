@@ -75,6 +75,8 @@ import org.opengis.util.InternationalString;
  * @author Simone Giannecchini
  * @since 2.4
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Extrema.java $
  */
 public class Extrema extends AbstractStatisticsOperationJAI {
 

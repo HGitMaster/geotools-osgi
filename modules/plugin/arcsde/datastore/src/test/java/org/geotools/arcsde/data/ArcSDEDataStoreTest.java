@@ -17,20 +17,27 @@
  */
 package org.geotools.arcsde.data;
 
+import static org.geotools.arcsde.data.TestData.TEST_TABLE_COLS;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.pool.ISession;
-import org.geotools.arcsde.pool.SessionPool;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.ISessionPool;
+import org.geotools.arcsde.session.UnavailableConnectionException;
+import org.geotools.data.DataAccess;
+import org.geotools.data.DataAccessFinder;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.SchemaException;
@@ -41,7 +48,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -49,6 +58,7 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.pe.PeFactory;
 import com.esri.sde.sdk.pe.PeProjectedCS;
 import com.esri.sde.sdk.pe.PeProjectionException;
+import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -58,7 +68,7 @@ import com.vividsolutions.jts.geom.Point;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/ArcSDEDataStoreTest.java $
- * @version $Id: ArcSDEDataStoreTest.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEDataStoreTest.java 34355 2009-11-09 19:05:33Z groldan $
  */
 public class ArcSDEDataStoreTest {
     /** package logger */
@@ -110,7 +120,7 @@ public class ArcSDEDataStoreTest {
     }
 
     @Test
-    public void testFinder() throws IOException {
+    public void testDataStoreFinderFindsIt() throws IOException {
         DataStore sdeDs = null;
 
         DataStoreFinder.scanForPlugins();
@@ -119,6 +129,38 @@ public class ArcSDEDataStoreTest {
         String failMsg = sdeDs + " is not an ArcSDEDataStore";
         assertTrue(failMsg, (sdeDs instanceof ArcSDEDataStore));
         LOGGER.fine("testFinder OK :" + sdeDs.getClass().getName());
+    }
+
+    @Test
+    public void testDataAccessFinderFindsIt() throws IOException {
+
+        Map<String, Serializable> params = new HashMap<String, Serializable>();
+        params.putAll(testData.getConProps());
+
+        DataAccess<? extends FeatureType, ? extends Feature> dataStore;
+        dataStore = DataAccessFinder.getDataStore(params);
+
+        assertNotNull(dataStore);
+        String failMsg = dataStore + " is not an ArcSDEDataStore";
+        assertTrue(failMsg, dataStore instanceof ArcSDEDataStore);
+    }
+
+    @Test
+    public void testGetInfo() {
+        ServiceInfo info = store.getInfo();
+        assertNotNull(info);
+        assertNotNull(info.getTitle());
+        assertNotNull(info.getDescription());
+        assertNotNull(info.getSchema());
+    }
+
+    @Test
+    public void testGet() {
+        ServiceInfo info = store.getInfo();
+        assertNotNull(info);
+        assertNotNull(info.getTitle());
+        assertNotNull(info.getDescription());
+        assertNotNull(info.getSchema());
     }
 
     /**
@@ -225,7 +267,13 @@ public class ArcSDEDataStoreTest {
         schema = store.getSchema(testData.getTempTableName());
         assertNotNull(schema);
         // ROW_ID is not included in TEST_TABLE_COLS
-        assertEquals(TestData.TEST_TABLE_COLS.length, schema.getAttributeCount());
+        assertEquals(TEST_TABLE_COLS.length, schema.getAttributeCount());
+
+        for (int i = 0; i < TEST_TABLE_COLS.length; i++) {
+            assertEquals("at index" + i, TEST_TABLE_COLS[i], schema.getDescriptor(i).getLocalName());
+        }
+        assertFalse(schema.getDescriptor(0).isNillable());
+        assertTrue(schema.getDescriptor(1).isNillable());
     }
 
     /**
@@ -240,16 +288,16 @@ public class ArcSDEDataStoreTest {
      * </p>
      * 
      * @throws IOException
-     *             DOCUMENT ME!
      * @throws SchemaException
-     *             DOCUMENT ME!
      * @throws SeException
+     * @throws UnavailableConnectionException
      */
     @Test
-    public void testCreateSchema() throws IOException, SchemaException, SeException {
+    public void testCreateSchema() throws IOException, SchemaException, SeException,
+            UnavailableConnectionException {
         final String typeName;
         {
-            SessionPool connectionPool = testData.getConnectionPool();
+            ISessionPool connectionPool = testData.getConnectionPool();
             ISession session = connectionPool.getSession();
             final String user;
             user = session.getUser();
@@ -274,6 +322,31 @@ public class ArcSDEDataStoreTest {
         hints.put("configuration.keyword", testData.getConfigKeyword());
         ((ArcSDEDataStore) ds).createSchema(type, hints);
 
+        testData.deleteTable(typeName);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testCreateNillableShapeSchema() throws IOException, SchemaException, SeException,
+            UnavailableConnectionException {
+        SimpleFeatureType type;
+        final String typeName = "GT_TEST_CREATE";
+        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+        b.setName(typeName);
+
+        b.add("OBJECTID", Integer.class);
+
+        b.nillable(true);
+        b.add("SHAPE", MultiLineString.class);
+
+        type = b.buildFeatureType();
+
+        ArcSDEDataStore ds = testData.getDataStore();
+
+        testData.deleteTable(typeName);
+        Map hints = new HashMap();
+        hints.put("configuration.keyword", testData.getConfigKeyword());
+        ds.createSchema(type, hints);
         testData.deleteTable(typeName);
     }
 

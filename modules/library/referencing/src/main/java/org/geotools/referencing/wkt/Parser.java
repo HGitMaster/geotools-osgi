@@ -72,8 +72,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * objects as well, which is part of the WKT's {@code FITTED_CS} element.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Parser.java $
- * @version $Id: Parser.java 31000 2008-07-10 21:11:13Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Parser.java $
+ * @version $Id: Parser.java 33399 2009-06-30 11:25:55Z aaime $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)
  *
@@ -312,7 +312,11 @@ public class Parser extends MathTransformParser {
      * This element has the following pattern:
      *
      * <blockquote><code>
-     * AUTHORITY["<name>", "<code>"]
+     * AUTHORITY["&lt;name&gt;", "&lt;code&gt;"]
+     * </code></blockquote>
+     * or even
+     * <blockquote><code>
+     * AUTHORITY["&lt;name&gt;", &lt;code&gt;]
      * </code></blockquote>
      *
      * @param  parent The parent element.
@@ -335,7 +339,12 @@ public class Parser extends MathTransformParser {
             }
         } else {
             final String auth = element.pullString("name");
-            final String code = element.pullString("code");
+            // the code can be annotation marked but could be a number to
+            String code = element.pullOptionalString("code");
+            if (code == null) {
+            	int codeNumber = element.pullInteger("code");
+            	code = String.valueOf(codeNumber);
+            }
             element.close();
             final Citation authority = Citations.fromName(auth);
             properties = new HashMap<String,Object>(4);

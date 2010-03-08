@@ -37,6 +37,8 @@ package org.geotools.geometry.iso.util.algorithm2D;
  *                            All rights reserved
  * *************************************************************************
  * </pre>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/RobustDeterminant.java $
  */
 public class RobustDeterminant {
 

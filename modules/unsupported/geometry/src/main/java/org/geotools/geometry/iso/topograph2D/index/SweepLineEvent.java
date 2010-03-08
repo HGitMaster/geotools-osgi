@@ -19,6 +19,8 @@ package org.geotools.geometry.iso.topograph2D.index;
 
 /**
  * Models an Event point within the Sweep Line Intersection Algorithm
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/index/SweepLineEvent.java $
  */
 public class SweepLineEvent implements Comparable {
 	public static final int INSERT = 1;

@@ -20,42 +20,72 @@ package org.geotools.coverageio.gdal.jp2mrsid;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.logging.Level;
 
 import javax.media.jai.PlanarImage;
 
+import org.gdal.gdal.Driver;
+import org.gdal.gdal.gdal;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFinder;
+import org.geotools.coverageio.gdal.GDALTestCase;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.test.TestData;
+import org.junit.Assert;
+import org.junit.Test;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 /**
  * @author Daniele Romagnoli, GeoSolutions
  * @author Simone Giannecchini (simboss), GeoSolutions
  *
  * Testing {@link JP2MrSIDReader}
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/jp2mrsid/JP2MrSIDTest.java $
  */
-public final class JP2MrSIDTest extends AbstractJP2MrSIDTestCase {
+public final class JP2MrSIDTest extends GDALTestCase {
     /**
      * file name of a valid JP2K sample data to be used for tests.
      */
     private final static String fileName = "sample.jp2";
 
-    /**
+    static {
+	    try {
+	        gdal.AllRegister();
+	        final Driver driverkak = gdal.GetDriverByName("JP2KAK");
+	        final Driver driverecw = gdal.GetDriverByName("JP2ECW");
+	        if (driverkak != null || driverecw != null) {
+	            final StringBuffer skipDriver = new StringBuffer("");
+	            if (driverkak != null)
+	                skipDriver.append("JP2KAK ");
+	            if (driverecw != null)
+	                skipDriver.append("JP2ECW");
+	            gdal.SetConfigOption("GDAL_SKIP", skipDriver.toString());
+	            gdal.AllRegister();
+	        }
+	    } catch (UnsatisfiedLinkError e) {
+	        if (LOGGER.isLoggable(Level.WARNING))
+	            LOGGER.warning("GDAL library unavailable.");
+	    }
+	}
+
+	/**
      * Creates a new instance of JP2MrSIDTest
      *
      * @param name
      */
-    public JP2MrSIDTest(String name) {
-        super(name);
+    public JP2MrSIDTest() {
+        super("JP2MrSID", new JP2MrSIDFormatFactory());
     }
 
-    public static final void main(String[] args) throws Exception {
-        junit.textui.TestRunner.run(JP2MrSIDTest.class);
-    }
-
+    @Test
     public void test() throws Exception {
         if (!testingEnabled()) {
             return;
@@ -80,7 +110,7 @@ public final class JP2MrSIDTest extends AbstractJP2MrSIDTestCase {
 
         final GridCoverage2D gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg });
 
-        assertNotNull(gc);
+        Assert.assertNotNull(gc);
 
         if (TestData.isInteractiveTest()) {
             gc.show();
@@ -94,4 +124,30 @@ public final class JP2MrSIDTest extends AbstractJP2MrSIDTestCase {
             LOGGER.info(gc.getEnvelope().toString());
         }
     }
+
+    @Test
+	public void testIsAvailable() throws NoSuchAuthorityCodeException, FactoryException {
+	    if (!testingEnabled()) {
+	        return;
+	    }
+	
+	    GridFormatFinder.scanForPlugins();
+	
+	    Iterator list = GridFormatFinder.getAvailableFormats().iterator();
+	    boolean found = false;
+	    GridFormatFactorySpi fac = null;
+	
+	    while (list.hasNext()) {
+	        fac = (GridFormatFactorySpi) list.next();
+	
+	        if (fac instanceof JP2MrSIDFormatFactory) {
+	            found = true;
+	            break;
+	        }
+	    }
+	
+	    Assert.assertTrue("JP2MrSIDFormatFactory not registered", found);
+	    Assert.assertTrue("JP2MrSIDFormatFactory not available", fac.isAvailable());
+	    Assert.assertNotNull(new JP2MrSIDFormatFactory().createFormat());
+	}
 }

@@ -25,6 +25,8 @@ import org.geotools.xml.XSD;
  * attributes in the http://www.w3.org/1999/xlink schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xlink/XLINK.java $
  */
 public final class XLINK extends XSD {
     /**

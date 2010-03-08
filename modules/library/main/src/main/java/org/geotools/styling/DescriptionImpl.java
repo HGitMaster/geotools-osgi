@@ -1,6 +1,7 @@
 package org.geotools.styling;
 
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.styling.Description;
 import org.opengis.util.InternationalString;
 
 public class DescriptionImpl implements Description {
@@ -22,6 +23,14 @@ public class DescriptionImpl implements Description {
         this.description = description;
     }
 
+    /**
+     * Copy constructor.
+     * @param description
+     */
+    public DescriptionImpl(org.opengis.style.Description description) {
+        this( description.getTitle(), description.getAbstract() );
+    }
+
     public InternationalString getTitle() {
         return title;
     }
@@ -30,6 +39,10 @@ public class DescriptionImpl implements Description {
         this.title = title;
     }
 
+    public void setTitle(String title) {
+        this.title = new SimpleInternationalString(title);
+    }
+    
     public InternationalString getAbstract() {
         return description;
     }
@@ -38,6 +51,10 @@ public class DescriptionImpl implements Description {
         this.description = description;
     }
 
+    public void setAbstract(String title) {
+        this.description = new SimpleInternationalString(title);
+    }
+    
     public Object accept(org.opengis.style.StyleVisitor visitor, Object extraData) {
         return null;
     }
@@ -75,6 +92,26 @@ public class DescriptionImpl implements Description {
         } else if (!title.equals(other.title))
             return false;
         return true;
+    }
+
+    /**
+     * Check the provided description return it as a DescriptionImpl
+     * @param description
+     * @return DescriptionImpl from the provided description
+     */
+    static DescriptionImpl cast(org.opengis.style.Description description) {
+        if( description == null ){
+            return null;
+        }
+        else if (description instanceof DescriptionImpl){
+            return (DescriptionImpl) description;
+        }
+        else {
+            DescriptionImpl copy = new DescriptionImpl();
+            copy.setTitle( description.getTitle() );
+            copy.setAbstract( description.getAbstract() );            
+            return copy;
+        }
     }
 
 }

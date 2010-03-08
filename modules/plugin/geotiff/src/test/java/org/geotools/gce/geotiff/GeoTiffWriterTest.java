@@ -39,7 +39,7 @@ import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.test.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
-import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -131,16 +131,10 @@ public class GeoTiffWriterTest extends TestCase {
 			IOException, UnsupportedOperationException, ParseException,
 			FactoryException, TransformException {
 
+
 		// /////////////////////////////////////////////////////////////////////
 		//
-		//
-		// READ
-		//
-		//
-		// /////////////////////////////////////////////////////////////////////
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Look for the original coverage that wew want to crop.
+		// Look for the original coverage that we want to crop.
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final File readdir = TestData.file(GeoTiffWriterTest.class, "");
@@ -224,13 +218,13 @@ public class GeoTiffWriterTest extends TestCase {
 		// checking the ranges of the output image.
 		final GridGeometry2D croppedGG = (GridGeometry2D) cropped
 				.getGridGeometry();
-		final GridRange croppedGR = croppedGG.getGridRange();
+		final GridEnvelope croppedGR = croppedGG.getGridRange();
 		final MathTransform croppedG2W = croppedGG.getGridToCRS(PixelInCell.CELL_CENTER);
 		final GeneralEnvelope croppedEnvelope = (GeneralEnvelope) cropped.getEnvelope();
-		assertTrue("min x do not match after crop", 29 == croppedGR.getLower(0));
-		assertTrue("min y do not match after crop", 30 == croppedGR.getLower(1));
-		assertTrue("max x do not match after crop", 90 == croppedGR.getUpper(0));
-		assertTrue("max y do not match after crop", 91 == croppedGR.getUpper(1));
+		assertTrue("min x do not match after crop", 29 == croppedGR.getLow(0));
+		assertTrue("min y do not match after crop", 30 == croppedGR.getLow(1));
+		assertTrue("max x do not match after crop", 90 == croppedGR.getHigh(0)+1);
+		assertTrue("max y do not match after crop", 91 == croppedGR.getHigh(1)+1);
 		// check that the affine transform are the same thing
 		assertTrue(
 				"The Grdi2World tranformations of the original and the cropped covearage do not match",

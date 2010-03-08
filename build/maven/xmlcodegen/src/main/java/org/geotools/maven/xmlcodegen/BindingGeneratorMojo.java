@@ -163,7 +163,7 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 				File d = new File( element );
 			
 				if ( d.exists() && d.isDirectory() ) {
-					urls.add( d.toURL() );
+					urls.add( d.toURI().toURL() );
 				}
 			}
 			
@@ -183,7 +183,7 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 			        artifacts = result.getArtifacts();
 			        for ( Iterator a = artifacts.iterator(); a.hasNext(); ) {
 			            Artifact dartifact = (Artifact) a.next();
-			            urls.add(dartifact.getFile().toURL());
+			            urls.add(dartifact.getFile().toURI().toURL());
 			        }
 			        
 			    }

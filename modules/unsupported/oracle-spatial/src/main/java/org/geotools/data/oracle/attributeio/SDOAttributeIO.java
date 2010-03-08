@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @author Andrea Aime
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
  *  
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/attributeio/SDOAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/attributeio/SDOAttributeIO.java $
  */
 public class SDOAttributeIO implements AttributeIO {
 

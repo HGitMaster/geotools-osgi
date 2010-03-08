@@ -72,8 +72,8 @@ import org.geotools.resources.i18n.Errors;
  * </ul>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/MolodenskiTransform.java $
- * @version $Id: MolodenskiTransform.java 31567 2008-09-22 09:41:07Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/MolodenskiTransform.java $
+ * @version $Id: MolodenskiTransform.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Rueben Schulz
  * @author Martin Desruisseaux
  */
@@ -548,7 +548,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * The EPSG does not use src_semi_major, etc. parameters and instead uses
      * "Semi-major axis length difference" and "Flattening difference".
      *
-     * @version $Id: MolodenskiTransform.java 31567 2008-09-22 09:41:07Z desruisseaux $
+     * @version $Id: MolodenskiTransform.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
      * @author Rueben Schulz
      */
     public static class Provider extends MathTransformProvider {
@@ -568,7 +568,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * The number of geographic dimension (2 or 3). This argument applies on
          * both the source and the target dimension. The default value is 2.
          */
-        public static final ParameterDescriptor<Integer> DIM = new DefaultParameterDescriptor(
+        public static final ParameterDescriptor<Integer> DIM =DefaultParameterDescriptor.create(
                     Collections.singletonMap(NAME_KEY,
                         new NamedIdentifier(Citations.OGC, "dim")),
                     DEFAULT_DIMENSION, 2, 3, false);
@@ -773,7 +773,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * The EPSG does not use src_semi_major, etc. parameters and instead uses
      * "Semi-major axis length difference" and "Flattening difference".
      *
-     * @version $Id: MolodenskiTransform.java 31567 2008-09-22 09:41:07Z desruisseaux $
+     * @version $Id: MolodenskiTransform.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */

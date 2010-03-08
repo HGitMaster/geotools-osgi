@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link RangeSet} implementation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/util/RangeSetTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/RangeSetTest.java $
  * @version $Id: RangeSetTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Andrea Aime
  */

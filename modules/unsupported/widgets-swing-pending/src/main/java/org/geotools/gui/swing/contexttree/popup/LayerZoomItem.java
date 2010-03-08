@@ -32,6 +32,8 @@ import org.geotools.map.MapLayer;
  * Default popup control for zoom on MapLayer, use for JContextTreePopup
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/popup/LayerZoomItem.java $
  */
 public class LayerZoomItem extends JMenuItem implements TreePopupItem {
 

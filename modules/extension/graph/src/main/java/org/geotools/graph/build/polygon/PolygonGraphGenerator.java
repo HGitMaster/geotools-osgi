@@ -72,7 +72,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/build/polygon/PolygonGraphGenerator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/build/polygon/PolygonGraphGenerator.java $
  */
 public class PolygonGraphGenerator implements GraphGenerator {
 

@@ -61,6 +61,8 @@ import org.geotools.styling.UserLayer;
  * 
  * @author Simone Giannecchini. GeoSolutions
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/StyleVisitorAdapter.java $
  */
 public class StyleVisitorAdapter implements StyleVisitor {
 

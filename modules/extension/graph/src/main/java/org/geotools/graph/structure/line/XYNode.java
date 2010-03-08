@@ -26,7 +26,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/structure/line/XYNode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/structure/line/XYNode.java $
  */
 public interface XYNode extends Node {
   

@@ -27,6 +27,8 @@ import java.awt.geom.Rectangle2D;
  * 
  * This class was translated from CPP into Java The original source code can be
  * found at http://astronomy.swin.edu.au/~pbourke/geometry/circlefrom3/
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/elem2D/Circle2D.java $
  */
 public class Circle2D {
     

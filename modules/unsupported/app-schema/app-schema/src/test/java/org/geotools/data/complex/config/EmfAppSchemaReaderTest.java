@@ -18,11 +18,8 @@
 package org.geotools.data.complex.config;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -30,16 +27,16 @@ import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.feature.Types;
+import org.geotools.feature.type.ComplexFeatureTypeImpl;
 import org.geotools.gml3.GML;
+import org.geotools.xml.SchemaIndex;
 import org.geotools.xs.XS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
-import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.PropertyDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -47,7 +44,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: EmfAppSchemaReaderTest.java 31607 2008-10-01 07:55:36Z bencd $
+ * @version $Id: EmfAppSchemaReaderTest.java 33611 2009-07-22 06:04:04Z ang05a $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/config/EmfAppSchemaReaderTest.java $
  * @since 2.4
@@ -75,24 +72,24 @@ public class EmfAppSchemaReaderTest extends TestCase {
         String res = "/test-data/simpleFeature.xsd";
         URL resource = getClass().getResource(res);
 
-        schemaLoader.parse(resource);
+        SchemaIndex schemaIndex = schemaLoader.parse(resource, null);
 
-        Map parsedTypes = schemaLoader.getTypeRegistry();
-        assertNotNull(parsedTypes);
+        FeatureTypeRegistry parsedTypes = new FeatureTypeRegistry();
+        parsedTypes.addSchemas(schemaIndex);
 
         Name typeName = Types.typeName(NS_URI, "simpleFeatureType");
-        AttributeType type = (AttributeType) parsedTypes.get(typeName);
+        AttributeType type = parsedTypes.getAttributeType(typeName);
         assertNotNull(type);
-        assertTrue(type.getClass().getName(), type instanceof SimpleFeatureType);
+        assertTrue(type.getClass().getName(), type instanceof ComplexType);
         assertTrue(type.getUserData().get(XSDTypeDefinition.class) instanceof XSDComplexTypeDefinition);
 
-        SimpleFeatureType ft = (SimpleFeatureType) type;
+        ComplexType ft = (ComplexType) type;
         String local = ft.getName().getLocalPart();
         String uri = ft.getName().getNamespaceURI();
         assertEquals("simpleFeatureType", local);
         assertEquals(NS_URI, uri);
 
-        List<AttributeDescriptor> attributes = ft.getAttributeDescriptors();
+        List attributes = Arrays.asList(((ComplexFeatureTypeImpl) ft).getTypeDescriptors().toArray());
         assertEquals(8, attributes.size());
         AttributeDescriptor descriptor;
 
@@ -139,15 +136,13 @@ public class EmfAppSchemaReaderTest extends TestCase {
     public void testComplexFeatureType() throws Exception {
         String res = "/test-data/complexFeature.xsd";
         URL resource = getClass().getResource(res);
-        schemaLoader.parse(resource);
-
-        Map typeRegistry = schemaLoader.getTypeRegistry();
-        Map descriptorRegistry = schemaLoader.getDescriptorRegistry();
-
-        assertNotNull(typeRegistry);
-
+        SchemaIndex schemaIndex = schemaLoader.parse(resource, null);
+        
+        FeatureTypeRegistry typeRegistry = new FeatureTypeRegistry();
+        typeRegistry.addSchemas(schemaIndex);
+        
         Name typeName = Types.typeName(NS_URI, "wq_plus_Type");
-        AttributeType type = (AttributeType) typeRegistry.get(typeName);
+        AttributeType type = (AttributeType) typeRegistry.getAttributeType(typeName);
         assertTrue(type instanceof FeatureType);
         assertFalse(type instanceof SimpleFeatureType);
         assertEquals(typeName, type.getName());
@@ -161,17 +156,17 @@ public class EmfAppSchemaReaderTest extends TestCase {
         typeName = Types.typeName(GML.NAMESPACE, GML.AbstractFeatureType.getLocalPart());
         assertEquals(typeName, wq_plus_Type.getSuper().getName());
         assertNotNull(wq_plus_Type.getDescriptors());
-        assertEquals(8, wq_plus_Type.getDescriptors().size());
+        assertEquals(8, ((ComplexFeatureTypeImpl) wq_plus_Type).getTypeDescriptors().size());
 
         Name name = Types.typeName(NS_URI, "wq_plus");
-        AttributeDescriptor wqPlusDescriptor = (AttributeDescriptor) descriptorRegistry.get(name);
+        AttributeDescriptor wqPlusDescriptor = typeRegistry.getDescriptor(name);
         assertNotNull(wqPlusDescriptor);
         assertEquals(name, wqPlusDescriptor.getName());
         assertSame(wq_plus_Type, wqPlusDescriptor.getType());
         assertTrue(wqPlusDescriptor.getUserData().get(XSDElementDeclaration.class) instanceof XSDElementDeclaration);
 
         typeName = Types.typeName(NS_URI, "measurementType");
-        type = (AttributeType) typeRegistry.get(typeName);
+        type = typeRegistry.getAttributeType(typeName);
         assertTrue(type instanceof ComplexType);
         assertFalse(type instanceof FeatureType);
         assertTrue(type.getUserData().get(XSDTypeDefinition.class) instanceof XSDComplexTypeDefinition);
@@ -218,14 +213,15 @@ public class EmfAppSchemaReaderTest extends TestCase {
     public void testSimpleAttributeFromComplexDeclaration() throws Exception {
         String res = "/test-data/complexFeature.xsd";
         URL resource = getClass().getResource(res);
-        schemaLoader.parse(resource);
+        SchemaIndex schemaIndex = schemaLoader.parse(resource, null);
 
-        Map registry = schemaLoader.getTypeRegistry();
+        FeatureTypeRegistry registry = new FeatureTypeRegistry();
+        registry.addSchemas(schemaIndex);
 
         Name tcl = Types.typeName(NS_URI, "TypedCategoryListType");
-        AttributeType typedCategoryListType = (AttributeType) registry.get(tcl);
+        AttributeType typedCategoryListType = registry.getAttributeType(tcl);
         assertNotNull(typedCategoryListType);
-        assertFalse(typedCategoryListType instanceof ComplexType);
+        assertTrue(typedCategoryListType instanceof ComplexType);
 
         AttributeType superType = typedCategoryListType.getSuper();
         assertNotNull(superType);

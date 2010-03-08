@@ -26,12 +26,14 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DefaultRepository;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Repository;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -39,7 +41,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Validator<br>
  * @author bowens<br>
  * Created Jun 25, 2004<br>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/Validator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/Validator.java $
  * @version <br>
  * 
  * <b>Puropse:</b><br>
@@ -72,7 +74,7 @@ public class Validator
 	
 	private ValidationProcessor validationProcessor;
 	
-	private Repository repository;
+	private DefaultRepository repository;
 	
 	
 	
@@ -83,7 +85,7 @@ public class Validator
 	 */
 	public Validator(Repository repository, ValidationProcessor processor)
 	{
-		this.repository = repository;
+		this.repository = (DefaultRepository) repository;
 		validationProcessor = processor;//new ValidationProcessor();
 	}
 
@@ -171,13 +173,6 @@ public class Validator
 
 
 	/**
-	 * <b>integrityValidation Purpose:</b> <br>
-	 * <p>
-	 * DOCUMENT ME!!
-	 * </p>
-	 * 
-	 * <b>Description:</b><br>
-	 * <p>
 	 * Integrity validation will iterate over all data stores passed in through the
  	 * stores map and run the tests associated with each store.
 	 * </p>
@@ -189,7 +184,7 @@ public class Validator
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public void integrityValidation(Map featureStores, ReferencedEnvelope bBox, ValidationResults results )
+	public void integrityValidation(Map<Name,FeatureSource<?,?>> featureStores, ReferencedEnvelope bBox, ValidationResults results )
 		throws IOException, Exception// WfsTransactionException 
 	{
 		//Data catalog = request.getWFS().getData();
@@ -203,10 +198,9 @@ public class Validator
 		
 		// go through each typeName passed in through stores
 		// and ask what we need to check
-		Set typeRefs = new HashSet();                
-		for (Iterator i = featureStores.keySet().iterator(); i.hasNext();) 
-		{
-			String typeRef = (String) i.next();
+		Set typeRefs = new HashSet();
+		for( Name name : featureStores.keySet() ){
+			String typeRef = typeRef( name );
 			typeRefs.add( typeRef );
         
 			Set dependencies = validationProcessor.getDependencies( typeRef );
@@ -289,7 +283,10 @@ public class Validator
 		//throw new WfsTransactionException(message.toString(), "validation");
 	}
 
-
+	    /** Convert a Name to a type reference (namespace ":" name) */
+	    protected String typeRef( Name name ){
+	        return name.getNamespaceURI()+":"+name.getLocalPart();
+	    }
 
 	/**
 	 * <b>getIntegrityValidationResults Purpose:</b> <br>

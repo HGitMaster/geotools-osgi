@@ -74,8 +74,8 @@ import org.opengis.style.StyleVisitor;
  * </p>
  *
  * @author James Macgill, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Fill.java $
- * @version $Id: Fill.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Fill.java $
+ * @version $Id: Fill.java 33833 2009-09-04 12:26:28Z jive $
  */
 public interface Fill extends org.opengis.style.Fill{
     static final Fill DEFAULT = new ConstantFill() {
@@ -227,7 +227,7 @@ public interface Fill extends org.opengis.style.Fill{
      * This parameter indicates that a stipple-fill repeated graphic will be
      * used and specifies the fill graphic to use.
      */
-    void setGraphicFill(Graphic graphicFill);
+    void setGraphicFill(org.opengis.style.Graphic graphicFill);
 
     void accept(org.geotools.styling.StyleVisitor visitor);
 
@@ -250,7 +250,7 @@ abstract class ConstantFill implements Fill {
         cannotModifyConstant();
     }
 
-    public void setGraphicFill(Graphic graphicFill) {
+    public void setGraphicFill(org.opengis.style.Graphic graphicFill) {
         cannotModifyConstant();
     }
     

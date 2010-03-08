@@ -63,7 +63,7 @@ import static org.junit.Assert.*;
  * the IDE however, in which case the tests are disabled in order to allows normal
  * execution of other tests.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/operation/CoordinateOperationFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/CoordinateOperationFactoryTest.java $
  * @version $Id: CoordinateOperationFactoryTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

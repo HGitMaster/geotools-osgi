@@ -9,6 +9,8 @@ import org.geotools.caching.spatialindex.SpatialIndexStatistics;
  * by the default spatial index statistics this
  * also tracks the number of evictions.</p>
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/GridSpatialIndexStatistics.java $
  */
 public class GridSpatialIndexStatistics extends SpatialIndexStatistics {
 	int stats_evictions = 0;

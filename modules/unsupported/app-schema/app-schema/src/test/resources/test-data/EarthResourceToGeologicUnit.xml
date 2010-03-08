@@ -42,7 +42,7 @@
 	<catalog>mappedPolygons.oasis.xml</catalog>
 	<targetTypes>
 		<FeatureType>
-			<schemaUri>commonSchemas_new/GeoSciML/geosciml.xsd</schemaUri>
+			<schemaUri>http://schemas.opengis.net/GeoSciML/geosciml.xsd</schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>
@@ -55,17 +55,19 @@
 					<targetAttribute>gsml:GeologicUnit</targetAttribute>
 				</AttributeMapping>
 				<AttributeMapping>
+				    <!-- All instances of gml:name should be mapped, how many is not known -->
 					<targetAttribute>gml:name</targetAttribute>
 					<sourceExpression>
-						<OCQL>strConcat('er.', getID())</OCQL>
+					  	<inputAttribute>gml:name</inputAttribute>
 					</sourceExpression>
+					<isMultiple>true</isMultiple>
 				</AttributeMapping>
 				<AttributeMapping>
 					<!--
 						This is used for chaining geological unit inside mapped feature as
 						specification
 					-->
-					<targetAttribute>gml:name[2]</targetAttribute>
+					<targetAttribute>FEATURE_LINK</targetAttribute>
 					<sourceExpression>
 						<OCQL>strConcat('gu.', getID())</OCQL>
 					</sourceExpression>
@@ -89,7 +91,7 @@
 					<targetAttributeNode>gsml:ControlledConceptPropertyType</targetAttributeNode>
 				</AttributeMapping>
 				<AttributeMapping>
-					<targetAttribute>gsml:classifier/gsml:ControlledConcept/gsml:preferredName</targetAttribute>
+					<targetAttribute>gsml:classifier/gsml:ControlledConcept/gml:name</targetAttribute>
 					<sourceExpression>
 						<inputAttribute>mo:classification/mo:MineralDepositModel/mo:mineralDepositGroup</inputAttribute>
 					</sourceExpression>
@@ -101,7 +103,7 @@
 					<sourceExpression>
 						<inputAttribute>mo:composition</inputAttribute>
 						<linkElement>gsml:CompositionPart</linkElement>
-						<linkField>gml:name</linkField>
+						<linkField>FEATURE_LINK</linkField>
 					</sourceExpression>
 					<isMultiple>true</isMultiple>
 				</AttributeMapping>

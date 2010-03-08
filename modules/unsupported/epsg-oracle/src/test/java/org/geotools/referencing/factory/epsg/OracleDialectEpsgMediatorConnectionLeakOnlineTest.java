@@ -29,6 +29,8 @@ import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
  * mediator/factory code.
  * 
  * @author Cory Horner (Refractions Research)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/epsg/OracleDialectEpsgMediatorConnectionLeakOnlineTest.java $
  */
 public class OracleDialectEpsgMediatorConnectionLeakOnlineTest extends OracleOnlineTestCase {
 

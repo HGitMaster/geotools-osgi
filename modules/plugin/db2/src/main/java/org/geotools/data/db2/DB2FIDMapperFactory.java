@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  * Overrides DefaultFIDMapperFactory methods for DB2-specific handling.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FIDMapperFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FIDMapperFactory.java $
  */
 public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(

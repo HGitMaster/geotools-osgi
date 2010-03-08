@@ -45,7 +45,7 @@ import org.geotools.util.logging.Logging;
  * @param <E> The type of elements in the set.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/WeakHashSet.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/WeakHashSet.java $
  * @version $Id: WeakHashSet.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

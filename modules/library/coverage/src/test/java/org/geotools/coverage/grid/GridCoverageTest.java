@@ -27,8 +27,8 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link GridCoverage2D} implementation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridCoverageTest.java $
- * @version $Id: GridCoverageTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridCoverageTest.java $
+ * @version $Id: GridCoverageTest.java 33828 2009-09-03 06:44:06Z mbedward $
  * @author Martin Desruisseaux (IRD)
  */
 public final class GridCoverageTest extends GridCoverageTestBase {
@@ -72,4 +72,5 @@ public final class GridCoverageTest extends GridCoverageTestBase {
         serial   = serial  .view(ViewType.GEOPHYSICS);
         assertRasterEquals(coverage, serial);
     }
+
 }

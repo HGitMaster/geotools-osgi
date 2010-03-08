@@ -32,7 +32,7 @@ import org.opengis.coverage.grid.GridEnvelope;
  * opposite of Java2D usage where {@link Rectangle} maximal values are exclusive.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridEnvelope2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridEnvelope2D.java $
  * @version $Id: GridEnvelope2D.java 30776 2008-06-20 17:00:11Z desruisseaux $
  * @author Martin Desruisseaux
  *

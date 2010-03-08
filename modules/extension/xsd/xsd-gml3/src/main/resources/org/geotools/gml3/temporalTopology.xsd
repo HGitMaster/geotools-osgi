@@ -141,8 +141,8 @@
 		<complexContent>
 			<extension base="gml:AbstractTimeTopologyPrimitiveType">
 				<sequence>
-					<element name="start" type="gml:TimeNodePropertyType"/>
-					<element name="end" type="gml:TimeNodePropertyType"/>
+					<!--element name="start" type="gml:TimeNodePropertyType"/>
+					<element name="end" type="gml:TimeNodePropertyType"/-->
 					<element name="extent" type="gml:TimePeriodPropertyType" minOccurs="0"/>
 				</sequence>
 			</extension>

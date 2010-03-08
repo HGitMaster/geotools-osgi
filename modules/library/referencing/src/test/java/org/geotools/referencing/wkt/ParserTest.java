@@ -44,8 +44,8 @@ import static org.junit.Assert.*;
 /**
  * Tests the WKT {@link Parser} implementation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/wkt/ParserTest.java $
- * @version $Id: ParserTest.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/wkt/ParserTest.java $
+ * @version $Id: ParserTest.java 33399 2009-06-30 11:25:55Z aaime $
  * @author Yann Cézard
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)
@@ -371,4 +371,14 @@ public final class ParserTest {
         }
         reader.close();
     }
+    
+    /**
+     * Test if the parser handles string and number coded Authority code-values. 
+     * @throws IOException
+     * @throws ParseException
+     */
+    @Test
+    public void testAuthorityCodeParsing() throws IOException, ParseException {
+        testParsing(new Parser(), "wkt/AuthorityCode.txt");
+    }    
 }

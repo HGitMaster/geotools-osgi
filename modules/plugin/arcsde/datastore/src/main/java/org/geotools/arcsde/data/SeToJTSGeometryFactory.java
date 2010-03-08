@@ -19,22 +19,24 @@ import com.vividsolutions.jts.geom.Polygon;
  * creates JTS geometries directly by calling {@link SeRow#getGeometry(GeometryFactory, int)},
  * instead of fetching an {@link SeShape} through {@link SeRow#getShape(int)} and then converting it
  * to a JTS geometry. This is work in progress and _experimental_, though.
+ * 
+ * @source $URL:
+ *         http://svn.osgeo.org/geotools/trunk/modules/plugin/arcsde/datastore/src/main/java/org
+ *         /geotools/arcsde/data/SeToJTSGeometryFactory.java $
  */
 public class SeToJTSGeometryFactory implements GeometryFactory {
 
-    protected static com.vividsolutions.jts.geom.GeometryFactory gf = new com.vividsolutions.jts.geom.GeometryFactory(new LiteCoordinateSequenceFactory());
+    protected static com.vividsolutions.jts.geom.GeometryFactory gf = new com.vividsolutions.jts.geom.GeometryFactory(
+            new LiteCoordinateSequenceFactory());
 
     private SeToJTSGeometryFactory delegate;
 
-    private int lastGeomType = Integer.MIN_VALUE;
-
-    public void init(int type, int numParts, int numPoints) {
-        if (type != lastGeomType) {
-            if(type == SeShape.TYPE_POLYGON){
-                delegate = new PolygonFactory();
-            }else if(type == SeShape.TYPE_MULTI_POLYGON){
-                delegate = new MultiPolygonFactory();
-            }
+    public void init(final int type, final int numParts, final int numPoints) {
+        if (type == SeShape.TYPE_POLYGON) {
+            delegate = new PolygonFactory();
+        } else if (type == SeShape.TYPE_MULTI_POLYGON) {
+            delegate = new MultiPolygonFactory();
+        } else {
             throw new IllegalArgumentException("Unhandled geometry type: " + type);
         }
         delegate.init(numParts, numPoints);
@@ -73,7 +75,7 @@ public class SeToJTSGeometryFactory implements GeometryFactory {
     }
 
     public void partOffsets(int[] partOffsets) {
-        // System.out.println(Arrays.asList(partOffsets));
+        // System.out.println(Arrays.toString(partOffsets));
     }
 
     /**

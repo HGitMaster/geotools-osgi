@@ -54,8 +54,8 @@ import org.geotools.resources.i18n.Errors;
  * coordinate points. Input points must be longitudes, latitudes and heights above the ellipsoid.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/GeocentricTransform.java $
- * @version $Id: GeocentricTransform.java 30760 2008-06-18 14:28:24Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/GeocentricTransform.java $
+ * @version $Id: GeocentricTransform.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Frank Warmerdam
  * @author Martin Desruisseaux (IRD)
  */
@@ -501,7 +501,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     /**
      * Inverse of a geocentric transform.
      *
-     * @version $Id: GeocentricTransform.java 30760 2008-06-18 14:28:24Z desruisseaux $
+     * @version $Id: GeocentricTransform.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
      * @author Martin Desruisseaux (IRD)
      */
     private final class Inverse extends AbstractMathTransform.Inverse implements Serializable {
@@ -569,7 +569,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric} coordinate
      * reference systems.
      *
-     * @version $Id: GeocentricTransform.java 30760 2008-06-18 14:28:24Z desruisseaux $
+     * @version $Id: GeocentricTransform.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
      * @author Martin Desruisseaux (IRD)
      */
     public static class Provider extends MathTransformProvider {
@@ -582,7 +582,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The operation parameter descriptor for the "semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
+        public static final ParameterDescriptor<Double> SEMI_MAJOR = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,  "semi_major"),
                     new NamedIdentifier(Citations.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
@@ -593,7 +593,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The operation parameter descriptor for the "semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
+        public static final ParameterDescriptor<Double> SEMI_MINOR = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,  "semi_minor"),
                     new NamedIdentifier(Citations.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
@@ -604,9 +604,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The number of geographic dimension (2 or 3). This is a Geotools-specific argument.
          * The default value is 3, which is the value implied in OGC's WKT.
          */
-        static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
-                    Collections.singletonMap(NAME_KEY,
-                        new NamedIdentifier(Citations.GEOTOOLS, "dim")),
+        static final ParameterDescriptor<Integer> DIM = DefaultParameterDescriptor.create(
+                    Collections.singletonMap(NAME_KEY, new NamedIdentifier(Citations.GEOTOOLS, "dim")),
                     3, 2, 3, false);
 
         /**
@@ -701,7 +700,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * to {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic} coordinate
      * reference systems.
      *
-     * @version $Id: GeocentricTransform.java 30760 2008-06-18 14:28:24Z desruisseaux $
+     * @version $Id: GeocentricTransform.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
      * @author Martin Desruisseaux (IRD)
      */
     public static class ProviderInverse extends Provider {

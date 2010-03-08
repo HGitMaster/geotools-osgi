@@ -28,7 +28,7 @@ import org.geotools.util.logging.Logging;
  * Utility class for managing memory mapped buffers.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/resources/NIOUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/NIOUtilities.java $
  * @version $Id: NIOUtilities.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Andrea Aimes
  */

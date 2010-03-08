@@ -18,13 +18,13 @@ package org.geotools.arcsde.data.versioning;
 
 import java.io.IOException;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 import com.esri.sde.sdk.client.SeStreamOp;
 
 /**
  * @author Gabriel Roldan (TOPP)
- * @version $Id: ArcSdeVersionHandler.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSdeVersionHandler.java 33451 2009-07-02 17:53:36Z groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/plugin/arcsde/datastore/src/main/java/org/geotools

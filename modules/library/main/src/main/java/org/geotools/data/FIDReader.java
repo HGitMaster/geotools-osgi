@@ -38,7 +38,7 @@ import java.io.IOException;
  * </p>
  *
  * @author Chris Holmes
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/FIDReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FIDReader.java $
  * @version $Id: FIDReader.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public interface FIDReader {

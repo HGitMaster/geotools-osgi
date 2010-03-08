@@ -17,6 +17,7 @@
  */
 package org.geotools.arcsde;
 
+import static org.geotools.arcsde.data.ArcSDEDataStoreConfig.VERSION_PARAM_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -26,15 +27,20 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.geotools.arcsde.data.ArcSDEDataStore;
+import org.geotools.arcsde.data.ArcSDEDataStoreConfig;
 import org.geotools.arcsde.data.InProcessViewSupportTestData;
 import org.geotools.arcsde.data.TestData;
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
-import org.geotools.arcsde.pool.ISession;
-import org.geotools.data.DataSourceException;
+import org.geotools.arcsde.session.ArcSDEConnectionConfig;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.UnavailableConnectionException;
+import org.geotools.data.DataAccessFactory;
+import org.geotools.data.DataAccessFinder;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFinder;
 import org.junit.After;
 import org.junit.Before;
@@ -42,6 +48,7 @@ import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeVersion;
 
 /**
  * Test suite for {@link ArcSDEDataStoreFactory}
@@ -50,9 +57,10 @@ import com.esri.sde.sdk.client.SeException;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/ArcSDEDataStoreFactoryTest.java $
- * @version $Id: ArcSDEDataStoreFactoryTest.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEDataStoreFactoryTest.java 34355 2009-11-09 19:05:33Z groldan $
  * @since 2.4.x
  */
+@SuppressWarnings("unchecked")
 public class ArcSDEDataStoreFactoryTest {
 
     /**
@@ -87,10 +95,10 @@ public class ArcSDEDataStoreFactoryTest {
         workingParams = testData.getConProps();
 
         nonWorkingParams = new HashMap(workingParams);
-        nonWorkingParams.put(ArcSDEConnectionConfig.SERVER_NAME_PARAM, "non-existent-server");
+        nonWorkingParams.put(ArcSDEConnectionConfig.SERVER_NAME_PARAM_NAME, "non-existent-server");
 
         illegalParams = new HashMap(workingParams);
-        illegalParams.put(ArcSDEConnectionConfig.DBTYPE_PARAM, "non-existent-db-type");
+        illegalParams.put(ArcSDEDataStoreConfig.DBTYPE_PARAM_NAME, "non-existent-db-type");
 
         dsFactory = new ArcSDEDataStoreFactory();
     }
@@ -101,18 +109,47 @@ public class ArcSDEDataStoreFactoryTest {
     }
 
     @Test
-    public void testLookUp() throws IOException {
+    public void testGetDataStore() throws IOException {
         DataStore dataStore;
 
         try {
             DataStoreFinder.getDataStore(nonWorkingParams);
             fail("should have failed with non working parameters");
-        } catch (DataSourceException e) {
+        } catch (IOException e) {
             assertTrue(true);
         }
         dataStore = DataStoreFinder.getDataStore(workingParams);
         assertNotNull(dataStore);
         assertTrue(dataStore instanceof ArcSDEDataStore);
+        dataStore.dispose();
+    }
+
+    @Test
+    public void testDataStoreFinderFindsIt() throws IOException {
+        Iterator<DataStoreFactorySpi> allFactories = DataStoreFinder.getAllDataStores();
+        ArcSDEDataStoreFactory sdeFac = null;
+        while (allFactories.hasNext()) {
+            DataAccessFactory next = allFactories.next();
+            if (next instanceof ArcSDEDataStoreFactory) {
+                sdeFac = (ArcSDEDataStoreFactory) next;
+                break;
+            }
+        }
+        assertNotNull(sdeFac);
+    }
+
+    @Test
+    public void testDataAccessFinderFindsIt() throws IOException {
+        Iterator<DataAccessFactory> allFactories = DataAccessFinder.getAllDataStores();
+        ArcSDEDataStoreFactory sdeFac = null;
+        while (allFactories.hasNext()) {
+            DataAccessFactory next = allFactories.next();
+            if (next instanceof ArcSDEDataStoreFactory) {
+                sdeFac = (ArcSDEDataStoreFactory) next;
+                break;
+            }
+        }
+        assertNotNull(sdeFac);
     }
 
     /**
@@ -156,6 +193,7 @@ public class ArcSDEDataStoreFactoryTest {
         DataStore store = dsFactory.createDataStore(workingParams);
         assertNotNull(store);
         assertTrue(store instanceof ArcSDEDataStore);
+        store.dispose();
     }
 
     /**
@@ -164,10 +202,12 @@ public class ArcSDEDataStoreFactoryTest {
      * 
      * @throws IOException
      * @throws SeException
+     * @throws UnavailableConnectionException
      */
     @Test
-    public void testCreateDataStoreWithInProcessViews() throws IOException, SeException {
-        ISession session = testData.getConnectionPool().getSession();
+    public void testCreateDataStoreWithInProcessViews() throws IOException, SeException,
+            UnavailableConnectionException {
+        ISession session = testData.getConnectionPool().getSession(true);
         try {
             InProcessViewSupportTestData.setUp(session, testData);
         } finally {
@@ -183,6 +223,64 @@ public class ArcSDEDataStoreFactoryTest {
         SimpleFeatureType viewType = store.getSchema(InProcessViewSupportTestData.typeName);
         assertNotNull(viewType);
         assertEquals(InProcessViewSupportTestData.typeName, viewType.getTypeName());
+        store.dispose();
     }
 
+    @Test
+    public void testVersionParamCheck() throws IOException, UnavailableConnectionException {
+        ISession session = testData.getConnectionPool().getSession(true);
+        final String versionName = "testVersionParamCheck";
+        try {
+            testData.createVersion(session, versionName,
+                    SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+        } finally {
+            session.dispose();
+        }
+
+        Map paramsWithVersion = new HashMap(workingParams);
+        try {
+            paramsWithVersion.put(VERSION_PARAM_NAME, "Non existent version name");
+            dsFactory.createDataStore(paramsWithVersion);
+        } catch (IOException e) {
+            assertTrue(e.getMessage(), e.getMessage().startsWith(
+                    "Specified ArcSDE version does not exist"));
+        }
+    }
+
+    @Test
+    public void testVersioned() throws IOException, UnavailableConnectionException {
+        ISession session = testData.getConnectionPool().getSession(true);
+        final String versionName = "testVersioned";
+        try {
+            testData.createVersion(session, versionName,
+                    SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+        } finally {
+            session.dispose();
+        }
+
+        Map paramsWithVersion = new HashMap(workingParams);
+        paramsWithVersion.put(VERSION_PARAM_NAME, versionName);
+        DataStore ds = dsFactory.createDataStore(paramsWithVersion);
+        assertNotNull(ds);
+        ds.dispose();
+
+        String qualifiedVersionName = session.getUser() + "." + versionName;
+        paramsWithVersion.put(VERSION_PARAM_NAME, qualifiedVersionName);
+        ds = dsFactory.createDataStore(paramsWithVersion);
+        assertNotNull(ds);
+        ds.dispose();
+
+        // version name should be case insensitive
+        qualifiedVersionName = qualifiedVersionName.toUpperCase();
+        paramsWithVersion.put(VERSION_PARAM_NAME, qualifiedVersionName);
+        ds = dsFactory.createDataStore(paramsWithVersion);
+        assertNotNull(ds);
+        ds.dispose();
+
+        qualifiedVersionName = qualifiedVersionName.toLowerCase();
+        paramsWithVersion.put(VERSION_PARAM_NAME, qualifiedVersionName);
+        ds = dsFactory.createDataStore(paramsWithVersion);
+        assertNotNull(ds);
+        ds.dispose();
+    }
 }

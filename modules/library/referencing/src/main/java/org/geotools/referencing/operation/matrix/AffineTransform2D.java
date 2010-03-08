@@ -20,6 +20,7 @@ import java.awt.geom.AffineTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -38,8 +39,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * would fails in most cases, and {@code isAffine()} would be useless.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/AffineTransform2D.java $
- * @version $Id: AffineTransform2D.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/AffineTransform2D.java $
+ * @version $Id: AffineTransform2D.java 34082 2009-10-06 11:00:21Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class AffineTransform2D extends AffineTransform implements Matrix {
@@ -210,5 +211,20 @@ public class AffineTransform2D extends AffineTransform implements Matrix {
     @Override
     public AffineTransform2D clone() {
         return (AffineTransform2D) super.clone();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AffineTransform)) {
+            return false;
+        }
+
+        AffineTransform a = (AffineTransform) obj;
+        
+        return Utilities.equals(getScaleX(), a.getScaleX()) &&
+            Utilities.equals(getScaleY(), a.getScaleY()) &&
+            Utilities.equals(getShearX(), a.getShearY()) &&
+            Utilities.equals(getTranslateX(), a.getTranslateX()) &&
+            Utilities.equals(getTranslateY(), a.getTranslateY());
     }
 }

@@ -21,6 +21,8 @@ import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.expression.Expression;
 /**
  * @author jdeolive
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/IsGreaterThanOrEqualToImpl.java $
  */
 public class IsGreaterThanOrEqualToImpl extends CompareFilterImpl
 		implements PropertyIsGreaterThanOrEqualTo {

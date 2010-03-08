@@ -34,7 +34,7 @@ import javax.sql.DataSource;
  * A factory to create a DB2 Connection based on the needed parameters.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2ConnectionFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2ConnectionFactory.java $
  * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */
 public class DB2ConnectionFactory {

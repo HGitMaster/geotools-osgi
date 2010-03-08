@@ -58,8 +58,8 @@ import org.geotools.util.Utilities;
  * </pre></blockquote>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/parameter/MatrixParameterDescriptors.java $
- * @version $Id: MatrixParameterDescriptors.java 31000 2008-07-10 21:11:13Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/MatrixParameterDescriptors.java $
+ * @version $Id: MatrixParameterDescriptors.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *
  * @see MatrixParameters
@@ -127,8 +127,8 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
          *       elements.
          */
         this(properties, new ParameterDescriptor[] {
-            new DefaultParameterDescriptor("num_row", DEFAULT_MATRIX_SIZE, 2, 50),
-            new DefaultParameterDescriptor("num_col", DEFAULT_MATRIX_SIZE, 2, 50)
+        		DefaultParameterDescriptor.create("num_row", DEFAULT_MATRIX_SIZE, 2, 50),
+        		DefaultParameterDescriptor.create("num_col", DEFAULT_MATRIX_SIZE, 2, 50)
         }, "elt_", '_');
     }
 

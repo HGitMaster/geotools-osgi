@@ -31,7 +31,7 @@ import org.geotools.styling.TextSymbolTest;
 /**
  *
  * @author jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/DefaultCoreSuite.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/DefaultCoreSuite.java $
  */                                
 public class DefaultCoreSuite extends TestCase {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");

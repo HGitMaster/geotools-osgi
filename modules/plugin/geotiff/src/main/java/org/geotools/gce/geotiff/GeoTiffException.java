@@ -69,7 +69,7 @@ import org.geotools.gce.geotiff.adapters.TiePoint;
  * </p>
  * 
  * @author Bryce Nordgren / USDA Forest Service
- * @author Simone Giannecchini
+ * @author Simone Giannecchini, GeoSolutions SAS
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffException.java $
  */

@@ -21,17 +21,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.geotools.data.complex.AppSchemaDataAccessRegistry;
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.complex.NestedAttributeMapping;
+import org.geotools.data.complex.filter.XPath;
+import org.geotools.factory.Hints;
 import org.geotools.filter.AttributeExpressionImpl;
+import org.geotools.filter.expression.FeaturePropertyAccessorFactory;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.expression.Expression;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * This class represents a list of expressions broken up from a single XPath expression that is
@@ -39,6 +44,8 @@ import org.opengis.filter.expression.Expression;
  * feature.
  * 
  * @author Rini Angreani, Curtin University of Technology
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/NestedAttributeExpression.java $
  */
 public class NestedAttributeExpression extends AttributeExpressionImpl {
     /**
@@ -47,7 +54,14 @@ public class NestedAttributeExpression extends AttributeExpressionImpl {
     private final List<Expression> expressions;
 
     /**
-     * Sole constructor
+     * The name spaces hints
+     */
+    private Hints namespaces;
+
+    private CoordinateReferenceSystem crs;
+
+    /**
+     * First constructor
      * 
      * @param xpath
      *            Attribute XPath
@@ -66,6 +80,19 @@ public class NestedAttributeExpression extends AttributeExpressionImpl {
     }
 
     /**
+     * Constructor with no expressions supplied. Used when feature mappings may not be there, ie.
+     * not from an app-schema data access.
+     * 
+     * @param xpath
+     *            Attribute XPath
+     */
+    public NestedAttributeExpression(String xpath, CoordinateReferenceSystem reprojection) {
+        super(xpath);
+        this.expressions = Collections.<Expression> emptyList();
+        this.crs = reprojection;
+    }
+
+    /**
      * see {@link org.geotools.filter.AttributeExpressionImpl#evaluate(Object)}
      */
     @Override
@@ -73,7 +100,7 @@ public class NestedAttributeExpression extends AttributeExpressionImpl {
         if (object == null) {
             return null;
         }
-            
+
         // only simple/complex features are supported
         if (!(object instanceof Feature)) {
             throw new UnsupportedOperationException(
@@ -82,25 +109,61 @@ public class NestedAttributeExpression extends AttributeExpressionImpl {
         ArrayList<Feature> rootList = new ArrayList<Feature>();
         rootList.add((Feature) object);
 
+        FeatureTypeMapping mappings = null;
+
+        String[] xPathSteps = this.attPath.split("/");
         // start from the first feature type
-        Expression expression = expressions.get(0);
-        Object value = expression.evaluate((Feature) object);
-        assert value instanceof Name;
-        FeatureTypeMapping mappings;
-        try {
-            mappings = AppSchemaDataAccessRegistry.getMapping((Name) value);
-        } catch (IOException e) {
-            throw new UnsupportedOperationException("Mapping not found for: '" + value + "' type!");
+        if (!expressions.isEmpty()) {
+            Expression expression = expressions.get(0);
+            Object value = expression.evaluate((Feature) object);
+            assert value instanceof Name;
+            try {
+                mappings = AppSchemaDataAccessRegistry.getMapping((Name) value);
+                this.namespaces = new Hints(FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT,
+                        mappings.getNamespaces());
+            } catch (IOException e) {
+                throw new UnsupportedOperationException("Mapping not found for: '" + value
+                        + "' type!");
+            }
+        } else {
+            // only supported for feature chaining purposes ie. linking between
+            // feature types through simple link fields such as gml:name
+            if (xPathSteps.length > 1) {
+                throw new UnsupportedOperationException(
+                        "Filtering deep complex attributes straight on complex features aren't supported yet.");
+            }
         }
         // iterate through the expressions, starting from the first attribute
-        Collection<?> valueList = evaluate(rootList, 1, mappings);
-
+        Collection<?> valueList = evaluate(rootList, 1, mappings, xPathSteps);
         if (valueList.isEmpty()) {
             return null;
         }
         String valueString = valueList.toString();
         // remove brackets
         return valueString.substring(1, valueString.length() - 1);
+    }
+
+    /**
+     * Return the next expression to be evaluated.
+     * 
+     * @param stepIndex
+     *            Index of expression
+     * @param xPathSteps
+     *            Broken up attribute expression xpath
+     * @param namespaces
+     *            Namespace support
+     * @return Next expression
+     */
+    private Expression getExpression(int stepIndex, String[] xPathSteps) {
+        // expressions are preceded with the root feature's type name, so the index
+        // is always +1 ahead of the xPathSteps index
+        // expression would be in the expressions list if we have access to simple features
+        // ie. the nested type is configured in an app-schema data access.. otherwise make up one
+        // from the xpath steps, as we
+        // would have complex features to evaluate against
+        return ((stepIndex < expressions.size()) ? expressions.get(stepIndex)
+                : new AttributeExpressionImpl(xPathSteps[stepIndex - 1], namespaces));
+
     }
 
     /**
@@ -114,22 +177,22 @@ public class NestedAttributeExpression extends AttributeExpressionImpl {
      *            Next index of expression to evaluate
      * @param mappings
      *            The feature type mapping of the features
+     * @param xPathSteps
+     *            Array representation of this attribute's broken up xpath steps
      * @return the values from the complex features as a list
      */
-    private Collection<Object> evaluate(Collection<Feature> rootList, int nextIndex,
-            FeatureTypeMapping mappings) {
-        Collection<Object> valueList = new ArrayList<Object>();
+    private Collection<Object> evaluate(Collection<Feature> rootList, int stepIndex,
+            FeatureTypeMapping mappings, String[] xPathSteps) {
+        Collection<Object> valueList = new HashSet<Object>();
 
-        if (nextIndex >= expressions.size()) {
+        if (stepIndex >= this.expressions.size() && stepIndex > xPathSteps.length) {
             return Collections.emptyList();
         }
 
-        // this should be an attribute expression
-        Expression expression = expressions.get(nextIndex);
-        assert expression instanceof AttributeExpressionImpl;
+        Expression expression = getExpression(stepIndex, xPathSteps);
 
         for (Feature root : rootList) {
-            ArrayList<Object> attributeValues = new ArrayList<Object>();
+            HashSet<Object> attributeValues = new HashSet<Object>();
 
             Object value = expression.evaluate(root);
 
@@ -153,55 +216,59 @@ public class NestedAttributeExpression extends AttributeExpressionImpl {
             } else {
                 attributeValues.add(value);
             }
-            if (nextIndex < expressions.size() - 1) {
-                // if this is not the last, get the next feature type in the chain
-                List<AttributeMapping> attMappings = mappings
-                        .getAttributeMappingsByExpression(expression);
+            if (stepIndex <= xPathSteps.length && mappings != null) {
+                // if this is not the last chain, get the next feature type
+                AttributeMapping mapping = mappings.getAttributeMapping(XPath.steps(mappings
+                        .getTargetFeature(), xPathSteps[stepIndex - 1], mappings.getNamespaces()));
 
-                if (attMappings.isEmpty()) {
+                if (stepIndex >= this.expressions.size() - 1) {
+                    // means we have more in xPathSteps than expressions, this could be
+                    // because the last chained attribute is mapped as an inline attribute
+                    // eg.
+                    // <targetAttribute>gsml:bodyMorphology/gsml:CGI_TermValue/gsml:value</targetAttribute>
+                    // if no more mapping found, then we're done
+                    if (mapping == null || !(mapping instanceof NestedAttributeMapping)) {
+                        if (!attributeValues.isEmpty()) {
+                            valueList.addAll(attributeValues);
+                        }
+                        continue;
+                    }
+                }
+                if (mapping == null) {
                     throw new UnsupportedOperationException("Mapping not found for: '"
-                            + expression.toString() + "'");
+                            + xPathSteps[stepIndex].toString() + "'");
                 }
-
-                if (attMappings.size() > 1) {
-                    // feature chaining only supports exact XPath with index so this shouldn't
-                    // happen
-                    throw new UnsupportedOperationException("Filtering attributes that map "
-                            + "to more than one source expressions is not supported yet");
-                }
-
-                AttributeMapping mapping = (AttributeMapping) attMappings.get(0);
                 assert mapping instanceof NestedAttributeMapping;
 
                 FeatureTypeMapping fMapping = null;
                 try {
-                    ArrayList<Feature> featureList = new ArrayList<Feature>();
+                    ArrayList<Feature> featureList = getFeatures((NestedAttributeMapping) mapping,
+                            attributeValues);
+                    // get the next type if there is any
+                    stepIndex++;
 
-                    // get the features by feature id values
-                    for (Object val : attributeValues) {
-                        featureList.addAll(((NestedAttributeMapping) mapping).getInputFeatures(val));
-                    }
+                    if (!featureList.isEmpty()) {
+                        Expression nextExpression;
+                        if (stepIndex < expressions.size() - 1) {
+                            // first get the feature type mapping for the next attribute
+                            nextExpression = expressions.get(stepIndex);
 
-                    // get the next attribute if there is any
-                    nextIndex++;
+                            value = nextExpression.evaluate(featureList.get(0));
 
-                    if (!featureList.isEmpty() && nextIndex < expressions.size() - 1) {
-                        // first get the feature type mapping for the next attribute
-                        Expression nextExpression = expressions.get(nextIndex);
-
-                        value = nextExpression.evaluate(featureList.get(0));
-
-                        assert value instanceof Name;
-                        try {
-                            fMapping = AppSchemaDataAccessRegistry.getMapping((Name) value);
-                        } catch (IOException e) {
-                            throw new UnsupportedOperationException("Mapping not found for: '"
-                                    + value + "' type!");
+                            assert value instanceof Name;
+                            try {
+                                fMapping = AppSchemaDataAccessRegistry.getMapping((Name) value);
+                                this.namespaces = new Hints(
+                                        FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT, fMapping
+                                                .getNamespaces());
+                            } catch (IOException e) {
+                                throw new UnsupportedOperationException("Mapping not found for: '"
+                                        + value + "' type!");
+                            }
                         }
-
-                        nextIndex++;
                         // then get the value of the next attribute
-                        valueList.addAll(evaluate(featureList, nextIndex, fMapping));
+                        stepIndex++;
+                        valueList.addAll(evaluate(featureList, stepIndex, fMapping, xPathSteps));
                     }
                 } catch (IOException e) {
                     throw new UnsupportedOperationException(
@@ -214,6 +281,38 @@ public class NestedAttributeExpression extends AttributeExpressionImpl {
             }
         }
         return valueList;
+    }
+
+    /**
+     * Return nested features from the supplied attribute mapping and foreign keys. If the mapping
+     * is configured in app-schema data access, we are after the simple/input features, otherwise we
+     * have to get the complex features since simple features may not be available.
+     * 
+     * @param mapping
+     *            The nested attribute mapping
+     * @param foreignKeys
+     *            Foreign key values to the nested type
+     * @return List of nested features
+     * @throws IOException
+     */
+    private ArrayList<Feature> getFeatures(NestedAttributeMapping mapping,
+            Collection<Object> foreignKeys) throws IOException {
+        ArrayList<Feature> featureList = new ArrayList<Feature>();
+
+        boolean hasSimpleFeatures = AppSchemaDataAccessRegistry.hasName(mapping
+                .getNestedFeatureType());
+
+        if (hasSimpleFeatures) {
+            for (Object val : foreignKeys) {
+                featureList.addAll(mapping.getInputFeatures(val, crs));
+            }
+        } else {
+            for (Object val : foreignKeys) {
+                featureList.addAll(mapping.getFeatures(val, crs));
+            }
+        }
+        return featureList;
+
     }
 
     /**

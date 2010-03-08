@@ -40,7 +40,7 @@ import org.geotools.util.WeakValueHashMap;
  * of {@link ColorModel} are shared among all callers in the running virtual machine.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/ColorModelFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/ColorModelFactory.java $
  * @version $Id: ColorModelFactory.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

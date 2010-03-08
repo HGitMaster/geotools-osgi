@@ -5,194 +5,136 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $              
      ======================================================================= -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" 
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-                               http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                                 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.geotools</groupId>
-    <artifactId>unsupported</artifactId>
-    <version>2.6-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <groupId>org.geotools</groupId>
+        <artifactId>unsupported</artifactId>
+        <version>2.6.2</version>
+    </parent>
 
-
-  <!-- =========================================================== -->
-  <!--   Properties and Profiles                                   -->
-  <!--       explanation of their effect.                          -->
-  <!--                                                             -->
-  <!--   Available profiles are:                                   -->
-  <!--                                                             -->
-  <!--     nameOfprofile      Explantion of what the profile does  -->
-  <!--                        for the user.                        -->
-  <!--                                                             -->
-  <!--     Example:           mvn -PnameOfprofile install          -->
-  <!--                                                             -->
-  <!--     Note ...                                                -->
-  <!-- =========================================================== -->
-  <!-- Default setting of properties -->
-  <!--
-  <properties>
-    <nameOfproperty>valueOfsetting</nameOfproperty>
-  </properties>
-  -->
-
-  <!-- Profiles set on the command-line to override default properties. -->
-  <!--
-  <profiles>
-    <profile>
-      <id>nameOfprofile</id>
-      <properties>
-        <nameOfproperty>valueOfsetting</nameOfproperty>
-      </properties>
-    </profile>
-  </profiles>
-  -->
-  
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
-  <groupId>org.geotools</groupId>
-  <artifactId>gt-process</artifactId>
-  <packaging>jar</packaging>
-  <name>Process</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/process/</url>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt-process</artifactId>
+    <packaging>jar</packaging>
+    <name>Process</name>
 
-  <scm>
-    <connection>
-      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/process/
-    </connection>
-    <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/process/</url>
-  </scm>
+    <scm>
+        <connection>
+            scm:svn:http://svn.osgeo.org/geotools/trunk/modules/unsupported/process/
+        </connection>
+        <url>http://svn.osgeo.org/geotools/trunk/modules/unsupported/process/</url>
+    </scm>
 
-  <description>
-    This is an API for creating processes/operations.
-  </description>
+    <description>
+      An API for creating custom processes/operations plus a
+      collection of pre-written processes including vector/raster
+      conversion.
+    </description>
   
-  <organization>
-    <name></name>
-    <url></url>
-  </organization>
-  
-  <!-- for your project. -->
-  <inceptionYear></inceptionYear>
-
-  <!-- Pick your license. -->
-  <!--
-  <licenses>
-    <license>
-      <name>Lesser General Public License (LGPL)</name>
-      <url>http://www.gnu.org/copyleft/lesser.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  -->
+    <licenses>
+        <license>
+            <name>Lesser General Public License (LGPL)</name>
+            <url>http://www.gnu.org/copyleft/lesser.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
 
   <!-- =========================================================== -->
   <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
-  <developers>
-    <developer>
-      <id>gdavis</id>
-      <name>Graham Davis</name>
-      <email>gdavis@refractions.net</email>
-      <organization>Refractions Research</organization>
-      <roles>
-        <role>Module Maintainer</role>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-  </developers>
+    <developers>
+        <developer>
+            <id>gdavis</id>
+            <name>Graham Davis</name>
+            <email>gdavis@refractions.net</email>
+            <organization>Refractions Research</organization>
+            <roles>
+                <role>Module Maintainer</role>
+                <role>Java Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>mbedward</id>
+            <name>Michael Bedward</name>
+            <email>michael.bedward@gmail.com</email>
+            <organization>Dept Environment and Climate Change</organization>
+            <organizationUrl>http://www.environment.nsw.gov.au</organizationUrl>
+            <timezone>+10</timezone>
+            <roles>
+                <role>Java Developer</role>
+                <role>Module Maintainer</role>
+            </roles>
+        </developer>
+    </developers>
 
 
   <!-- =========================================================== -->
   <!--     Dependency Mangement                                    -->
   <!-- =========================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-main</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-postgis</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-coverage</artifactId>
-      <version>${project.version}</version>
-    </dependency>    
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-main</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-coverage</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-postgis</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-shapefile</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_core</artifactId>
+            <!-- The version number is specified in the parent POM. -->
+            <scope>provided</scope>  <!-- Users should execute JAI installer. -->
+        </dependency>
+        <dependency>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_imageio</artifactId>
+            <!-- The version number is specified in the parent POM. -->
+            <scope>provided</scope>  <!-- Users should execute JAI installer. -->
+        </dependency>
 
-
-  <!-- =========================================================== -->
-  <!--     Build Configuration                                     -->
-  <!--         copies all JARs in a single directory.              -->
-  <!-- =========================================================== -->
-  <build>
-
-    <plugins>
-      <!-- ====    Compilation      ============================== -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!-- ====    Switch commenting to skip tests    = -->
-          <skip>${allow.test.skip}</skip>
-          <!-- skip>true</skip> -->
-          <includes>
-            <include></include>
-          </includes>
-          <excludes>
-            <exclude></exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-
-      <!-- ====    Testing          ============================== -->
-      <!-- ====    Code Formatting  ============================== -->
-      <!--
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jalopy-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>format</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      -->
-      <!-- ====    Code Coverage    ============================== -->
-      <!--
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clover-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal></goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      -->
-    </plugins>
-
-  </build>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-sample-data</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_codec</artifactId>
+	    <!-- The version number is specified in the parent POM. -->
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>

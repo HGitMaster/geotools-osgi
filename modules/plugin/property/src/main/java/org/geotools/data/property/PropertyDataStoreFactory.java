@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * DataStore factory that creates {@linkplain org.geotools.data.property.PropertyDataStore}s
  *
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyDataStoreFactory.java $
  * @version $Id: PropertyDataStoreFactory.java 32332 2009-01-26 18:54:59Z aaime $
  */
 public class PropertyDataStoreFactory implements DataStoreFactorySpi {

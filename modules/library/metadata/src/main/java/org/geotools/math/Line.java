@@ -36,7 +36,7 @@ import org.opengis.util.Cloneable;
  * {@link #x} compute the converse and should work even if the line is vertical.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/math/Line.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/math/Line.java $
  * @version $Id: Line.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (PMO, IRD)
  *

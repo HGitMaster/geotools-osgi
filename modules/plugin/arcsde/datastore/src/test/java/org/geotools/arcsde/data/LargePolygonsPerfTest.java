@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
@@ -279,11 +278,10 @@ public class LargePolygonsPerfTest {
         log("-----------------------------------------------------");
         log("Testing SeQuery with SeShape fetching");
 
-        Properties props = testData.getConProps();
+        Map<String, String> props = testData.getConProps();
 
-        SeConnection conn = new SeConnection(props.getProperty("server"), Integer.parseInt(props
-                .getProperty("port")), props.getProperty("instance"), props.getProperty("user"),
-                props.getProperty("password"));
+        SeConnection conn = new SeConnection(props.get("server"), Integer.parseInt(props
+                .get("port")), props.get("instance"), props.get("user"), props.get("password"));
 
         try {
             Stopwatch sw = new Stopwatch();
@@ -314,11 +312,10 @@ public class LargePolygonsPerfTest {
         log("-----------------------------------------------------");
         log("Testing SeQuery with GeometryFactory fetching");
 
-        Properties props = testData.getConProps();
+        Map<String, String> props = testData.getConProps();
 
-        SeConnection conn = new SeConnection(props.getProperty("server"), Integer.parseInt(props
-                .getProperty("port")), props.getProperty("instance"), props.getProperty("user"),
-                props.getProperty("password"));
+        SeConnection conn = new SeConnection(props.get("server"), Integer.parseInt(props
+                .get("port")), props.get("instance"), props.get("user"), props.get("password"));
 
         try {
             Stopwatch sw = new Stopwatch();

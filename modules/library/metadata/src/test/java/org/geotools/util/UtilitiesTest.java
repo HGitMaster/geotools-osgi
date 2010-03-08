@@ -24,7 +24,7 @@ import static org.geotools.util.Utilities.*;
 /**
  * Tests the {@link Utilities} static methods.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/util/UtilitiesTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/UtilitiesTest.java $
  * @version $Id: UtilitiesTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

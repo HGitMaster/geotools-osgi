@@ -41,6 +41,8 @@ import org.opengis.filter.Not;
  * 
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/cql2/CQLBooleanValueExpressionTest.java $
  */
 public class CQLBooleanValueExpressionTest {
     protected final org.geotools.filter.text.commons.Language language;

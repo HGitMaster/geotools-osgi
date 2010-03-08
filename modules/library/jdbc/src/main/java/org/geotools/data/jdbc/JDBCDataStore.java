@@ -108,8 +108,10 @@ import org.opengis.filter.Filter;
  * @author Sean  Geoghegan, Defence Science and Technology Organisation
  * @author Chris Holmes, TOPP
  * @author Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCDataStore.java $
- * @version $Id: JDBCDataStore.java 30646 2008-06-12 18:48:06Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCDataStore.java $
+ * @version $Id: JDBCDataStore.java 33484 2009-07-06 02:17:34Z jdeolive $
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public abstract class JDBCDataStore extends JDBC2DataStore {
 	protected JDBCDataStore( DataSource dataSource, JDBCDataStoreConfig config ) throws IOException {

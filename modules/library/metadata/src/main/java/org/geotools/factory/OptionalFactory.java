@@ -45,7 +45,7 @@ package org.geotools.factory;
  * is undetermined if the {@code isAvailable()} state changes with time.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/OptionalFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/OptionalFactory.java $
  * @version $Id: OptionalFactory.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  *

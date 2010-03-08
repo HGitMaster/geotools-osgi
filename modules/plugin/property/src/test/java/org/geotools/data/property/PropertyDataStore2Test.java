@@ -36,7 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Test non functionality of PropertyDataStore.
  * 
  * @author Jody Garnett, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStore2Test.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStore2Test.java $
  */
 public class PropertyDataStore2Test extends TestCase {
     PropertyDataStore store;

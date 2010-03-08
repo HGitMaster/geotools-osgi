@@ -67,7 +67,7 @@ import org.geotools.feature.SchemaException;
  * </ul>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/data/DataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/DataStore.java $
  * @version $Id: DataStore.java 30642 2008-06-12 17:52:06Z acuster $
  */
 public interface DataStore extends DataAccess<SimpleFeatureType, SimpleFeature>{

@@ -1,10 +1,12 @@
 package org.geotools.renderer.lite;
 
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+
 import java.awt.Font;
 import java.awt.RenderingHints;
 import java.io.File;
-
-import junit.framework.TestCase;
+import java.util.Collections;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.property.PropertyDataStore;
@@ -14,18 +16,19 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.style.FontCache;
 import org.geotools.styling.Style;
 import org.geotools.test.TestData;
+import org.junit.Before;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import static java.awt.RenderingHints.*;
 
-public class FillTest extends TestCase {
-    private static final long TIME = 2000;
+public class FillTest {
+    private static final long TIME = 20000;
     FeatureSource<SimpleFeatureType, SimpleFeature> fs;
     FeatureSource<SimpleFeatureType, SimpleFeature> bfs;
     ReferencedEnvelope bounds;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         File property = new File(TestData.getResource(this, "square.properties").toURI());
         PropertyDataStore ds = new PropertyDataStore(property.getParentFile());
         fs = ds.getFeatureSource("square");
@@ -37,10 +40,11 @@ public class FillTest extends TestCase {
         Font f = Font.createFont(Font.TRUETYPE_FONT, TestData.getResource(this, "recreate.ttf").openStream());
         FontCache.getDefaultInstance().registerFont(f);
         
-//        System.setProperty("org.geotools.test.interactive", "true");
+        // System.setProperty("org.geotools.test.interactive", "true");
         
     }
     
+    @Test
     public void testSolidFill() throws Exception {
         Style style = RendererBaseTest.loadStyle(this, "fillSolid.sld");
         
@@ -53,6 +57,7 @@ public class FillTest extends TestCase {
         RendererBaseTest.showRender("SolidFill", renderer, TIME, bounds);
     }
 
+    @Test
     public void testCrossFill() throws Exception {
         Style style = RendererBaseTest.loadStyle(this, "fillCross.sld");
         
@@ -66,6 +71,7 @@ public class FillTest extends TestCase {
         RendererBaseTest.showRender("CrossFill", renderer, TIME, bounds);
     }
     
+    @Test
     public void testTriangleFill() throws Exception {
         Style style = RendererBaseTest.loadStyle(this, "fillTriangle.sld");
         
@@ -79,6 +85,7 @@ public class FillTest extends TestCase {
         RendererBaseTest.showRender("TriangleFill", renderer, TIME, bounds);
     }
     
+    @Test
     public void testCircleFill() throws Exception {
         Style style = RendererBaseTest.loadStyle(this, "fillCircle.sld");
         
@@ -92,6 +99,7 @@ public class FillTest extends TestCase {
         RendererBaseTest.showRender("CircleFill", renderer, TIME, bounds);
     }
     
+    @Test
     public void testSlash() throws Exception {
         Style style = RendererBaseTest.loadStyle(this, "fillSlash.sld");
         
@@ -105,6 +113,7 @@ public class FillTest extends TestCase {
         RendererBaseTest.showRender("SlashFill", renderer, TIME, bounds);
     }
     
+    @Test
     public void testImageFill() throws Exception {
         Style style = RendererBaseTest.loadStyle(this, "fillImage.sld");
         
@@ -117,6 +126,7 @@ public class FillTest extends TestCase {
         RendererBaseTest.showRender("ImageFill", renderer, TIME, bounds);
     }
     
+    @Test
     public void testFontFill() throws Exception {
         Style style = RendererBaseTest.loadStyle(this, "fillTTFDecorative.sld");
         
@@ -130,8 +140,7 @@ public class FillTest extends TestCase {
         RendererBaseTest.showRender("TTF decorative", renderer, TIME, bounds);
     }
     
-    
-    
+    @Test
     public void testFTSComposition() throws Exception {
     	
     	Style bgStyle = RendererBaseTest.loadStyle(this, "fillSolid.sld");

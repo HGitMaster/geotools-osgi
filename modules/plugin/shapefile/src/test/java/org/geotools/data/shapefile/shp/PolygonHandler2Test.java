@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 /**
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/shp/PolygonHandler2Test.java $
- * @version $Id: PolygonHandler2Test.java 30670 2008-06-12 23:59:23Z acuster $
+ * @version $Id: PolygonHandler2Test.java 33985 2009-09-25 09:02:24Z aaime $
  * @author Ian Schneider
  */
 public class PolygonHandler2Test extends org.geotools.data.shapefile.TestCaseSupport {
@@ -47,7 +47,7 @@ public class PolygonHandler2Test extends org.geotools.data.shapefile.TestCaseSup
         c[1] = new Coordinate(1, 1, Double.NaN);
         c[2] = new Coordinate(1, 2, 3);
 
-        PolygonHandler handler = new PolygonHandler();
+        PolygonHandler handler = new PolygonHandler(new GeometryFactory());
         assertTrue(handler.getShapeType() == ShapeType.POLYGON);
 
         for (int i = 0, ii = c.length; i < ii; i++) {
@@ -82,7 +82,7 @@ public class PolygonHandler2Test extends org.geotools.data.shapefile.TestCaseSup
             }
         }
 
-        PolygonHandler ph = new PolygonHandler();
+        PolygonHandler ph = new PolygonHandler(new GeometryFactory());
         ArrayList assigned = ph.assignHolesToShells(shells, holes);
         assertEquals(((ArrayList) assigned.get(0)).size(), holes.size());
     }

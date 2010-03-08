@@ -44,7 +44,7 @@ import java.util.List;
  * &lt;/xsd:element&gt;
  * </code></pre>
  *
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Style.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Style.java $
  * @version $Id: Style.java 32919 2009-05-03 14:18:31Z jive $
  * @author James Macgill
  */

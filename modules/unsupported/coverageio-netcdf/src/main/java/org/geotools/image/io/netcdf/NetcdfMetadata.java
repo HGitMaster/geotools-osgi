@@ -62,7 +62,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * would not know what to do with the extra coordinate systems anyway.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio-netcdf/src/main/java/org/geotools/image/io/netcdf/NetcdfMetadata.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio-netcdf/src/main/java/org/geotools/image/io/netcdf/NetcdfMetadata.java $
  * @version $Id: NetcdfMetadata.java 30775 2008-06-20 15:50:30Z cedricbr $
  * @author Martin Desruisseaux
  */

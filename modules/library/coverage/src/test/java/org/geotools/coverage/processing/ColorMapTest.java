@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link ColorMap}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/processing/ColorMapTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/processing/ColorMapTest.java $
  * @version $Id: ColorMapTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux
  */

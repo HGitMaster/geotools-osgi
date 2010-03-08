@@ -72,8 +72,8 @@ import org.opengis.filter.expression.Expression;
  * standards with names and semantics which are as close as possible.
  * </ul>
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Stroke.java $
- * @version $Id: Stroke.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Stroke.java $
+ * @version $Id: Stroke.java 33833 2009-09-04 12:26:28Z jive $
  * @author James Macgill
  */
 public interface Stroke extends org.opengis.style.Stroke {
@@ -110,7 +110,7 @@ public interface Stroke extends org.opengis.style.Stroke {
             }
 
             public float[] getDashArray() {
-                return new float[] { 1, 0 };
+                return null;
             }
 
             public Expression getDashOffset() {
@@ -294,7 +294,7 @@ public interface Stroke extends org.opengis.style.Stroke {
      * This parameter indicates that a stipple-fill repeated graphic will be
      * used and specifies the fill graphic to use.
      */
-    void setGraphicFill(Graphic graphicFill);
+    void setGraphicFill(org.opengis.style.Graphic graphicFill);
 
     /**
      * This parameter indicates that a repeated-linear-graphic graphic stroke
@@ -323,7 +323,7 @@ public interface Stroke extends org.opengis.style.Stroke {
      * be assumed to be the middle pixel row of the image, starting from the
      * first pixel column and ending at the last pixel column.
      */
-    void setGraphicStroke(Graphic graphicStroke);
+    void setGraphicStroke(org.opengis.style.Graphic graphicStroke);
 
     void accept(org.geotools.styling.StyleVisitor visitor);
 
@@ -363,11 +363,11 @@ abstract class ConstantStroke implements Stroke {
         cannotModifyConstant();
     }
 
-    public void setGraphicFill(Graphic graphicFill) {
+    public void setGraphicFill(org.opengis.style.Graphic graphicFill) {
         cannotModifyConstant();
     }
 
-    public void setGraphicStroke(Graphic graphicStroke) {
+    public void setGraphicStroke(org.opengis.style.Graphic graphicStroke) {
         cannotModifyConstant();
     }
 

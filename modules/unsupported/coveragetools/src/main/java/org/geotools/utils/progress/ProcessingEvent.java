@@ -21,6 +21,8 @@ import java.util.EventObject;
 /**
  * @author Simone Giannecchini, GeoSolutions.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/progress/ProcessingEvent.java $
  */
 public class ProcessingEvent extends EventObject {
 

@@ -50,6 +50,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * this are provided in the schemas in annex D.
  * 
  * @author Jackson Roehrig & Sanjay Jena
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/complex/ComplexImpl.java $
  */
 public abstract class ComplexImpl extends GeometryImpl implements Complex {
 

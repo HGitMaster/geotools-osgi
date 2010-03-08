@@ -34,6 +34,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @since 2.5
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/DefaultFeatureFactory.java $
  */
 public class DefaultFeatureFactory extends AbstractFeatureFactoryImpl {
 

@@ -24,6 +24,8 @@ import java.util.Date;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.geotools.factory.Hints;
+
 
 import junit.framework.TestCase;
 
@@ -132,6 +134,14 @@ public class TemporalConverterFactoryTest extends TestCase {
 			.convert( date, Timestamp.class );
 		assertNotNull( timeStamp );
 		assertEquals( new Timestamp( date.getTime() ), timeStamp );
+		
+		      
+		//check safe conversion
+		Hints h = new Hints();
+		h.put(ConverterFactory.SAFE_CONVERSION, new Boolean(true));
+		assertNull( factory.createConverter( Timestamp.class, Calendar.class, h ) );
+		h.put(ConverterFactory.SAFE_CONVERSION, new Boolean(false));
+		assertNotNull( factory.createConverter( Timestamp.class, Calendar.class, h ) );
 	}
 	
 	public void testTimeToCalendar() throws Exception {

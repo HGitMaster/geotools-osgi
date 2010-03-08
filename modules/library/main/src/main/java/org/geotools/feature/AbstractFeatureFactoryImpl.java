@@ -49,7 +49,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Gabriel Roldan
  * @author Justin Deoliveira
  * 
- * @version $Id: AbstractFeatureFactoryImpl.java 32284 2009-01-21 06:09:14Z jive $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/AbstractFeatureFactoryImpl.java $
+ * @version $Id: AbstractFeatureFactoryImpl.java 34126 2009-10-12 06:35:18Z mbedward $
  */
 public abstract class AbstractFeatureFactoryImpl implements FeatureFactory {
  

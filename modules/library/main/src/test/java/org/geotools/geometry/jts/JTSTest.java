@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * Tests the {@link JTS} implementation.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/geometry/jts/JTSTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/geometry/jts/JTSTest.java $
  * @version $Id: JTSTest.java 31236 2008-08-26 21:26:11Z jgarnett $
  * @author Jess Eichar
  * @author Martin Desruisseaux

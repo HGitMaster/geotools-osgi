@@ -26,7 +26,7 @@ import org.opengis.metadata.quality.TopologicalConsistency;
  * Correctness of the explicitly encoded topological characteristics of the dataset as
  * described by the scope.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/TopologicalConsistencyImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/TopologicalConsistencyImpl.java $
  * @version $Id: TopologicalConsistencyImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

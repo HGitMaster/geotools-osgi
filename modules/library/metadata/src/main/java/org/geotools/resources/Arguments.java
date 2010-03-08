@@ -51,7 +51,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * and exits the virtual machine with a call to {@link System#exit} with error code 1.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/resources/Arguments.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/Arguments.java $
  * @version $Id: Arguments.java 30742 2008-06-16 19:48:45Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

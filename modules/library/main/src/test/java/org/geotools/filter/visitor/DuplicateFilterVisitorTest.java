@@ -37,7 +37,7 @@ import org.opengis.filter.expression.Literal;
  * Unit test for DuplicatorFilterVisitor.
  *
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/filter/visitor/DuplicateFilterVisitorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/visitor/DuplicateFilterVisitorTest.java $
  */
 public class DuplicateFilterVisitorTest extends TestCase {
 

@@ -24,6 +24,8 @@ import org.opengis.filter.capability.ScalarCapabilities;
  * Implementation of the ScalarCapabilities interface.
  * 
  * @author Justin Deoliveira, The Open Planning Project
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/capability/ScalarCapabilitiesImpl.java $
  */
 public class ScalarCapabilitiesImpl implements ScalarCapabilities {
 

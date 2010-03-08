@@ -30,7 +30,7 @@ import org.opengis.filter.expression.Expression;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/visitor/MinVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/MinVisitor.java $
  */
 public class MinVisitor implements FeatureCalc {
     private Expression expr;

@@ -16,6 +16,7 @@
  */
 package org.geotools.caching;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,48 +28,48 @@ import org.geotools.caching.spatialindex.NodeIdentifier;
  * <p>
  * Removes the oldest items from the cache.
  * </p>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/LRUEvictionPolicy.java $
  */
 public class LRUEvictionPolicy implements EvictionPolicy {
-    private Map<NodeIdentifier, Object> queue;
-    private EvictableTree tree;
+	private Map<NodeIdentifier, Object> queue;
+	private EvictableTree tree;
 
-    public LRUEvictionPolicy(EvictableTree tree) {
-        this.queue = new LinkedHashMap<NodeIdentifier, Object>(100, .75f, true);
-        this.tree = tree;
-    }
+	public LRUEvictionPolicy(EvictableTree tree) {
+		this.queue = Collections.synchronizedMap(new LinkedHashMap<NodeIdentifier, Object>(100, .75f, true));
+		this.tree = tree;
+	}
 
-    public boolean evict() {
-        Iterator<NodeIdentifier> it = queue.keySet().iterator();
-        while(it.hasNext()){
-            NodeIdentifier node = it.next();
-            if (!node.isLocked()){
-                try{
-                    node.writeLock();
-                    try{
-                        tree.evict(node);
-                        queue.remove(node);    
-                    }finally{
-                        node.writeUnLock();
-                    }
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                    return false;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
+	public boolean evict() {
+		synchronized (queue) {
+			Iterator<NodeIdentifier> it = queue.keySet().iterator();
+			while (it.hasNext()) {
+				NodeIdentifier node = it.next();
+				if (!node.isLocked()) {
+					try {
+						node.writeLock();
+						try {
+							tree.evict(node);
+							queue.remove(node);
+						} finally {
+							node.writeUnLock();
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+						return false;
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-    public void access(NodeIdentifier node) {
-        if (queue.containsKey(node)) {
-            queue.get(node);
-        } else if (node.isValid()) {
-            queue.put(node, null);
-        }
-    }
-    
-//    public boolean canEvict(){
-//    	return queue.size() > 0;
-//    }
+	public void access(NodeIdentifier node) {
+		if (queue.containsKey(node)) {
+			queue.get(node);
+		} else if (node.isValid()) {
+			queue.put(node, null);
+		}
+	}
 }

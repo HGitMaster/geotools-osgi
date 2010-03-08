@@ -35,6 +35,8 @@ import org.geotools.util.Utilities;
  * 
  * @author Simone Giannecchini, GeoSolutions
  * @author Mike Nidel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/adapters/GeoKeyEntry.java $
  */
 public final class GeoKeyEntry implements Comparable<GeoKeyEntry>{
 	@Override
@@ -160,12 +162,12 @@ public final class GeoKeyEntry implements Comparable<GeoKeyEntry>{
 	}
 
 	public void setValueOffset(int valueOffset) {
-		ensureNotNegative("ALUE_OFFSET", valueOffset);
+		ensureNotNegative("VALUE_OFFSET", valueOffset);
 		this.valueOffset = valueOffset;
 	}
 
 	public int[] getValues() {
-		return new int[] { keyID, tiffTagLocation, valueOffset, count };
+		return new int[] { keyID, tiffTagLocation, count, valueOffset};
 	}
 
 	/**

@@ -33,6 +33,8 @@ import com.vividsolutions.jts.util.Assert;
  * Unit test for FilterToCQL
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/cql2/FilterToCQLTest.java $
  */
 public class FilterToCQLTest extends TestCase {
 
@@ -63,6 +65,11 @@ public class FilterToCQLTest extends TestCase {
     public void testOR() throws Exception {
         cqlTest( "(ATTR1 > 10 OR ATTR2 < 2)" );
     }
+
+    public void testLike() throws Exception {
+        cqlTest( "ATTR1 LIKE '%ABC%'" );
+    }
+    
     protected void cqlTest( String cql ) throws Exception {
         Filter filter = CQL.toFilter(cql);
         assertNotNull( cql + " parse", filter );

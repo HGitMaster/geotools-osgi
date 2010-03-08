@@ -38,7 +38,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * This string also defines the {@linkplain CharSequence character sequence}.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/AbstractInternationalString.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/AbstractInternationalString.java $
  * @version $Id: AbstractInternationalString.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

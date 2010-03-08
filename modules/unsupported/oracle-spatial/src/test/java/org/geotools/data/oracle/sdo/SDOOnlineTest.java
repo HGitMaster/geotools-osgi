@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/sdo/SDOOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/sdo/SDOOnlineTest.java $
  */
 public class SDOOnlineTest extends TestCase {
     GeometryFixture fixture;

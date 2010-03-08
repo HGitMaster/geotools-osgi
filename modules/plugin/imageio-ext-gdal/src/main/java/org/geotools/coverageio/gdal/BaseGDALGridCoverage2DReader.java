@@ -28,7 +28,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverageio.BaseGridCoverage2DReader;
 import org.geotools.data.DataSourceException;
@@ -101,39 +101,25 @@ public abstract class BaseGDALGridCoverage2DReader extends
                     "Unexpected error! Metadata should be an instance of the expected class:"
                             + " GDALCommonIIOImageMetadata.");
         }
-
-        getPropertiesFromCommonMetadata((GDALCommonIIOImageMetadata) metadata);
+        parseCommonMetadata((GDALCommonIIOImageMetadata) metadata);
 
         // //
         //
-        // If common metadata doesn't have sufficient information to set CRS
-        // envelope, try other ways, such as looking for a PRJ
+        // Envelope and CRS checks
         //
         // //
-        if (getCoverageCRS() == null) {
-            parsePRJFile();
-        }
-
         if (getCoverageCRS() == null) {
             LOGGER.info("crs not found, proceeding with EPSG:4326");
             setCoverageCRS(AbstractGridFormat.getDefaultCRS());
         }
-
-        // //
-        //
-        // If no sufficient information have been found to set the
-        // envelope, try other ways, such as looking for a WorldFile
-        //
-        // //
+        
+        
         if (getCoverageEnvelope() == null) {
-            parseWorldFile();
-            if (getCoverageEnvelope() == null) {
-                throw new DataSourceException(
-                        "Unavailable envelope for this coverage");
-            }
+            throw new DataSourceException(
+                    "Unable to compute the envelope for this coverage");
         }
 
-        // setting the coordinate reference system for the envelope
+        // setting the coordinate reference system for the envelope, just to make sure we set it
         getCoverageEnvelope().setCoordinateReferenceSystem(getCoverageCRS());
 
         // Additional settings due to "final" methods getOriginalXXX
@@ -150,7 +136,7 @@ public abstract class BaseGDALGridCoverage2DReader extends
      *                a {@link GDALCommonIIOImageMetadata} metadata instance
      *                from where to search needed properties.
      */
-    private void getPropertiesFromCommonMetadata(
+    private void parseCommonMetadata(
             GDALCommonIIOImageMetadata metadata) {
 
         // ////////////////////////////////////////////////////////////////////
@@ -163,53 +149,44 @@ public abstract class BaseGDALGridCoverage2DReader extends
         // 1) CRS
         //
         // //
-    	try {
-			setCoverageCRS(CRS.decode("EPSG:3079"));
-		} catch (NoSuchAuthorityCodeException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (FactoryException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-//        if (getCoverageCRS() == null) {
-//            final String wkt = metadata.getProjection();
-//
-//            if ((wkt != null) && !(wkt.equalsIgnoreCase(""))) {
-//                try {
-//                    setCoverageCRS(CRS.parseWKT(wkt));
-//                    final Integer epsgCode = CRS.lookupEpsgCode(getCoverageCRS(), true);
-//
-//                    // Force the creation of the CRS directly from the
-//                    // retrieved
-//                    // EPSG code in order to prevent weird transformation
-//                    // between
-//                    // "same" CRSs having slight differences.
-//                    // TODO: cache epsgCode-CRSs
-//                    if (epsgCode != null) {
-//                        setCoverageCRS(CRS.decode("EPSG:" + epsgCode));
-//                    }
-//                } catch (FactoryException fe) {
-//                    // unable to get CRS from WKT
-//                    if (LOGGER.isLoggable(Level.FINE)) {
-//                        // LOGGER.log(Level.WARNING,
-//                        // fe.getLocalizedMessage(), fe);
-//                        LOGGER.log(Level.FINE,
-//                                "Unable to get CRS from WKT contained in metadata."
-//                                        + " Looking for a PRJ.");
-//                    }
-//
-//                    setCoverageCRS(null);
-//                }
-//            }
-//        }
+        // //
+        //
+        // Let the prj file override the internal representation for the undelrying source of information.
+        //
+        // //
+        parsePRJFile();
+        // if there was not prj or the envelope could not be created easily, let's go with the standard metadata.
+        if (getCoverageCRS() == null) {
+            final String wkt = metadata.getProjection();
+
+            if ((wkt != null) && !(wkt.equalsIgnoreCase(""))) {
+                try {
+                    setCoverageCRS(CRS.parseWKT(wkt));
+                    final Integer epsgCode = CRS.lookupEpsgCode(getCoverageCRS(), true);
+                    // Force the creation of the CRS directly from the
+                    // retrieved EPSG code in order to prevent weird transformation
+                    // between "same" CRSs having slight differences.
+                    // TODO: cache epsgCode-CRSs
+                    if (epsgCode != null) {
+                        setCoverageCRS(CRS.decode("EPSG:" + epsgCode));
+                    }
+                } catch (FactoryException fe) {
+                    // unable to get CRS from WKT
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        LOGGER.log(Level.FINE,"Unable to get CRS from WKT contained in metadata. Looking for a PRJ.");
+                    }
+                    //reset crs 
+                    setCoverageCRS(null);
+                }
+            }
+        }
         // //
         //
         // 2) Grid
         //
         // //
         if (getCoverageGridRange() == null)
-            setCoverageGridRange(new GeneralGridRange(new Rectangle(0, 0,
+            setCoverageGridRange(new GridEnvelope2D(new Rectangle(0, 0,
                     metadata.getWidth(), metadata.getHeight())));
 
         // //
@@ -217,35 +194,39 @@ public abstract class BaseGDALGridCoverage2DReader extends
         // 3) Envelope
         //
         // //
-
-        final double[] geoTransform = metadata.getGeoTransformation();
-        if ((geoTransform != null) && (geoTransform.length == 6)) {
-            final AffineTransform tempTransform = new AffineTransform(
-                    geoTransform[1], geoTransform[4], geoTransform[2],
-                    geoTransform[5], geoTransform[0], geoTransform[3]);
-            // ATTENTION: Gdal geotransform does not use the pixel is
-            // centre convention like world files.
-            if (getCoverageEnvelope() == null) {
-                try {
-                    // Envelope setting
-                    setCoverageEnvelope(CRS.transform(ProjectiveTransform
-                            .create(tempTransform), new GeneralEnvelope(
-                            getCoverageGridRange().toRectangle())));
-                } catch (IllegalStateException e) {
-                    if (LOGGER.isLoggable(Level.WARNING)) {
-                        LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-                    }
-                } catch (TransformException e) {
-                    if (LOGGER.isLoggable(Level.WARNING)) {
-                        LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-                    }
-                }
-            }
-            // Grid2World Transformation
-            final double tr = -PixelTranslation
-                    .getPixelTranslation(PixelInCell.CELL_CORNER);
-            tempTransform.translate(tr, tr);
-            this.raster2Model = ProjectiveTransform.create(tempTransform);
+        //
+        // Let's look for a world file first.
+        //
+        parseWorldFile();
+        if (getCoverageEnvelope() == null) {
+	        final double[] geoTransform = metadata.getGeoTransformation();
+	        if ((geoTransform != null) && (geoTransform.length == 6)) {
+	            final AffineTransform tempTransform = new AffineTransform(
+	                    geoTransform[1], geoTransform[4], geoTransform[2],
+	                    geoTransform[5], geoTransform[0], geoTransform[3]);
+	            // ATTENTION: Gdal geotransform does not use the pixel is
+	            // centre convention like world files.
+	            if (getCoverageEnvelope() == null) {
+	                try {
+	                    // Envelope setting
+	                    setCoverageEnvelope(CRS.transform(ProjectiveTransform
+	                            .create(tempTransform), new GeneralEnvelope(
+	                            getCoverageGridRange())));
+	                } catch (IllegalStateException e) {
+	                    if (LOGGER.isLoggable(Level.WARNING)) {
+	                        LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+	                    }
+	                } catch (TransformException e) {
+	                    if (LOGGER.isLoggable(Level.WARNING)) {
+	                        LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+	                    }
+	                }
+	            }
+	            // Grid2World Transformation
+	            final double tr = -PixelTranslation.getPixelTranslation(PixelInCell.CELL_CORNER);
+	            tempTransform.translate(tr, tr);
+	            this.raster2Model = ProjectiveTransform.create(tempTransform);
+	        }
         }
     }
 }

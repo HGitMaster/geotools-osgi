@@ -29,6 +29,8 @@ import org.geotools.xml.XSD;
  * attributes in the http://www.opengis.net/ows/1.1 schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/v1_1/OWS.java $
  */
 public final class OWS extends XSD {
 

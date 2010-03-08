@@ -24,6 +24,11 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+
 public class SimpleFeaturePropertyAccessorTest extends TestCase {
 
 	SimpleFeatureType type;
@@ -107,6 +112,28 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 		} catch (IllegalAttributeException e) {}
 		
 		
+	}
+	
+	public void testGetAnyGeometry() throws Exception {
+	    SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+	    tb.setName( "test");
+	    tb.add("g1", Point.class );
+	    tb.add("g2", Point.class );
+	    tb.setDefaultGeometry( "g1" );
+	    
+	    SimpleFeatureType type = tb.buildFeatureType();
+	    
+	    SimpleFeatureBuilder b = new SimpleFeatureBuilder(type);
+	    b.set("g1", null );
+	    
+	    Point p = new GeometryFactory().createPoint( new Coordinate(0,0));
+	    b.set("g2", p );
+	    SimpleFeature feature = b.buildFeature(null);
+	    
+	    assertNull( feature.getDefaultGeometry() );
+	    assertEquals(p, SimpleFeaturePropertyAccessorFactory
+	            .DEFAULT_GEOMETRY_ACCESS.get( feature, "", Geometry.class ));
+	    
 	}
 	
 }

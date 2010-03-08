@@ -29,7 +29,7 @@ import org.opengis.feature.type.FeatureType;
 /**
  * Description of the class of information covered by the information.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/maintenance/ScopeDescriptionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/maintenance/ScopeDescriptionImpl.java $
  * @version $Id: ScopeDescriptionImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

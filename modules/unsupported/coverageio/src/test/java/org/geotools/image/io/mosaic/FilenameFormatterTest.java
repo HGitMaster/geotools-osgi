@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link FilenameFormatter}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/FilenameFormatterTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/FilenameFormatterTest.java $
  * @version $Id: FilenameFormatterTest.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux
  */

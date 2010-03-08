@@ -28,6 +28,8 @@ import org.opengis.referencing.ReferenceIdentifier;
 /**
  *
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/reference/DefaultClock.java $
  */
 public class DefaultClock extends DefaultTemporalReferenceSystem implements Clock {
 

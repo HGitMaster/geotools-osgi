@@ -16,6 +16,7 @@
  */
 package org.geotools.data.shapefile.indexed;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.geotools.TestData;
 import org.geotools.data.DataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -94,10 +96,9 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
 
     private ShapefileDataStore testCreateDataStore(boolean newDS,
             boolean createIndex) throws Exception {
-        copyShapefiles(IndexedShapefileDataStoreTest.STATE_POP);
+        File f = copyShapefiles(IndexedShapefileDataStoreTest.STATE_POP);
         Map map = new HashMap();
-        map.put(ShapefileDataStoreFactory.URLP.key, TestData.url(TestCaseSupport.class,
-                IndexedShapefileDataStoreTest.STATE_POP));
+        map.put(ShapefileDataStoreFactory.URLP.key, f.toURI().toURL());
         map.put(ShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key,
                 createIndex ? Boolean.TRUE : Boolean.FALSE);
 

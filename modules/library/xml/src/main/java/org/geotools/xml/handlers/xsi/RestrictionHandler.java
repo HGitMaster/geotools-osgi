@@ -35,7 +35,7 @@ import org.xml.sax.SAXNotRecognizedException;
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/RestrictionHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/RestrictionHandler.java $
  * @version $Id: RestrictionHandler.java 30650 2008-06-12 19:53:40Z acuster $
  */
 public class RestrictionHandler extends XSIElementHandler {

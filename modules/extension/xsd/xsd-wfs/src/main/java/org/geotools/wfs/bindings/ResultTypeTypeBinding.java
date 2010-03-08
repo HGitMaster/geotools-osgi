@@ -63,6 +63,8 @@ import org.geotools.xml.InstanceComponent;
  * </p>
  * 
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/ResultTypeTypeBinding.java $
  */
 public class ResultTypeTypeBinding extends AbstractSimpleBinding {
     public ResultTypeTypeBinding(WfsFactory factory) {

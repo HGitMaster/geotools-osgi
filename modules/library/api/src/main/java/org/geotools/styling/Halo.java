@@ -63,10 +63,10 @@ import org.opengis.filter.expression.Expression;
  * </li>
  * </ul>
  * </p>
- * $Id: Halo.java 32919 2009-05-03 14:18:31Z jive $
+ * $Id: Halo.java 33833 2009-09-04 12:26:28Z jive $
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Halo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Halo.java $
  */
 public interface Halo extends org.opengis.style.Halo{
 
@@ -89,7 +89,7 @@ public interface Halo extends org.opengis.style.Halo{
      *
      * @param fill
      */
-    void setFill(Fill fill);
+    void setFill(org.opengis.style.Fill fill);
 
     void accept(org.geotools.styling.StyleVisitor visitor);
 }

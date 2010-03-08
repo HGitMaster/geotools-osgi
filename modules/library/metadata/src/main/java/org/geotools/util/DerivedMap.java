@@ -40,7 +40,7 @@ import java.util.Set;
  * @param <V>  The type of values in both this map and the underlying map.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/DerivedMap.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/DerivedMap.java $
  * @version $Id: DerivedMap.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

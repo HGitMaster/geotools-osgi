@@ -195,7 +195,7 @@ public class Show2DMapSpike
         {
             try
             {
-                return new File( target ).toURL();
+                return new File( target ).toURI().toURL();
             }
             catch ( MalformedURLException e )
             {

@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link XMath} static methods.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/test/java/org/geotools/math/XMathTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/math/XMathTest.java $
  * @version $Id: XMathTest.java 30725 2008-06-13 19:29:06Z desruisseaux $
  * @author Martin Desruisseaux
  */

@@ -33,6 +33,8 @@ import org.opengis.geometry.Geometry;
  * <p>
  * When Envelope objects are created or initialized, the supplies extent values
  * are automatically sorted into the correct order.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Envelope.java $
  */
 public class Envelope implements Serializable {
 

@@ -61,7 +61,7 @@ import static org.junit.Assert.*;
  * Base class for grid coverage tests. This base class provides factory methods for sample
  * {@link GridCoverage2D}, and {@code assertEqual} methods for comparing values.
  *
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridCoverageTestBase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridCoverageTestBase.java $
  * @version $Id: GridCoverageTestBase.java 32888 2009-04-30 16:16:22Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */

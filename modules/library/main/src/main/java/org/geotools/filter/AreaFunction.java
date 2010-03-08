@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  *
  * @author  James
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/AreaFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/AreaFunction.java $
  */
 public class AreaFunction extends FunctionExpressionImpl{ 
     

@@ -32,6 +32,8 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * Convenience implementation of the   {@link DefaultPiecewiseTransform1DElement}   .
  * @author   Simone Giannecchini, GeoSolutions
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/referencing/piecewise/DefaultPiecewiseTransform1DElement.java $
  */
 public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D implements
 		PiecewiseTransform1DElement {

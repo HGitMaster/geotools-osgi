@@ -41,7 +41,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 /**
  * An implementation of FeatureWriter that will work over a result set.
  * 
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureWriter.java $
  */
 public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
 
@@ -73,15 +73,18 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
         this.byteaWKB = byteaWKB;
         this.sqlBuilder = sqlBuilder;
     }
-
+    
     protected String getGeometryInsertText(Geometry geom, int srid) throws IOException {
+        return getGeometryInsertText(geom, srid, 2);
+    }
+
+    protected String getGeometryInsertText(Geometry geom, int srid, int dimension) throws IOException {
     	if( geom == null ) {
     		return "null";
     	}
     	
         if(WKBEnabled) {
-            //String wkb = WKBEncoder.encodeGeometryHex(geom);
-            String wkb = WKBWriter.bytesToHex( new WKBWriter().write( geom ) );
+            String wkb = WKBWriter.bytesToHex( new WKBWriter(dimension).write( geom ) );
             if (byteaWKB)
             	return "setSRID('"+wkb+"'::geometry,"+srid+")";
 	        else

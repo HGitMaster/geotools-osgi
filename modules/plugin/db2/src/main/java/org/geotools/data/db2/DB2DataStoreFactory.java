@@ -38,7 +38,7 @@ import javax.sql.DataSource;
  * DB2DataStore.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2DataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2DataStoreFactory.java $
  */
 public class DB2DataStoreFactory extends AbstractDataStoreFactory
     implements DataStoreFactorySpi {

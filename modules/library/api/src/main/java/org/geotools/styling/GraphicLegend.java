@@ -9,16 +9,18 @@ import org.opengis.style.GraphicalSymbol;
  * Used to represent a Rule (or other construct) in a user interface or legend.
  * 
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/GraphicLegend.java $
  */
 public interface GraphicLegend extends org.opengis.style.GraphicLegend {
 
     public AnchorPoint getAnchorPoint();
     
-    public void setAnchorPoint( AnchorPoint anchor );
+    public void setAnchorPoint( org.opengis.style.AnchorPoint anchor );
 
     public Displacement getDisplacement();
     
-    public void setDisplacmeent( Displacement displacement );
+    public void setDisplacement( org.opengis.style.Displacement displacement );
 
     public Expression getOpacity();
 

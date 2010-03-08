@@ -31,20 +31,40 @@ import org.opengis.util.Cloneable;
  * Direct implementation of Halo.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/HaloImpl.java $
- * @version $Id: HaloImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/HaloImpl.java $
+ * @version $Id: HaloImpl.java 33833 2009-09-04 12:26:28Z jive $
  */
 public class HaloImpl implements Halo, Cloneable {
     /** The logger for the default core module. */
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
-    private Fill fill = new FillImpl();
+    private FillImpl fill = new FillImpl();
     private Expression radius = null;
 
+    /**
+     * Cast to HaloImpl (creating a copy if needed).
+     * @param halo
+     * @return HaloImpl equal to the provided halo
+     */
+    static HaloImpl cast( org.opengis.style.Halo halo ){
+        if( halo == null){
+            return null;
+        }
+        else if( halo instanceof HaloImpl){
+            return (HaloImpl) halo;
+        }
+        else {
+            HaloImpl copy = new HaloImpl();
+            copy.setFill( halo.getFill() );
+            copy.setRadius( halo.getRadius() );
+            
+            return copy;
+        }
+    }
     public HaloImpl() {
         this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
     }
-
+    
     public HaloImpl(FilterFactory factory) {
         filterFactory = factory;
         init();
@@ -70,7 +90,7 @@ public class HaloImpl implements Halo, Cloneable {
      *
      * @return Value of property fill.
      */
-    public org.geotools.styling.Fill getFill() {
+    public FillImpl getFill() {
         return fill;
     }
 
@@ -79,8 +99,8 @@ public class HaloImpl implements Halo, Cloneable {
      *
      * @param fill New value of property fill.
      */
-    public void setFill(org.geotools.styling.Fill fill) {
-        this.fill = fill;
+    public void setFill(org.opengis.style.Fill fill) {
+        this.fill = FillImpl.cast( fill );
     }
 
     /**
@@ -119,7 +139,7 @@ public class HaloImpl implements Halo, Cloneable {
     public Object clone() {
         try {
             HaloImpl clone = (HaloImpl) super.clone();
-            clone.fill = (Fill) ((Cloneable) fill).clone();
+            clone.fill = (FillImpl) ((Cloneable) fill).clone();
 
             return clone;
         } catch (CloneNotSupportedException e) {

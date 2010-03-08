@@ -25,6 +25,7 @@ import org.geotools.metadata.iso.citation.CitationImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -61,7 +62,7 @@ public class PropertyExistsFunctionTest {
         Assert.assertEquals("propertyexists", f.getName().toLowerCase());
     }
 
-    @Test
+    @Ignore
     public void testFind() {
         Function function = ff.function("propertyexists", ff.property("testPropName"));
         Assert.assertNotNull(function);

@@ -22,6 +22,8 @@ package org.geotools.utils.progress;
  * 
  * @author aaime, TOPP.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/progress/ExceptionEvent.java $
  */
 public class ExceptionEvent extends ProcessingEvent {
 

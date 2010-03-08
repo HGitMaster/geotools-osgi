@@ -68,7 +68,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </ul>
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/geometry/jts/JTS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/geometry/jts/JTS.java $
  * @version $Id: JTS.java 30642 2008-06-12 17:52:06Z acuster $
  * @author Jody Garnett
  * @author Martin Desruisseaux

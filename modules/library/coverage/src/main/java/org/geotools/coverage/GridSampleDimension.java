@@ -23,6 +23,7 @@ import java.awt.image.IndexColorModel;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import javax.measure.unit.Unit;
@@ -75,8 +76,8 @@ import org.geotools.util.Utilities;
  * in the class name.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/GridSampleDimension.java $
- * @version $Id: GridSampleDimension.java 30760 2008-06-18 14:28:24Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/GridSampleDimension.java $
+ * @version $Id: GridSampleDimension.java 33941 2009-09-21 12:26:52Z mbedward $
  * @author Martin Desruisseaux (IRD)
  */
 public class GridSampleDimension implements SampleDimension, Serializable {
@@ -310,7 +311,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * @throws IllegalArgumentException
      *             if the range {@code [minimum..maximum]} is not valid.
      */
-    public GridSampleDimension(final CharSequence  description,
+    @SuppressWarnings("deprecation")
+	public GridSampleDimension(final CharSequence  description,
                                final SampleDimensionType  type,
                                final ColorInterpretation color,
                                final Color[]           palette,
@@ -329,7 +331,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     }
 
     /** Constructs a list of categories. Used by constructors only. */
-    private static CategoryList list(CharSequence  description,
+    @SuppressWarnings("deprecation")
+	private static CategoryList list(CharSequence  description,
                                      SampleDimensionType  type,
                                      ColorInterpretation color,
                                final Color[]           palette,
@@ -694,7 +697,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      *
      * @return A code value indicating grid value data type.
      */
-    public SampleDimensionType getSampleDimensionType() {
+    @SuppressWarnings("unchecked")
+	public SampleDimensionType getSampleDimensionType() {
         final NumberRange range = getRange();
         if (range == null) {
             return SampleDimensionType.REAL_32BITS;
@@ -768,7 +772,11 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * @see #getCategory
      */
     public List<Category> getCategories() {
-        return categories;
+        if (categories == null) {
+            return Collections.emptyList();
+        } else {
+            return categories;
+        }
     }
 
     /**
@@ -939,7 +947,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * @todo We should do a better job in {@code CategoryList.getRange()} when selecting the
      *       appropriate data type. {@link TypeMap#getSampleDimensionType} may be of some help.
      */
-    public NumberRange getRange() {
+    public NumberRange<? extends Number> getRange() {
         return (categories != null) ? categories.getRange() : null;
     }
 

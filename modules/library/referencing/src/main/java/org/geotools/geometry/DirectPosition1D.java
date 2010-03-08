@@ -27,7 +27,7 @@ import org.opengis.geometry.MismatchedDimensionException;
  * Holds the coordinates for a one-dimensional position within some coordinate reference system.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/geometry/DirectPosition1D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/geometry/DirectPosition1D.java $
  * @version $Id: DirectPosition1D.java 30892 2008-07-04 15:17:36Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

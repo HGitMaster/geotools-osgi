@@ -24,6 +24,8 @@ import org.opengis.feature.type.Name;
  * This class will *directly* access a Property with the name equal to xpath.
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/expression/DirectPropertyAccessorFactory.java $
  */
 public class DirectPropertyAccessorFactory implements PropertyAccessorFactory {
 

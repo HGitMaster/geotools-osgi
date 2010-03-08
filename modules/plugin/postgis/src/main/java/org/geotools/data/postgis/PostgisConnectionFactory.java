@@ -40,7 +40,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisConnectionFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisConnectionFactory.java $
  * @version $Id: PostgisConnectionFactory.java 30669 2008-06-12 23:36:58Z acuster $
  * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  *  *

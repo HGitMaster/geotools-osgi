@@ -31,6 +31,8 @@ import org.opengis.util.InternationalString;
 /**
  * Convenience implementation of the    {@link Domain1D}    interface.
  * @author    Simone Giannecchini
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/referencing/piecewise/DefaultDomain1D.java $
  */
 public class DefaultDomain1D<E extends DefaultDomainElement1D>  extends AbstractList<E> implements Domain1D<E>{
 

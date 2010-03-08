@@ -52,7 +52,7 @@ import org.geotools.referencing.datum.DefaultVerticalDatum;
  * </TD></TR></TABLE>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/crs/DefaultVerticalCRS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/crs/DefaultVerticalCRS.java $
  * @version $Id: DefaultVerticalCRS.java 31143 2008-08-07 10:24:07Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

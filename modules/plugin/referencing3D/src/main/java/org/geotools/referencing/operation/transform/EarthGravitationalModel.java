@@ -63,8 +63,8 @@ import org.geotools.metadata.iso.citation.Citations;
  * file, with some spaces trimmed.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/EarthGravitationalModel.java $
- * @version $Id: EarthGravitationalModel.java 30658 2008-06-12 21:00:20Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/EarthGravitationalModel.java $
+ * @version $Id: EarthGravitationalModel.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Pierre Cardinal
  * @author Martin Desruisseaux
  */
@@ -371,8 +371,8 @@ public final class EarthGravitationalModel extends VerticalTransform {
     /**
      * The provider for {@link EarthGravitationalModel}.
      *
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/EarthGravitationalModel.java $
-     * @version $Id: EarthGravitationalModel.java 30658 2008-06-12 21:00:20Z acuster $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/EarthGravitationalModel.java $
+     * @version $Id: EarthGravitationalModel.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
      * @author Martin Desruisseaux
      */
     public static class Provider extends MathTransformProvider {
@@ -380,7 +380,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
          * The operation parameter descriptor for the maximum degree and order.
          * The default value is 180.
          */
-        public static final ParameterDescriptor ORDER = new DefaultParameterDescriptor(
+        public static final ParameterDescriptor<Integer> ORDER = DefaultParameterDescriptor.create(
                     Collections.singletonMap(NAME_KEY,
                         new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
                                                                 VocabularyKeys.ORDER))),

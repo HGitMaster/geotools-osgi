@@ -120,8 +120,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * defaultcore.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryImpl.java $
- * @version $Id: FilterFactoryImpl.java 32736 2009-04-04 06:51:02Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryImpl.java $
+ * @version $Id: FilterFactoryImpl.java 34797 2010-01-15 09:42:08Z ang05a $
  */
 public class FilterFactoryImpl implements FilterFactory {
     
@@ -290,7 +290,6 @@ public class FilterFactoryImpl implements FilterFactory {
     }
     
     public BBOX bbox(Expression e, double minx, double miny, double maxx, double maxy, String srs) {
-        
         PropertyName name = null;
         if ( e instanceof PropertyName ) {
             name = (PropertyName) e;
@@ -308,7 +307,12 @@ public class FilterFactoryImpl implements FilterFactory {
         }
         
         BBOXImpl box = new BBOXImpl(this,e,bbox);
-        box.setPropertyName( name.getPropertyName() );
+        if (e == null) {
+            // otherwise this line is redundant. Also complex
+            // features with bbox request would fail as this would remove the
+            // namespace from the property name
+            box.setPropertyName(name.getPropertyName());
+        }
         box.setSRS(srs);
         box.setMinX(minx);
         box.setMinY(miny);

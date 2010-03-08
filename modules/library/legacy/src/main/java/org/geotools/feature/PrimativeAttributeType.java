@@ -27,7 +27,7 @@ import org.opengis.filter.Filter;
  * restrictions, and that the restrictions are immutable.
  *
  * @author dzwiers
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/main/java/org/geotools/feature/PrimativeAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/PrimativeAttributeType.java $
  *
  * @deprecated Will be removed in geotools 2.6
  */

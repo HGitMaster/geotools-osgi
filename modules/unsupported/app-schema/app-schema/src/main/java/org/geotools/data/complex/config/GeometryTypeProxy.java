@@ -26,7 +26,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * @author Gabriel Roldan
  * @version $Id: GeometryTypeProxy.java 31815 2008-11-10 07:53:14Z bencd $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/GeometryTypeProxy.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/GeometryTypeProxy.java $
  * @since 2.4
  */
 class GeometryTypeProxy extends AttributeTypeProxy implements GeometryType {

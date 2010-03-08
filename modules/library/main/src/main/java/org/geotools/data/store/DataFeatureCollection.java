@@ -24,8 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +38,6 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.collection.SubFeatureCollection;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.SortBy2;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -50,10 +47,8 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A starting point for implementing FeatureCollection's backed onto a FeatureReader.
@@ -76,7 +71,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  * @author jgarnett
  * @since 2.1.RC0
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/store/DataFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/DataFeatureCollection.java $
  */
 public abstract class DataFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
     
@@ -456,7 +451,7 @@ public abstract class DataFeatureCollection implements FeatureCollection<SimpleF
             float size = size();
             float position = 0;            
             progress.started();
-        	for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( position++/size )){
+        	for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( 100.0f * position++ / size )){
                 try {
                     SimpleFeature feature = (SimpleFeature) iterator.next();
                     visitor.visit(feature);

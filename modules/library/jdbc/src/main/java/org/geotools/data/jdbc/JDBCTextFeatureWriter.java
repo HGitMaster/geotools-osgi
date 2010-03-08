@@ -34,6 +34,7 @@ import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -61,8 +62,10 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Andrea Aime
  * @author chorner
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCTextFeatureWriter.java $
- * @version $Id: JDBCTextFeatureWriter.java 30921 2008-07-05 07:51:23Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCTextFeatureWriter.java $
+ * @version $Id: JDBCTextFeatureWriter.java 33484 2009-07-06 02:17:34Z jdeolive $
+ * 
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
     /** The logger for the jdbc module. */
@@ -218,13 +221,22 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         for (int i = 0; i < attributeTypes.size(); i++) {
             attrValue = null;
             if (attributeTypes.get(i) instanceof GeometryDescriptor) {
+                GeometryDescriptor descriptor = (GeometryDescriptor) attributeTypes.get(i);
                 String geomName = attributeTypes.get(i).getLocalName();
                 int srid = ftInfo.getSRID(geomName);
                 Geometry geometry = (Geometry) attributes[i];
+                
+                int dimension = 2;
+                if(descriptor.getUserData().get(Hints.COORDINATE_DIMENSION) instanceof Integer) {
+                    dimension = (Integer) descriptor.getUserData().get(Hints.COORDINATE_DIMENSION);
+                } else if(descriptor.getCoordinateReferenceSystem() != null) {
+                    dimension = descriptor.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
+                }
+                
                 if( geometry==null ){
                     attrValue="NULL";
                 }else
-                    attrValue = getGeometryInsertText(geometry, srid);
+                    attrValue = getGeometryInsertText(geometry, srid, dimension);
             } else {
                 if(!autoincrementColumns.contains(attributeTypes.get(i).getLocalName()) || attributes[i] != null)
                     attrValue = addQuotes(attributes[i]);
@@ -276,6 +288,17 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      *
      */
     protected abstract String getGeometryInsertText(Geometry geom, int srid) throws IOException;
+    
+    /**
+     * Turns a geometry into the textual version needed for the sql statement
+     *
+     * @param geom
+     * @param srid
+     * @param dimension
+     */
+    protected String getGeometryInsertText(Geometry geom, int srid, int dimension) throws IOException {
+        return getGeometryInsertText(geom, srid);
+    }
 
     /**
      * Override that uses sql statements to perform the operation.

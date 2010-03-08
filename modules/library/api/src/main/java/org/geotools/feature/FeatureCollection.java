@@ -92,8 +92,8 @@ import org.opengis.util.ProgressListener;
  * @author Rob Hranac, VFNY
  * @author Ian Schneider, USDA-ARS
  * @author Jody Garnett, Refractions Research, Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/feature/FeatureCollection.java $
- * @version $Id: FeatureCollection.java 31080 2008-07-26 01:33:21Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/feature/FeatureCollection.java $
+ * @version $Id: FeatureCollection.java 34003 2009-09-27 18:12:13Z jive $
  *
  */
 public interface FeatureCollection<T extends FeatureType, F extends Feature> {
@@ -426,7 +426,9 @@ public interface FeatureCollection<T extends FeatureType, F extends Feature> {
     /** @see java.util.Collection#retainAll(Collection) */   
     public boolean retainAll(Collection<?> c);
       
-    /** @see java.util.Collection#size() */
+    /**
+     * @see java.util.Collection#size()
+     */
     int size();
     
     /** @see java.util.Collection#toArray() */    

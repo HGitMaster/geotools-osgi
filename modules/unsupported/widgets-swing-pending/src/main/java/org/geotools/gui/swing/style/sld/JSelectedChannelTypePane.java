@@ -26,6 +26,8 @@ import org.geotools.styling.SelectedChannelTypeImpl;
  * SelectedChannel type panel
  * 
  * @author  Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/style/sld/JSelectedChannelTypePane.java $
  */
 public class JSelectedChannelTypePane extends javax.swing.JPanel implements StyleElementEditor<SelectedChannelType>{
 

@@ -27,6 +27,8 @@ import org.geotools.xml.XSD;
  * attributes in the http://www.w3.org/2001/SMIL20/Language schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/smil/SMIL20LANG.java $
  */
 public final class SMIL20LANG extends XSD {
     /**

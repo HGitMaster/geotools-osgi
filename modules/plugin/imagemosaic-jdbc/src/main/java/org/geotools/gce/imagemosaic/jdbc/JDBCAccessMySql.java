@@ -16,189 +16,207 @@
  */
 package org.geotools.gce.imagemosaic.jdbc;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.logging.Level;
+
+import org.geotools.geometry.GeneralEnvelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKBWriter;
 
-import org.geotools.geometry.GeneralEnvelope;
-
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import java.io.IOException;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import java.text.MessageFormat;
-
-import java.util.logging.Level;
-
 /**
- * Implementation of JDBCAccess for MySql database 
+ * Implementation of JDBCAccess for MySql database
  * 
  * @author mcr
- *
+ * 
  */
 class JDBCAccessMySql extends JDBCAccessBase {
-    private String extentSelect = null;
-    private String allSelect = null;
-    private String allSelectJoined = null;
-    private String gridSelect = null;
-    private String gridSelectJoined = null;
+	private String extentSelect = null;
 
-    JDBCAccessMySql(Config config) throws IOException {
-        super(config);
-        initStatementStrings(config);
-    }
+	private String allSelect = null;
 
-    /**
-     * Initialze needed sql statement strings
-     * 
-     * @param config
-     */
-    private void initStatementStrings(Config config) {
-        String geomAttr = config.getGeomAttributeNameInSpatialTable();
-        extentSelect = "select asbinary(envelope(" + geomAttr + ")) from {0}";
+	private String allSelectJoined = null;
 
-        String spatialSelectClause = "select s." +
-            config.getKeyAttributeNameInSpatialTable() + "," +
-            "asbinary(envelope(s." + geomAttr + "))";
+	private String gridSelect = null;
 
-        allSelect = spatialSelectClause + ",s." +
-            config.getBlobAttributeNameInTileTable() + " from {0} s";
-        allSelectJoined = spatialSelectClause + ",t." +
-            config.getBlobAttributeNameInTileTable() +
-            " from {0} s, {1} t  WHERE ";
-        allSelectJoined += (" s." + config.getKeyAttributeNameInSpatialTable() +
-        " = t." + config.getKeyAttributeNameInTileTable());
+	private String gridSelectJoined = null;
 
-        String whereClause = "mbrIntersects(" + geomAttr + "," +
-            "GeomFromWKB(?)) = 1";
+	JDBCAccessMySql(Config config) throws IOException {
+		super(config);
+		initStatementStrings(config);
+	}
 
-        gridSelect = allSelect + " WHERE " + whereClause;
-        gridSelectJoined = allSelectJoined + " AND " + whereClause;
-    }
+	/**
+	 * Initialze needed sql statement strings
+	 * 
+	 * @param config
+	 */
+	private void initStatementStrings(Config config) {
+		String geomAttr = config.getGeomAttributeNameInSpatialTable();
+		extentSelect = "select asbinary(envelope(" + geomAttr + ")) from {0}";
 
-    /* (non-Javadoc)
-     * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#setGridSelectParams(java.sql.PreparedStatement, org.geotools.geometry.GeneralEnvelope, org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo)
-     */
-    @Override
-    protected void setGridSelectParams(PreparedStatement s,
-        GeneralEnvelope envelope, ImageLevelInfo li) throws SQLException {
-        WKBWriter w = new WKBWriter();
-        byte[] bytes = w.write(polyFromEnvelope(envelope));
-        s.setBytes(1, bytes);
+		String spatialSelectClause = "select s."
+				+ config.getKeyAttributeNameInSpatialTable() + ","
+				+ "asbinary(envelope(s." + geomAttr + "))";
 
-        // s.setInt(2, li.getSrsId()); not supported
-    }
+		allSelect = spatialSelectClause + ",s."
+				+ config.getBlobAttributeNameInTileTable() + " from {0} s";
+		allSelectJoined = spatialSelectClause + ",t."
+				+ config.getBlobAttributeNameInTileTable()
+				+ " from {0} s, {1} t  WHERE ";
+		allSelectJoined += (" s." + config.getKeyAttributeNameInSpatialTable()
+				+ " = t." + config.getKeyAttributeNameInTileTable());
 
-    /* (non-Javadoc)
-     * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getRandomTileStatement(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo)
-     */
-    @Override
-    protected String getRandomTileStatement(ImageLevelInfo li) {
-        if (li.isImplementedAsTableSplit()) {
-            return MessageFormat.format(allSelectJoined,
-                new Object[] { li.getSpatialTableName(), li.getTileTableName() });
-        } else {
-            return MessageFormat.format(allSelect,
-                new Object[] { li.getSpatialTableName() });
-        }
-    }
+		String whereClause = "mbrIntersects(" + geomAttr + ","
+				+ "GeomFromWKB(?)) = 1";
 
-    /* (non-Javadoc)
-     * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getGridSelectStatement(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo)
-     */
-    @Override
-    protected String getGridSelectStatement(ImageLevelInfo li) {
-        if (li.isImplementedAsTableSplit()) {
-            return MessageFormat.format(gridSelectJoined,
-                new Object[] { li.getSpatialTableName(), li.getTileTableName() });
-        } else {
-            return MessageFormat.format(gridSelect,
-                new Object[] { li.getSpatialTableName() });
-        }
-    }
+		gridSelect = allSelect + " WHERE " + whereClause;
+		gridSelectJoined = allSelectJoined + " AND " + whereClause;
+	}
 
-    /* (non-Javadoc)
-     * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getExtentSelectStatment(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo)
-     */
-    @Override
-    protected String getExtentSelectStatment(ImageLevelInfo li) {
-        return MessageFormat.format(extentSelect,
-            new Object[] { li.getSpatialTableName() });
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#setGridSelectParams(java.sql.PreparedStatement,
+	 *      org.geotools.geometry.GeneralEnvelope,
+	 *      org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo)
+	 */
+	@Override
+	protected void setGridSelectParams(PreparedStatement s,
+			GeneralEnvelope envelope, ImageLevelInfo li) throws SQLException {
+		WKBWriter w = new WKBWriter();
+		byte[] bytes = w.write(polyFromEnvelope(envelope));
+		s.setBytes(1, bytes);
 
-    /* (non-Javadoc)
-     * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getExtent(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo, java.sql.Connection)
-     */
-    @Override
-    protected Envelope getExtent(ImageLevelInfo li, Connection con)
-        throws SQLException, IOException {
-        String extentSelect = getExtentSelectStatment(li);
+		// s.setInt(2, li.getSrsId()); not supported
+	}
 
-        String statementString = MessageFormat.format(extentSelect,
-                new Object[] { li.getSpatialTableName() });
-        Envelope extent = null;
-        PreparedStatement s = con.prepareStatement(statementString);
-        ResultSet r = s.executeQuery();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getRandomTileStatement(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo)
+	 */
+	@Override
+	protected String getRandomTileStatement(ImageLevelInfo li) {
+		if (li.isImplementedAsTableSplit()) {
+			return MessageFormat.format(allSelectJoined, new Object[] {
+					li.getSpatialTableName(), li.getTileTableName() });
+		} else {
+			return MessageFormat.format(allSelect, new Object[] { li
+					.getSpatialTableName() });
+		}
+	}
 
-        WKBReader reader = new WKBReader();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getGridSelectStatement(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo)
+	 */
+	@Override
+	protected String getGridSelectStatement(ImageLevelInfo li) {
+		if (li.isImplementedAsTableSplit()) {
+			return MessageFormat.format(gridSelectJoined, new Object[] {
+					li.getSpatialTableName(), li.getTileTableName() });
+		} else {
+			return MessageFormat.format(gridSelect, new Object[] { li
+					.getSpatialTableName() });
+		}
+	}
 
-        while (r.next()) {
-            byte[] bytes = r.getBytes(1);
-            Geometry g;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getExtentSelectStatment(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo)
+	 */
+	@Override
+	protected String getExtentSelectStatment(ImageLevelInfo li) {
+		return MessageFormat.format(extentSelect, new Object[] { li
+				.getSpatialTableName() });
+	}
 
-            try {
-                g = reader.read(bytes);
-            } catch (ParseException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                throw new IOException(e.getMessage());
-            }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getExtent(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo,
+	 *      java.sql.Connection)
+	 */
+	@Override
+	protected Envelope getExtent(ImageLevelInfo li, Connection con)
+			throws SQLException, IOException {
+		String extentSelect = getExtentSelectStatment(li);
 
-            if (extent == null) {
-                extent = g.getEnvelopeInternal();
-            } else {
-                extent.expandToInclude(g.getEnvelopeInternal());
-            }
-        }
+		String statementString = MessageFormat.format(extentSelect,
+				new Object[] { li.getSpatialTableName() });
+		Envelope extent = null;
+		PreparedStatement s = con.prepareStatement(statementString);
+		ResultSet r = s.executeQuery();
 
-        r.close();
-        s.close();
+		WKBReader reader = new WKBReader();
 
-        return extent;
-    }
+		while (r.next()) {
+			byte[] bytes = r.getBytes(1);
+			Geometry g;
 
-    /* (non-Javadoc)
-     * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getEnvelopeFromResultSet(java.sql.ResultSet)
-     */
-    @Override
-    protected Envelope getEnvelopeFromResultSet(ResultSet r)
-        throws SQLException {
-        byte[] bytes = r.getBytes(2);
-        WKBReader reader = new WKBReader();
-        Geometry bbox = null;
+			try {
+				g = reader.read(bytes);
+			} catch (ParseException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				throw new IOException(e.getMessage());
+			}
 
-        try {
-            bbox = reader.read(bytes);
-        } catch (ParseException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new SQLException(e.getMessage());
-        }
+			if (extent == null) {
+				extent = g.getEnvelopeInternal();
+			} else {
+				extent.expandToInclude(g.getEnvelopeInternal());
+			}
+		}
 
-        return bbox.getEnvelopeInternal();
-    }
+		r.close();
+		s.close();
 
-    /* (non-Javadoc)
-     * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getCRS(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo, java.sql.Connection)
-     */
-    @Override
-    protected CoordinateReferenceSystem getCRS(ImageLevelInfo li, Connection con)
-        throws IOException {
-        return null;
-    }
+		return extent;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getEnvelopeFromResultSet(java.sql.ResultSet)
+	 */
+	@Override
+	protected Envelope getEnvelopeFromResultSet(ResultSet r)
+			throws SQLException {
+		byte[] bytes = r.getBytes(2);
+		WKBReader reader = new WKBReader();
+		Geometry bbox = null;
+
+		try {
+			bbox = reader.read(bytes);
+		} catch (ParseException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw new SQLException(e.getMessage());
+		}
+
+		return bbox.getEnvelopeInternal();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.gce.imagemosaic.jdbc.JDBCAccessBase#getCRS(org.geotools.gce.imagemosaic.jdbc.ImageLevelInfo,
+	 *      java.sql.Connection)
+	 */
+	@Override
+	protected CoordinateReferenceSystem getCRS(ImageLevelInfo li, Connection con)
+			throws IOException {
+		return null;
+	}
 }

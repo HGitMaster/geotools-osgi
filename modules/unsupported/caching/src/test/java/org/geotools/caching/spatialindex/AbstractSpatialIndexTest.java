@@ -37,6 +37,8 @@ import java.util.Set;
  *
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/test/java/org/geotools/caching/spatialindex/AbstractSpatialIndexTest.java $
  */
 public abstract class AbstractSpatialIndexTest extends TestCase {
 	private static final String DATA_PREFIX = "Object: ";

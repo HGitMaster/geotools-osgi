@@ -81,7 +81,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/filter/FilterOpsComplexTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/filter/FilterOpsComplexTypes.java $
  */
 public class FilterOpsComplexTypes {    
     

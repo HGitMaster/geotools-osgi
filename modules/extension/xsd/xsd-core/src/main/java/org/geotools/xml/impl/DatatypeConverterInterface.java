@@ -49,6 +49,8 @@ import javax.xml.namespace.QName;
  * @see javax.xml.bind.DatatypeConverter
  * @see javax.xml.bind.ParseConversionEvent
  * @see javax.xml.bind.PrintConversionEvent
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/DatatypeConverterInterface.java $
  */
 public interface DatatypeConverterInterface {
   /** <p>Parses the lexical representation and converts it into a String.</p>

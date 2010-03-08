@@ -18,18 +18,15 @@ package org.geotools.data.shapefile.shp;
 
 import java.nio.ByteBuffer;
 
-import org.geotools.geometry.jts.coordinatesequence.CSBuilder;
-import org.geotools.geometry.jts.coordinatesequence.CSBuilderFactory;
-
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 
 /*
- * $Id: MultiLineHandler.java 30670 2008-06-12 23:59:23Z acuster $ @author
+ * $Id: MultiLineHandler.java 33985 2009-09-25 09:02:24Z aaime $ @author
  * aaime @author Ian Schneider
  */
 /**
@@ -42,10 +39,8 @@ import com.vividsolutions.jts.geom.MultiLineString;
 public class MultiLineHandler implements ShapeHandler {
     final ShapeType shapeType;
 
-    GeometryFactory geometryFactory = new GeometryFactory();
-
-    CSBuilder builder = CSBuilderFactory.getDefaultBuilder();
-
+    GeometryFactory geometryFactory;
+    
     double[] x;
 
     double[] y;
@@ -53,8 +48,9 @@ public class MultiLineHandler implements ShapeHandler {
     double[] z;
 
     /** Create a MultiLineHandler for ShapeType.ARC */
-    public MultiLineHandler() {
+    public MultiLineHandler(GeometryFactory gf) {
         shapeType = ShapeType.ARC;
+        this.geometryFactory = gf;
     }
 
     /**
@@ -66,7 +62,7 @@ public class MultiLineHandler implements ShapeHandler {
      * @throws ShapefileException
      *                 If the ShapeType is not correct (see constructor).
      */
-    public MultiLineHandler(ShapeType type) throws ShapefileException {
+    public MultiLineHandler(ShapeType type, GeometryFactory gf) throws ShapefileException {
         if ((type != ShapeType.ARC) && (type != ShapeType.ARCM)
                 && (type != ShapeType.ARCZ)) {
             throw new ShapefileException(
@@ -74,8 +70,9 @@ public class MultiLineHandler implements ShapeHandler {
         }
 
         shapeType = type;
+        this.geometryFactory = gf;
     }
-
+    
     /**
      * Get the type of shape stored
      * (ShapeType.ARC,ShapeType.ARCM,ShapeType.ARCZ)
@@ -174,31 +171,30 @@ public class MultiLineHandler implements ShapeHandler {
             // duplicating the single
             // coordinate
             // Coordinate[] points = null;
+            CoordinateSequence cs;
+            final CoordinateSequenceFactory csFactory = geometryFactory.getCoordinateSequenceFactory();
             if (length == 1)
-                // points = new Coordinate[2];
-                builder.start(2, dimensions);
+                cs = csFactory.create(2, dimensions);
             else
-                // points = new Coordinate[length];
-                builder.start(length, dimensions);
+                cs = csFactory.create(length, dimensions);
 
             for (int i = 0; i < length; i++) {
-                builder.setOrdinate(x[offset], 0, i);
-                builder.setOrdinate(y[offset], 1, i);
+                cs.setOrdinate(i, 0, x[offset]);
+                cs.setOrdinate(i, 1, y[offset]);
                 if (dimensions == 3)
-                    builder.setOrdinate(z[offset], 2, i);
+                    cs.setOrdinate(i, 2, z[offset]);
                 // points[i] = coords[offset];
                 offset++;
             }
 
             if (length == 1) {
-                // points[1] = (Coordinate) points[0].clone();
-                builder.setOrdinate(x[offset - 1], 0, 1);
-                builder.setOrdinate(y[offset - 1], 1, 1);
+                cs.setOrdinate(1, 0, x[offset - 1]);
+                cs.setOrdinate(1, 1, y[offset - 1]);
                 if (dimensions == 3)
-                    builder.setOrdinate(z[offset - 1], 2, 1);
+                    cs.setOrdinate(1, 2, z[offset - 1]);
             }
 
-            lines[part] = geometryFactory.createLineString(builder.end());
+            lines[part] = geometryFactory.createLineString(cs);
         }
 
         return geometryFactory.createMultiLineString(lines);
@@ -244,18 +240,18 @@ public class MultiLineHandler implements ShapeHandler {
                 clonePoint = false;
             }
 
-            builder.start(length, dimensions);
+            CoordinateSequence cs = geometryFactory.getCoordinateSequenceFactory().create(length, dimensions);
             for (int i = 0; i < length; i++) {
-                builder.setOrdinate(buffer.getDouble(), 0, i);
-                builder.setOrdinate(buffer.getDouble(), 1, i);
+                cs.setOrdinate(i, 0, buffer.getDouble());
+                cs.setOrdinate(i, 1, buffer.getDouble());
             }
 
             if (clonePoint) {
-                builder.setOrdinate(builder.getOrdinate(0, 0), 0, 1);
-                builder.setOrdinate(builder.getOrdinate(1, 0), 1, 1);
+                cs.setOrdinate(1, 0, cs.getOrdinate(0, 0));
+                cs.setOrdinate(1, 1, cs.getOrdinate(0, 1));
             }
 
-            lines[part] = builder.end();
+            lines[part] = cs;
         }
 
         // if we have another coordinate, read and add to the coordinate
@@ -281,7 +277,7 @@ public class MultiLineHandler implements ShapeHandler {
                 }
 
                 for (int i = 0; i < length; i++) {
-                    builder.setOrdinate(lines[part], buffer.getDouble(), 2, i);
+                    lines[part].setOrdinate(i, 2, buffer.getDouble());
                 }
 
             }

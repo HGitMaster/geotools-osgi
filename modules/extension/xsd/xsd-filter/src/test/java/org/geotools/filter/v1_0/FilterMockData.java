@@ -64,6 +64,8 @@ import org.geotools.gml2.GML;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/test/java/org/geotools/filter/v1_0/FilterMockData.java $
  */
 public class FilterMockData {
     static FilterFactory2 f = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
@@ -209,11 +211,16 @@ public class FilterMockData {
     }
 
     static Element and(Document document, Node parent) {
+        return and(document,parent,false);
+    }
+    
+    static Element and(Document document, Node parent, boolean empty) {
         Element and = element(document, parent, OGC.And);
 
-        propertyIsEqualTo(document, and);
-        propertyIsNotEqualTo(document, and);
-
+        if( !empty ) {
+            propertyIsEqualTo(document, and);
+            propertyIsNotEqualTo(document, and);
+        }
         return and;
     }
 

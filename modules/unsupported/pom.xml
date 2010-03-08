@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32685 2009-03-24 10:45:01Z aaime $
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>modules</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
 
 
@@ -58,29 +58,23 @@
          <module>coveragetools</module>
          <module>sql-datastore</module>
          <module>geometryless</module>
-         <module>notifying-collections</module>
-       </modules>
-     </profile>
-     <profile>
-       <id>app-schema</id>
-       <modules>
-         <module>app-schema</module>
        </modules>
      </profile>
 
      <!-- ================================================== -->
      <!--     Modules kicked out of the build                -->
      <!-- ================================================== -->
-     <!-- these modules do not compile; some are just here   -->
-     <!-- as a historical curisosity                         -->
+
+     <!-- These modules have been removed from the build     -->
+     <!-- so as not to clash with the new swing module.      -->
+     <!-- Selected classes will be moved out of these to the -->
+     <!-- new module prior to discarding them                -->
      <profile>
-       <id>archive</id>
+       <id>swing-archive</id>
        <modules>
-         <module>hsql</module>
-         <module>geomedia</module>
          <module>ogr</module>
-         <module>gml3</module>
-         <module>tile</module>
+         <module>widgets-swing</module>
+         <module>widgets-swing-pending</module>
        </modules>
      </profile>
 
@@ -115,15 +109,6 @@
        </modules>
      </profile>
      <profile>
-       <id>swing</id>
-       <activation>
-         <property><name>all</name></property>
-       </activation>
-       <modules>
-         <module>widgets-swing-pending</module>
-       </modules>
-     </profile>
-     <profile>
        <id>temporal</id>
        <activation>
          <property><name>all</name></property>
@@ -142,6 +127,30 @@
          <module>wps</module>
        </modules>
      </profile>
+     <profile>
+       <id>epsg-h2</id>
+       <activation>
+         <property><name>all</name></property>
+       </activation>
+       <modules>
+         <module>epsg-h2</module>
+       </modules>
+     </profile>
+     <profile>
+       <id>app-schema</id>
+       <modules>
+         <module>app-schema</module>
+       </modules>
+     </profile>
+     <profile>
+       <id>shapefile-renderer</id>
+       <activation>
+         <property><name>all</name></property>
+       </activation>
+       <modules>
+         <module>shapefile-renderer</module>
+       </modules>
+     </profile>
 
      <profile>
        <id>unsupported</id>
@@ -149,26 +158,24 @@
          <property><name>all</name></property>
        </activation>
        <modules>
+         <module>app-schema</module>
          <module>epsg-oracle</module>
-         <module>gml</module>    
-         <module>gpx</module>
+         <module>epsg-h2</module>
          <module>jdbc-ng</module>
-         <module>mif</module>
          <module>mysql</module>
          <module>oracle-spatial</module>
          <module>postgis-versioned</module>
-         <module>tiger</module>
          <module>vpf</module>
-         <module>xml-gpx</module>
+         <module>caching</module>
+         <module>shapefile-renderer</module>
        </modules>
      </profile>
   </profiles>
 
   <modules>
-    <module>ogc</module>
-    <module>repository</module>
-    <module>mappane</module>
+    <module>swing</module>
     <module>directory</module>
+    <module>wfs</module>
   </modules>
 
 </project>

@@ -29,7 +29,7 @@ import org.opengis.filter.expression.ExpressionVisitor;
  * internally defined manner.
  *
  * @author Rob Hranac, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/AttributeExpressionImpl2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/AttributeExpressionImpl2.java $
  * @version $Id: AttributeExpressionImpl2.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public class AttributeExpressionImpl2 extends DefaultExpression

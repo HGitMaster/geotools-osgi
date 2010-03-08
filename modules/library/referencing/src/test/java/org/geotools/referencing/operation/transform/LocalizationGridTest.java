@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 /**
  * Test the {@link LocalizationGrid} implementation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/LocalizationGridTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/LocalizationGridTest.java $
  * @version $Id: LocalizationGridTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)

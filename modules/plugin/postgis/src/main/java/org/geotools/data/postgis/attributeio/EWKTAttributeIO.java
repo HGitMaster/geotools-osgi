@@ -38,7 +38,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  *
  * @since @2.4.1 Read/Write EWKT
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/EWKTAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/EWKTAttributeIO.java $
  */
 public class EWKTAttributeIO implements AttributeIO {
     WKTReader reader;

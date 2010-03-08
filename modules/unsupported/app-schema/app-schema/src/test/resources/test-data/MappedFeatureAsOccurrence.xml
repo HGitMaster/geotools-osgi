@@ -33,9 +33,7 @@
 	<catalog>mappedPolygons.oasis.xml</catalog>
 	<targetTypes>
 		<FeatureType>
-			<schemaUri>
-                commonSchemas_new/GeoSciML/geosciml.xsd
-            </schemaUri>
+			<schemaUri>http://schemas.opengis.net/GeoSciML/geosciml.xsd </schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>

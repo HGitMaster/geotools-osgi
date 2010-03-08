@@ -23,6 +23,7 @@ import org.geotools.graph.traverse.GraphWalker;
 import org.geotools.graph.traverse.basic.BasicGraphTraversal;
 import org.geotools.graph.traverse.standard.DijkstraIterator;
 import org.geotools.graph.traverse.standard.DijkstraIterator.EdgeWeighter;
+import org.geotools.graph.traverse.standard.DijkstraIterator.NodeWeighter;
 
 /**
  * Calculates node paths in a graph using Dijkstra's Shortest Path Algorithm. 
@@ -33,7 +34,7 @@ import org.geotools.graph.traverse.standard.DijkstraIterator.EdgeWeighter;
  * @see DijsktraIterator 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/path/DijkstraShortestPathFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/path/DijkstraShortestPathFinder.java $
  */
 public class DijkstraShortestPathFinder implements GraphWalker {
   
@@ -68,8 +69,22 @@ public class DijkstraShortestPathFinder implements GraphWalker {
   public DijkstraShortestPathFinder(
     Graph graph, Graphable source, EdgeWeighter weighter
   ) {
+    this(graph,source,weighter,null); 
+  }
+  
+  /**
+   * Constructs a new path finder.
+   * 
+   * @param graph Graph to calculate paths for.
+   * @param source Node to calculate paths from.
+   * @param weighter Associates weights with edges in the graph.
+   * @param nweighter Associates weights with nodes in the graph.
+   */
+  public DijkstraShortestPathFinder(
+    Graph graph, Graphable source, EdgeWeighter weighter, NodeWeighter nweighter
+  ) {
     m_graph = graph;
-    m_iterator = new DijkstraIterator(weighter);
+    m_iterator = new DijkstraIterator(weighter,nweighter);
     m_iterator.setSource(source);
     m_traversal = new BasicGraphTraversal(graph, this, m_iterator); 
   }

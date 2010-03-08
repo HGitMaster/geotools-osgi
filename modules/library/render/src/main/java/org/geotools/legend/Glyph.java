@@ -42,6 +42,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * is set up to produce BufferedImage.
  * 
  * @author Johann Sorel (AlterSIG)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/legend/Glyph.java $
  */
 public class Glyph {
  

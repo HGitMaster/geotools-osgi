@@ -327,6 +327,8 @@ import org.opengis.util.InternationalString;
  * 
  * @author Justin
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/TypeBuilder.java $
  */
 public class TypeBuilder {
 

@@ -45,7 +45,7 @@ import org.geotools.resources.UnmodifiableArrayList;
  * {@link #equals}.
  *
  * @since 2.5
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/OverviewLevel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/OverviewLevel.java $
  * @version $Id: OverviewLevel.java 31464 2008-09-08 16:33:51Z desruisseaux $
  * @author Martin Desruisseaux
  */

@@ -30,6 +30,8 @@ import org.opengis.geometry.primitive.SolidBoundary;
  * 
  * @author Jackson Roehrig & Sanjay Jena
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/SolidImpl.java $
  */
 public class SolidImpl extends PrimitiveImpl implements Solid {
     private static final long serialVersionUID = 9203406429631890989L;

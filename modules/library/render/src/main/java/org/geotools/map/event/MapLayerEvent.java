@@ -27,8 +27,8 @@ import java.util.EventObject;
  * @author Andrea Aime
  * @author Ian Turton
  * @author Martin Desruisseaux
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/map/event/MapLayerEvent.java $
- * @version $Id: MapLayerEvent.java 32675 2009-03-24 00:11:46Z mbedward $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/event/MapLayerEvent.java $
+ * @version $Id: MapLayerEvent.java 33005 2009-05-14 09:21:34Z mbedward $
  *
  * @see Layer
  * @see LayerListener
@@ -92,7 +92,7 @@ public class MapLayerEvent extends EventObject {
         super(source);
         this.reason = reason;
 
-        if ((reason <= 0) || (reason > FILTER_CHANGED)) {
+        if ((reason <= 0) || (reason > SELECTION_CHANGED)) {
             throw new IllegalArgumentException();
         }
     }

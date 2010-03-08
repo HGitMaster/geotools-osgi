@@ -39,7 +39,7 @@ import org.geotools.resources.Classes;
  * be redirected. The set of allowed instructions depends on the subclass used.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/AbstractConsole.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/AbstractConsole.java $
  * @version $Id: AbstractConsole.java 32866 2009-04-25 20:56:09Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

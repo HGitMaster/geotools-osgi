@@ -39,7 +39,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @param <V> The type of values in the map.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/CheckedHashMap.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/CheckedHashMap.java $
  * @version $Id: CheckedHashMap.java 30852 2008-07-03 15:59:42Z desruisseaux $
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux (IRD)

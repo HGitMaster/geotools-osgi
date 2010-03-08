@@ -19,7 +19,7 @@ public class SeQuery extends SeStreamOp {
 	public SeRow fetch() throws SeException{ return null; }
 	public void setSpatialConstraints(short i, boolean b, SeFilter[] f)throws SeException {}
 	public SeTableStats calculateTableStatistics(String s, int i, SeQueryInfo q, int j) { return null; }
-	public void queryRasterTile(SeRasterConstraint c) {}
+	public void queryRasterTile(SeRasterConstraint c) throws SeException{}
 	public void prepareSql(String s) {}
 
 }

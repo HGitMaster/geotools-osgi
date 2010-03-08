@@ -27,6 +27,8 @@ import javax.swing.tree.TreePath;
  * 
  * @author Johann Sorel
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/popup/SeparatorItem.java $
  */
 public class SeparatorItem extends JSeparator implements TreePopupItem{
        

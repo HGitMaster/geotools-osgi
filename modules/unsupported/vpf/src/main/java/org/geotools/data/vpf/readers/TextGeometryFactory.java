@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Builds text primities
  *
  * @author John Meagher
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/readers/TextGeometryFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/readers/TextGeometryFactory.java $
  */
 public class TextGeometryFactory extends VPFGeometryFactory implements FileConstants {
     

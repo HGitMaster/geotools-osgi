@@ -67,7 +67,8 @@ import java.sql.Statement;
  *
  * @author Dani Daniele Franzoni
  * @author aaime Andrea Aime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/FIDMapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/FIDMapper.java $
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public interface FIDMapper extends Serializable {
     /**

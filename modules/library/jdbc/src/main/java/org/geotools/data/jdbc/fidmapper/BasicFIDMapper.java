@@ -36,7 +36,8 @@ import org.opengis.feature.simple.SimpleFeature;
  *
  * @author aaime Andrea Aime
  * @author Dani Daniele Franzoni
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/BasicFIDMapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/BasicFIDMapper.java $
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class BasicFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;

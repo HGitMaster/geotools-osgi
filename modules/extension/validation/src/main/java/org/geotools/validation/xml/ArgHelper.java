@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/main/java/org/geotools/validation/xml/ArgHelper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/xml/ArgHelper.java $
  * @version $Id: ArgHelper.java 32252 2009-01-18 09:40:37Z aaime $
  */
 public class ArgHelper {

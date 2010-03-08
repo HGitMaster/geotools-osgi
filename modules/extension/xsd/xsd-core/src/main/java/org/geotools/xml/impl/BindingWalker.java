@@ -50,6 +50,10 @@ public class BindingWalker implements TypeWalker.Visitor {
         chains = new HashMap();
         typeWalker = new TypeWalker();
     }
+    
+    public Binding getAnyTypeBinding() {
+        return loader.loadBinding(XS.ANYTYPE, context);
+    }
 
     public boolean visit(XSDTypeDefinition type) {
         //look up the associated binding object for this type

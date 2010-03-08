@@ -48,7 +48,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * The complete confDemo also includes a large road and building shapefile.
  * </p>
  * @author Jody Garnett
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/test/java/org/geotools/validation/TestFixture.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/TestFixture.java $
  */
 public class TestFixture {
     Repository data = new DefaultRepository();
@@ -84,7 +84,7 @@ public class TestFixture {
         });
         for( int i=0; i<shapefiles.length;i++){
         	File shapefile = new File( directory, shapefiles[i] );
-        	ShapefileDataStore dataStore = new ShapefileDataStore( shapefile.toURL() );
+        	ShapefileDataStore dataStore = new ShapefileDataStore( shapefile.toURI().toURL() );
         	String dataStoreId = dataStore.getTypeNames()[0].toUpperCase();
         	String typeName = dataStore.getTypeNames()[0];
         	FeatureIterator<SimpleFeature> features = dataStore.getFeatureSource( typeName ).getFeatures().features();

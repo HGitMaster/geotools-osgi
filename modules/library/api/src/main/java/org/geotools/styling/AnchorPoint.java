@@ -22,12 +22,12 @@ import org.opengis.style.StyleVisitor;
 
 
 /**
- * An AnchorPoint identifies the location inside a textlabel to use as an
+ * An AnchorPoint identifies the location inside a label or graphic to use as an
  * "anchor" for positioning it relative to a point geometry.
- *
+ * 
  * @author Ian Turton
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/AnchorPoint.java $
- * @version $Id: AnchorPoint.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/AnchorPoint.java $
+ * @version $Id: AnchorPoint.java 33898 2009-09-13 15:39:05Z jive $
  */
 public interface AnchorPoint extends org.opengis.style.AnchorPoint{
     //TODO: add AnchorPoint to GeoAPI

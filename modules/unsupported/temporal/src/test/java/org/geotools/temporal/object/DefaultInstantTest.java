@@ -30,6 +30,8 @@ import org.opengis.temporal.Position;
 /**
  *
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/test/java/org/geotools/temporal/object/DefaultInstantTest.java $
  */
 public class DefaultInstantTest {
 
@@ -105,6 +107,17 @@ public class DefaultInstantTest {
         Collection<Period> begunby = null;
         ((DefaultInstant) instant1).setBegunBy(begunby);
         assertEquals(instant1.getBegunBy(), result);
+    }
+    
+    
+    /**
+     * Test comparison of Instants
+     */
+    @Test
+    public void testCompare() {
+       assertEquals(1,((DefaultInstant)instant1).compareTo(instant2));
+       assertEquals(0,((DefaultInstant)instant1).compareTo(instant1));
+       assertEquals(0,((DefaultInstant)instant2).compareTo(instant2));
     }
 
     /**

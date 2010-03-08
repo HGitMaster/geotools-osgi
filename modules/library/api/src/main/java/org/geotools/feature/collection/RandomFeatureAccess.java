@@ -37,7 +37,7 @@ import org.geotools.feature.FeatureCollection;
  * are kept in memory.
  * </p>
  * @author Jody Garnett, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/feature/collection/RandomFeatureAccess.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/feature/collection/RandomFeatureAccess.java $
  */
 public interface RandomFeatureAccess extends FeatureCollection<SimpleFeatureType, SimpleFeature> {
     /**

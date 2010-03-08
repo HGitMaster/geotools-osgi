@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
@@ -30,18 +29,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.transaction.TransactionRequiredException;
 
 import org.geotools.TestData;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
-import org.geotools.data.FIDReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
@@ -60,6 +57,8 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -83,7 +82,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/shpLazyLoadingIndex/ext/shape/test/org/geotools/data/shapefile/indexed/ShapefileDataStoreTest.java $
- * @version $Id: IndexedShapefileDataStoreTest.java 32760 2009-04-08 16:32:28Z aaime $
+ * @version $Id: IndexedShapefileDataStoreTest.java 34902 2010-02-16 11:02:07Z aaime $
  * @author Ian Schneider
  */
 public class IndexedShapefileDataStoreTest extends TestCaseSupport {
@@ -95,6 +94,8 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
 
     final static String CHINESE = "shapes/chinese_poly.shp";
 
+    final static String UTF8 = "shapes/wgs1snt.shp";
+
     public IndexedShapefileDataStoreTest(String testName) throws IOException {
         super(testName);
     }
@@ -104,8 +105,9 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         if (q == null) {
             q = new DefaultQuery();
         }
-
-        URL url = TestData.url(resource);
+        
+        File shpFile = copyShapefiles(resource);
+        URL url = shpFile.toURI().toURL();
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(url);
         FeatureSource<SimpleFeatureType, SimpleFeature> fs = s.getFeatureSource(s.getTypeNames()[0]);
 
@@ -120,7 +122,8 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
             Query q) throws Exception {
         if (q == null)
             q = new DefaultQuery();
-        URL url = TestData.url(resource);
+        File shpFile = copyShapefiles(resource);
+        URL url = shpFile.toURI().toURL();
         ShapefileDataStore s = new IndexedShapefileDataStore(url, null, false,
                 true, IndexType.QIX, charset);
         FeatureSource<SimpleFeatureType, SimpleFeature> fs = s.getFeatureSource(s.getTypeNames()[0]);
@@ -157,6 +160,74 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
             // lanaguage
         }
     }
+    
+    public void testLoadUTF8Chars() throws Exception {
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = loadFeatures(UTF8, Charset
+                    .forName("UTF8"), null);
+        SimpleFeature first = firstFeature(fc);
+
+        assertEquals("200", first.getAttribute("VISUAL"));
+            
+        assertEquals(101.1, first.getAttribute("NUM1"));
+        assertEquals(5101.1, first.getAttribute("NUM2"));
+
+        // This is about charset:
+        String name = (String) first.getAttribute("NAME");
+        assertEquals("Iconfee Stra\u00dfe", name);
+    }
+    
+    
+
+    /**
+     * This is just another approach to open the shapefile and pass the Charset
+     * If the Shape is opened with "ISO-8859-1", the single UTF-8 encoded is shown as two ugly
+     * chars. As expected, because it's UTF8 two-byte.
+     */
+    public void testLoadingAndReadingUTF8Wrongly() throws Exception {
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = loadFeatures(UTF8, Charset
+                .forName("ISO-8859-1"), null);
+        
+        FeatureIterator<SimpleFeature> iterator = features.features();
+        assertTrue ( iterator.hasNext() );
+        assertEquals(4, features.size());
+        SimpleFeature f = iterator.next();
+        iterator.close();
+        
+        // GEOM, NAME,C,100   VISUAL,C,3      NUM1,N,5        NUM2,N,5  
+        assertEquals(5, f.getAttributeCount());
+        
+        String nameAttribute = (String) f.getAttribute("NAME");
+        
+        // We expect that the UTF8 is not understood here and there will be one extra char for the misinterpreted special char
+        assertEquals("Iconfee Stra\u00dfe".length()+1, nameAttribute.length());
+    }
+    
+
+    /**
+     * This is just another approach to open the shapefile and pass the Charset  
+     * Now we open the shape with UTF8 charset and expect the attribute to be correctly retuned with
+     * 4 chars and including the german special character.
+     */
+    public void testLoadingAndReadingUTF8Correctly() throws Exception {
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = loadFeatures(UTF8, Charset
+                .forName("UTF8"), null);
+        
+        FeatureIterator<SimpleFeature> iterator = features.features();
+        assertTrue(iterator.hasNext());
+        assertEquals(4, features.size());
+        SimpleFeature f = iterator.next();
+        iterator.close();
+
+        // GEOM, NAME,C,100   VISUAL,C,3      NUM1,N,5        NUM2,N,5  
+        assertEquals(5, f.getAttributeCount());
+
+        String nameAttribute = (String) f.getAttribute("NAME");
+
+        // We expect that the UTF8 is not understood here
+        assertEquals("Iconfee Stra\u00dfe".length(), nameAttribute.length());
+        assertEquals("Iconfee Stra\u00dfe", nameAttribute);
+    }
+    
 
     public void testSchema() throws Exception {
         URL url = TestData.url(STATE_POP);
@@ -169,7 +240,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
 
     public void testSpacesInPath() throws Exception {
         URL u = TestData.url(TestCaseSupport.class, "folder with spaces/pointtest.shp");
-        File f = new File(URLDecoder.decode(u.getFile(), "UTF-8"));
+        File f = DataUtilities.urlToFile(u);
         assertTrue(f.exists());
 
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(u);
@@ -199,11 +270,10 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
 
     public void testCreateAndReadQIX() throws Exception {
         File shpFile = copyShapefiles(STATE_POP);
-        URL url = shpFile.toURL();
-        String filename = url.getFile();
-        filename = filename.substring(0, filename.lastIndexOf("."));
+        URL url = shpFile.toURI().toURL();
 
-        File file = new File(filename + ".qix");
+        String name = shpFile.getName();
+        File file = new File(shpFile.getParent(), name.substring(0, name.lastIndexOf('.')) + ".qix");
 
         if (file.exists()) {
             file.delete();
@@ -253,9 +323,63 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         ds2.dispose();
     }
 
+    public void testSelectionQuery() throws Exception {
+        File shpFile = copyShapefiles(STATE_POP);
+        URL url = shpFile.toURI().toURL();
+        IndexedShapefileDataStore ds = new IndexedShapefileDataStore(url, null, true, true,
+                IndexType.NONE);
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = ds.getFeatureSource();
+        SimpleFeatureType schema = featureSource.getSchema();
+        DefaultQuery query = new DefaultQuery( schema.getTypeName() );
+        query.setPropertyNames(new String[0]);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures( query );
+        
+        assertNotNull( "selection query worked", features );
+        assertTrue( "selection non empty", features.size() > 0 );
+        ReferencedEnvelope bounds = features.getBounds();
+        
+        final Set<FeatureId> selection = new LinkedHashSet<FeatureId>();
+        features.accepts( new FeatureVisitor() {
+            public void visit(Feature feature) {
+                selection.add( feature.getIdentifier() );
+            }
+        }, null );
+        assertFalse( selection.isEmpty() );
+        
+        // try with filter and no attributes
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        String geomName = schema.getGeometryDescriptor().getName().getLocalPart();
+        
+        query.setFilter( ff.bbox( ff.property(geomName), bounds) );
+        features = featureSource.getFeatures( query );
+        
+        assertNotNull( "selection query worked", features );
+        assertTrue( "selection non empty", features.size() > 0 );
+    }
+    
+    public void testQueryBboxNonGeomAttributes() throws Exception {
+        File shpFile = copyShapefiles(STATE_POP);
+        URL url = shpFile.toURI().toURL();
+        IndexedShapefileDataStore ds = new IndexedShapefileDataStore(url, null, true, true,
+                IndexType.NONE);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource();
+        
+        // build a query that extracts no geom but uses a bbox filter
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        DefaultQuery q = new DefaultQuery();
+        q.setPropertyNames(new String[] {"STATE_NAME", "PERSONS"});
+        ReferencedEnvelope queryBounds = new ReferencedEnvelope(-75.102613, -72.361859, 40.212597,
+                41.512517, null);
+        q.setFilter(ff.bbox(ff.property(""), queryBounds));
+        
+        // grab the features
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fs.getFeatures(q);
+        assertTrue(fc.size() > 0);
+    }
+
     public void testFidFilter() throws Exception {
         File shpFile = copyShapefiles(STATE_POP);
-        URL url = shpFile.toURL();
+        URL url = shpFile.toURI().toURL();
         IndexedShapefileDataStore ds = new IndexedShapefileDataStore(url, null, true, true,
                 IndexType.NONE);
         FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = ds.getFeatureSource();
@@ -341,30 +465,6 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         }
         return indexedFeatures;
     }
-//
-//    public void testCreateAndReadGRX() throws Exception {
-//        URL url = TestData.url(STATE_POP);
-//        String filename = url.getFile();
-//        filename = filename.substring(0, filename.lastIndexOf("."));
-//
-//        File file = new File(filename + ".grx");
-//
-//        if (file.exists()) {
-//            file.delete();
-//        }
-//
-//        IndexedShapefileDataStore ds = new IndexedShapefileDataStore(url, null,
-//                true, true, IndexType.EXPERIMENTAL_UNSUPPORTED_GRX);
-//        FeatureCollection<SimpleFeatureType, SimpleFeature> features = ds.getFeatureSource().getFeatures();
-//        Iterator iter = features.iterator();
-//
-//        while (iter.hasNext()) {
-//            iter.next();
-//        }
-//
-//        // TODO: The following assertion fails
-//        // assertTrue(file.exists());
-//    }
 
     public void testLoadAndVerify() throws Exception {
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = loadFeatures(STATE_POP, null);
@@ -388,7 +488,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc = createFeatureCollection();
         f.createNewFile();
 
-        IndexedShapefileDataStore sds = new IndexedShapefileDataStore(f.toURL());
+        IndexedShapefileDataStore sds = new IndexedShapefileDataStore(f.toURI().toURL());
         writeFeatures(sds, fc);
 
         return sds;
@@ -614,7 +714,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         tmpFile.createNewFile();
 
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(tmpFile
-                .toURL());
+                .toURI().toURL());
         writeFeatures(s, features);
         s.dispose();
     }
@@ -687,14 +787,14 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
 
         // write features
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(tmpFile
-                .toURL());
+                .toURI().toURL());
         s.createSchema(type);
         writeFeatures(s, features);
 
         s.dispose();
         
         // read features
-        s = new IndexedShapefileDataStore(tmpFile.toURL());
+        s = new IndexedShapefileDataStore(tmpFile.toURI().toURL());
 
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc = loadFeatures(s);
         FeatureIterator<SimpleFeature> fci = fc.features();

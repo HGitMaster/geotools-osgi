@@ -50,6 +50,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * Computes the overlay of two {@link Geometry}s. The overlay can be used to
  * determine any boolean combination of the geometries.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/overlay/OverlayOp.java $
  */
 public class OverlayOp extends GeometryGraphOperation {
 

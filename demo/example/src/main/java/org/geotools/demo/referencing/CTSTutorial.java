@@ -92,8 +92,8 @@ import org.opengis.util.GenericName;
  * START SNIPPET and END SNIPPET comments are used by the wiki to display code snippets from svn.
  * Factory creation is repeated below so that it shows up in the tutorial code snippets.
  * 
- * @source $URL: http://svn.geotools.org/branches/2.5.x/demo/referencing/src/main/java/org/geotools/demo/referencing/CTSTutorial.java $
- * @version $Id: CTSTutorial.java 30760 2008-06-18 14:28:24Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/referencing/CTSTutorial.java $
+ * @version $Id: CTSTutorial.java 34132 2009-10-12 07:45:46Z mbedward $
  * @author Rueben Schulz
  *
  * TODO using the auto crs factory

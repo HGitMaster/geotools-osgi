@@ -29,6 +29,8 @@ import org.opengis.temporal.TemporalReferenceSystem;
  * Used for describing temporal positions referenced to other temporal reference systems.
  * 
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultTemporalPosition.java $
  */
 public class DefaultTemporalPosition implements TemporalPosition {
 

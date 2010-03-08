@@ -47,8 +47,8 @@ import org.geotools.referencing.factory.DirectAuthorityFactory;
  * space.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/AutoCRSFactory.java $
- * @version $Id: AutoCRSFactory.java 31593 2008-09-25 12:30:10Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/AutoCRSFactory.java $
+ * @version $Id: AutoCRSFactory.java 34859 2010-02-03 19:30:23Z aaime $
  * @author Jody Garnett
  * @author Rueben Schulz
  * @author Martin Desruisseaux
@@ -94,7 +94,8 @@ public class AutoCRSFactory extends DirectAuthorityFactory implements CRSAuthori
         add(Auto42002.DEFAULT);
         add(Auto42003.DEFAULT);
         add(Auto42004.DEFAULT);
-        add(Auto42005.DEFAULT);
+        // We don't actually support the Mollweide projection
+        // add(Auto42005.DEFAULT);
     }
 
     /**

@@ -23,7 +23,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 /** Provides ...
  * 
  *  @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/JoiningAttributeWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/JoiningAttributeWriter.java $
  */
 public class JoiningAttributeWriter implements AttributeWriter {
     private AttributeWriter[] writers;

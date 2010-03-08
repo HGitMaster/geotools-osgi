@@ -40,6 +40,8 @@ import org.opengis.util.ProgressListener;
  * Implement a feature collection just based on provision of iterator.
  * 
  * @author Jody Garnett (Refractions Research Inc)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/collection/AdaptorFeatureCollection.java $
  */
 public abstract class AdaptorFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
  

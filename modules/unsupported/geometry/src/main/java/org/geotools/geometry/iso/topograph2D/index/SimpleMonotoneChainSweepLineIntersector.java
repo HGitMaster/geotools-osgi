@@ -31,6 +31,8 @@ import org.geotools.geometry.iso.topograph2D.Edge;
  * The use of MonotoneChains as the items in the index seems to offer an
  * improvement in performance over a sweep-line alone.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/index/SimpleMonotoneChainSweepLineIntersector.java $
  */
 public class SimpleMonotoneChainSweepLineIntersector extends EdgeSetIntersector {
 

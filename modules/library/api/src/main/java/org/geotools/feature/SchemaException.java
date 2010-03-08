@@ -19,7 +19,7 @@ package org.geotools.feature;
 
 /**
  * Indicates client class has attempted to create an invalid schema.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/feature/SchemaException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/feature/SchemaException.java $
  */
 public class SchemaException extends Exception {
     /**

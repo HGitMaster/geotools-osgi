@@ -51,8 +51,8 @@ import org.geotools.resources.i18n.Vocabulary;
  * This transform is the inverse of {@link ExponentialTransform1D}.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/LogarithmicTransform1D.java $
- * @version $Id: LogarithmicTransform1D.java 30760 2008-06-18 14:28:24Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/LogarithmicTransform1D.java $
+ * @version $Id: LogarithmicTransform1D.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *
  * @see ExponentialTransform1D
@@ -370,7 +370,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     /**
      * The provider for the {@link LogarithmicTransform1D}.
      *
-     * @version $Id: LogarithmicTransform1D.java 30760 2008-06-18 14:28:24Z desruisseaux $
+     * @version $Id: LogarithmicTransform1D.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
      * @author Martin Desruisseaux (IRD)
      */
     public static class Provider extends MathTransformProvider {
@@ -383,14 +383,14 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          * The operation parameter descriptor for the {@link #base base} parameter value.
          * Valid values range from 0 to infinity. The default value is 10.
          */
-        public static final ParameterDescriptor BASE = new DefaultParameterDescriptor(
+        public static final ParameterDescriptor<Double> BASE = DefaultParameterDescriptor.create(
                 "base", 10, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * The operation parameter descriptor for the {@link #offset offset} parameter value.
          * Valid values range is unrestricted. The default value is 0.
          */
-        public static final ParameterDescriptor OFFSET = new DefaultParameterDescriptor(
+        public static final ParameterDescriptor<Double> OFFSET =DefaultParameterDescriptor.create(
                 "offset", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**

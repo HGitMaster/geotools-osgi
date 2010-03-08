@@ -48,7 +48,7 @@ import org.opengis.util.NameFactory;
  * in a subclass.
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/factory/BasicFactories.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/factory/BasicFactories.java $
  * @version $Id: BasicFactories.java 32736 2009-04-04 06:51:02Z jive $
  * @author Martin Desruisseaux
  */

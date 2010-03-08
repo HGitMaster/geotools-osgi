@@ -33,6 +33,8 @@ import org.opengis.geometry.primitive.Point;
  * reference to a Point (variant indirect). Position::direct [0,1] :
  * DirectPosition2D Position::indirect [0,1] : PointRef Position: {direct.isNull =
  * indirect.isNotNull}
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/PositionImpl.java $
  */
 
 public class PositionImpl implements Position, Serializable {

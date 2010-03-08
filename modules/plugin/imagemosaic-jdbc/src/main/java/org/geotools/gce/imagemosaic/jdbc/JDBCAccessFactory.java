@@ -20,56 +20,56 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Factory for JDBCAccess Objects. 
+ * Factory for JDBCAccess Objects.
  * 
  * The following rule applies:
  * 
  * For each Config object exists exactly one JDBCAccess object !
  * 
  * @author mcr
- *
+ * 
  */
 class JDBCAccessFactory {
-    static Map<String, JDBCAccess> JDBCAccessMap = new HashMap<String, JDBCAccess>();
+	static Map<String, JDBCAccess> JDBCAccessMap = new HashMap<String, JDBCAccess>();
 
-    /**
-     * Factory method
-     * 
-     * @param 	config	The Config object
-     * @return 			the corresponding JDBCAccess object 
-     * @throws Exception
-     */
-    static synchronized JDBCAccess getJDBCAcess(Config config)
-        throws Exception {
-        JDBCAccess jdbcAccess = JDBCAccessMap.get(config.getXmlUrl());
+	/**
+	 * Factory method
+	 * 
+	 * @param config
+	 *            The Config object
+	 * @return the corresponding JDBCAccess object
+	 * @throws Exception
+	 */
+	static synchronized JDBCAccess getJDBCAcess(Config config) throws Exception {
+		JDBCAccess jdbcAccess = JDBCAccessMap.get(config.getXmlUrl());
 
-        if (jdbcAccess != null) {
-            return jdbcAccess;
-        }
+		if (jdbcAccess != null) {
+			return jdbcAccess;
+		}
 
-        SpatialExtension type = config.getSpatialExtension();
+		SpatialExtension type = config.getSpatialExtension();
 
-        if (type == null) {
-            throw new Exception("Property <spatialExtension> missing");
-        }
+		if (type == null) {
+			throw new Exception("Property <spatialExtension> missing");
+		}
 
-        if (type == SpatialExtension.DB2) {
-            jdbcAccess = new JDBCAccessDB2(config);
-        } else if (type == SpatialExtension.POSTGIS) {
-            jdbcAccess = new JDBCAccessPostGis(config);
-        } else if (type == SpatialExtension.MYSQL) {
-            jdbcAccess = new JDBCAccessMySql(config);
-        } else if (type == SpatialExtension.UNIVERSAL) {
-            jdbcAccess = new JDBCAccessUniversal(config);
-        } else if (type == SpatialExtension.ORACLE) {
-            jdbcAccess = new JDBCAccessOracle(config);
-        } else {
-            throw new Exception("spatialExtension: " + type + " not supported");
-        }
+		if (type == SpatialExtension.DB2) {
+			jdbcAccess = new JDBCAccessDB2(config);
+		} else if (type == SpatialExtension.POSTGIS) {
+			jdbcAccess = new JDBCAccessPostGis(config);
+		} else if (type == SpatialExtension.MYSQL) {
+			jdbcAccess = new JDBCAccessMySql(config);
+		} else if (type == SpatialExtension.UNIVERSAL) {
+			jdbcAccess = new JDBCAccessUniversal(config);
+		} else if (type == SpatialExtension.ORACLE) {
+			jdbcAccess = new JDBCAccessOracle(config);
+		} else {
+			throw new Exception("spatialExtension: " + type + " not supported");
+		}
 
-        jdbcAccess.initialize();
-        JDBCAccessMap.put(config.getXmlUrl(), jdbcAccess);
+		jdbcAccess.initialize();
+		JDBCAccessMap.put(config.getXmlUrl(), jdbcAccess);
 
-        return jdbcAccess;
-    }
+		return jdbcAccess;
+	}
 }

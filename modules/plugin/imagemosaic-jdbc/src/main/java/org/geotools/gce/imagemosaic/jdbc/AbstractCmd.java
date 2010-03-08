@@ -15,7 +15,6 @@
  *    Lesser General Public License for more details.
  */
 
-
 package org.geotools.gce.imagemosaic.jdbc;
 
 import java.io.File;
@@ -24,9 +23,12 @@ import java.net.URLDecoder;
 
 public class AbstractCmd {
 
-	protected static String CONFIGPARAM="-config";
-	protected static String SPATIALTNPREFIXPARAM="-spatialTNPrefix";
-	protected static String TILETNPREFIXPARAM= "-tileTNPrefix";
+	protected static String CONFIGPARAM = "-config";
+
+	protected static String SPATIALTNPREFIXPARAM = "-spatialTNPrefix";
+
+	protected static String TILETNPREFIXPARAM = "-tileTNPrefix";
+
 	protected static URL getURLFromString(String source) {
 		if (source == null) {
 			return null;
@@ -38,8 +40,8 @@ public class AbstractCmd {
 			if (f.exists()) {
 				return f.toURI().toURL();
 			}
-			sourceURL = new URL(URLDecoder.decode((String) source,"UTF8"));
-		
+			sourceURL = new URL(URLDecoder.decode((String) source, "UTF8"));
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(1);
@@ -47,8 +49,8 @@ public class AbstractCmd {
 		return sourceURL;
 	}
 
-    static String getTableName(String prefix, int level) {
-        return prefix + "_" + level;
-    }
+	static String getTableName(String prefix, int level) {
+		return prefix + "_" + level;
+	}
 
 }

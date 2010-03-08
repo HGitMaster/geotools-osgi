@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -241,9 +242,8 @@ public abstract class AbstractGenerator {
     protected File findSchemaFile( String path ) throws IOException {
         File file = null;
         try {
-            file = new File(new URL(path).getFile());
-        }
-        catch( MalformedURLException e ) {
+            file = new File(new URL(path).toURI());
+        } catch( URISyntaxException e ) {
             file = new File( path );
         }
     	

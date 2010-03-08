@@ -24,6 +24,8 @@ import org.opengis.filter.expression.Expression;
  * Straight implementation of GeoAPI interface.
  * 
  * @author Justin Deoliveira, The Open Planning Project
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/IsBetweenImpl.java $
  */
 public class IsBetweenImpl extends CompareFilterImpl implements BetweenFilter {
 

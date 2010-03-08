@@ -26,7 +26,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * DefaultFeatureCollections.
  *
  * @author Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/DefaultFeatureCollections.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/DefaultFeatureCollections.java $
  */
 public class DefaultFeatureCollections extends FeatureCollections {
     /**

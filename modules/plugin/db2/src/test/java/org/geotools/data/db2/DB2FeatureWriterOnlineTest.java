@@ -34,7 +34,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * Exercise DB2FeatureWriter.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2FeatureWriterOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2FeatureWriterOnlineTest.java $
  */
 public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
     private DB2DataStore dataStore = null;

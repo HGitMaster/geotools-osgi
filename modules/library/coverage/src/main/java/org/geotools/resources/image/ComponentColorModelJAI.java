@@ -52,7 +52,7 @@ import javax.media.jai.iterator.RectIter;
  * @todo Remove this patch when JAI will recognize J2SE 1.4 classes.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/resources/image/ComponentColorModelJAI.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/resources/image/ComponentColorModelJAI.java $
  * @version $Id: ComponentColorModelJAI.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

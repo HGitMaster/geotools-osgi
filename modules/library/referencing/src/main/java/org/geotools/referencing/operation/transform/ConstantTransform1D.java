@@ -26,7 +26,7 @@ import java.util.Arrays;
  * specialized {@code ConstantTransform1D} class is faster.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ConstantTransform1D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ConstantTransform1D.java $
  * @version $Id: ConstantTransform1D.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

@@ -62,7 +62,7 @@ import org.geotools.metadata.iso.spatial.PixelTranslation;
  * a kind of envelope with a coordinate reference system fixed to WGS 84 (EPSG:4326).
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/geometry/GeneralEnvelope.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/geometry/GeneralEnvelope.java $
  * @version $Id: GeneralEnvelope.java 30776 2008-06-20 17:00:11Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini

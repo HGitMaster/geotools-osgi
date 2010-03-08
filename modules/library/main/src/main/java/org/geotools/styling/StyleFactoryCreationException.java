@@ -25,7 +25,7 @@ package org.geotools.styling;
  * $
  *
  * @author iant
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/StyleFactoryCreationException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/StyleFactoryCreationException.java $
  */
 public class StyleFactoryCreationException extends java.lang.Exception {
     private static final long serialVersionUID = -1809128211848169317L;

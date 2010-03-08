@@ -46,7 +46,7 @@ import org.geotools.util.logging.Logging;
  * time. This class also provides facilities for string formatting using {@link MessageFormat}.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/resources/IndexedResourceBundle.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/IndexedResourceBundle.java $
  * @version $Id: IndexedResourceBundle.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

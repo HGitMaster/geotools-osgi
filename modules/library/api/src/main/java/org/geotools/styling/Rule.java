@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.opengis.filter.Filter;
 import org.opengis.metadata.citation.OnLineResource;
-import org.opengis.style.Description;
+
 import org.opengis.style.GraphicLegend;
 
 /**
@@ -77,7 +77,7 @@ import org.opengis.style.GraphicLegend;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Rule.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Rule.java $
  */
 public interface Rule extends org.opengis.style.Rule {
 
@@ -90,11 +90,17 @@ public interface Rule extends org.opengis.style.Rule {
     void setName(String name);
 
     /**
-     * Description for this style.
+     * Description for this rule.
      * @return Human readable description for use in user interfaces
      * @since 2.5.x
      */
     Description getDescription();
+    
+    /**
+     * Description for this rule.
+     * @param description Human readable title and abstract.
+     */
+    void setDescription(org.opengis.style.Description description);
     
     /**
      * Gets the title.

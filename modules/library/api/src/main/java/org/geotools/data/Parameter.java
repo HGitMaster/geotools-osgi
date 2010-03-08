@@ -26,14 +26,16 @@ import org.opengis.util.InternationalString;
  * A Parameter defines information about a valid process parameter.
  *
  * @author gdavis
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/Parameter.java $
  */
 public class Parameter<T> {
-	/**
-	 * This is the key (ie machine readable text) used to represent
-	 * this parameter in a java.util.Map.
-	 * 
-	 * @param key (or machine readable name) for this parameter.
-	 */
+    /**
+     * This is the key (ie machine readable text) used to represent this parameter in a
+     * java.util.Map.
+     * 
+     * @param key (or machine readable name) for this parameter.
+     */
     public final String key;
     
     /**
@@ -103,7 +105,32 @@ public class Parameter<T> {
      * "min" and "max" may be useful for restrictions for things like int sizes, etc.
      */
     public static final String MIN = "min";
+    /**
+     * "min" and "max" may be useful for restrictions for things like int sizes, etc.
+     */
     public static final String MAX = "max";
+    
+    /**
+     * File extension expected - "shp", "jpg", etc...
+     */
+    public static final String EXT = "ext";
+    
+    /**
+     * Level or Category of the parameter - "user", "advanced", "program"
+     * <p>
+     * <ul>
+     * <li>user - should be shown to all users and is used every time.<br>
+     *     example: user name and password
+     * </li>
+     * <li>advanced - advanced or expert parameter used in special cases<br>
+     *     example: choice between get and post requests for WFS
+     * </li>
+     * <li>program - intended for programs often tweaking settings for performance<br>
+     *     example: JDBC datasource for which it is hard for a user to type in
+     * </li>
+     * </ul>
+     */
+    public static final String LEVEL = "level";
     
     /**
      * Refinement of type; such as the FeatureType of a FeatureCollection, or component type of a List.
@@ -118,6 +145,14 @@ public class Parameter<T> {
      * parameter description. This metadata is only used to help restrict what
      * the user enters; not all client application will understand and respect
      * these keys - please communicate with your end-user.
+     * 
+     * @see CRS
+     * @see ELEMENT
+     * @see FEATURE_TYPE
+     * @see IS_PASSWORD
+     * @see LENGTH
+     * @see MAX
+     * @see MIN
      */
     public final Map<String, Object> metadata;
 
@@ -125,52 +160,80 @@ public class Parameter<T> {
      * Mandatory parameter - quickly constructed with out a properly internationalized
      * title and description.
      * 
-     * @param key
-     * @param type
-     * @param title
-     * @param description
-     * @deprecated Please translate title and description into an InternationalString  
+     * @param key machine readable key for use in a java.util.Map
+     * @param type Java class for the expected value
+     * @param title Human readable title used for use in a user interface
+     * @param description Human readable description
      */
      public Parameter(String key, Class<T> type, String title,
      		String description ) {
          this( key, type, new SimpleInternationalString(title), new SimpleInternationalString(description) );
      }
 
+     /**
+      * Mandatory parameter - quickly constructed with out a properly internationalized
+      * title and description.
+      * 
+      * @param key machine readable key for use in a java.util.Map
+      * @param type Java class for the expected value
+      * @param title Human readable title used for use in a user interface
+      * @param description Human readable description
+      */
+      public Parameter(String key, Class<T> type, String title,
+                 String description, Map<String,Object> metadata ) {
+          this( key, type, new SimpleInternationalString(title), new SimpleInternationalString(description), metadata);
+      }
    /**
     * Mandatory parameter
-    * @param key
-    * @param type
-    * @param title
-    * @param description
+    * @param key machine readable key for use in a java.util.Map
+    * @param type Java class for the expected value
+    * @param title Human readable title used for use in a user interface
+    * @param description Human readable description
     */
     public Parameter(String key, Class<T> type, InternationalString title,
     		InternationalString description ) {
-        this( key, type, title, description, false, 1, 1, null, null );
+        this( key, type, title, description, true, 1, 1, null, null );
     }
     
     /**
-     * Mandiatory parameter with metadata.
-     * @param key
-     * @param type
-     * @param title
-     * @param description
-     * @param metadata
+     * Mandatory parameter with metadata.
+     * @param key machine readable key for use in a java.util.Map
+     * @param type Java class for the expected value
+     * @param title Human readable title used for use in a user interface
+     * @param description Human readable description
+     * @param metadata Hints to the user interface (read the javadocs for each metadata key)
+     * 
+     * @see CRS
+     * @see ELEMENT
+     * @see FEATURE_TYPE
+     * @see IS_PASSWORD
+     * @see LENGTH
+     * @see MAX
+     * @see MIN
      */
      public Parameter(String key, Class<T> type, InternationalString title,
      		InternationalString description, Map<String,Object> metadata ) {
-         this( key, type, title, description, false, 1, 1, null, metadata );
+         this( key, type, title, description, true, 1, 1, null, metadata );
      }
     /**
      * Addition of optional parameters
-     * @param key
-     * @param type
-     * @param title
-     * @param description
-     * @param required
-     * @param min
-     * @param max
-     * @param sample
-     * @param metadata
+     * @param key machine readable key for use in a java.util.Map
+     * @param type Java class for the expected value
+     * @param title Human readable title used for use in a user interface
+     * @param description Human readable description
+     * @param required true if the value is required
+     * @param min Minimum value; or null if not needed
+     * @param max Maximum value; or null if not needed
+     * @param sample Sample value; may be used as a default in a user interface
+     * @param metadata Hints to the user interface (read the javadocs for each metadata key)
+     * 
+     * @see CRS
+     * @see ELEMENT
+     * @see FEATURE_TYPE
+     * @see IS_PASSWORD
+     * @see LENGTH
+     * @see MAX
+     * @see MIN
      */
     public Parameter(String key, Class<T> type, InternationalString title,
     				 InternationalString description,
@@ -187,4 +250,26 @@ public class Parameter<T> {
         this.metadata = metadata == null ? null : Collections.unmodifiableMap(metadata);
     }
     
+    /**
+     * Provides for easy access to the {@link Parameter#IS_PASSWORD} metadata
+     * @return true if {@code metadata.get(IS_PASSWORD) == Boolean.TRUE}
+     */
+    public boolean isPassword(){
+        return metadata != null && Boolean.TRUE.equals(metadata.get(IS_PASSWORD));
+    }
+ 
+    /**
+     * Easy access to check the {@link #LEVEL} metadata
+     * @return provided level or "user" by default
+     */
+    public String getLevel(){
+        if( metadata == null ){
+            return "user";
+        }
+        String level = (String) metadata.get(LEVEL);
+        if( level == null ){
+            return "user";
+        }
+        return level;        
+    }
 }

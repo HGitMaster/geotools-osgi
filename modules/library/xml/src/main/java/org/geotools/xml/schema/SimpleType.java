@@ -29,7 +29,7 @@ import javax.naming.OperationNotSupportedException;
  * </p>
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/schema/SimpleType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/SimpleType.java $
  */
 public interface SimpleType extends Type {
     /**

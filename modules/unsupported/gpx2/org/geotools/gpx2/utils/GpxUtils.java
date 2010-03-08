@@ -19,6 +19,8 @@ package org.geotools.gpx2.utils;
  * that can be accessed from a static context. This includes methods for 
  * working with latitude and longitude values represented as doubles in 
  * decimal degrees format.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/gpx2/org/geotools/gpx2/utils/GpxUtils.java $
  */
 public final class GpxUtils 
 {

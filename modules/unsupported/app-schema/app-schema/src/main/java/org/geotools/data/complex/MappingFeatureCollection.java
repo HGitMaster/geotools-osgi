@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * {@link FeatureCollection} for a {@link MappingFeatureIterator}.
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: MappingFeatureCollection.java 32634 2009-03-16 02:49:51Z bencaradocdavies $
+ * @version $Id: MappingFeatureCollection.java 34793 2010-01-15 08:08:17Z ang05a $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/app-schema/app-schema/src/main/java
  *         /org/geotools/data/complex/MappingFeatureCollection.java $
@@ -133,7 +133,7 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
      * @see org.geotools.feature.FeatureCollection#close(java.util.Iterator)
      */
     public void close(Iterator<Feature> close) {
-        ((MappingFeatureIterator) close).close();
+        ((IMappingFeatureIterator) close).close();
     }
 
     /*
@@ -161,7 +161,7 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
      */
     public FeatureIterator<Feature> features() {
         try {
-            return new MappingFeatureIterator(store, mapping, query);
+            return MappingFeatureIteratorFactory.getInstance(store, mapping, query);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -231,7 +231,7 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
      */
     public Iterator<Feature> iterator() {
         try {
-            return new MappingFeatureIterator(store, mapping, query);
+            return MappingFeatureIteratorFactory.getInstance(store, mapping, query);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -290,11 +290,17 @@ public class MappingFeatureCollection implements FeatureCollection<FeatureType, 
      * @see org.geotools.feature.FeatureCollection#size()
      */
     public int size() {
-        try {
-            return store.getCount(query);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        // RA: ensure when there are multiple entries of the same features from denormalised view,
+        // we regard them as 1 feature.
+        // This is also needed for oracle back end when filtered with nested attributes
+        // because directly counting the features from the db store with the raw query
+        // will result in IllegalArgumentException since it'll try to translate the nested
+        // attributes filter to SQL form
+        int featureCount = 0;
+        for (FeatureIterator<Feature> features = features(); features.hasNext(); features.next()) {
+            featureCount++;
         }
+        return featureCount;
     }
 
     /*

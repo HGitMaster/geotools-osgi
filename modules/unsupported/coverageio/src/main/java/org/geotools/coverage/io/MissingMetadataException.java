@@ -26,7 +26,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * when a raster is being read but the file doesn't contains enough information for
  * constructing the raster's coordinate system.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/MissingMetadataException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/MissingMetadataException.java $
  * @version $Id: MissingMetadataException.java 30965 2008-07-09 10:04:21Z cedricbr $
  * @author Martin Desruisseaux (IRD)
  *

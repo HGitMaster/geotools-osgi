@@ -72,7 +72,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  *
  * @author Jody Garnett, Refractions Research Inc
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/data/AbstractFeatureSource.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/AbstractFeatureSource.java $
  */
 public abstract class AbstractFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
     /** The logger for the filter module. */

@@ -32,7 +32,7 @@ import org.opengis.util.Cloneable;
  * This class is final for performance reason.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/math/Complex.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/math/Complex.java $
  * @version $Id: Complex.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Justin Deoliveira
  * @author Martin Desruisseaux

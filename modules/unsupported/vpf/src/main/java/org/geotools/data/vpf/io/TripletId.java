@@ -27,7 +27,7 @@ import org.geotools.data.vpf.exc.VPFDataFormatException;
  *         OneMap
  * @version 1.0.0
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/TripletId.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/TripletId.java $
  */
 public class TripletId extends Number {
     /**

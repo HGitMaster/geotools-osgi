@@ -47,6 +47,8 @@ import org.geotools.xml.*;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/ResponsiblePartySubsetTypeBinding.java $
  */
 public class ResponsiblePartySubsetTypeBinding extends AbstractComplexEMFBinding {
     public ResponsiblePartySubsetTypeBinding(Ows10Factory factory) {

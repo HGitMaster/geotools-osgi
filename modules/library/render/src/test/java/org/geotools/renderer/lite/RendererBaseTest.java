@@ -43,6 +43,8 @@ import org.geotools.test.TestData;
  * DOCUMENT ME!
  * 
  * @author Simone Giannecchini
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/RendererBaseTest.java $
  */
 public abstract class RendererBaseTest {
 
@@ -118,7 +120,7 @@ public abstract class RendererBaseTest {
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                if (image.getRGB(x, y) != -1) {
+                if (image.getRGB(x, y) != 0) {
                     hasData = true;
                 }
             }

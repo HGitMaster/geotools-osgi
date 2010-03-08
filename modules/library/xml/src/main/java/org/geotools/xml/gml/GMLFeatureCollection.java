@@ -26,7 +26,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/gml/GMLFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/gml/GMLFeatureCollection.java $
  */
 public class GMLFeatureCollection extends DefaultFeatureCollection {
 	private ReferencedEnvelope bounds;

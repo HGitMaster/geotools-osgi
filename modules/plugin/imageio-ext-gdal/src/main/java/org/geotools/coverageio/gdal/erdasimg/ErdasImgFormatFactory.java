@@ -76,7 +76,7 @@ public final class ErdasImgFormatFactory extends BaseGridFormatFactorySPI implem
      *
      * @return A {@link ErdasImgFormat}
      */
-    public Format createFormat() {
+    public ErdasImgFormat createFormat() {
         return new ErdasImgFormat();
     }
 }

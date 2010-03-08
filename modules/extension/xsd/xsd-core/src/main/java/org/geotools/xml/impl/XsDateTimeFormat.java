@@ -27,6 +27,8 @@ import java.util.TimeZone;
  * to parse and format <code>xs:dateTime</code> values.</p>
  *
  * @author <a href="mailto:joe@ispsoft.de">Jochen Wiedmann</a>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/XsDateTimeFormat.java $
  */
 public class XsDateTimeFormat extends Format {
     final boolean parseDate;

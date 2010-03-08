@@ -29,8 +29,8 @@ import org.opengis.filter.PropertyIsLike;
  * Defines a like filter, which checks to see if an attribute matches a REGEXP.
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/filter/LikeFilterImpl.java $
- * @version $Id: LikeFilterImpl.java 32755 2009-04-07 14:37:10Z jdeolive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/LikeFilterImpl.java $
+ * @version $Id: LikeFilterImpl.java 34034 2009-10-01 15:15:03Z jdeolive $
  */
 public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 
@@ -52,9 +52,6 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
     /** the pattern compiled into a java regex */
     private Pattern compPattern = null;
 
-    /** The matcher to match patterns with. */
-    private Matcher match = null;
-    
     /** Used to indicate if case should be ignored or not */
     boolean matchingCase;
     
@@ -161,22 +158,22 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 	
 	public void setWildCard(String wildCard) {
 		this.wildcardMulti = wildCard;
-		match = null;
+		compPattern = null;
 	}
 	
 	public void setSingleChar(String singleChar) {
 		this.wildcardSingle = singleChar;
-		match = null;
+		compPattern = null;
 	}
 	
 	public void setEscape(String escape) {
 		this.escape = escape;
-		match = null;
+		compPattern = null;
 	}
 
     public void setMatchCase(boolean matchingCase){
         this.matchingCase = matchingCase;
-        match = null;
+        compPattern = null;
     }
 	
 	public boolean isMatchingCase() {
@@ -187,8 +184,8 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
             this.matchingCase = matchingCase;
     }
 	
-    private Matcher getMatcher(){
-        if(match == null){
+    private Matcher getMatcher(String string){
+        if(compPattern == null){
             // protect the vars as this is moved code
 
             String pattern1 = new String(this.pattern);
@@ -280,9 +277,8 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
             compPattern = isMatchingCase()  
                 ? Pattern.compile(pattern1)
                 : Pattern.compile(pattern1, Pattern.CASE_INSENSITIVE);
-            match = compPattern.matcher("");
         }
-        return match;
+        return compPattern.matcher(string);
     }
 
     /**
@@ -419,7 +415,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      */
     public void setLiteral(String literal) {
     	this.pattern = literal;
-    	match = null;
+    	compPattern = null;
     }
     
     /**
@@ -452,9 +448,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
                 return false;
             }
 
-            Matcher matcher = getMatcher();
-            matcher.reset(value.toString());
-
+            Matcher matcher = getMatcher(value.toString());
             return matcher.matches();
     }
     

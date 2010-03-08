@@ -37,6 +37,8 @@ import org.opengis.geometry.primitive.SurfaceBoundary;
  * 
  * @author SYS Technologies
  * @author dillard
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/PolyhedralSurfaceImpl.java $
  * @version $Revision $
  */
 public class PolyhedralSurfaceImpl extends GeometryImpl implements PolyhedralSurface {

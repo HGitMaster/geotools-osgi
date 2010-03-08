@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32631 2009-03-15 17:06:15Z aaime $
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>library</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
 
 
@@ -27,12 +27,10 @@
   <artifactId>gt-metadata</artifactId>
   <packaging>jar</packaging>
   <name>Metadata</name>
-  <url>http://maven.geotools.fr/reports/modules/library/metadata/</url>
+  
 
   <scm>
-    <connection>
-      scm:svn:http://svn.osgeo.org/geotools/trunk/modules/library/metadata/
-    </connection>
+    <connection>scm:svn:http://svn.osgeo.org/geotools/trunk/modules/library/metadata/</connection>
     <url>http://svn.osgeo.org/geotools/trunk/modules/library/metadata/</url>
   </scm>
 
@@ -148,23 +146,6 @@
       <artifactId>log4j</artifactId>
       <scope>provided</scope>  <!-- Not required for default execution. -->
       <optional>true</optional>
-    </dependency>
-    <!--
-        This dependency is required in order to build on JDK that does not
-        contain JAXB annotations source code (before jdk1.6), and for jdk that
-        do not have the whole set of annotations. Indeed the JAXB 2.1.5 is
-        required, and for earliers-JDK (before 1.6.0 update 4), some annotations
-        are still lacking.
-        If the JDK used contains JAXB (at least a 2.1.5 version) with the
-        endorsed system for example, these annotations will be used instead of
-        this dependency, since the JDK classpath comes before this dependency at
-        compilation-time.
-    -->
-    <dependency>
-      <groupId>org.geotools.maven</groupId>
-      <artifactId>jaxb</artifactId>
-      <scope>provided</scope>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

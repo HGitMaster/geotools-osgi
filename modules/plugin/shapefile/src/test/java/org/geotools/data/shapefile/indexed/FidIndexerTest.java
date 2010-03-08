@@ -37,11 +37,11 @@ public class FidIndexerTest extends FIDTestCase {
      * Test method for 'org.geotools.index.fid.FidIndexer.generate(URL)'
      */
     public void testGenerate() throws Exception {
-        ShpFiles shpFiles = new ShpFiles(backshp.toURL());
+        ShpFiles shpFiles = new ShpFiles(backshp.toURI().toURL());
         FidIndexer.generate(shpFiles);
 
         IndexedShapefileDataStore ds = new IndexedShapefileDataStore(backshp
-                .toURL(), null, false, false, IndexType.NONE);
+                .toURI().toURL(), null, false, false, IndexType.NONE);
 
         FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource();
         int features = fs.getCount(Query.ALL);

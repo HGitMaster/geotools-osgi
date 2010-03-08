@@ -31,4 +31,7 @@ public class SeVersion {
     public void changeState(SeObjectId newStateId)throws SeException {
     }
 
+    public void delete() throws SeException{}
+
+    public void setOwner(String o) throws SeException {}
 }

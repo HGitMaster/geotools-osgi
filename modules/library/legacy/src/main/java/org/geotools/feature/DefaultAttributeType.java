@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Rob Hranac, VFNY
  * @author Chris Holmes, TOPP
  * @author Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/main/java/org/geotools/feature/DefaultAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/DefaultAttributeType.java $
  * @version $Id: DefaultAttributeType.java 30647 2008-06-12 18:58:42Z acuster $
  */
 public class DefaultAttributeType extends AttributeDescriptorImpl 

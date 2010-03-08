@@ -73,7 +73,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @goal generate
  * @phase generate-sources
  * @description Parses a JJT file and transform it to Java Files.
- * @source $URL: http://gtsvn.refractions.net/trunk/build/maven/jjtree-javacc/src/main/java/org/geotools/maven/JJTreeJavaCC.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/jjtree-javacc/src/main/java/org/geotools/maven/JJTreeJavaCC.java $
  * @version $Id: JJTreeJavaCC.java 24765 2007-03-15 03:50:56Z desruisseaux $
  *
  * @author jruiz

@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
@@ -33,16 +33,16 @@ import org.opengis.util.Cloneable;
  * stroke defines how a line is rendered.
  *
  * @author James Macgill, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/StrokeImpl.java $
- * @version $Id: StrokeImpl.java 31679 2008-10-18 10:23:12Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/StrokeImpl.java $
+ * @version $Id: StrokeImpl.java 33834 2009-09-04 13:20:54Z jive $
  */
 public class StrokeImpl implements Stroke, Cloneable {
     private FilterFactory filterFactory;
     private Expression color;
     private float[] dashArray;
     private Expression dashOffset;
-    private Graphic fillGraphic;
-    private Graphic strokeGraphic;
+    private GraphicImpl fillGraphic;
+    private GraphicImpl strokeGraphic;
     private Expression lineCap;
     private Expression lineJoin;
     private Expression opacity;
@@ -139,8 +139,8 @@ public class StrokeImpl implements Stroke, Cloneable {
             System.arraycopy(dashArray, 0, ret, 0, dashArray.length);
         } else {
         	final float[] defaultDashArray = Stroke.DEFAULT.getDashArray();
-        	
-        	assert defaultDashArray != null;
+        	if(defaultDashArray == null)
+        	    return null;
         	
         	ret = new float[defaultDashArray.length];
         	System.arraycopy(defaultDashArray, 0, ret, 0, defaultDashArray.length);
@@ -203,7 +203,7 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @return The graphic to use as a stipple fill. If null, then no Stipple
      *         fill should be used.
      */
-    public Graphic getGraphicFill() {
+    public GraphicImpl getGraphicFill() {
         return fillGraphic;
     }
 
@@ -214,11 +214,11 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @param fillGraphic The graphic to use as a stipple fill. If null, then
      *        no Stipple fill should be used.
      */
-    public void setGraphicFill(Graphic fillGraphic) {
+    public void setGraphicFill(org.opengis.style.Graphic fillGraphic) {
         if (this.fillGraphic == fillGraphic) {
             return;
         }
-        this.fillGraphic = fillGraphic;
+        this.fillGraphic = GraphicImpl.cast( fillGraphic );
     }
 
     /**
@@ -233,7 +233,7 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @return The graphic to use as a linear graphic. If null, then no graphic
      *         stroke should be used.
      */
-    public Graphic getGraphicStroke() {
+    public GraphicImpl getGraphicStroke() {
         return strokeGraphic;
     }
 
@@ -249,11 +249,11 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @param strokeGraphic The graphic to use as a linear graphic. If null,
      *        then no graphic stroke should be used.
      */
-    public void setGraphicStroke(Graphic strokeGraphic) {
+    public void setGraphicStroke(org.opengis.style.Graphic strokeGraphic) {
         if (this.strokeGraphic == strokeGraphic) {
             return;
         }
-        this.strokeGraphic = strokeGraphic;
+        this.strokeGraphic = GraphicImpl.cast(strokeGraphic);
     }
 
     /**
@@ -422,11 +422,11 @@ public class StrokeImpl implements Stroke, Cloneable {
             }
 
             if (fillGraphic != null && fillGraphic instanceof Cloneable) {
-                clone.fillGraphic = (Graphic) ((Cloneable) fillGraphic).clone();
+                clone.fillGraphic = (GraphicImpl) ((Cloneable) fillGraphic).clone();
             }
 
             if (strokeGraphic != null && fillGraphic instanceof Cloneable ) {
-                clone.strokeGraphic = (Graphic) ((Cloneable) strokeGraphic)
+                clone.strokeGraphic = (GraphicImpl) ((Cloneable) strokeGraphic)
                     .clone();
             }
 
@@ -556,6 +556,34 @@ public class StrokeImpl implements Stroke, Cloneable {
         }
 
         return true;
+    }
+
+    static StrokeImpl cast(org.opengis.style.Stroke stroke) {
+        if( stroke == null ){
+            return null;
+        }
+        else if (stroke instanceof StrokeImpl){
+            return (StrokeImpl) stroke;
+        }
+        else {
+            StrokeImpl copy = new StrokeImpl();
+            copy.setColor( stroke.getColor());
+            if( stroke.getDashArray() != null ){
+                float dashArray[] = stroke.getDashArray();
+                float ret[] = new float[ dashArray.length ];
+                System.arraycopy(dashArray, 0, ret, 0, dashArray.length );                
+                copy.setDashArray( ret );
+            }
+            copy.setDashOffset(stroke.getDashOffset());
+            copy.setGraphicFill( GraphicImpl.cast(stroke.getGraphicFill()));
+            copy.setGraphicStroke( GraphicImpl.cast(stroke.getGraphicStroke()));
+            copy.setLineCap( stroke.getLineCap());
+            copy.setLineJoin(stroke.getLineJoin());
+            copy.setOpacity( stroke.getOpacity());
+            copy.setWidth(stroke.getWidth());
+            
+            return copy;
+        }
     }
 
 }

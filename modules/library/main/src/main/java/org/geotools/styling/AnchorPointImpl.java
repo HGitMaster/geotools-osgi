@@ -30,8 +30,8 @@ import org.opengis.util.Cloneable;
  * Direct implementation of AnchorPoint.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/AnchorPointImpl.java $
- * @version $Id: AnchorPointImpl.java 31599 2008-09-29 07:32:48Z jgarnett $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/AnchorPointImpl.java $
+ * @version $Id: AnchorPointImpl.java 33813 2009-08-28 14:45:11Z jive $
  */
 public class AnchorPointImpl implements AnchorPoint,Cloneable {
     
@@ -41,6 +41,22 @@ public class AnchorPointImpl implements AnchorPoint,Cloneable {
     private Expression anchorPointX = null;
     private Expression anchorPointY = null;
 
+    
+    static AnchorPointImpl cast( org.opengis.style.AnchorPoint anchor ){
+        if( anchor == null ){
+            return null;
+        }
+        else if (anchor instanceof AnchorPointImpl){
+            return (AnchorPointImpl) anchor;
+        }
+        else {
+            AnchorPointImpl copy = new AnchorPointImpl();
+            copy.setAnchorPointX( anchor.getAnchorPointX() );
+            copy.setAnchorPointY( anchor.getAnchorPointY() );
+            return copy;
+        }
+    }
+    
     public AnchorPointImpl() {
         this( CommonFactoryFinder.getFilterFactory( GeoTools.getDefaultHints() ) );
     }

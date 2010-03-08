@@ -31,8 +31,8 @@ import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.Command;
+import org.geotools.arcsde.session.ISession;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
@@ -146,6 +146,10 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         assert session != null;
         assert listenerManager != null;
         assert versionHandler != null;
+
+        if (!(fidReader instanceof FIDReader.SdeManagedFidReader || fidReader instanceof FIDReader.UserManagedFidReader)) {
+            throw new DataSourceException("fid reader is not user nor sde managed: " + fidReader);
+        }
 
         this.fidReader = fidReader;
         this.featureType = featureType;
@@ -360,11 +364,14 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * @see FeatureWriter#write()
      */
     public void write() throws IOException {
-        final SeLayer layer = getLayer();
+
+        // make the feature validate against its schema before inserting/updating
+        feature.validate();
+
         if (isNewlyCreated(feature)) {
             Number newId;
             try {
-                newId = insertSeRow(feature, layer);
+                newId = insertSeRow(feature);
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Error inserting " + feature + ": " + e.getMessage(), e);
                 throw e;
@@ -375,7 +382,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             fireAdded(mutableFidFeature);
         } else {
             try {
-                updateRow(feature, layer);
+                updateRow(feature);
                 fireChanged(feature);
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Error updating " + feature + ": " + e.getMessage(), e);
@@ -392,8 +399,6 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * 
      * @param modifiedFeature
      *            the newly create Feature to insert.
-     * @param layer
-     *            the layer where to insert the feature.
      * @param session
      *            the connection to use for the insert operation. Its auto commit mode determines
      *            whether the operation takes effect immediately or not.
@@ -402,20 +407,13 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      *             if thrown by any sde stream method
      * @throws IOException
      */
-    private void updateRow(final SimpleFeature modifiedFeature, final SeLayer layer)
-            throws IOException {
+    private void updateRow(final SimpleFeature modifiedFeature) throws IOException {
+
+        final SeLayer layer = getLayer();
+        final SeCoordinateReference seCoordRef = layer == null ? null : layer.getCoordRef();
 
         final SeUpdate updateStream = (SeUpdate) createStream(SeUpdate.class);
         // updateStream.setWriteMode(true);
-
-        final SeCoordinateReference seCoordRef = session
-                .issue(new Command<SeCoordinateReference>() {
-                    @Override
-                    public SeCoordinateReference execute(ISession session, SeConnection connection)
-                            throws SeException, IOException {
-                        return layer.getCoordRef();
-                    }
-                });
 
         final LinkedHashMap<Integer, String> mutableColumns = getUpdatableColumnNames();
         final String[] rowColumnNames = new ArrayList<String>(mutableColumns.values())
@@ -459,17 +457,16 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * 
      * @param newFeature
      *            the newly create Feature to insert.
-     * @param layer
-     *            the layer where to insert the feature.
      * @param session
      *            the connection to use for the insert operation. Its auto commit mode determines
      *            whether the operation takes effect immediately or not.
      * @throws IOException
      */
-    private Number insertSeRow(final SimpleFeature newFeature, final SeLayer layer)
-            throws IOException {
+    private Number insertSeRow(final SimpleFeature newFeature) throws IOException {
 
-        final SeCoordinateReference seCoordRef = layer.getCoordRef();
+        // final SeTable table = getTable();
+        final SeLayer layer = getLayer();
+        final SeCoordinateReference seCoordRef = layer == null ? null : layer.getCoordRef();
 
         // this returns only the mutable attributes
         final LinkedHashMap<Integer, String> insertColumns = getInsertableColumnNames();
@@ -481,7 +478,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                     IOException {
 
                 final SeInsert insertStream = (SeInsert) createStream(SeInsert.class);
-                Number newId;
+                Number newId = null;
 
                 try {
                     final SeRow row;
@@ -490,8 +487,15 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                     // and include it in the attributes to set
                     if (fidReader instanceof FIDReader.UserManagedFidReader) {
                         newId = getNextAvailableUserManagedId();
-                        final int rowIdIndex = fidReader.getColumnIndex();
-                        newFeature.setAttribute(rowIdIndex, newId);
+                        if (newId == null) {
+                            LOGGER.finest("There seems not to be a sequence"
+                                    + " for the table, not setting a generated id, "
+                                    + "user ought to be taking care of it");
+                            newId = (Number) newFeature.getAttribute(fidReader.getColumnIndex());
+                        } else {
+                            final int rowIdIndex = fidReader.getColumnIndex();
+                            newFeature.setAttribute(rowIdIndex, newId);
+                        }
                     }
                     String[] rowColumnNames = new ArrayList<String>(insertColumns.values())
                             .toArray(new String[0]);
@@ -506,8 +510,6 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                     if (fidReader instanceof FIDReader.SdeManagedFidReader) {
                         SeObjectId newRowId = insertStream.lastInsertedRowId();
                         newId = Long.valueOf(newRowId.longValue());
-                    } else {
-                        throw new DataSourceException("fid reader is not user nor sde managed");
                     }
 
                     insertStream.flushBufferedWrites(); // jg: my customer wanted this uncommented
@@ -578,18 +580,27 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * @return
      * @throws IOException
      * @throws SeException
+     * @return a new available id if possible, {@code null} if thre seems not to be a sequence for
+     *         the table
      */
     private Number getNextAvailableUserManagedId() throws IOException, SeException {
 
         // TODO: refactor, this is expensive to do for each row to insert
         // TODO: refactor to some sort of strategy object like done for
         // FIDReader
+        final SeLayer layer = getLayer();
         final SeTable table = getTable();
         // ArcSDE JavaDoc only says: "Returns a range of row id values"
-        //http://edndoc.esri.com/arcsde/9.1/java_api/docs/com/esri/sde/sdk/client/setable.html#getIds
+        // http://edndoc.esri.com/arcsde/9.1/java_api/docs/com/esri/sde/sdk/client/setable.html#getIds
         // (int)
-        // I've checked empirically it is to return a range of available ids
-        final SeTableIdRange ids = table.getIds(1);
+        /*
+         * I've checked empirically it is to return a range of available ids. And also found it
+         * works for layers but not for registered tables with non spatial layer.. sigh..
+         */
+        final SeTableIdRange ids = layer == null ? null : table.getIds(1);
+        if (ids == null) {
+            return null;
+        }
         final SeObjectId startId = ids.getStartId();
         final long id = startId.longValue();
         final Long newId = Long.valueOf(id);
@@ -718,15 +729,19 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             final String typeName = this.featureType.getTypeName();
             final SeColumnDefinition[] columnDefinitions = session.describe(typeName);
             final String shapeAttributeName;
-
-            shapeAttributeName = session.issue(new Command<String>() {
-                @Override
-                public String execute(ISession session, SeConnection connection)
-                        throws SeException, IOException {
-                    SeLayer layer = session.getLayer(typeName);
-                    return layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
-                }
-            });
+            if (this.featureType.getGeometryDescriptor() == null) {
+                // no geometry column, it's a non sptial registered table
+                shapeAttributeName = null;
+            } else {
+                shapeAttributeName = session.issue(new Command<String>() {
+                    @Override
+                    public String execute(ISession session, SeConnection connection)
+                            throws SeException, IOException {
+                        SeLayer layer = session.getLayer(typeName);
+                        return layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
+                    }
+                });
+            }
 
             // use LinkedHashMap to respect column order
             LinkedHashMap<Integer, String> columnList = new LinkedHashMap<Integer, String>();
@@ -818,7 +833,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     }
 
     private SeLayer getLayer() throws IOException {
-        if (this.cachedLayer == null) {
+        if (this.cachedLayer == null && featureType.getGeometryDescriptor() != null) {
             final String typeName = this.featureType.getTypeName();
             final SeLayer layer = session.getLayer(typeName);
             this.cachedLayer = layer;

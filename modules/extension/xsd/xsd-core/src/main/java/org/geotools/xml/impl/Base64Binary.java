@@ -23,6 +23,8 @@ import sun.misc.BASE64Encoder;
 
 
 /** A utility class for working with base64 encoding.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/Base64Binary.java $
  */
 public class Base64Binary {
 	/** Creates a clone of the byte array <code>pValue</code>.

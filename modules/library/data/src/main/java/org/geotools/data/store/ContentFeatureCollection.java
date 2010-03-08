@@ -55,6 +55,8 @@ import org.opengis.filter.identity.FeatureId;
  * A FeatureCollection that completly delegates to a backing FetaureSource.
  * 
  * @author Jody Garnett (Refractions Research, Inc.)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentFeatureCollection.java $
  */
 public class ContentFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
     
@@ -109,9 +111,6 @@ public class ContentFeatureCollection implements FeatureCollection<SimpleFeature
         this.featureSource = featureSource;
         this.query = query;
         
-        //add the feautre source listener
-        featureSource.addFeatureListener(listener);
-        
         //retype feature type if necessary
         if ( query.getPropertyNames() != Query.ALL_NAMES ) {
             this.featureType = 
@@ -138,28 +137,7 @@ public class ContentFeatureCollection implements FeatureCollection<SimpleFeature
 
     public void accepts(org.opengis.feature.FeatureVisitor visitor,
             org.opengis.util.ProgressListener progress) throws IOException {
-        if( progress == null ) progress = new NullProgressListener();
-        
-         FeatureReader<SimpleFeatureType, SimpleFeature> reader = featureSource.getReader(query);
-        try{
-            float size = size();
-            float position = 0;            
-            progress.started();
-            while( reader.hasNext() ){
-                if (size > 0) progress.progress( position++/size );
-                try {
-                    SimpleFeature feature = reader.next();
-                    visitor.visit(feature);
-                }
-                catch( Exception erp ){
-                    progress.exceptionOccurred( erp );
-                }
-            }            
-        }
-        finally {
-            progress.complete();            
-            reader.close();
-        }
+        featureSource.accepts( query, visitor, progress);
     }
     
     
@@ -170,7 +148,14 @@ public class ContentFeatureCollection implements FeatureCollection<SimpleFeature
      * @param listener The listener to add
      */
     public void addListener(CollectionListener listener) {
-        listeners.add(listener);
+        // create the bridge only if we have collection listeners around
+        synchronized (listeners) {
+            if(listeners.size() == 0) {
+                featureSource.addFeatureListener(this.listener);
+            }
+            
+            listeners.add(listener);
+        }
     }
 
     /**
@@ -179,7 +164,13 @@ public class ContentFeatureCollection implements FeatureCollection<SimpleFeature
      * @param listener The listener to remove
      */
     public void removeListener(CollectionListener listener) {
-        listeners.remove(listener);
+        // as soon as the listeners are out we clean up
+        synchronized (listeners) {
+            listeners.remove(listener);
+        
+            if(listeners.size() == 0)
+                featureSource.removeFeatureListener(this.listener);
+        }
     }
     
     // Iterators

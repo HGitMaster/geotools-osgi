@@ -92,7 +92,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * complexType definition to be used by the GMLSchema
  *
  * @author $author$
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/gml/GMLComplexTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/gml/GMLComplexTypes.java $
  * @version $Revision: 1.9 $
  *
  * @see GMLSchema

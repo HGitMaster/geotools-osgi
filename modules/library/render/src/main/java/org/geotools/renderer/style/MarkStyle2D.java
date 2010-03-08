@@ -28,8 +28,8 @@ import org.geotools.resources.Utilities;
  * Style to represent points as small filled and stroked shapes
  *
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/MarkStyle2D.java $
- * @version $Id: MarkStyle2D.java 32420 2009-02-06 11:28:10Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/MarkStyle2D.java $
+ * @version $Id: MarkStyle2D.java 34849 2010-01-29 16:07:40Z aaime $
  */
 public class MarkStyle2D extends PolygonStyle2D {
     Shape shape;
@@ -64,7 +64,7 @@ public class MarkStyle2D extends PolygonStyle2D {
     public Shape getTransformedShape(float x, float y) {
         if (shape != null) {
             Rectangle2D bounds = shape.getBounds2D();
-            double shapeSize = Math.max(bounds.getWidth(), bounds.getHeight());
+            double shapeSize = bounds.getHeight();
             double scale = size / shapeSize;
             TransformedShape ts = new TransformedShape();
             ts.shape = shape;

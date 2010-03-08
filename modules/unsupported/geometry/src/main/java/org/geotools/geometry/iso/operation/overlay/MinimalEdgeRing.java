@@ -29,6 +29,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * than 2. These are the form of rings required to represent polygons under the
  * OGC SFS spatial data model.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/overlay/MinimalEdgeRing.java $
  */
 public class MinimalEdgeRing extends EdgeRing {
 

@@ -27,7 +27,7 @@ import org.opengis.filter.Filter;
  *
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/main/java/org/geotools/feature/type/NumericAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/type/NumericAttributeType.java $
  */
 public class NumericAttributeType extends DefaultAttributeType implements PrimativeAttributeType {
     /**

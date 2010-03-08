@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 31093 2008-07-28 23:06:31Z groldan $              
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>geotools</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
   
 
@@ -110,11 +110,6 @@
           <maxmemory>512M</maxmemory>
             <!-- Specifies the encoding name of the source files.-->
           <encoding>UTF-8</encoding>
-            <!-- Whether to build an aggregated report at the root.-->
-          <aggregate>true</aggregate>
-            <!-- By default (false), generates javadoc with deprecated classes.
-                 Set to true in order to have a javadoc without deprecated classes.-->
-          <nodeprecated>false</nodeprecated>
             <!-- Set an additional parameter for the command line. -->
           <additionalparam>-keywords</additionalparam>
           <breakiterator>true</breakiterator>
@@ -198,7 +193,7 @@
             <link>http://download.java.net/media/java3d/javadoc/1.5.1</link>
             <link>http://jscience.org/api/</link>
             <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
-            <link>http://www.jump-project.org/docs/jts/1.7/api</link>
+            <link>http://tsusiatsoftware.net/jts/javadoc</link>
           </links>
 
           <!-- Separates packages on the overview page into the    -->
@@ -266,10 +261,6 @@
                 org.geotools.factory*:org.geotools.io*:org.geotools.util*:org.geotools.math*:org.geotools.nature*:org.geotools.event*:org.geotools.index*
               </packages>
             </group>
-            <group>
-              <title>Bridges to external applications</title>
-              <packages>org.geotools.openoffice*</packages>
-            </group>
           </groups>
         </configuration>
       </plugin>
@@ -281,6 +272,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>library</module>
+    <module>ogc</module>    
     <module>plugin</module>
     <module>extension</module>
     <module>unsupported</module>

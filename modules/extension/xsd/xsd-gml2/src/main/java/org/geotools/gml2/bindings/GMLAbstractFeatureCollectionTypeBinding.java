@@ -52,6 +52,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLAbstractFeatureCollectionTypeBinding.java $
  */
 public class GMLAbstractFeatureCollectionTypeBinding extends AbstractComplexBinding {
     /**

@@ -27,7 +27,7 @@ import org.opengis.filter.expression.PropertyName;
  * It should handle xpath attributePaths of features, and should
  * report the attribute found at the attributePath of a feature.
  * </p>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/api/src/main/java/org/geotools/filter/AttributeExpression.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/AttributeExpression.java $
  * @version $Id: AttributeExpression.java 30642 2008-06-12 17:52:06Z acuster $
  *
  * @deprecated use {@link org.opengis.filter.expression.PropertyName}

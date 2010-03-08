@@ -26,11 +26,12 @@ import org.geotools.data.shapefile.shp.ShapefileReader;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/indexed/ShapefileTest.java $
- * @version $Id: ShapefileTest.java 30670 2008-06-12 23:59:23Z acuster $
+ * @version $Id: ShapefileTest.java 33985 2009-09-25 09:02:24Z aaime $
  * @author Ian Schneider
  * @author James Macgill
  */
@@ -43,7 +44,7 @@ public class ShapefileTest extends org.geotools.data.shapefile.ShapefileTest {
     public void testShapefileReaderRecord() throws Exception {
         File file = copyShapefiles(STATEPOP);
         ShpFiles shpFiles = new ShpFiles(file.toURI().toURL());
-        ShapefileReader reader = new ShapefileReader(shpFiles, false, false);
+        ShapefileReader reader = new ShapefileReader(shpFiles, false, false, new GeometryFactory());
         ArrayList offsets = new ArrayList();
 
         while (reader.hasNext()) {
@@ -57,7 +58,7 @@ public class ShapefileTest extends org.geotools.data.shapefile.ShapefileTest {
         }
         reader.close();
         copyShapefiles(STATEPOP);
-        reader = new ShapefileReader(shpFiles, false, false);
+        reader = new ShapefileReader(shpFiles, false, false, new GeometryFactory());
 
         for (int i = 0, ii = offsets.size(); i < ii; i++) {
             reader.shapeAt(((Integer) offsets.get(i)).intValue());
@@ -68,7 +69,7 @@ public class ShapefileTest extends org.geotools.data.shapefile.ShapefileTest {
 
     protected void loadShapes(String resource, int expected) throws Exception {
         ShpFiles shpFiles = new ShpFiles(TestData.url(resource));
-        ShapefileReader reader = new ShapefileReader(shpFiles, false, false);
+        ShapefileReader reader = new ShapefileReader(shpFiles, false, false, new GeometryFactory());
         int cnt = 0;
         try {
             while (reader.hasNext()) {
@@ -85,7 +86,7 @@ public class ShapefileTest extends org.geotools.data.shapefile.ShapefileTest {
     protected void loadMemoryMapped(String resource, int expected)
             throws Exception {
         ShpFiles shpFiles = new ShpFiles(TestData.url(resource));
-        ShapefileReader reader = new ShapefileReader(shpFiles, false, false);
+        ShapefileReader reader = new ShapefileReader(shpFiles, false, false, new GeometryFactory());
         int cnt = 0;
         try {
             while (reader.hasNext()) {

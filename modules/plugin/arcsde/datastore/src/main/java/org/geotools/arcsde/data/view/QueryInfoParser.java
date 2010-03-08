@@ -33,7 +33,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeException;
@@ -46,7 +46,7 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * process view definition of ArcSDE Java API.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: QueryInfoParser.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: QueryInfoParser.java 33451 2009-07-02 17:53:36Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/view/QueryInfoParser.java $

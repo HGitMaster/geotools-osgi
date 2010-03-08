@@ -52,6 +52,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * 
  * @author Leprosy
  * @since 0.3 TODO: test wkt geometry parse.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/GeometryAttributeImpl.java $
  */
 public class GeometryAttributeImpl extends AttributeImpl implements
 		GeometryAttribute {

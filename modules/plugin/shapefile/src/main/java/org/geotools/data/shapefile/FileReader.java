@@ -21,6 +21,8 @@ package org.geotools.data.shapefile;
  * by {@link ShpFiles}
  * 
  * @author jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/FileReader.java $
  */
 public interface FileReader {
     /**

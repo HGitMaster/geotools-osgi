@@ -18,7 +18,6 @@ package org.geotools.gml3;
 
 import javax.xml.namespace.QName;
 
-import org.geotools.gml2.FeaturePropertyExtractor;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.bindings.GMLCoordTypeBinding;
 import org.geotools.gml2.bindings.GMLCoordinatesTypeBinding;
@@ -27,6 +26,7 @@ import org.geotools.gml3.bindings.AbstractFeatureTypeBinding;
 import org.geotools.gml3.bindings.AbstractGeometryTypeBinding;
 import org.geotools.gml3.bindings.AbstractRingPropertyTypeBinding;
 import org.geotools.gml3.bindings.BoundingShapeTypeBinding;
+import org.geotools.gml3.bindings.ComplexSupportXSAnyTypeBinding;
 import org.geotools.gml3.bindings.CurveArrayPropertyTypeBinding;
 import org.geotools.gml3.bindings.CurvePropertyTypeBinding;
 import org.geotools.gml3.bindings.CurveSegmentArrayPropertyTypeBinding;
@@ -74,6 +74,7 @@ import org.geotools.gml3.smil.SMIL20LANGConfiguration;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
+import org.geotools.xs.XS;
 import org.picocontainer.MutablePicoContainer;
 
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
@@ -86,6 +87,8 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/GMLConfiguration.java $
  */
 public class GMLConfiguration extends Configuration {
     
@@ -196,6 +199,7 @@ public class GMLConfiguration extends Configuration {
         container.registerComponentImplementation(GML.SurfacePropertyType,
             SurfacePropertyTypeBinding.class);
         container.registerComponentImplementation(GML.SurfaceType, SurfaceTypeBinding.class);
+        container.registerComponentImplementation(XS.ANYTYPE, ComplexSupportXSAnyTypeBinding.class);
     }
 
     /**
@@ -212,6 +216,7 @@ public class GMLConfiguration extends Configuration {
         super.configureContext(container);
 
         container.registerComponentInstance(new FeatureTypeCache());
+        container.registerComponentInstance(new XSDIdRegistry());
 
         //factories
         container.registerComponentInstance(CoordinateSequenceFactory.class,

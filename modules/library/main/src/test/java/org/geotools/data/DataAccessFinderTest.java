@@ -41,7 +41,7 @@ import org.opengis.filter.Filter;
  * @author Gabriel Roldan (TOPP)
  * @version $Id: DataAccessFinderTest.java 30648 2008-06-12 19:22:35Z acuster $
  * @since 2.5.x
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/data/DataAccessFinderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/DataAccessFinderTest.java $
  */
 public class DataAccessFinderTest extends TestCase {
 
@@ -204,7 +204,7 @@ public class DataAccessFinderTest extends TestCase {
      * @author Gabriel Roldan (TOPP)
      * @version $Id: DataAccessFinderTest.java 30648 2008-06-12 19:22:35Z acuster $
      * @since 2.5.x
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/data/DataAccessFinderTest.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/DataAccessFinderTest.java $
      */
     public static class MockDataAccessFactory implements DataAccessFactory {
         public boolean isAvailable() {
@@ -253,7 +253,7 @@ public class DataAccessFinderTest extends TestCase {
      * @author Gabriel Roldan (TOPP)
      * @version $Id: DataAccessFinderTest.java 30648 2008-06-12 19:22:35Z acuster $
      * @since 2.5.x
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/data/DataAccessFinderTest.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/DataAccessFinderTest.java $
      */
     public static class MockDataStoreFactory implements DataStoreFactorySpi {
         public boolean isAvailable() {
@@ -304,7 +304,7 @@ public class DataAccessFinderTest extends TestCase {
      * @author Gabriel Roldan (TOPP)
      * @version $Id: DataAccessFinderTest.java 30648 2008-06-12 19:22:35Z acuster $
      * @since 2.5.x
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/data/DataAccessFinderTest.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/DataAccessFinderTest.java $
      */
     public static class MockUnavailableDataStoreFactory extends MockDataStoreFactory {
 

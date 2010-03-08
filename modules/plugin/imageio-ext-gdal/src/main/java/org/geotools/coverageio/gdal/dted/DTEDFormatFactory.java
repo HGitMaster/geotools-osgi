@@ -77,7 +77,7 @@ public final class DTEDFormatFactory extends BaseGridFormatFactorySPI implements
      *
      * @return A {@link DTEDFormat}
      */
-    public Format createFormat() {
+    public DTEDFormat createFormat() {
         return new DTEDFormat();
     }
 

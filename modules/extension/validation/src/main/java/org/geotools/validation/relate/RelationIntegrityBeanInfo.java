@@ -25,7 +25,7 @@ import org.geotools.validation.DefaultIntegrityValidationBeanInfo;
 /**
  * @author bowens
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelationIntegrityBeanInfo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelationIntegrityBeanInfo.java $
  */
 public abstract class RelationIntegrityBeanInfo
 		extends DefaultIntegrityValidationBeanInfo 

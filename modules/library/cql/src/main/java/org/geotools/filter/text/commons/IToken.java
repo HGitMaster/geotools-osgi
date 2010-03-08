@@ -29,6 +29,8 @@ import org.geotools.filter.text.generated.parsers.Token;
  * 
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.5
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/commons/IToken.java $
  */
 public interface IToken {
 

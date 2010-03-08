@@ -29,11 +29,12 @@ import java.util.Collections;
 
 import org.geotools.text.Text;
 import org.geotools.data.Parameter;
+import org.geotools.feature.NameImpl;
 import org.geotools.process.Process;
 import org.opengis.util.InternationalString;
-import org.geotools.process.impl.AbstractProcessFactory;
+import org.geotools.process.impl.SingleProcessFactory;
 
-public class DoubleAdditionFactory extends AbstractProcessFactory
+public class DoubleAdditionFactory extends SingleProcessFactory
 {
 	static final Parameter<Double> INPUT_A = new Parameter<Double>("input_a", Double.class, Text.text("First value"),  Text.text("First value to add"));
 	static final Parameter<Double> INPUT_B = new Parameter<Double>("input_b", Double.class, Text.text("Second value"), Text.text("Second value to add"));
@@ -51,6 +52,10 @@ public class DoubleAdditionFactory extends AbstractProcessFactory
 	{
         resultInfo.put(RESULT.key, RESULT);
     }
+	
+	public DoubleAdditionFactory() {
+	    super(new NameImpl(GT_NAMESPACE, "DoubleAddition"));
+	}
 
 	public Process create(Map<String, Object> parameters) throws IllegalArgumentException
 	{
@@ -80,11 +85,6 @@ public class DoubleAdditionFactory extends AbstractProcessFactory
 	public Process create() throws IllegalArgumentException
 	{
 	    return new DoubleAdditionProcess(this);
-	}
-
-	public String getName()
-	{
-		return "DoubleAddition";
 	}
 
 	public boolean supportsProgress()

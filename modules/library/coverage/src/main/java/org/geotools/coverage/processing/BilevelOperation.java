@@ -33,7 +33,7 @@ import org.geotools.coverage.GridSampleDimension;
  * {@link BinarizeDescriptor Binarize}.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/BilevelOperation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/BilevelOperation.java $
  * @version $Id: BilevelOperation.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

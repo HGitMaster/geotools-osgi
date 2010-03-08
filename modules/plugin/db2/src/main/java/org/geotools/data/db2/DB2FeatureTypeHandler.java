@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  * Override methods from FeatureTypeHandler for DB2-specific handling.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FeatureTypeHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FeatureTypeHandler.java $
  */
 public class DB2FeatureTypeHandler extends FeatureTypeHandler {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(

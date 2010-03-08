@@ -41,6 +41,8 @@ import org.opengis.geometry.BoundingBox;
  * @author Justin Deoliveira, The Open Planning Project
  * @since 2.5
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/DecoratingFeature.java $
  */
 public class DecoratingFeature implements SimpleFeature {
 

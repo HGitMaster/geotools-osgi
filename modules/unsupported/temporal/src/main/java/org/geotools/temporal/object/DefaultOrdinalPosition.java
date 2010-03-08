@@ -27,6 +27,8 @@ import org.opengis.temporal.TemporalReferenceSystem;
  * temporal reference system.
  *
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultOrdinalPosition.java $
  */
 public class DefaultOrdinalPosition extends DefaultTemporalPosition implements OrdinalPosition {
 

@@ -87,7 +87,7 @@ public final class MrSIDFormat extends BaseGDALGridFormat implements Format {
     /**
      * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object, Hints)
      */
-    public GridCoverageReader getReader(Object source, Hints hints) {
+    public MrSIDReader getReader(Object source, Hints hints) {
         try {
             return new MrSIDReader(source, hints);
         } catch (MismatchedDimensionException e) {

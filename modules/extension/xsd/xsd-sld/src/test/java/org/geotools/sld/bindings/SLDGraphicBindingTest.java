@@ -17,6 +17,7 @@
 package org.geotools.sld.bindings;
 
 import java.awt.Color;
+import org.geotools.filter.Filters;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Mark;
 
@@ -41,8 +42,8 @@ public class SLDGraphicBindingTest extends SLDTestSupport {
         assertEquals(Integer.parseInt("34", 16), c.getGreen());
         assertEquals(Integer.parseInt("56", 16), c.getBlue());
 
-        assertEquals(1, org.geotools.styling.SLD.intValue(graphic.getSize()));
-        assertEquals(1, org.geotools.styling.SLD.intValue(graphic.getOpacity()));
-        assertEquals(90, org.geotools.styling.SLD.intValue(graphic.getRotation()));
+        assertEquals(1, Filters.asInt(graphic.getSize()));
+        assertEquals(1, Filters.asInt(graphic.getOpacity()));
+        assertEquals(90, Filters.asInt(graphic.getRotation()));
     }
 }

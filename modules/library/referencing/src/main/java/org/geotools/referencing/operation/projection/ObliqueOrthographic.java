@@ -33,8 +33,8 @@ import static java.lang.Math.*;
  * form is given here.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueOrthographic.java $
- * @version $Id: ObliqueOrthographic.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueOrthographic.java $
+ * @version $Id: ObliqueOrthographic.java 34859 2010-02-03 19:30:23Z aaime $
  * @author Rueben Schulz
  */
 public class ObliqueOrthographic extends Orthographic {
@@ -70,7 +70,6 @@ public class ObliqueOrthographic extends Orthographic {
         super(parameters);
         sinphi0 = sin(latitudeOfOrigin);
         cosphi0 = cos(latitudeOfOrigin);
-        ensureSpherical();
     }
 
     /**

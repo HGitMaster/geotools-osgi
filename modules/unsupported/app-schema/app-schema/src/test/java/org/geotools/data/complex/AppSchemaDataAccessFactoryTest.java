@@ -38,7 +38,7 @@ import org.opengis.feature.type.Name;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id: AppSchemaDataAccessFactoryTest.java 32432 2009-02-09 04:07:41Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AppSchemaDataAccessFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AppSchemaDataAccessFactoryTest.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessFactoryTest extends TestCase {

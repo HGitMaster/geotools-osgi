@@ -27,7 +27,7 @@ import java.util.PropertyResourceBundle;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisTests.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisTests.java $
  * deprecated please use PostgisOnlineTestCase
  */
 public class PostgisTests {

@@ -19,13 +19,17 @@ package org.geotools.referencing.operation.projection;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.referencing.operation.projection.MapProjection.AbstractProvider;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -34,8 +38,8 @@ import org.geotools.resources.i18n.Vocabulary;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp.html">lambert_conic_conformal_2sp</A>
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertConformal2SP.java $
- * @version $Id: LambertConformal2SP.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertConformal2SP.java $
+ * @version $Id: LambertConformal2SP.java 34051 2009-10-02 15:31:02Z aaime $
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
@@ -81,7 +85,7 @@ public class LambertConformal2SP extends LambertConformal {
      * code 9802).
      *
      * @since 2.2
-     * @version $Id: LambertConformal2SP.java 30641 2008-06-12 17:42:27Z acuster $
+     * @version $Id: LambertConformal2SP.java 34051 2009-10-02 15:31:02Z aaime $
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      *
@@ -99,6 +103,8 @@ public class LambertConformal2SP extends LambertConformal {
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(Citations.OGC,      "Lambert_Conformal_Conic_2SP"),
                 new NamedIdentifier(Citations.EPSG,     "Lambert Conic Conformal (2SP)"),
+                new NamedIdentifier(Citations.ESRI,     "Lambert_Conformal_Conic"),
+                new NamedIdentifier(Citations.ESRI,     "Lambert_Conformal_Conic_2SP"),
                 new NamedIdentifier(Citations.EPSG,     "9802"),
                 new NamedIdentifier(Citations.GEOTIFF,  "CT_LambertConfConic_2SP"),
                 new NamedIdentifier(Citations.GEOTIFF,  "CT_LambertConfConic"),
@@ -108,7 +114,8 @@ public class LambertConformal2SP extends LambertConformal {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
                 STANDARD_PARALLEL_1, STANDARD_PARALLEL_2,
-                FALSE_EASTING,       FALSE_NORTHING
+                FALSE_EASTING,       FALSE_NORTHING, 
+                SCALE_FACTOR // This last parameter is for ESRI compatibility
             });
 
         /**
@@ -136,7 +143,38 @@ public class LambertConformal2SP extends LambertConformal {
         protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            return new LambertConformal2SP(parameters);
+            if(getParameter(STANDARD_PARALLEL_2, parameters) == null &&
+               getParameter(STANDARD_PARALLEL_1, parameters) == null &&
+               getParameter(LATITUDE_OF_ORIGIN, parameters) != null) {
+                // handle the ESRI 1SP case
+                return new LambertConformal1SP(parameters);
+            } else if(Utilities.equals(doubleValue(STANDARD_PARALLEL_1, parameters),
+                                doubleValue(STANDARD_PARALLEL_2, parameters)) &&
+               Utilities.equals(doubleValue(STANDARD_PARALLEL_1, parameters),
+                                doubleValue(LATITUDE_OF_ORIGIN, parameters))
+                                ) {
+                // handle the ESRI 1SP case
+                return new LambertConformal1SP(parameters);
+            } else if(getParameter(STANDARD_PARALLEL_2, parameters) == null &&
+               Utilities.equals(doubleValue(STANDARD_PARALLEL_1, parameters),
+                                doubleValue(LATITUDE_OF_ORIGIN, parameters))) {
+                // handle the ESRI 1SP case
+                return new LambertConformal1SP(parameters);
+            } else {
+                // switch sp1 and sp2 so that we get a consistent ordering, this allows to recognize
+                // tow Lamber conformal with the same standard parallels declared in opposite order
+                ParameterValue<Double> sp1 = getParameter(STANDARD_PARALLEL_1, parameters); 
+                ParameterValue<Double> sp2 = getParameter(STANDARD_PARALLEL_2, parameters);
+                if(sp1 != null && sp2 != null) {
+                    if(sp1.doubleValue() < sp2.doubleValue()) {
+                        final double temp = sp1.doubleValue();
+                        sp1.setValue(sp2.doubleValue());
+                        sp2.setValue(temp);
+                    }
+                }
+                
+                return new LambertConformal2SP(parameters);
+            }
         }
     }
 }

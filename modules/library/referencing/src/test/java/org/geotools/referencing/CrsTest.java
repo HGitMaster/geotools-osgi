@@ -19,6 +19,7 @@ package org.geotools.referencing;
 import java.util.Set;
 import java.awt.geom.Rectangle2D;
 
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
@@ -29,6 +30,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -37,8 +39,8 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link CRS} utilities methods.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/CrsTest.java $
- * @version $Id: CrsTest.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/CrsTest.java $
+ * @version $Id: CrsTest.java 34842 2010-01-27 16:44:20Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public final class CrsTest {
@@ -97,6 +99,46 @@ public final class CrsTest {
         final MathTransform crsTransform = CRS.findMathTransform(WGS84, crs, true);
         assertFalse(crsTransform.isIdentity());
     }
+    
+    /**
+     * Checks X is equated to Easting and Y to Northing
+     * @throws Exception
+     */
+    public void testAxisAliases() throws Exception {
+        String wkt1 = "PROJCS[\"NAD_1927_Texas_Statewide_Mapping_System\"," +
+        		"GEOGCS[\"GCS_North_American_1927\"," +
+        		"DATUM[\"D_North_American_1927\"," +
+        		"SPHEROID[\"Clarke_1866\",6378206.4,294.9786982]]," +
+        		"PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]," +
+        		"PROJECTION[\"Lambert_Conformal_Conic\"]," +
+        		"PARAMETER[\"False_Easting\",3000000.0]," +
+        		"PARAMETER[\"False_Northing\",3000000.0]," +
+        		"PARAMETER[\"Central_Meridian\",-100.0]," +
+        		"PARAMETER[\"Standard_Parallel_1\",27.416666666666668]," +
+        		"PARAMETER[\"Standard_Parallel_2\",34.916666666666664]," +
+        		"PARAMETER[\"Latitude_Of_Origin\",31.166666666666668]," +
+        		"UNIT[\"Foot\",0.3048]]";
+        
+        String wkt2 = "PROJCS[\"NAD_1927_Texas_Statewide_Mapping_System\"," +
+                "GEOGCS[\"GCS_North_American_1927\"," +
+                "DATUM[\"D_North_American_1927\"," +
+                "SPHEROID[\"Clarke_1866\",6378206.4,294.9786982]]," +
+                "PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]," +
+                "PROJECTION[\"Lambert_Conformal_Conic\"]," +
+                "PARAMETER[\"False_Easting\",3000000.0]," +
+                "PARAMETER[\"False_Northing\",3000000.0]," +
+                "PARAMETER[\"Central_Meridian\",-100.0]," +
+                "PARAMETER[\"Standard_Parallel_1\",27.416666666666668]," +
+                "PARAMETER[\"Standard_Parallel_2\",34.916666666666664]," +
+                "PARAMETER[\"Latitude_Of_Origin\",31.166666666666668]," +
+                "UNIT[\"Foot\",0.3048]" +
+                "AXIS[\"Easting\", EAST]," + 
+                "AXIS[\"Northing\", NORTH]]";
+        
+        CoordinateReferenceSystem crs1 = CRS.parseWKT(wkt1);
+        CoordinateReferenceSystem crs2 = CRS.parseWKT(wkt2);
+        assertTrue(CRS.equalsIgnoreMetadata(crs1, crs2));
+    }
 
     /**
      * Tests the transformations of an envelope.
@@ -120,6 +162,33 @@ public final class CrsTest {
 
         assertTrue(oldEnvelope.contains(firstEnvelope, true));
         assertTrue(oldEnvelope.equals  (firstEnvelope, 0.02, true));
+    }
+    
+    /**
+     * Tests the transformations of an envelope when the two CRS have identify
+     * transforms but different datum names 
+     */
+    @Test
+    public void testEnvelopeTransformation2() throws FactoryException, TransformException {
+        final CoordinateReferenceSystem WGS84Altered = CRS.parseWKT(WKT.WGS84_ALTERED);
+        final CoordinateReferenceSystem WGS84  = DefaultGeographicCRS.WGS84;
+        final MathTransform crsTransform = CRS.findMathTransform(WGS84, WGS84Altered, true);
+        assertTrue(crsTransform.isIdentity());
+
+        final GeneralEnvelope firstEnvelope;
+        firstEnvelope = new GeneralEnvelope(new double[] {-124, 42}, new double[] {-122, 43});
+        firstEnvelope.setCoordinateReferenceSystem(WGS84);
+
+        // this triggered a assertion error in GEOT-2934
+        Envelope transformed = CRS.transform(firstEnvelope, WGS84Altered);
+        
+        // check the envelope is what we expect
+        assertEquals(transformed.getCoordinateReferenceSystem(), WGS84Altered);
+        double EPS = 1e-9;
+        assertEquals(transformed.getMinimum(0), firstEnvelope.getMinimum(0), EPS);
+        assertEquals(transformed.getMinimum(1), firstEnvelope.getMinimum(1), EPS);
+        assertEquals(transformed.getMaximum(0), firstEnvelope.getMaximum(0), EPS);
+        assertEquals(transformed.getMaximum(1), firstEnvelope.getMaximum(1), EPS);
     }
 
     /**
@@ -167,5 +236,10 @@ public final class CrsTest {
         expected = XRectangle2D.createFromExtremums(-180, -90, 180, -41.03163170198091);
         actual = CRS.transform(operation, envelope, actual);
         assertTrue(XRectangle2D.equalsEpsilon(expected, actual));
+    }
+
+    @Test
+    public void testGetHorizontalCrs() {
+        assertEquals( DefaultEngineeringCRS.GENERIC_2D, CRS.getHorizontalCRS(DefaultEngineeringCRS.GENERIC_2D));
     }
 }

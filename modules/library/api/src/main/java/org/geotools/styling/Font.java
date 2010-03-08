@@ -33,8 +33,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * font-style, font-weight and font-size.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/api/src/main/java/org/geotools/styling/Font.java $
- * @version $Id: Font.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Font.java $
+ * @version $Id: Font.java 33833 2009-09-04 12:26:28Z jive $
  */
 public interface Font extends org.opengis.style.Font{
     /** default font-size value **/
@@ -59,6 +59,8 @@ public interface Font extends org.opengis.style.Font{
 
     /**
      * The "font-style" SVG parameter should be "normal", "italic", or "oblique".
+     * <p>
+     * If null is returned the default value should be considered "normal".
      * @return Expression or null
      */
     Expression getStyle();
@@ -71,6 +73,8 @@ public interface Font extends org.opengis.style.Font{
 
     /**
      * The "font-weight" SVG parameter should be "normal" or "bold".
+     * <p>
+     * If null the default should be considered as "normal"
      * @return font-weight SVG parameter
      */
     Expression getWeight();
@@ -81,18 +85,22 @@ public interface Font extends org.opengis.style.Font{
     void setWeight(Expression weight);
     
     /**
-     * Font size.
+     * Font size in pixels with a default of 10 pixels.
+     * <p>
+     * Please note this is specified in pixels so you may need to take the
+     * resolution of your output into account when providing a size.
+     * 
      * @return font size
      */
     Expression getSize();
     
     /**
-     * @param size the font size
+     * @param size the font size in pixels
      */
     void setSize(Expression size);
     
     //
-    // Deprecated names used from GeoTools 2.0-2.5
+    // Depreciated names used from GeoTools 2.0-2.5
     //
     /**
      * @deprecated Please use getStyle in 2.6.x

@@ -5,7 +5,7 @@
 #
 # If this file is updated, remember to update Registry.registerServices(...) accordingly.
 #
-# Version: $Id: registryFile.jai 16592 2005-11-03 05:59:00Z desruisseaux $
+# Version: $Id: registryFile.jai 34781 2010-01-13 11:56:07Z simonegiannecchini $
 #
 ##################################################################################################
 #
@@ -31,11 +31,15 @@
 descriptor  org.geotools.image.jai.CombineDescriptor
 descriptor  org.geotools.image.jai.HysteresisDescriptor
 descriptor  org.geotools.image.jai.NodataFilterDescriptor
+descriptor  org.geotools.image.palette.ColorReductionDescriptor
+descriptor  org.geotools.image.palette.ColorInversionDescriptor
 
 
 #
 # "rendered" factory objects
 #
-rendered  org.geotools.image.jai.CombineCRIF       org.geotools  org.geotools.Combine       Combine
-rendered  org.geotools.image.jai.HysteresisCRIF    org.geotools  org.geotools.Hysteresis    Hysteresis
-rendered  org.geotools.image.jai.NodataFilterCRIF  org.geotools  org.geotools.NodataFilter  NodataFilter
+rendered  org.geotools.image.jai.CombineCRIF       		org.geotools  org.geotools.Combine       Combine
+rendered  org.geotools.image.jai.HysteresisCRIF    		org.geotools  org.geotools.Hysteresis    Hysteresis
+rendered  org.geotools.image.jai.NodataFilterCRIF  		org.geotools  org.geotools.NodataFilter  NodataFilter
+rendered  org.geotools.image.palette.ColorReductionCRIF	org.geotools  org.geotools.ColorReduction ColorReduction
+rendered  org.geotools.image.palette.ColorInversionCRIF	org.geotools  org.geotools.ColorInversion ColorInversion

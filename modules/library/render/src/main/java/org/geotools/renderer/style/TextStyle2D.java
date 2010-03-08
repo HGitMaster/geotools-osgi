@@ -37,7 +37,7 @@ import org.geotools.resources.Utilities;
  *
  * @author Andrea Aime
  * @author dblasby
- * @version $Id: TextStyle2D.java 30649 2008-06-12 19:44:08Z acuster $
+ * @version $Id: TextStyle2D.java 34286 2009-10-30 10:53:08Z aaime $
  */
 
 /** DJB:
@@ -73,7 +73,7 @@ import org.geotools.resources.Utilities;
      * 
      *   This replaces the old behavior which converted a LinePlacement -> pointplacement and set the absoluteLineDisplacement flag!
 	 * 
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/style/TextStyle2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/TextStyle2D.java $
 	 * */
 	 
 public class TextStyle2D extends Style2D {
@@ -100,6 +100,32 @@ public class TextStyle2D extends Style2D {
 
     /** Holds value of property composite. */
     private Composite composite;
+    
+    public TextStyle2D() {
+        // default constructor
+    }
+    
+    public TextStyle2D(TextStyle2D t) {
+        this.anchorX = t.anchorX;
+        this.anchorY = t.anchorY;
+        this.composite = t.composite;
+        this.displacementX = t.displacementX;
+        this.displacementY = t.displacementY;
+        this.fill = t.fill;
+        this.font = t.font;
+        this.graphic = t.graphic;
+        this.haloComposite = t.haloComposite;
+        this.haloFill = t.haloFill;
+        this.haloRadius = t.haloRadius;
+        this.haloShape = t.haloShape;
+        this.label = t.label;
+        this.maxScale = t.maxScale;
+        this.minScale = t.minScale;
+        this.perpendicularOffset = t.perpendicularOffset;
+        this.pointPlacement = t.pointPlacement;
+        this.rotation = t.rotation;
+        this.textGlyphVector = t.textGlyphVector;
+    }
 
     /**
      */
@@ -343,26 +369,28 @@ public class TextStyle2D extends Style2D {
         /**
          * Sets the style2D to be drawn underneath this text
          */
-        public void setGraphic(Style2D s) {
-        	graphic = s;
-        }
+    public void setGraphic(Style2D s) {
+    	graphic = s;
+    }
+    
+   /**
+     * gets the Style2D to be drawn underneath this text
+     */
+    public Style2D getGraphic() {
+    	return graphic;
+    }
+    
+    public Rectangle getGraphicDimensions() {
+    	if (graphic instanceof MarkStyle2D)
+    		return ((MarkStyle2D)graphic).getShape().getBounds();
+    	else if (graphic instanceof GraphicStyle2D) {
+    		BufferedImage i = ((GraphicStyle2D)graphic).getImage();
+    		return new Rectangle(i.getWidth(),i.getHeight());
+    	} else {
+    		throw new RuntimeException("Can't render graphic which is not a MarkStyle2D or a GraphicStyle2D");
+    	}
+    }
         
-       /**
-         * gets the Style2D to be drawn underneath this text
-         */
-        public Style2D getGraphic() {
-        	return graphic;
-        }
         
-        public Rectangle getGraphicDimensions() {
-        	if (graphic instanceof MarkStyle2D)
-        		return ((MarkStyle2D)graphic).getShape().getBounds();
-        	else if (graphic instanceof GraphicStyle2D) {
-        		BufferedImage i = ((GraphicStyle2D)graphic).getImage();
-        		return new Rectangle(i.getWidth(),i.getHeight());
-        	} else {
-        		throw new RuntimeException("Can't render graphic which is not a MarkStyle2D or a GraphicStyle2D");
-        	}
-        }
     
 }

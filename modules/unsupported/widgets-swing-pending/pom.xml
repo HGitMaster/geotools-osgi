@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>unsupported</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
 
 
@@ -27,7 +27,7 @@
   <artifactId>gt-widgets-swing-pending</artifactId>
   <packaging>jar</packaging>
   <name>Widgets-swing-pending</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/widgets-swing-pending/</url>
+  
 
   <scm>
     <connection>
@@ -52,15 +52,41 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <id>johann.sorel</id>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jody.garnett@lisasoft.com</email>
+      <organization>LISAsoft</organization>
+      <organizationUrl>http://lisasoft.com/</organizationUrl>
+      <timezone>+10</timezone>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Michael Bedward</name>
+      <id>mbedward</id>
+      <email>michael.bedward@gmail.com</email>
+      <organization>Dept Environment and Climate Change</organization>
+      <organizationUrl>http://www.environment.nsw.gov.au</organizationUrl>
+      <timezone>+10</timezone>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+  
+  <contributors>  
+    <contributor>
       <name>Johann Sorel</name>
       <email>sorel.johann@inbox.com</email>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
-    </developer>
-  </developers>
+    </contributor>
+  </contributors>
 
 
   <!-- =========================================================== -->
@@ -133,13 +159,6 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-main</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- mappane-2.6-SNAPSHOT.jar -->
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-mappane</artifactId>
       <version>${project.version}</version>
     </dependency>
 

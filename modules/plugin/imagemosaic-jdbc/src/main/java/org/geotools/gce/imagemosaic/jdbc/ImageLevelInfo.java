@@ -16,316 +16,329 @@
  */
 package org.geotools.gce.imagemosaic.jdbc;
 
-import com.vividsolutions.jts.geom.Envelope;
-
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * Java Bean for pyramid level information. 
- * For each pyramid and the original image, there is one ImageLevelInfo object    
- *
+ * Java Bean for pyramid level information. For each pyramid and the original
+ * image, there is one ImageLevelInfo object
+ * 
  * @author mcr
- *
+ * 
  */
 class ImageLevelInfo implements Comparable<ImageLevelInfo> {
-	
+
 	/**
 	 * Flag if ImageIO.read(InputStream in) does not return a null pointer
 	 */
 	private boolean canImageIOReadFromInputStream;
-    /**
-     * 	The Coordinate Reference System stored in the sql database (if supported)
-     */
-    private CoordinateReferenceSystem crs;
-    /**
-     * The Spatial Reference System Id if the used database supports it
-     */
-    private Integer srsId;
-    /**
-     * The name of the coverage, stored in the master table
-     */
-    private String coverageName;
-    /**
-     * minimum X value of the covered extent
-     */
-    private Double extentMinX;
-    /**
-     * minimum Y value of the covered extent
-     */
-    private Double extentMinY;
-    /**
-     * maximum X value of the covered extent
-     */
-    private Double extentMaxX;
-    /**
-     * maximu Y value  of the covered extent
-     */
-    private Double extentMaxY;
-    /**
-     * resolution of the x axis
-     */
-    private Double resX;
-    /**
-     * resolution of the y axis
-     */
-    private Double resY;
-    /**
-     * table name where to find the images
-     */
-    private String tileTableName;
-    /**
-     * table name where to find georeferencing information
-     */
-    private String spatialTableName;
-    /**
-     * the number of entries in the spatial table
-     */
-    private Integer countFeature;
-    /**
-     * the number of entries in the tiles table
-     */
-    private Integer countTiles;
-    /**
-     * storing resolutionX and resolution Y as array, for convinience
-     */
-    private double[] resolution = null;
-    /**
-     * storing the extent as envelope, for convinience
-     */
-    private Envelope envelope = null;
 
-    String getCoverageName() {
-        return coverageName;
-    }
+	/**
+	 * The Coordinate Reference System stored in the sql database (if supported)
+	 */
+	private CoordinateReferenceSystem crs;
 
-    void setCoverageName(String coverageName) {
-        this.coverageName = coverageName;
-    }
+	/**
+	 * The Spatial Reference System Id if the used database supports it
+	 */
+	private Integer srsId;
 
-    Double getExtentMaxX() {
-        return extentMaxX;
-    }
+	/**
+	 * The name of the coverage, stored in the master table
+	 */
+	private String coverageName;
 
-    void setExtentMaxX(Double extentMaxX) {
-        this.extentMaxX = extentMaxX;
-        envelope = null;
-    }
+	/**
+	 * minimum X value of the covered extent
+	 */
+	private Double extentMinX;
 
-    Double getExtentMaxY() {
-        return extentMaxY;
-    }
+	/**
+	 * minimum Y value of the covered extent
+	 */
+	private Double extentMinY;
 
-    void setExtentMaxY(Double extentMaxY) {
-        this.extentMaxY = extentMaxY;
-        envelope = null;
-    }
+	/**
+	 * maximum X value of the covered extent
+	 */
+	private Double extentMaxX;
 
-    Double getExtentMinX() {
-        return extentMinX;
-    }
+	/**
+	 * maximu Y value of the covered extent
+	 */
+	private Double extentMaxY;
 
-    void setExtentMinX(Double extentMinX) {
-        this.extentMinX = extentMinX;
-        envelope = null;
-    }
+	/**
+	 * resolution of the x axis
+	 */
+	private Double resX;
 
-    Double getExtentMinY() {
-        return extentMinY;
-    }
+	/**
+	 * resolution of the y axis
+	 */
+	private Double resY;
 
-    void setExtentMinY(Double extentMinY) {
-        this.extentMinY = extentMinY;
-        envelope = null;
-    }
+	/**
+	 * table name where to find the images
+	 */
+	private String tileTableName;
 
-    Double getResX() {
-        return resX;
-    }
+	/**
+	 * table name where to find georeferencing information
+	 */
+	private String spatialTableName;
 
-    void setResX(Double resX) {
-        this.resX = resX;
-        resolution = null;
-    }
+	/**
+	 * the number of entries in the spatial table
+	 */
+	private Integer countFeature;
 
-    Double getResY() {
-        return resY;
-    }
+	/**
+	 * the number of entries in the tiles table
+	 */
+	private Integer countTiles;
 
-    void setResY(Double resY) {
-        this.resY = resY;
-        resolution = null;
-    }
+	/**
+	 * storing resolutionX and resolution Y as array, for convinience
+	 */
+	private double[] resolution = null;
 
-    String getSpatialTableName() {
-        return spatialTableName;
-    }
+	/**
+	 * storing the extent as envelope, for convinience
+	 */
+	private Envelope envelope = null;
 
-    void setSpatialTableName(String spatialTableName) {
-        this.spatialTableName = spatialTableName;
-    }
+	String getCoverageName() {
+		return coverageName;
+	}
 
-    String getTileTableName() {
-        return tileTableName;
-    }
+	void setCoverageName(String coverageName) {
+		this.coverageName = coverageName;
+	}
 
-    void setTileTableName(String tileTableName) {
-        this.tileTableName = tileTableName;
-    }
+	Double getExtentMaxX() {
+		return extentMaxX;
+	}
 
-    @Override
-    public String toString() {
-        return "Coverage: " + getCoverageName() + ":" + getSpatialTableName() +
-        ":" + getTileTableName();
-    }
+	void setExtentMaxX(Double extentMaxX) {
+		this.extentMaxX = extentMaxX;
+		envelope = null;
+	}
 
-    public int compareTo(ImageLevelInfo other) {
-        int res = 0;
+	Double getExtentMaxY() {
+		return extentMaxY;
+	}
 
-        if ((res = getCoverageName().compareTo(other.getCoverageName())) != 0) {
-            return res;
-        }
+	void setExtentMaxY(Double extentMaxY) {
+		this.extentMaxY = extentMaxY;
+		envelope = null;
+	}
 
-        if ((res = getResX().compareTo(other.getResX())) != 0) {
-            return res;
-        }
+	Double getExtentMinX() {
+		return extentMinX;
+	}
 
-        if ((res = getResY().compareTo(other.getResY())) != 0) {
-            return res;
-        }
+	void setExtentMinX(Double extentMinX) {
+		this.extentMinX = extentMinX;
+		envelope = null;
+	}
 
-        return 0;
-    }
+	Double getExtentMinY() {
+		return extentMinY;
+	}
 
-    double[] getResolution() {
-        if (resolution != null) {
-            return resolution;
-        }
+	void setExtentMinY(Double extentMinY) {
+		this.extentMinY = extentMinY;
+		envelope = null;
+	}
 
-        resolution = new double[2];
+	Double getResX() {
+		return resX;
+	}
 
-        if (getResX() != null) {
-            resolution[0] = getResX().doubleValue();
-        }
+	void setResX(Double resX) {
+		this.resX = resX;
+		resolution = null;
+	}
 
-        if (getResY() != null) {
-            resolution[1] = getResY().doubleValue();
-        }
+	Double getResY() {
+		return resY;
+	}
 
-        return resolution;
-    }
+	void setResY(Double resY) {
+		this.resY = resY;
+		resolution = null;
+	}
 
-    Envelope getEnvelope() {
-        if (envelope != null) {
-            return envelope;
-        }
+	String getSpatialTableName() {
+		return spatialTableName;
+	}
 
-        if ((getExtentMaxX() == null) || (getExtentMaxY() == null) ||
-                (getExtentMinX() == null) || (getExtentMinY() == null)) {
-            return null;
-        }
+	void setSpatialTableName(String spatialTableName) {
+		this.spatialTableName = spatialTableName;
+	}
 
-        envelope = new Envelope(getExtentMinX().doubleValue(),
-                getExtentMaxX().doubleValue(), getExtentMinY().doubleValue(),
-                getExtentMaxY().doubleValue());
+	String getTileTableName() {
+		return tileTableName;
+	}
 
-        return envelope;
-    }
+	void setTileTableName(String tileTableName) {
+		this.tileTableName = tileTableName;
+	}
 
-    Integer getCountFeature() {
-        return countFeature;
-    }
+	@Override
+	public String toString() {
+		return "Coverage: " + getCoverageName() + ":" + getSpatialTableName()
+				+ ":" + getTileTableName();
+	}
 
-    void setCountFeature(Integer countFeature) {
-        this.countFeature = countFeature;
-    }
+	public int compareTo(ImageLevelInfo other) {
+		int res = 0;
 
-    Integer getCountTiles() {
-        return countTiles;
-    }
+		if ((res = getCoverageName().compareTo(other.getCoverageName())) != 0) {
+			return res;
+		}
 
-    void setCountTiles(Integer countTiles) {
-        this.countTiles = countTiles;
-    }
+		if ((res = getResX().compareTo(other.getResX())) != 0) {
+			return res;
+		}
 
-    CoordinateReferenceSystem getCrs() {
-        return crs;
-    }
+		if ((res = getResY().compareTo(other.getResY())) != 0) {
+			return res;
+		}
 
-    void setCrs(CoordinateReferenceSystem crs) {
-        this.crs = crs;
-    }
+		return 0;
+	}
 
-    boolean calculateResolutionNeeded() {
-        return (getResX() == null) || (getResY() == null);
-    }
+	double[] getResolution() {
+		if (resolution != null) {
+			return resolution;
+		}
 
-    boolean calculateExtentsNeeded() {
-        return (getExtentMaxX() == null) || (getExtentMaxY() == null) ||
-        (getExtentMinX() == null) || (getExtentMinY() == null);
-    }
+		resolution = new double[2];
 
-    String infoString() {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        PrintWriter w = new PrintWriter(bout);
-        w.print("Coveragename: ");
-        w.println(getCoverageName());
+		if (getResX() != null) {
+			resolution[0] = getResX().doubleValue();
+		}
 
-        if (getCrs() != null) {
-            w.print("CoordinateRefernceSystem: ");
-            w.println(getCrs().getName());
-        }
+		if (getResY() != null) {
+			resolution[1] = getResY().doubleValue();
+		}
 
-        if (getSrsId() != null) {
-            w.print("SRS_ID: ");
-            w.println(getSrsId());
-        }
+		return resolution;
+	}
 
-        w.print("Envelope: ");
-        w.println(getEnvelope());
+	Envelope getEnvelope() {
+		if (envelope != null) {
+			return envelope;
+		}
 
-        w.print("Resolution X: ");
-        w.println(getResX());
+		if ((getExtentMaxX() == null) || (getExtentMaxY() == null)
+				|| (getExtentMinX() == null) || (getExtentMinY() == null)) {
+			return null;
+		}
 
-        w.print("Resolution Y: ");
-        w.println(getResY());
+		envelope = new Envelope(getExtentMinX().doubleValue(), getExtentMaxX()
+				.doubleValue(), getExtentMinY().doubleValue(), getExtentMaxY()
+				.doubleValue());
 
-        w.print("Tiletable: ");
-        w.print(getTileTableName());
+		return envelope;
+	}
 
-        if (getCountTiles() != null) {
-            w.print(" #tiles: ");
-            w.println(getCountTiles());
-        }
+	Integer getCountFeature() {
+		return countFeature;
+	}
 
-        w.print("Spatialtable: ");
-        w.print(getSpatialTableName());
+	void setCountFeature(Integer countFeature) {
+		this.countFeature = countFeature;
+	}
 
-        if (getCountFeature() != null) {
-            w.print(" #geometries: ");
-            w.println(getCountFeature());
-        }
+	Integer getCountTiles() {
+		return countTiles;
+	}
 
-        w.close();
+	void setCountTiles(Integer countTiles) {
+		this.countTiles = countTiles;
+	}
 
-        return bout.toString();
-    }
+	CoordinateReferenceSystem getCrs() {
+		return crs;
+	}
 
-    Integer getSrsId() {
-        return srsId;
-    }
+	void setCrs(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+	}
 
-    void setSrsId(Integer srsId) {
-        this.srsId = srsId;
-    }
+	boolean calculateResolutionNeeded() {
+		return (getResX() == null) || (getResY() == null);
+	}
 
-    boolean isImplementedAsTableSplit() {
-        return getSpatialTableName().equals(getTileTableName()) == false;
-    }
+	boolean calculateExtentsNeeded() {
+		return (getExtentMaxX() == null) || (getExtentMaxY() == null)
+				|| (getExtentMinX() == null) || (getExtentMinY() == null);
+	}
+
+	String infoString() {
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		PrintWriter w = new PrintWriter(bout);
+		w.print("Coveragename: ");
+		w.println(getCoverageName());
+
+		if (getCrs() != null) {
+			w.print("CoordinateRefernceSystem: ");
+			w.println(getCrs().getName());
+		}
+
+		if (getSrsId() != null) {
+			w.print("SRS_ID: ");
+			w.println(getSrsId());
+		}
+
+		w.print("Envelope: ");
+		w.println(getEnvelope());
+
+		w.print("Resolution X: ");
+		w.println(getResX());
+
+		w.print("Resolution Y: ");
+		w.println(getResY());
+
+		w.print("Tiletable: ");
+		w.print(getTileTableName());
+
+		if (getCountTiles() != null) {
+			w.print(" #tiles: ");
+			w.println(getCountTiles());
+		}
+
+		w.print("Spatialtable: ");
+		w.print(getSpatialTableName());
+
+		if (getCountFeature() != null) {
+			w.print(" #geometries: ");
+			w.println(getCountFeature());
+		}
+
+		w.close();
+
+		return bout.toString();
+	}
+
+	Integer getSrsId() {
+		return srsId;
+	}
+
+	void setSrsId(Integer srsId) {
+		this.srsId = srsId;
+	}
+
+	boolean isImplementedAsTableSplit() {
+		return getSpatialTableName().equals(getTileTableName()) == false;
+	}
 
 	public boolean getCanImageIOReadFromInputStream() {
 		return canImageIOReadFromInputStream;

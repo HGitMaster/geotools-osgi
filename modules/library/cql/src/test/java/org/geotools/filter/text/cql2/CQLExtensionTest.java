@@ -44,6 +44,8 @@ import org.opengis.filter.expression.PropertyName;
  *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.5
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/cql2/CQLExtensionTest.java $
  * @version Revision: 1.9
  */
 public class CQLExtensionTest{
@@ -151,12 +153,12 @@ public class CQLExtensionTest{
 
         PropertyIsGreaterThan gt = (PropertyIsGreaterThan) filters.get(0);
         Assert.assertEquals("attr1", ((PropertyName) gt.getExpression1()).getPropertyName());
-        Assert.assertEquals(new Integer(5), ((Literal) gt.getExpression2()).getValue());
+        Assert.assertEquals(new Long(5), ((Literal) gt.getExpression2()).getValue());
 
         PropertyIsBetween btw = (PropertyIsBetween) filters.get(1);
         Assert.assertEquals("attr2", ((PropertyName) btw.getExpression()).getPropertyName());
-        Assert.assertEquals(new Integer(1), ((Literal) btw.getLowerBoundary()).getValue());
-        Assert.assertEquals(new Integer(7), ((Literal) btw.getUpperBoundary()).getValue());
+        Assert.assertEquals(new Long(1), ((Literal) btw.getLowerBoundary()).getValue());
+        Assert.assertEquals(new Long(7), ((Literal) btw.getUpperBoundary()).getValue());
 
         PropertyIsEqualTo equals = (PropertyIsEqualTo) filters.get(2);
         Assert.assertEquals("attr3", ((PropertyName) equals.getExpression1()).getPropertyName());
@@ -185,7 +187,7 @@ public class CQLExtensionTest{
 
         PropertyIsGreaterThan gt = (PropertyIsGreaterThan) filters.get(0);
         Assert.assertEquals("attr1", ((PropertyName) gt.getExpression1()).getPropertyName());
-        Assert.assertEquals(new Integer(5), ((Literal) gt.getExpression2()).getValue());
+        Assert.assertEquals(new Long(5), ((Literal) gt.getExpression2()).getValue());
 
         PropertyIsEqualTo equals = (PropertyIsEqualTo) filters.get(2);
         Assert.assertEquals("attr3", ((PropertyName) equals.getExpression1()).getPropertyName());

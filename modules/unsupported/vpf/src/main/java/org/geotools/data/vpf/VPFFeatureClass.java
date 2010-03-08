@@ -66,7 +66,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * delegate its schema related operations to its feature class.
  *
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFFeatureClass.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFFeatureClass.java $
  */
 public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
     SimpleFeatureType {

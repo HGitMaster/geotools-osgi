@@ -23,7 +23,9 @@ import org.geotools.xlink.XLINK;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.opengis.feature.Association;
+import org.opengis.feature.Property;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -48,6 +50,8 @@ import org.opengis.feature.Association;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/ReferenceTypeBinding.java $
  */
 public class ReferenceTypeBinding extends AbstractComplexBinding {
     /**
@@ -64,7 +68,7 @@ public class ReferenceTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Association.class;
+        return Property.class;
     }
 
     /**
@@ -78,15 +82,23 @@ public class ReferenceTypeBinding extends AbstractComplexBinding {
         //TODO: implement and remove call to super
         return super.parse(instance, node, value);
     }
+    
+    public Element encode(Object object, Document document, Element value) throws Exception {
+        Property property = (Property) object;
+        // I don't think we can assign values to this type, so only encode client properties
+        // for the mean time
+        GML3EncodingUtils.encodeClientProperties(property, value);
 
-    public Object getProperty(Object object, QName name)
-        throws Exception {
-        Association association = (Association) object;
+        return value;
+    }
 
-        //non resolveed, return the xlink:href
+    public Object getProperty(Object object, QName name) throws Exception {
+        Property association = (Property) object;
+    
+        //non resolved, return the xlink:href
         if (XLINK.HREF.equals(name)) {
             String id = (String) association.getUserData().get("gml:id");
-
+    
             return "#" + id;
         }
     

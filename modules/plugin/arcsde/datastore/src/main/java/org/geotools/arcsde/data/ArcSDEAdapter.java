@@ -32,8 +32,8 @@ import java.util.logging.Logger;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.Command;
+import org.geotools.arcsde.session.ISession;
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -78,7 +78,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/datastore/src/main
  *         /java/org/geotools/arcsde/data/ArcSDEAdapter.java $
- * @version $Id: ArcSDEAdapter.java 32670 2009-03-23 16:24:16Z groldan $
+ * @version $Id: ArcSDEAdapter.java 33585 2009-07-17 23:39:49Z groldan $
  */
 public class ArcSDEAdapter {
     /** Logger for ths class' package */
@@ -261,10 +261,16 @@ public class ArcSDEAdapter {
      */
     public static FeatureTypeInfo fetchSchema(final String typeName, final String namespace,
             final ISession session) throws IOException {
-        final SeLayer layer = session.getLayer(typeName);
         final SeTable table = session.getTable(typeName);
+        SeLayer layer = null;
 
         final SeColumnDefinition[] seColumns = session.describe(typeName);
+        for (SeColumnDefinition col : seColumns) {
+            if (col.getType() == SeColumnDefinition.TYPE_SHAPE) {
+                layer = session.getLayer(typeName);
+                break;
+            }
+        }
 
         final List<AttributeDescriptor> properties = createAttributeDescriptors(layer, namespace,
                 seColumns);
@@ -288,7 +294,8 @@ public class ArcSDEAdapter {
             });
             final boolean hasWritePermissions = userHasWritePermissions(permMask.intValue());
             canDoTransactions = hasWritePermissions
-                    && (fidStrategy instanceof FIDReader.SdeManagedFidReader || fidStrategy instanceof FIDReader.UserManagedFidReader);
+                    && (fidStrategy instanceof FIDReader.SdeManagedFidReader || fidStrategy instanceof FIDReader.UserManagedFidReader)
+                    && !hasReadOnlyColumn(seColumns);
             if (hasWritePermissions && !canDoTransactions) {
                 LOGGER.fine(typeName + " is writable bu has no primary key, thus we're using it "
                         + "read-only as can't get a propper feature id out of it");
@@ -298,6 +305,25 @@ public class ArcSDEAdapter {
                 isMultiVersioned, isView);
         return typeInfo;
 
+    }
+
+    /**
+     * Check if any of the column types are read-only (such as CLOB).
+     * <p>
+     * This check should be temporary; currently writing CLOB types is producing a segmentation
+     * fault (gasp!) in ArcSDE 9.3. We imagine the java encoding is not quite what ArcSDE expected.
+     * 
+     * @param seColumns
+     * @return true if any of the columns are read-only
+     */
+    private static boolean hasReadOnlyColumn(SeColumnDefinition[] seColumns) {
+        for (SeColumnDefinition col : seColumns) {
+            if (col.getType() == SeColumnDefinition.TYPE_CLOB
+                    || col.getType() == SeColumnDefinition.TYPE_NCLOB) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -411,7 +437,7 @@ public class ArcSDEAdapter {
             // didn't found in the ArcSDE Java API the way of knowing
             // if an SeColumnDefinition is nillable
             attName = colDef.getName();
-            isNilable = true;
+            isNilable = colDef.allowsNulls();
             defValue = null;
             fieldLen = colDef.getSize();
 
@@ -426,7 +452,7 @@ public class ArcSDEAdapter {
                 int seShapeType = sdeLayer.getShapeTypes();
                 typeClass = getGeometryTypeFromLayerMask(seShapeType);
                 isNilable = (seShapeType & SeLayer.SE_NIL_TYPE_MASK) == SeLayer.SE_NIL_TYPE_MASK;
-                defValue = ArcSDEGeometryBuilder.defaultValueFor(typeClass);
+                defValue = isNilable ? null : ArcSDEGeometryBuilder.defaultValueFor(typeClass);
             } else {
                 typeClass = getJavaBinding(sdeType);
                 if (typeClass == null) {
@@ -439,16 +465,17 @@ public class ArcSDEAdapter {
                 // Set restrictions = Restrictions.createLength(name, typeClass,
                 // fieldLen);
             }
-            int rowIdType = colDef.getRowIdType();
-            if (colDef.getRowIdType() == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE) {
+            final int rowIdType = colDef.getRowIdType();
+            if (rowIdType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE) {
                 continue; // skip over things we cannot edit modify or otherwise treat as
                 // attributes
             }
             AttributeTypeBuilder b = new AttributeTypeBuilder();
+            // call setDefaultValue before setBinding
+            b.setDefaultValue(defValue);
             b.setBinding(typeClass);
             b.setName(attName);
             b.setNillable(isNilable);
-            b.setDefaultValue(defValue);
             if (fieldLen > 0) {
                 b.setLength(fieldLen);
             }
@@ -898,11 +925,6 @@ public class ArcSDEAdapter {
             throw new NullPointerException("You have to provide a FeatureType instance");
         }
 
-        if (featureType.getGeometryDescriptor() == null) {
-            throw new IllegalArgumentException(
-                    "FeatureType must have at least one geometry attribute");
-        }
-
         final Command<Void> createSchemaCmd = new Command<Void>() {
             @Override
             public Void execute(ISession session, SeConnection connection) throws SeException,
@@ -923,26 +945,24 @@ public class ArcSDEAdapter {
                 int rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
                 String rowIdColumn = null;
                 String configKeyword = "DEFAULTS";
-                if (hints != null) {
-                    if (hints.get("configuration.keyword") instanceof String) {
-                        configKeyword = (String) hints.get("configuration.keyword");
+                if (hints.containsKey("configuration.keyword")) {
+                    configKeyword = String.valueOf(hints.get("configuration.keyword"));
+                }
+                if (hints.get("rowid.column.type") instanceof String) {
+                    String rowIdStr = (String) hints.get("rowid.column.type");
+                    if (rowIdStr.equalsIgnoreCase("NONE")) {
+                        rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
+                    } else if (rowIdStr.equalsIgnoreCase("USER")) {
+                        rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
+                    } else if (rowIdStr.equalsIgnoreCase("SDE")) {
+                        rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
+                    } else {
+                        throw new DataSourceException(
+                                "createSchema hint 'rowid.column.type' must be one of 'NONE', 'USER' or 'SDE'");
                     }
-                    if (hints.get("rowid.column.type") instanceof String) {
-                        String rowIdStr = (String) hints.get("rowid.column.type");
-                        if (rowIdStr.equalsIgnoreCase("NONE")) {
-                            rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
-                        } else if (rowIdStr.equalsIgnoreCase("USER")) {
-                            rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
-                        } else if (rowIdStr.equalsIgnoreCase("SDE")) {
-                            rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
-                        } else {
-                            throw new DataSourceException(
-                                    "createSchema hint 'rowid.column.type' must be one of 'NONE', 'USER' or 'SDE'");
-                        }
-                    }
-                    if (hints.get("rowid.column.name") instanceof String) {
-                        rowIdColumn = (String) hints.get("rowid.column.name");
-                    }
+                }
+                if (hints.get("rowid.column.name") instanceof String) {
+                    rowIdColumn = (String) hints.get("rowid.column.name");
                 }
 
                 // placeholder to a catched exception to know in the finally block
@@ -955,7 +975,7 @@ public class ArcSDEAdapter {
 
                     if (unqualifiedTypeName.indexOf('.') == -1) {
                         // Use the already parsed name (unqualifiedTypeName)
-                        qualifiedName = connection.getUser() + "." + unqualifiedTypeName; //featureType.getTypeName();
+                        qualifiedName = connection.getUser() + "." + unqualifiedTypeName; // featureType.getTypeName();
                         LOGGER.finer("new full qualified type name: " + qualifiedName);
                     } else {
                         qualifiedName = unqualifiedTypeName;

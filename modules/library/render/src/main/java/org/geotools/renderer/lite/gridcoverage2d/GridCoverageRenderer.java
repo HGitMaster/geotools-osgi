@@ -51,12 +51,14 @@ import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.styling.RasterSymbolizer;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.filter.expression.Expression;
+import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -72,8 +74,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author  Simone Giannecchini
  * @author  Andrea Aime
  * @author  Alessio Fabiani
- * @source  $URL: http://svn.osgeo.org/geotools/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
- * @version  $Id: GridCoverageRenderer.java 32890 2009-04-30 16:56:18Z simonegiannecchini $
+ * @source  $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
+ * @version  $Id: GridCoverageRenderer.java 33831 2009-09-03 10:49:54Z simonegiannecchini $
  * @task  Add support for SLD styles
  */
 @SuppressWarnings("deprecation")
@@ -163,7 +165,7 @@ public final class GridCoverageRenderer {
 
     /** Parameters used to control the {@link Scale} operation. */
     private static final Resample resampleFactory = new Resample();
-
+    
     /**
      * Creates a new {@link GridCoverageRenderer} object.
      * 
@@ -174,15 +176,21 @@ public final class GridCoverageRenderer {
      * @param screenSize
      *                at which we want to rendere the source
      *                {@link GridCoverage2D}.
+     * @param worldToScreen if not <code>null</code> and if it contains a rotation,
+     * this Affine Tranform is used directly to convert from world coordinates
+     * to screen coordinates. Otherwise, a standard {@link GridToEnvelopeMapper}
+     * is used to calculate the affine transform.
+     * 
      * @throws TransformException
      * @throws NoninvertibleTransformException
-     * 
+     * @deprecated Use {@link GridCoverageRenderer#GridCoverageRenderer(CoordinateReferenceSystem, Envelope, Rectangle, AffineTransform, RenderingHints)}
+     *             instead
      */
     public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
             final Envelope envelope, Rectangle screenSize)
             throws TransformException, NoninvertibleTransformException {
 
-        this(destinationCRS, envelope, screenSize, null);
+        this(destinationCRS, envelope, screenSize, null, null);
 
     }
 
@@ -196,15 +204,68 @@ public final class GridCoverageRenderer {
      * @param screenSize
      *                at which we want to rendere the source
      *                {@link GridCoverage2D}.
-     * @param java2dHints
-     *                to control this rendering process.
+     * @param worldToScreen if not <code>null</code> and if it contains a rotation,
+     * this Affine Tranform is used directly to convert from world coordinates
+     * to screen coordinates. Otherwise, a standard {@link GridToEnvelopeMapper}
+     * is used to calculate the affine transform.
      * 
      * @throws TransformException
      * @throws NoninvertibleTransformException
      */
     public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
+            final Envelope envelope, Rectangle screenSize, AffineTransform worldToScreen)
+            throws TransformException, NoninvertibleTransformException {
+
+        this(destinationCRS, envelope, screenSize, worldToScreen, null);
+
+    }
+    
+    /**
+     * Creates a new {@link GridCoverageRenderer} object.
+     * 
+     * @param destinationCRS
+     *                the CRS of the {@link GridCoverage2D} to render.
+     * @param envelope
+     *                delineating the area to be rendered.
+     * @param screenSize
+     *                at which we want to rendere the source
+     *                {@link GridCoverage2D}.
+     * @param java2dHints
+     *                to control this rendering process.
+     * @throws TransformException
+     * @throws NoninvertibleTransformException
+     * @deprecated Use {@link GridCoverageRenderer#GridCoverageRenderer(CoordinateReferenceSystem, Envelope, Rectangle, AffineTransform, RenderingHints)}
+     *             instead
+     */
+    public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
+            final Envelope envelope, Rectangle screenSize, RenderingHints java2dHints) throws TransformException,
+            NoninvertibleTransformException {
+        this(destinationCRS, envelope, screenSize, null,java2dHints);
+    }
+
+    /**
+     * Creates a new {@link GridCoverageRenderer} object.
+     * 
+     * @param destinationCRS
+     *                the CRS of the {@link GridCoverage2D} to render.
+     * @param envelope
+     *                delineating the area to be rendered.
+     * @param screenSize
+     *                at which we want to rendere the source
+     *                {@link GridCoverage2D}.
+     * @param worldToScreen if not <code>null</code> and if it contains a rotation,
+     * this Affine Tranform is used directly to convert from world coordinates
+     * to screen coordinates. Otherwise, a standard {@link GridToEnvelopeMapper}
+     * is used to calculate the affine transform.
+     * 
+     * @param java2dHints
+     *                to control this rendering process.
+     * @throws TransformException
+     * @throws NoninvertibleTransformException
+     */
+    public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
             final Envelope envelope, Rectangle screenSize,
-            RenderingHints java2dHints) throws TransformException,
+            AffineTransform worldToScreen, RenderingHints java2dHints) throws TransformException,
             NoninvertibleTransformException {
 
         // ///////////////////////////////////////////////////////////////////
@@ -231,8 +292,16 @@ public final class GridCoverageRenderer {
         //
         // ///////////////////////////////////////////////////////////////////
         gridToEnvelopeMapper.setEnvelope(destinationEnvelope);
-        finalGridToWorld = new AffineTransform(gridToEnvelopeMapper.createAffineTransform());
-        finalWorldToGrid = finalGridToWorld.createInverse();
+        
+        // PHUSTAD : The gridToEnvelopeMapper does not handle rotated views. 
+        // 
+        if (worldToScreen != null && XAffineTransform.getRotation(worldToScreen) != 0.0) { 
+            finalWorldToGrid = new AffineTransform(worldToScreen);
+            finalGridToWorld = finalWorldToGrid.createInverse();
+        } else {
+            finalGridToWorld = new AffineTransform(gridToEnvelopeMapper.createAffineTransform());
+            finalWorldToGrid = finalGridToWorld.createInverse();
+        }
 
         // ///////////////////////////////////////////////////////////////////
         //
@@ -326,11 +395,23 @@ public final class GridCoverageRenderer {
      *                 if the transformation from grid to coordinate system in
      *                 the GridCoverage is not an AffineTransform
      */
-    public void paint(final Graphics2D graphics,
-            final GridCoverage2D gridCoverage, final RasterSymbolizer symbolizer)
+    public void paint(
+    		final Graphics2D graphics,
+            final GridCoverage2D gridCoverage, 
+            final RasterSymbolizer symbolizer)
             throws FactoryException, TransformException,
             NoninvertibleTransformException {
 
+        // ///////////////////////////////////////////////////////////////////
+        //
+        // Initial checks
+        //
+        // ///////////////////////////////////////////////////////////////////
+    	if(graphics==null)
+    		throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"graphics"));
+    	if(gridCoverage==null)
+    		throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"gridCoverage"));
+    	
         if (LOGGER.isLoggable(Level.FINE))
             LOGGER.fine(new StringBuilder("Drawing coverage ").append(gridCoverage.toString()).toString());
         // ///////////////////////////////////////////////////////////////////
@@ -533,10 +614,18 @@ public final class GridCoverageRenderer {
             LOGGER.fine(new StringBuilder("Raster Symbolizer ").toString());
         if (LOGGER.isLoggable(Level.FINE))
             LOGGER.fine(new StringBuffer("Raster Symbolizer ").toString());
-        final RasterSymbolizerHelper rsp = new RasterSymbolizerHelper (preSymbolizer,this.hints);
-        rsp.visit(symbolizer);
-        final GridCoverage2D recoloredGridCoverage = (GridCoverage2D) rsp.getOutput();
-        final RenderedImage finalImage = recoloredGridCoverage.geophysics(false).getRenderedImage();
+        final RenderedImage finalImage;
+        final GridCoverage2D finalGC;
+        if(symbolizer!=null){
+        	final RasterSymbolizerHelper rsp = new RasterSymbolizerHelper (preSymbolizer,this.hints);
+        	rsp.visit(symbolizer);
+        	finalGC = (GridCoverage2D) rsp.getOutput();
+        	finalImage = finalGC.geophysics(false).getRenderedImage();
+    	}
+        else{
+        	finalGC=preSymbolizer;
+        	finalImage=finalGC.geophysics(false).getRenderedImage();
+        }
 
         // ///////////////////////////////////////////////////////////////////
         //
@@ -545,22 +634,17 @@ public final class GridCoverageRenderer {
         // the display
         //
         // ///////////////////////////////////////////////////////////////////
-        final GridGeometry2D recoloredCoverageGridGeometry = ((GridGeometry2D) recoloredGridCoverage.getGridGeometry());
-        final MathTransform2D finalGCTransform=recoloredCoverageGridGeometry.getGridToCRS2D();
+        final GridGeometry2D recoloredCoverageGridGeometry = ((GridGeometry2D) finalGC.getGridGeometry());
+        // I need to translate half of a pixel since in wms the envelope
+        // map to the corners of the raster space not to the center of the
+        // pixels.
+        final MathTransform2D finalGCTransform=recoloredCoverageGridGeometry.getGridToCRS2D(PixelOrientation.UPPER_LEFT);
         if (!(finalGCTransform instanceof AffineTransform)) {
             throw new UnsupportedOperationException(
                     "Non-affine transformations not yet implemented"); // TODO
         }
         final AffineTransform finalGCgridToWorld = new AffineTransform((AffineTransform) finalGCTransform);
 
-        // //
-        //
-        // I need to translate half of a pixel since in wms 1.1.1 the envelope
-        // map to the corners of the raster space not to the center of the
-        // pixels.
-        //
-        // //
-        finalGCgridToWorld.translate(-0.5, -0.5); // Map to upper-left corner.
 
         // //
         //

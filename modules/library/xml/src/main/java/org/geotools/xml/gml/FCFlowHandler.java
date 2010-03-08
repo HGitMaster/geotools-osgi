@@ -25,6 +25,8 @@ import java.util.Map;
  * Allows the XMLSAXHandler to abort parsing of GML.
  * 
  * @author Richard Gould
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/gml/FCFlowHandler.java $
  */
 public class FCFlowHandler implements FlowHandler {
     public boolean shouldStop(Map hints) {

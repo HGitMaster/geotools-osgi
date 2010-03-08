@@ -30,6 +30,7 @@ import org.geotools.data.Parameter;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
+import org.geotools.util.KVP;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
 
@@ -43,7 +44,7 @@ import org.opengis.util.InternationalString;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStoreFactory.java $
  */
 public class PostgisDataStoreFactory extends AbstractDataStoreFactory
     implements org.geotools.data.DataStoreFactorySpi {
@@ -51,7 +52,8 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
     private static final String DRIVER_CLASS = "org.postgresql.Driver";
 
     public static final Param DBTYPE = new Param("dbtype", String.class,
-            "must be 'postgis'", true, "postgis");
+            "must be 'postgis'", true, "postgis",
+            new KVP( Param.LEVEL, "program") );
 
     public static final Param HOST = new Param("host", String.class,
             "postgis host machine", true, "localhost");
@@ -70,27 +72,34 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
 
     public static final Param PASSWD = new Param("passwd", String.class,
             new SimpleInternationalString("password used to login"),
-            false, null, Collections.singletonMap(Parameter.IS_PASSWORD, Boolean.TRUE));
+            false, null, 
+            new KVP( Parameter.IS_PASSWORD, Boolean.TRUE));
     
     public static final Param MAXCONN = new Param("max connections", Integer.class,
-            "maximum number of open connections", false, new Integer(10));
+            "maximum number of open connections", false, 10,
+            new KVP( Param.LEVEL, "program"));
     
     public static final Param MINCONN = new Param("min connections", Integer.class,
-            "minimum number of pooled connection", false, new Integer(4));
+            "minimum number of pooled connection", false, 4,
+            new KVP( Param.LEVEL, "program"));
     
     public static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
-            "check connection is alive before using it", false, Boolean.FALSE);
+            "check connection is alive before using it", false, Boolean.FALSE,
+            new KVP( Param.LEVEL, "program"));
 
     public static final Param NAMESPACE = new Param("namespace", String.class,
-            "namespace prefix used", false);
+            "namespace prefix used", false,
+            new KVP( Param.LEVEL, "advanced"));
 
     public static final Param WKBENABLED = new Param("wkb enabled", Boolean.class,
             "set to true if Well Known Binary should be used to read PostGIS "
-            + "data (experimental)", false, new Boolean(true));
+            + "data (experimental)", false, new Boolean(true),
+            new KVP( Param.LEVEL, "advanced"));
 
     public static final Param LOOSEBBOX = new Param("loose bbox", Boolean.class,
             "set to true if the Bounding Box should be 'loose', faster but "
-            + "not as deadly accurate", false, new Boolean(true));
+            + "not as deadly accurate", false, new Boolean(true),
+            new KVP( Param.LEVEL, "advanced"));
 
     public static final Param ESTIMATEDEXTENT = new Param( "estimated extent", Boolean.class,
     		"set to true if the bounds for a table should be computed using the " + 
@@ -98,7 +107,8 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
     		"and in some cases *far* less accurate if the data within the actual bounds " +
     		"does not follow a uniform distribution. It also relies on the fact that you have" +
     		"accurate table stats available. So it is a good idea to 'VACUUM ANALYZE' " +
-    		"the postgis table.", false, new Boolean(false));
+    		"the postgis table.", false, new Boolean(false),
+    		new KVP( Param.LEVEL, "advanced"));
     
     /**
      * Creates a new instance of PostgisDataStoreFactory

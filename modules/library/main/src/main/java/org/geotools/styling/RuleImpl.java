@@ -36,8 +36,8 @@ import org.opengis.util.Cloneable;
  *
  * @author James Macgill
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/RuleImpl.java $
- * @version $Id: RuleImpl.java 32919 2009-05-03 14:18:31Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/RuleImpl.java $
+ * @version $Id: RuleImpl.java 33833 2009-09-04 12:26:28Z jive $
  */
 public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
     private List<Symbolizer> symbolizers = new ArrayList<Symbolizer>();
@@ -45,7 +45,7 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
     private List<org.geotools.styling.Graphic> legends = new ArrayList<org.geotools.styling.Graphic>();
     
     private String name;
-    private Description description = new DescriptionImpl();
+    private DescriptionImpl description = new DescriptionImpl();
     private Filter filter = null;
     private boolean hasElseFilter = false;
     private double maxScaleDenominator = Double.POSITIVE_INFINITY;
@@ -174,8 +174,12 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
         return ret;
     }
     
-    public Description getDescription() {
+    public DescriptionImpl getDescription() {
         return description;
+    }
+    
+    public void setDescription(org.opengis.style.Description description) {
+        this.description = DescriptionImpl.cast(description);
     }
     
     public String getName() {
@@ -444,6 +448,19 @@ public class RuleImpl implements org.geotools.styling.Rule, Cloneable {
 
     public void setOnlineResource(OnLineResource online) {
         this.online = online;
+    }
+
+    static RuleImpl cast(Rule rule) {
+        if( rule == null ){
+            return null;
+        }
+        else if (rule instanceof RuleImpl){
+            return (RuleImpl) rule;
+        }
+        else {
+            RuleImpl copy = new RuleImpl( rule ); // replace with casting ...
+            return copy;
+        }
     }
 
 }

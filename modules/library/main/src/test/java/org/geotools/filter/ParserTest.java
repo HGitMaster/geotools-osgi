@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * Unit test for sax parser.
  *
  * @author James MacGill, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/filter/ParserTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/ParserTest.java $
  */
 public class ParserTest extends FilterTestSupport {
     /** Standard logging instance */

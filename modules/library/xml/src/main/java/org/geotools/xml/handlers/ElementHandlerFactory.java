@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
  *
  * @see org.geotools.xml.XMLSAXHandler
  * @see Schema
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/handlers/ElementHandlerFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/ElementHandlerFactory.java $
  */
 public class ElementHandlerFactory {
     public static final String KEY = "org.geotools.xml.handlers.ElementHandlerFactory_KEY";

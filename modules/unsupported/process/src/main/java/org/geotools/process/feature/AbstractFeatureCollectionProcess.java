@@ -1,96 +1,34 @@
 /*
- *    GeoTools - The Open Source Java GIS Toolkit
- *    http://geotools.org
- *
- *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
+
 package org.geotools.process.feature;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.process.Process;
-import org.geotools.util.NullProgressListener;
+import org.geotools.process.impl.AbstractProcess;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.util.ProgressListener;
 
 /**
- * Abstract implementation of Process for feature collections.
- * <p>
- * Subclasses need to implement {@link #processFeature(SimpleFeature, Map)}. This method
- * should perform the operation on the feature, changing any attributes on the feature in 
- * as necessary.
- * </p>
- * 
- * @see AbstractFeatureCollectionProcessFactory 
+ * A Process for feature collections.
+ *
  * @author Justin Deoliveira, OpenGEO
- * 
+ * @author Michael Bedward
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/feature/AbstractFeatureCollectionProcess.java $
  */
-public abstract class AbstractFeatureCollectionProcess implements Process {
+public abstract class AbstractFeatureCollectionProcess extends AbstractProcess {
 
-    public final Map<String, Object> execute(Map<String, Object> input,
-            ProgressListener monitor) {
-        if ( monitor == null ) {
-            monitor = new NullProgressListener();
-        }
-        
-        //read the parameters, features and buffer amount
-        FeatureCollection features = 
-            (FeatureCollection) input.get( AbstractFeatureCollectionProcessFactory.FEATURES.key );
-
-        //start progress
-        float scale = 100f / features.size();
-        monitor.started();
-        
-        //create the result feature collection
-        FeatureCollection result = 
-            new DefaultFeatureCollection(null, (SimpleFeatureType) features.getSchema() );
-
-        FeatureIterator fi = features.features();
-        try {
-            int counter = 0;
-            while( fi.hasNext() ) {
-                //copy the feature
-                SimpleFeature feature = SimpleFeatureBuilder.copy( (SimpleFeature) fi.next() );
-                //buffer the geometry
-                try {
-                    processFeature( feature, input );
-                }
-                catch( Exception e ) {
-                    monitor.exceptionOccurred( e );
-                }
-                
-                monitor.progress( scale * counter++);
-                result.add( feature );    
-            }
-        }
-        finally {
-            features.close( fi );
-        }
-        monitor.complete();
-        
-        //return the result
-        Map<String,Object> output = new HashMap<String, Object>();
-        output.put( AbstractFeatureCollectionProcessFactory.RESULT.key, result );
-        return output;
+    /**
+     * Constructor
+     *
+     * @param factory
+     */
+    public AbstractFeatureCollectionProcess(AbstractFeatureCollectionProcessFactory factory) {
+        super(factory);
     }
-    
+
     /**
      * Performs an operation on a single feature in the collection.
      * <p>
@@ -107,11 +45,12 @@ public abstract class AbstractFeatureCollectionProcess implements Process {
      * }
      * </pre>
      * </p>
-     * @param feature
-     * @param input
+     *
+     * @param feature the feature being processed
+     * @param input a Map of input parameters
+     *
      * @throws Exception
      */
     protected abstract void processFeature( SimpleFeature feature, Map<String,Object> input )
         throws Exception;
-
 }

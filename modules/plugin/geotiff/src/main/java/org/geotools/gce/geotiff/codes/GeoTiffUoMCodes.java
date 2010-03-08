@@ -20,7 +20,7 @@ package org.geotools.gce.geotiff.codes;
  * @author Simone Giannecchini
  * @since 2.3
  *
- * @source $URL: http://svn.geotools.org/branches/2.5.x/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/IIOMetadataAdpaters/utils/codes/GeoTiffUoMCodes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/codes/GeoTiffUoMCodes.java $
  */
 public final class GeoTiffUoMCodes {
 

@@ -24,15 +24,18 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -45,7 +48,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * ValidatorTest<br>
  *
  * @author bowens<br> Created Jun 28, 2004<br>
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/validation/src/test/java/org/geotools/validation/ValidatorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/ValidatorTest.java $
  * @version <br><b>Puropse:</b><br><p><b>Description:</b><br><p><b>Usage:</b><br><p>
  */
 public class ValidatorTest extends TestCase {
@@ -74,11 +77,10 @@ public class ValidatorTest extends TestCase {
         assertNotNull(fixture.repository.datastore("SWAMPS"));
         assertNotNull(fixture.repository.datastore("RIVERS"));
 
-        Map types = fixture.repository.types();
-        assertTrue( types.containsKey( "LAKES:lakes" ) );
-        assertTrue( types.containsKey( "STREAMS:streams" ) );
-        assertTrue( types.containsKey( "SWAMPS:swamps" ) );
-        assertTrue( types.containsKey( "RIVERS:rivers" ) );        
+        assertNotNull( fixture.repository.source( "LAKES","lakes" ) );
+        assertNotNull( fixture.repository.source( "STREAMS","streams" ) );
+        assertNotNull( fixture.repository.source( "SWAMPS","swamps" ) );
+        assertNotNull( fixture.repository.source( "RIVERS","rivers" ) );        
     }
 
     public void testFeatureValidation() throws Exception {
@@ -132,12 +134,17 @@ public class ValidatorTest extends TestCase {
 
     public void testIntegrityValidation() throws Exception {
     	DefaultFeatureResults results = new DefaultFeatureResults();
-    	Set set = fixture.repository.types().keySet();
-    	Map map = new HashMap();
-    	for( Iterator i=set.iterator(); i.hasNext(); ){
-    		String typeRef = (String) i.next();
-    		String split[] = typeRef.split(":");
-    		map.put( typeRef, fixture.repository.source( split[0], split[1] ) );
+    	Set<Name> set = fixture.repository.getNames();
+    	
+    	Map<String,FeatureSource<?,?>> map = new HashMap<String,FeatureSource<?,?>>();
+    	
+    	for( Name name : set ){
+    	    DataStore store = fixture.repository.dataStore( name );
+    	    for( String typeName : store.getTypeNames() ){
+    	        String typeRef = name.toString()+":"+typeName;
+    	        map.put( typeRef, fixture.repository.source( name.toString(), typeName ) );    
+    	    }
+    	    
     	}    	
     	fixture.processor.runIntegrityTests( set, map, null, results );    	    	
     	assertEquals( "integrity test", 0, results.error.size() );
@@ -174,13 +181,18 @@ public class ValidatorTest extends TestCase {
     	Validator validator = new Validator( fixture.repository, fixture.processor );
     	
     	DefaultFeatureResults results = new DefaultFeatureResults();
-    	Set set = fixture.repository.types().keySet();
-    	Map map = new HashMap();
-    	for( Iterator i=set.iterator(); i.hasNext(); ){
-    		String typeRef = (String) i.next();
-    		String split[] = typeRef.split(":");
-    		map.put( typeRef, fixture.repository.source( split[0], split[1] ) );
-    	}    	
+    	Set<Name> set = fixture.repository.getNames();
+        Map<Name,FeatureSource<?,?>> map = new HashMap<Name,FeatureSource<?,?>>();
+        
+        for( Name name : set ){
+            DataStore store = fixture.repository.dataStore( name );
+            for( String typeName : store.getTypeNames() ){
+                Name typeRef = new NameImpl( name.toString(), typeName );
+                //String typeRef = name.toString()+":"+typeName;
+                map.put( typeRef, fixture.repository.source( name.toString(), typeName ) );    
+            }
+            
+        }           	
     	validator.integrityValidation( map, null, results );    	    	
     	assertEquals( "integrity test", 0, results.error.size() );
     }
@@ -189,9 +201,9 @@ public class ValidatorTest extends TestCase {
     	
     	DefaultFeatureResults results = new DefaultFeatureResults();
     	Set set = new HashSet();
-    	Map map = new HashMap();
+    	Map<Name,FeatureSource<?,?>> map = new HashMap();
     	set.add( "RIVERS:rivers" );
-    	map.put( "RIVERS:rivers", fixture.repository.source( "RIVERS", "rivers" ));
+    	map.put( new NameImpl("RIVERS","rivers"), fixture.repository.source( "RIVERS", "rivers" ));
     	
     	validator.integrityValidation( map, null, results );    	    	
     	assertEquals( "integrity test", 0, results.error.size() );

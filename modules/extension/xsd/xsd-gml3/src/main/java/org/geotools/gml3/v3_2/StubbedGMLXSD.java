@@ -30,6 +30,8 @@ import org.geotools.xml.XSD;
  * 
  * @author Justin Deoliveira, OpenGEO
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/v3_2/StubbedGMLXSD.java $
  */
 public abstract class StubbedGMLXSD extends XSD {
 

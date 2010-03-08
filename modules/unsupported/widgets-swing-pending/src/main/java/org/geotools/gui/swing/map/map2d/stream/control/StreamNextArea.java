@@ -27,6 +27,8 @@ import org.geotools.gui.swing.map.map2d.stream.NavigableMap2D;
  * Next area action
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/control/StreamNextArea.java $
  */
 public class StreamNextArea extends AbstractAction {
 

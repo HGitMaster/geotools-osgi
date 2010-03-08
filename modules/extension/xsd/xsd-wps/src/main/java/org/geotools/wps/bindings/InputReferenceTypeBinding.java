@@ -31,6 +31,8 @@ import org.geotools.xml.ComplexEMFBinding;
 /**
  * Binding for inputReference attribute of Method element
  * @author Lucas Reed, Refractions Research Inc
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wps/src/main/java/org/geotools/wps/bindings/InputReferenceTypeBinding.java $
  */
 public class InputReferenceTypeBinding extends ComplexEMFBinding {
     public InputReferenceTypeBinding(Wps10Factory factory) {

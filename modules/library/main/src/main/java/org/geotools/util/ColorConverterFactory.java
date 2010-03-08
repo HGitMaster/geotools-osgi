@@ -36,6 +36,8 @@ import org.geotools.factory.Hints;
  * </p>
  * @author Jody Garnett (Refractions Research)
  * @since 2.5
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/util/ColorConverterFactory.java $
  */
 public class ColorConverterFactory implements ConverterFactory {
 

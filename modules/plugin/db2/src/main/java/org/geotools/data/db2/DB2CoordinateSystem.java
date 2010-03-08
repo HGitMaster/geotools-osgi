@@ -31,7 +31,7 @@ import java.sql.Statement;
  * Extender catalog tables.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2CoordinateSystem.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2CoordinateSystem.java $
  */
 public class DB2CoordinateSystem {
     private int srsId;

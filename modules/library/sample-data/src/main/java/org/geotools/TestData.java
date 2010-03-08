@@ -40,7 +40,7 @@ import java.nio.channels.ReadableByteChannel;
  * class provided in the {@code org.geotools.resources} directory.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/sample-data/src/main/java/org/geotools/TestData.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/sample-data/src/main/java/org/geotools/TestData.java $
  * @version $Id: TestData.java 30651 2008-06-12 20:06:27Z acuster $
  * @author Martin Desruisseaux
  *

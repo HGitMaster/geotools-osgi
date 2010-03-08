@@ -46,8 +46,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </code></blockquote>
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/logging/Logging.java $
- * @version $Id: Logging.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/logging/Logging.java $
+ * @version $Id: Logging.java 34824 2010-01-21 16:02:21Z aaime $
  * @author Martin Desruisseaux
  */
 public final class Logging {
@@ -138,7 +138,7 @@ public final class Logging {
     public static Logger getLogger(final Class<?> classe) {
         String name = classe.getName();
         final int separator = name.lastIndexOf('.');
-        name = (separator >= 1) ? name.substring(0, separator-1) : "";
+        name = (separator >= 1) ? name.substring(0, separator) : "";
         return getLogger(name);
     }
 

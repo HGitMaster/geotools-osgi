@@ -28,6 +28,8 @@ import org.geotools.map.MapLayer;
  * Default selection column.
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/column/SelectionTreeTableColumn.java $
  */
 public final class SelectionTreeTableColumn extends TreeTableColumn {
     

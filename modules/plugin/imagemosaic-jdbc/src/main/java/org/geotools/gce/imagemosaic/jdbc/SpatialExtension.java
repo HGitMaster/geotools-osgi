@@ -20,50 +20,50 @@ package org.geotools.gce.imagemosaic.jdbc;
  * Enum for support spatial extension
  * 
  * @author mcr
- *
+ * 
  */
-public enum SpatialExtension {DB2("DB2"),
-    ORACLE("ORACLE"),
-    POSTGIS("POSTGIS"),
-    MYSQL("MYSQL"),
-    UNIVERSAL("UNIVERSAL");
-    private SpatialExtension(String name) {
-        this.name = name;
-    }
+public enum SpatialExtension {
+	DB2("DB2"), ORACLE("ORACLE"), POSTGIS("POSTGIS"), MYSQL("MYSQL"), UNIVERSAL(
+			"UNIVERSAL");
+	private SpatialExtension(String name) {
+		this.name = name;
+	}
 
-    private String name;
+	private String name;
 
-    public String toString() {
-        return name;
-    }
+	public String toString() {
+		return name;
+	}
 
-    /**
-     * Factory method for obtaining a SpatialExtension object from a string
-     * 
-     * @param 	spatName	The string representation for teh SpatialExtension object
-     * @return	the 		corresponding SpatialExtension object, null if spatname is unknown
-     */
-    static SpatialExtension fromString(String spatName) {
-        if ("DB2".equalsIgnoreCase(spatName)) {
-            return DB2;
-        }
+	/**
+	 * Factory method for obtaining a SpatialExtension object from a string
+	 * 
+	 * @param spatName
+	 *            The string representation for teh SpatialExtension object
+	 * @return the corresponding SpatialExtension object, null if spatname is
+	 *         unknown
+	 */
+	static SpatialExtension fromString(String spatName) {
+		if ("DB2".equalsIgnoreCase(spatName)) {
+			return DB2;
+		}
 
-        if ("ORACLE".equalsIgnoreCase(spatName)) {
-            return ORACLE;
-        }
+		if ("ORACLE".equalsIgnoreCase(spatName)) {
+			return ORACLE;
+		}
 
-        if ("MYSQL".equalsIgnoreCase(spatName)) {
-            return MYSQL;
-        }
+		if ("MYSQL".equalsIgnoreCase(spatName)) {
+			return MYSQL;
+		}
 
-        if ("POSTGIS".equalsIgnoreCase(spatName)) {
-            return POSTGIS;
-        }
+		if ("POSTGIS".equalsIgnoreCase(spatName)) {
+			return POSTGIS;
+		}
 
-        if ("UNIVERSAL".equalsIgnoreCase(spatName)) {
-            return UNIVERSAL;
-        }
+		if ("UNIVERSAL".equalsIgnoreCase(spatName)) {
+			return UNIVERSAL;
+		}
 
-        return null;
-    }
+		return null;
+	}
 }

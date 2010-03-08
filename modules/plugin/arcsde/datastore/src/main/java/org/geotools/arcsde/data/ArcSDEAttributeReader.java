@@ -21,7 +21,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.SdeRow;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.util.logging.Logging;
@@ -49,7 +50,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/ArcSDEAttributeReader.java $
- * @version $Id: ArcSDEAttributeReader.java 32322 2009-01-24 20:11:52Z groldan $
+ * @version $Id: ArcSDEAttributeReader.java 34115 2009-10-10 01:09:29Z groldan $
  */
 final class ArcSDEAttributeReader implements AttributeReader {
     /** Shared package's logger */
@@ -99,23 +100,28 @@ final class ArcSDEAttributeReader implements AttributeReader {
 
     private ISession session;
 
+    private GeometryFactory geometryFactory;
+
     /**
      * The query that defines this readers interaction with an ArcSDE instance.
      * 
      * @param query
      *            the {@link SeQuery} wrapper where to fetch rows from. Must NOT be already
      *            {@link ArcSDEQuery#execute() executed}.
+     * @param geometryFactory
+     *            the JTS GeometryFactory to use when creating Feature geometries
      * @param session
      *            the session the <code>query</code> is being ran over. This attribute reader will
      *            close it only if it does not have a transaction in progress.
      * @throws IOException
      */
-    public ArcSDEAttributeReader(final ArcSDEQuery query, final ISession session)
-            throws IOException {
+    public ArcSDEAttributeReader(final ArcSDEQuery query, final GeometryFactory geometryFactory,
+            final ISession session) throws IOException {
         this.query = query;
         this.session = session;
         this.fidReader = query.getFidReader();
         this.schema = query.getSchema();
+        this.geometryFactory = geometryFactory;
 
         String typeName = schema.getTypeName();
 
@@ -230,7 +236,7 @@ final class ArcSDEAttributeReader implements AttributeReader {
      * @throws ArrayIndexOutOfBoundsException
      *             if <code>index</code> is outside the bounds of the schema attribute's count
      */
-    public Object read(int index) throws IOException, ArrayIndexOutOfBoundsException {
+    public Object read(final int index) throws IOException, ArrayIndexOutOfBoundsException {
         Object value = currentRow.getObject(index);
         if (value instanceof SeShape) {
             try {
@@ -243,7 +249,7 @@ final class ArcSDEAttributeReader implements AttributeReader {
                     actualGeomtryClass = ArcSDEAdapter.getGeometryTypeFromSeShape(shape);
                     final ArcSDEGeometryBuilder geometryBuilder;
                     geometryBuilder = ArcSDEGeometryBuilder.builderFor(actualGeomtryClass);
-                    value = geometryBuilder.construct(shape);
+                    value = geometryBuilder.construct(shape, geometryFactory);
                     if (!this.schemaGeometryClass.isAssignableFrom(actualGeomtryClass)) {
                         value = adaptGeometry((Geometry) value, schemaGeometryClass);
                     }
@@ -251,7 +257,7 @@ final class ArcSDEAttributeReader implements AttributeReader {
             } catch (SeException e) {
                 throw new ArcSdeException(e);
             }
-        }else if(value instanceof Geometry){
+        } else if (value instanceof Geometry) {
             if (!this.schemaGeometryClass.isAssignableFrom(value.getClass())) {
                 value = adaptGeometry((Geometry) value, schemaGeometryClass);
             }

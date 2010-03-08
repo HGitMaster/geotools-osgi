@@ -42,7 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author James Macgill
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/extension/brewer/src/main/java/org/geotools/brewer/color/ColorBrewer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/brewer/color/ColorBrewer.java $
  */
 public class ColorBrewer {
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.brewer.color");
@@ -54,7 +54,7 @@ public class ColorBrewer {
     public static final PaletteType QUALITATIVE = new PaletteType(false, true, "QUALITATIVE");
     String name = null;
     String description = null;
-    Hashtable palettes = new Hashtable();
+    Hashtable<String,BrewerPalette> palettes = new Hashtable<String,BrewerPalette>();
 
     /**
      * Creates a new instance of ColorBrewer
@@ -123,7 +123,7 @@ public class ColorBrewer {
     }
 
     public BrewerPalette[] getPalettes(PaletteType type, int numClasses) {
-        List palettes = new ArrayList();
+        List<BrewerPalette> palettes = new ArrayList<BrewerPalette>();
         Object[] entry = this.palettes.keySet().toArray();
 
         for (int i = 0; i < entry.length; i++) {
@@ -150,7 +150,7 @@ public class ColorBrewer {
     }
 
     public BrewerPalette[] getPalettes(PaletteType type, int numClasses, int requiredViewers) {
-        List palettes = new ArrayList();
+        List<BrewerPalette> palettes = new ArrayList<BrewerPalette>();
         Object[] entry = this.palettes.keySet().toArray();
 
         for (int i = 0; i < entry.length; i++) {
@@ -227,7 +227,7 @@ public class ColorBrewer {
      */
     public String[] getPaletteNames(int minClasses, int maxClasses) {
         Object[] keys = palettes.keySet().toArray();
-        Set paletteSet = new HashSet();
+        Set<String> paletteSet = new HashSet<String>();
 
         //generate the set of palette names
         for (int i = 0; i < keys.length; i++) {
@@ -464,7 +464,7 @@ public class ColorBrewer {
     public void reset() {
         name = null;
         description = null;
-        palettes = new Hashtable();
+        palettes = new Hashtable<String,BrewerPalette>();
     }
 
     public boolean isSet(int singleValue, int multipleValue) {

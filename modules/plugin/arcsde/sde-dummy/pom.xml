@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 32010 2008-12-15 04:37:38Z jive $              
+        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>arcsde-plugin</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.2</version>
   </parent>
 
 
@@ -27,7 +27,7 @@
   <artifactId>gt-sde-dummy</artifactId>
   <packaging>jar</packaging>
   <name>ArcSDE dummy api</name>
-  <url>http://maven.geotools.fr/reports/modules/plugin/arcsde/sde-dummy/</url>
+  
 
   <scm>
     <connection>
@@ -54,24 +54,35 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>Saul Farber</name>
-      <id>saul.farber</id>
-      <email>Saul.Farber@state.ma.us</email>
-      <organization></organization>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@users.sourceforge.net</email>
+      <organization>OpenGeo</organization>
+      <organizationUrl>http://opengeo.org</organizationUrl>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
-      <name>Gabriel Roldan</name>
-      <id>groldan</id>
-      <email>groldan@users.sourceforge.net</email>
-      <organization>TOPP</organization>
+      <name>Jody Garnett</name>
+      <id>jgarnett</id>
+      <email>jody.garnett@gmail.com</email>
+      <organization>LISAsoft</organization>
+      <organizationUrl>http://www.lisasoft.com</organizationUrl>
       <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
+  <contributors>
+    <contributor>
+      <name>Saul Farber</name>
+      <email>saul@peoplegis.com</email>
+      <roles>
+        <role>Former co-module maintainer and Java Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
 
 </project>

@@ -124,7 +124,7 @@ import org.geotools.referencing.operation.transform.ProjectiveTransform;
  * </pre></td></tr></table></blockquote>
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/LocalizationGrid.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/LocalizationGrid.java $
  * @version $Id: LocalizationGrid.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)

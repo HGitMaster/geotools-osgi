@@ -17,13 +17,10 @@
 package org.geotools.styling;
 
 
+import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
-import org.geotools.util.Utilities;
-
 import org.opengis.filter.expression.Expression;
-import org.opengis.style.Description;
-import org.opengis.style.Displacement;
 import org.opengis.style.StyleVisitor;
 import org.opengis.util.Cloneable;
 
@@ -34,20 +31,16 @@ import org.opengis.util.Cloneable;
  *
  * @author James Macgill, CCG
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/PolygonSymbolizerImpl.java $
- * @version $Id: PolygonSymbolizerImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/PolygonSymbolizerImpl.java $
+ * @version $Id: PolygonSymbolizerImpl.java 34564 2009-11-30 16:08:45Z aaime $
  */
-public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
+public class PolygonSymbolizerImpl extends AbstractSymbolizer implements PolygonSymbolizer, Cloneable {
     
-    private final Description description;
-    private final String name;
-    private final Expression offset;
-    private final Unit uom;
-    private final Displacement disp;
+    private Expression offset;
+    private DisplacementImpl disp;
     
     private Fill fill = new FillImpl();
-    private Stroke stroke = new StrokeImpl();
-    private String geometryName = null;
+    private StrokeImpl stroke = new StrokeImpl();
 
     /**
      * Creates a new instance of DefaultPolygonStyler
@@ -60,72 +53,32 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
             Fill fill, 
             Displacement disp, 
             Expression offset, 
-            Unit uom, 
+            Unit<Length> uom, 
             String geom, 
             String name, 
-            Description desc){
-        this.stroke = stroke;
+            Description desc) {
+        super(name, desc, geom, uom);
+        this.stroke = StrokeImpl.cast( stroke );
         this.fill = fill;
-        this.disp = disp;
+        this.disp = DisplacementImpl.cast( disp );
         this.offset = offset;
-        this.uom = uom;
-        this.geometryName = geom;
-        this.name = name;
-        this.description = desc;
-    }
-    
-    public String getName() {
-        return name;
-    }
-
-    public Description getDescription() {
-        return description;
-    }
-    
-    /**
-     * This property defines the geometry to be used for styling.<br>
-     * The property is optional and if it is absent (null) then the "default"
-     * geometry property of the feature should be used. Geometry types other
-     * than inherently area types can be used. If a line is used then the line
-     * string is closed for filling (only) by connecting its end point to its
-     * start point. The geometryPropertyName is the name of a geometry
-     * property in the Feature being styled.  Typically, features only have
-     * one geometry so, in general, the need to select one is not required.
-     * Note: this moves a little away from the SLD spec which provides an
-     * XPath reference to a Geometry object, but does follow it in spirit.
-     *
-     * @return The name of the attribute in the feature being styled  that
-     *         should be used.  If null then the default geometry should be
-     *         used.
-     */
-    public String getGeometryPropertyName() {
-        return geometryName;
-    }
-
-    /**
-     * Sets the GeometryPropertyName.
-     *
-     * @param name The name of the GeometryProperty.
-     *
-     * @see #PolygonSymbolizerImpl.geometryPropertyName()
-     */
-    @Deprecated
-    public void setGeometryPropertyName(String name) {
-        geometryName = name;
-    }
-
-    public Unit getUnitOfMeasure() {
-        return uom;
     }
     
     public Expression getPerpendicularOffset() {
         return offset;
+    }
+
+    public void setPerpendicularOffset(Expression offset ) {
+        this.offset = offset;
     }
     
     public Displacement getDisplacement() {
         return disp;
     }
 
+    public void setDisplacement(org.opengis.style.Displacement displacement) {
+        this.disp = DisplacementImpl.cast( displacement );
+    }
     /**
      * Provides the graphical-symbolization parameter to use to fill the area
      * of the geometry.
@@ -142,12 +95,11 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
      *
      * @param fill The Fill style to use when rendering the area.
      */
-    @Deprecated
-    public void setFill(Fill fill) {
+    public void setFill(org.opengis.style.Fill fill) {
         if (this.fill == fill) {
             return;
         }
-        this.fill = fill;
+        this.fill = FillImpl.cast(fill);
     }
 
     /**
@@ -156,7 +108,7 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
      *
      * @return The Stroke style to use when rendering lines.
      */
-    public Stroke getStroke() {
+    public StrokeImpl getStroke() {
         return stroke;
     }
 
@@ -166,12 +118,11 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
      *
      * @param stroke The Stroke style to use when rendering lines.
      */
-    @Deprecated
-    public void setStroke(Stroke stroke) {
+    public void setStroke(org.opengis.style.Stroke stroke) {
         if (this.stroke == stroke) {
             return;
         }
-        this.stroke = stroke;
+        this.stroke = StrokeImpl.cast( stroke );
     }
 
     /**
@@ -206,7 +157,7 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
             }
 
             if (stroke != null) {
-                clone.stroke = (Stroke) ((Cloneable) stroke).clone();
+                clone.stroke = (StrokeImpl) ((Cloneable) stroke).clone();
             }
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e); // this should never happen.
@@ -215,77 +166,72 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
         return clone;
     }
 
-    /**
-     * Generates a hashcode for the PolygonSymbolizerImpl.
-     *
-     * @return A hashcode.
-     */
+    @Override
     public int hashCode() {
-        final int PRIME = 1000003;
-        int result = 0;
-
-        if (fill != null) {
-            result = (PRIME * result) + fill.hashCode();
-        }
-
-        if (stroke != null) {
-            result = (PRIME * result) + stroke.hashCode();
-        }
-
-        if (geometryName != null) {
-            result = (PRIME * result) + geometryName.hashCode();
-        }
-        
-        if (description != null) {
-            result = (PRIME * result) + description.hashCode();
-        }
-        
-        if (uom != null) {
-            result = (PRIME * result) + uom.hashCode();
-        }
-        
-        if (offset != null) {
-            result = (PRIME * result) + offset.hashCode();
-        }
-
-        if (disp != null) {
-            result = (PRIME * result) + disp.hashCode();
-        }
-        
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((disp == null) ? 0 : disp.hashCode());
+        result = prime * result + ((fill == null) ? 0 : fill.hashCode());
+        result = prime * result + ((offset == null) ? 0 : offset.hashCode());
+        result = prime * result + ((stroke == null) ? 0 : stroke.hashCode());
         return result;
     }
 
-    /**
-     * Compares this PolygonSymbolizerImpl with another.
-     * 
-     * <p>
-     * Two PolygonSymbolizerImpls are equal if they have the same
-     * geometryProperty, fill and stroke.
-     * </p>
-     *
-     * @param oth the object to compare against.
-     *
-     * @return true if oth is equal to this object.
-     */
-    public boolean equals(Object oth) {
-        if (this == oth) {
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        PolygonSymbolizerImpl other = (PolygonSymbolizerImpl) obj;
+        if (disp == null) {
+            if (other.disp != null)
+                return false;
+        } else if (!disp.equals(other.disp))
+            return false;
+        if (fill == null) {
+            if (other.fill != null)
+                return false;
+        } else if (!fill.equals(other.fill))
+            return false;
+        if (offset == null) {
+            if (other.offset != null)
+                return false;
+        } else if (!offset.equals(other.offset))
+            return false;
+        if (stroke == null) {
+            if (other.stroke != null)
+                return false;
+        } else if (!stroke.equals(other.stroke))
+            return false;
+        return true;
+    }
+
+    static PolygonSymbolizerImpl cast(org.opengis.style.Symbolizer symbolizer) {
+        if( symbolizer == null ){
+            return null;
         }
-
-        if (oth instanceof PolygonSymbolizerImpl) {
-            PolygonSymbolizerImpl other = (PolygonSymbolizerImpl) oth;
-
-            return Utilities.equals(this.geometryName,
-                other.geometryName)
-            && Utilities.equals(fill, other.fill)
-            && Utilities.equals(stroke, other.stroke)
-            && Utilities.equals(description, other.description)
-            && Utilities.equals(disp, other.disp)
-            && Utilities.equals(offset, other.offset)
-            && Utilities.equals(uom, other.uom);
+        else if (symbolizer instanceof PolygonSymbolizerImpl){
+            return (PolygonSymbolizerImpl) symbolizer;
         }
-
-        return false;
+        else if( symbolizer instanceof org.opengis.style.PolygonSymbolizer ){
+            org.opengis.style.PolygonSymbolizer polygonSymbolizer = (org.opengis.style.PolygonSymbolizer) symbolizer;
+            PolygonSymbolizerImpl copy = new PolygonSymbolizerImpl();
+            copy.setStroke( StrokeImpl.cast(polygonSymbolizer.getStroke()));
+            copy.setDescription( polygonSymbolizer.getDescription() );
+            copy.setDisplacement( polygonSymbolizer.getDisplacement());
+            copy.setFill(polygonSymbolizer.getFill());
+            copy.setGeometryPropertyName( polygonSymbolizer.getGeometryPropertyName());
+            copy.setName(polygonSymbolizer.getName());
+            copy.setPerpendicularOffset(polygonSymbolizer.getPerpendicularOffset());
+            copy.setUnitOfMeasure( polygonSymbolizer.getUnitOfMeasure());
+            return copy;
+        }
+        else {
+            return null; // not possible
+        }
     }
 
 

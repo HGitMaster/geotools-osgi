@@ -18,8 +18,6 @@ package org.geotools.data.shapefile.indexed;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -27,9 +25,7 @@ import java.util.TreeSet;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShpFiles;
 import org.geotools.data.shapefile.shp.IndexFile;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.util.Comparators;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -46,7 +42,7 @@ public class IndexedFidReaderTest extends FIDTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        ShpFiles shpFiles = new ShpFiles(backshp.toURL());
+        ShpFiles shpFiles = new ShpFiles(backshp.toURI().toURL());
         FidIndexer.generate(shpFiles);
 
         indexFile = new IndexFile(shpFiles, false);
@@ -89,7 +85,7 @@ public class IndexedFidReaderTest extends FIDTestCase {
         int expectedCount = 0;
         Set<String> expectedFids = new LinkedHashSet<String>();
         {
-            IndexedShapefileDataStore ds = new IndexedShapefileDataStore(backshp.toURL(), null,
+            IndexedShapefileDataStore ds = new IndexedShapefileDataStore(backshp.toURI().toURL(), null,
                     true, true, IndexType.NONE);
             FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = ds.getFeatureSource();
             FeatureIterator<SimpleFeature> features = featureSource.getFeatures().features();
@@ -113,7 +109,7 @@ public class IndexedFidReaderTest extends FIDTestCase {
         int expectedCount = 0;
         Set<String> expectedFids = new TreeSet<String>(Collections.reverseOrder());
         {
-            IndexedShapefileDataStore ds = new IndexedShapefileDataStore(backshp.toURL(), null,
+            IndexedShapefileDataStore ds = new IndexedShapefileDataStore(backshp.toURI().toURL(), null,
                     true, true, IndexType.NONE);
             FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = ds.getFeatureSource();
             FeatureIterator<SimpleFeature> features = featureSource.getFeatures().features();
@@ -126,6 +122,11 @@ public class IndexedFidReaderTest extends FIDTestCase {
 
         assertTrue(expectedCount > 0);
         assertEquals(expectedCount, reader.getCount());
+        
+        while (reader.hasNext()) {
+            System.out.println(reader.next());
+        }
+        
         
         assertFalse("findFid for archsites.5 returned -1",-1 == reader.findFid("archsites.5"));
         assertFalse("findFid for archsites.25 returned -1",-1 == reader.findFid("archsites.25"));

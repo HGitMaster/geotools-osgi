@@ -45,7 +45,7 @@ import org.geotools.resources.Utilities;
  * Tests the usage of {@link CoordinateOperationFactory} with the help of the
  * EPSG database.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/epsg/OperationFactoryOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/epsg/OperationFactoryOnlineTest.java $
  * @version $Id: OperationFactoryOnlineTest.java 30691 2008-06-13 13:20:02Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

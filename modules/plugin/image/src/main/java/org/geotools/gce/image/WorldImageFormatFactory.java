@@ -32,7 +32,7 @@ import org.opengis.coverage.grid.Format;
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/image/src/org/geotools/gce/image/WorldImageFormatFactory.java $
  */
 public final class WorldImageFormatFactory implements GridFormatFactorySpi {
-	public Format createFormat() {
+	public WorldImageFormat createFormat() {
 		return new WorldImageFormat();
 	}
 

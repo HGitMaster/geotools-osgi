@@ -28,10 +28,10 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 /**
  * A code parsed by the {@link AutoCRSFactory} methods.
- * The expected format is {@code AUTO:code,lon0,lat0} where {@code AUTO} is optional.
+ * The expected format is {@code AUTO:code,unit,lon0,lat0} where {@code AUTO} is optional.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Code.java $
- * @version $Id: Code.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Code.java $
+ * @version $Id: Code.java 34857 2010-02-03 10:35:14Z aaime $
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
@@ -74,45 +74,47 @@ final class Code {
     public Code(final String text, final Class type) throws NoSuchAuthorityCodeException {
         String authority = "AUTO";
         int    code      = 0;
+        int    unit      = 9001;
         double longitude = Double.NaN;
         double latitude  = Double.NaN;
-        int startField   = -1;
-parse:  for (int i=0; /*stop condition in the 'switch' statement below*/; i++) {
-            final char delimiter = (i==0) ? ':' : ',';
-            int endField = text.indexOf(delimiter, ++startField);
-            if (endField < 0) {
-                if (i == 0) {
-                    // The "AUTO" prefix is optional. Continue the search for next fields.
-                    startField = -1;
-                    continue;
-                }
-                endField = text.length();
+        
+        // there are two syntaxes for the AUTO factory:
+        // AUTO:code,unit,longitude,latitude (from WMS 1.1 spec)
+        // AUTO:code,longitude,latitude (from early WMS specs)
+        // here we try to support both of them
+        
+        // the AUTO prefix is optional, remove it if necessary (and support also AUTO2)
+        String[] parts;
+        if(text.startsWith("AUTO"))
+            parts = text.replaceAll("AUTO(2)?\\s*:", "").split("\\s*,\\s*");
+        else
+            parts = text.split("\\s*,\\s*");
+        
+        // do we have enough components?
+        if(parts.length < 3) {
+            throw noSuchAuthorityCode(type, text);
+        } 
+        
+        try {
+            if(parts.length < 4) {
+                // code,lon,lat
+                code = Integer.parseInt  (parts[0]);
+                longitude = Double.parseDouble(parts[1]); 
+                latitude  = Double.parseDouble(parts[2]);  
+            } else {
+                // code,unit,lon,lat
+                code = Integer.parseInt  (parts[0]);
+                unit = Integer.parseInt  (parts[1]);
+                longitude = Double.parseDouble(parts[2]); 
+                latitude  = Double.parseDouble(parts[3]);
             }
-            if (endField <= startField) {
-                // A required field was not found.
-                throw noSuchAuthorityCode(type, text);
-            }
-            final String field = text.substring(startField, endField).trim();
-            try {
-                switch (i) {
-                    default: throw new AssertionError(i);
-                    case 0:  authority =                    field;  break;
-                    case 1:  code      = Integer.parseInt  (field); break;
-                    case 2:  longitude = Double.parseDouble(field); break;
-                    case 3:  latitude  = Double.parseDouble(field); break parse;
-                    /*
-                     * Add case statements here if the is more fields to parse.
-                     * Only the last case should end with 'break parse' instead of 'break'.
-                     */
-                }
-            } catch (NumberFormatException exception) {
-                // If a number can't be parsed, then this is an invalid authority code.
-                NoSuchAuthorityCodeException e = noSuchAuthorityCode(type, text);
-                e.initCause(exception);
-                throw e;
-            }
-            startField = endField;
+        } catch(NumberFormatException exception) {
+            // If a number can't be parsed, then this is an invalid authority code.
+            NoSuchAuthorityCodeException e = noSuchAuthorityCode(type, text);
+            e.initCause(exception);
+            throw e;
         }
+        
         if (!(longitude>=Longitude.MIN_VALUE && longitude<=Longitude.MAX_VALUE &&
               latitude >= Latitude.MIN_VALUE && latitude <= Latitude.MAX_VALUE))
         {

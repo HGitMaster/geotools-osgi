@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  This is to test SRS encoding in Geoserver app-schema SRSWfsTest
+-->
+<as:AppSchemaDataAccess xmlns:as="http://www.geotools.org/app-schema"
+	xmlns:ogc="http://www.opengis.net/ogc" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geotools.org/app-schema AppSchemaDataAccess.xsd
+                      http://www.opengis.net/ogc http://schemas.opengis.net/filter/1.1.0/expr.xsd">
+	<namespaces>
+		<Namespace>
+			<prefix>gml</prefix>
+			<uri>http://www.opengis.net/gml</uri>
+		</Namespace>
+		<Namespace>
+			<prefix>ex</prefix>
+			<uri>http://example.com</uri>
+		</Namespace>
+	</namespaces>
+	<sourceDataStores>
+		<DataStore>
+			<id>SRSTestPropertyfile</id>
+			<parameters>
+				<Parameter>
+					<name>directory</name>
+					<!-- path can be relative to this file if starts with "file: -->
+					<value>file:./</value>
+				</Parameter>
+			</parameters>
+		</DataStore>
+	</sourceDataStores>
+	<targetTypes>
+		<FeatureType>
+			<schemaUri>NestedGeometry.xsd</schemaUri>
+		</FeatureType>
+	</targetTypes>
+	<typeMappings>
+		<FeatureTypeMapping>
+			<sourceDataStore>SRSTestPropertyfile</sourceDataStore>
+			<sourceType>SRSTestPropertyfile</sourceType>
+			<targetElement>
+				ex:geomContainer
+			</targetElement>
+			<attributeMappings>
+				<AttributeMapping>
+					<targetAttribute>
+						ex:geomContainer
+					</targetAttribute>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>ex:geom</targetAttribute>
+					<sourceExpression>
+						<OCQL>GEOM</OCQL>
+					</sourceExpression>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>ex:nestedFeature</targetAttribute>
+					<sourceExpression>
+						<OCQL>NESTED_GEOM_ID</OCQL>
+						<linkElement>ex:nestedGeom</linkElement>
+						<linkField>FEATURE_LINK</linkField>
+					</sourceExpression>
+				</AttributeMapping>
+			</attributeMappings>
+		</FeatureTypeMapping>
+		<FeatureTypeMapping>
+			<sourceDataStore>SRSTestPropertyfile</sourceDataStore>
+			<sourceType>SRSTestPropertyfile</sourceType>
+			<targetElement>
+				ex:nestedGeom
+			</targetElement>
+			<attributeMappings>
+				<AttributeMapping>
+					<targetAttribute>
+						ex:nestedGeom
+					</targetAttribute>					
+					<idExpression>
+					    <OCQL>strConcat('nested.', getId())</OCQL>
+					</idExpression>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>ex:geom</targetAttribute>
+					<sourceExpression>
+						<OCQL>GEOM</OCQL>
+					</sourceExpression>
+				</AttributeMapping>
+				<AttributeMapping>
+					<targetAttribute>
+		                FEATURE_LINK
+		            </targetAttribute>
+					<sourceExpression>
+						<OCQL>strTrim(getId())</OCQL>
+					</sourceExpression>
+				</AttributeMapping>
+			</attributeMappings>
+		</FeatureTypeMapping>
+	</typeMappings>
+</as:AppSchemaDataAccess>

@@ -24,7 +24,7 @@ import java.io.IOException;
  * This exception typically has a {@link java.text.ParseException} has its cause.
  * It is similar in spirit to {@link java.util.InvalidPropertiesFormatException}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/io/ContentFormatException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/io/ContentFormatException.java $
  * @version $Id: ContentFormatException.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

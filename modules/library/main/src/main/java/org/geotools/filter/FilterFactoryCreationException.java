@@ -23,7 +23,7 @@ package org.geotools.filter;
  * the  implementation of the StyleFactory.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryCreationException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryCreationException.java $
  * @version $Id: FilterFactoryCreationException.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public class FilterFactoryCreationException extends java.lang.Exception {

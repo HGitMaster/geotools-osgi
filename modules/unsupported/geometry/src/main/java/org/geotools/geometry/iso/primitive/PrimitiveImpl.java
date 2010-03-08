@@ -62,6 +62,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Further, if that object is cast as a Primitive value and as a Complex value,
  * then the two values need not be equal as Objects.
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/PrimitiveImpl.java $
  * @version <A HREF="http://www.opengis.org/docs/01-101.pdf">Abstract
  *          Specification V5</A>
  * @author Jackson Roehrig & Sanjay Jena

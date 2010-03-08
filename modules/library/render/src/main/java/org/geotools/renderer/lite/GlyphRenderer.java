@@ -25,7 +25,7 @@ import org.geotools.styling.Graphic;
 /**
  *
  * @author  jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/GlyphRenderer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/GlyphRenderer.java $
  */
 public interface GlyphRenderer {
  

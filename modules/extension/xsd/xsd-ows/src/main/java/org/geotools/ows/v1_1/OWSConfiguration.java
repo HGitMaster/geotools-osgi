@@ -18,6 +18,7 @@ package org.geotools.ows.v1_1;
 
 import java.util.Map;
 
+import net.opengis.ows11.AllowedValuesType;
 import net.opengis.ows11.AnyValueType;
 import net.opengis.ows11.Ows11Factory;
 
@@ -33,6 +34,8 @@ import org.picocontainer.MutablePicoContainer;
  * Parser configuration for the http://www.opengis.net/ows/1.1 schema.
  * 
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/v1_1/OWSConfiguration.java $
  */
 public class OWSConfiguration extends Configuration {
 
@@ -60,6 +63,7 @@ public class OWSConfiguration extends Configuration {
     protected void registerBindings(Map bindings) {
         bindings.put(OWS.AcceptVersionsType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.AcceptVersionsType));        
         bindings.put(OWS.AddressType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.AddressType));
+        bindings.put(OWS.AllowedValues, new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.AllowedValues, AllowedValuesType.class));
         bindings.put(OWS.AnyValue,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.AnyValue, AnyValueType.class));
         
         bindings.put(OWS.GetCapabilitiesType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.GetCapabilitiesType));
@@ -75,7 +79,7 @@ public class OWSConfiguration extends Configuration {
         bindings.put(OWS.LanguageStringType,new SimpleContentComplexEMFBinding(Ows11Factory.eINSTANCE,OWS.LanguageStringType));
         bindings.put(OWS.MetadataType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.MetadataType));
         bindings.put(OWS.OnlineResourceType, new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.OnlineResourceType));
-        
+        bindings.put(OWS.RangeType, new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.RangeType));
         bindings.put(OWS.RequestMethodType, new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.RequestMethodType));
         bindings.put(OWS.ResponsiblePartySubsetType, new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.ResponsiblePartySubsetType));
         bindings.put(OWS.TelephoneType, new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.TelephoneType));
@@ -90,6 +94,7 @@ public class OWSConfiguration extends Configuration {
         bindings.put(OWS._ServiceProvider, new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS._ServiceProvider));
 
         bindings.put(OWS.UOM, new UnitBinding());
+        bindings.put(OWS.ValueType, new SimpleContentComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.ValueType));
     }
     
     protected void configureContext(MutablePicoContainer container) {

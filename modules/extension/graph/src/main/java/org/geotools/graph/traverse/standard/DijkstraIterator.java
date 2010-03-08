@@ -75,7 +75,7 @@ import org.geotools.graph.util.PriorityQueue;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/DijkstraIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/DijkstraIterator.java $
  */
 public class DijkstraIterator extends SourceGraphIterator {
 
@@ -88,6 +88,9 @@ public class DijkstraIterator extends SourceGraphIterator {
   
   /** provides weights for edges in the graph **/
   protected EdgeWeighter weighter;
+  
+  /** provides weights for nodes in the graph **/
+  protected NodeWeighter nweighter;
   
   /** priority queue to manage active nodes **/
   protected PriorityQueue queue;
@@ -102,7 +105,21 @@ public class DijkstraIterator extends SourceGraphIterator {
    *        over.
    */
   public DijkstraIterator(EdgeWeighter weighter) {
+    this(weighter,null);
+  }
+  
+  /**
+   * Constructs a new Dijkstra iterator which uses the specided EdgeWeighter and 
+   * NodeWeighter
+   * 
+   * @param weighter Calculates weights for edges in the graph being iterated
+   *        over.
+   * @param nweighter Calculates weights for nodes in the graph being iterated 
+   *        over.
+   */
+  public DijkstraIterator(EdgeWeighter weighter, NodeWeighter nweighter) {
     this.weighter = weighter;
+    this.nweighter = nweighter;
   }
   
   /**
@@ -180,6 +197,15 @@ public class DijkstraIterator extends SourceGraphIterator {
         double cost = weighter.getWeight(currdn.node.getEdge(related)) 
                     + currdn.cost;
         
+        //calculate the cost of going through the node
+        if ( nweighter != null ) {
+            double ncost = 0d;
+            if(currdn.parent != null) {
+                Edge e1 = currdn.parent.node.getEdge(currdn.node);
+                Edge e2 = currdn.node.getEdge(related);
+                ncost = nweighter.getWeight(currdn.node,e1,e2);
+            }
+        }
         //if cost less than current cost of related node, update 
         if (cost < reldn.cost) {
           reldn.cost = cost;
@@ -258,6 +284,27 @@ public class DijkstraIterator extends SourceGraphIterator {
      * @return The weight of the edge.
      */
     public double getWeight(Edge e);  
+  }
+  
+  /**
+   * Supplies a weight for each pair of adjacent edges. 
+   * 
+   * @author Sandeep Kumar Jakkaraju sandeepkumar@iitbombay.org
+   *
+   */
+  public static interface NodeWeighter {
+
+    /**
+     * Returns the weight for a node, with respect to two adjecent edges.
+     * 
+     * @param n The node.
+     * @param e1 First edge.
+     * @param e2 Second edge.
+     *
+     * @return The weight associated with traversing through the node from 
+     *  the first edge to the second.
+     */
+     public double getWeight(Node n, Edge e1, Edge e2);  
   }
   
   /**

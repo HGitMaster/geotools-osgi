@@ -31,7 +31,7 @@ import org.opengis.util.InternationalString;
 /**
  * New metadata element, not found in ISO 19115, which is required to describe geographic data.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/ExtendedElementInformationImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/ExtendedElementInformationImpl.java $
  * @version $Id: ExtendedElementInformationImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

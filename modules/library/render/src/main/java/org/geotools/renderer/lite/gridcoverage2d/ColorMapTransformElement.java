@@ -35,6 +35,8 @@ import org.geotools.referencing.piecewise.PiecewiseTransform1DElement;
  * 
  * @author Simone Giannecchini, GeoSolutions
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/ColorMapTransformElement.java $
  */
 public interface ColorMapTransformElement extends PiecewiseTransform1DElement {
 	/**

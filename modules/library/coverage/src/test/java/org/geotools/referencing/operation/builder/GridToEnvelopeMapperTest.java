@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
  * of the referencing module because it need an implementation of {@link GridRange}.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/referencing/operation/builder/GridToEnvelopeMapperTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/referencing/operation/builder/GridToEnvelopeMapperTest.java $
  * @version $Id: GridToEnvelopeMapperTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux
  */

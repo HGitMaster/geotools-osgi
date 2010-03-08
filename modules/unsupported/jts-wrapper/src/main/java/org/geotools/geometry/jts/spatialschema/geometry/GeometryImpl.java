@@ -1,5 +1,5 @@
 /*******************************************************************************
- * $Id: GeometryImpl.java 32736 2009-04-04 06:51:02Z jive $
+ * $Id: GeometryImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  * $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/GeometryImpl.java,v $
  * Copyright (C) 2003 Open GIS Consortium, Inc. All Rights Reserved.
  * http://www.opengis.org/Legal/
@@ -42,6 +42,8 @@ import org.geotools.factory.BasicFactories;
 /**
  * Base class for our JTS-based implementation of the various ISO 19107 geometry
  * classes.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/GeometryImpl.java $
  */
 public abstract class GeometryImpl 
 	implements Geometry, Serializable, Cloneable, JTSGeometry {

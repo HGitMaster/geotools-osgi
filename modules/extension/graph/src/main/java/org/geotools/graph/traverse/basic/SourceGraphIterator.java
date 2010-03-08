@@ -23,7 +23,7 @@ import org.geotools.graph.structure.Graphable;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/graph/src/main/java/org/geotools/graph/traverse/basic/SourceGraphIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/traverse/basic/SourceGraphIterator.java $
  */
 public abstract class SourceGraphIterator extends AbstractGraphIterator {
   

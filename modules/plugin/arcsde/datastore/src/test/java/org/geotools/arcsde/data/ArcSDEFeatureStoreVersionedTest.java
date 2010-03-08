@@ -21,11 +21,11 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Properties;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -56,7 +56,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/da/src/test/java/org
  *         /geotools/arcsde/data/ArcSDEFeatureStoreTest.java $
- * @version $Id: ArcSDEFeatureStoreVersionedTest.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ArcSDEFeatureStoreVersionedTest.java 33451 2009-07-02 17:53:36Z groldan $
  */
 public class ArcSDEFeatureStoreVersionedTest {
     /** package logger */
@@ -267,7 +267,7 @@ public class ArcSDEFeatureStoreVersionedTest {
 
     @Test
     public void testEditVersionedTableTransactionConcurrently() throws Exception {
-        Properties conProps = testData.getConProps();
+        Map<String, String> conProps = testData.getConProps();
 
         final ArcSDEDataStore dataStore1 = (ArcSDEDataStore) DataStoreFinder.getDataStore(conProps);
         final ArcSDEDataStore dataStore2 = (ArcSDEDataStore) DataStoreFinder.getDataStore(conProps);

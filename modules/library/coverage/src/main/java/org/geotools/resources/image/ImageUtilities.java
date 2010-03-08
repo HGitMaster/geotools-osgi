@@ -16,23 +16,37 @@
  */
 package org.geotools.resources.image;
 
-import java.awt.image.*;
 import java.awt.Dimension;
 import java.awt.RenderingHints;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferDouble;
+import java.awt.image.DataBufferFloat;
+import java.awt.image.DataBufferInt;
+import java.awt.image.DataBufferShort;
+import java.awt.image.DataBufferUShort;
+import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
+import java.awt.image.WritableRenderedImage;
 import java.io.IOException;
-import java.util.Iterator;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageReader;
 import javax.imageio.spi.IIORegistry;
-import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageReaderWriterSpi;
-import javax.imageio.spi.ImageWriterSpi;
 import javax.media.jai.BorderExtender;
+import javax.media.jai.BorderExtenderCopy;
+import javax.media.jai.BorderExtenderReflect;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
+import javax.media.jai.OpImage;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
 
@@ -40,6 +54,7 @@ import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
+import com.sun.media.imageioimpl.common.PackageUtil;
 import com.sun.media.jai.operator.ImageReadDescriptor;
 
 
@@ -53,12 +68,81 @@ import com.sun.media.jai.operator.ImageReadDescriptor;
  * It may change in incompatible way in any future version.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/resources/image/ImageUtilities.java $
- * @version $Id: ImageUtilities.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/resources/image/ImageUtilities.java $
+ * @version $Id: ImageUtilities.java 34823 2010-01-19 18:47:51Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini
  */
 public final class ImageUtilities {
+	
+
+	 /**
+     * {@code true} if JAI media lib is available.
+     */
+    private static final boolean mediaLibAvailable;
+    static {
+
+    	// do we wrappers at hand?
+        boolean mediaLib = false;
+        Class mediaLibImage = null;
+        try {
+            mediaLibImage = Class.forName("com.sun.medialib.mlib.Image");
+        } catch (ClassNotFoundException e) {
+        }
+        mediaLib = (mediaLibImage != null);
+        
+        
+        // npw check if we either wanted to disable explicitly and if we installed the native libs
+        if(mediaLib){
+        
+	        try {
+	        	// explicit disable
+	            mediaLib =
+	                !Boolean.getBoolean("com.sun.media.jai.disableMediaLib");
+	            
+	            //native libs installed
+		        if(mediaLib)
+		        {
+		        	final Class mImage=mediaLibImage;
+	                mediaLib=AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+	                     public Boolean run() {
+	                    	 try {
+	                    		//get the method
+	                    		final Class params[] = {};
+								Method method= mImage.getDeclaredMethod("isAvailable", params);
+
+								//invoke
+	                    		final Object paramsObj[] = {};
+
+	        		        	final Object o=mImage.newInstance();
+		                        return (Boolean) method.invoke(o, paramsObj);
+							} catch (Throwable e) {
+								return false;
+							}
+	                     }
+	                });
+		        }	            
+	        } catch (Throwable e) {
+	            // Because the property com.sun.media.jai.disableMediaLib isn't
+	            // defined as public, the users shouldn't know it.  In most of
+	            // the cases, it isn't defined, and thus no access permission
+	            // is granted to it in the policy file.  When JAI is utilized in
+	            // a security environment, AccessControlException will be thrown.
+	            // In this case, we suppose that the users would like to use
+	            // medialib accelaration.  So, the medialib won't be disabled.
+	
+	            // The fix of 4531501
+	        	
+	        	mediaLib=false;
+	        }
+	        
+
+        }
+
+
+        mediaLibAvailable=mediaLib;
+    }
+    
     /**
      * {@link RenderingHints} used to prevent {@link JAI} operations from expanding
      * {@link IndexColorModel}s.
@@ -338,7 +422,7 @@ public final class ImageUtilities {
      * @param  sources The list of sources {@link RenderedImage}.
      * @return A new {@code ImageLayout}, or the original {@code layout} if no change was needed.
      */
-    public static ImageLayout createIntersection(final ImageLayout layout, final List sources) {
+    public static ImageLayout createIntersection(final ImageLayout layout, final List<RenderedImage> sources) {
         ImageLayout result = layout;
         if (result == null) {
             result = new ImageLayout();
@@ -481,20 +565,6 @@ public final class ImageUtilities {
             } else {
                 registry.setOrdering(category, standard, codeclib);
             }
-        }
-    }
-
-    /**
-     * @deprecated Replaced by {@link #allowNativeCodec(String,Class,boolean)}.
-     */
-    public static void allowNativeCodec(final String  format,
-                                        final boolean writer,
-                                        final boolean allowed)
-    {
-        if (writer) {
-            allowNativeCodec(format, ImageWriterSpi.class, allowed);
-        } else {
-            allowNativeCodec(format, ImageReaderSpi.class, allowed);
         }
     }
 
@@ -650,4 +720,22 @@ public final class ImageUtilities {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.UNSUPPORTED_DATA_TYPE));
         }
     }
+
+    /**
+     * Tells me whether or not the native libraries for JAI are active or not.
+     * 
+     * @return <code>false</code> in case the JAI native libs are not in the path, <code>true</code> otherwise.
+     */
+	public static boolean isMediaLibAvailable() {
+		return mediaLibAvailable;
+	}
+	
+    /**
+     * Tells me whether or not the native libraries for JAI/ImageIO are active or not.
+     * 
+     * @return <code>false</code> in case the JAI/ImageIO native libs are not in the path, <code>true</code> otherwise.
+     */
+	public static boolean isCLibAvailable() {
+		return PackageUtil.isCodecLibAvailable();
+	}
 }

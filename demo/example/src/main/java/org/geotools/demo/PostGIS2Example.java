@@ -34,12 +34,14 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
-import org.geotools.demo.postgis.PostGISDialog;
+import org.geotools.data.postgis.PostgisDataStoreFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.collection.AbstractFeatureVisitor;
 import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.text.cql2.CQL;
-import org.geotools.gui.swing.ProgressWindow;
+import org.geotools.swing.ProgressWindow;
+import org.geotools.swing.data.JDataStoreWizard;
+import org.geotools.swing.wizard.JWizard;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -66,31 +68,43 @@ public class PostGIS2Example {
 		System.out.println("Header: "+DataUtilities.spec( simpleFeatureType ));
 		
 		JQuery dialog = new JQuery( dataStore );
-		dialog.show();
+		dialog.setVisible(true);
 		dialog.dispose();
 		System.exit(0);
 	}
 
 	private static DataStore getDatabase(String[] args) throws IOException {
-		PostGISDialog dialog;
-		
-		if (args.length == 0){
-			dialog = new PostGISDialog();
-		}
-		else {
-			File file = new File( args[0] );
-			if (!file.exists()){
-				throw new FileNotFoundException( file.getAbsolutePath() );
-			}
-			InputStream reader = new FileInputStream( file );
-			Properties config = new Properties();			
-			config.load(reader);
-			
-			dialog = new PostGISDialog( config );
-		}		
-		dialog.show();
-		Map properties = dialog.getProperties();
-		dialog.dispose();
+	    PostgisDataStoreFactory factory = new PostgisDataStoreFactory();
+	        JDataStoreWizard wizard;
+	        if (args.length == 0) {
+	            wizard = new JDataStoreWizard(factory);
+	        } else {
+	            File file = new File(args[0]);
+	            if (!file.exists()) {
+	                throw new FileNotFoundException(file.getAbsolutePath());
+	            }
+	            InputStream input = new FileInputStream(file);
+	            Properties config = new Properties();
+	            config.load(input);
+
+	            wizard = new JDataStoreWizard(factory, config);
+	        }
+	        // prompt user
+	        int result = wizard.showModalDialog();
+	        System.out.print("Wizard completed with:");
+
+	        switch (result) {
+	        case JWizard.FINISH:
+	            break;
+	        case JWizard.CANCEL:
+	            System.exit(0);
+	        case JWizard.ERROR:
+	        default:
+	            System.exit(1);
+	        }
+	        
+		Map properties = wizard.getConnectionParameters();
+		wizard.dispose();
 
 		if( properties == null){
 			System.exit(0);

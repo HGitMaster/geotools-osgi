@@ -51,7 +51,7 @@ import static org.junit.Assert.*;
  * Actually, there is many {@link ConcatenatedTransform}, each optimized for special cases.
  * This test tries to test a wide range of subclasses.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/MathTransformTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/MathTransformTest.java $
  * @version $Id: MathTransformTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux
  */

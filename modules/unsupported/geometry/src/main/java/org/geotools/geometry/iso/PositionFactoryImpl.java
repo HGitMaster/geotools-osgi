@@ -51,6 +51,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </ul>
  * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/PositionFactoryImpl.java $
  */
 public class PositionFactoryImpl implements Serializable, Factory, PositionFactory {
 	private static final long serialVersionUID = 1L;

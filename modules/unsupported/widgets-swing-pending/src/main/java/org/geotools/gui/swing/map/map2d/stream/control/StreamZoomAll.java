@@ -29,6 +29,8 @@ import org.geotools.map.MapContext;
  * Zoom all action
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/control/StreamZoomAll.java $
  */
 public class StreamZoomAll extends AbstractAction {
 

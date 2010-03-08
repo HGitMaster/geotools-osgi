@@ -81,7 +81,7 @@ import org.geotools.util.Utilities;
  * </pre></blockquote>
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/logging/MonolineFormatter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/logging/MonolineFormatter.java $
  * @version $Id: MonolineFormatter.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

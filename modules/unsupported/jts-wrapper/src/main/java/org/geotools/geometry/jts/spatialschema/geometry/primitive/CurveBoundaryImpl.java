@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: CurveBoundaryImpl.java 25075 2007-04-09 19:20:46Z desruisseaux $
+ ** $Id: CurveBoundaryImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/CurveBoundaryImpl.java,v $
  **
@@ -23,6 +23,8 @@ import org.opengis.geometry.primitive.Point;
  * realized about halfway through that I won't necessarily need it.  So the
  * last few methods are still unimplemented (and just delegate to the
  * superclass, which currently does nothing).
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/CurveBoundaryImpl.java $
  */
 public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements CurveBoundary {
     

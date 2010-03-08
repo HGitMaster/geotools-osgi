@@ -77,7 +77,7 @@ public final class JP2MrSIDFormatFactory extends BaseGridFormatFactorySPI implem
      *
      * @return A {@link JP2MrSIDFormat}.;
      */
-    public Format createFormat() {
+    public JP2MrSIDFormat createFormat() {
         return new JP2MrSIDFormat();
     }
 }

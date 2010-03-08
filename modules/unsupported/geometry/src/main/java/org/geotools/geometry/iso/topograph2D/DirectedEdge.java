@@ -27,6 +27,8 @@ import java.io.PrintStream;
  * planar graphs may not require explicit Edge objects to be created). Usually
  * a client using a <code>PlanarGraph</code> will subclass <code>DirectedEdge</code>
  * to add its own application-specific data and methods.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/DirectedEdge.java $
  */
 public class DirectedEdge extends EdgeEnd {
 

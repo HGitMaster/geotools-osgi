@@ -55,7 +55,7 @@ import org.opengis.parameter.ParameterValue;
  * }</code></pre>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/data/AbstractDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/AbstractDataStoreFactory.java $
  */
 public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
     
@@ -179,7 +179,7 @@ class ParamDescriptor extends DefaultParameterDescriptor {
     private static final long serialVersionUID = 1L;
     Param param;
     public ParamDescriptor(Param param) {
-        super( param.key, param.description, param.sample, param.required );
+        super( DefaultParameterDescriptor.create(param.key, param.description, param.type,  param.sample, param.required ));
         this.param = param;
     }
     public ParameterValue createValue() {

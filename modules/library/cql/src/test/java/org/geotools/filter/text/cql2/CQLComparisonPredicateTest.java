@@ -42,6 +42,8 @@ import org.opengis.filter.expression.PropertyName;
  *
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.5
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/cql2/CQLComparisonPredicateTest.java $
  */
 public class CQLComparisonPredicateTest {
     
@@ -184,6 +186,23 @@ public class CQLComparisonPredicateTest {
         eqFilter = (PropertyIsEqualTo) filter;
         Assert.assertEquals("attr", ((PropertyName) eqFilter.getExpression1()).getPropertyName());
         Assert.assertEquals(Boolean.FALSE, ((Literal) eqFilter.getExpression2()).getValue());
+    }
+
+    @Test
+    public void LongLiteral() throws Exception {
+       
+        Filter filter;
+        PropertyIsEqualTo eqFilter;
+        
+        //test true value
+        final String expectedValue = Long.toString(Long.MAX_VALUE);
+        filter = CompilerUtil.parseFilter(this.language, "attr = " + expectedValue );
+        Assert.assertNotNull(filter);
+        Assert.assertTrue(filter instanceof PropertyIsEqualTo);
+
+        eqFilter = (PropertyIsEqualTo) filter;
+        Assert.assertEquals("attr", ((PropertyName) eqFilter.getExpression1()).getPropertyName());
+        Assert.assertEquals(Long.parseLong(expectedValue), ((Literal) eqFilter.getExpression2()).getValue());
     }
 
     @Test

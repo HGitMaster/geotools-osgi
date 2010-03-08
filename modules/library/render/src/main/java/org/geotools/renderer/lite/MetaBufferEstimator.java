@@ -57,6 +57,8 @@ import org.opengis.filter.expression.Literal;
 
 /**
  * Parses a style or part of it and returns the size of the largest stroke and the biggest point symbolizer whose width is specified with a literal expression.<br> Also provides an indication whether the stroke width is accurate, or if a non literal width has been found.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/MetaBufferEstimator.java $
  */
 
 public class MetaBufferEstimator extends FilterAttributeExtractor implements StyleVisitor {

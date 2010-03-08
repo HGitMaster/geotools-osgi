@@ -38,6 +38,8 @@ import org.opengis.util.InternationalString;
  * 
  * @author gabriel
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/ComplexTypeImpl.java $
  */
 public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 

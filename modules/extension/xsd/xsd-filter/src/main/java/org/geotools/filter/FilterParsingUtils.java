@@ -41,6 +41,8 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
  * </p>
  * @author Justin Deoliveira, OpenGEO
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/FilterParsingUtils.java $
  */
 public class FilterParsingUtils {
 

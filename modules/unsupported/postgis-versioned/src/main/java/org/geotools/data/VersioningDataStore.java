@@ -25,6 +25,8 @@ import java.io.IOException;
  * as well as 
  * 
  * @author Andrea Aime, TOPP
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/VersioningDataStore.java $
  */
 public interface VersioningDataStore extends DataStore {
     /**

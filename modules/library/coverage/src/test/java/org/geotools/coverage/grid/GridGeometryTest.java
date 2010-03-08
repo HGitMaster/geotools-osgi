@@ -18,6 +18,8 @@ package org.geotools.coverage.grid;
 
 import java.awt.geom.AffineTransform;
 
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.Envelope2D;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.metadata.spatial.PixelOrientation;
@@ -26,17 +28,18 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 
 import org.junit.*;
+import org.opengis.geometry.DirectPosition;
 import static org.junit.Assert.*;
 
 
 /**
  * Test the {@link GridGeometry} implementation.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridGeometryTest.java $
- * @version $Id: GridGeometryTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridGeometryTest.java $
+ * @version $Id: GridGeometryTest.java 33828 2009-09-03 06:44:06Z mbedward $
  * @author Martin Desruisseaux (IRD)
  */
-public final class GridGeometryTest {
+public final class GridGeometryTest extends GridCoverageTestBase {
     /**
      * Tests the construction with an identity transform.
      */
@@ -124,4 +127,113 @@ public final class GridGeometryTest {
         tr = (AffineTransform) gg.getGridToCRS2D(PixelOrientation.UPPER_LEFT);
         assertTrue(tr.isIdentity());
     }
+    
+    @Test
+    public void testWorldToGridPoint() throws Exception {
+        GridGeometry2D gg = getRandomCoverage().getGridGeometry();
+
+        Envelope2D worldBounds = gg.getEnvelope2D();
+        GridEnvelope2D gridBounds = gg.getGridRange2D();
+        GridCoordinates2D gridExp = new GridCoordinates2D();
+
+        DirectPosition worldPoint = worldBounds.getLowerCorner();
+        GridCoordinates2D gridCalc = gg.worldToGrid(worldPoint);
+        gridExp.setLocation(0, gridBounds.height - 1);
+        assertTrue(gridExp.equals(gridCalc));
+
+        worldPoint = worldBounds.getUpperCorner();
+        gridCalc = gg.worldToGrid(worldPoint);
+        gridExp.setLocation(gridBounds.width - 1, 0);
+        assertTrue(gridExp.equals(gridCalc));
+    }
+
+    @Test
+    public void testWorldToGridEnvelope() throws Exception {
+        GridGeometry2D gg = getRandomCoverage().getGridGeometry();
+
+        Envelope2D worldBounds = gg.getEnvelope2D();
+        GridEnvelope2D gridBounds = gg.getGridRange2D();
+
+        GridEnvelope2D gridEnv = gg.worldToGrid(worldBounds);
+        assertTrue(gridBounds.equals(gridEnv));
+
+        // test sub-area conversion by creating an envelope that excludes
+        // the first and last grid row and col centres
+        double cellWidthX = worldBounds.getWidth() / gridBounds.getWidth();
+        double cellWidthY = worldBounds.getHeight() / gridBounds.getHeight();
+
+        Envelope2D subEnv = new Envelope2D(gg.getCoordinateReferenceSystem2D(),
+                worldBounds.getMinX() + cellWidthX * 0.6,
+                worldBounds.getMinY() + cellWidthY * 0.6,
+                worldBounds.getWidth() - cellWidthX * 1.2,
+                worldBounds.getHeight() - cellWidthY * 1.2);
+
+        gridEnv = gg.worldToGrid(subEnv);
+
+        GridEnvelope2D expectedEnv = new GridEnvelope2D(
+                gridBounds.x + 1,
+                gridBounds.y + 1,
+                gridBounds.width - 2,
+                gridBounds.height - 2);
+
+        assertTrue( gridEnv.equals(expectedEnv) );
+    }
+
+    @Test
+    public void testGridToWorldPoint() throws Exception {
+        final double TOL = 1.0E-6;
+
+        GridGeometry2D gg = getRandomCoverage().getGridGeometry();
+
+        Envelope2D worldBounds = gg.getEnvelope2D();
+        GridEnvelope2D gridBounds = gg.getGridRange2D();
+
+        double cellWidthX = worldBounds.getWidth() / gridBounds.getWidth();
+        double cellWidthY = worldBounds.getHeight() / gridBounds.getHeight();
+
+        GridCoordinates2D low = gridBounds.getLow();
+        DirectPosition2D dp = (DirectPosition2D) gg.gridToWorld(low);
+
+        assertTrue(Math.abs(dp.x - (cellWidthX/2) - worldBounds.getMinX()) < TOL);
+        assertTrue(Math.abs(dp.y + (cellWidthY/2) - worldBounds.getMaxY()) < TOL);
+
+        GridCoordinates2D high = gridBounds.getHigh();
+        dp = (DirectPosition2D) gg.gridToWorld(high);
+
+        assertTrue(Math.abs(dp.x + (cellWidthX/2) - worldBounds.getMaxX()) < TOL);
+        assertTrue(Math.abs(dp.y - (cellWidthY/2) - worldBounds.getMinY()) < TOL);
+    }
+
+    @Test
+    public void testGridToWorldEnvelope() throws Exception {
+        final double TOL = 1.0E-6;
+
+        GridGeometry2D gg = getRandomCoverage().getGridGeometry();
+
+        Envelope2D worldBounds = gg.getEnvelope2D();
+        GridEnvelope2D gridBounds = gg.getGridRange2D();
+
+        assertTrue(worldBounds.boundsEquals(gg.gridToWorld(gridBounds), 0, 1, TOL));
+
+        // test sub-area conversion
+        GridEnvelope2D subGrid = new GridEnvelope2D(
+                gridBounds.x + 1,
+                gridBounds.y + 1,
+                gridBounds.width - 2,
+                gridBounds.height - 2);
+
+        Envelope2D subEnv = gg.gridToWorld(subGrid);
+
+        double cellWidthX = worldBounds.getWidth() / gridBounds.getWidth();
+        double cellWidthY = worldBounds.getHeight() / gridBounds.getHeight();
+
+        Envelope2D expectedEnv = new Envelope2D(gg.getCoordinateReferenceSystem2D(),
+                worldBounds.getMinX() + cellWidthX,
+                worldBounds.getMinY() + cellWidthY,
+                worldBounds.getWidth() - 2 * cellWidthX,
+                worldBounds.getHeight() - 2 * cellWidthY);
+
+        assertTrue( expectedEnv.boundsEquals(subEnv, 0, 1, TOL) );
+    }
+
 }

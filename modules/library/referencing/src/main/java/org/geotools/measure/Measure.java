@@ -24,7 +24,7 @@ import org.geotools.util.Utilities;
  * A scalar with an unit.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/measure/Measure.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/measure/Measure.java $
  * @version $Id: Measure.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (PMO, IRD)
  */

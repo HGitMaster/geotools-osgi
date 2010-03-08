@@ -38,6 +38,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
  * @since 2.5
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/ResourceInfo.java $
  */
 public interface ResourceInfo {
     /**

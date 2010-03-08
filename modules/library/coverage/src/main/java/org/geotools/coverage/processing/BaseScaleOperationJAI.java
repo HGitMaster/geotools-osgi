@@ -18,7 +18,6 @@ package org.geotools.coverage.processing;
 
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.image.RenderedImage;
 import java.util.Map;
 
@@ -31,7 +30,6 @@ import javax.media.jai.OperationDescriptor;
 
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.ViewType;
 import org.geotools.metadata.iso.spatial.PixelTranslation;
 import org.geotools.referencing.operation.LinearTransform;
@@ -56,7 +54,7 @@ import org.opengis.util.InternationalString;
  * optimizations in case we were dealing with non-geo view of coverage.
  * 
  * @author Simone Giannecchini, GeoSolutions.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/BaseScaleOperationJAI.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/BaseScaleOperationJAI.java $
  * @since 2.5
  */
 public class BaseScaleOperationJAI extends OperationJAI {

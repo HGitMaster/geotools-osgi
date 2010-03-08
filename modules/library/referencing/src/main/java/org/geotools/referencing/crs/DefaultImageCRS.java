@@ -42,7 +42,7 @@ import org.geotools.referencing.AbstractReferenceSystem;
  * </TD></TR></TABLE>
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/crs/DefaultImageCRS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/crs/DefaultImageCRS.java $
  * @version $Id: DefaultImageCRS.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

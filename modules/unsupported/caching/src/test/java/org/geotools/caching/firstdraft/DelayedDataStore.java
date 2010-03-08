@@ -36,6 +36,8 @@ import org.geotools.feature.SchemaException;
 
 /**
  * @author  crousson
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/test/java/org/geotools/caching/firstdraft/DelayedDataStore.java $
  */
 public class DelayedDataStore implements DataStore {
     private final DataStore sourceDataStore;

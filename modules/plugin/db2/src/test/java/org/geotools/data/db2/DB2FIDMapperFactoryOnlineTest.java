@@ -31,7 +31,7 @@ import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
  * Exercise DB2FIDMapperFactory.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2FIDMapperFactoryOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2FIDMapperFactoryOnlineTest.java $
  */
 public class DB2FIDMapperFactoryOnlineTest extends AbstractDB2OnlineTestCase {
     public void testMappers() throws Exception {

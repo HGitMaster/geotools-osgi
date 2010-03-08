@@ -39,7 +39,7 @@ import org.geotools.util.Utilities;
  * {@linkplain org.opengis.referencing.cs.CoordinateSystemAxis coordinate system axis} with which
  * it is combined to create a {@linkplain org.opengis.referencing.crs.VerticalCRS vertical CRS}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultVerticalDatum.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultVerticalDatum.java $
  * @version $Id: DefaultVerticalDatum.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

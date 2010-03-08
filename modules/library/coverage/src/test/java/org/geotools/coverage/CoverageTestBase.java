@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 /**
  * Base class for tests on {@link AbstractCoverage} subclasses.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/CoverageTestBase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/CoverageTestBase.java $
  * @version $Id: CoverageTestBase.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

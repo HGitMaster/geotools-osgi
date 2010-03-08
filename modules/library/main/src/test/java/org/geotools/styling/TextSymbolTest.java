@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Point;
  *
  * @task REVISIT: redo the Map stuff - I commented it out since DefaultMap is
  *       deprecated - cholmes.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/styling/TextSymbolTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/TextSymbolTest.java $
  */
 public class TextSymbolTest extends TestCase {
     private static final FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);

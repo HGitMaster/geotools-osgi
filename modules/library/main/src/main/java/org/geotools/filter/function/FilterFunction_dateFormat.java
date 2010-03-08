@@ -28,6 +28,8 @@ import org.geotools.filter.FunctionExpressionImpl;
  * @see SimpleDateFormat
  * @author Andrea Aime - TOPP
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/FilterFunction_dateFormat.java $
  */
 public class FilterFunction_dateFormat extends FunctionExpressionImpl {
     

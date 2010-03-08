@@ -16,10 +16,10 @@
  */
 package org.geotools.data.shapefile;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -28,9 +28,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.geotools.TestData;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.TestData;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -48,7 +48,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/TestCaseSupport.java $
- * @version $Id: TestCaseSupport.java 30670 2008-06-12 23:59:23Z acuster $
+ * @version $Id: TestCaseSupport.java 33948 2009-09-22 06:55:55Z jive $
  * @author Ian Schneider
  * @author Martin Desruisseaux
  */
@@ -173,7 +173,9 @@ public class TestCaseSupport extends TestCase {
      * test suite.
      */
     protected File getTempFile() throws IOException {
-        File tmpFile = File.createTempFile("test-shp", ".shp");
+        // force in some valid but weird chars into teh path to be on par with OSX that does it
+        // on its own
+        File tmpFile = File.createTempFile("test-+()shp", ".shp");
         tmpFile.deleteOnExit();
         assertTrue(tmpFile.isFile());
 

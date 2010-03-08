@@ -39,6 +39,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * start counting from the start position, in order to do subList efficiently.
  * </p>
  * @author Jody
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/DoublePointArray.java $
  */
 public class DoublePointArray extends AbstractList<Position> implements PointArray, Serializable {
     private static final long serialVersionUID = 1250362674574138318L;

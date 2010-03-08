@@ -22,7 +22,7 @@ import org.geotools.factory.GeoTools;
 
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
-import org.opengis.style.ExternalMark;
+import org.opengis.style.GraphicalSymbol;
 import org.opengis.style.StyleVisitor;
 import org.opengis.util.Cloneable;
 
@@ -32,8 +32,8 @@ import org.opengis.util.Cloneable;
  *
  * @author Ian Turton, CCG
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/MarkImpl.java $
- * @version $Id: MarkImpl.java 31133 2008-08-05 15:20:33Z johann.sorel $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/MarkImpl.java $
+ * @version $Id: MarkImpl.java 33898 2009-09-13 15:39:05Z jive $
  */
 public class MarkImpl implements Mark, Cloneable {
     
@@ -41,10 +41,10 @@ public class MarkImpl implements Mark, Cloneable {
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.styling");
 
     private final FilterFactory filterFactory;
-    private Fill fill;
-    private Stroke stroke;
+    private FillImpl fill;
+    private StrokeImpl stroke;
 
-    private final ExternalMark external;
+    private ExternalMarkImpl external;
     private Expression wellKnownName = null;
     private Expression rotation = null;
     private Expression size = null;
@@ -62,14 +62,14 @@ public class MarkImpl implements Mark, Cloneable {
         setWellKnownName(name);
     }
 
-    public MarkImpl( FilterFactory filterFactory, ExternalMark exter ) {
+    public MarkImpl( FilterFactory filterFactory, ExternalMark external ) {
         this.filterFactory = filterFactory;
         LOGGER.fine("creating defaultMark");
 
         try {
             StyleFactory sfac = new StyleFactoryImpl();
-            fill = sfac.getDefaultFill();
-            stroke = sfac.getDefaultStroke();
+            fill = FillImpl.cast( sfac.getDefaultFill() );
+            stroke = StrokeImpl.cast( sfac.getDefaultStroke() );
 
             wellKnownName = filterFactory.literal("square");
             size = filterFactory.literal(new Integer(6));
@@ -77,7 +77,7 @@ public class MarkImpl implements Mark, Cloneable {
         } catch (org.geotools.filter.IllegalFilterException ife) {
             severe("<init>", "Failed to build default mark: ", ife);
         }
-        this.external = exter;
+        this.external = ExternalMarkImpl.cast( external );
     }
 
     /**
@@ -101,7 +101,7 @@ public class MarkImpl implements Mark, Cloneable {
      *
      * @return the Fill definition to use when rendering the Mark.
      */
-    public Fill getFill() {
+    public FillImpl getFill() {
         return fill;
     }
 
@@ -111,7 +111,7 @@ public class MarkImpl implements Mark, Cloneable {
      *
      * @return The Stroke definition to use when rendering the Mark.
      */
-    public Stroke getStroke() {
+    public StrokeImpl getStroke() {
         return stroke;
     }
 
@@ -132,8 +132,8 @@ public class MarkImpl implements Mark, Cloneable {
      *
      * @param fill New value of property fill.
      */
-    public void setFill(org.geotools.styling.Fill fill) {
-        this.fill = fill;
+    public void setFill(org.opengis.style.Fill fill) {
+        this.fill = FillImpl.cast(fill);
     }
 
     /**
@@ -141,8 +141,8 @@ public class MarkImpl implements Mark, Cloneable {
      *
      * @param stroke New value of property stroke.
      */
-    public void setStroke(Stroke stroke) {
-        this.stroke = stroke;
+    public void setStroke(org.opengis.style.Stroke stroke) {
+        this.stroke = StrokeImpl.cast( stroke );
     }
 
     public void setSize(Expression size) {
@@ -219,10 +219,10 @@ public class MarkImpl implements Mark, Cloneable {
         try {
             MarkImpl clone = (MarkImpl) super.clone();
             if (fill != null) {
-            	clone.fill = (Fill) ((Cloneable) fill).clone();
+            	clone.fill = (FillImpl) ((Cloneable) fill).clone();
             }
             if (stroke != null && stroke instanceof Cloneable) {
-            	clone.stroke = (Stroke) ((Cloneable)stroke).clone();
+            	clone.stroke = (StrokeImpl) ((Cloneable)stroke).clone();
             }
 
             return clone;
@@ -344,9 +344,46 @@ public class MarkImpl implements Mark, Cloneable {
 
         return true;
     }
-
-    public ExternalMark getExternalMark() {
+    
+    public ExternalMarkImpl getExternalMark() {
         return external;
+    }
+
+    public void setExternalMark(org.opengis.style.ExternalMark external) {
+        this.external = ExternalMarkImpl.cast( external );
+    }
+    @SuppressWarnings("deprecation")
+    static MarkImpl cast(GraphicalSymbol item) {
+        if( item == null ){
+            return null;
+        }
+        else if ( item instanceof MarkImpl){
+            return (MarkImpl) item;
+        }
+        else if ( item instanceof TextMark){
+            TextMark text = (TextMark) item;
+            TextMarkImpl copy = new TextMarkImpl();
+            copy.setFill( text.getFill() );
+            copy.setRotation( text.getRotation() );
+            copy.setSize( text.getSize() );
+            copy.setStroke( text.getStroke() );
+            copy.setSymbol( text.getSymbol() );
+            copy.setWellKnownName( text.getWellKnownName() );
+
+            return copy;
+        }
+        else if (item instanceof Mark ){
+            Mark mark = (Mark) item;
+            MarkImpl copy = new TextMarkImpl();
+            copy.setFill( mark.getFill() );
+            copy.setRotation( mark.getRotation() );
+            copy.setSize( mark.getSize() );
+            copy.setStroke( mark.getStroke() );
+            copy.setWellKnownName( mark.getWellKnownName() );
+            copy.setExternalMark( mark.getExternalMark() );
+            return copy;            
+        }
+        return null;
     }
 
 }

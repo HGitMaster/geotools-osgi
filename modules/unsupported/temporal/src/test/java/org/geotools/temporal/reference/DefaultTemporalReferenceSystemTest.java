@@ -41,6 +41,8 @@ import org.opengis.util.InternationalString;
 /**
  *
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/test/java/org/geotools/temporal/reference/DefaultTemporalReferenceSystemTest.java $
  */
 public class DefaultTemporalReferenceSystemTest {
 

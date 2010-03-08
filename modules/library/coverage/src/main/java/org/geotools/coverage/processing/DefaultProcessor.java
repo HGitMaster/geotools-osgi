@@ -17,6 +17,7 @@
 package org.geotools.coverage.processing;
 
 import java.awt.RenderingHints;
+import java.awt.image.RenderedImage;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -30,21 +31,20 @@ import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.TileCache;
 
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.Interpolator2D;
+import org.geotools.factory.FactoryRegistry;
+import org.geotools.factory.Hints;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Loggings;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.Interpolator2D;
-import org.geotools.factory.FactoryRegistry;
-import org.geotools.factory.Hints;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Loggings;
-import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -64,8 +64,8 @@ import org.geotools.resources.i18n.LoggingKeys;
  * may be big, consider wrapping {@code DefaultProcessor} instances in {@link BufferedProcessor}.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/processing/DefaultProcessor.java $
- * @version $Id: DefaultProcessor.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/DefaultProcessor.java $
+ * @version $Id: DefaultProcessor.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */
 public class DefaultProcessor extends AbstractProcessor {

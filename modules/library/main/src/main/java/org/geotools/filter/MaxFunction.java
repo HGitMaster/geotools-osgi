@@ -25,7 +25,7 @@ import org.opengis.filter.expression.Expression;
  * A function that returns the maximum of two arguments.
  *
  * @author James
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/MaxFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/MaxFunction.java $
  * @version $Id: MaxFunction.java 30648 2008-06-12 19:22:35Z acuster $
  * @deprecated - use org.geotools.filter.function.math.MinFunction instead
  */

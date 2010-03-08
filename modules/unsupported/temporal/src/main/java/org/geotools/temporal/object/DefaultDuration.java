@@ -22,6 +22,8 @@ import org.opengis.temporal.Duration;
  * A data type to be used for describing length or distance in the temporal dimension.
  *
  * @author Mehdi Sidhoum (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultDuration.java $
  */
 public abstract class DefaultDuration implements Duration {
     public abstract long getTimeInMillis();

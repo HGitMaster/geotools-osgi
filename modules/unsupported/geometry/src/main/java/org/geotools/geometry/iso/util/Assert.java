@@ -22,6 +22,8 @@ package org.geotools.geometry.iso.util;
 
 /**
  * A utility for making programming assertions.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/Assert.java $
  */
 public class Assert {
 

@@ -67,7 +67,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Created on 19. april 2004, 14:53
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFLibrary.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFLibrary.java $
  */
 public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFLibraryIfc {
 

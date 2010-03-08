@@ -21,13 +21,13 @@ import java.io.IOException;
 
 import net.sf.jsqlparser.schema.Table;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 /**
  * Utility used to qualify table names
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: TableQualifier.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: TableQualifier.java 33451 2009-07-02 17:53:36Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/view/TableQualifier.java $

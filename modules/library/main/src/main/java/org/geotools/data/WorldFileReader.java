@@ -62,6 +62,8 @@ import org.opengis.referencing.operation.MathTransform;
  * @author Simone Giannecchini, GeoSolutions
  * @since 2.3
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/WorldFileReader.java $
  */
 public class WorldFileReader {
     /**

@@ -28,6 +28,8 @@ import org.geotools.geometry.iso.util.Assert;
  * A DirectedEdgeStar is an ordered list of <b>outgoing</b> DirectedEdges
  * around a node. It supports labelling the edges as well as linking the edges
  * to form both MaximalEdgeRings and MinimalEdgeRings.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/DirectedEdgeStar.java $
  */
 public class DirectedEdgeStar extends EdgeEndStar {
 

@@ -24,7 +24,7 @@ package org.geotools.data.oracle.sdo;
  * 
  * @author Jody Garnett, Refractions Research, Inc.
  * @author $Author: jgarnett $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/sdo/ETYPE.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/sdo/ETYPE.java $
  * @version $Id: ETYPE.java 30706 2008-06-13 15:47:21Z acuster $
  */
 public interface ETYPE {

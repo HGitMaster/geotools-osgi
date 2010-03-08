@@ -23,36 +23,12 @@ import org.opengis.referencing.operation.MathTransform2D;
 /**
  * Seems to be a cache of fun information associated with the Symbolizer.
  * 
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/lite/SymbolizerAssociation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/SymbolizerAssociation.java $
  */
-public class SymbolizerAssociation
+class SymbolizerAssociation
 {
      public MathTransform2D  xform = null;
+     public MathTransform2D  crsxform = null;
      public CoordinateReferenceSystem crs = null;
-     
-     public SymbolizerAssociation()
-     {
-
-     }
-     
-     public MathTransform2D getXform()
-     {
-     	return xform;
-     }
-     
-     public void setXform(MathTransform2D xform)
-     {
-     	this.xform = xform;
-     }
-     
-     public CoordinateReferenceSystem getCRS()
-     {
-     	return crs;
-     }
-     
-     public void setCRS(CoordinateReferenceSystem crs)
-     {
-     	this.crs = crs;
-     }
-     
+	 public MathTransform2D axform;
 }

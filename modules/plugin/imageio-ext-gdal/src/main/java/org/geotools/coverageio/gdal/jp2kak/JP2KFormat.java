@@ -28,7 +28,6 @@ import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
@@ -87,7 +86,7 @@ public final class JP2KFormat extends BaseGDALGridFormat implements Format {
     /**
      * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object, Hints)
      */
-    public GridCoverageReader getReader(Object source, Hints hints) {
+    public JP2KReader getReader(Object source, Hints hints) {
         try {
             return new JP2KReader(source, hints);
         } catch (MismatchedDimensionException e) {

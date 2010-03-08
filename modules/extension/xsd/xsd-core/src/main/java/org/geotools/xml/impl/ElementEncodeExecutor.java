@@ -16,17 +16,19 @@
  */
 package org.geotools.xml.impl;
 
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.util.Converters;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.SimpleBinding;
+import org.opengis.feature.ComplexAttribute;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 
 public class ElementEncodeExecutor implements BindingWalker.Visitor {
@@ -81,8 +83,24 @@ public class ElementEncodeExecutor implements BindingWalker.Visitor {
 
             return;
         }
-        
-        if (!binding.getType().isAssignableFrom(object.getClass())) {
+
+        /*
+         * Notes on the nasty ComplexAttribute instanceof check, based on discussion in GEOT-2474.
+         * 
+         * ElementEncodeExecutor does too much: it calls the encode method of a binding, but also
+         * provides automatic conversion services for simple features. This causes encoding of any
+         * complexType with simpleContent of xs:string to fail if the input data is a GeoAPI object.
+         * ElementEncodeExecutor was written to support encoding of, for example, CodeType from a
+         * String. However, CodeType is most fully represented by a ComplexAttribute (it can have a
+         * codeSpace attribute). The instanceof check retains the old behaviour so
+         * ElementEncodeExecutor can still automagically convert simple features into XML. The
+         * instanceof is necessary because ElementEncodeExecutor will otherwise use
+         * Converters.convert to turn any ComplexAttribute bound to a String into a String. Because
+         * every Java object has a toString method, this will always "succeed", and garbage will be
+         * encoded. This breaks XML well-formedness, not to mention being generally useless.
+         */
+        if (!(object instanceof ComplexAttribute)
+                && !binding.getType().isAssignableFrom(object.getClass())) {
             //try to convert 
             Object converted = Converters.convert(object, binding.getType());
 

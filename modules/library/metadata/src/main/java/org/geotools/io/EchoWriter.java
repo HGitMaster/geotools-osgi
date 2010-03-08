@@ -27,7 +27,7 @@ import java.io.Writer;
  * to the standard output the content sent to a file. This writer is usefull for debugging
  * purpose.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/io/EchoWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/io/EchoWriter.java $
  * @version $Id: EchoWriter.java 31015 2008-07-15 11:29:32Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

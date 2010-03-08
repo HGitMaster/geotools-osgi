@@ -35,6 +35,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * "-" implies primitive.parameterization(length()-s) = parameterization(s)};
  * 
  * @author Jackson Roehrig & Sanjay Jena
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/OrientableCurveImpl.java $
  */
 public abstract class OrientableCurveImpl extends OrientablePrimitiveImpl
 		implements OrientableCurve {

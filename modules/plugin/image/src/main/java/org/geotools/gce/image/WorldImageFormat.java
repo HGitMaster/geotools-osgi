@@ -20,12 +20,10 @@ package org.geotools.gce.image;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,12 +31,12 @@ import java.util.logging.Logger;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -58,29 +56,29 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 		Format {
 
 	/** {@link Set} of supported extensions for png world files. */
-	private final static Set PNG_WFILE_EXT;
+	private final static Set<String> PNG_WFILE_EXT;
 
 	/** {@link Set} of supported extensions for tiff world files. */
-	private final static Set TIFF_WFILE_EXT;
+	private final static Set<String> TIFF_WFILE_EXT;
 
 	/** {@link Set} of supported extensions for jpeg world files. */
-	private final static Set JPG_WFILE_EXT;
+	private final static Set<String> JPG_WFILE_EXT;
 
 	/** {@link Set} of supported extensions for gif world files. */
-	private final static Set GIF_WFILE_EXT;
+	private final static Set<String> GIF_WFILE_EXT;
 
 	/** {@link Set} of supported extensions for bmp world files. */
-	private final static Set BMP_WFILE_EXT;
+	private final static Set<String> BMP_WFILE_EXT;
 
 	static {
 		// png
-		Set tempSet = new HashSet(2);
+		Set<String> tempSet = new HashSet<String>(2);
 		tempSet.add(".pgw");
 		tempSet.add(".pngw");
 		PNG_WFILE_EXT = Collections.unmodifiableSet(tempSet);
 
 		// jpeg
-		tempSet = new HashSet(3);
+		tempSet = new HashSet<String>(3);
 		tempSet.add(".jpw");
 		tempSet.add(".jgw");
 		tempSet.add(".jpgw");
@@ -88,19 +86,19 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 		JPG_WFILE_EXT = Collections.unmodifiableSet(tempSet);
 
 		// gif
-		tempSet = new HashSet(2);
+		tempSet = new HashSet<String>(2);
 		tempSet.add(".gifw");
 		tempSet.add(".gfw");
 		GIF_WFILE_EXT = Collections.unmodifiableSet(tempSet);
 
 		// png
-		tempSet = new HashSet(2);
+		tempSet = new HashSet<String>(2);
 		tempSet.add(".tfw");
 		tempSet.add(".tiffw");
 		TIFF_WFILE_EXT = Collections.unmodifiableSet(tempSet);
 
 		// bmp
-		tempSet = new HashSet(2);
+		tempSet = new HashSet<String>(2);
 		tempSet.add(".bmw");
 		tempSet.add(".bmpw");
 		BMP_WFILE_EXT = Collections.unmodifiableSet(tempSet);
@@ -115,8 +113,8 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 * an output format in which we want to encode the image itself. PNG is
 	 * default output format.
 	 */
-	public static final ParameterDescriptor FORMAT = new DefaultParameterDescriptor(
-			"Format", "Indicates the output format for this image", "png", true);
+	public static final ParameterDescriptor<String> FORMAT = DefaultParameterDescriptor.create(
+			"Format", "Indicates the output format for this image",String.class, "png", true);
 
 	/**
 	 * WorldImageFormat
@@ -127,11 +125,10 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 
 	private void setInfo() {
 		// information for this format
-		HashMap info = new HashMap();
+		HashMap<String, String> info = new HashMap<String, String>();
 
 		info.put("name", "WorldImage");
-		info.put("description",
-				"A raster file accompanied by a spatial data file");
+		info.put("description","A raster file accompanied by a spatial data file");
 		info.put("vendor", "Geotools");
 		info.put("docURL", "http://www.geotools.org/WorldImageReader+formats");
 		info.put("version", "1.0");
@@ -159,7 +156,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 * 
 	 * @return a new WorldImageReader for the source
 	 */
-	public GridCoverageReader getReader(Object source) {
+	public WorldImageReader getReader(Object source) {
 		return getReader(source, null);
 	}
 
@@ -206,7 +203,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 			final URL url = (URL) input;
 			final String protocol = url.getProtocol();
 			if (protocol.equalsIgnoreCase("file"))
-				pathname = url.getFile();
+				pathname = DataUtilities.urlToFile(url).getPath();
 			else {
 				if (protocol.equalsIgnoreCase("http")) {
 					final String query;
@@ -261,11 +258,11 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 			if (dotIndex != -1) {
 				fileName = pathname.substring(0, dotIndex);
 				suffix = pathname.substring(dotIndex + 1, pathname.length());
-				final Set suffixes = WorldImageFormat.getWorldExtension(suffix);
-				final Iterator it = suffixes.iterator();
+				final Set<String> suffixes = WorldImageFormat.getWorldExtension(suffix);
+				final Iterator<String> it = suffixes.iterator();
 				StringBuffer buff = new StringBuffer(fileName);
 				do {
-					answer = new File(buff.append((String)it.next()).toString()).exists();
+					answer = new File(buff.append(it.next()).toString()).exists();
 					buff = new StringBuffer(fileName);
 				} while (!answer && it.hasNext());
 				if (!answer) {
@@ -296,7 +293,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 * @return a corresponding {@link Set} of world file extensions, including
 	 *         the '.'
 	 */
-	public static Set getWorldExtension(String fileExtension) {
+	public static Set<String> getWorldExtension(String fileExtension) {
 		if (fileExtension == null) {
 			throw new NullPointerException("Provided input is null");
 		}
@@ -337,7 +334,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 *            {@link Hints} to control the provided {@link WorldImageReader}.
 	 * @return a new WorldImageReader for the source
 	 */
-	public GridCoverageReader getReader(Object source, Hints hints) {
+	public WorldImageReader getReader(Object source, Hints hints) {
 		try {
 			return new WorldImageReader(source, hints);
 		} catch (DataSourceException e) {

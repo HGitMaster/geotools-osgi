@@ -31,7 +31,7 @@ import org.geotools.util.Utilities;
  * functionally equivalent to C/C++'s {@code realloc}.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/resources/XArray.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/XArray.java $
  * @version $Id: XArray.java 31015 2008-07-15 11:29:32Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

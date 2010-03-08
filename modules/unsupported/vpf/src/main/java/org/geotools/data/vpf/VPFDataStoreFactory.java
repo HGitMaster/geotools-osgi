@@ -55,7 +55,7 @@ import org.geotools.feature.SchemaException;
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  * @author Chris Holmes, Fulbright
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFDataStoreFactory.java $
  * @version 2.1.0
  */
 public class VPFDataStoreFactory implements DataStoreFactorySpi {

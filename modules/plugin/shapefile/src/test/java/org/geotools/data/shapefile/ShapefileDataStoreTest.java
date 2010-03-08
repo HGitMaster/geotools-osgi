@@ -22,14 +22,19 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.geotools.TestData;
 import org.geotools.data.DataUtilities;
@@ -70,7 +75,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/ShapefileDataStoreTest.java $
- * @version $Id: ShapefileDataStoreTest.java 32760 2009-04-08 16:32:28Z aaime $
+ * @version $Id: ShapefileDataStoreTest.java 34900 2010-02-16 10:51:46Z aaime $
  * @author Ian Schneider
  */
 public class ShapefileDataStoreTest extends TestCaseSupport {
@@ -79,6 +84,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     final static String STREAM = "shapes/stream.shp";
     final static String DANISH = "shapes/danish_point.shp";
     final static String CHINESE = "shapes/chinese_poly.shp";
+    final static String RUSSIAN = "shapes/rus-windows-1251.shp";
     final static FilterFactory2 ff = CommonFactoryFinder
             .getFilterFactory2(null);
 
@@ -138,15 +144,31 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             SimpleFeature first = firstFeature(fc);
             String s = (String) first.getAttribute("NAME");
             assertEquals("\u9ed1\u9f99\u6c5f\u7701", s);
-        } catch (UnsupportedCharsetException notInstalledInJRE){
-                // this just means you have not installed
-                // chinese support into your JRE
-                // (as such it represents a bad configuration
-                //  rather than a test failure)
-                // we only wanted to ensure that if you have Chinese support
-                // available - GeoTools can use it
-            }
+        } catch (UnsupportedCharsetException notInstalledInJRE) {
+            // this just means you have not installed
+            // chinese support into your JRE
+            // (as such it represents a bad configuration
+            // rather than a test failure)
+            // we only wanted to ensure that if you have Chinese support
+            // available - GeoTools can use it
         }
+    }
+    
+    public void testLoadRussianChars() throws Exception {
+        try {
+            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = loadFeatures(RUSSIAN, Charset
+                    .forName("CP1251"), null);
+            FeatureIterator<SimpleFeature> features = fc.features();
+            SimpleFeature f = features.next();
+            assertEquals("\u041A\u0438\u0440\u0438\u043B\u043B\u0438\u0446\u0430", f.getAttribute("TEXT"));
+            f = features.next();
+            assertEquals("\u0421\u043C\u0435\u0448\u0430\u043D\u044B\u0439 12345", f.getAttribute("TEXT"));
+            features.close();
+        } catch (UnsupportedCharsetException notInstalledInJRE) {
+            // this just means you have not installed Russian support into your JRE
+            // (as such it represents a bad configuration rather than a test failure)
+        }
+    }
     
 
     public void testNamespace() throws Exception {
@@ -174,7 +196,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     public void testSpacesInPath() throws Exception {
         URL u = TestData.url(TestCaseSupport.class, "folder with spaces/pointtest.shp");
-        File f = new File(URLDecoder.decode(u.getFile(), "UTF-8"));
+        File f = DataUtilities.urlToFile(u);
         assertTrue(f.exists());
         ShapefileDataStore s = new ShapefileDataStore(u);
         loadFeatures(s);
@@ -227,7 +249,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     public void testCreateSchemaWithEmptyCRS() throws Exception {
         File file = new File("test.shp");
-        URL toURL = file.toURL();
+        URL toURL = file.toURI().toURL();
         ShapefileDataStore ds = new ShapefileDataStore(toURL);
         ds.createSchema(DataUtilities.createType("test", "geom:MultiPolygon"));
 
@@ -251,7 +273,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     public void testCreateSchemaWithCRS() throws Exception {
         File file = new File("test.shp");
-        URL toURL = file.toURL();
+        URL toURL = file.toURI().toURL();
         ShapefileDataStore ds = new ShapefileDataStore(toURL);
         SimpleFeatureType featureType = DataUtilities.createType("test", "geom:MultiPolygon:srid=32615");
         CoordinateReferenceSystem crs = featureType.getGeometryDescriptor().getCoordinateReferenceSystem(); 
@@ -288,7 +310,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     
     public void testForceCRS() throws Exception {
         File file = new File("test.shp");
-        URL toURL = file.toURL();
+        URL toURL = file.toURI().toURL();
 
         ShapefileDataStore ds = new ShapefileDataStore(toURL);
         ds.createSchema(DataUtilities.createType("test", "geom:MultiPolygon"));
@@ -319,7 +341,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     private ShapefileDataStore createDataStore(File f) throws Exception {
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc = createFeatureCollection();
-        ShapefileDataStore sds = new ShapefileDataStore(f.toURL());
+        ShapefileDataStore sds = new ShapefileDataStore(f.toURI().toURL());
         writeFeatures(sds, fc);
         return sds;
     }
@@ -452,7 +474,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
         File tempFile = getTempFile();
         ShapefileDataStore shapefileDataStore = new ShapefileDataStore(tempFile
-                .toURL());
+                .toURI().toURL());
         shapefileDataStore.createSchema(featureType);
 
         FeatureWriter<SimpleFeatureType, SimpleFeature> featureWriter = shapefileDataStore.getFeatureWriter(
@@ -528,7 +550,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = createFeatureCollection();
         File tmpFile = getTempFile();
         tmpFile.createNewFile();
-        ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURL());
+        ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURI().toURL());
         writeFeatures(s, features);
     }
 
@@ -552,7 +574,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         // store features
         File tmpFile = getTempFile();
         tmpFile.createNewFile();
-        ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURL());
+        ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURI().toURL());
         writeFeatures(s, features);
 
         // read them back
@@ -571,7 +593,9 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     public void testGeometriesWriting() throws Exception {
 
-        String[] wktResources = new String[] { "point", "multipoint", "line",
+//        String[] wktResources = new String[] { "point", "multipoint", "line",
+//                "multiline", "polygon", "multipolygon" };
+        String[] wktResources = new String[] { "line",
                 "multiline", "polygon", "multipolygon" };
 
         for (int i = 0; i < wktResources.length; i++) {
@@ -638,12 +662,12 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
         // write features
         ShapefileDataStore shapeDataStore = new ShapefileDataStore(tmpFile
-                .toURL());
+                .toURI().toURL());
         shapeDataStore.createSchema(type);
         writeFeatures(shapeDataStore, features);
 
         // read features
-        shapeDataStore = new ShapefileDataStore(tmpFile.toURL());
+        shapeDataStore = new ShapefileDataStore(tmpFile.toURI().toURL());
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc = loadFeatures(shapeDataStore);
         FeatureIterator<SimpleFeature> fci = fc.features();
         // verify
@@ -765,17 +789,114 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         // store features
         File tmpFile = getTempFile();
         tmpFile.createNewFile();
-        ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURL());
+        ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURI().toURL());
         s.createSchema(type);
         
         // was failing in GEOT-2427
         Transaction t= new DefaultTransaction();
         FeatureWriter<SimpleFeatureType, SimpleFeature> writer = s.getFeatureWriter(s.getTypeNames()[0], t);
         SimpleFeature feature1 = writer.next();
-        
-        
     }
+    
+    private void doTestReadWriteDate(String str_date) throws Exception {
+        
+        final boolean datetime_enabled = Boolean.getBoolean("org.geotools.shapefile.datetime");
+        
+        File file = org.geotools.test.TestData.temp(this, "timestamp.shp");
+                
+        URL toURL = file.toURI().toURL();
+        
+        ShapefileDataStore ds = new ShapefileDataStore(toURL);
+        ds.createSchema(DataUtilities.createType("test",
+                        "geom:Point,timestamp:java.util.Date,date:java.util.Date,timestamp2:java.util.Date,timestamp3:java.util.Date"));
 
+        final FeatureWriter<SimpleFeatureType, SimpleFeature> fw;
+        fw = ds.getFeatureWriterAppend(Transaction.AUTO_COMMIT);
+        final SimpleFeature sf;
+        
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+        
+        Date date = (Date) dateFormatter.parse(str_date);
+
+        Calendar timestampCal = new GregorianCalendar();
+       
+        timestampCal.setTime(date);
+        
+        timestampCal.add(Calendar.MILLISECOND, 1);
+        // Set timestamp 00:00:00.001 at the same day
+        Date timestamp = timestampCal.getTime();
+        
+        timestampCal.add(Calendar.MILLISECOND,  12*60*60*1000);
+        // Set timestamp2 12:00:00.001 at the same day
+        Date timestamp2 = timestampCal.getTime();
+
+        timestampCal.add(Calendar.MILLISECOND,  11*60*60*1000+ 59*60*1000 + 59*1000 + 998);
+        // Set timestamp3 to  23:59:59.999 at the same day
+        Date timestamp3 = timestampCal.getTime(); 
+        
+        // Write the values to the shapefile and close the datastore.
+        sf = fw.next();
+        sf.setAttribute(0, new GeometryFactory().createPoint(new Coordinate(1, -1)));
+        sf.setAttribute(1, timestamp);
+        sf.setAttribute(2, date);
+        sf.setAttribute(3, timestamp2);
+        sf.setAttribute(4, timestamp3);
+        // Cleanup
+        fw.close();
+        
+        // Open the shapefile for reading to verify it's contents.
+        final FeatureReader<SimpleFeatureType, SimpleFeature> fr;
+        fr =  ds.getFeatureReader();
+        
+        assertTrue(fr.hasNext());
+        final SimpleFeature sf1 = fr.next();  
+
+        // Check the read values match with the written ones.
+        Date timestamp_ = (Date) sf1.getAttribute(1);
+        Date timestamp2_ = (Date) sf1.getAttribute(3);
+        Date timestamp3_ = (Date) sf1.getAttribute(4);         
+        
+        if (datetime_enabled){
+            // if datetime support is enabled, check it matches the real timestamp
+            assertEquals(timestamp, timestamp_);
+            assertEquals(timestamp2, timestamp2_);
+            assertEquals(timestamp3, timestamp3_);
+        }else{
+            // if datetime support is not enabled, test it matches the plain date
+            assertEquals(date , timestamp_);
+            assertEquals(date , timestamp2_);
+            assertEquals(date , timestamp3_);
+        }
+        
+        Date date_ = (Date) sf1.getAttribute(2);
+        assertEquals(date , date_);
+        
+        // Cleanup
+        fr.close();
+        ds.dispose();
+      }
+    
+    public void testReadWriteDatetimeDisabled() throws Exception{
+        System.setProperty("org.geotools.shapefile.datetime", "false");
+        doTestReadWriteDate("1984-09-16");
+    }
+    
+    public void testReadWriteDatetimeEnabled() throws Exception{
+        System.setProperty("org.geotools.shapefile.datetime", "true");
+        doTestReadWriteDate("1984-09-16");
+    }
+    
+    public void testReadWriteDatetimeBeforeNewYear() throws Exception{
+        System.setProperty("org.geotools.shapefile.datetime", "true");
+        doTestReadWriteDate("1999-12-31");
+    }
+    
+    public void testReadWriteDatetimeAfterNewYear() throws Exception{
+        System.setProperty("org.geotools.shapefile.datetime", "true");
+        doTestReadWriteDate("2000-01-01");
+    }
+    
+    
     /**
      * This is useful to dump a UTF16 character to an UT16 escape sequence,
      * basically the only way to represent the chars we don't have on the

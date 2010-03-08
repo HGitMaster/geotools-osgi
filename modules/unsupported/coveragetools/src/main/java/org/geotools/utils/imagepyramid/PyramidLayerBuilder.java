@@ -33,8 +33,8 @@ import javax.media.jai.InterpolationNearest;
 import org.apache.commons.cli2.Option;
 import org.apache.commons.cli2.validation.InvalidArgumentException;
 import org.apache.commons.cli2.validation.Validator;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.OverviewPolicy;
@@ -50,6 +50,7 @@ import org.geotools.utils.progress.BaseArgumentsManager;
 import org.geotools.utils.progress.ExceptionEvent;
 import org.geotools.utils.progress.ProcessingEvent;
 import org.geotools.utils.progress.ProcessingEventListener;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -84,6 +85,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * 
  * @author Simone Giannecchini, GeoSolutions
  * @author Alessio Fabiani. GeoSolutions
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/imagepyramid/PyramidLayerBuilder.java $
  * @version 0.3
  * 
  */
@@ -508,7 +511,7 @@ public class PyramidLayerBuilder extends BaseArgumentsManager implements
 			LOGGER.fine(message.toString());
 		fireEvent(message.toString(), 0);
 
-		final GeneralGridRange range = inReader.getOriginalGridRange();
+		final GridEnvelope range = inReader.getOriginalGridRange();
 		message = new StringBuilder("Original range is ").append(range
 				.toString());
 		if (LOGGER.isLoggable(Level.FINE))
@@ -516,8 +519,8 @@ public class PyramidLayerBuilder extends BaseArgumentsManager implements
 		fireEvent(message.toString(), 0);
 
 		// new number of rows and columns
-		final double newWidth = (range.getLength(0) * 1.0) / scaleFactor;
-		final double newHeight = (range.getLength(1) * 1.0) / scaleFactor;
+		final double newWidth = (range.getSpan(0) * 1.0) / scaleFactor;
+		final double newHeight = (range.getSpan(1) * 1.0) / scaleFactor;
 		if (tileW > newWidth)
 			tileW = newWidth;
 		if (tileH > newHeight)
@@ -562,10 +565,12 @@ public class PyramidLayerBuilder extends BaseArgumentsManager implements
 		final double totalNumberOfFile = newRows * newCols;
 
 		// getting resolution of each tile
-		final double tileGeoWidth = envelope.getLength(0) / newCols;
-		final double tileGeoHeight = envelope.getLength(1) / newRows;
+		final double tileGeoWidth = envelope.getSpan(0) / newCols;
+		final double tileGeoHeight = envelope.getSpan(1) / newRows;
 
-		final int uppers[] = range.getUpper().getCoordinateValues();
+		final int uppers[] = range.getHigh().getCoordinateValues();
+		uppers[0] ++;
+		uppers[1] ++;
 		final double newRange[] = new double[] { uppers[0] / newCols,uppers[1] / newRows };
 		final DefaultProcessor processor = new DefaultProcessor(null);
 		for (int i = 0; i < newRows; i++)
@@ -616,7 +621,7 @@ public class PyramidLayerBuilder extends BaseArgumentsManager implements
 				final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] { _minx, _miny }, new double[] { _maxx,_maxy });
 				cropEnvelope.setCoordinateReferenceSystem(inReader.getCrs());
 				//we need to supply the requeste grid range but we use a fake one since we are using the ignore overviews switch 
-				gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0, 800, 800)), cropEnvelope));
+				gg.setValue(new GridGeometry2D(new GridEnvelope2D(new Rectangle(0, 0, 800, 800)), cropEnvelope));
 				message = new StringBuilder("Reading with grid envelope ").append(cropEnvelope.toString());
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine(message.toString());
@@ -651,7 +656,7 @@ public class PyramidLayerBuilder extends BaseArgumentsManager implements
 				// Adjusting the resolution in order to be the same as for all the others coverage
 				//
 				// //
-				final GeneralGridRange newGridrange = new GeneralGridRange(new Rectangle2D.Double(0.0, 0.0, newRange[0],newRange[1]).getBounds());
+				final GridEnvelope2D newGridrange = new GridEnvelope2D(new Rectangle2D.Double(0.0, 0.0, newRange[0],newRange[1]).getBounds());
 				final GridGeometry2D scaledGridGeometry = new GridGeometry2D(newGridrange, cropEnvelope);
 				param = processor.getOperation("Resample").getParameters();
 				param.parameter("Source").setValue(cropped);

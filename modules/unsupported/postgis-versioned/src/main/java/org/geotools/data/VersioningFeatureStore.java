@@ -28,6 +28,8 @@ import org.opengis.filter.Filter;
  * {@link VersioningFeatureSource}
  * 
  * @author Andrea Aime, TOPP
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/VersioningFeatureStore.java $
  */
 public interface VersioningFeatureStore extends VersioningFeatureSource, FeatureStore<SimpleFeatureType, SimpleFeature> {
     /**

@@ -27,6 +27,8 @@ import org.geotools.geometry.iso.util.algorithm2D.AlgoPoint2D;
  * 
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/topology/Simplex2D.java $
  */
 public abstract class Simplex2D extends BRepFace2D {
 	

@@ -36,7 +36,9 @@ import org.geotools.geometry.jts.GeometryUtils;
 /**
  * Holds the coordinates for a one-dimensional position within some coordinate reference system.
  * 
- * @version $Id: DirectPosition1D.java 30920 2008-07-04 23:56:32Z jgarnett $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/DirectPosition1D.java $
+ * @version $Id: DirectPosition1D.java 34133 2009-10-12 08:14:05Z mbedward $
  * @author Martin Desruisseaux
  */
 public class DirectPosition1D implements DirectPosition, Serializable, Cloneable {

@@ -36,6 +36,7 @@ import org.geotools.data.wps.request.DescribeProcessRequest;
 import org.geotools.data.wps.response.DescribeProcessResponse;
 import org.geotools.ows.ServiceException;
 import org.geotools.process.Process;
+import org.geotools.process.ProcessException;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -53,6 +54,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * 
  * @author GDavis
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wps/src/test/java/org/geotools/data/wps/OnlineWPSFactoryTest.java $
  */
 public class OnlineWPSFactoryTest extends TestCase {
 	
@@ -96,7 +99,7 @@ public class OnlineWPSFactoryTest extends TestCase {
 	 * @throws IOException 
 	 * @throws ServiceException 
 	 */
-	public void testExecuteProcessBufferLocal() throws ParseException, ServiceException, IOException {
+	public void testExecuteProcessBufferLocal() throws ParseException, ServiceException, IOException, ProcessException {
 		
 		// don't run the test if the server is not up or we aren't doing local tests
 		if (!runTests || !useLocalServer) return;
@@ -119,7 +122,7 @@ public class OnlineWPSFactoryTest extends TestCase {
         runExecuteProcessBufferLocal(geom6);
 	}
 	
-	private void runExecuteProcessBufferLocal(Geometry geom1) throws ServiceException, IOException, ParseException {
+	private void runExecuteProcessBufferLocal(Geometry geom1) throws ServiceException, IOException, ParseException, ProcessException {
 		
 		WPSCapabilitiesType capabilities = wps.getCapabilities();
 		
@@ -180,7 +183,7 @@ public class OnlineWPSFactoryTest extends TestCase {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public void testExecuteLocalUnion() throws ServiceException, IOException, ParseException {
+	public void testExecuteLocalUnion() throws ServiceException, IOException, ParseException, ProcessException {
 		
 		// don't run the test if the server is not up
 		if (!runTests) return;		
@@ -258,7 +261,7 @@ public class OnlineWPSFactoryTest extends TestCase {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public void testBADExecuteLocalUnion() throws ServiceException, IOException, ParseException {
+	public void testBADExecuteLocalUnion() throws ServiceException, IOException, ParseException, ProcessException {
 		
 		// don't run the test if the server is not up
 		if (!runTests) return;		
@@ -318,7 +321,7 @@ public class OnlineWPSFactoryTest extends TestCase {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public void testExecuteLocalAdd() throws ServiceException, IOException, ParseException {
+	public void testExecuteLocalAdd() throws ServiceException, IOException, ParseException, ProcessException {
 		
 		// don't run the test if the server is not up
 		if (!runTests) return;		

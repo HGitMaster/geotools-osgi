@@ -166,4 +166,24 @@ public class SimplifyingFilterVisitorTest extends TestCase {
         
         assertEquals(expected, result);
     }
+    
+    public void testSingleNegation() {
+    	Filter f = ff.not(ff.equals(ff.property("prop"), ff.literal(10)));
+    	Filter result = (Filter) f.accept(visitor, null);
+    	assertEquals(f, result);
+    }
+    
+    public void testDoubleNegation() {
+    	PropertyIsEqualTo equal = ff.equals(ff.property("prop"), ff.literal(10));
+		Filter f = ff.not(ff.not(equal));
+    	Filter result = (Filter) f.accept(visitor, null);
+    	assertEquals(equal, result);
+    }
+    
+    public void testTripleNegation() {
+    	PropertyIsEqualTo equal = ff.equals(ff.property("prop"), ff.literal(10));
+		Filter f = ff.not(ff.not(ff.not(equal)));
+    	Filter result = (Filter) f.accept(visitor, null);
+    	assertEquals(ff.not(equal), result);
+    }
 }

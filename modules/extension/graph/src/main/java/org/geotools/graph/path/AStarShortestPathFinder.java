@@ -30,6 +30,8 @@ import org.geotools.graph.traverse.standard.AStarIterator.AStarFunctions;
  * (for details see http://en.wikipedia.org/wiki/A_star) 
  * @see AStarIterator 
  * @author Germán E. Trouillet, Francisco G. Malbrán. Universidad Nacional de Córdoba (UNC)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/path/AStarShortestPathFinder.java $
  */
 public class AStarShortestPathFinder implements GraphWalker {
         /** Graphs to calculate paths for **/

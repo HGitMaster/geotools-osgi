@@ -31,6 +31,8 @@ import org.opengis.filter.expression.Subtract;
  * override desired methods.
  * 
  * @author Cory Horner, Refractions Research Inc.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/expression/AbstractExpressionVisitor.java $
  */
 public class AbstractExpressionVisitor implements ExpressionVisitor {
 

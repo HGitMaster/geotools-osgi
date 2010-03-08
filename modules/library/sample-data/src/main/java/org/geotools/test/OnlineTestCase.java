@@ -59,7 +59,7 @@ import junit.framework.TestCase;
  * </p>
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/sample-data/src/main/java/org/geotools/test/OnlineTestCase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/sample-data/src/main/java/org/geotools/test/OnlineTestCase.java $
  * @version $Id: OnlineTestCase.java 32476 2009-02-12 03:36:13Z bencaradocdavies $
  * @author Justin Deoliveira, The Open Planning Project
  */

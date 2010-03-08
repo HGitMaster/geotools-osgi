@@ -21,6 +21,8 @@ import java.util.List;
 /**
  *
  * @author jfc173
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/util/delaunay/AutoClustData.java $
  */
 public class AutoClustData {
     

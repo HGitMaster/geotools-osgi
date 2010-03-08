@@ -38,7 +38,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * 
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridReadWriteTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridReadWriteTest.java $
  */
 public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	private final Random generator = new Random();
@@ -291,7 +291,7 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 		assertNotNull("Unable to get a writer for a file", af
 				.getWriter(TestData.temp(this, "temp")));
 		assertNotNull("Unable to get a writer for a url", af.getWriter(TestData
-				.temp(this, "temp").toURL()));
+				.temp(this, "temp").toURI().toURL()));
 		assertNotNull("We should be ablet to write on an http link", af
 				.getWriter(new URL("http://www.geo-solutions.it")));
 

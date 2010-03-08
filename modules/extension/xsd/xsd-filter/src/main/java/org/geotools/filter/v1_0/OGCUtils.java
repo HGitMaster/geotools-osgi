@@ -39,6 +39,8 @@ import org.geotools.xml.Node;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/OGCUtils.java $
  */
 public class OGCUtils {
     /**

@@ -37,7 +37,6 @@ import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.FeatureTypeStyleImpl;
 import org.geotools.styling.Fill;
-import org.geotools.styling.FillImpl;
 import org.geotools.styling.Font;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Halo;
@@ -86,6 +85,8 @@ import org.opengis.style.Description;
  * or changing the scale - see RescaleStyleVisitor for an example).
  * </p>
  * @author Jesse Eichar
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/visitor/DuplicatingStyleVisitor.java $
  */
 public class DuplicatingStyleVisitor implements StyleVisitor {
 	
@@ -378,22 +379,22 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
 //                fts.getName());
         
         
-//        Rule[] rules = fts.getRules();
-//        int length=rules.length;
-//        Rule[] rulesCopy = new Rule[length];
-//        for (int i = 0; i < length; i++) {
-//            if (rules[i] != null) {
-//                rules[i].accept(this);
-//                rulesCopy[i] = (Rule) pages.pop();
-//            }
-//        }
+        Rule[] rules = fts.getRules();
+        int length=rules.length;
+        Rule[] rulesCopy = new Rule[length];
+        for (int i = 0; i < length; i++) {
+            if (rules[i] != null) {
+                rules[i].accept(this);
+                rulesCopy[i] = (Rule) pages.pop();
+            }
+        }
 //
 //        copy = sf.createFeatureTypeStyle();
 //        copy.setName(fts.getName());
 //        copy.setTitle(fts.getTitle());
 //        copy.setAbstract(fts.getAbstract());
 //        copy.setFeatureTypeName(fts.getFeatureTypeName());
-//        copy.setRules(rulesCopy);
+        copy.setRules(rulesCopy);
 //        copy.setSemanticTypeIdentifiers((String[]) fts.getSemanticTypeIdentifiers().clone());
         
         if( STRICT && !copy.equals( fts )){
@@ -553,7 +554,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         if( colorMap == null ) return null;
         
         colorMap.accept(this);
-        return (ColorMap) getCopy();
+        return (ColorMap) pages.pop();
     }
     
     protected SelectedChannelType[] copy( SelectedChannelType[] channels){
@@ -622,7 +623,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     protected Halo copy( Halo halo){
         if( halo == null ) return null;
         halo.accept(this);
-        return (Halo) getCopy();
+        return (Halo) pages.pop();
     }
     
     /**
@@ -633,20 +634,19 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     protected Displacement copy(Displacement displacement) {
         if( displacement == null ) return null;
         displacement.accept(this);
-        return (Displacement) getCopy();
+        return (Displacement) pages.pop();
     }
     
     protected LabelPlacement copy(LabelPlacement placement) {
         if( placement == null ) return null;
         placement.accept(this);
-        LabelPlacement copy = (LabelPlacement) getCopy();
-        return copy;
+        return (LabelPlacement) pages.pop();
     }
 
     protected Symbol copy(Symbol symbol) {
         if( symbol == null ) return null;
         symbol.accept(this);
-        return (Symbol) getCopy();
+        return (Symbol) pages.pop();
     }
     
     /**
@@ -657,7 +657,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     protected AnchorPoint copy(AnchorPoint anchorPoint) {
         if( anchorPoint == null ) return null;
         anchorPoint.accept(this);
-        return (AnchorPoint) getCopy();
+        return (AnchorPoint) pages.pop();
     }
 
     public void visit(Fill fill) {
@@ -715,6 +715,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     public void visit(PointSymbolizer ps) {
         PointSymbolizer copy = sf.getDefaultPointSymbolizer();
         copy.setGeometryPropertyName( ps.getGeometryPropertyName());
+        copy.setUnitOfMeasure(ps.getUnitOfMeasure());
         copy.setGraphic( copy( ps.getGraphic() ));
         if( STRICT ){
             if( !copy.equals( ps )){
@@ -727,6 +728,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     public void visit(LineSymbolizer line) {
         LineSymbolizer copy = sf.getDefaultLineSymbolizer();
         copy.setGeometryPropertyName( line.getGeometryPropertyName());
+        copy.setUnitOfMeasure(line.getUnitOfMeasure());
         copy.setStroke( copy( line.getStroke()));
         
         if( STRICT && !copy.equals( line )){
@@ -739,6 +741,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         PolygonSymbolizer copy = sf.createPolygonSymbolizer();
         copy.setFill( copy( poly.getFill()));
         copy.setGeometryPropertyName( poly.getGeometryPropertyName());
+        copy.setUnitOfMeasure(poly.getUnitOfMeasure());
         copy.setStroke(copy(poly.getStroke()));
         
         if( STRICT && !copy.equals( poly )){
@@ -750,12 +753,14 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     public void visit(TextSymbolizer text) {
         TextSymbolizer copy = sf.createTextSymbolizer();
         copy.setFill( copy( text.getFill()));
-        copy.setFonts( copy( text.getFonts()));
+        copy.setFont( copy( text.getFont()));
         copy.setGeometryPropertyName( text.getGeometryPropertyName() );
+        copy.setUnitOfMeasure(text.getUnitOfMeasure());
         copy.setHalo( copy( text.getHalo() ));
         copy.setLabel( copy( text.getLabel()));
-        copy.setPlacement( copy( text.getPlacement()));
+        copy.setLabelPlacement( copy( text.getLabelPlacement()));
         copy.setPriority( copy( text.getPriority()));
+        copy.getOptions().putAll(text.getOptions());
         
         if( STRICT && !copy.equals( text )){
             throw new IllegalStateException("Was unable to duplicate provided TextSymbolizer:"+text );
@@ -769,6 +774,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         copy.setColorMap( copy( raster.getColorMap() ));
         copy.setContrastEnhancement( copy( raster.getContrastEnhancement()));
         copy.setGeometryPropertyName( raster.getGeometryPropertyName());
+        copy.setUnitOfMeasure(raster.getUnitOfMeasure());
         copy.setImageOutline( copy( raster.getImageOutline()));
         copy.setOpacity( copy( raster.getOpacity() ));
         copy.setOverlap( copy( raster.getOverlap()));
@@ -978,7 +984,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         copy.setColor(copy(colorMapEntry.getColor()));
         copy.setLabel(colorMapEntry.getLabel());
         copy.setOpacity(copy(colorMapEntry.getOpacity()));
-        copy.setQuantity(copy.getQuantity());
+        copy.setQuantity(colorMapEntry.getQuantity());
 
         if (STRICT && !copy.equals(colorMapEntry)) {
             throw new IllegalStateException("Was unable to duplicate provided ColorMapEntry:" + colorMapEntry);

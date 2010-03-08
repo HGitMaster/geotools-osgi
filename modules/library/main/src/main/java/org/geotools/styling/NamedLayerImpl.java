@@ -19,39 +19,43 @@
 package org.geotools.styling;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.geotools.resources.Utilities;
-
+import org.geotools.util.Utilities;
 
 /**
  * Default implementation of named layer.
  *
  * @author jamesm
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/NamedLayerImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/NamedLayerImpl.java $
  */
 public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
     List<Style> styles = new ArrayList<Style>();
 
-    FeatureTypeConstraint[] featureTypeConstraints = new FeatureTypeConstraint[0];
+    //FeatureTypeConstraint[] featureTypeConstraints = new FeatureTypeConstraint[0];    
+    List<FeatureTypeConstraint> featureTypeConstraints = new ArrayList<FeatureTypeConstraint>();
     
+    public List<FeatureTypeConstraint> layerFeatureConstraints() {
+    	return featureTypeConstraints;
+    }
     public FeatureTypeConstraint[] getLayerFeatureConstraints() {
-        return featureTypeConstraints;
+        return featureTypeConstraints.toArray(new FeatureTypeConstraint[0]);
     }
 
     public void setLayerFeatureConstraints(FeatureTypeConstraint[] featureTypeConstraints) {
-    	this.featureTypeConstraints = featureTypeConstraints;
+    	this.featureTypeConstraints.clear();
+    	this.featureTypeConstraints.addAll(Arrays.asList(featureTypeConstraints));
     }
     
     public Style[] getStyles() {
-        return (Style[]) styles.toArray(new Style[0]);
+        return styles.toArray(new Style[0]);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param sl may be a StyleImpl or a NamedStyle
-     */
+    public List<Style> styles() {
+    	return styles;
+    }
+    
     public void addStyle(Style sl) {
         styles.add(sl);
     }
@@ -71,15 +75,13 @@ public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
         	if (!Utilities.equals(styles, other.styles))
         		return false;
         	
-        	if (featureTypeConstraints.length != other.featureTypeConstraints.length) return false;
-        	
-        	for (int i = 0; i < featureTypeConstraints.length; i++) {
-        		if (!Utilities.equals(featureTypeConstraints[i], other.featureTypeConstraints[i]))
-        			return false;
+        	if(!Utilities.equals(featureTypeConstraints, other.featureTypeConstraints)){
+        		return false;
         	}
         	return true;
         }
 
         return false;
 	}
+	
 }

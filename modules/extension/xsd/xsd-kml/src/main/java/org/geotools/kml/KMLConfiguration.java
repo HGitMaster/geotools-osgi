@@ -58,6 +58,8 @@ import org.geotools.xml.Configuration;
  * Parser configuration for the http://earth.google.com/kml/2.1 schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/KMLConfiguration.java $
  */
 public class KMLConfiguration extends Configuration {
     /**

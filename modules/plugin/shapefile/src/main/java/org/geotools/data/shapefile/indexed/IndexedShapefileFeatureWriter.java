@@ -16,7 +16,7 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.FIX;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,12 +113,10 @@ class IndexedShapefileFeatureWriter extends ShapefileFeatureWriter implements
                     FidIndexer.generate(shpFiles);
                 }
 
-                deleteFile(ShpFileType.GRX);
                 deleteFile(ShpFileType.QIX);
 
                 if (indexedShapefileDataStore.treeType == IndexType.QIX) {
-                    indexedShapefileDataStore
-                            .buildQuadTree(indexedShapefileDataStore.maxDepth);
+                    indexedShapefileDataStore.buildQuadTree();
                 }
             }
         } catch (Throwable e) {

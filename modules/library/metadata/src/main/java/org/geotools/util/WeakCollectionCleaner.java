@@ -30,11 +30,11 @@ import org.geotools.util.logging.Logging;
  * is invoked.
  *
  * @since 2.0
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/WeakCollectionCleaner.java $
- * @version $Id: WeakCollectionCleaner.java 30792 2008-06-23 19:19:58Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/WeakCollectionCleaner.java $
+ * @version $Id: WeakCollectionCleaner.java 34812 2010-01-18 09:10:00Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
-final class WeakCollectionCleaner extends Thread {
+public final class WeakCollectionCleaner extends Thread {
     /**
      * The default thread.
      */
@@ -44,8 +44,8 @@ final class WeakCollectionCleaner extends Thread {
      * List of reference collected by the garbage collector.
      * Those elements must be removed from {@link #table}.
      */
-    final ReferenceQueue<Object> referenceQueue = new ReferenceQueue<Object>();
-
+    ReferenceQueue<Object> referenceQueue = new ReferenceQueue<Object>();
+    
     /**
      * Constructs and starts a new thread as a daemon. This thread will be sleeping
      * most of the time.  It will run only some few nanoseconds each time a new
@@ -57,19 +57,21 @@ final class WeakCollectionCleaner extends Thread {
         setDaemon(true);
         start();
     }
+    
+    public synchronized ReferenceQueue<Object> getReferenceQueue() {
+        return referenceQueue;
+    }
 
     /**
      * Loop to be run during the virtual machine lifetime.
      */
     @Override
     public void run() {
-        // The reference queue should never be null.  However some strange cases (maybe caused
-        // by an anormal JVM state) have been reported on the mailing list. In such case, stop
-        // the daemon instead of writting 50 Mb of log messages.
-        while (referenceQueue != null) {
+        ReferenceQueue<Object> rq;
+        while ((rq = getReferenceQueue ()) != null) {
             try {
                 // Block until a reference is enqueded.
-                final Reference ref = referenceQueue.remove();
+                final Reference ref = rq.remove();
                 if (ref == null) {
                     /*
                      * Should never happen according Sun's Javadoc ("Removes the next reference
@@ -96,6 +98,26 @@ final class WeakCollectionCleaner extends Thread {
                 // keep the same behaviour as if assertions were turned off.
             }
         }
-        Logging.getLogger(WeakCollectionCleaner.class).severe("Daemon stopped."); // Should never happen.
+        Logging.getLogger(WeakCollectionCleaner.class).info("Weak collection cleaner stopped");
+    }
+    
+    /**
+     * Stops the cleaner thread. Calling this method is recommended in all long running applications
+     * with custom class loaders (e.g., web applications).
+     */
+    public void exit() {
+        // try to stop it gracefully
+        synchronized (this) {
+            referenceQueue = null;
+        }
+        this.interrupt();
+        try {
+            this.join(500);
+        } catch (InterruptedException e) {
+
+        }
+        // last resort tentative to kill the cleaner thread
+        if (this.isAlive())
+            this.stop();
     }
 }

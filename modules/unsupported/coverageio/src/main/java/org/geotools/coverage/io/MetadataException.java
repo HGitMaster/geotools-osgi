@@ -24,7 +24,7 @@ import org.geotools.image.io.text.DefaultTextMetadataParser;
  * The base class for error related to grid coverage's metadata.
  * This exception is thrown by the helper class {@link MetadataBuilder}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/MetadataException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/MetadataException.java $
  * @version $Id: MetadataException.java 30965 2008-07-09 10:04:21Z cedricbr $
  * @author Martin Desruisseaux (IRD)
  *

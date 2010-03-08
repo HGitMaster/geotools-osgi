@@ -33,8 +33,8 @@ import org.xml.sax.helpers.NamespaceSupport;
 /**
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: FeatureTypeMapping.java 32633 2009-03-16 01:44:12Z ang05a $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/FeatureTypeMapping.java $
+ * @version $Id: FeatureTypeMapping.java 34495 2009-11-25 12:24:06Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/FeatureTypeMapping.java $
  * @since 2.4
  */
 public class FeatureTypeMapping {
@@ -58,6 +58,8 @@ public class FeatureTypeMapping {
 
     NamespaceSupport namespaces;
 
+    String itemXpath;
+    
     /**
      * No parameters constructor for use by the digester configuration engine as a JavaBean
      */
@@ -73,6 +75,13 @@ public class FeatureTypeMapping {
         this.namespaces = namespaces;
     }
 
+    public FeatureTypeMapping(FeatureSource source, AttributeDescriptor target,
+            List<AttributeMapping> mappings, NamespaceSupport namespaces,
+            String itemXpath) {
+        this(source, target, mappings, namespaces);
+        this.itemXpath = itemXpath;
+    }
+    
     public List<AttributeMapping> getAttributeMappings() {
         return Collections.unmodifiableList(attributeMappings);
     }
@@ -143,6 +152,10 @@ public class FeatureTypeMapping {
         return namespaces;
     }
 
+    public String getItemXpath() {
+        return itemXpath;
+    }
+
     /**
      * Has to be called after {@link #setTargetType(FeatureType)}
      * 
@@ -153,16 +166,19 @@ public class FeatureTypeMapping {
         this.target = feature;
     }
 
-    public void setSource() {
-        this.source = source;
-    }
-
     public AttributeDescriptor getTargetFeature() {
         return this.target;
     }
 
     public FeatureSource getSource() {
         return this.source;
+    }
+    
+    public FeatureTypeMapping getUnderlyingComplexMapping() {
+        if (source instanceof MappingFeatureSource) {
+            return ((MappingFeatureSource) source).getMapping();
+        }
+        return null;
     }
 
 }

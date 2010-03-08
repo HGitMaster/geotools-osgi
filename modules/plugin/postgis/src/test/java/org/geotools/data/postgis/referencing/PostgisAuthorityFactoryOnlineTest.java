@@ -37,7 +37,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Test PostgisAuthorityFactory
  * 
  * @author Jesse Eichar, Refractions Research Inc.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/referencing/PostgisAuthorityFactoryOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/referencing/PostgisAuthorityFactoryOnlineTest.java $
  */
 public class PostgisAuthorityFactoryOnlineTest extends TestCase {
     

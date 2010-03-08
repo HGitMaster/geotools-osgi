@@ -64,6 +64,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,6 +92,8 @@ import org.geotools.xml.impl.TypeWalker.Visitor;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/Schemas.java $
  */
 public class Schemas {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(Schemas.class.getPackage()
@@ -221,6 +224,10 @@ public class Schemas {
 
     public static final XSDSchema parse(String location, List locators, List resolvers)
         throws IOException {
+        
+        //url decode to take care of paths with spaces
+        location = URLDecoder.decode( location );
+        
         //check for case of file url, make sure it is an absolute reference
         if (new File(location).exists()) {
             location = new File(location).getCanonicalFile().toURI().toString();
@@ -993,6 +1000,20 @@ public class Schemas {
      * attribute of the element.
      */
     public static final List getAttributeDeclarations(XSDTypeDefinition type) {
+        return getAttributeDeclarations(type,true);
+    }
+    
+    /**
+     * Returns a list of all attribute declarations declared in the type (and optionally
+     * any base type) of the specified element.
+     *
+     * @param element The element.
+     * @param includeParents Wether to include parent types.
+     *
+     * @return A list of @link XSDAttributeDeclaration objects, one for each
+     * attribute of the element.
+     */
+    public static final List getAttributeDeclarations(XSDTypeDefinition type, boolean includeParents) {
         final ArrayList attributes = new ArrayList();
 
         //walk up the type hierarchy of the element to generate a list of atts
@@ -1036,7 +1057,15 @@ public class Schemas {
                 }
             };
 
-        new TypeWalker().walk(type, visitor);
+        if (includeParents) {
+            //walk up the type hierarchy of the element to generate a list of 
+            // possible elements
+            new TypeWalker().walk(type, visitor);
+        } else {
+            //just visit this type
+            visitor.visit(type);
+        }
+        
 
         return attributes;
     }

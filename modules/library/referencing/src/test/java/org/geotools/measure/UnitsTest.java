@@ -31,6 +31,8 @@ import static org.junit.Assert.*;
  * Test conversions using the units declared in {@link Units}.
  *
  * @author Martin Desruisseaux (Geomatys)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/measure/UnitsTest.java $
  */
 public class UnitsTest {
     /**

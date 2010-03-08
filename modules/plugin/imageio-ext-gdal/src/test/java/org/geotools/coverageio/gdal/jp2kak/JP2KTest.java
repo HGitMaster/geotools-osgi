@@ -19,24 +19,34 @@ package org.geotools.coverageio.gdal.jp2kak;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.coverageio.gdal.BaseGDALGridCoverage2DReader;
+import org.geotools.coverageio.gdal.GDALTestCase;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.test.TestData;
+import org.junit.Assert;
+import org.junit.Test;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 /**
  * @author Daniele Romagnoli, GeoSolutions
  * @author Simone Giannecchini (simboss), GeoSolutions
  *
  * Testing {@link JP2KReader}
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/jp2kak/JP2KTest.java $
  */
-public final class JP2KTest extends AbstractJP2KTestCase {
+public final class JP2KTest extends GDALTestCase {
     protected final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
     "org.geotools.coverageio.gdal.jp2kak");
     
@@ -50,14 +60,12 @@ public final class JP2KTest extends AbstractJP2KTestCase {
      *
      * @param name
      */
-    public JP2KTest(String name) {
-        super(name);
+    public JP2KTest() {
+        super("JP2K", new JP2KFormatFactory());
     }
 
-    public static final void main(String[] args) throws Exception {
-        junit.textui.TestRunner.run(JP2KTest.class);
-    }
 
+    @Test
     public void test() throws Exception {
         if (!testingEnabled()) {
             return;
@@ -95,4 +103,31 @@ public final class JP2KTest extends AbstractJP2KTestCase {
             LOGGER.info(gc.getEnvelope().toString());
         }
     }
+
+    @Test
+	public void testIsAvailable() throws NoSuchAuthorityCodeException, FactoryException {
+	    if (!testingEnabled()) {
+	        return;
+	    }
+	
+	    GridFormatFinder.scanForPlugins();
+	
+	    Iterator list = GridFormatFinder.getAvailableFormats().iterator();
+	    boolean found = false;
+	    GridFormatFactorySpi fac = null;
+	
+	    while (list.hasNext()) {
+	        fac = (GridFormatFactorySpi) list.next();
+	
+	        if (fac instanceof JP2KFormatFactory) {
+	            found = true;
+	
+	            break;
+	        }
+	    }
+	
+	    Assert.assertTrue("JP2KFormatFactory not registered", found);
+	    Assert.assertTrue("JP2KFormatFactory not available", fac.isAvailable());
+	    Assert.assertNotNull(new JP2KFormatFactory().createFormat());
+	}
 }

@@ -42,7 +42,7 @@ import static java.lang.Math.*;
  * the {@linkplain #inverseTransformNormalized inverse transform}.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/PolarStereographic.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/PolarStereographic.java $
  * @version $Id: PolarStereographic.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author André Gosselin
  * @author Martin Desruisseaux (PMO, IRD)

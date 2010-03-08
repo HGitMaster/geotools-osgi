@@ -30,7 +30,7 @@ import org.geotools.validation.DefaultFeatureValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/extension/validation/src/main/java/org/geotools/validation/spatial/IsValidGeometryValidationBeanInfo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/spatial/IsValidGeometryValidationBeanInfo.java $
  * @version $Id: IsValidGeometryValidationBeanInfo.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class IsValidGeometryValidationBeanInfo extends DefaultFeatureValidationBeanInfo {

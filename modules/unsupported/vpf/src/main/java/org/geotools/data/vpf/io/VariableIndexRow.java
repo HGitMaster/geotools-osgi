@@ -23,7 +23,7 @@ import org.geotools.data.vpf.ifc.VPFRow;
  * VariableIndexRow.java Created: Sun Mar 16 23:28:11 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/VariableIndexRow.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/VariableIndexRow.java $
  * @version $Id: VariableIndexRow.java 30687 2008-06-13 11:03:06Z acuster $
  */
 public class VariableIndexRow implements VPFRow {

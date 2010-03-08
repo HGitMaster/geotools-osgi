@@ -36,7 +36,7 @@ import org.geotools.TestData;
  * @
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/test/java/org/geotools/xml/SchemaParserTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/SchemaParserTest.java $
  */
 public class SchemaParserTest extends TestCase {
     protected SAXParser parser;

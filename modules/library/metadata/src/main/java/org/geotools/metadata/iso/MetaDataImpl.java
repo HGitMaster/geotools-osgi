@@ -44,7 +44,7 @@ import org.opengis.referencing.ReferenceSystem;
 /**
  * Root entity which defines metadata about a resource or resources.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/MetaDataImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/MetaDataImpl.java $
  * @version $Id: MetaDataImpl.java 31593 2008-09-25 12:30:10Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

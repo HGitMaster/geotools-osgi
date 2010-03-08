@@ -158,8 +158,7 @@ class ColorMapNode extends StyleVisitorCoverageProcessingNodeAdapter implements
 			// have a valid NoDataValue that we can use.
 			//
 			// /////////////////////////////////////////////////////////////////////
-			final GridSampleDimension candidateSD = (GridSampleDimension) sourceCoverage
-					.getSampleDimension(0);
+			final GridSampleDimension candidateSD = (GridSampleDimension) sourceCoverage.getSampleDimension(0);
 			double[] candidateNoDataValues = preparaNoDataValues(candidateSD);
 
 			// /////////////////////////////////////////////////////////////////////
@@ -167,6 +166,7 @@ class ColorMapNode extends StyleVisitorCoverageProcessingNodeAdapter implements
 			// Main Loop
 			//
 			// /////////////////////////////////////////////////////////////////////
+			//TODO MAKE THE COLORS CONFIGURABLE 
 			final SLDColorMapBuilder builder = new SLDColorMapBuilder();
 			builder.setExtendedColors(this.extendedColors)
 					.setLinearColorMapType(this.type)
@@ -185,9 +185,11 @@ class ColorMapNode extends StyleVisitorCoverageProcessingNodeAdapter implements
 			// Create the list of no data colorMapTransform domain elements. Note that all of them 
 			//
 			// /////////////////////////////////////////////////////////////////////
-			final LinearColorMapElement noDataCategories[] = new LinearColorMapElement[candidateNoDataValues.length];
-			for (int i = 0; i < noDataCategories.length; i++) {
-				builder.addValueToPreserve(candidateNoDataValues[i]);
+			if(candidateNoDataValues!=null&&candidateNoDataValues.length>0){
+				final LinearColorMapElement noDataCategories[] = new LinearColorMapElement[candidateNoDataValues.length];
+				for (int i = 0; i < noDataCategories.length; i++) {
+					builder.addValueToPreserve(candidateNoDataValues[i]);
+				}
 			}
 
 			// /////////////////////////////////////////////////////////////////////
@@ -229,7 +231,10 @@ class ColorMapNode extends StyleVisitorCoverageProcessingNodeAdapter implements
                 break; 
             case DataBuffer.TYPE_DOUBLE:case DataBuffer.TYPE_UNDEFINED:
                 candidateNoDataValues[0]=Double.NaN;
-                break;  
+                break;
+            default://BYTE, USHORT
+            	candidateNoDataValues=null;
+            break;
            }
         }
         return candidateNoDataValues;

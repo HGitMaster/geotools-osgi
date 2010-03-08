@@ -33,7 +33,7 @@ import org.geotools.resources.i18n.Errors;
  * Abstract definition of a parameter or group of parameters used by an operation method.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/parameter/AbstractParameterDescriptor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/AbstractParameterDescriptor.java $
  * @version $Id: AbstractParameterDescriptor.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

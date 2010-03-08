@@ -27,7 +27,7 @@ import org.geotools.factory.Hints;
  * {@code "EPSG"} name space.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-extension/src/main/java/org/geotools/referencing/factory/epsg/UnnamedExtension.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-extension/src/main/java/org/geotools/referencing/factory/epsg/UnnamedExtension.java $
  * @version $Id: UnnamedExtension.java 30656 2008-06-12 20:32:50Z acuster $
  * @author Andrea Aime
  */

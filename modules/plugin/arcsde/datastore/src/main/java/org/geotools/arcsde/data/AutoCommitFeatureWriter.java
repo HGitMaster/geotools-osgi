@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
@@ -34,7 +34,7 @@ import org.opengis.filter.Filter;
  * A FeatureWriter for auto commit mode.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: AutoCommitFeatureWriter.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: AutoCommitFeatureWriter.java 33451 2009-07-02 17:53:36Z groldan $
  * @since 2.5
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java

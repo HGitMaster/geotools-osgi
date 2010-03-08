@@ -55,7 +55,7 @@ import org.geotools.referencing.factory.epsg.LongitudeFirstFactory;
  * {@code plugin/epsg-hsql} module since the HSQL plugin is the only one which
  * is garantee to work on any machine running Maven.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/OrderedAxisAuthorityFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/OrderedAxisAuthorityFactoryTest.java $
  * @version $Id: OrderedAxisAuthorityFactoryTest.java 30656 2008-06-12 20:32:50Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Jody Garnett

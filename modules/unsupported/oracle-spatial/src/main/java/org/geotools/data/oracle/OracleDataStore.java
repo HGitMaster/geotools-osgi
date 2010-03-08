@@ -82,7 +82,7 @@ import com.vividsolutions.jts.io.ParseException;
 
 /**
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleDataStore.java $
  */
 public class OracleDataStore extends JDBCDataStore {
      private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.oracle");

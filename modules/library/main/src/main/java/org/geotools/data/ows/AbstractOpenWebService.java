@@ -50,6 +50,8 @@ import org.geotools.ows.ServiceException;
  * implemented) and their own request/response instances.
  * 
  * @author Richard Gould
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ows/AbstractOpenWebService.java $
  */
 public abstract class AbstractOpenWebService<C extends Capabilities, R extends Object> {
     /** Define a interval to wait a server response  */

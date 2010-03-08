@@ -73,8 +73,8 @@ import org.geotools.math.XMath;
  * All {@code Category} objects are immutable and thread-safe.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/Category.java $
- * @version $Id: Category.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/Category.java $
+ * @version $Id: Category.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *
  * @see GridSampleDimension
@@ -164,7 +164,7 @@ public class Category implements Serializable {
      * May be computed only when first requested, or may be
      * user-supplied (which is why it must be serialized).
      */
-    NumberRange range;
+    NumberRange<? extends Number> range;
 
     /**
      * The math transform from sample to geophysics values (never {@code null}).
@@ -442,7 +442,7 @@ public class Category implements Serializable {
         this.name      = SimpleInternationalString.wrap(name);
         this.ARGB      = ARGB;
         this.range     = range;
-        Class type     = range.getElementClass();
+        Class<?> type     = range.getElementClass();
         boolean minInc = range.isMinIncluded();
         boolean maxInc = range.isMaxIncluded();
         this.minimum   = doubleValue(type, range.getMinValue(), minInc ? 0 : +1);
@@ -555,8 +555,8 @@ public class Category implements Serializable {
     private static MathTransform1D createLinearTransform(final NumberRange sampleValueRange,
                                                          final NumberRange geophysicsValueRange)
     {
-        final Class sType =     sampleValueRange.getElementClass();
-        final Class gType = geophysicsValueRange.getElementClass();
+        final Class<?> sType =     sampleValueRange.getElementClass();
+        final Class<?> gType = geophysicsValueRange.getElementClass();
         /*
          * First, find the direction of the adjustment to apply to the ranges if we wanted
          * all values to be inclusives. Then, check if the adjustment is really needed: if
@@ -617,7 +617,7 @@ public class Category implements Serializable {
      *                  +1 to return the next representable number, or
      *                   0 to return the number with no change.
      */
-    private static double doubleValue(final Class        type,
+    private static double doubleValue(final Class<?>        type,
                                       final Comparable number,
                                       final int     direction)
     {
@@ -707,7 +707,7 @@ public class Category implements Serializable {
      * @see GridSampleDimension#getMinimumValue()
      * @see GridSampleDimension#getMaximumValue()
      */
-    public NumberRange getRange() {
+    public NumberRange<? extends Number> getRange() {
         assert range != null;
         return range;
     }

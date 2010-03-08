@@ -52,6 +52,7 @@ import net.opengis.wfs.WFSCapabilitiesType;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
+import org.geotools.data.DataUtilities;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.xml.Parser;
@@ -238,7 +239,8 @@ public class WFSParsingTest extends TestCase {
         // http://localhost:8080/geoserver/wfs?service=WFS&amp;version=1.1.0&amp;request=DescribeFeatureType&amp;typeName=sf:PrimitiveGeoFeature
         String schemaLocation = doc.getDocumentElement().getAttributeNS(
                 "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
-        String absolutePath = tmp.toURL().toExternalForm();
+        String absolutePath = DataUtilities.fileToURL( tmp ).toExternalForm();
+        
 		schemaLocation = schemaLocation.replaceAll("http://cite.opengeospatial.org/gmlsf .*",
                 "http://cite.opengeospatial.org/gmlsf " + absolutePath);
         doc.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",

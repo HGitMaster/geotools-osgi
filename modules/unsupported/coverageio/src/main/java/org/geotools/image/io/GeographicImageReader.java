@@ -88,7 +88,7 @@ import org.geotools.image.io.metadata.Band;
  * operators after reading.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/GeographicImageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/GeographicImageReader.java $
  * @version $Id: GeographicImageReader.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux
  */

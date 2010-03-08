@@ -25,7 +25,6 @@ import org.geotools.factory.GeoTools;
 import junit.framework.TestCase;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.opengis.feature.simple.SimpleFeature;
@@ -38,13 +37,12 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 /**
  *
  * @author James
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/filter/function/FunctionTestSupport.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/function/FunctionTestSupport.java $
  */
 public class FunctionTestSupport extends TestCase {
     
     protected FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection;
     protected FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
-    protected ExpressionBuilder builder = new ExpressionBuilder();
     protected SimpleFeatureType dataType;
     protected SimpleFeature[] testFeatures;
     

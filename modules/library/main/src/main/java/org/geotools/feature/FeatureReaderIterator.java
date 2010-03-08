@@ -32,7 +32,7 @@ import org.opengis.feature.type.FeatureType;
  * will be thrown.
  *  
  * @author jeichar
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/FeatureReaderIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/FeatureReaderIterator.java $
  */
 public class FeatureReaderIterator<F extends Feature> implements Iterator<F> {
 

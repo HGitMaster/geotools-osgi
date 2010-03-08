@@ -91,6 +91,8 @@ import java.util.Stack;
  * </ul>
  *
  * @author Jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/filter/FilterEncodingPreProcessor.java $
  */
 public class FilterEncodingPreProcessor implements FilterVisitor, FilterVisitor2 {
     private static final int LOW = 0;

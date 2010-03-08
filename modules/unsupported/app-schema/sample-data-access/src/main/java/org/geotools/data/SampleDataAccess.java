@@ -25,14 +25,12 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 
-import com.sun.org.apache.xml.internal.utils.UnImplNode;
-
 /**
  * Sample implementation of {@link DataAccess} for testing. Create with
  * {@link SampleDataAccessFactory}.
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: SampleDataAccess.java 32619 2009-03-10 05:53:43Z bencaradocdavies $
+ * @version $Id: SampleDataAccess.java 34511 2009-11-26 05:34:06Z bencaradocdavies $
  * @source $URL:
  *         http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/sample-data-access
  *         /src/main/java/org/geotools/data/SampleDataAccess.java $

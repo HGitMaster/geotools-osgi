@@ -42,6 +42,8 @@ import org.opengis.coverage.grid.GridCoverage;
  * all RasterSymbolizer options.
  * 
  * @author Simone Giannecchini, GeoSolutions
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/RasterSymbolizerHelper.java $
  */
 public class RasterSymbolizerHelper extends
 		SubchainStyleVisitorCoverageProcessingAdapter implements StyleVisitor {
@@ -136,7 +138,8 @@ public class RasterSymbolizerHelper extends
 	 * @see org.geotools.renderer.lite.gridcoverage2d.StyleVisitorAdapter#visit(org.geotools.styling.RasterSymbolizer)
 	 */
 	public synchronized void visit(RasterSymbolizer rs) {
-	        ColorMapUtilities.ensureNonNull("RasterSymbolizer", rs);
+	        
+		ColorMapUtilities.ensureNonNull("RasterSymbolizer", rs);
 
 		// /////////////////////////////////////////////////////////////////////
 		//

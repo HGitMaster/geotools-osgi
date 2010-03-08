@@ -32,7 +32,7 @@ import junit.framework.TestCase;
 /**
  * @author dzwiers
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/test/java/org/geotools/xml/SchemaMergeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/SchemaMergeTest.java $
  */
 public class SchemaMergeTest extends TestCase {
 

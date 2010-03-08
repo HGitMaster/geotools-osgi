@@ -44,7 +44,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * A two dimensional array of numbers. Row and column numbering begins with zero.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/GeneralMatrix.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/GeneralMatrix.java $
  * @version $Id: GeneralMatrix.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini

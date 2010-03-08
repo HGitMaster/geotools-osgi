@@ -24,8 +24,8 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link Source} taglet.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $
- * @version $Id: SourceTest.java 30766 2008-06-19 13:24:46Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $
+ * @version $Id: SourceTest.java 34116 2009-10-10 08:45:31Z mbedward $
  * @author Martin Desruisseaux
  */
 public class SourceTest {
@@ -37,11 +37,11 @@ public class SourceTest {
         Source  s = new Source();
         Matcher m;
         String tag, url, group, category, module;
-        tag = "$URL: http://gtsvn.refractions.net/trunk/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $";
-        //The url above is only converted from $URL: http://gtsvn.refractions.net/trunk/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $ if we have obtained the 
+        tag = "$URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $";
+        //The url above is only converted from $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $ if we have obtained the 
         //  file using a standard access mechanism to SVN. This fails, for 
         //  example, with mercurial converstion 'hg convert svnrepo hgrepo'
-        if ( !tag.equals("$URL: http://gtsvn.refractions.net/trunk/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $") ){
+        if ( !tag.equals("$URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $") ){
             m = s.findURL.matcher(tag);
             assertTrue(m.matches());
 
@@ -56,31 +56,5 @@ public class SourceTest {
             assertEquals("maven", category);
             assertEquals("javadoc", module);
         }
-
-        // Try an other URL from a tag.
-        url = "http://svn.geotools.org/tags/2.4-M0/modules/library/api/src/main/java/org/geotools/catalog/ResolveChangeListener.java";
-        m = s.findModule.matcher(url);
-        assertTrue(m.matches());
-        group    = m.group(1);
-        category = m.group(2);
-        module   = m.group(3);
-        assertEquals("modules", group);
-        assertEquals("library", category);
-        assertEquals("api", module);
-
-        // Try an other URL from a tag.
-        url = "http://svn.geotools.org/tags/2.2-RC4/modules/library/referencing/src/main/java/org/geotools/referencing/CRS.java";
-        tag = Source.SVN_KEYWORD_DELIMITER + "URL: " + url + ' ' + Source.SVN_KEYWORD_DELIMITER;
-        m = s.findURL.matcher(tag);
-        assertTrue(m.matches());
-        assertEquals(url, m.group(1).trim());
-        m = s.findModule.matcher(url);
-        assertTrue(m.matches());
-        group    = m.group(1);
-        category = m.group(2);
-        module   = m.group(3);
-        assertEquals("modules", group);
-        assertEquals("library", category);
-        assertEquals("referencing", module);
     }
 }

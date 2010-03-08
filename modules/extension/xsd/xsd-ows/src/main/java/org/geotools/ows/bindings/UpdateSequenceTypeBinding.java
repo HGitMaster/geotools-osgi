@@ -40,6 +40,8 @@ import org.geotools.xml.*;
  * </p>
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/UpdateSequenceTypeBinding.java $
  */
 public class UpdateSequenceTypeBinding extends AbstractSimpleBinding {
     public UpdateSequenceTypeBinding(Ows10Factory factory) {

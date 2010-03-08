@@ -24,15 +24,16 @@ import javax.media.jai.OperationDescriptorImpl;
 import javax.media.jai.registry.RenderedRegistryMode;
 
 public class ColorReductionDescriptor extends OperationDescriptorImpl {
+	
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -8859576263333814317L;
-
+	private static final long serialVersionUID = -8931287738914712392L;
 	/**
 	 * The operation name, which is {@value}.
 	 */
-	public static final String OPERATION_NAME = "ColorReduction";
+	public static final String OPERATION_NAME = "org.geotools.ColorReduction";
 
 	/**
 	 * Constructs the descriptor.
@@ -118,7 +119,7 @@ public class ColorReductionDescriptor extends OperationDescriptorImpl {
 			return false;
 		if(alphaThreashold<0||alphaThreashold>255)
 			return false;
-		if(numColors<=0||(numColors>255))
+		if(numColors<=0||(numColors>256))
 			return false;
 		return true;
 	}

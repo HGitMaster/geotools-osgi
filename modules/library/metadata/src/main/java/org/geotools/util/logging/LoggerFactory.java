@@ -27,7 +27,7 @@ import org.geotools.util.WeakValueHashMap;
  * forward directly all log methods to an other framework.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/util/logging/LoggerFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/logging/LoggerFactory.java $
  * @version $Id: LoggerFactory.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  *

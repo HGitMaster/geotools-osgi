@@ -27,6 +27,8 @@ import org.geotools.index.Data;
 /**
  * Currently just wraps ArrayList and delegates to that class
  * @author jesse
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/CloseableArrayList.java $
  */
 public class CloseableArrayList extends AbstractList<Data> implements
         CloseableCollection<Data> {

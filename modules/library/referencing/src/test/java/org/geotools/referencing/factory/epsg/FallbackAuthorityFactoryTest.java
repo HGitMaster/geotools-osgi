@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
  * Checks the exception thrown by the fallback system do report actual errors when the code is
  * available but for some reason broken, and not "code not found" ones.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/test/java/org/geotools/referencing/factory/epsg/FallbackAuthorityFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/factory/epsg/FallbackAuthorityFactoryTest.java $
  * @version $Id: FallbackAuthorityFactoryTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Andrea Aime (TOPP)
  */

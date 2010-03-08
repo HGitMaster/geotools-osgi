@@ -25,7 +25,7 @@ package org.geotools.gml;
  * </p>
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/gml/GMLHandlerJTS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/GMLHandlerJTS.java $
  * @version $Id: GMLHandlerJTS.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public interface GMLHandlerJTS extends org.xml.sax.ContentHandler {

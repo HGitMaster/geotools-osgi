@@ -42,6 +42,8 @@ import org.geotools.xml.Node;
  *
  * @author Justin Deoliveira,Refractions Research Inc.,jdeolive@refractions.net
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/Handler.java $
  */
 public interface Handler {
     /**

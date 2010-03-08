@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: GenericCurveImpl.java 25075 2007-04-09 19:20:46Z desruisseaux $
+ ** $Id: GenericCurveImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/geometry/GenericCurveImpl.java,v $
  **
@@ -19,6 +19,8 @@ import org.geotools.geometry.jts.JTSGeometry;
  * 
  * @author SYS Technologies
  * @author crossley
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/geometry/GenericCurveImpl.java $
  * @version $Revision $
  */
 public abstract class GenericCurveImpl implements GenericCurve, JTSGeometry {

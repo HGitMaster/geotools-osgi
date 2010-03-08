@@ -56,7 +56,7 @@ import org.opengis.util.Cloneable;
  * Unit test for RescaleStyleVisitor.
  *
  * @author Jody Garnett (Refractions Research Inc)
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/test/java/org/geotools/styling/visitor/RescaleStyleVisitorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/visitor/RescaleStyleVisitorTest.java $
  */
 public class RescaleStyleVisitorTest extends TestCase {
     StyleBuilder sb;

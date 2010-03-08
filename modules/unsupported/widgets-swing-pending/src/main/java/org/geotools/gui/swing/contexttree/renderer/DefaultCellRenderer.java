@@ -32,6 +32,8 @@ import org.jdesktop.swingx.renderer.TableCellContext;
  * DefaultCellRenderer for JContextTree columns
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/renderer/DefaultCellRenderer.java $
  */
 public class DefaultCellRenderer implements javax.swing.table.TableCellRenderer, org.jdesktop.swingx.RolloverRenderer, java.io.Serializable {
     

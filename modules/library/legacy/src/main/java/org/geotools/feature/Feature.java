@@ -144,7 +144,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @author Rob Hranac, TOPP
  * @author Ian Schneider, USDA-ARS
  * @author dzwiers
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/legacy/src/main/java/org/geotools/feature/Feature.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/Feature.java $
  * @version $Id: Feature.java 30647 2008-06-12 18:58:42Z acuster $
  *
  * @see org.geotools.feature.FeatureType

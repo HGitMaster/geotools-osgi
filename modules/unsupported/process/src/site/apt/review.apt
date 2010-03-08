@@ -33,9 +33,16 @@ Abstract classes for building processes and factories.
 Implenmentated processes and factories.
 
 
+* org.geotools.process.feature
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Processes working with feature collections.
+
+
 * org.geotools.process.raster
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Process examples making use of raster data structures such as GridCoverage and PlanarImage.
+Contains processes for vector to raster and raster to vector conversion. The vector to
+raster classes are adapted from code contributed by Steve Ansari (NOAA) which was
+placed in the public domain as per US Government convention.
 
 
 * org.geotools.text

@@ -35,7 +35,7 @@ import java.util.logging.Level;
  *
  * @author Andrea Aime
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/fidmapper/PostgisFIDMapperFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/fidmapper/PostgisFIDMapperFactory.java $
  */
 public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
     JDBCDataStoreConfig config;

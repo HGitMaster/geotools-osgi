@@ -38,7 +38,7 @@ import org.geotools.referencing.operation.AbstractCoordinateOperation;
  * to {@code get} methods are forwarded to the appropriate {@link IdentifiedObject} method.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/Properties.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/Properties.java $
  * @version $Id: Properties.java 30975 2008-07-09 18:04:53Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

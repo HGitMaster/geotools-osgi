@@ -39,6 +39,8 @@ import org.opengis.filter.Filter;
  * @author aaime
  * @since 2.4
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/WrappingPostgisFeatureSource.java $
  */
 public class WrappingPostgisFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
     FeatureSource<SimpleFeatureType, SimpleFeature> wrapped;

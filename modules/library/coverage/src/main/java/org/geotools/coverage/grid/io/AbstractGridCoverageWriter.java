@@ -25,10 +25,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.util.logging.Logging;
-import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
-import org.opengis.parameter.GeneralParameterValue;
 
 /**
  * An {@link AbstractGridCoverageWriter} is the base class for all
@@ -43,6 +40,7 @@ import org.opengis.parameter.GeneralParameterValue;
  * @since 2.3.x
  *
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 
 	/** The {@link Logger} for this {@link AbstractGridCoverageWriter}. */
@@ -126,7 +124,6 @@ public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 	 */
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 	}
 

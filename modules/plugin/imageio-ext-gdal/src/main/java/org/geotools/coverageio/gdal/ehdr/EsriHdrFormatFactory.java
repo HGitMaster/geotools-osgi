@@ -77,7 +77,7 @@ public final class EsriHdrFormatFactory implements GridFormatFactorySpi {
      *
      * @return A {@link EsriHdrFormat}
      */
-    public Format createFormat() {
+    public EsriHdrFormat createFormat() {
         return new EsriHdrFormat();
     }
 

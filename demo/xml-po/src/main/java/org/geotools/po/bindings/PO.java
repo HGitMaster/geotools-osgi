@@ -12,13 +12,17 @@ package org.geotools.po.bindings;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.xml.XSD;
+
 /**
  * This interface contains the qualified names of all the types,elements, and 
  * attributes in the http://www.geotools.org/po schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/xml-po/src/main/java/org/geotools/po/bindings/PO.java $
  */
-public interface PO {
+public class PO extends XSD {
 
 	/** @generated */
 	public static final String NAMESPACE = "http://www.geotools.org/po";
@@ -44,9 +48,31 @@ public interface PO {
 	/** @generated */
 	public static final QName purchaseOrder = 
 		new QName("http://www.geotools.org/po","purchaseOrder");
-
 	/* Attributes */
 	
+	
+    private PO() {}
+    
+    /**
+     * singleton instance.
+     */
+    private static PO instance = new PO();
+    
+    /**
+     * The singleton instance;
+     */
+    public static PO getInstance() {
+        return instance;
+    }
+
+    @Override
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+    @Override
+    public String getSchemaLocation() {
+        return getClass().getResource("po.xsd").toString();
+    }
 
 }
 	

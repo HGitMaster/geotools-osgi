@@ -22,7 +22,9 @@ package org.geotools.feature;
  * 
  * @author Andrea Aime
  * 
- * @version $Id: ValidatingFeatureFactoryImpl.java 30990 2008-07-10 09:15:29Z aaime $
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/ValidatingFeatureFactoryImpl.java $
+ * @version $Id: ValidatingFeatureFactoryImpl.java 34126 2009-10-12 06:35:18Z mbedward $
  */
 public class ValidatingFeatureFactoryImpl extends AbstractFeatureFactoryImpl {
     

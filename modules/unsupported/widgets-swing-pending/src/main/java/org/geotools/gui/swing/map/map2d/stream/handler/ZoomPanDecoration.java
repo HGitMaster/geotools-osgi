@@ -28,6 +28,8 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  * Zoom pan decoration
  * 
  * @author Johann Sorel
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/handler/ZoomPanDecoration.java $
  */
 public class ZoomPanDecoration extends JComponent implements MapDecoration{
 

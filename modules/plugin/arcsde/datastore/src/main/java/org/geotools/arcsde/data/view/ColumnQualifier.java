@@ -22,14 +22,14 @@ import java.util.Map;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 /**
  * Qualifies a column name with the ArcSDE "table.user." prefix as required by the ArcSDE java api
  * to not get confused when using joined tables.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ColumnQualifier.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: ColumnQualifier.java 33451 2009-07-02 17:53:36Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/view/ColumnQualifier.java $

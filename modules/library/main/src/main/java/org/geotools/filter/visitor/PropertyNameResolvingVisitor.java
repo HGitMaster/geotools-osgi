@@ -30,6 +30,8 @@ import org.opengis.filter.expression.PropertyName;
  * 
  * @author Justin Deoliveira, OpenGEO
  * @since 2.6
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/PropertyNameResolvingVisitor.java $
  */
 public class PropertyNameResolvingVisitor extends DuplicatingFilterVisitor {
 

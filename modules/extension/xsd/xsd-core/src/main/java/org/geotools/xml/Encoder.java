@@ -59,10 +59,12 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.xml.impl.BindingFactoryImpl;
 import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.BindingPropertyExtractor;
+import org.geotools.xml.impl.BindingVisitorDispatch;
 import org.geotools.xml.impl.BindingWalker;
 import org.geotools.xml.impl.BindingWalkerFactoryImpl;
 import org.geotools.xml.impl.ElementEncoder;
 import org.geotools.xml.impl.GetPropertyExecutor;
+import org.geotools.xml.impl.MismatchedBindingFinder;
 import org.geotools.xml.impl.NamespaceSupportWrapper;
 import org.geotools.xml.impl.SchemaIndexImpl;
 import org.picocontainer.MutablePicoContainer;
@@ -123,6 +125,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
  *
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/Encoder.java $
  */
 public class Encoder {
     /**
@@ -568,6 +572,10 @@ public class Encoder {
 
     public void encode(Object object, QName name, ContentHandler handler)
         throws IOException, SAXException {
+        
+        //maintain a stack of (encoding,element declaration pairs)
+        Stack encoded = null;
+        
         try {
         serializer = handler;
 
@@ -617,8 +625,7 @@ public class Encoder {
             new IOException().initCause(e);
         }
 
-        //maintain a stack of (encoding,element declaration pairs)
-        Stack encoded = new Stack();
+        encoded = new Stack();
 
         //add the first entry
         XSDElementDeclaration root = index.getElementDeclaration(name);
@@ -682,15 +689,9 @@ public class Encoder {
                             encoded.push(new EncodingEntry(next, element,entry));                            
                         }
                     } else {
-                        //iterator done, special case check here for feature collection
-                        // we need to ensure the iterator is closed properly
+                        //iterator done, close it
                         Object source = child[2];
-                        if ( source instanceof FeatureCollection ) {
-                            //only close the iterator if not just a wrapping one
-                            if ( !( itr instanceof SingleIterator ) ) {
-                                ((FeatureCollection)source).close( itr );    
-                            }
-                        }
+                        closeIterator(itr,source);
                         
                         //this child is done, remove from child list
                         entry.children.remove(0);
@@ -849,8 +850,8 @@ public class Encoder {
 
                     //get the object(s) for this attribute
                     GetPropertyExecutor executor = new GetPropertyExecutor(entry.object, attribute);
-
-                    bindingWalker.walk(entry.element, executor, context);
+                    
+                    BindingVisitorDispatch.walk(object, bindingWalker, entry.element, executor, context);
 
                     if (executor.getChildObject() != null) {
                         //encode the attribute
@@ -1017,6 +1018,23 @@ O:
             //cleanup
             index.destroy();
             
+            //close any iterators still present in the stack, this will only occur in an exception
+            // case
+            if (encoded != null) {
+                while(!encoded.isEmpty()) {
+                    EncodingEntry entry = (EncodingEntry) encoded.pop();
+                    if (!entry.children.isEmpty()) {
+                        Object[] child = (Object[]) entry.children.get(0);
+                        Iterator itr = (Iterator) child[1];
+                        try {
+                            closeIterator(itr,child[2]);
+                        }
+                        catch( Exception e ) {
+                            //ignore, we are already in an error case.
+                        }
+                    }
+                }
+            }
             //TODO: there are probably other refences to elements of XSDScheam objects, we should
             // kill them too
         }
@@ -1041,6 +1059,16 @@ O:
         return (Document) result.getNode();
     }
     
+    protected void closeIterator(Iterator itr, Object source) {
+        //special case check here for feature collection
+        // we need to ensure the iterator is closed properly
+        if ( source instanceof FeatureCollection ) {
+            //only close the iterator if not just a wrapping one
+            if ( !( itr instanceof SingleIterator ) ) {
+                ((FeatureCollection)source).close( itr );
+            }
+        }
+    }
     protected Node encode(Object object, XSDNamedComponent component) {
         return encode( object, component, null );
     }

@@ -22,7 +22,7 @@ import org.opengis.filter.expression.Expression;
  * Default color map entry implementation
  *
  * @author aaime
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/styling/ColorMapEntryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/ColorMapEntryImpl.java $
  */
 public class ColorMapEntryImpl implements ColorMapEntry {
     //private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");

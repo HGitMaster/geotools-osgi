@@ -20,6 +20,8 @@ package org.geotools.geometry.iso.topograph2D;
 /**
  * A Position indicates the position of a Location relative to a graph component
  * (Node, Edge, or Area).
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Position.java $
  */
 public class Position {
 

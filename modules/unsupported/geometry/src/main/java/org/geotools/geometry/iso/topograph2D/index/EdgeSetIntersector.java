@@ -30,6 +30,8 @@ import java.util.List;
  * It uses a {@link SegmentIntersector} to compute the intersections between
  * segments and to record statistics about what kinds of intersections were
  * found.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/index/EdgeSetIntersector.java $
  */
 public abstract class EdgeSetIntersector {
 

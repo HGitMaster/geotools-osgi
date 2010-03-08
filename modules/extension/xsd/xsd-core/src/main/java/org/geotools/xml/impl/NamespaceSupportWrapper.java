@@ -24,6 +24,8 @@ import javax.xml.namespace.NamespaceContext;
 
 /**
  * NamespaceContext wrapper around namespace support.
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/NamespaceSupportWrapper.java $
  */
 public class NamespaceSupportWrapper implements NamespaceContext {
     NamespaceSupport namespaceSupport;

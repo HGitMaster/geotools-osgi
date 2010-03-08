@@ -33,7 +33,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * when a method first need it.
  *
  * @since 2.3
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/factory/RecursiveSearchException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/RecursiveSearchException.java $
  * @version $Id: RecursiveSearchException.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

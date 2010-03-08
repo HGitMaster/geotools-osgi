@@ -18,9 +18,7 @@
 package org.geotools.data.complex.config;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,26 +40,32 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import org.apache.xml.resolver.Catalog;
-import org.apache.xml.resolver.tools.ResolvingXMLReader;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.DataAccessRegistry;
 import org.geotools.data.complex.FeatureTypeMapping;
+import org.geotools.data.complex.FeatureTypeMappingFactory;
 import org.geotools.data.complex.NestedAttributeMapping;
+import org.geotools.data.complex.TreeAttributeMapping;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.factory.Hints;
 import org.geotools.feature.Types;
 import org.geotools.filter.AttributeExpressionImpl;
+import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.expression.FeaturePropertyAccessorFactory;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.xml.SchemaIndex;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.expression.Expression;
 import org.xml.sax.helpers.NamespaceSupport;
@@ -72,8 +77,11 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AppSchemaDataAccessConfigurator.java 32690 2009-03-25 02:58:59Z ang05a $
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AppSchemaDataAccessConfigurator.java $
+ * @author Russell Petty, GSV
+ * @version $Id: AppSchemaDataAccessConfigurator.java 34495 2009-11-25 12:24:06Z ang05a $
+ * @source $URL:
+ *         http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main
+ *         /java/org/geotools/data/complex/config/AppSchemaDataAccessConfigurator.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessConfigurator {
@@ -84,9 +92,9 @@ public class AppSchemaDataAccessConfigurator {
     /** DOCUMENT ME! */
     private AppSchemaDataAccessDTO config;
 
-    private Map typeRegistry;
+    private Map<String, String> resolvedSchemaLocations;
 
-    private Map descriptorRegistry;
+    private FeatureTypeRegistry typeRegistry;
 
     private Map sourceDataStores;
 
@@ -95,11 +103,12 @@ public class AppSchemaDataAccessConfigurator {
      * mapping file.
      */
     private NamespaceSupport namespaces;
+
     /**
-     * This holds the data access ids when isDataAccess is specified in the mapping connection 
-     * parameters. A data access differs from a data store where it produces complex
-     * features, instead of simple features. This requires the data access to be registered, so
-     * that its complex feature source can later be retrieved via the DataAccessRegistry.
+     * This holds the data access ids when isDataAccess is specified in the mapping connection
+     * parameters. A data access differs from a data store where it produces complex features,
+     * instead of simple features. This requires the data access to be registered, so that its
+     * complex feature source can later be retrieved via the DataAccessRegistry.
      */
     private ArrayList<String> inputDataAccessIds;
 
@@ -112,7 +121,8 @@ public class AppSchemaDataAccessConfigurator {
     private AppSchemaDataAccessConfigurator(AppSchemaDataAccessDTO config) {
         this.config = config;
         namespaces = new NamespaceSupport();
-        inputDataAccessIds = new ArrayList <String>();
+        inputDataAccessIds = new ArrayList<String>();
+        resolvedSchemaLocations = new HashMap<String, String>();
         Map nsMap = config.getNamespaces();
         for (Iterator it = nsMap.entrySet().iterator(); it.hasNext();) {
             Map.Entry entry = (Entry) it.next();
@@ -184,28 +194,41 @@ public class AppSchemaDataAccessConfigurator {
             TypeMapping dto = (TypeMapping) it.next();
 
             FeatureSource featureSource = getFeatureSource(dto);
-            AttributeDescriptor target = getTargetDescriptor(dto);
-            List attMappings = getAttributeMappings(target, dto.getAttributeMappings());
+            GeometryType geomType = null;
+            // get default geometry from underlying feature source and pass it on
+            GeometryDescriptor defaultGeom = featureSource.getSchema().getGeometryDescriptor();
+            if (defaultGeom != null) {
+                geomType = defaultGeom.getType();
+            }
+            AttributeDescriptor target = getTargetDescriptor(dto, geomType);
+
+            // set schema location for describeFeatureType
+            String nsURI = target.getName().getNamespaceURI();
+            if (nsURI != null) {
+                String schemaURI = resolvedSchemaLocations.get(nsURI);
+                if (schemaURI != null) {
+                    target.getType().getUserData().put("schemaURI", schemaURI);
+                }
+            }
+            List attMappings = getAttributeMappings(target, dto.getAttributeMappings(), dto.getItemXpath());
 
             FeatureTypeMapping mapping;
 
-            mapping = new FeatureTypeMapping(featureSource, target, attMappings, namespaces);
+            mapping = FeatureTypeMappingFactory.getInstance(featureSource, target, attMappings, namespaces,
+                    dto.getItemXpath(), dto.isXmlDataStore());
 
             featureTypeMappings.add(mapping);
         }
         return featureTypeMappings;
     }
 
-    private AttributeDescriptor getTargetDescriptor(TypeMapping dto) throws IOException {
-        if (descriptorRegistry == null) {
-            throw new IllegalStateException("schemas not yet parsed");
-        }
-
+    private AttributeDescriptor getTargetDescriptor(TypeMapping dto, GeometryType geomType)
+            throws IOException {
         String prefixedTargetName = dto.getTargetElementName();
         Name targetNodeName = degloseName(prefixedTargetName);
 
-        AttributeDescriptor targetDescriptor;
-        targetDescriptor = (AttributeDescriptor) descriptorRegistry.get(targetNodeName);
+        AttributeDescriptor targetDescriptor = typeRegistry.getDescriptor(targetNodeName, geomType,
+                dto.getAttributeMappings());
         if (targetDescriptor == null) {
             throw new NoSuchElementException("descriptor " + targetNodeName
                     + " not found in parsed schema");
@@ -222,7 +245,8 @@ public class AppSchemaDataAccessConfigurator {
      * 
      * @return
      */
-    private List getAttributeMappings(final AttributeDescriptor root, final List attDtos) throws IOException {
+    private List getAttributeMappings(final AttributeDescriptor root, final List attDtos,
+            String itemXpath) throws IOException {
         List attMappings = new LinkedList();
 
         for (Iterator it = attDtos.iterator(); it.hasNext();) {
@@ -230,14 +254,25 @@ public class AppSchemaDataAccessConfigurator {
             org.geotools.data.complex.config.AttributeMapping attDto;
             attDto = (org.geotools.data.complex.config.AttributeMapping) it.next();
 
-            String idExpr = attDto.getIdentifierExpression();
+            String idExpr = attDto.getIdentifierExpression();            
+            String idXpath = null;
+            if (idExpr == null) {
+             // this might be because it's an XPath expression
+                idXpath = attDto.getIdentifierPath();
+                if (idXpath != null) {
+                    //validate without indexed elements
+                    final StepList inputXPathSteps = XPath.steps(root, itemXpath + "/"+ idXpath, namespaces);
+                    validateConfiguredNamespaces(inputXPathSteps);
+                }                         
+            }
+                        
             String sourceExpr = attDto.getSourceExpression();
             String inputXPath = null;
             if (sourceExpr == null) {
                 // this might be because it's an XPath expression
                 inputXPath = attDto.getInputAttributePath();
                 if (inputXPath != null) {
-                    final StepList inputXPathSteps = XPath.steps(root, inputXPath, namespaces);
+                    final StepList inputXPathSteps = XPath.steps(root, itemXpath + "/" + inputXPath, namespaces);
                     validateConfiguredNamespaces(inputXPathSteps);
                 }
             }
@@ -249,21 +284,24 @@ public class AppSchemaDataAccessConfigurator {
 
             final boolean isMultiValued = attDto.isMultiple();
 
-            final Expression idExpression = parseOgcCqlExpression(idExpr);
+            final Expression idExpression = (idXpath == null) ? parseOgcCqlExpression(idExpr)
+                    : new AttributeExpressionImpl(idXpath, new Hints(
+                            FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT, this.namespaces));
             // if the data source is a data access, the input XPath expression is the source
             // expression
-            final Expression sourceExpression = (inputXPath == null) ? parseOgcCqlExpression(sourceExpr)
-                    : new AttributeExpressionImpl(inputXPath, new Hints(
-                            FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT, this.namespaces));
-            
+            final Expression sourceExpression; 
+
+            sourceExpression = (inputXPath == null) ? parseOgcCqlExpression(sourceExpr) : new AttributeExpressionImpl(inputXPath, new Hints(
+                  FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT, this.namespaces));
+
             final AttributeType expectedInstanceOf;
 
-            final Map clientProperties = getClientProperties(attDto);
+            final Map clientProperties = getClientProperties(attDto, itemXpath);
 
             if (expectedInstanceTypeName != null) {
-                Name expectedNodeTypeName = null;
-                expectedNodeTypeName = degloseTypeName(expectedInstanceTypeName);
-                expectedInstanceOf = (AttributeType) typeRegistry.get(expectedNodeTypeName);
+                Name expectedNodeTypeName = degloseTypeName(expectedInstanceTypeName);
+                expectedInstanceOf = typeRegistry
+                        .getAttributeType(expectedNodeTypeName, null, null);
                 if (expectedInstanceOf == null) {
                     String msg = "mapping expects and instance of " + expectedNodeTypeName
                             + " for attribute " + targetXPath
@@ -275,6 +313,11 @@ public class AppSchemaDataAccessConfigurator {
             }
             AttributeMapping attMapping;
             String sourceElement = attDto.getLinkElement();
+            if(attDto.getLabel() != null || attDto.getParentLabel() != null) {
+                attMapping = new TreeAttributeMapping(idExpression, sourceExpression, targetXPathSteps,
+                        expectedInstanceOf, isMultiValued, clientProperties, attDto.getLabel(), 
+                        attDto.getParentLabel(), attDto.getTargetQueryString(), attDto.getInstancePath());
+            } else
             if (sourceElement != null) {
                 // nested complex attributes
                 String sourceField = attDto.getLinkField();
@@ -284,7 +327,7 @@ public class AppSchemaDataAccessConfigurator {
                 // a nested feature
                 attMapping = new NestedAttributeMapping(idExpression, sourceExpression,
                         targetXPathSteps, isMultiValued, clientProperties,
-                        degloseTypeName(sourceElement), sourceFieldSteps);
+                        degloseTypeName(sourceElement), sourceFieldSteps, namespaces);
             } else {
                 attMapping = new AttributeMapping(idExpression, sourceExpression, targetXPathSteps,
                         expectedInstanceOf, isMultiValued, clientProperties);
@@ -342,7 +385,7 @@ public class AppSchemaDataAccessConfigurator {
      *         mapping)
      * @throws DataSourceException
      */
-    private Map getClientProperties(org.geotools.data.complex.config.AttributeMapping dto)
+    private Map getClientProperties(org.geotools.data.complex.config.AttributeMapping dto, String inputXPath)
             throws DataSourceException {
 
         if (dto.getClientProperties().size() == 0) {
@@ -355,7 +398,18 @@ public class AppSchemaDataAccessConfigurator {
             String name = (String) entry.getKey();
             Name qName = degloseName(name);
             String cqlExpression = (String) entry.getValue();
-            Expression expression = parseOgcCqlExpression(cqlExpression);
+            
+            final Expression expression;
+            if (inputXPath == null) {
+                expression =  parseOgcCqlExpression(cqlExpression);
+            } else if(cqlExpression.startsWith("'")) {
+                FilterFactoryImpl ff = new FilterFactoryImpl();
+                expression = ff.literal(cqlExpression);
+            } else {
+                expression =  new AttributeExpressionImpl(cqlExpression, new Hints(
+                        FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT, this.namespaces));
+            }
+                        
             clientProperties.put(qName, expression);
         }
         return clientProperties;
@@ -412,49 +466,31 @@ public class AppSchemaDataAccessConfigurator {
         schemaParser = EmfAppSchemaReader.newInstance();
         schemaParser.setCatalog(oasisCatalog);
 
+        // create a single type registry for all the schemas in the config
+        typeRegistry = new FeatureTypeRegistry(namespaces);
+
         for (Iterator it = schemaFiles.iterator(); it.hasNext();) {
             String schemaLocation = (String) it.next();
             final URL schemaUrl = resolveResourceLocation(baseUrl, schemaLocation);
             AppSchemaDataAccessConfigurator.LOGGER.fine("parsing schema "
                     + schemaUrl.toExternalForm());
 
-            schemaParser.parse(schemaUrl);
+            SchemaIndex schemaIndex = schemaParser.parse(schemaUrl, resolvedSchemaLocations);
+            // add the resolved EMF schema so typeRegistry can find the needed type tree when it's
+            // asked for the mapped FeatureType
+            typeRegistry.addSchemas(schemaIndex);
         }
-
-        typeRegistry = schemaParser.getTypeRegistry();
-        descriptorRegistry = schemaParser.getDescriptorRegistry();
     }
 
     private Catalog getCatalog() throws MalformedURLException, IOException {
-        Catalog oasisCatalog = null;
         String catalogLocation = config.getCatalog();
-        if (catalogLocation != null) {
-            final URL baseUrl = new URL(config.getBaseSchemasUrl());
-            final URL resolvedResourceLocation = resolveResourceLocation(baseUrl, catalogLocation);
-            catalogLocation = resolvedResourceLocation.toExternalForm();
-            boolean exists = resourceExists(resolvedResourceLocation);
-            if (!exists) {
-                throw new FileNotFoundException("Catalog file does not exists: " + catalogLocation);
-            }
-            final ResolvingXMLReader reader = new ResolvingXMLReader();
-            final Catalog catalog = reader.getCatalog();
-            catalog.getCatalogManager().setVerbosity(9);
-            catalog.getCatalogManager().setIgnoreMissingProperties(false);
-            catalog.parseCatalog(catalogLocation);
-            oasisCatalog = catalog;
+        if (catalogLocation == null) {
+            return null;
+        } else {
+            URL baseUrl = new URL(config.getBaseSchemasUrl());
+            URL resolvedCatalogLocation = resolveResourceLocation(baseUrl, catalogLocation);
+            return CatalogUtilities.buildPrivateCatalog(resolvedCatalogLocation);
         }
-        return oasisCatalog;
-    }
-
-    private boolean resourceExists(final URL resolvedResourceLocation) {
-        InputStream in;
-        try {
-            in = resolvedResourceLocation.openStream();
-            in.close();
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
     }
 
     private URL resolveResourceLocation(final URL baseUrl, String schemaLocation)
@@ -498,12 +534,12 @@ public class AppSchemaDataAccessConfigurator {
         String id;
 
         for (Iterator it = dsParams.iterator(); it.hasNext();) {
-            SourceDataStore dsconfig = (SourceDataStore) it.next();            
-            id = dsconfig.getId();    
-            
+            SourceDataStore dsconfig = (SourceDataStore) it.next();
+            id = dsconfig.getId();
+
             if (dsconfig.isDataAccess()) {
                 inputDataAccessIds.add(id);
-            } 
+            }
 
             Map datastoreParams = dsconfig.getParams();
 
@@ -514,8 +550,11 @@ public class AppSchemaDataAccessConfigurator {
             DataAccess dataStore = DataAccessFinder.getDataStore(datastoreParams);
 
             if (dataStore == null) {
+                AppSchemaDataAccessConfigurator.LOGGER.log(Level.SEVERE,
+                        "Cannot find a DataAccess for parameters " + datastoreParams);
                 throw new DataSourceException("Cannot find a DataAccess for parameters "
-                        + datastoreParams);
+                        + "(some not shown) "
+                        + filterDatastoreParams(datastoreParams));
             }
 
             AppSchemaDataAccessConfigurator.LOGGER.fine("got datastore " + dataStore);
@@ -523,6 +562,46 @@ public class AppSchemaDataAccessConfigurator {
         }
 
         return datastores;
+    }
+    
+    /**
+     * Database connection parameters that are probably safe to report to the end user.
+     * (Things we can be pretty sure are not passwords.)
+     */
+    @SuppressWarnings("serial")
+    private static final List<String> SAFE_DATASTORE_PARAMS = Collections
+            .unmodifiableList(new ArrayList<String>() {
+                {
+                    add("url"); // shapefile
+                    add("directory"); // propertyfile
+                    add("namespace"); // just about everything
+                    add("dbtype"); // jdbc
+                    add("jndiReferenceName"); // jdni
+                    // these are all various jdbc options
+                    add("host");
+                    add("port");
+                    add("database");
+                    add("schema");
+                    add("user");
+                }
+            });
+    
+    /**
+     * Return datastore params filtered to include only known-safe parameters.
+     * We cannot try to find passwords, because even dbtype could be misspelled.
+     * 
+     * @param datastoreParams
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Map filterDatastoreParams(Map datastoreParams) {
+        Map filteredDatastoreParams = new LinkedHashMap();
+        for (String key : SAFE_DATASTORE_PARAMS) {
+            if (datastoreParams.containsKey(key)) {
+                filteredDatastoreParams.put(key, datastoreParams.get(key));
+            }
+        }
+        return filteredDatastoreParams;
     }
 
     /**
@@ -533,11 +612,9 @@ public class AppSchemaDataAccessConfigurator {
      * @return
      * @throws MalformedURLException
      */
-    private Map resolveRelativePaths(final Map datastoreParams) throws MalformedURLException {
+    private Map resolveRelativePaths(final Map datastoreParams) {
         Map resolvedParams = new HashMap();
-
-        for (Iterator it = datastoreParams.entrySet().iterator(); it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
+        for (Map.Entry entry : (Set<Map.Entry>) datastoreParams.entrySet()) {
             String key = (String) entry.getKey();
             String value = (String) entry.getValue();
             if (value != null && value.startsWith("file:")) {
@@ -546,20 +623,27 @@ public class AppSchemaDataAccessConfigurator {
                 if (!f.isAbsolute()) {
                     LOGGER.fine("resolving relative path " + value + " for dataURLstore parameter "
                             + key);
-                    URL baseSchemasUrl = new URL(config.getBaseSchemasUrl());
-                    URL resolvedUrl = new URL(baseSchemasUrl, value);
-                    value = resolvedUrl.toExternalForm();
-                    // HACK for shapefile: shapefile requires file:/...
-                    if (!"url".equals(key) && value.startsWith("file:")) {
-                        value = value.substring("file:".length());
+                    try {
+                        // use of URL here should be safe as the base schema url should
+                        // not yet have undergone any conversion to file or
+                        // encoding/decoding
+                        URL baseSchemasUrl = new URL(config.getBaseSchemasUrl());
+                        URL resolvedUrl = new URL(baseSchemasUrl, value);
+                        if ("url".equals(key)) {
+                            // HACK for shapefile: shapefile requires file:/...
+                            value = resolvedUrl.toExternalForm();
+                        } else {
+                            // data stores seem to not expect file URIs
+                            value = DataUtilities.urlToFile(resolvedUrl).getPath();
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
                     LOGGER.fine("new value for " + key + ": " + value);
                 }
             }
-
             resolvedParams.put(key, value);
         }
-
         return resolvedParams;
     }
 

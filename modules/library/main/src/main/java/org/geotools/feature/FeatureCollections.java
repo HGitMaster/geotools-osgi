@@ -29,7 +29,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * A utility class for working with FeatureCollections.
  * Provides a mechanism for obtaining a FeatureCollection<SimpleFeatureType, SimpleFeature> instance.
  * @author  Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/FeatureCollections.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/FeatureCollections.java $
  */
 public abstract class FeatureCollections implements Factory {
   

@@ -24,22 +24,30 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.coverageio.gdal.BaseGDALGridCoverage2DReader;
+import org.geotools.coverageio.gdal.GDALTestCase;
 import org.geotools.coverageio.gdal.ecw.ECWReader;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.test.TestData;
+import org.junit.Assert;
+import org.junit.Test;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 /**
  * @author Alex Petkov, Missoula Fire Sciences Laboratory
@@ -47,8 +55,10 @@ import org.opengis.parameter.ParameterValue;
  * @author Simone Giannecchini (simboss), GeoSolutions
  * 
  * Testing {@link ECWReader}
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/ehdr/EsriHdrTest.java $
  */
-public final class EsriHdrTest extends AbstractEsriHdrTestCase {
+public final class EsriHdrTest extends GDALTestCase {
     /**
      * file name of a valid EHdr sample data to be used for tests.
      */
@@ -59,14 +69,12 @@ public final class EsriHdrTest extends AbstractEsriHdrTestCase {
      * 
      * @param name
      */
-    public EsriHdrTest(String name) {
-        super(name);
+    public EsriHdrTest() {
+        super("EHdr", new EsriHdrFormatFactory());
     }
 
-    public static final void main(String[] args) throws Exception {
-        junit.textui.TestRunner.run(EsriHdrTest.class);
-    }
 
+    @Test
     public void test() throws Exception {
         if (!testingEnabled()) {
             return;
@@ -92,12 +100,12 @@ public final class EsriHdrTest extends AbstractEsriHdrTestCase {
         hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, l));
 
         // get a reader
-        final URL url = file.toURL();
+        final URL url = file.toURI().toURL();
         final Object source = url;
         final BaseGDALGridCoverage2DReader reader = new EsriHdrReader(source,
                 hints);
         // Testing the getSource method
-        assertEquals(reader.getSource(), source);
+        Assert.assertEquals(reader.getSource(), source);
 
         // /////////////////////////////////////////////////////////////////////
         //
@@ -115,7 +123,7 @@ public final class EsriHdrTest extends AbstractEsriHdrTestCase {
         final double cropFactor = 2.0;
         final int oldW = gc.getRenderedImage().getWidth();
         final int oldH = gc.getRenderedImage().getHeight();
-        final Rectangle range = reader.getOriginalGridRange().toRectangle();
+        final Rectangle range =((GridEnvelope2D)reader.getOriginalGridRange());
         final GeneralEnvelope oldEnvelope = reader.getOriginalEnvelope();
         final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] {
                 oldEnvelope.getLowerCorner().getOrdinate(0)
@@ -129,13 +137,13 @@ public final class EsriHdrTest extends AbstractEsriHdrTestCase {
 
         final ParameterValue gg = (ParameterValue) ((AbstractGridFormat) reader
                 .getFormat()).READ_GRIDGEOMETRY2D.createValue();
-        gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
+        gg.setValue(new GridGeometry2D(new GridEnvelope2D(new Rectangle(0, 0,
                 (int) (range.width / 4.0 / cropFactor),
                 (int) (range.height / 4.0 / cropFactor))), cropEnvelope));
         gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg });
-        assertNotNull(gc);
+        Assert.assertNotNull(gc);
         // NOTE: in some cases might be too restrictive
-        assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
+        Assert.assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
                 .getScale(((AffineTransform) ((GridGeometry2D) gc
                         .getGridGeometry()).getGridToCRS2D())) / 2, true));
 
@@ -161,10 +169,37 @@ public final class EsriHdrTest extends AbstractEsriHdrTestCase {
 
         final ParameterValue gg2 = (ParameterValue) ((AbstractGridFormat) reader
                 .getFormat()).READ_GRIDGEOMETRY2D.createValue();
-        gg2.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0,
+        gg2.setValue(new GridGeometry2D(new GridEnvelope2D(new Rectangle(0,
                 0, (int) (range.width), (int) (range.height))), wrongEnvelope));
 
         gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg2 });
-        assertNull("Wrong envelope requested", gc);
+        Assert.assertNull("Wrong envelope requested", gc);
+    }
+    
+    @Test
+    public void testIsAvailable() throws NoSuchAuthorityCodeException, FactoryException {
+        if (!testingEnabled()) {
+            return;
+        }
+
+        GridFormatFinder.scanForPlugins();
+
+        Iterator list = GridFormatFinder.getAvailableFormats().iterator();
+        boolean found = false;
+        GridFormatFactorySpi fac = null;
+
+        while (list.hasNext()) {
+            fac = (GridFormatFactorySpi) list.next();
+
+            if (fac instanceof EsriHdrFormatFactory) {
+                found = true;
+
+                break;
+            }
+        }
+
+        Assert.assertTrue("EsriHdrFormatFactory not registered", found);
+        Assert.assertTrue("EsriHdrFormatFactory not available", fac.isAvailable());
+        Assert.assertNotNull(new EsriHdrFormatFactory().createFormat());
     }
 }

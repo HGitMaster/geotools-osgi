@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: PositionImpl.java 30497 2008-06-03 16:24:54Z desruisseaux $
+ ** $Id: PositionImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/geometry/PositionImpl.java,v $
  **
@@ -24,6 +24,8 @@ import org.opengis.geometry.coordinate.Position;
  * @UML datatype GM_Position
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/geometry/PositionImpl.java $
  * @version 2.0
  */
 public class PositionImpl implements Position {

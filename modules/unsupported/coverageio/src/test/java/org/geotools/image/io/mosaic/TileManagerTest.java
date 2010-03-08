@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link TileManager}.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/TileManagerTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/TileManagerTest.java $
  * @version $Id: TileManagerTest.java 31649 2008-10-12 17:56:37Z desruisseaux $
  * @author Martin Desruisseaux
  */

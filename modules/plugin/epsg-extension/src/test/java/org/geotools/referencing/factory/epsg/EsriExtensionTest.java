@@ -44,7 +44,7 @@ import junit.framework.TestSuite;
 /**
  * Tests ESRI CRS support.
  * 
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/epsg-extension/src/test/java/org/geotools/referencing/factory/epsg/EsriExtensionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-extension/src/test/java/org/geotools/referencing/factory/epsg/EsriExtensionTest.java $
  * @version $Id: EsriExtensionTest.java 30656 2008-06-12 20:32:50Z acuster $
  * @author Jody Garnett
  * @author Martin Desruisseaux

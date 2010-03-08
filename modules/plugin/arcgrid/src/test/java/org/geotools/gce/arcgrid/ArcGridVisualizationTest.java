@@ -17,7 +17,6 @@
  */
 package org.geotools.gce.arcgrid;
 
-import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,17 +26,9 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.PlanarImage;
 
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.io.AbstractGridFormat;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
 import org.geotools.test.TestData;
-import org.geotools.resources.coverage.CoverageUtilities;
 import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * <p>
@@ -57,7 +48,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * </p>
  * 
  * @author <a href="mailto:simboss1@gmil.com">Simone Giannecchini (simboss)</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridVisualizationTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridVisualizationTest.java $
  * @version 1.0
  */
 public final class ArcGridVisualizationTest extends ArcGridTestCaseAdapter {
@@ -110,7 +101,7 @@ public final class ArcGridVisualizationTest extends ArcGridTestCaseAdapter {
 		
 		LOGGER.info("Reading the gzipped coverage through a URL");
 		// Reading the coverage through a URL
-		reader = new ArcGridReader( f.toURL());
+		reader = new ArcGridReader( f.toURI().toURL());
 		final GridCoverage2D gc4 = (GridCoverage2D) reader.read(null);
 
 		// show the coverage or try to load the data

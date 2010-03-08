@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * work faster - this should probably be done in the superclass.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleFeatureWriter.java $
  * @version $Id: OracleFeatureWriter.java 30921 2008-07-05 07:51:23Z jgarnett $
  */
 public class OracleFeatureWriter extends JDBCTextFeatureWriter {

@@ -30,7 +30,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Information about the distributor of and options for obtaining the resource.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/metadata/src/main/java/org/geotools/metadata/iso/distribution/DistributionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/distribution/DistributionImpl.java $
  * @version $Id: DistributionImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/SimpleTypeGT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/SimpleTypeGT.java $
  */
 public class SimpleTypeGT implements SimpleType {
     // file visible to avoid set* methods

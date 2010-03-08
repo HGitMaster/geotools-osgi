@@ -69,6 +69,8 @@ import org.opengis.referencing.operation.Matrix;
  * 
  * @author Simone Giannecchini, GeoSolutions
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/WorldFileWriter.java $
  */
 public class WorldFileWriter {
 	/**

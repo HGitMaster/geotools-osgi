@@ -63,7 +63,7 @@ import static java.lang.Math.*;
  * </ul>
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueStereographic.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueStereographic.java $
  * @version $Id: ObliqueStereographic.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Gerald I. Evenden (for original code in Proj4)
  * @author Rueben Schulz
@@ -244,7 +244,7 @@ public class ObliqueStereographic extends StereographicUSGS {
      * EPSG.
      *
      * @since 2.4
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueStereographic.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueStereographic.java $
      * @version $Id: ObliqueStereographic.java 30641 2008-06-12 17:42:27Z acuster $
      * @author Rueben Schulz
      *

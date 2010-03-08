@@ -22,8 +22,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.geotools.data.Parameter;
+import org.geotools.feature.NameImpl;
 import org.geotools.process.Process;
-import org.geotools.process.impl.AbstractProcessFactory;
+import org.geotools.process.impl.SingleProcessFactory;
 import org.geotools.text.Text;
 import org.opengis.feature.Feature;
 import org.opengis.util.InternationalString;
@@ -32,9 +33,10 @@ import org.opengis.util.InternationalString;
  * XXX Untested Factory for FeatureBuffer process
  *
  * @author Lucas Reed, Refractions Research Inc
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/literal/FeatureBufferFactory.java $
  */
-public class FeatureBufferFactory extends AbstractProcessFactory
-{
+public class FeatureBufferFactory extends SingleProcessFactory  {
 	static final Parameter<Feature> INPUT_A = new Parameter<Feature>("input_a",
 			Feature.class, Text.text("Input Feature"),    Text.text("Feature to buffer"));
 	static final Parameter<Double> INPUT_B = new Parameter<Double>("input_b", Double.class,
@@ -54,6 +56,10 @@ public class FeatureBufferFactory extends AbstractProcessFactory
 	static
 	{
         resultInfo.put(RESULT.key, RESULT);
+    }
+	
+	public FeatureBufferFactory() {
+        super(new NameImpl(GT_NAMESPACE, "FeatureBuffer"));
     }
 
 	public Process create(Map<String, Object> parameters) throws IllegalArgumentException
@@ -79,11 +85,6 @@ public class FeatureBufferFactory extends AbstractProcessFactory
 	public InternationalString getTitle()
 	{
 	    return Text.text("FeatureBuffer");
-	}
-
-	public String getName()
-	{
-		return "FeatureBuffer";
 	}
 
 	public boolean supportsProgress()

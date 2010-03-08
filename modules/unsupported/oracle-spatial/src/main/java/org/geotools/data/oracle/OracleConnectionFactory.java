@@ -35,7 +35,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleConnectionFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleConnectionFactory.java $
  * @version $Id: OracleConnectionFactory.java 30706 2008-06-13 15:47:21Z acuster $
  * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */

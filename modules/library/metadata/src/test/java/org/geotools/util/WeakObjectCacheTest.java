@@ -24,6 +24,8 @@ import static org.junit.Assert.*;
  * Tests the WeakObjectCache with simple tests.
  *
  * @author Cory Horner (Refractions Research)
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/WeakObjectCacheTest.java $
  */
 public final class WeakObjectCacheTest {
     private Integer  key1 = 1;

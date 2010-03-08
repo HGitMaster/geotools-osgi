@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Base interface for renderer. This is very much work in progress.
  * <strong>Note: this interface will changes in future versions.</strong>
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/Renderer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/Renderer.java $
  * @version $Id: Renderer.java 30649 2008-06-12 19:44:08Z acuster $
  * @author James Macgill
  */

@@ -35,7 +35,8 @@ import java.sql.Statement;
  * A simple implementation of FIDMapper for multi column primary keys
  *
  * @author wolf
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/MultiColumnFIDMapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/MultiColumnFIDMapper.java $
+ * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class MultiColumnFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;

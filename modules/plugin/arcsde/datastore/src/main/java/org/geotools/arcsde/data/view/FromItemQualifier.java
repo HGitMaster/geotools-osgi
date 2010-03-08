@@ -22,7 +22,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.FromItemVisitor;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.ISession;
 
 /**
  * Fully qualifies a table names.
@@ -36,7 +36,7 @@ import org.geotools.arcsde.pool.ISession;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: FromItemQualifier.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: FromItemQualifier.java 33451 2009-07-02 17:53:36Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/view/FromItemQualifier.java $

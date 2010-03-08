@@ -34,6 +34,8 @@ import org.opengis.feature.type.Schema;
  * http://www.opengis.net/gml schema.
  *
  * @generated
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/GML.java $
  */
 public final class GML extends XSD {
 

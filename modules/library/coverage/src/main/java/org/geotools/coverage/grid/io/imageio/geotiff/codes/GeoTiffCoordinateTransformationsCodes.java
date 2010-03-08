@@ -36,6 +36,8 @@ package org.geotools.coverage.grid.io.imageio.geotiff.codes;
  * @author Simone Giannecchini
  * @since 2.3
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/imageio/geotiff/codes/GeoTiffCoordinateTransformationsCodes.java $
  */
 public final class GeoTiffCoordinateTransformationsCodes {
 

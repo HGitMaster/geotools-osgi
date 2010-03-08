@@ -32,8 +32,10 @@ import java.util.logging.Logger;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.Command;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.SdeRow;
+import org.geotools.arcsde.session.UnavailableConnectionException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
@@ -138,6 +140,10 @@ import com.vividsolutions.jts.geom.Point;
  * /arcsde/data/SDEJavaApiJoinTest.java $ &#064;version $Id: SDEJavaApiJoinTest.java 31903
  * 2008-11-22 20:44:25Z groldan $ &#064;since 2.3.x
  * 
+ * 
+ * @source $URL:
+ *         http://svn.osgeo.org/geotools/trunk/modules/plugin/arcsde/datastore/src/test/java/org
+ *         /geotools/arcsde/data/SDEJavaApiJoinTest.java $
  */
 public class SDEJavaApiJoinTest {
     /** package logger */
@@ -157,10 +163,11 @@ public class SDEJavaApiJoinTest {
      * @throws SeException
      * @throws FactoryException
      * @throws NoSuchAuthorityCodeException
+     * @throws UnavailableConnectionException
      */
     @BeforeClass
     public static void oneTimeSetUp() throws IOException, SeException,
-            NoSuchAuthorityCodeException, FactoryException {
+            NoSuchAuthorityCodeException, FactoryException, UnavailableConnectionException {
         testData = new TestData();
         testData.setUp();
 

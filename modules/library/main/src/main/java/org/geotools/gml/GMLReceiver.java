@@ -26,7 +26,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * DOCUMENT ME!
  *
  * @author Darren Edmonds
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/gml/GMLReceiver.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/GMLReceiver.java $
  */
 public class GMLReceiver extends XMLFilterImpl implements GMLHandlerFeature {
     /** */

@@ -75,6 +75,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Jackson Roehrig & Sanjay Jena
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/GeometryFactoryImpl.java $
  */
 public class GeometryFactoryImpl implements Factory, GeometryFactory {
 

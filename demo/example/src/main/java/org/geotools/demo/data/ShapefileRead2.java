@@ -35,6 +35,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Jody Garnett (Refractions Research)
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/data/ShapefileRead2.java $
  */
 public class ShapefileRead2 {
 

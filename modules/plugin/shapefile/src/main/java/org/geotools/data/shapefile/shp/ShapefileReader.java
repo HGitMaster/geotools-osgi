@@ -34,6 +34,12 @@ import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.resources.NIOUtilities;
 import org.geotools.util.logging.Logging;
 
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+
 /**
  * The general use of this class is: <CODE><PRE>
  * 
@@ -86,7 +92,7 @@ public class ShapefileReader implements FileReader {
         /** The maximum Y value. */
         public double maxY;
 
-        ShapeType type;
+        public ShapeType type;
 
         int end = 0; // Relative to the whole file
 
@@ -110,6 +116,43 @@ public class ShapefileReader implements FileReader {
         public String toString() {
             return "Record " + number + " length " + length + " bounds " + minX
                     + "," + minY + " " + maxX + "," + maxY;
+        }
+        
+        public Envelope envelope() {
+            return new Envelope(minX, maxX, minY, maxY);
+        }
+        
+        public Object getSimplifiedShape() {
+            CoordinateSequenceFactory csf = geometryFactory.getCoordinateSequenceFactory();
+            if(type.isMultiPointType()) {
+                CoordinateSequence cs = csf.create(1, 2);
+                cs.setOrdinate(0, 0, (minX + maxX) / 2);
+                cs.setOrdinate(0, 1, (minY + maxY) / 2);
+                return geometryFactory.createPoint(cs);
+            } else if(type.isLineType()) {
+                CoordinateSequence cs = csf.create(2, 2);
+                cs.setOrdinate(0, 0, minX);
+                cs.setOrdinate(0, 1, minY);
+                cs.setOrdinate(1, 0, maxX);
+                cs.setOrdinate(1, 1, maxY);
+                return geometryFactory.createLineString(cs);
+            } else if(type.isPolygonType()) {
+                CoordinateSequence cs = csf.create(5, 2);
+                cs.setOrdinate(0, 0, minX);
+                cs.setOrdinate(0, 1, minY);
+                cs.setOrdinate(1, 0, minX);
+                cs.setOrdinate(1, 1, maxY);
+                cs.setOrdinate(2, 0, maxX);
+                cs.setOrdinate(2, 1, maxY);
+                cs.setOrdinate(3, 0, maxX);
+                cs.setOrdinate(3, 1, minY);
+                cs.setOrdinate(4, 0, minX);
+                cs.setOrdinate(4, 1, minY);
+                LinearRing ring = geometryFactory.createLinearRing(cs);
+                return geometryFactory.createPolygon(ring, null);
+            } else {
+                return shape();
+            }
         }
     }
 
@@ -138,6 +181,16 @@ public class ShapefileReader implements FileReader {
     private IndexFile shxReader;
     
     private StreamLogging streamLogger = new StreamLogging("Shapefile Reader");
+    
+    private GeometryFactory geometryFactory;
+    
+    /**
+     * @deprecated Use {@link #ShapefileReader(ShpFiles, boolean, boolean, GeometryFactory)} instead
+     */
+    public ShapefileReader(ShpFiles shapefileFiles, boolean strict,
+            boolean useMemoryMapped) throws IOException, ShapefileException {
+        this(shapefileFiles, strict, useMemoryMapped, new GeometryFactory());
+    }
 
     /**
      * Creates a new instance of ShapeFile.
@@ -153,7 +206,7 @@ public class ShapefileReader implements FileReader {
      *                 If for some reason the file contains invalid records.
      */
     public ShapefileReader(ShpFiles shapefileFiles, boolean strict,
-            boolean useMemoryMapped) throws IOException, ShapefileException {
+            boolean useMemoryMapped, GeometryFactory gf) throws IOException, ShapefileException {
         this.channel = shapefileFiles.getReadChannel(ShpFileType.SHP, this);
         this.useMemoryMappedBuffer = useMemoryMapped;
         streamLogger.open();
@@ -165,7 +218,7 @@ public class ShapefileReader implements FileReader {
             		"assuming the .shp file is not sparse", e);
             currentShape = UNKNOWN;
         }
-        init(strict);
+        init(strict, gf);
     }
     
     /**
@@ -251,10 +304,11 @@ public class ShapefileReader implements FileReader {
         return r;
     }
 
-    private void init(boolean strict) throws IOException, ShapefileException {
+    private void init(boolean strict, GeometryFactory gf) throws IOException, ShapefileException {
+        geometryFactory = gf;
         header = readHeader(channel, strict);
         fileShapeType = header.getShapeType();
-        handler = fileShapeType.getShapeHandler();
+        handler = fileShapeType.getShapeHandler(gf);
 
         // recordHeader = ByteBuffer.allocateDirect(8);
         // recordHeader.order(ByteOrder.BIG_ENDIAN);
@@ -303,6 +357,10 @@ public class ShapefileReader implements FileReader {
      *                 If errors occur while closing the channel.
      */
     public void close() throws IOException {
+        // don't throw NPE on double close
+        if(channel == null)
+            return;
+        
         if (channel.isOpen()) {
             channel.close();
             streamLogger.close();
@@ -383,7 +441,7 @@ public class ShapefileReader implements FileReader {
             return this.toBufferOffset(record.end);
         }
     }
-
+    
     /**
      * Transfer (by bytes) the data at the current record to the
      * ShapefileWriter.
@@ -593,6 +651,7 @@ public class ShapefileReader implements FileReader {
      */
     public Object shapeAt(int offset) throws IOException,
             UnsupportedOperationException {
+        disableShxUsage();
         if (randomAccessEnabled) {
             this.goTo(offset);
             return nextRecord().shape();

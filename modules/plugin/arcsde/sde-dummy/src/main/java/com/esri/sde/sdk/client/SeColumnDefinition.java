@@ -30,7 +30,6 @@ public class SeColumnDefinition {
 	public int getSize() { return 0; }
 	public short getScale() { return 0; }
 	public short getRowIdType() { return 0; }
-	
-	
+        public boolean allowsNulls() {return false;}
 
 }

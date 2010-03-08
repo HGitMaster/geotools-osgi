@@ -23,7 +23,7 @@ import org.geotools.data.vpf.ifc.DataTypesDefinition;
  * RowField.java Created: Mon Jan 27 13:58:34 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/RowField.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/RowField.java $
  * @version $Id: RowField.java 30687 2008-06-13 11:03:06Z acuster $
  */
 public class RowField extends Number implements DataTypesDefinition {

@@ -22,8 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
+import org.geotools.arcsde.session.Command;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.SdeRow;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 
@@ -48,7 +49,7 @@ import com.esri.sde.sdk.client.SeTable;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: FIDReader.java 32195 2009-01-09 19:00:35Z groldan $
+ * @version $Id: FIDReader.java 33474 2009-07-03 13:39:00Z groldan $
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java
  *         /org/geotools/arcsde/data/FIDReader.java $

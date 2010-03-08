@@ -51,7 +51,7 @@ import javax.vecmath.MismatchedSizeException;
  *  m = (A<sup>T</sup>A)<sup>-1</sup> A<sup>T</sup>x'  </blockquote> </pre>
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/AffineTransformBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/AffineTransformBuilder.java $
  * @version $Id: AffineTransformBuilder.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Jan Jezek
  */

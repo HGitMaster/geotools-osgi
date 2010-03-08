@@ -25,7 +25,7 @@ package org.geotools.xml.schema;
  * @author dzwiers www.refractions.net
  *
  * @see Element
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/xml/src/main/java/org/geotools/xml/schema/All.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/All.java $
  */
 public interface All extends ElementGrouping {
     /**

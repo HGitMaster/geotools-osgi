@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/filter/FilterFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterFilter.java $
  * @version $Id: FilterFilter.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {

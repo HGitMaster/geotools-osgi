@@ -35,6 +35,8 @@ import org.geotools.data.postgis.VersionedPostgisDataStore;
  * 
  * @author aaime
  * @since 2.4
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/fidmapper/VersionedFIDMapperFactory.java $
  */
 public class VersionedFIDMapperFactory extends DefaultFIDMapperFactory {
 

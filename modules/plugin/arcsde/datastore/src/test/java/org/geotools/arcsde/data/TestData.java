@@ -21,19 +21,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
-import org.geotools.arcsde.pool.Command;
-import org.geotools.arcsde.pool.ISession;
-import org.geotools.arcsde.pool.SessionPool;
-import org.geotools.arcsde.pool.SessionPoolFactory;
-import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
+import org.geotools.arcsde.session.Command;
+import org.geotools.arcsde.session.Commands;
+import org.geotools.arcsde.session.ISession;
+import org.geotools.arcsde.session.ISessionPool;
+import org.geotools.arcsde.session.ISessionPoolFactory;
+import org.geotools.arcsde.session.SessionPoolFactory;
+import org.geotools.arcsde.session.UnavailableConnectionException;
+import org.geotools.arcsde.session.Commands.GetVersionCommand;
+import org.geotools.data.DataSourceException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -54,6 +59,7 @@ import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeState;
 import com.esri.sde.sdk.client.SeTable;
+import com.esri.sde.sdk.client.SeVersion;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -66,6 +72,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.operation.valid.IsValidOp;
+import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 /**
  * Provides access to the ArcSDEDataStore test data configuration.
@@ -74,7 +82,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java
  *         /org/geotools/arcsde/data/TestData.java $
- * @version $Id: TestData.java 32500 2009-02-17 18:31:11Z groldan $
+ * @version $Id: TestData.java 34789 2010-01-13 16:44:32Z groldan $
  */
 @SuppressWarnings( { "nls", "unchecked" })
 public class TestData {
@@ -104,7 +112,7 @@ public class TestData {
     /** the configuration keyword to use when creating layers and tables */
     private String configKeyword;
 
-    private SessionPool _pool;
+    private ISessionPool _pool;
 
     /**
      * Creates a new TestData object.
@@ -161,9 +169,9 @@ public class TestData {
         if (cleanTestTable) {
             deleteTempTable();
         }
-        if (cleanPool) {
-            SessionPoolFactory pfac = SessionPoolFactory.getInstance();
-            pfac.clear();
+        if (cleanPool && _pool != null) {
+            _pool.close();
+            _pool = null;
         }
     }
 
@@ -186,19 +194,23 @@ public class TestData {
      *             DOCUMENT ME!
      */
     public ArcSDEDataStore getDataStore() throws IOException {
-        SessionPool pool = getConnectionPool();
+        ISessionPool pool = newSessionPool();
         ArcSDEDataStore dataStore = new ArcSDEDataStore(pool);
 
         return dataStore;
     }
 
-    public SessionPool getConnectionPool() throws IOException {
+    public ISessionPool getConnectionPool() throws IOException {
         if (this._pool == null) {
-            SessionPoolFactory pfac = SessionPoolFactory.getInstance();
-            ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(this.conProps);
-            this._pool = pfac.createSharedPool(config);
+            this._pool = newSessionPool();
         }
         return this._pool;
+    }
+
+    public ISessionPool newSessionPool() throws IOException {
+        ISessionPoolFactory pfac = SessionPoolFactory.getInstance();
+        ArcSDEDataStoreConfig config = new ArcSDEDataStoreConfig(this.conProps);
+        return pfac.createPool(config.getSessionConfig());
     }
 
     /**
@@ -206,12 +218,17 @@ public class TestData {
      * 
      * @return Returns the conProps.
      */
-    public Properties getConProps() {
-        return this.conProps;
+    public Map<String, String> getConProps() {
+        return new HashMap<String, String>((Map) this.conProps);
     }
 
     public String getTempTableName() throws IOException {
-        ISession session = getConnectionPool().getSession();
+        ISession session;
+        try {
+            session = getConnectionPool().getSession();
+        } catch (UnavailableConnectionException e) {
+            throw new RuntimeException(e);
+        }
         String tempTableName;
         try {
             tempTableName = getTempTableName(session);
@@ -259,13 +276,13 @@ public class TestData {
     }
 
     public void deleteTable(final String typeName) throws IOException,
-            UnavailableArcSDEConnectionException {
+            UnavailableConnectionException {
         deleteTable(typeName, true);
     }
 
     public void deleteTable(final String typeName, final boolean ignoreFailure) throws IOException,
-            UnavailableArcSDEConnectionException {
-        SessionPool connectionPool = getConnectionPool();
+            UnavailableConnectionException {
+        ISessionPool connectionPool = getConnectionPool();
         deleteTable(connectionPool, typeName, ignoreFailure);
     }
 
@@ -274,17 +291,15 @@ public class TestData {
      * 
      * @param connPool
      *            to get the connection to use in deleting {@link #getTempTableName()}
+     * @throws UnavailableConnectionException
      */
-    public void deleteTempTable(SessionPool connPool) throws IOException {
+    public void deleteTempTable(ISessionPool connPool) throws IOException,
+            UnavailableConnectionException {
         deleteTable(connPool, getTempTableName(), true);
     }
 
-    private static void deleteTable(final SessionPool connPool, final String tableName,
-            final boolean ignoreFailure) throws IOException, UnavailableArcSDEConnectionException {
-
-        final ISession session = connPool.getSession();
-
-        // final SeTable layer = session.createSeTable(tableName);
+    private static void deleteTable(final ISessionPool connPool, final String tableName,
+            final boolean ignoreFailure) throws IOException, UnavailableConnectionException {
 
         final Command<Void> deleteCmd = new Command<Void>() {
 
@@ -313,8 +328,12 @@ public class TestData {
             }
         };
 
-        session.issue(deleteCmd);
-        session.dispose();
+        final ISession session = connPool.getSession();
+        try {
+            session.issue(deleteCmd);
+        } finally {
+            session.dispose();
+        }
     }
 
     /**
@@ -327,7 +346,7 @@ public class TestData {
      *             for any error
      */
     public void createTempTable(final boolean insertTestData) throws Exception {
-        SessionPool connPool = getConnectionPool();
+        ISessionPool connPool = getConnectionPool();
 
         deleteTempTable(connPool);
 
@@ -373,7 +392,7 @@ public class TestData {
      */
     public void insertTestData() throws Exception {
         truncateTempTable();
-        SessionPool connPool = getConnectionPool();
+        ISessionPool connPool = getConnectionPool();
         ISession session = connPool.getSession();
         try {
             SeLayer tempTableLayer = getTempLayer(session);
@@ -383,10 +402,16 @@ public class TestData {
         }
     }
 
-    public void truncateTempTable() throws IOException {
-        final SessionPool connPool = getConnectionPool();
+    public void truncateTempTable() throws IOException, UnavailableConnectionException {
+        final String tempTableName = getTempTableName();
+
+        truncateTestTable(tempTableName);
+    }
+
+    public void truncateTestTable(final String tempTableName) throws IOException,
+            DataSourceException, UnavailableConnectionException {
+        final ISessionPool connPool = getConnectionPool();
         final ISession session = connPool.getSession();
-        final String tempTableName = getTempTableName(session);
 
         try {
             session.issue(new Command<Void>() {
@@ -437,7 +462,7 @@ public class TestData {
                         false);
 
                 colDefs[1] = new SeColumnDefinition(TEST_TABLE_COLS[0],
-                        SeColumnDefinition.TYPE_INT32, 10, 0, isNullable);
+                        SeColumnDefinition.TYPE_INT32, 10, 0, false);
                 colDefs[2] = new SeColumnDefinition(TEST_TABLE_COLS[1],
                         SeColumnDefinition.TYPE_INT16, 4, 0, isNullable);
                 colDefs[3] = new SeColumnDefinition(TEST_TABLE_COLS[2],
@@ -566,11 +591,13 @@ public class TestData {
             throws Exception {
 
         SeColumnDefinition[] colDefs = tempTableColumns;
-        Geometry[] geoms = g;
-        if (geoms.length < 8) {
+        final Geometry[] geoms;
+        if (g.length < 8) {
             Geometry[] tmp = new Geometry[8];
-            System.arraycopy(geoms, 0, tmp, 0, geoms.length);
+            System.arraycopy(g, 0, tmp, 0, g.length);
             geoms = tmp;
+        } else {
+            geoms = g;
         }
 
         final SeCoordinateReference coordref = layer.getCoordRef();
@@ -581,6 +608,13 @@ public class TestData {
             if (geom == null) {
                 shape = null;
             } else {
+                IsValidOp validationOp = new IsValidOp(geom);
+                TopologyValidationError validationError = validationOp.getValidationError();
+                if (validationError != null) {
+                    throw new IllegalArgumentException("Provided geometry is invalid: "
+                            + validationError.getMessage());
+                }
+
                 ArcSDEGeometryBuilder builder = ArcSDEGeometryBuilder.builderFor(geom.getClass());
                 shape = builder.constructShape(geom, coordref);
             }
@@ -890,7 +924,7 @@ public class TestData {
         try {
             testData.setUp();
             // testData.createSimpleTestTables();
-            testData.createSampleLayers(2000);
+            testData.createSampleLayers(1500, 1);
             // testData.deleteSampleLayers(5000);
             System.err.println("test tables successfully created");
         } catch (Exception e) {
@@ -901,8 +935,9 @@ public class TestData {
         }
     }
 
-    private void deleteSampleLayers(final int numLayersToCreate) throws IOException {
-        final SessionPool connectionPool = getConnectionPool();
+    private void deleteSampleLayers(final int numLayersToCreate) throws IOException,
+            UnavailableConnectionException {
+        final ISessionPool connectionPool = getConnectionPool();
         final ISession session = connectionPool.getSession();
         final NumberFormat formatter = NumberFormat.getInstance();
         formatter.setMinimumIntegerDigits(4);
@@ -932,9 +967,12 @@ public class TestData {
     /**
      * This private method is used to create a lot of layers in the test database in order to fix
      * GEOT-1956
+     * 
+     * @throws UnavailableConnectionException
      */
-    private void createSampleLayers(final int numLayersToCreate) throws IOException {
-        final SessionPool connectionPool = getConnectionPool();
+    private void createSampleLayers(final int numLayersToCreate, final int startFrom)
+            throws IOException, UnavailableConnectionException {
+        final ISessionPool connectionPool = getConnectionPool();
         final ISession session = connectionPool.getSession();
 
         String tableName;
@@ -960,15 +998,21 @@ public class TestData {
             rowIdColName = "ROW_ID";
             shapeTypeMask = SeLayer.SE_POINT_TYPE_MASK;
             for (int count = 1; count <= numLayersToCreate; count++) {
-                tableName = "GT_MULTIPLE_LAYER_" + formatter.format(count);
+                tableName = "GT_MULTIPLE_LAYER_" + formatter.format(count + startFrom - 1);
                 System.err.println("Creating " + tableName);
 
                 Integer registrationType = registrationTypes.removeFirst();
                 rowIdColumnType = registrationType.intValue();
                 registrationTypes.addLast(registrationType);
 
-                createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType,
+                createTestTable(session, tableName, rowIdColName, rowIdColumnType, true,
                         shapeTypeMask);
+                try {
+                    Thread.currentThread().sleep(1500);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         } finally {
             session.dispose();
@@ -976,8 +1020,8 @@ public class TestData {
         LOGGER.info(numLayersToCreate + " created successfully");
     }
 
-    public void createSimpleTestTables() throws IOException {
-        final SessionPool connectionPool = getConnectionPool();
+    public void createSimpleTestTables() throws IOException, UnavailableConnectionException {
+        final ISessionPool connectionPool = getConnectionPool();
         final ISession session = connectionPool.getSession();
 
         String tableName;
@@ -990,51 +1034,55 @@ public class TestData {
 
             tableName = "GT_TEST_POINT_ROWID_USER";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
-            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createTestTable(session, tableName, rowIdColName, rowIdColumnType, true, shapeTypeMask);
 
             tableName = "GT_TEST_POINT_ROWID_SDE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
-            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createTestTable(session, tableName, rowIdColName, rowIdColumnType, true, shapeTypeMask);
 
             tableName = "GT_TEST_POINT_ROWID_NONE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
-            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createTestTable(session, tableName, rowIdColName, rowIdColumnType, true, shapeTypeMask);
 
             shapeTypeMask = SeLayer.SE_LINE_TYPE_MASK;
 
             tableName = "GT_TEST_LINE_ROWID_USER";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
-            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createTestTable(session, tableName, rowIdColName, rowIdColumnType, true, shapeTypeMask);
 
             tableName = "GT_TEST_LINE_ROWID_SDE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
-            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createTestTable(session, tableName, rowIdColName, rowIdColumnType, true, shapeTypeMask);
 
             tableName = "GT_TEST_LINE_ROWID_NONE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
-            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createTestTable(session, tableName, rowIdColName, rowIdColumnType, true, shapeTypeMask);
 
             shapeTypeMask = SeLayer.SE_AREA_TYPE_MASK;
 
             tableName = "GT_TEST_POLYGON_ROWID_USER";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
-            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createTestTable(session, tableName, rowIdColName, rowIdColumnType, true, shapeTypeMask);
 
             tableName = "GT_TEST_POLYGON_ROWID_SDE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
-            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createTestTable(session, tableName, rowIdColName, rowIdColumnType, true, shapeTypeMask);
 
             tableName = "GT_TEST_POLYGON_ROWID_NONE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
-            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createTestTable(session, tableName, rowIdColName, rowIdColumnType, true, shapeTypeMask);
         } finally {
             session.dispose();
         }
     }
 
-    private void createSimpleTestTable(final ISession session, final String tableName,
-            final String rowIdColName, final int rowIdColumnType, final int shapeTypeMask)
-            throws IOException {
+    /**
+     * Creates and registers a table, optionally creating a layer for it
+     */
+    public void createTestTable(final ISession session, final String tableName,
+            final String rowIdColName, final int rowIdColumnType, final boolean createLayer,
+            final int shapeTypeMask) throws IOException {
+
         LOGGER.fine("Creating layer " + tableName);
 
         final Command<Void> createCmd = new Command<Void>() {
@@ -1042,7 +1090,6 @@ public class TestData {
             @Override
             public Void execute(ISession session, SeConnection connection) throws SeException,
                     IOException {
-                final SeLayer layer = new SeLayer(connection);
                 final SeTable table = new SeTable(connection, tableName);
 
                 try {
@@ -1050,7 +1097,6 @@ public class TestData {
                 } catch (SeException e) {
                     LOGGER.fine("table " + tableName + " does not already exist");
                 }
-                layer.setTableName(tableName);
 
                 final boolean isNullable = true;
 
@@ -1094,36 +1140,40 @@ public class TestData {
                     makeVersioned(session, tableName);
                 }
 
-                /*
-                 * Define the attributes of the spatial column
-                 */
-                layer.setSpatialColumnName("GEOM");
+                if (createLayer) {
+                    final SeLayer layer = new SeLayer(connection);
+                    layer.setTableName(tableName);
+                    /*
+                     * Define the attributes of the spatial column
+                     */
+                    layer.setSpatialColumnName("GEOM");
 
-                /*
-                 * Set the type of shapes that can be inserted into the layer.
-                 */
-                layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | shapeTypeMask);
-                layer.setGridSizes(1100.0, 0.0, 0.0);
-                layer.setDescription("GeoTools test table");
+                    /*
+                     * Set the type of shapes that can be inserted into the layer.
+                     */
+                    layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | shapeTypeMask);
+                    layer.setGridSizes(1100.0, 0.0, 0.0);
+                    layer.setDescription("GeoTools test table");
 
-                /*
-                 * Define the layer's Coordinate Reference
-                 */
-                SeCoordinateReference coordref = getGenericCoordRef();
+                    /*
+                     * Define the layer's Coordinate Reference
+                     */
+                    SeCoordinateReference coordref = getGenericCoordRef();
 
-                // SeExtent ext = new SeExtent(-1000000.0, -1000000.0,
-                // 1000000.0,
-                // 1000000.0);
-                SeExtent ext = coordref.getXYEnvelope();
-                layer.setExtent(ext);
-                layer.setCoordRef(coordref);
+                    // SeExtent ext = new SeExtent(-1000000.0, -1000000.0,
+                    // 1000000.0,
+                    // 1000000.0);
+                    SeExtent ext = coordref.getXYEnvelope();
+                    layer.setExtent(ext);
+                    layer.setCoordRef(coordref);
 
-                layer.setCreationKeyword(configKeyword);
+                    layer.setCreationKeyword(configKeyword);
 
-                /*
-                 * Spatially enable the new table...
-                 */
-                layer.create(3, 4);
+                    /*
+                     * Spatially enable the new table...
+                     */
+                    layer.create(3, 4);
+                }
                 return null;
             }
         };
@@ -1131,7 +1181,7 @@ public class TestData {
         session.issue(createCmd);
     }
 
-    private void makeVersioned(final ISession session, final String tableName) throws IOException {
+    public void makeVersioned(final ISession session, final String tableName) throws IOException {
 
         Command<Void> cmd = new Command<Void>() {
 
@@ -1150,6 +1200,85 @@ public class TestData {
         };
 
         session.issue(cmd);
+    }
+
+    /**
+     * Creates an ArcSDE version named {@code versionName} if it doesn't already exist
+     * 
+     * @param session
+     * @param versionName
+     * @param parentVersion
+     * @throws IOException
+     */
+    public void createVersion(final ISession session, final String versionName,
+            final String parentVersionName) throws IOException {
+
+        session.issue(new Command<Void>() {
+
+            @Override
+            public Void execute(ISession session, SeConnection connection) throws SeException,
+                    IOException {
+
+                final SeVersion parentVersion = session.issue(new GetVersionCommand(
+                        parentVersionName));
+                SeVersion version = null;
+                try {
+                    version = session.issue(new GetVersionCommand(versionName));
+                } catch (ArcSdeException e) {
+                    // ignore
+                }
+                if (version != null) {
+                    // already exists, no need to create it
+                    return null;
+                }
+
+                SeVersion newVersion = new SeVersion(connection, parentVersionName);
+                // newVersion.getInfo();
+                newVersion.setName(versionName);
+                newVersion.setOwner(session.getUser());
+                newVersion.setParentName(parentVersionName);
+                newVersion.setDescription(parentVersion.getName()
+                        + " child for GeoTools ArcSDE unit tests");
+                // do not require ArcSDE to create a unique name if the
+                // required
+                // version already exists
+                boolean uniqueName = false;
+                try {
+                    newVersion.create(uniqueName, newVersion);
+                    // newVersion.alter();
+                    newVersion.getInfo();
+                } catch (SeException e) {
+                    throw new ArcSdeException(e);
+                }
+                return null;
+            }
+        });
+
+    }
+
+    public void deleteVersion(final ISession s, final String versionName) throws IOException {
+
+        s.issue(new Command<Void>() {
+
+            @Override
+            public Void execute(ISession session, SeConnection connection) throws SeException,
+                    IOException {
+
+                final SeVersion version;
+                try {
+                    version = session.issue(new Commands.GetVersionCommand(versionName));
+                } catch (IOException e) {
+                    // version does not exist, we're ok...
+                    return null;
+                }
+
+                LOGGER.fine("Deleting version " + versionName);
+                version.delete();
+                LOGGER.fine("Version " + versionName + " deleted!");
+
+                return null;
+            }
+        });
     }
 
     /**
@@ -1265,4 +1394,5 @@ public class TestData {
             }
         });
     }
+
 }

@@ -29,6 +29,8 @@ import javax.sql.DataSource;
  * 
  * @author Andrea Aime - TOPP
  * 
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/AbstractManageableDataSource.java $
  */
 public abstract class AbstractManageableDataSource implements ManageableDataSource {
 

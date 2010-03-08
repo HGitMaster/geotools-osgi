@@ -39,7 +39,7 @@ import org.geotools.resources.i18n.DescriptionKeys;
  * An image encoder for matrix of floating-point numbers.
  *
  * @since 2.4
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMatrixImageWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMatrixImageWriter.java $
  * @version $Id: TextMatrixImageWriter.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux
  */
@@ -113,7 +113,7 @@ public class TextMatrixImageWriter extends TextImageWriter {
      * Service provider interface (SPI) for {@link TextMatrixImageWriter}s.
      *
      * @since 2.4
-     * @source $URL: http://gtsvn.refractions.net/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMatrixImageWriter.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMatrixImageWriter.java $
      * @version $Id: TextMatrixImageWriter.java 30679 2008-06-13 10:19:41Z acuster $
      * @author Martin Desruisseaux
      */

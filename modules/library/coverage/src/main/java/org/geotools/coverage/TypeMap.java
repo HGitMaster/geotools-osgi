@@ -48,8 +48,8 @@ import org.geotools.util.NumberRange;
  * to {@link DataBuffer} types.
  *
  * @since 2.1
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/coverage/src/main/java/org/geotools/coverage/TypeMap.java $
- * @version $Id: TypeMap.java 30643 2008-06-12 18:27:03Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/TypeMap.java $
+ * @version $Id: TypeMap.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */
 public final class TypeMap {
@@ -109,14 +109,14 @@ public final class TypeMap {
     /**
      * The full range of sample values.
      */
-    private final NumberRange range;
+    private final NumberRange<? extends Number> range;
 
     /**
      * The range of positive sample values (excluding 0). This range is non-null only for unsigned
      * type. A range excluding 0 is sometime usefull when the 0 value is reserved for a "no data"
      * category.
      */
-    private final NumberRange positiveRange;
+    private final NumberRange<? extends Number> positiveRange;
 
     /**
      * The name as an international string.
@@ -207,8 +207,8 @@ public final class TypeMap {
      * @param  range The range of values.
      * @return The smallest sample dimension type for the specified range.
      */
-    public static SampleDimensionType getSampleDimensionType(final Range range) {
-        final Class type = range.getElementClass();
+    public static SampleDimensionType getSampleDimensionType(final Range<?> range) {
+        final Class<?> type = range.getElementClass();
         if (Double.class.isAssignableFrom(type)) {
             return REAL_64BITS;
         }
@@ -365,7 +365,7 @@ public final class TypeMap {
     /**
      * Returns the full range of sample values for the specified dimension type.
      */
-    public static NumberRange getRange(final SampleDimensionType type) {
+    public static NumberRange<? extends Number> getRange(final SampleDimensionType type) {
         if (type != null) {
             final int ordinal = type.ordinal();
             if (ordinal>=0 && ordinal<MAP.length) {
@@ -380,7 +380,7 @@ public final class TypeMap {
      * unsigned type. A range excluding 0 is sometime usefull when the 0 value is reserved for a
      * "no data" category.
      */
-    public static NumberRange getPositiveRange(final SampleDimensionType type) {
+    public static NumberRange<? extends Number> getPositiveRange(final SampleDimensionType type) {
         if (type != null) {
             final int ordinal = type.ordinal();
             if (ordinal>=0 && ordinal<MAP.length) {
@@ -503,7 +503,8 @@ public final class TypeMap {
      * @return The code for the specified color model and band number.
      * @throws IllegalArgumentException if the band number is not in the valid range.
      */
-    public static ColorInterpretation getColorInterpretation(final ColorModel model, final int band)
+	@SuppressWarnings("deprecation")
+	public static ColorInterpretation getColorInterpretation(final ColorModel model, final int band)
             throws IllegalArgumentException
     {
         if (band<0 || band>=ColorUtilities.getNumBands(model)) {

@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: DirectPositionImpl.java 30920 2008-07-04 23:56:32Z jgarnett $
+ ** $Id: DirectPositionImpl.java 34133 2009-10-12 08:14:05Z mbedward $
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/DirectPositionImpl.java,v $
  **
@@ -34,6 +34,8 @@ import org.opengis.util.Cloneable;
  * @UML datatype DirectPosition
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/DirectPositionImpl.java $
  * @version $Revision: 1.9 $, $Date: 2005/11/02 05:39:33 $
  *
  * @revisit Version number: I suggest to use <strong>specification</strong> version number

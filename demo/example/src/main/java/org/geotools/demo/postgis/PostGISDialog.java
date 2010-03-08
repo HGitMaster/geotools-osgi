@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,155 +34,172 @@ import org.geotools.data.postgis.PostgisDataStoreFactory;
 /**
  * A dialog that displays the PostGIS connection parameters.
  * 
- * This class is not important to our main story of connecting to PostGIS
- * it does serve as a nice example of how to use the Param information
- * published by the PostgidDataStoreFactory class.
+ * This class is not important to our main story of connecting to PostGIS it does serve as a nice
+ * example of how to use the Param information published by the PostgidDataStoreFactory class.
  * <p>
- * If you want to write a generic DatastoreDialog you can make use of
- * the getParametersInfo() method at runtime.
+ * If you want to write a generic DatastoreDialog you can make use of the getParametersInfo() method
+ * at runtime.
  * </p>
+ * 
  * @author Jody Garnett
+ *
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/postgis/PostGISDialog.java $
  */
 public class PostGISDialog extends JDialog implements ActionListener {
-	private static final long serialVersionUID = -4773502007868922959L;
-	private PostgisDataStoreFactory factory;
+    private static final long serialVersionUID = -4773502007868922959L;
 
-	private JParamField database;
-	private JParamField dbtype;
-	private JParamField host;
-	private JParamField port;
-	private JParamField schema;
-	private JParamField user;
-	private JPasswordField password;
-	private JButton okay;
-	private JButton cancel;
-	
-	boolean connect = false;
-	public PostGISDialog(){
-		this( Collections.EMPTY_MAP);
-	}
+    private PostgisDataStoreFactory factory;
 
-	public PostGISDialog(Map config) {
-		setTitle("Connection Parameters");
-		setModal( true );
-		dbtype = new JParamField( PostgisDataStoreFactory.DBTYPE, config );
-		host = new JParamField( PostgisDataStoreFactory.HOST, config );
-		port = new JParamField( PostgisDataStoreFactory.PORT, config );
-		
-		schema = new JParamField( PostgisDataStoreFactory.SCHEMA, config );
-		database = new JParamField( PostgisDataStoreFactory.DATABASE, config );
-		user = new JParamField( PostgisDataStoreFactory.USER, config );
-		password = new JPasswordField( (String) config.get( PostgisDataStoreFactory.USER.key ));
-		
-		String description = PostgisDataStoreFactory.PASSWD.description == null ? null : PostgisDataStoreFactory.PASSWD.description.toString();
-		password.setToolTipText( description );
+    private JParamField database;
 
-		okay = new JButton("OK");
-		cancel = new JButton("Cancel");
-		
-		okay.addActionListener( this );
-		cancel.addActionListener( this );
-		
-		// layout dialog
-		setLayout( new GridLayout(0,2));
-		
-		add( new JLabel("DBType") );
-		add( dbtype );
-		add( new JLabel("Host"));
-		add( host );
-		add( new JLabel("Port"));
-		add( port );
-		add( new JLabel("Schema"));
-		add( schema );
-		add( new JLabel("Database"));
-		add( database );
-		add( new JLabel("user"));
-		add( user );
-		add( new JLabel("password"));
-		add( password );
-		
-		add( new JLabel(""));
-		JPanel buttons = new JPanel();
-		add( buttons );			
-		buttons.add( okay );
-		buttons.add( cancel );
-		
-		setDefaultCloseOperation( JDialog.HIDE_ON_CLOSE );
-		Dimension preferredSize = getPreferredSize();
-		preferredSize.height += 30;
-		setSize( preferredSize );
-	}
+    private JParamField dbtype;
 
-	public Map getProperties() {
-		if( !connect ){
-			return null;
-		}
-		Map config = new HashMap();
-		config.put( PostgisDataStoreFactory.DBTYPE.key, dbtype.getValue() );
-		
-		config.put( PostgisDataStoreFactory.HOST.key, host.getValue() );
-		config.put( PostgisDataStoreFactory.PORT.key, port.getValue() );
-		
-		config.put( PostgisDataStoreFactory.SCHEMA.key, schema.getValue() );
-		config.put( PostgisDataStoreFactory.DATABASE.key, database.getValue() );
-		config.put( PostgisDataStoreFactory.USER.key, user.getValue() );
-		config.put( PostgisDataStoreFactory.PASSWD.key, password.getText() );			
-		
-		
-		return config;
-	}
+    private JParamField host;
 
-	public void actionPerformed(ActionEvent e) {
-		String action = e.getActionCommand();
-		if( "OK".equals( action )){
-			connect = true;
-		}
-		setVisible( false );			
-	}
-	class JParamField extends JTextField {
-		Param param;
-		Object value;
-		
-		JParamField( Param param ){
-			this( param, Collections.EMPTY_MAP );
-		}
-		JParamField( Param param, Map map ){
-			super( 14 );
-			this.param = param;
-			setValue( map.get( param.key ));
-			addKeyListener( new KeyAdapter(){
-				public void keyReleased(KeyEvent e) {
-					refresh();
-				}
-			});
-			String description = param.description == null ? null : param.description.toString();
-			setToolTipText( description );
-		}
-		public void refresh(){
-			try {
-				JParamField.this.value = param.parse( getText() );
-				setToolTipText( param.description.toString() );
-				setForeground( Color.BLACK );
-			} catch (Throwable e) {
-				setToolTipText( e.getLocalizedMessage() );
-				setForeground( Color.RED );
-				JParamField.this.value = null;
-			}
-		}
-		public void setValue( Object value ){
-			if( value == null ){
-				value = param.sample;
-			}
-			this.value = value;
-			if( value == null ){
-				setText("");
-			}
-			else {
-				setText( param.text( value ) );			
-			}
-		}
-		public Object getValue() {
-			return value;
-		}
-	}
+    private JParamField port;
+
+    private JParamField schema;
+
+    private JParamField user;
+
+    private JPasswordField password;
+
+    private JButton okay;
+
+    private JButton cancel;
+
+    boolean connect = false;
+
+    public PostGISDialog() {
+        this(Collections.EMPTY_MAP);
+    }
+
+    public PostGISDialog(Map config) {
+        setTitle("Connection Parameters");
+        setModal(true);
+        dbtype = new JParamField(PostgisDataStoreFactory.DBTYPE, config);
+        host = new JParamField(PostgisDataStoreFactory.HOST, config);
+        port = new JParamField(PostgisDataStoreFactory.PORT, config);
+
+        schema = new JParamField(PostgisDataStoreFactory.SCHEMA, config);
+        database = new JParamField(PostgisDataStoreFactory.DATABASE, config);
+        user = new JParamField(PostgisDataStoreFactory.USER, config);
+        password = new JPasswordField((String) config.get(PostgisDataStoreFactory.USER.key));
+
+        String description = PostgisDataStoreFactory.PASSWD.description == null ? null
+                : PostgisDataStoreFactory.PASSWD.description.toString();
+        password.setToolTipText(description);
+
+        okay = new JButton("OK");
+        cancel = new JButton("Cancel");
+
+        okay.addActionListener(this);
+        cancel.addActionListener(this);
+
+        // layout dialog
+        setLayout(new GridLayout(0, 2));
+
+        add(new JLabel("DBType"));
+        add(dbtype);
+        add(new JLabel("Host"));
+        add(host);
+        add(new JLabel("Port"));
+        add(port);
+        add(new JLabel("Schema"));
+        add(schema);
+        add(new JLabel("Database"));
+        add(database);
+        add(new JLabel("user"));
+        add(user);
+        add(new JLabel("password"));
+        add(password);
+
+        add(new JLabel(""));
+        JPanel buttons = new JPanel();
+        add(buttons);
+        buttons.add(okay);
+        buttons.add(cancel);
+
+        setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        Dimension preferredSize = getPreferredSize();
+        preferredSize.height += 30;
+        setSize(preferredSize);
+    }
+
+    public Map<String, Serializable> getProperties() {
+        if (!connect) {
+            return null;
+        }
+        Map<String, Serializable> config = new HashMap<String, Serializable>();
+        config.put(PostgisDataStoreFactory.DBTYPE.key, dbtype.getValue());
+
+        config.put(PostgisDataStoreFactory.HOST.key, host.getValue());
+        config.put(PostgisDataStoreFactory.PORT.key, port.getValue());
+
+        config.put(PostgisDataStoreFactory.SCHEMA.key, schema.getValue());
+        config.put(PostgisDataStoreFactory.DATABASE.key, database.getValue());
+        config.put(PostgisDataStoreFactory.USER.key, user.getValue());
+        config.put(PostgisDataStoreFactory.PASSWD.key, password.getText());
+
+        return config;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        String action = e.getActionCommand();
+        if ("OK".equals(action)) {
+            connect = true;
+        }
+        setVisible(false);
+    }
+
+    class JParamField extends JTextField {
+        Param param;
+
+        Serializable value;
+
+        JParamField(Param param) {
+            this(param, Collections.EMPTY_MAP);
+        }
+
+        JParamField(Param param, Map map) {
+            super(14);
+            this.param = param;
+            setValue(map.get(param.key));
+            addKeyListener(new KeyAdapter() {
+                public void keyReleased(KeyEvent e) {
+                    refresh();
+                }
+            });
+            String description = param.description == null ? null : param.description.toString();
+            setToolTipText(description);
+        }
+
+        public void refresh() {
+            try {
+                JParamField.this.value = (Serializable) param.parse(getText());
+                setToolTipText(param.description.toString());
+                setForeground(Color.BLACK);
+            } catch (Throwable e) {
+                setToolTipText(e.getLocalizedMessage());
+                setForeground(Color.RED);
+                JParamField.this.value = null;
+            }
+        }
+
+        public void setValue(Object value) {
+            if (value == null) {
+                value = param.sample;
+            }
+            this.value = (Serializable) value;
+            if (value == null) {
+                setText("");
+            } else {
+                setText(param.text(value));
+            }
+        }
+
+        public Serializable getValue() {
+            return value;
+        }
+    }
 }

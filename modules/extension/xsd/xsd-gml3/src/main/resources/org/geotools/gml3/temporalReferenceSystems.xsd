@@ -95,11 +95,11 @@
 					<element name="start" type="gml:TimeNodePropertyType"/>
 					<element name="end" type="gml:TimeNodePropertyType"/>
 					<element name="extent" type="gml:TimePeriodPropertyType" minOccurs="0"/>
-					<element name="member" type="gml:TimeOrdinalEraPropertyType" minOccurs="0" maxOccurs="unbounded">
+					<!--element name="member" type="gml:TimeOrdinalEraPropertyType" minOccurs="0" maxOccurs="unbounded">
 						<annotation>
 							<documentation>An Era may be composed of several member Eras. The "member" element implements the association to the Era at the next level down the hierarchy.  "member" follows the standard GML property pattern whereby its (complex) value may be either described fully inline, or may be the target of a link carried on the member element and described fully elsewhere, either in the same document or from another service.</documentation>
 						</annotation>
-					</element>
+					</element-->
 					<element name="group" type="gml:ReferenceType" minOccurs="0">
 						<annotation>
 							<documentation>In a particular Time System, an Era may be a member of a group.  The "group" element implements the back-pointer to the Era at the next level up in the hierarchy. 

@@ -34,7 +34,7 @@ import org.geotools.util.FrequencySortedSet;
  * A tile manager for the particular case of tile distributed on a regular grid.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/GridTileManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/GridTileManager.java $
  * @version $Id: GridTileManager.java 32440 2009-02-09 11:14:54Z acuster $
  * @author Martin Desruisseaux
  */

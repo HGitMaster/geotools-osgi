@@ -29,7 +29,7 @@ import org.geotools.resources.IndexedResourceBundle;
  * or use static convenience methods instead.
  *
  * @since 2.2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/render/src/main/java/org/geotools/renderer/i18n/Errors.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/i18n/Errors.java $
  * @version $Id: Errors.java 30649 2008-06-12 19:44:08Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini (GeoSolutions)

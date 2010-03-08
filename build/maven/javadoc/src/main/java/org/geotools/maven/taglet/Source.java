@@ -27,8 +27,8 @@ import com.sun.tools.doclets.Taglet;
  * The <code>@source</code> tag. This tag expects an URL to the source in the SVN repository.
  * The SVN URL keyword is ignored.
  *
- * @source $URL: http://gtsvn.refractions.net/trunk/build/maven/javadoc/src/main/java/org/geotools/maven/taglet/Source.java $
- * @version $Id: Source.java 30567 2008-06-08 11:26:56Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/main/java/org/geotools/maven/taglet/Source.java $
+ * @version $Id: Source.java 34136 2009-10-13 04:18:45Z mbedward $
  * @author Martin Desruisseaux
  */
 public final class Source implements Taglet {
@@ -50,12 +50,12 @@ public final class Source implements Taglet {
     /**
      * The base URL for Maven reports.
      */
-    private static final String MAVEN_REPORTS_BASE_URL = "http://maven.geotools.fr/reports/";
+    //private static final String MAVEN_REPORTS_BASE_URL = "http://maven.geotools.fr/reports/";
 
     /**
      * The base URL for Maven repository.
      */
-    private static final String MAVEN_REPOSITORY_BASE_URL = "http://maven.geotools.fr/repository/";
+    private static final String MAVEN_REPOSITORY_BASE_URL = "http://download.osgeo.org/webdav/geotools/";
 
     /**
      * The pattern to use for fetching the URL.
@@ -72,16 +72,16 @@ public final class Source implements Taglet {
      * Constructs a default <code>@source</code> taglet.
      */
     Source() {
-        super();                                           //   Typical example         Could be also
-        findModule = Pattern.compile(                      //   ---------------------   ---------------------
-            "\\p{Alnum}+\\Q://\\E"                      +  //   http://                 https://
-            "[\\p{Alnum}\\:\\.\\-]+"                    +  //   svn.geotools.org        gtsvn.refractions.net
-            "\\/\\p{Alpha}+\\/"                         +  //   /trunk/                 /tags/
-            "(?:\\p{Alnum}+\\.[\\p{Alnum}\\.\\-]+\\/)?" +  //   (nothing)               2.3-M1/
-            "([\\p{Alnum}\\-]+)\\/"                     +  //   modules/                build/
-            "([\\p{Alnum}\\-]+)\\/"                     +  //   library/                plugins/
-            "([\\p{Alnum}\\-]+)\\/"                     +  //   referencing/            epsg-hsql/
-            ".+");
+        super();
+        findModule = Pattern.compile(
+                "https?\\Q://\\E" +   // http or https
+                "[a-zA-Z\\.\\-]+" + // host e.g. svn.osgeo.org
+                "\\/geotools" + // /geotools
+                "\\/[a-z]+" + // trunk or tags or branches
+                "(\\/[a-zA-Z0-9\\-\\_\\.]+)?" +  // group 1: tag or branch name or null if trunk
+                "\\/(((modules)\\/(library|plugin|extension|unsupported))|demo)" + // groups 2 - 5
+                "\\/(.+)" +  // group 6: module name
+                "\\/src.*");
     }
 
     /**
@@ -190,23 +190,45 @@ public final class Source implements Taglet {
             if (!matchModule.matches()) {
                 continue;
             }
-            final String group    = matchModule.group(1);
-            final String category = matchModule.group(2);
-            final String module   = matchModule.group(3);
-            buffer.append('\n').append(i==0 ? "<DD>" : "    ").append("<CODE><B>")
-                   .append(group).append('/')
-                   .append(category).append('/')
-                   .append(module).append("</B></CODE> &nbsp; (<A HREF=\"")
-                   .append(MAVEN_REPOSITORY_BASE_URL).append("org/geotools/");
-            if (category.equals("maven")) {
+
+            final String modulePath = matchModule.group(6);
+            int pos = modulePath.indexOf('/');
+            final String module;
+            if (pos == -1) {
+                module = modulePath;
+            } else {
+                module = modulePath.substring(pos+1);
+            }
+
+            final String group, category;
+            if (matchModule.group(2).equals("demo")) {
+                group = matchModule.group(2);
+                category = null;
+
+            } else {
+                group = matchModule.group(4);
+                category = matchModule.group(5);
+            }
+
+            /*
+             * Module path e.g. modules/library/main
+             */
+            buffer.append('\n').append(i == 0 ? "<DD>" : "    ").append("<CODE><B>");
+
+            buffer.append(group).append('/');
+            if (category != null) {
                 buffer.append(category).append('/');
             }
-            buffer.append("gt-").append(module).append("/\"><CODE>gt-")
-                  .append(module).append(".jar</CODE></A>) (<A HREF=\"")
-                  .append(MAVEN_REPORTS_BASE_URL).append(module)
-                  .append("/index.html\">Maven report</A>) (<A HREF=\"")
-                  .append(url).append("\">SVN head</A>)");
+            buffer.append(module);
+
+            /*
+             * Jar name in brackets e.g. (gt-main.jar)
+             */
+            buffer.append(" (gt-").append(module).append(".jar)");
+            
+            buffer.append("</B></CODE>");
         }
+
         return buffer.append("</DD>\n").toString();
     }
 }

@@ -32,7 +32,6 @@ import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
@@ -42,22 +41,29 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
  */
+@SuppressWarnings("deprecation")
 public final class ArcGridFormat extends AbstractGridFormat implements Format {
+	
 	/**
 	 * Logger.
-	 * 
 	 */
 	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.arcgrid");
 
 	/** Indicates whether the arcgrid data must be written in GRASS format */
-	public static final DefaultParameterDescriptor GRASS = new DefaultParameterDescriptor(
-			"GRASS", "Indicates whether the arcgrid data has to be written in GRASS format",
-			Boolean.FALSE, true);
+	public static final DefaultParameterDescriptor<Boolean> GRASS = DefaultParameterDescriptor.create(
+			"GRASS", 
+			"Indicates whether the arcgrid data has to be written in GRASS format",
+			Boolean.class,
+			Boolean.FALSE, 
+			true);
 	
 	/** Indicates whether we ask the plugin to resample the coverage to have dx==dy */
-	public static final DefaultParameterDescriptor FORCE_CELLSIZE = new DefaultParameterDescriptor(
-			"FORCE_CELLSIZE", "Indicates whether the input coverage has to be resampled to have dx==dyt",
-			Boolean.FALSE, false);
+	public static final DefaultParameterDescriptor<Boolean> FORCE_CELLSIZE = DefaultParameterDescriptor.create(
+			"FORCE_CELLSIZE",
+			"Indicates whether the input coverage has to be resampled to have dx==dyt",
+			Boolean.class,
+			Boolean.FALSE,
+			false);
 	
 
 	/** Caching the {@link AsciiGridsImageReaderSpi} factory. */
@@ -76,7 +82,7 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 	 * Sets the metadata information.
 	 */
 	private void setInfo() {
-		HashMap info = new HashMap();
+		HashMap<String, String> info = new HashMap<String, String>();
 
 		info.put("name", "ArcGrid");
 		info.put("description", "Arc Grid Coverage Format");
@@ -102,7 +108,7 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 	 * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object
 	 *      source)
 	 */
-	public GridCoverageReader getReader(Object source) {
+	public ArcGridReader getReader(Object source) {
 		return getReader(source, null);
 	}
 
@@ -152,7 +158,7 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 	 * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object,
 	 *      Hints)
 	 */
-	public GridCoverageReader getReader(Object source, Hints hints) {
+	public ArcGridReader getReader(Object source, Hints hints) {
 		try {
 			return new ArcGridReader(source, hints);
 		} catch (DataSourceException e) {
@@ -170,7 +176,6 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 	 *         {@link GeoToolsWriteParams} to control the writing process.
 	 */
 	public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
-
 		return new ArcGridWriteParams();
 	}
 }

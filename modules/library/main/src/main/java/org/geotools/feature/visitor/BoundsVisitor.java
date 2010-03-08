@@ -17,6 +17,7 @@
 package org.geotools.feature.visitor;
 
 import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -30,33 +31,25 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
- * @source $URL: http://gtsvn.refractions.net/trunk/modules/library/main/src/main/java/org/geotools/feature/visitor/BoundsVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/BoundsVisitor.java $
  */
 public class BoundsVisitor implements FeatureCalc {
-    Envelope bounds = new Envelope();
-
-    public void init(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
-    	//do nothing
-    }
-    
+    ReferencedEnvelope bounds = new ReferencedEnvelope();    
     
     public void visit(SimpleFeature feature) {
        visit((org.opengis.feature.Feature)feature);
     }
     
     public void visit(org.opengis.feature.Feature feature) {
-    	 Geometry geom = (Geometry) feature.getDefaultGeometryProperty().getValue();
-         Envelope bbox = geom.getEnvelopeInternal();
-
-         bounds.expandToInclude(bbox);
+        bounds.include( feature.getBounds() );
     }
 
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         return bounds;
     }
 
     public void reset(Envelope bounds) {
-        this.bounds = new Envelope();
+        this.bounds = new ReferencedEnvelope();
     }
 
     public CalcResult getResult() {
@@ -64,14 +57,14 @@ public class BoundsVisitor implements FeatureCalc {
     }
 
     public static class BoundsResult extends AbstractCalcResult {
-        private Envelope bbox;
+        private ReferencedEnvelope bbox;
 
-        public BoundsResult(Envelope bbox) {
+        public BoundsResult(ReferencedEnvelope bbox) {
             this.bbox = bbox;
         }
 
-        public Object getValue() {
-            return new Envelope(bbox);
+        public ReferencedEnvelope getValue() {
+            return new ReferencedEnvelope(bbox);
         }
 
         public boolean isCompatible(CalcResult targetResults) {
@@ -90,9 +83,11 @@ public class BoundsVisitor implements FeatureCalc {
             }
 
             if (resultsToAdd instanceof BoundsResult) {
+                BoundsResult boundsToAdd = (BoundsResult) resultsToAdd;
+                
                 //add one set to the other (to create one big unique list)
-                Envelope newBounds = new Envelope(bbox);
-                newBounds.expandToInclude((Envelope) resultsToAdd.getValue());
+                ReferencedEnvelope newBounds = new ReferencedEnvelope(bbox);
+                newBounds.include( boundsToAdd.getValue());
 
                 return new BoundsResult(newBounds);
             } else {

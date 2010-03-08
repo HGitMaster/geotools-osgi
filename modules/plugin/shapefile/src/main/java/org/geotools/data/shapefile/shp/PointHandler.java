@@ -34,9 +34,9 @@ import com.vividsolutions.jts.geom.Point;
 public class PointHandler implements ShapeHandler {
 
     final ShapeType shapeType;
-    GeometryFactory geometryFactory = new GeometryFactory();
+    GeometryFactory geometryFactory;
 
-    public PointHandler(ShapeType type) throws ShapefileException {
+    public PointHandler(ShapeType type, GeometryFactory gf) throws ShapefileException {
         if ((type != ShapeType.POINT) && (type != ShapeType.POINTM)
                 && (type != ShapeType.POINTZ)) { // 2d, 2d+m, 3d+m
             throw new ShapefileException(
@@ -44,12 +44,13 @@ public class PointHandler implements ShapeHandler {
         }
 
         shapeType = type;
+        this.geometryFactory = gf;
     }
 
     public PointHandler() {
         shapeType = ShapeType.POINT; // 2d
     }
-
+    
     /**
      * Returns the shapefile shape type value for a point
      * 
