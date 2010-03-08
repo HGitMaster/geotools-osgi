@@ -96,6 +96,9 @@
          <module>coverageio</module>
          <module>coverageio-netcdf</module>
          <module>coveragetools</module>
+         <module>imagemosaic-sql</module>
+         <module>imagemosaic-base</module>
+         <module>imagemosaic-shp</module>
        </modules>
      </profile>
      <profile>
@@ -163,7 +166,6 @@
          <module>epsg-h2</module>
          <module>jdbc-ng</module>
          <module>mysql</module>
-         <module>oracle-spatial</module>
          <module>postgis-versioned</module>
          <module>vpf</module>
          <module>caching</module>

@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Geotools Dependencies
+Bundle-SymbolicName: org.geotools.deps
+Bundle-Version: 2.6.0.osgi
+Bundle-Vendor: Harman/Becker
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

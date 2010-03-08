@@ -139,7 +139,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public final class StreamingRenderer implements GTRenderer {
 
-	private final static int defaultMaxFiltersToSendToDatastore = 5; // default
+   private final static int defaultMaxFiltersToSendToDatastore = 5; // default
     
     /**
      * Computes the scale as the ratio between map distances and real world distances,
@@ -159,49 +159,49 @@ public final class StreamingRenderer implements GTRenderer {
      */
     public static final String SCALE_OGC = "OGC";
     
-	/** Tolerance used to compare doubles for equality */
-	private static final double TOLERANCE = 1e-6;
+   /** Tolerance used to compare doubles for equality */
+   private static final double TOLERANCE = 1e-6;
 
-	/** The logger for the rendering module. */
-	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
+   /** The logger for the rendering module. */
+   private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
 
-	int error = 0;
+   int error = 0;
 
-	/** Filter factory for creating bounding box filters */
-	private final static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
-	
-	private final static PropertyName gridPropertyName = filterFactory.property("grid");
-	
-	private final static PropertyName paramsPropertyName = filterFactory.property("params");
-	
-	private final static PropertyName defaultGeometryPropertyName = filterFactory.property("");
-	
+   /** Filter factory for creating bounding box filters */
+   private final static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
+   
+   private final static PropertyName gridPropertyName = filterFactory.property("grid");
+   
+   private final static PropertyName paramsPropertyName = filterFactory.property("params");
+   
+   private final static PropertyName defaultGeometryPropertyName = filterFactory.property("");
+   
 
-	/**
-	 * Context which contains the layers and the bounding box which needs to be
-	 * rendered.
-	 */
-	private MapContext context;
+   /**
+    * Context which contains the layers and the bounding box which needs to be
+    * rendered.
+    */
+   private MapContext context;
 
-	/**
-	 * Flag which determines if the renderer is interactive or not. An
-	 * interactive renderer will return rather than waiting for time consuming
-	 * operations to complete (e.g. Image Loading). A non-interactive renderer
-	 * (e.g. a SVG or PDF renderer) will block for these operations.
-	 */
-	private boolean interactive = true;
+   /**
+    * Flag which determines if the renderer is interactive or not. An
+    * interactive renderer will return rather than waiting for time consuming
+    * operations to complete (e.g. Image Loading). A non-interactive renderer
+    * (e.g. a SVG or PDF renderer) will block for these operations.
+    */
+   private boolean interactive = true;
 
-	/**
-	 * Flag which controls behaviour for applying affine transformation to the
-	 * graphics object. If true then the transform will be concatenated to the
-	 * existing transform. If false it will be replaced.
-	 */
-	private boolean concatTransforms = false;
+   /**
+    * Flag which controls behaviour for applying affine transformation to the
+    * graphics object. If true then the transform will be concatenated to the
+    * existing transform. If false it will be replaced.
+    */
+   private boolean concatTransforms = false;
 
-	/** Geographic map extent, eventually expanded to consider buffer area around the map */
-	private ReferencedEnvelope mapExtent;
-	
-	/** Geographic map extent, as provided by the caller */
+   /** Geographic map extent, eventually expanded to consider buffer area around the map */
+   private ReferencedEnvelope mapExtent;
+   
+   /** Geographic map extent, as provided by the caller */
     private ReferencedEnvelope originalMapExtent;
     
     /**
@@ -210,37 +210,37 @@ public final class StreamingRenderer implements GTRenderer {
      */
     private ProjectionHandler projectionHandler;
 
-	/** The size of the output area in output units. */
-	private Rectangle screenSize;
+   /** The size of the output area in output units. */
+   private Rectangle screenSize;
 
-	/**
-	 * This flag is set to false when starting rendering, and will be checked
-	 * during the rendering loop in order to make it stop forcefully
-	 */
-	private boolean renderingStopRequested = false;
+   /**
+    * This flag is set to false when starting rendering, and will be checked
+    * during the rendering loop in order to make it stop forcefully
+    */
+   private boolean renderingStopRequested = false;
 
-	/**
-	 * The ratio required to scale the features to be rendered so that they fit
-	 * into the output space.
-	 */
-	private double scaleDenominator;
+   /**
+    * The ratio required to scale the features to be rendered so that they fit
+    * into the output space.
+    */
+   private double scaleDenominator;
 
-	/** Maximum displacement for generalization during rendering */
-	private double generalizationDistance = 0.8;
+   /** Maximum displacement for generalization during rendering */
+   private double generalizationDistance = 0.8;
 
-	/** Factory that will resolve symbolizers into rendered styles */
-	private SLDStyleFactory styleFactory = new SLDStyleFactory();
+   /** Factory that will resolve symbolizers into rendered styles */
+   private SLDStyleFactory styleFactory = new SLDStyleFactory();
 
-	protected LabelCache labelCache = new LabelCacheImpl();
+   protected LabelCache labelCache = new SynchronizedLabelCache(new LabelCacheImpl());
 
-	/** The painter class we use to depict shapes onto the screen */
-	private StyledShapePainter painter = new StyledShapePainter(labelCache);
+   /** The painter class we use to depict shapes onto the screen */
+   private StyledShapePainter painter = new StyledShapePainter(labelCache);
 
-	private IndexedFeatureResults indexedFeatureResults;
+   private IndexedFeatureResults indexedFeatureResults;
 
 	private List<RenderListener> renderListeners = new CopyOnWriteArrayList<RenderListener>();
 
-	private RenderingHints java2dHints;
+   private RenderingHints java2dHints;
 
 	private boolean optimizedDataLoadingEnabledDEFAULT = true;
 
@@ -311,11 +311,11 @@ public final class StreamingRenderer implements GTRenderer {
 	public static final String VECTOR_RENDERING_KEY = "vectorRenderingEnabled";
 	private static boolean VECTOR_RENDERING_ENABLED_DEFAULT = false;
 	
-	public static final String LABEL_CACHE_KEY = "labelCache";
-	public static final String DPI_KEY = "dpi";
-	public static final String DECLARED_SCALE_DENOM_KEY = "declaredScaleDenominator";
-	public static final String OPTIMIZED_DATA_LOADING_KEY = "optimizedDataLoadingEnabled";
-	public static final String SCALE_COMPUTATION_METHOD_KEY = "scaleComputationMethod";
+   public static final String LABEL_CACHE_KEY = "labelCache";
+   public static final String DPI_KEY = "dpi";
+   public static final String DECLARED_SCALE_DENOM_KEY = "declaredScaleDenominator";
+   public static final String OPTIMIZED_DATA_LOADING_KEY = "optimizedDataLoadingEnabled";
+   public static final String SCALE_COMPUTATION_METHOD_KEY = "scaleComputationMethod";
     
     /**
      * "optimizedDataLoadingEnabled" - Boolean  yes/no (see default optimizedDataLoadingEnabledDEFAULT)
@@ -330,76 +330,76 @@ public final class StreamingRenderer implements GTRenderer {
      */
     private Map rendererHints = null;
     
-	private AffineTransform worldToScreenTransform = null;
+   private AffineTransform worldToScreenTransform = null;
 
-	private CoordinateReferenceSystem destinationCrs;
+   private CoordinateReferenceSystem destinationCrs;
 
-	private boolean canTransform;
-	
-	/**
-	 * Whether the renderer must perform generalization for the current set of features.
-	 * For each layer we will set this flag depending on whether the datastore can do full
-	 * generalization for us, or not
-	 */
-	private boolean inMemoryGeneralization = true;
+   private boolean canTransform;
+   
+   /**
+    * Whether the renderer must perform generalization for the current set of features.
+    * For each layer we will set this flag depending on whether the datastore can do full
+    * generalization for us, or not
+    */
+   private boolean inMemoryGeneralization = true;
 
-	/**
-	 * Creates a new instance of LiteRenderer without a context. Use it only to
-	 * gain access to utility methods of this class or if you want to render
-	 * random feature collections instead of using the map context interface
-	 */
-	public StreamingRenderer() {
+   /**
+    * Creates a new instance of LiteRenderer without a context. Use it only to
+    * gain access to utility methods of this class or if you want to render
+    * random feature collections instead of using the map context interface
+    */
+   public StreamingRenderer() {
 
-	}
+   }
 
-	/**
-	 * Sets the flag which controls behaviour for applying affine transformation
-	 * to the graphics object.
-	 * 
-	 * @param flag
-	 *            If true then the transform will be concatenated to the
-	 *            existing transform. If false it will be replaced.
-	 */
-	public void setConcatTransforms(boolean flag) {
-		concatTransforms = flag;
-	}
+   /**
+    * Sets the flag which controls behaviour for applying affine transformation
+    * to the graphics object.
+    * 
+    * @param flag
+    *            If true then the transform will be concatenated to the
+    *            existing transform. If false it will be replaced.
+    */
+   public void setConcatTransforms(boolean flag) {
+      concatTransforms = flag;
+   }
 
-	/**
-	 * Flag which controls behaviour for applying affine transformation to the
-	 * graphics object.
-	 * 
-	 * @return a boolean flag. If true then the transform will be concatenated
-	 *         to the existing transform. If false it will be replaced.
-	 */
-	public boolean getConcatTransforms() {
-		return concatTransforms;
-	}
+   /**
+    * Flag which controls behaviour for applying affine transformation to the
+    * graphics object.
+    * 
+    * @return a boolean flag. If true then the transform will be concatenated
+    *         to the existing transform. If false it will be replaced.
+    */
+   public boolean getConcatTransforms() {
+      return concatTransforms;
+   }
 
-	/**
-	 * adds a listener that responds to error events of feature rendered events.
-	 * 
-	 * @see RenderListener
-	 * 
-	 * @param listener
-	 *            the listener to add.
-	 */
-	public void addRenderListener(RenderListener listener) {
-		renderListeners.add(listener);
-	}
+   /**
+    * adds a listener that responds to error events of feature rendered events.
+    * 
+    * @see RenderListener
+    * 
+    * @param listener
+    *            the listener to add.
+    */
+   public void addRenderListener(RenderListener listener) {
+      renderListeners.add(listener);
+   }
 
-	/**
-	 * Removes a render listener.
-	 * 
-	 * @see RenderListener
-	 * 
-	 * @param listener
-	 *            the listener to remove.
-	 */
-	public void removeRenderListener(RenderListener listener) {
-		renderListeners.remove(listener);
-	}
+   /**
+    * Removes a render listener.
+    * 
+    * @see RenderListener
+    * 
+    * @param listener
+    *            the listener to remove.
+    */
+   public void removeRenderListener(RenderListener listener) {
+      renderListeners.remove(listener);
+   }
 
-	private void fireFeatureRenderedEvent(Object feature) {
+   private void fireFeatureRenderedEvent(Object feature) {
         if( !(feature instanceof SimpleFeature)){
             return;
         }
@@ -412,7 +412,7 @@ public final class StreamingRenderer implements GTRenderer {
         }
 	}
 
-	private void fireErrorEvent(Exception e) {
+   private void fireErrorEvent(Exception e) {
         if (renderListeners.size() > 0) {
             RenderListener listener;
             for (int i = 0; i < renderListeners.size(); i++) {
@@ -420,137 +420,137 @@ public final class StreamingRenderer implements GTRenderer {
                 listener.errorOccurred(e);
             }
         }
-	}
+   }
 
-	/**
-	 * If you call this method from another thread than the one that called
-	 * <code>paint</code> or <code>render</code> the rendering will be
-	 * forcefully stopped before termination
-	 */
-	public void stopRendering() {
-		renderingStopRequested = true;
-		labelCache.stop();
-	}
+   /**
+    * If you call this method from another thread than the one that called
+    * <code>paint</code> or <code>render</code> the rendering will be
+    * forcefully stopped before termination
+    */
+   public void stopRendering() {
+      renderingStopRequested = true;
+      labelCache.stop();
+   }
 
-	/**
-	 * Renders features based on the map layers and their styles as specified in
-	 * the map context using <code>setContext</code>. <p/> This version of
-	 * the method assumes that the size of the output area and the
-	 * transformation from coordinates to pixels are known. The latter
-	 * determines the map scale. The viewport (the visible part of the map) will
-	 * be calculated internally.
-	 * 
-	 * @param graphics
-	 *            The graphics object to draw to.
-	 * @param paintArea
-	 *            The size of the output area in output units (eg: pixels).
-	 * @param worldToScreen
-	 *            A transform which converts World coordinates to Screen
-	 *            coordinates.
-	 * @task Need to check if the Layer CoordinateSystem is different to the
-	 *       BoundingBox rendering CoordinateSystem and if so, then transform
-	 *       the coordinates.
-	 * @deprecated Use paint(Graphics2D graphics, Rectangle paintArea,
-	 *             ReferencedEnvelope mapArea) or paint(Graphics2D graphics,
-	 *             Rectangle paintArea, ReferencedEnvelope mapArea,
-	 *             AffineTransform worldToScreen) instead.
-	 */
-	public void paint(Graphics2D graphics, Rectangle paintArea,
-			AffineTransform worldToScreen) {
-		if (worldToScreen == null || paintArea == null) {
-			LOGGER.info("renderer passed null arguments");
-			return;
-		} // Other arguments get checked later
-		// First, create the bbox in real world coordinates
-		Envelope mapArea;
-		try {
-			mapArea = RendererUtilities.createMapEnvelope(paintArea,
-					worldToScreen);
-			paint(graphics, paintArea, mapArea, worldToScreen);
-		} catch (NoninvertibleTransformException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			fireErrorEvent(new Exception(
-					"Can't create pixel to world transform", e));
-		}
-	}
+   /**
+    * Renders features based on the map layers and their styles as specified in
+    * the map context using <code>setContext</code>. <p/> This version of
+    * the method assumes that the size of the output area and the
+    * transformation from coordinates to pixels are known. The latter
+    * determines the map scale. The viewport (the visible part of the map) will
+    * be calculated internally.
+    * 
+    * @param graphics
+    *            The graphics object to draw to.
+    * @param paintArea
+    *            The size of the output area in output units (eg: pixels).
+    * @param worldToScreen
+    *            A transform which converts World coordinates to Screen
+    *            coordinates.
+    * @task Need to check if the Layer CoordinateSystem is different to the
+    *       BoundingBox rendering CoordinateSystem and if so, then transform
+    *       the coordinates.
+    * @deprecated Use paint(Graphics2D graphics, Rectangle paintArea,
+    *             ReferencedEnvelope mapArea) or paint(Graphics2D graphics,
+    *             Rectangle paintArea, ReferencedEnvelope mapArea,
+    *             AffineTransform worldToScreen) instead.
+    */
+   public void paint(Graphics2D graphics, Rectangle paintArea,
+         AffineTransform worldToScreen) {
+      if (worldToScreen == null || paintArea == null) {
+         LOGGER.info("renderer passed null arguments");
+         return;
+      } // Other arguments get checked later
+      // First, create the bbox in real world coordinates
+      Envelope mapArea;
+      try {
+         mapArea = RendererUtilities.createMapEnvelope(paintArea,
+               worldToScreen);
+         paint(graphics, paintArea, mapArea, worldToScreen);
+      } catch (NoninvertibleTransformException e) {
+         LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+         fireErrorEvent(new Exception(
+               "Can't create pixel to world transform", e));
+      }
+   }
 
-	/**
-	 * Renders features based on the map layers and their styles as specified in
-	 * the map context using <code>setContext</code>. <p/> This version of
-	 * the method assumes that the area of the visible part of the map and the
-	 * size of the output area are known. The transform between the two is
-	 * calculated internally.
-	 * 
-	 * @param graphics
-	 *            The graphics object to draw to.
-	 * @param paintArea
-	 *            The size of the output area in output units (eg: pixels).
-	 * @param mapArea
-	 *            the map's visible area (viewport) in map coordinates.
-	 * @deprecated Use paint(Graphics2D graphics, Rectangle paintArea,
-	 *             ReferencedEnvelope mapArea) or paint(Graphics2D graphics,
-	 *             Rectangle paintArea, ReferencedEnvelope mapArea,
-	 *             AffineTransform worldToScreen) instead.
-	 */
-	public void paint(Graphics2D graphics, Rectangle paintArea, Envelope mapArea) {
-		if (mapArea == null || paintArea == null) {
-			LOGGER.info("renderer passed null arguments");
-			return;
-		} // Other arguments get checked later
-		paint(graphics, paintArea, mapArea, RendererUtilities
-				.worldToScreenTransform(mapArea, paintArea));
-	}
+   /**
+    * Renders features based on the map layers and their styles as specified in
+    * the map context using <code>setContext</code>. <p/> This version of
+    * the method assumes that the area of the visible part of the map and the
+    * size of the output area are known. The transform between the two is
+    * calculated internally.
+    * 
+    * @param graphics
+    *            The graphics object to draw to.
+    * @param paintArea
+    *            The size of the output area in output units (eg: pixels).
+    * @param mapArea
+    *            the map's visible area (viewport) in map coordinates.
+    * @deprecated Use paint(Graphics2D graphics, Rectangle paintArea,
+    *             ReferencedEnvelope mapArea) or paint(Graphics2D graphics,
+    *             Rectangle paintArea, ReferencedEnvelope mapArea,
+    *             AffineTransform worldToScreen) instead.
+    */
+   public void paint(Graphics2D graphics, Rectangle paintArea, Envelope mapArea) {
+      if (mapArea == null || paintArea == null) {
+         LOGGER.info("renderer passed null arguments");
+         return;
+      } // Other arguments get checked later
+      paint(graphics, paintArea, mapArea, RendererUtilities
+            .worldToScreenTransform(mapArea, paintArea));
+   }
 
-	/**
-	 * Renders features based on the map layers and their styles as specified in
-	 * the map context using <code>setContext</code>. <p/> This version of
-	 * the method assumes that the area of the visible part of the map and the
-	 * size of the output area are known. The transform between the two is
-	 * calculated internally.
-	 * 
-	 * @param graphics
-	 *            The graphics object to draw to.
-	 * @param paintArea
-	 *            The size of the output area in output units (eg: pixels).
-	 * @param mapArea
-	 *            the map's visible area (viewport) in map coordinates.
-	 */
-	public void paint(Graphics2D graphics, Rectangle paintArea,
-			ReferencedEnvelope mapArea) {
-		if (mapArea == null || paintArea == null) {
-			LOGGER.info("renderer passed null arguments");
-			return;
-		} // Other arguments get checked later
-		paint(graphics, paintArea, mapArea, RendererUtilities
-				.worldToScreenTransform(mapArea, paintArea));
-	}
+   /**
+    * Renders features based on the map layers and their styles as specified in
+    * the map context using <code>setContext</code>. <p/> This version of
+    * the method assumes that the area of the visible part of the map and the
+    * size of the output area are known. The transform between the two is
+    * calculated internally.
+    * 
+    * @param graphics
+    *            The graphics object to draw to.
+    * @param paintArea
+    *            The size of the output area in output units (eg: pixels).
+    * @param mapArea
+    *            the map's visible area (viewport) in map coordinates.
+    */
+   public void paint(Graphics2D graphics, Rectangle paintArea,
+         ReferencedEnvelope mapArea) {
+      if (mapArea == null || paintArea == null) {
+         LOGGER.info("renderer passed null arguments");
+         return;
+      } // Other arguments get checked later
+      paint(graphics, paintArea, mapArea, RendererUtilities
+            .worldToScreenTransform(mapArea, paintArea));
+   }
 
-	/**
-	 * Renders features based on the map layers and their styles as specified in
-	 * the map context using <code>setContext</code>. <p/> This version of
-	 * the method assumes that paint area, envelope and worldToScreen transform
-	 * are already computed. Use this method to avoid recomputation. <b>Note
-	 * however that no check is performed that they are really in sync!<b/>
-	 * 
-	 * @param graphics
-	 *            The graphics object to draw to.
-	 * @param paintArea
-	 *            The size of the output area in output units (eg: pixels).
-	 * @param mapArea
-	 *            the map's visible area (viewport) in map coordinates.
-	 * @param worldToScreen
-	 *            A transform which converts World coordinates to Screen
-	 *            coordinates.
-	 * @deprecated Use paint(Graphics2D graphics, Rectangle paintArea,
-	 *             ReferencedEnvelope mapArea) or paint(Graphics2D graphics,
-	 *             Rectangle paintArea, ReferencedEnvelope mapArea,
-	 *             AffineTransform worldToScreen) instead.
-	 */
-	public void paint(Graphics2D graphics, Rectangle paintArea,
-			Envelope mapArea, AffineTransform worldToScreen) {
-		paint( graphics, paintArea, new ReferencedEnvelope(mapArea, context.getCoordinateReferenceSystem()),
-				worldToScreen);
-	}
+   /**
+    * Renders features based on the map layers and their styles as specified in
+    * the map context using <code>setContext</code>. <p/> This version of
+    * the method assumes that paint area, envelope and worldToScreen transform
+    * are already computed. Use this method to avoid recomputation. <b>Note
+    * however that no check is performed that they are really in sync!<b/>
+    * 
+    * @param graphics
+    *            The graphics object to draw to.
+    * @param paintArea
+    *            The size of the output area in output units (eg: pixels).
+    * @param mapArea
+    *            the map's visible area (viewport) in map coordinates.
+    * @param worldToScreen
+    *            A transform which converts World coordinates to Screen
+    *            coordinates.
+    * @deprecated Use paint(Graphics2D graphics, Rectangle paintArea,
+    *             ReferencedEnvelope mapArea) or paint(Graphics2D graphics,
+    *             Rectangle paintArea, ReferencedEnvelope mapArea,
+    *             AffineTransform worldToScreen) instead.
+    */
+   public void paint(Graphics2D graphics, Rectangle paintArea,
+         Envelope mapArea, AffineTransform worldToScreen) {
+      paint( graphics, paintArea, new ReferencedEnvelope(mapArea, context.getCoordinateReferenceSystem()),
+            worldToScreen);
+   }
 
 	private double computeScale(ReferencedEnvelope envelope, Rectangle paintArea, 
 	        AffineTransform worldToScreen, Map hints) {
@@ -571,79 +571,79 @@ public final class StreamingRenderer implements GTRenderer {
     }
 
     /**
-	 * Renders features based on the map layers and their styles as specified in
-	 * the map context using <code>setContext</code>. <p/> This version of
-	 * the method assumes that paint area, envelope and worldToScreen transform
-	 * are already computed. Use this method to avoid recomputation. <b>Note
-	 * however that no check is performed that they are really in sync!<b/>
-	 * 
-	 * @param graphics
-	 *            The graphics object to draw to.
-	 * @param paintArea
-	 *            The size of the output area in output units (eg: pixels).
-	 * @param mapArea
-	 *            the map's visible area (viewport) in map coordinates. Its
-	 *            associate CRS is ALWAYS 2D
-	 * @param worldToScreen
-	 *            A transform which converts World coordinates to Screen
-	 *            coordinates.
-	 */
-	public void paint(Graphics2D graphics, Rectangle paintArea,
-			ReferencedEnvelope mapArea, AffineTransform worldToScreen) {
-		// ////////////////////////////////////////////////////////////////////
-		// 
-		// Check for null arguments, recompute missing ones if possible
-		//
-		// ////////////////////////////////////////////////////////////////////
-		if (graphics == null || paintArea == null) {
-			LOGGER.severe("renderer passed null arguments");
-			throw new NullPointerException("renderer passed null arguments");
-		} else if (mapArea == null && paintArea == null) {
-			LOGGER.severe("renderer passed null arguments");
-			throw new NullPointerException("renderer passed null arguments");
-		} else if (mapArea == null) {
+    * Renders features based on the map layers and their styles as specified in
+    * the map context using <code>setContext</code>. <p/> This version of
+    * the method assumes that paint area, envelope and worldToScreen transform
+    * are already computed. Use this method to avoid recomputation. <b>Note
+    * however that no check is performed that they are really in sync!<b/>
+    * 
+    * @param graphics
+    *            The graphics object to draw to.
+    * @param paintArea
+    *            The size of the output area in output units (eg: pixels).
+    * @param mapArea
+    *            the map's visible area (viewport) in map coordinates. Its
+    *            associate CRS is ALWAYS 2D
+    * @param worldToScreen
+    *            A transform which converts World coordinates to Screen
+    *            coordinates.
+    */
+   public void paint(Graphics2D graphics, Rectangle paintArea,
+         ReferencedEnvelope mapArea, AffineTransform worldToScreen) {
+      // ////////////////////////////////////////////////////////////////////
+      // 
+      // Check for null arguments, recompute missing ones if possible
+      //
+      // ////////////////////////////////////////////////////////////////////
+      if (graphics == null || paintArea == null) {
+         LOGGER.severe("renderer passed null arguments");
+         throw new NullPointerException("renderer passed null arguments");
+      } else if (mapArea == null && paintArea == null) {
+         LOGGER.severe("renderer passed null arguments");
+         throw new NullPointerException("renderer passed null arguments");
+      } else if (mapArea == null) {
 
-			LOGGER.severe("renderer passed null arguments");
-			throw new NullPointerException("renderer passed null arguments");
-		} else if (worldToScreen == null) {
-			worldToScreen = RendererUtilities.worldToScreenTransform(mapArea,
-					paintArea);
-			if (worldToScreen == null)
-				return;
-		}
+         LOGGER.severe("renderer passed null arguments");
+         throw new NullPointerException("renderer passed null arguments");
+      } else if (worldToScreen == null) {
+         worldToScreen = RendererUtilities.worldToScreenTransform(mapArea,
+               paintArea);
+         if (worldToScreen == null)
+            return;
+      }
 
-		// ////////////////////////////////////////////////////////////////////
-		// 
-		// Setting base information
-		//
-		// TODO the way this thing is built is a mess if you try to use it in a
-		// multithreaded environment. I will fix this at the end.
-		//
-		// ////////////////////////////////////////////////////////////////////
-		destinationCrs = mapArea.getCoordinateReferenceSystem();
-		mapExtent = new ReferencedEnvelope(mapArea);
-		this.screenSize = paintArea;
-		this.worldToScreenTransform = worldToScreen;
-		error = 0;
-		if (java2dHints != null)
-			graphics.setRenderingHints(java2dHints);
-		// reset the abort flag
-		renderingStopRequested = false;
+      // ////////////////////////////////////////////////////////////////////
+      // 
+      // Setting base information
+      //
+      // TODO the way this thing is built is a mess if you try to use it in a
+      // multithreaded environment. I will fix this at the end.
+      //
+      // ////////////////////////////////////////////////////////////////////
+      destinationCrs = mapArea.getCoordinateReferenceSystem();
+      mapExtent = new ReferencedEnvelope(mapArea);
+      this.screenSize = paintArea;
+      this.worldToScreenTransform = worldToScreen;
+      error = 0;
+      if (java2dHints != null)
+         graphics.setRenderingHints(java2dHints);
+      // reset the abort flag
+      renderingStopRequested = false;
 
-		// ////////////////////////////////////////////////////////////////////
-		//
-		// Managing transformations , CRSs and scales
-		//
-		// If we are rendering to a component which has already set up some form
-		// of transformation then we can concatenate our transformation to it.
-		// An example of this is the ZoomPane component of the swinggui module.
-		// ////////////////////////////////////////////////////////////////////
-		if (concatTransforms) {
-			AffineTransform atg = graphics.getTransform();
-			atg.concatenate(worldToScreenTransform);
-			worldToScreenTransform = atg;
-			graphics.setTransform(worldToScreenTransform);
-		}
+      // ////////////////////////////////////////////////////////////////////
+      //
+      // Managing transformations , CRSs and scales
+      //
+      // If we are rendering to a component which has already set up some form
+      // of transformation then we can concatenate our transformation to it.
+      // An example of this is the ZoomPane component of the swinggui module.
+      // ////////////////////////////////////////////////////////////////////
+      if (concatTransforms) {
+         AffineTransform atg = graphics.getTransform();
+         atg.concatenate(worldToScreenTransform);
+         worldToScreenTransform = atg;
+         graphics.setTransform(worldToScreenTransform);
+      }
 		if(isAdvancedProjectionHandlingEnabled())
 		    projectionHandler = ProjectionHandlerFinder.getHandler(mapExtent);
 
@@ -651,7 +651,7 @@ public final class StreamingRenderer implements GTRenderer {
         scaleDenominator = computeScale(mapArea, paintArea,worldToScreenTransform, rendererHints);
         if(LOGGER.isLoggable(Level.FINE))
             LOGGER.fine("Computed scale denominator: " + scaleDenominator);
-		//////////////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////////////
         //
         // Consider expanding the map extent so that a few more geometries
         // will be considered, in order to catch those outside of the rendering
@@ -665,75 +665,75 @@ public final class StreamingRenderer implements GTRenderer {
                     mapExtent.getCoordinateReferenceSystem()); 
         }
 
-		// ////////////////////////////////////////////////////////////////////
-		//
-		// Processing all the map layers in the context using the accompaining
-		// styles
-		//
-		// ////////////////////////////////////////////////////////////////////
-		final MapLayer[] layers = context.getLayers();
-		labelCache.start();
-		if(labelCache instanceof LabelCacheImpl) {
-		    boolean outlineEnabled = TEXT_RENDERING_OUTLINE.equals(getTextRenderingMethod());
+      // ////////////////////////////////////////////////////////////////////
+      //
+      // Processing all the map layers in the context using the accompaining
+      // styles
+      //
+      // ////////////////////////////////////////////////////////////////////
+      final MapLayer[] layers = context.getLayers();
+      labelCache.start();
+      if(labelCache instanceof LabelCacheImpl) {
+          boolean outlineEnabled = TEXT_RENDERING_OUTLINE.equals(getTextRenderingMethod());
             ((LabelCacheImpl) labelCache).setOutlineRenderingEnabled(outlineEnabled);
-		}
-		final int layersNumber = layers.length;
-		MapLayer currLayer;
-		for (int i = 0; i < layersNumber; i++) // DJB: for each layer (ie. one
-		{
-			currLayer = layers[i];
+      }
+      final int layersNumber = layers.length;
+      MapLayer currLayer;
+      for (int i = 0; i < layersNumber; i++) // DJB: for each layer (ie. one
+      {
+         currLayer = layers[i];
 
-			if (!currLayer.isVisible()) {
-				// Only render layer when layer is visible
-				continue;
-			}
+         if (!currLayer.isVisible()) {
+            // Only render layer when layer is visible
+            continue;
+         }
 
-			if (renderingStopRequested) {
-				return;
-			}
-			labelCache.startLayer(i+"");
-			try {
+         if (renderingStopRequested) {
+            return;
+         }
+         labelCache.startLayer(i+"");
+         try {
 
-				// extract the feature type stylers from the style object
-				// and process them
-				processStylers(graphics, currLayer, worldToScreenTransform,
-						destinationCrs, mapExtent, screenSize, i+"");
-			} catch (Throwable t) {
-				LOGGER.log(Level.SEVERE, t.getLocalizedMessage(), t);
-				fireErrorEvent(new Exception(new StringBuffer(
-						"Exception rendering layer ").append(currLayer)
-						.toString(), t));
-			}
+            // extract the feature type stylers from the style object
+            // and process them
+            processStylers(graphics, currLayer, worldToScreenTransform,
+                  destinationCrs, mapExtent, screenSize, i+"");
+         } catch (Throwable t) {
+            LOGGER.log(Level.SEVERE, t.getLocalizedMessage(), t);
+            fireErrorEvent(new Exception(new StringBuffer(
+                  "Exception rendering layer ").append(currLayer)
+                  .toString(), t));
+         }
 
-			labelCache.endLayer(i+"", graphics, screenSize);
-		}
+         labelCache.endLayer(i+"", graphics, screenSize);
+      }
 
-		labelCache.end(graphics, paintArea);
+      labelCache.end(graphics, paintArea);
 
-		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine(new StringBuffer("Style cache hit ratio: ").append(
-					styleFactory.getHitRatio()).append(" , hits ").append(
-					styleFactory.getHits()).append(", requests ").append(
-					styleFactory.getRequests()).toString());
-		if (error > 0) {
-			LOGGER
-					.warning(new StringBuffer(
-							"Number of Errors during paint(Graphics2D, AffineTransform) = ")
-							.append(error).toString());
-		}
-	}
+      if (LOGGER.isLoggable(Level.FINE))
+         LOGGER.fine(new StringBuffer("Style cache hit ratio: ").append(
+               styleFactory.getHitRatio()).append(" , hits ").append(
+               styleFactory.getHits()).append(", requests ").append(
+               styleFactory.getRequests()).toString());
+      if (error > 0) {
+         LOGGER
+               .warning(new StringBuffer(
+                     "Number of Errors during paint(Graphics2D, AffineTransform) = ")
+                     .append(error).toString());
+      }
+   }
 
-	/**
-	 * Extends the provided {@link Envelope} in order to add the number of pixels
-	 * specified by <code>buffer</code> in every direction.
-	 * 
-	 * @param envelope to extend.
-	 * @param worldToScreen by means  of which doing the extension.
-	 * @param buffer to use for the extension.
-	 * @return an extended version of the provided {@link Envelope}.
-	 */
+   /**
+    * Extends the provided {@link Envelope} in order to add the number of pixels
+    * specified by <code>buffer</code> in every direction.
+    * 
+    * @param envelope to extend.
+    * @param worldToScreen by means  of which doing the extension.
+    * @param buffer to use for the extension.
+    * @return an extended version of the provided {@link Envelope}.
+    */
     private Envelope expandEnvelope(Envelope envelope, AffineTransform worldToScreen, int buffer) {
-    	assert buffer>0;
+      assert buffer>0;
         double bufferX =  Math.abs(buffer * 1.0 /  XAffineTransform.getScaleX0(worldToScreen));
         double bufferY =  Math.abs(buffer * 1.0 /  XAffineTransform.getScaleY0(worldToScreen));
         return new Envelope(envelope.getMinX() - bufferX, 
@@ -741,114 +741,114 @@ public final class StreamingRenderer implements GTRenderer {
                 envelope.getMaxY() + bufferY);
     }
 
-	/**
-	 * Queries a given layer's <code>Source</code> instance to be rendered. 
-	 * <p>
-	 * <em><strong>Note: This is proof-of-concept quality only!</strong> At 
-	 * the moment the query is not filtered, that means all objects with all 
-	 * fields are read from the datastore for every call to this method. This 
-	 * method should work like 
-	 * {@link #queryLayer(MapLayer, FeatureSource, SimpleFeatureType, LiteFeatureTypeStyle[], Envelope, CoordinateReferenceSystem, CoordinateReferenceSystem, Rectangle, GeometryAttributeType)} 
-	 * and eventually replace it.</em>
-	 * </p>
-	 * 
-	 * @param currLayer The actually processed layer for rendering
-	 * @param source Source to read data from
-	 */
-	//TODO: Implement filtering for bbox and read in only the need attributes 
-	Collection queryLayer(MapLayer currLayer, CollectionSource source) {
-		//REVISIT: this method does not make sense. Always compares
-	    //new DefaultQuery(DefaultQuery.ALL) for reference equality with Query.All. GR.
-	    
-		Collection results = null;
-		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
-		Query definitionQuery;
+   /**
+    * Queries a given layer's <code>Source</code> instance to be rendered. 
+    * <p>
+    * <em><strong>Note: This is proof-of-concept quality only!</strong> At 
+    * the moment the query is not filtered, that means all objects with all 
+    * fields are read from the datastore for every call to this method. This 
+    * method should work like 
+    * {@link #queryLayer(MapLayer, FeatureSource, SimpleFeatureType, LiteFeatureTypeStyle[], Envelope, CoordinateReferenceSystem, CoordinateReferenceSystem, Rectangle, GeometryAttributeType)} 
+    * and eventually replace it.</em>
+    * </p>
+    * 
+    * @param currLayer The actually processed layer for rendering
+    * @param source Source to read data from
+    */
+   //TODO: Implement filtering for bbox and read in only the need attributes 
+   Collection queryLayer(MapLayer currLayer, CollectionSource source) {
+      //REVISIT: this method does not make sense. Always compares
+       //new DefaultQuery(DefaultQuery.ALL) for reference equality with Query.All. GR.
+       
+      Collection results = null;
+      DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
+      Query definitionQuery;
 
-		definitionQuery = currLayer.getQuery();
+      definitionQuery = currLayer.getQuery();
 
-		if (definitionQuery != Query.ALL) {
-			if (query == Query.ALL) {
-				query = new DefaultQuery(definitionQuery);
-			} else {
-				query = new DefaultQuery(DataUtilities.mixQueries(definitionQuery, query, "liteRenderer"));
-			}
-		}
-		
-		results = source.content(query.getFilter());
+      if (definitionQuery != Query.ALL) {
+         if (query == Query.ALL) {
+            query = new DefaultQuery(definitionQuery);
+         } else {
+            query = new DefaultQuery(DataUtilities.mixQueries(definitionQuery, query, "liteRenderer"));
+         }
+      }
+      
+      results = source.content(query.getFilter());
 
-		return results;
-	}
-		
-	
-	/**
-	 * Queries a given layer's features to be rendered based on the target
-	 * rendering bounding box.
-	 * <p>
-	 * If <code>optimizedDataLoadingEnabled</code> attribute has been set to
-	 * <code>true</code>, the following optimization will be performed in
-	 * order to limit the number of features returned:
-	 * <ul>
-	 * <li>Just the features whose geometric attributes lies within
-	 * <code>envelope</code> will be queried</li>
-	 * <li>The queried attributes will be limited to just those needed to
-	 * perform the rendering, based on the required geometric and non geometric
-	 * attributes found in the Layer's style rules</li>
-	 * <li>If a <code>Query</code> has been set to limit the resulting
-	 * layer's features, the final filter to obtain them will respect it. This
-	 * means that the bounding box filter and the Query filter will be combined,
-	 * also including maxFeatures from Query</li>
-	 * <li>At least that the layer's definition query explicitly says to
-	 * retrieve some attribute, no attributes will be requested from it, for
-	 * performance reasons. So it is desirable to not use a Query for filtering
-	 * a layer which includes attributes. Note that including the attributes in
-	 * the result is not necessary for the query's filter to get properly
-	 * processed. </li>
-	 * </ul>
-	 * </p>
-	 * <p>
-	 * <b>NOTE </b>: This is an internal method and should only be called by
-	 * <code>paint(Graphics2D, Rectangle, AffineTransform)</code>. It is
-	 * package protected just to allow unit testing it.
-	 * </p>
-	 * 
-	 * @param currLayer
-	 *            the actually processing layer for renderition
-	 * @param schema
-	 * @param source
-	 * @param envelope
-	 *            the spatial extent which is the target area of the rendering
-	 *            process
-	 * @param destinationCrs
-	 *            DOCUMENT ME!
-	 * @param sourceCrs
-	 * @param screenSize
-	 * @param geometryAttribute
-	 * @return the set of features resulting from <code>currLayer</code> after
-	 *         querying its feature source
-	 * @throws IllegalFilterException
-	 *             if something goes wrong constructing the bbox filter
-	 * @throws IOException
-	 * @throws IllegalAttributeException
-	 * @see MapLayer#setQuery(org.geotools.data.Query)
-	 */
-	/*
-	 * Default visibility for testing purposes
-	 */
-	
-	FeatureCollection<SimpleFeatureType, SimpleFeature> queryLayer(MapLayer currLayer, FeatureSource<SimpleFeatureType, SimpleFeature> source,
-			SimpleFeatureType schema, LiteFeatureTypeStyle[] styles,
-			Envelope mapArea, CoordinateReferenceSystem mapCRS,
-			CoordinateReferenceSystem featCrs, Rectangle screenSize,
-			GeometryDescriptor geometryAttribute,
+      return results;
+   }
+      
+   
+   /**
+    * Queries a given layer's features to be rendered based on the target
+    * rendering bounding box.
+    * <p>
+    * If <code>optimizedDataLoadingEnabled</code> attribute has been set to
+    * <code>true</code>, the following optimization will be performed in
+    * order to limit the number of features returned:
+    * <ul>
+    * <li>Just the features whose geometric attributes lies within
+    * <code>envelope</code> will be queried</li>
+    * <li>The queried attributes will be limited to just those needed to
+    * perform the rendering, based on the required geometric and non geometric
+    * attributes found in the Layer's style rules</li>
+    * <li>If a <code>Query</code> has been set to limit the resulting
+    * layer's features, the final filter to obtain them will respect it. This
+    * means that the bounding box filter and the Query filter will be combined,
+    * also including maxFeatures from Query</li>
+    * <li>At least that the layer's definition query explicitly says to
+    * retrieve some attribute, no attributes will be requested from it, for
+    * performance reasons. So it is desirable to not use a Query for filtering
+    * a layer which includes attributes. Note that including the attributes in
+    * the result is not necessary for the query's filter to get properly
+    * processed. </li>
+    * </ul>
+    * </p>
+    * <p>
+    * <b>NOTE </b>: This is an internal method and should only be called by
+    * <code>paint(Graphics2D, Rectangle, AffineTransform)</code>. It is
+    * package protected just to allow unit testing it.
+    * </p>
+    * 
+    * @param currLayer
+    *            the actually processing layer for renderition
+    * @param schema
+    * @param source
+    * @param envelope
+    *            the spatial extent which is the target area of the rendering
+    *            process
+    * @param destinationCrs
+    *            DOCUMENT ME!
+    * @param sourceCrs
+    * @param screenSize
+    * @param geometryAttribute
+    * @return the set of features resulting from <code>currLayer</code> after
+    *         querying its feature source
+    * @throws IllegalFilterException
+    *             if something goes wrong constructing the bbox filter
+    * @throws IOException
+    * @throws IllegalAttributeException
+    * @see MapLayer#setQuery(org.geotools.data.Query)
+    */
+   /*
+    * Default visibility for testing purposes
+    */
+   
+   FeatureCollection<SimpleFeatureType, SimpleFeature> queryLayer(MapLayer currLayer, FeatureSource<SimpleFeatureType, SimpleFeature> source,
+         SimpleFeatureType schema, LiteFeatureTypeStyle[] styles,
+         Envelope mapArea, CoordinateReferenceSystem mapCRS,
+         CoordinateReferenceSystem featCrs, Rectangle screenSize,
+         GeometryDescriptor geometryAttribute,
             AffineTransform worldToScreenTransform)
-			throws IllegalFilterException, IOException,
-			IllegalAttributeException {
-	    FeatureCollection<SimpleFeatureType, SimpleFeature> results = null;
-		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
-		Query definitionQuery;
-		final int length;
-		Filter filter = null;
-		
+         throws IllegalFilterException, IOException,
+         IllegalAttributeException {
+       FeatureCollection<SimpleFeatureType, SimpleFeature> results = null;
+      DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
+      Query definitionQuery;
+      final int length;
+      Filter filter = null;
+      
         // if map extent are not already expanded by a constant buffer, try to compute a layer
         // specific one based on stroke widths
         if(getRenderingBuffer() == 0) {
@@ -874,16 +874,16 @@ public final class StreamingRenderer implements GTRenderer {
             attributes = findStyleAttributes(styles, schema);
         }
         
-		ReferencedEnvelope envelope = new ReferencedEnvelope(mapArea, mapCRS);
-		if (isOptimizedDataLoadingEnabled()) {
-			// see what attributes we really need by exploring the styles
-			// for testing purposes we have a null case -->
+      ReferencedEnvelope envelope = new ReferencedEnvelope(mapArea, mapCRS);
+      if (isOptimizedDataLoadingEnabled()) {
+         // see what attributes we really need by exploring the styles
+         // for testing purposes we have a null case -->
 
-			try {
-				// Then create the geometry filters. We have to create one for
-				// each geometric attribute used during the rendering as the
-				// feature may have more than one and the styles could use non
-				// default geometric ones
+         try {
+            // Then create the geometry filters. We have to create one for
+            // each geometric attribute used during the rendering as the
+            // feature may have more than one and the styles could use non
+            // default geometric ones
 				List<ReferencedEnvelope> envelopes;
 				if (projectionHandler != null) {
                     envelopes = projectionHandler.getQueryEnvelopes(featCrs);
@@ -893,91 +893,91 @@ public final class StreamingRenderer implements GTRenderer {
     				} else {
     					envelopes = Collections.singletonList(envelope);
     				}
-				}
+            }
 
                 if(LOGGER.isLoggable(Level.FINE))
                     LOGGER.fine("Querying layer " + schema.getTypeName() +  " with bbox: " + envelope);
 				filter = createBBoxFilters(schema, attributes, envelopes);
 
-				// now build the query using only the attributes and the
-				// bounding box needed
-				query = new DefaultQuery(schema.getTypeName());
-				query.setFilter(filter);
-				query.setPropertyNames(attributes);
-				processRuleForQuery(styles, query);
+            // now build the query using only the attributes and the
+            // bounding box needed
+            query = new DefaultQuery(schema.getTypeName());
+            query.setFilter(filter);
+            query.setPropertyNames(attributes);
+            processRuleForQuery(styles, query);
 
-			} catch (Exception e) {
-				fireErrorEvent(new Exception("Error transforming bbox", e));
-				canTransform = false;
-				query = new DefaultQuery(schema.getTypeName());
-				query.setPropertyNames(attributes);
-				Envelope bounds = source.getBounds();
-				if (bounds != null && envelope.intersects(bounds)) {
-					LOGGER.log(Level.WARNING, "Got a tranform exception while trying to de-project the current " +
-											"envelope, bboxs intersect therefore using envelope)", e);
-					filter = null;					
+         } catch (Exception e) {
+            fireErrorEvent(new Exception("Error transforming bbox", e));
+            canTransform = false;
+            query = new DefaultQuery(schema.getTypeName());
+            query.setPropertyNames(attributes);
+            Envelope bounds = source.getBounds();
+            if (bounds != null && envelope.intersects(bounds)) {
+               LOGGER.log(Level.WARNING, "Got a tranform exception while trying to de-project the current " +
+                                 "envelope, bboxs intersect therefore using envelope)", e);
+               filter = null;             
 					filter = createBBoxFilters(schema, attributes, Collections.singletonList(envelope));
-					query.setFilter(filter);
-				} else {
-					LOGGER.log(Level.WARNING, "Got a tranform exception while trying to de-project the current " +
-											"envelope, falling back on full data loading (no bbox query)", e);
-					query.setFilter(Filter.INCLUDE);
-				}
-				processRuleForQuery(styles, query);
+               query.setFilter(filter);
+            } else {
+               LOGGER.log(Level.WARNING, "Got a tranform exception while trying to de-project the current " +
+                                 "envelope, falling back on full data loading (no bbox query)", e);
+               query.setFilter(Filter.INCLUDE);
+            }
+            processRuleForQuery(styles, query);
 
-			}
-		}
+         }
+      }
 
-		// now, if a definition query has been established for this layer, be
-		// sure to respect it by combining it with the bounding box one.
-		// Currently this definition query is being set dynamically in geoserver
-		// as per the user's filter, maxFeatures and startIndex WMS GetMap custom parameters
-		definitionQuery = currLayer.getQuery();
+      // now, if a definition query has been established for this layer, be
+      // sure to respect it by combining it with the bounding box one.
+      // Currently this definition query is being set dynamically in geoserver
+      // as per the user's filter, maxFeatures and startIndex WMS GetMap custom parameters
+      definitionQuery = currLayer.getQuery();
 
-		if (definitionQuery != Query.ALL) {
-			if (query == Query.ALL) {
-				query = new DefaultQuery(definitionQuery);
-			} else {
-				query = new DefaultQuery(DataUtilities.mixQueries(
-						definitionQuery, query, "liteRenderer"));
-			}
-		}
-		query.setCoordinateSystem(featCrs);
-		
-		// prepare hints
-		// ... basic one, we want fast and compact coordinate sequences
-		Hints hints = new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory());
-		// ... if possible we let the datastore do the generalization
-		Set<RenderingHints.Key> fsHints = source.getSupportedHints();
-		if(fsHints.contains(Hints.GEOMETRY_DISTANCE) || fsHints.contains(Hints.GEOMETRY_SIMPLIFICATION)) {
-		    CoordinateReferenceSystem crs = getNativeCRS(schema, Arrays.asList(attributes));
-		    if(crs != null) {
-		        try {
-    		        MathTransform mt = buildFullTransform(crs, mapCRS, worldToScreenTransform);
-    		        double[] spans = Decimator.computeGeneralizationDistances(mt.inverse(), screenSize, generalizationDistance);
-    		        double distance = spans[0] < spans[1] ? spans[0] : spans[1];
-    		        if(fsHints.contains(Hints.GEOMETRY_SIMPLIFICATION)) {
-    		            // good, we don't need to perform in memory generalization, the datastore
-    		            // does it all for us
+      if (definitionQuery != Query.ALL) {
+         if (query == Query.ALL) {
+            query = new DefaultQuery(definitionQuery);
+         } else {
+            query = new DefaultQuery(DataUtilities.mixQueries(
+                  definitionQuery, query, "liteRenderer"));
+         }
+      }
+      query.setCoordinateSystem(featCrs);
+      
+      // prepare hints
+      // ... basic one, we want fast and compact coordinate sequences
+      Hints hints = new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory());
+      // ... if possible we let the datastore do the generalization
+      Set<RenderingHints.Key> fsHints = source.getSupportedHints();
+      if(fsHints.contains(Hints.GEOMETRY_DISTANCE) || fsHints.contains(Hints.GEOMETRY_SIMPLIFICATION)) {
+          CoordinateReferenceSystem crs = getNativeCRS(schema, Arrays.asList(attributes));
+          if(crs != null) {
+              try {
+                 MathTransform mt = buildFullTransform(crs, mapCRS, worldToScreenTransform);
+                 double[] spans = Decimator.computeGeneralizationDistances(mt.inverse(), screenSize, generalizationDistance);
+                 double distance = spans[0] < spans[1] ? spans[0] : spans[1];
+                 if(fsHints.contains(Hints.GEOMETRY_SIMPLIFICATION)) {
+                     // good, we don't need to perform in memory generalization, the datastore
+                     // does it all for us
                         hints.put(Hints.GEOMETRY_SIMPLIFICATION, distance);
                         inMemoryGeneralization = false;
-    		        } else if(fsHints.contains(Hints.GEOMETRY_DISTANCE)) {
-    		            // in this case the datastore can get us close, but we can still
-    		            // perform some in memory generalization
-    		            hints.put(Hints.GEOMETRY_DISTANCE, distance);
-    		        }
-		        } catch(Exception e) {
-		            LOGGER.log(Level.INFO, "Error computing the generalization hints", e);
-		        }
-		    }
-		}
-		query.setHints(hints);
-		
-		// simplify the filter
+                 } else if(fsHints.contains(Hints.GEOMETRY_DISTANCE)) {
+                     // in this case the datastore can get us close, but we can still
+                     // perform some in memory generalization
+                     hints.put(Hints.GEOMETRY_DISTANCE, distance);
+                 }
+              } catch(Exception e) {
+                  LOGGER.log(Level.INFO, "Error computing the generalization hints", e);
+              }
+          }
+      }
+      query.setHints(hints);
+      
+      // simplify the filter
         SimplifyingFilterVisitor simplifier = new SimplifyingFilterVisitor();
         Filter simplifiedFilter = (Filter) query.getFilter().accept(simplifier, null);
         query.setFilter(simplifiedFilter);
-		
+      
 		return source.getFeatures(query);
 	}
 
@@ -1078,104 +1078,104 @@ public final class StreamingRenderer implements GTRenderer {
         return crs;
     }
 
-	/**
-	 * JE: If there is a single rule "and" its filter together with the query's
-	 * filter and send it off to datastore. This will allow as more processing
-	 * to be done on the back end... Very useful if DataStore is a database.
-	 * Problem is that worst case each filter is ran twice. Next we will modify
-	 * it to find a "Common" filter between all rules and send that to the
-	 * datastore.
-	 * 
-	 * DJB: trying to be smarter. If there are no "elseRules" and no rules w/o a
-	 * filter, then it makes sense to send them off to the Datastore We limit
-	 * the number of Filters sent off to the datastore, just because it could
-	 * get a bit rediculous. In general, for a database, if you can limit 10% of
-	 * the rows being returned you're probably doing quite well. The main
-	 * problem is when your filters really mean you're secretly asking for all
-	 * the data in which case sending the filters to the Datastore actually
-	 * costs you. But, databases are *much* faster at processing the Filters
-	 * than JAVA is and can use statistical analysis to do it.
-	 * 
-	 * @param styles
-	 * @param q
-	 */
+   /**
+    * JE: If there is a single rule "and" its filter together with the query's
+    * filter and send it off to datastore. This will allow as more processing
+    * to be done on the back end... Very useful if DataStore is a database.
+    * Problem is that worst case each filter is ran twice. Next we will modify
+    * it to find a "Common" filter between all rules and send that to the
+    * datastore.
+    * 
+    * DJB: trying to be smarter. If there are no "elseRules" and no rules w/o a
+    * filter, then it makes sense to send them off to the Datastore We limit
+    * the number of Filters sent off to the datastore, just because it could
+    * get a bit rediculous. In general, for a database, if you can limit 10% of
+    * the rows being returned you're probably doing quite well. The main
+    * problem is when your filters really mean you're secretly asking for all
+    * the data in which case sending the filters to the Datastore actually
+    * costs you. But, databases are *much* faster at processing the Filters
+    * than JAVA is and can use statistical analysis to do it.
+    * 
+    * @param styles
+    * @param q
+    */
 
-	private void processRuleForQuery(LiteFeatureTypeStyle[] styles,
-			DefaultQuery q) {
-		try {
+   private void processRuleForQuery(LiteFeatureTypeStyle[] styles,
+         DefaultQuery q) {
+      try {
 
-			// first we check to see if there are >
-			// "getMaxFiltersToSendToDatastore" rules
-			// if so, then we dont do anything since no matter what there's too
-			// many to send down.
-			// next we check for any else rules. If we find any --> dont send
-			// anything to Datastore
-			// next we check for rules w/o filters. If we find any --> dont send
-			// anything to Datastore
-			//
-			// otherwise, we're gold and can "or" together all the filters then
-			// AND it with the original filter.
-			// ie. SELECT * FROM ... WHERE (the_geom && BBOX) AND (filter1 OR
-			// filter2 OR filter3);
+         // first we check to see if there are >
+         // "getMaxFiltersToSendToDatastore" rules
+         // if so, then we dont do anything since no matter what there's too
+         // many to send down.
+         // next we check for any else rules. If we find any --> dont send
+         // anything to Datastore
+         // next we check for rules w/o filters. If we find any --> dont send
+         // anything to Datastore
+         //
+         // otherwise, we're gold and can "or" together all the filters then
+         // AND it with the original filter.
+         // ie. SELECT * FROM ... WHERE (the_geom && BBOX) AND (filter1 OR
+         // filter2 OR filter3);
 
-			final int maxFilters = getMaxFiltersToSendToDatastore();
-			final List<Filter> filtersToDS = new ArrayList<Filter>();
-			// look at each featuretypestyle
-			for(LiteFeatureTypeStyle style : styles) {
-				if (style.elseRules.length > 0) // uh-oh has elseRule
-					return;
-				// look at each rule in the featuretypestyle
-				for(Rule r : style.ruleList) {
-					if (r.getFilter() == null)
-						return; // uh-oh has no filter (want all rows)
-					filtersToDS.add(r.getFilter());
-				}
-			}
-			
-			// if too many bail out
-			if (filtersToDS.size() > maxFilters)
-				return;
+         final int maxFilters = getMaxFiltersToSendToDatastore();
+         final List<Filter> filtersToDS = new ArrayList<Filter>();
+         // look at each featuretypestyle
+         for(LiteFeatureTypeStyle style : styles) {
+            if (style.elseRules.length > 0) // uh-oh has elseRule
+               return;
+            // look at each rule in the featuretypestyle
+            for(Rule r : style.ruleList) {
+               if (r.getFilter() == null)
+                  return; // uh-oh has no filter (want all rows)
+               filtersToDS.add(r.getFilter());
+            }
+         }
+         
+         // if too many bail out
+         if (filtersToDS.size() > maxFilters)
+            return;
 
-			// or together all the filters
-			org.opengis.filter.Filter ruleFiltersCombined;
-			if (filtersToDS.size() == 1) {
-				ruleFiltersCombined = (Filter) filtersToDS.get(0);
-			} else {
-			    ruleFiltersCombined = filterFactory.or(filtersToDS); 
-			}
-			
-			// combine with the pre-existing filter
-			ruleFiltersCombined = filterFactory.and(
-					q.getFilter(), ruleFiltersCombined);
-			q.setFilter(ruleFiltersCombined);
-		} catch (Exception e) {
-			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.log(Level.SEVERE,
-						"Could not send rules to datastore due to: "
-								+ e.getLocalizedMessage(), e);
-		}
-	}
+         // or together all the filters
+         org.opengis.filter.Filter ruleFiltersCombined;
+         if (filtersToDS.size() == 1) {
+            ruleFiltersCombined = (Filter) filtersToDS.get(0);
+         } else {
+             ruleFiltersCombined = filterFactory.or(filtersToDS); 
+         }
+         
+         // combine with the pre-existing filter
+         ruleFiltersCombined = filterFactory.and(
+               q.getFilter(), ruleFiltersCombined);
+         q.setFilter(ruleFiltersCombined);
+      } catch (Exception e) {
+         if (LOGGER.isLoggable(Level.WARNING))
+            LOGGER.log(Level.SEVERE,
+                  "Could not send rules to datastore due to: "
+                        + e.getLocalizedMessage(), e);
+      }
+   }
 
-	/**
-	 * find out the maximum number of filters we're going to send off to the
-	 * datastore. See processRuleForQuery() for details.
-	 * 
-	 */
-	private int getMaxFiltersToSendToDatastore() {
-		try {
-			Integer result = (Integer) rendererHints
-					.get("maxFiltersToSendToDatastore");
-			if (result == null)
-				return defaultMaxFiltersToSendToDatastore; // default if not
-			// present in hints
-			return result.intValue();
+   /**
+    * find out the maximum number of filters we're going to send off to the
+    * datastore. See processRuleForQuery() for details.
+    * 
+    */
+   private int getMaxFiltersToSendToDatastore() {
+      try {
+         Integer result = (Integer) rendererHints
+               .get("maxFiltersToSendToDatastore");
+         if (result == null)
+            return defaultMaxFiltersToSendToDatastore; // default if not
+         // present in hints
+         return result.intValue();
 
-		} catch (Exception e) {
-			return defaultMaxFiltersToSendToDatastore;
-		}
-	}
+      } catch (Exception e) {
+         return defaultMaxFiltersToSendToDatastore;
+      }
+   }
 
-	/**
+   /**
      * Checks if optimized feature type style rendering is enabled, or not.
      * See {@link #OPTIMIZE_FTS_RENDERING_KEY} description for a full explanation.
      */
@@ -1245,309 +1245,309 @@ public final class StreamingRenderer implements GTRenderer {
         return rbe.getBuffer();
     }
 
-	/**
-	 * Inspects the <code>MapLayer</code>'s style and retrieves it's needed
-	 * attribute names, returning at least the default geometry attribute name.
-	 * 
-	 * @param layer
-	 *            the <code>MapLayer</code> to determine the needed attributes
-	 *            from
-	 * @param schema
-	 *            the <code>layer</code>'s FeatureSource<SimpleFeatureType, SimpleFeature> schema
-	 * @return the minimum set of attribute names needed to render
-	 *         <code>layer</code>
-	 */
-	private String[] findStyleAttributes(LiteFeatureTypeStyle[] styles,
-			SimpleFeatureType schema) {
-		final StyleAttributeExtractor sae = new StyleAttributeExtractor();
+   /**
+    * Inspects the <code>MapLayer</code>'s style and retrieves it's needed
+    * attribute names, returning at least the default geometry attribute name.
+    * 
+    * @param layer
+    *            the <code>MapLayer</code> to determine the needed attributes
+    *            from
+    * @param schema
+    *            the <code>layer</code>'s FeatureSource<SimpleFeatureType, SimpleFeature> schema
+    * @return the minimum set of attribute names needed to render
+    *         <code>layer</code>
+    */
+   private String[] findStyleAttributes(LiteFeatureTypeStyle[] styles,
+         SimpleFeatureType schema) {
+      final StyleAttributeExtractor sae = new StyleAttributeExtractor();
 
-		LiteFeatureTypeStyle lfts;
-		Rule[] rules;
-		int rulesLength;
-		final int length = styles.length;
-		for (int t = 0; t < length; t++) {
-			lfts = styles[t];
-			rules = lfts.elseRules;
-			rulesLength = rules.length;
-			for (int j = 0; j < rulesLength; j++) {
-				sae.visit(rules[j]);
-			}
-			rules = lfts.ruleList;
-			rulesLength = rules.length;
-			for (int j = 0; j < rulesLength; j++) {
-				sae.visit(rules[j]);
-			}
-		}
+      LiteFeatureTypeStyle lfts;
+      Rule[] rules;
+      int rulesLength;
+      final int length = styles.length;
+      for (int t = 0; t < length; t++) {
+         lfts = styles[t];
+         rules = lfts.elseRules;
+         rulesLength = rules.length;
+         for (int j = 0; j < rulesLength; j++) {
+            sae.visit(rules[j]);
+         }
+         rules = lfts.ruleList;
+         rulesLength = rules.length;
+         for (int j = 0; j < rulesLength; j++) {
+            sae.visit(rules[j]);
+         }
+      }
 
-		String[] ftsAttributes = sae.getAttributeNames();
+      String[] ftsAttributes = sae.getAttributeNames();
 
-		/*
-		 * DJB: this is an old comment - erase it soon (see geos-469 and below) -
-		 * we only add the default geometry if it was used.
-		 * 
-		 * GR: if as result of sae.getAttributeNames() ftsAttributes already
-		 * contains geometry attribute names, they gets duplicated, which produces
-		 * an error in AbstracDatastore when trying to create a derivate
-		 * SimpleFeatureType. So I'll add the default geometry only if it is not
-		 * already present, but: should all the geometric attributes be added by
-		 * default? I will add them, but don't really know what's the expected
-		 * behavior
-		 */
-		List atts = new LinkedList(Arrays.asList(ftsAttributes));
-		List<AttributeDescriptor> attTypes = schema.getAttributeDescriptors();
-		String attName;
+      /*
+       * DJB: this is an old comment - erase it soon (see geos-469 and below) -
+       * we only add the default geometry if it was used.
+       * 
+       * GR: if as result of sae.getAttributeNames() ftsAttributes already
+       * contains geometry attribute names, they gets duplicated, which produces
+       * an error in AbstracDatastore when trying to create a derivate
+       * SimpleFeatureType. So I'll add the default geometry only if it is not
+       * already present, but: should all the geometric attributes be added by
+       * default? I will add them, but don't really know what's the expected
+       * behavior
+       */
+      List atts = new LinkedList(Arrays.asList(ftsAttributes));
+      List<AttributeDescriptor> attTypes = schema.getAttributeDescriptors();
+      String attName;
 
-		final int attTypesLength = attTypes.size();
-		for (int i = 0; i < attTypesLength; i++) {
-			attName = attTypes.get(i).getLocalName();
+      final int attTypesLength = attTypes.size();
+      for (int i = 0; i < attTypesLength; i++) {
+         attName = attTypes.get(i).getLocalName();
 
-			// DJB: This geometry check was commented out. I think it should
-			// actually be back in or
-			// you get ALL the attributes back, which isn't what you want.
-			// ALX: For rasters I need even the "grid" attribute.
+         // DJB: This geometry check was commented out. I think it should
+         // actually be back in or
+         // you get ALL the attributes back, which isn't what you want.
+         // ALX: For rasters I need even the "grid" attribute.
 
-			// DJB:geos-469, we do not grab all the geometry columns.
-			// for symbolizers, if a geometry is required it is either
-			// explicitly named
-			// ("<Geometry><PropertyName>the_geom</PropertyName></Geometry>")
-			// or the default geometry is assumed (no <Geometry> element).
-			// I've modified the style attribute extractor so it tracks if the
-			// default geometry is used. So, we no longer add EVERY geometry
-			// column to the query!!
+         // DJB:geos-469, we do not grab all the geometry columns.
+         // for symbolizers, if a geometry is required it is either
+         // explicitly named
+         // ("<Geometry><PropertyName>the_geom</PropertyName></Geometry>")
+         // or the default geometry is assumed (no <Geometry> element).
+         // I've modified the style attribute extractor so it tracks if the
+         // default geometry is used. So, we no longer add EVERY geometry
+         // column to the query!!
 
-			if ((attName.equalsIgnoreCase("grid"))
-					&& !atts.contains(attName)||
-					(attName.equalsIgnoreCase("params"))
-					&& !atts.contains(attName)) {
-				atts.add(attName);
-				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.fine("added attribute " + attName);
-			}
-		}
+         if ((attName.equalsIgnoreCase("grid"))
+               && !atts.contains(attName)||
+               (attName.equalsIgnoreCase("params"))
+               && !atts.contains(attName)) {
+            atts.add(attName);
+            if (LOGGER.isLoggable(Level.FINE))
+               LOGGER.fine("added attribute " + attName);
+         }
+      }
 
-		try {
-			// DJB:geos-469 if the default geometry was used in the style, we
-			// need to grab it.
-			if (sae.getDefaultGeometryUsed()
-					&& (!atts.contains(schema.getGeometryDescriptor().getLocalName()))) {
-				atts.add(schema.getGeometryDescriptor().getLocalName());
-			}
-		} catch (Exception e) {
-			// might not be a geometry column. That will cause problems down the
-			// road (why render a non-geometry layer)
-		}
+      try {
+         // DJB:geos-469 if the default geometry was used in the style, we
+         // need to grab it.
+         if (sae.getDefaultGeometryUsed()
+               && (!atts.contains(schema.getGeometryDescriptor().getLocalName()))) {
+            atts.add(schema.getGeometryDescriptor().getLocalName());
+         }
+      } catch (Exception e) {
+         // might not be a geometry column. That will cause problems down the
+         // road (why render a non-geometry layer)
+      }
 
-		ftsAttributes = new String[atts.size()];
-		atts.toArray(ftsAttributes);
+      ftsAttributes = new String[atts.size()];
+      atts.toArray(ftsAttributes);
 
-		return ftsAttributes;
-	}
+      return ftsAttributes;
+   }
 
-	/**
-	 * Creates the bounding box filters (one for each geometric attribute)
-	 * needed to query a <code>MapLayer</code>'s feature source to return
-	 * just the features for the target rendering extent
-	 * 
-	 * @param schema
-	 *            the layer's feature source schema
-	 * @param attributes
-	 *            set of needed attributes
-	 * @param bbox
-	 *            the expression holding the target rendering bounding box
-	 * @return an or'ed list of bbox filters, one for each geometric attribute
-	 *         in <code>attributes</code>. If there are just one geometric
-	 *         attribute, just returns its corresponding
-	 *         <code>GeometryFilter</code>.
-	 * @throws IllegalFilterException
-	 *             if something goes wrong creating the filter
-	 */
-	private Filter createBBoxFilters(SimpleFeatureType schema, String[] attributes,
+   /**
+    * Creates the bounding box filters (one for each geometric attribute)
+    * needed to query a <code>MapLayer</code>'s feature source to return
+    * just the features for the target rendering extent
+    * 
+    * @param schema
+    *            the layer's feature source schema
+    * @param attributes
+    *            set of needed attributes
+    * @param bbox
+    *            the expression holding the target rendering bounding box
+    * @return an or'ed list of bbox filters, one for each geometric attribute
+    *         in <code>attributes</code>. If there are just one geometric
+    *         attribute, just returns its corresponding
+    *         <code>GeometryFilter</code>.
+    * @throws IllegalFilterException
+    *             if something goes wrong creating the filter
+    */
+   private Filter createBBoxFilters(SimpleFeatureType schema, String[] attributes,
 			List<ReferencedEnvelope> bboxes) throws IllegalFilterException {
 		Filter filter = Filter.INCLUDE;
-		final int length = attributes.length;
-		AttributeDescriptor attType;
-		
-		for (int j = 0; j < length; j++) {
-			attType = schema.getDescriptor(attributes[j]);
+      final int length = attributes.length;
+      AttributeDescriptor attType;
+      
+      for (int j = 0; j < length; j++) {
+         attType = schema.getDescriptor(attributes[j]);
 
-			// DJB: added this for better error messages!
-			if (attType == null) {
-				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.fine(new StringBuffer("Could not find '").append(
-							attributes[j]).append("' in the FeatureType (")
-							.append(schema.getTypeName()).append(")")
-							.toString());
-				throw new IllegalFilterException(new StringBuffer(
-						"Could not find '").append(
-						attributes[j] + "' in the FeatureType (").append(
-						schema.getTypeName()).append(")").toString());
-			}
+         // DJB: added this for better error messages!
+         if (attType == null) {
+            if (LOGGER.isLoggable(Level.FINE))
+               LOGGER.fine(new StringBuffer("Could not find '").append(
+                     attributes[j]).append("' in the FeatureType (")
+                     .append(schema.getTypeName()).append(")")
+                     .toString());
+            throw new IllegalFilterException(new StringBuffer(
+                  "Could not find '").append(
+                  attributes[j] + "' in the FeatureType (").append(
+                  schema.getTypeName()).append(")").toString());
+         }
 
 			if (attType instanceof GeometryDescriptor) {
 				Filter gfilter = new FastBBOX(attType.getLocalName(), bboxes.get(0));
                 
 				if (filter == Filter.INCLUDE) {
-					filter = gfilter;
-				} else {
-					filter = filterFactory.or( filter, gfilter );
-				}
+               filter = gfilter;
+            } else {
+               filter = filterFactory.or( filter, gfilter );
+            }
 				
 				if(bboxes.size() > 0) {
 					for (int k = 1; k < bboxes.size(); k++) {
 						filter = filterFactory.or( filter, new FastBBOX(attType.getLocalName(), bboxes.get(k)) );
 					}
 				}
-			}
-		}
+         }
+      }
 
-		return filter;
-	}
+      return filter;
+   }
 
-	/**
-	 * Checks if a rule can be triggered at the current scale level
-	 * 
-	 * @param r
-	 *            The rule
-	 * @return true if the scale is compatible with the rule settings
-	 */
-	private boolean isWithInScale(Rule r) {
-		return ((r.getMinScaleDenominator() - TOLERANCE) <= scaleDenominator)
-				&& ((r.getMaxScaleDenominator() + TOLERANCE) > scaleDenominator);
-	}
+   /**
+    * Checks if a rule can be triggered at the current scale level
+    * 
+    * @param r
+    *            The rule
+    * @return true if the scale is compatible with the rule settings
+    */
+   private boolean isWithInScale(Rule r) {
+      return ((r.getMinScaleDenominator() - TOLERANCE) <= scaleDenominator)
+            && ((r.getMaxScaleDenominator() + TOLERANCE) > scaleDenominator);
+   }
 
-	/**
-	 * <p>Creates a list of <code>LiteFeatureTypeStyle</code>s with:
-	 * <ol type="a">
-	 * <li>out-of-scale rules removed</li>
-	 * <li>incompatible FeatureTypeStyles removed</li>
-	 * </ol>
-	 * </p>
-	 * 
-	 * <p><em><strong>Note:</strong> This method has a lot of duplication with 
-	 * {@link #createLiteFeatureTypeStyles(FeatureTypeStyle[], SimpleFeatureType, Graphics2D)}. 
-	 * </em></p>
-	 * 
-	 * @param featureStyles Styles to process
-	 * @param typeDescription The type description that has to be matched
-	 * @return ArrayList<LiteFeatureTypeStyle>
-	 */
-	//TODO: Merge the two createLiteFeatureTypeStyles() methods
-	private ArrayList createLiteFeatureTypeStyles(FeatureTypeStyle[] featureStyles, Object typeDescription, Graphics2D graphics) throws IOException {
-		ArrayList result = new ArrayList();
-		
-		Rule[] rules;
-		ArrayList ruleList = new ArrayList();
-		ArrayList elseRuleList = new ArrayList();
-		Rule r;
-		LiteFeatureTypeStyle lfts;
-		BufferedImage image;
-		int numOfRules;		
-		int itemNumber = 0;
+   /**
+    * <p>Creates a list of <code>LiteFeatureTypeStyle</code>s with:
+    * <ol type="a">
+    * <li>out-of-scale rules removed</li>
+    * <li>incompatible FeatureTypeStyles removed</li>
+    * </ol>
+    * </p>
+    * 
+    * <p><em><strong>Note:</strong> This method has a lot of duplication with 
+    * {@link #createLiteFeatureTypeStyles(FeatureTypeStyle[], SimpleFeatureType, Graphics2D)}. 
+    * </em></p>
+    * 
+    * @param featureStyles Styles to process
+    * @param typeDescription The type description that has to be matched
+    * @return ArrayList<LiteFeatureTypeStyle>
+    */
+   //TODO: Merge the two createLiteFeatureTypeStyles() methods
+   private ArrayList createLiteFeatureTypeStyles(FeatureTypeStyle[] featureStyles, Object typeDescription, Graphics2D graphics) throws IOException {
+      ArrayList result = new ArrayList();
+      
+      Rule[] rules;
+      ArrayList ruleList = new ArrayList();
+      ArrayList elseRuleList = new ArrayList();
+      Rule r;
+      LiteFeatureTypeStyle lfts;
+      BufferedImage image;
+      int numOfRules;      
+      int itemNumber = 0;
 
-		final int length = featureStyles.length;
-		for (int i = 0; i < length; i++) {
-			FeatureTypeStyle fts = featureStyles[i];
-	
-			if ( typeDescription == null || typeDescription.toString().indexOf( fts.getFeatureTypeName() ) == -1 ) continue; 
-			
-			// get applicable rules at the current scale
-			rules = fts.getRules();
-			ruleList = new ArrayList();
-			elseRuleList = new ArrayList();
+      final int length = featureStyles.length;
+      for (int i = 0; i < length; i++) {
+         FeatureTypeStyle fts = featureStyles[i];
+   
+         if ( typeDescription == null || typeDescription.toString().indexOf( fts.getFeatureTypeName() ) == -1 ) continue; 
+         
+         // get applicable rules at the current scale
+         rules = fts.getRules();
+         ruleList = new ArrayList();
+         elseRuleList = new ArrayList();
 
-			numOfRules = rules.length;
-			for (int j = 0; j < numOfRules; j++) {
-				// getting rule
-				r = rules[j];
+         numOfRules = rules.length;
+         for (int j = 0; j < numOfRules; j++) {
+            // getting rule
+            r = rules[j];
 
-				if (isWithInScale(r)) {
-					if (r.hasElseFilter()) {
-						elseRuleList.add(r);
-					} else {
-						ruleList.add(r);
-					}
-				}
-			}
-			if ((ruleList.size() == 0) && (elseRuleList.size() == 0))
-				continue; // DJB: optimization - nothing to render, dont
-			// do anything!!
+            if (isWithInScale(r)) {
+               if (r.hasElseFilter()) {
+                  elseRuleList.add(r);
+               } else {
+                  ruleList.add(r);
+               }
+            }
+         }
+         if ((ruleList.size() == 0) && (elseRuleList.size() == 0))
+            continue; // DJB: optimization - nothing to render, dont
+         // do anything!!
 
-			if (itemNumber == 0 || !isOptimizedFTSRenderingEnabled()) // we can optimize this one!
-			{
-				lfts = new LiteFeatureTypeStyle(graphics, ruleList,
-						elseRuleList);
-			} else {
-				image = graphics
-						.getDeviceConfiguration()
-						.createCompatibleImage(screenSize.width,
-								screenSize.height, Transparency.TRANSLUCENT);
-				lfts = new LiteFeatureTypeStyle(image, graphics
-						.getTransform(), ruleList, elseRuleList,
-						java2dHints);
-			}
-			result.add(lfts);
-			itemNumber++;			
-			
-		}
+         if (itemNumber == 0 || !isOptimizedFTSRenderingEnabled()) // we can optimize this one!
+         {
+            lfts = new LiteFeatureTypeStyle(graphics, ruleList,
+                  elseRuleList);
+         } else {
+            image = graphics
+                  .getDeviceConfiguration()
+                  .createCompatibleImage(screenSize.width,
+                        screenSize.height, Transparency.TRANSLUCENT);
+            lfts = new LiteFeatureTypeStyle(image, graphics
+                  .getTransform(), ruleList, elseRuleList,
+                  java2dHints);
+         }
+         result.add(lfts);
+         itemNumber++;        
+         
+      }
 
-		return result;
-	}
-	
-	/**
-	 * creates a list of LiteFeatureTypeStyles a) out-of-scale rules removed b)
-	 * incompatible FeatureTypeStyles removed
-	 * 
-	 * 
-	 * @param featureStylers
-	 * @param features
-	 * @throws Exception
-	 * @return ArrayList<LiteFeatureTypeStyle>
-	 */
-	private ArrayList createLiteFeatureTypeStyles(
-			FeatureTypeStyle[] featureStyles, SimpleFeatureType ftype,
-			Graphics2D graphics) throws IOException {
-		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("creating rules for scale denominator - "
-					+ NumberFormat.getNumberInstance().format(scaleDenominator));
-		ArrayList result = new ArrayList();
+      return result;
+   }
+   
+   /**
+    * creates a list of LiteFeatureTypeStyles a) out-of-scale rules removed b)
+    * incompatible FeatureTypeStyles removed
+    * 
+    * 
+    * @param featureStylers
+    * @param features
+    * @throws Exception
+    * @return ArrayList<LiteFeatureTypeStyle>
+    */
+   private ArrayList createLiteFeatureTypeStyles(
+         FeatureTypeStyle[] featureStyles, SimpleFeatureType ftype,
+         Graphics2D graphics) throws IOException {
+      if (LOGGER.isLoggable(Level.FINE))
+         LOGGER.fine("creating rules for scale denominator - "
+               + NumberFormat.getNumberInstance().format(scaleDenominator));
+      ArrayList result = new ArrayList();
 
-		int itemNumber = 0;
+      int itemNumber = 0;
 
-		LiteFeatureTypeStyle lfts;
+      LiteFeatureTypeStyle lfts;
 		for (FeatureTypeStyle fts : featureStyles) {
 			if (isFeatureTypeStyleActive(ftype, fts)) {
-				// DJB: this FTS is compatible with this FT.
+            // DJB: this FTS is compatible with this FT.
 
-				// get applicable rules at the current scale
+            // get applicable rules at the current scale
 			    List[] splittedRules = splitRules(fts);
 				List ruleList = splittedRules[0];
 				List elseRuleList = splittedRules[1];
 
 				// if none, skip it
-				if ((ruleList.size() == 0) && (elseRuleList.size() == 0))
+            if ((ruleList.size() == 0) && (elseRuleList.size() == 0))
 					continue; 
 
-				if (itemNumber == 0 || !isOptimizedFTSRenderingEnabled()) // we can optimize this one!
-				{
-					lfts = new LiteFeatureTypeStyle(graphics, ruleList,
-							elseRuleList);
-				} else {
+            if (itemNumber == 0 || !isOptimizedFTSRenderingEnabled()) // we can optimize this one!
+            {
+               lfts = new LiteFeatureTypeStyle(graphics, ruleList,
+                     elseRuleList);
+            } else {
 					BufferedImage image = graphics
-							.getDeviceConfiguration()
-							.createCompatibleImage(screenSize.width,
-									screenSize.height, Transparency.TRANSLUCENT);
-					lfts = new LiteFeatureTypeStyle(image, graphics
-							.getTransform(), ruleList, elseRuleList,
-							java2dHints);
-				}
-				result.add(lfts);
-				itemNumber++;
+                     .getDeviceConfiguration()
+                     .createCompatibleImage(screenSize.width,
+                           screenSize.height, Transparency.TRANSLUCENT);
+               lfts = new LiteFeatureTypeStyle(image, graphics
+                     .getTransform(), ruleList, elseRuleList,
+                     java2dHints);
+            }
+            result.add(lfts);
+            itemNumber++;
 
-			}
-		}
+         }
+      }
 
-		return result;
-	}
+      return result;
+   }
 	
 	private boolean isFeatureTypeStyleActive(SimpleFeatureType ftype, FeatureTypeStyle fts) {
 	    return ((ftype.getTypeName() != null)
@@ -1683,58 +1683,58 @@ public final class StreamingRenderer implements GTRenderer {
         return features;
     }
     
-	/**
-	 * Applies each feature type styler in turn to all of the features. This
-	 * perhaps needs some explanation to make it absolutely clear.
-	 * featureStylers[0] is applied to all features before featureStylers[1] is
-	 * applied. This can have important consequences as regards the painting
-	 * order.
-	 * <p>
-	 * In most cases, this is the desired effect. For example, all line features
-	 * may be rendered with a fat line and then a thin line. This produces a
-	 * 'cased' effect without any strange overlaps.
-	 * </p>
-	 * <p>
-	 * This method is internal and should only be called by render.
-	 * </p>
-	 * <p>
-	 * </p>
-	 * 
-	 * @param graphics
-	 *            DOCUMENT ME!
-	 * @param features
-	 *            An array of features to be rendered
-	 * @param featureStylers
-	 *            An array of feature stylers to be applied
-	 * @param at
-	 *            DOCUMENT ME!
-	 * @param destinationCrs -
-	 *            The destination CRS, or null if no reprojection is required
-	 * @param screenSize
-	 * @param layerId 
-	 * @throws IOException
-	 * @throws IllegalAttributeException
-	 * @throws IllegalFilterException
-	 */
-	final private void processStylers(final Graphics2D graphics,
-			MapLayer currLayer, AffineTransform at,
-			CoordinateReferenceSystem destinationCrs, Envelope mapArea,
-			Rectangle screenSize, String layerId) throws IllegalFilterException, IOException,
-			IllegalAttributeException {
+   /**
+    * Applies each feature type styler in turn to all of the features. This
+    * perhaps needs some explanation to make it absolutely clear.
+    * featureStylers[0] is applied to all features before featureStylers[1] is
+    * applied. This can have important consequences as regards the painting
+    * order.
+    * <p>
+    * In most cases, this is the desired effect. For example, all line features
+    * may be rendered with a fat line and then a thin line. This produces a
+    * 'cased' effect without any strange overlaps.
+    * </p>
+    * <p>
+    * This method is internal and should only be called by render.
+    * </p>
+    * <p>
+    * </p>
+    * 
+    * @param graphics
+    *            DOCUMENT ME!
+    * @param features
+    *            An array of features to be rendered
+    * @param featureStylers
+    *            An array of feature stylers to be applied
+    * @param at
+    *            DOCUMENT ME!
+    * @param destinationCrs -
+    *            The destination CRS, or null if no reprojection is required
+    * @param screenSize
+    * @param layerId 
+    * @throws IOException
+    * @throws IllegalAttributeException
+    * @throws IllegalFilterException
+    */
+   final private void processStylers(final Graphics2D graphics,
+         MapLayer currLayer, AffineTransform at,
+         CoordinateReferenceSystem destinationCrs, Envelope mapArea,
+         Rectangle screenSize, String layerId) throws IllegalFilterException, IOException,
+         IllegalAttributeException {
 
-		/*
-		 * DJB: changed this a wee bit so that it now does the layer query AFTER
-		 * it has evaluated the rules for scale inclusion. This makes it so that
-		 * geometry columns (and other columns) will not be queried unless they
-		 * are actually going to be required. see geos-469
-		 */
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Preparing feature information and styles
-		//
-		// /////////////////////////////////////////////////////////////////////
-		final FeatureTypeStyle[] featureStylers = currLayer.getStyle().getFeatureTypeStyles();
-		
+      /*
+       * DJB: changed this a wee bit so that it now does the layer query AFTER
+       * it has evaluated the rules for scale inclusion. This makes it so that
+       * geometry columns (and other columns) will not be queried unless they
+       * are actually going to be required. see geos-469
+       */
+      // /////////////////////////////////////////////////////////////////////
+      //
+      // Preparing feature information and styles
+      //
+      // /////////////////////////////////////////////////////////////////////
+      final FeatureTypeStyle[] featureStylers = currLayer.getStyle().getFeatureTypeStyles();
+      
         final FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) currLayer.getFeatureSource();
         
         Collection collection = null;
@@ -1745,59 +1745,59 @@ public final class StreamingRenderer implements GTRenderer {
         final ArrayList lfts ;
         
         if ( featureSource != null ) {
-			final SimpleFeatureType schema = featureSource.getSchema();
-	        
-			final GeometryDescriptor geometryAttribute = schema.getGeometryDescriptor();
-			sourceCrs = geometryAttribute.getType().getCoordinateReferenceSystem();
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine(new StringBuffer("processing ").append(
-						featureStylers.length).append(" stylers for ").append(
-						currLayer.getFeatureSource().getSchema().getName())
-						.toString());
-			}
-			// transformMap = new HashMap();
-			lfts = createLiteFeatureTypeStyles(featureStylers,schema, graphics);
+         final SimpleFeatureType schema = featureSource.getSchema();
+           
+         final GeometryDescriptor geometryAttribute = schema.getGeometryDescriptor();
+         sourceCrs = geometryAttribute.getType().getCoordinateReferenceSystem();
+         if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine(new StringBuffer("processing ").append(
+                  featureStylers.length).append(" stylers for ").append(
+                  currLayer.getFeatureSource().getSchema().getName())
+                  .toString());
+         }
+         // transformMap = new HashMap();
+         lfts = createLiteFeatureTypeStyles(featureStylers,schema, graphics);
             if(lfts.size() == 0)
                 return;
-	
-	        LiteFeatureTypeStyle[] featureTypeStyleArray = (LiteFeatureTypeStyle[]) lfts.toArray(new LiteFeatureTypeStyle[lfts.size()]);
-	        // /////////////////////////////////////////////////////////////////////
-			//
-			// DJB: get a featureresults (so you can get a feature reader) for the
-			// data
-			//
-			// /////////////////////////////////////////////////////////////////////
+   
+           LiteFeatureTypeStyle[] featureTypeStyleArray = (LiteFeatureTypeStyle[]) lfts.toArray(new LiteFeatureTypeStyle[lfts.size()]);
+           // /////////////////////////////////////////////////////////////////////
+         //
+         // DJB: get a featureresults (so you can get a feature reader) for the
+         // data
+         //
+         // /////////////////////////////////////////////////////////////////////
         
-	        // ... assume we have to do the generalization, the query layer process will
-	        // turn down the flag if we don't 
-	        inMemoryGeneralization = true;
-        	features = queryLayer(currLayer, featureSource, schema,
-				featureTypeStyleArray,
-				mapArea, destinationCrs, sourceCrs, screenSize,
-				geometryAttribute, at);
-        	
-        	features = prepFeatureCollection( features, sourceCrs );        	
+           // ... assume we have to do the generalization, the query layer process will
+           // turn down the flag if we don't 
+           inMemoryGeneralization = true;
+         features = queryLayer(currLayer, featureSource, schema,
+            featureTypeStyleArray,
+            mapArea, destinationCrs, sourceCrs, screenSize,
+            geometryAttribute, at);
+         
+         features = prepFeatureCollection( features, sourceCrs );          
         } else {
             CollectionSource source = currLayer.getSource();
-        	collection = queryLayer( currLayer, currLayer.getSource() );
+         collection = queryLayer( currLayer, currLayer.getSource() );
             
-        	sourceCrs = null;
-        	lfts = createLiteFeatureTypeStyles( featureStylers, source.describe(), graphics );
+         sourceCrs = null;
+         lfts = createLiteFeatureTypeStyles( featureStylers, source.describe(), graphics );
         }
 
-		if (lfts.size() == 0) return; // nothing to do
+      if (lfts.size() == 0) return; // nothing to do
 
-		
-		if(isOptimizedFTSRenderingEnabled())
-		    drawOptimized(graphics, currLayer, at, destinationCrs, layerId, collection, features,
+      
+      if(isOptimizedFTSRenderingEnabled())
+          drawOptimized(graphics, currLayer, at, destinationCrs, layerId, collection, features,
                 scaleRange, lfts);
-		else
-		    drawPlain(graphics, currLayer, at, destinationCrs, layerId, collection, features,
-	                scaleRange, lfts);
+      else
+          drawPlain(graphics, currLayer, at, destinationCrs, layerId, collection, features,
+                   scaleRange, lfts);
 
-	}
-	
-	    /**
+   }
+   
+       /**
      * Performs all rendering on the user provided graphics object by scanning
      * the collection multiple times, one for each feature type style provided
      */
@@ -1846,65 +1846,65 @@ public final class StreamingRenderer implements GTRenderer {
         }
 	}
 
-	/**
-	 * Performs rendering so that the collection is scanned only once even in presence
-	 * of multiple feature type styles, using the in memory buffer for each feature type
-	 * style other than the first one (that uses the graphics provided by the user)s 
-	 */
+   /**
+    * Performs rendering so that the collection is scanned only once even in presence
+    * of multiple feature type styles, using the in memory buffer for each feature type
+    * style other than the first one (that uses the graphics provided by the user)s 
+    */
     private void drawOptimized(final Graphics2D graphics, MapLayer currLayer, AffineTransform at,
             CoordinateReferenceSystem destinationCrs, String layerId, Collection collection,
             FeatureCollection features, final NumberRange scaleRange, final ArrayList lfts) {
         Iterator iterator = null;
-		if( collection != null ) iterator = collection.iterator();        
-		if( features != null ) iterator = features.iterator();
-		
-		if( iterator == null ) return; // nothing to do
-		
-		final LiteFeatureTypeStyle[] fts_array = (LiteFeatureTypeStyle[]) lfts
-				.toArray(new LiteFeatureTypeStyle[lfts.size()]);
+      if( collection != null ) iterator = collection.iterator();        
+      if( features != null ) iterator = features.iterator();
+      
+      if( iterator == null ) return; // nothing to do
+      
+      final LiteFeatureTypeStyle[] fts_array = (LiteFeatureTypeStyle[]) lfts
+            .toArray(new LiteFeatureTypeStyle[lfts.size()]);
 
-		try {
+      try {
 		    boolean clone = isCloningRequired(currLayer, fts_array);
 			RenderableFeature rf = new RenderableFeature(currLayer, clone);
-			// loop exit condition tested inside try catch
+         // loop exit condition tested inside try catch
             // make sure we test hasNext() outside of the try/cath that follows, as that
             // one is there to make sure a single feature error does not ruin the rendering
             // (best effort) whilst an exception in hasNext() + ignoring catch results in
             // an infinite loop
-			while (iterator.hasNext() && !renderingStopRequested) { 
-				try {
-					rf.setFeature(iterator.next());
-					// draw the feature on the main graphics and on the eventual extra image buffers
-					for (LiteFeatureTypeStyle liteFeatureTypeStyle : fts_array) {
-					    process(rf, liteFeatureTypeStyle, scaleRange, at, destinationCrs, layerId);
+         while (iterator.hasNext() && !renderingStopRequested) { 
+            try {
+               rf.setFeature(iterator.next());
+               // draw the feature on the main graphics and on the eventual extra image buffers
+               for (LiteFeatureTypeStyle liteFeatureTypeStyle : fts_array) {
+                   process(rf, liteFeatureTypeStyle, scaleRange, at, destinationCrs, layerId);
                         
-					}
-				} catch (Throwable tr) {
-					LOGGER.log(Level.SEVERE, tr.getLocalizedMessage(), tr);
-					fireErrorEvent(new Exception("Error rendering feature", tr));
-				}
-			}
-		} finally {
+               }
+            } catch (Throwable tr) {
+               LOGGER.log(Level.SEVERE, tr.getLocalizedMessage(), tr);
+               fireErrorEvent(new Exception("Error rendering feature", tr));
+            }
+         }
+      } finally {
             if( collection instanceof FeatureCollection ){
                 FeatureCollection resource = (FeatureCollection ) collection;
                 resource.close( iterator );
             } else if(features != null) {
                 features.close( iterator );
             }
-		}
-		// have to re-form the image now.
-		// graphics.setTransform( new AffineTransform() );
-		graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-		for (int t = 0; t < fts_array.length; t++) {
-			// first fts won't have an image, it's using the user provided graphics
-			// straight, so we don't need to compose it back in.
-			if (fts_array[t].myImage != null) 
-			{
-				graphics.drawImage(fts_array[t].myImage, 0, 0, null);
-				fts_array[t].myImage.flush();
-				fts_array[t].graphics.dispose();
-			}
-		}
+      }
+      // have to re-form the image now.
+      // graphics.setTransform( new AffineTransform() );
+      graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+      for (int t = 0; t < fts_array.length; t++) {
+         // first fts won't have an image, it's using the user provided graphics
+         // straight, so we don't need to compose it back in.
+         if (fts_array[t].myImage != null) 
+         {
+            graphics.drawImage(fts_array[t].myImage, 0, 0, null);
+            fts_array[t].myImage.flush();
+            fts_array[t].graphics.dispose();
+         }
+      }
 	}
     
     /**
@@ -1958,295 +1958,295 @@ public final class StreamingRenderer implements GTRenderer {
         return false;
     }
 
-	/**
-	 * @param rf
-	 * @param feature 
-	 * @param style
-	 * @param layerId 
-	 */
-	final private void process(RenderableFeature rf, LiteFeatureTypeStyle style,
-			NumberRange scaleRange, AffineTransform at,
-			CoordinateReferenceSystem destinationCrs, String layerId)
-			throws TransformException, FactoryException {
-		boolean doElse = true;
-		Rule[] elseRuleList = style.elseRules;
-		Rule[] ruleList = style.ruleList;
-		Rule r;
-		Filter filter;
-		Symbolizer[] symbolizers;
-		Graphics2D graphics = style.graphics;
-		// applicable rules
-		final int length = ruleList.length;
-		for (int t = 0; t < length; t++) {
-			r = ruleList[t];
-			filter = r.getFilter();
+   /**
+    * @param rf
+    * @param feature 
+    * @param style
+    * @param layerId 
+    */
+   final private void process(RenderableFeature rf, LiteFeatureTypeStyle style,
+         NumberRange scaleRange, AffineTransform at,
+         CoordinateReferenceSystem destinationCrs, String layerId)
+         throws TransformException, FactoryException {
+      boolean doElse = true;
+      Rule[] elseRuleList = style.elseRules;
+      Rule[] ruleList = style.ruleList;
+      Rule r;
+      Filter filter;
+      Symbolizer[] symbolizers;
+      Graphics2D graphics = style.graphics;
+      // applicable rules
+      final int length = ruleList.length;
+      for (int t = 0; t < length; t++) {
+         r = ruleList[t];
+         filter = r.getFilter();
 
-			if ((filter == null) || filter.evaluate(rf.content)) {
-				doElse = false;
-				symbolizers = r.getSymbolizers();
-				processSymbolizers(graphics, rf, symbolizers, scaleRange,
-						at, destinationCrs, layerId);
-			}
-		}
+         if ((filter == null) || filter.evaluate(rf.content)) {
+            doElse = false;
+            symbolizers = r.getSymbolizers();
+            processSymbolizers(graphics, rf, symbolizers, scaleRange,
+                  at, destinationCrs, layerId);
+         }
+      }
 
-		if (doElse) {
-			final int elseLength = elseRuleList.length;
-			for (int tt = 0; tt < elseLength; tt++) {
-				r = elseRuleList[tt];
-				symbolizers = r.getSymbolizers();
+      if (doElse) {
+         final int elseLength = elseRuleList.length;
+         for (int tt = 0; tt < elseLength; tt++) {
+            r = elseRuleList[tt];
+            symbolizers = r.getSymbolizers();
 
-				processSymbolizers(graphics, rf, symbolizers, scaleRange,
-						at, destinationCrs, layerId);
+            processSymbolizers(graphics, rf, symbolizers, scaleRange,
+                  at, destinationCrs, layerId);
 
-			}
-		}
-	}
+         }
+      }
+   }
 
-	/**
-	 * Applies each of a set of symbolizers in turn to a given feature.
-	 * <p>
-	 * This is an internal method and should only be called by processStylers.
-	 * </p>
-	 * @param currLayer 
-	 * 
-	 * @param graphics
-	 * @param drawMe
-	 *            The feature to be rendered
-	 * @param symbolizers
-	 *            An array of symbolizers which actually perform the rendering.
-	 * @param scaleRange
-	 *            The scale range we are working on... provided in order to make
-	 *            the style factory happy
-	 * @param shape
-	 * @param destinationCrs
-	 * @param layerId 
-	 * @throws TransformException
-	 * @throws FactoryException
-	 */
-	final private void processSymbolizers(final Graphics2D graphics,
-			final RenderableFeature drawMe, final Symbolizer[] symbolizers,
-			NumberRange scaleRange, AffineTransform at,
-			CoordinateReferenceSystem destinationCrs, String layerId)
-			throws TransformException, FactoryException {
-		final int length = symbolizers.length;
+   /**
+    * Applies each of a set of symbolizers in turn to a given feature.
+    * <p>
+    * This is an internal method and should only be called by processStylers.
+    * </p>
+    * @param currLayer 
+    * 
+    * @param graphics
+    * @param drawMe
+    *            The feature to be rendered
+    * @param symbolizers
+    *            An array of symbolizers which actually perform the rendering.
+    * @param scaleRange
+    *            The scale range we are working on... provided in order to make
+    *            the style factory happy
+    * @param shape
+    * @param destinationCrs
+    * @param layerId 
+    * @throws TransformException
+    * @throws FactoryException
+    */
+   final private void processSymbolizers(final Graphics2D graphics,
+         final RenderableFeature drawMe, final Symbolizer[] symbolizers,
+         NumberRange scaleRange, AffineTransform at,
+         CoordinateReferenceSystem destinationCrs, String layerId)
+         throws TransformException, FactoryException {
+      final int length = symbolizers.length;
 		
 		// clips Graphics to current drawing area before painting
 		Graphics2D clippedGraphics = (Graphics2D)graphics.create();
 		clippedGraphics.clip(screenSize);
 		
-		for (int m = 0; m < length; m++) {
+      for (int m = 0; m < length; m++) {
 
-			// /////////////////////////////////////////////////////////////////
-			//
-			// RASTER
-			//
-			// /////////////////////////////////////////////////////////////////
-			final Symbolizer symbolizer = symbolizers[m];
-			if (symbolizer instanceof RasterSymbolizer) {
+         // /////////////////////////////////////////////////////////////////
+         //
+         // RASTER
+         //
+         // /////////////////////////////////////////////////////////////////
+         final Symbolizer symbolizer = symbolizers[m];
+         if (symbolizer instanceof RasterSymbolizer) {
 				renderRaster(clippedGraphics, drawMe.content,
-						(RasterSymbolizer) symbolizer, destinationCrs,
+                  (RasterSymbolizer) symbolizer, destinationCrs,
 						scaleRange,at);
 
-			} else {
+         } else {
 
-				// /////////////////////////////////////////////////////////////////
-				//
-				// FEATURE
-				//
-				// /////////////////////////////////////////////////////////////////
-				LiteShape2 shape = drawMe.getShape(symbolizer, at);
-				if(shape == null)
-					continue;
-				if (symbolizer instanceof TextSymbolizer && drawMe.content instanceof SimpleFeature) {
-					labelCache.put(layerId, (TextSymbolizer) symbolizers[m], (SimpleFeature) drawMe.content,
-							shape, scaleRange);
-				} else {
-					Style2D style = styleFactory.createStyle(drawMe.content,
-							symbolizer, scaleRange);
+            // /////////////////////////////////////////////////////////////////
+            //
+            // FEATURE
+            //
+            // /////////////////////////////////////////////////////////////////
+            LiteShape2 shape = drawMe.getShape(symbolizer, at);
+            if(shape == null)
+               continue;
+            if (symbolizer instanceof TextSymbolizer && drawMe.content instanceof SimpleFeature) {
+               labelCache.put(layerId, (TextSymbolizer) symbolizers[m], (SimpleFeature) drawMe.content,
+                     shape, scaleRange);
+            } else {
+               Style2D style = styleFactory.createStyle(drawMe.content,
+                     symbolizer, scaleRange);
 					painter.paint(clippedGraphics, shape, style, scaleDenominator);
-				}
+            }
 
-			}
-		}
-		fireFeatureRenderedEvent(drawMe.content);
-	}
+         }
+      }
+      fireFeatureRenderedEvent(drawMe.content);
+   }
 
-	
+   
 
-	/**
-	 * Renders a grid coverage on the device.
-	 * 
-	 * @param graphics
-	 *            DOCUMENT ME!
-	 * @param drawMe
-	 *            the feature that contains the GridCoverage. The grid coverage
-	 *            must be contained in the "grid" attribute
-	 * @param symbolizer
-	 *            The raster symbolizer
-	 * @param scaleRange
+   /**
+    * Renders a grid coverage on the device.
+    * 
+    * @param graphics
+    *            DOCUMENT ME!
+    * @param drawMe
+    *            the feature that contains the GridCoverage. The grid coverage
+    *            must be contained in the "grid" attribute
+    * @param symbolizer
+    *            The raster symbolizer
+    * @param scaleRange
 	 * @param worldToScreen the world to screen transform
-	 * @param world2Grid 
-	 * @task make it follow the symbolizer
-	 */
-	private void renderRaster(Graphics2D graphics, Object drawMe,
-			RasterSymbolizer symbolizer,
+    * @param world2Grid 
+    * @task make it follow the symbolizer
+    */
+   private void renderRaster(Graphics2D graphics, Object drawMe,
+         RasterSymbolizer symbolizer,
 			CoordinateReferenceSystem destinationCRS, Range scaleRange, AffineTransform worldToScreen) {
-		final Object grid = gridPropertyName.evaluate( drawMe);
-		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine(new StringBuffer("rendering Raster for feature ")
-					.append(drawMe.toString()).append(" - ").append(
-							grid).toString());
+      final Object grid = gridPropertyName.evaluate( drawMe);
+      if (LOGGER.isLoggable(Level.FINE))
+         LOGGER.fine(new StringBuffer("rendering Raster for feature ")
+               .append(drawMe.toString()).append(" - ").append(
+                     grid).toString());
 
-		GridCoverage2D coverage=null;
-		try {
-			// /////////////////////////////////////////////////////////////////
-			//
-			// If the grid object is a reader we ask him to do its best for the
-			// requested resolution, if it is a gridcoverage instead we have to
-			// rely on the gridocerage renderer itself.
-			//
-			// /////////////////////////////////////////////////////////////////
-			final GridCoverageRenderer gcr = new GridCoverageRenderer(
+      GridCoverage2D coverage=null;
+      try {
+         // /////////////////////////////////////////////////////////////////
+         //
+         // If the grid object is a reader we ask him to do its best for the
+         // requested resolution, if it is a gridcoverage instead we have to
+         // rely on the gridocerage renderer itself.
+         //
+         // /////////////////////////////////////////////////////////////////
+         final GridCoverageRenderer gcr = new GridCoverageRenderer(
 					destinationCRS, originalMapExtent, screenSize, worldToScreen,java2dHints);
 
-			// //
-			// It is a grid coverage
-			// //
-			if (grid instanceof GridCoverage)
-				gcr.paint(graphics, (GridCoverage2D) grid, symbolizer);
-			else if (grid instanceof AbstractGridCoverage2DReader) {
-				
-				// //
-				// It is an AbstractGridCoverage2DReader, let's use parameters
-				// if we have any supplied by a user.
-				// //
-				// first I created the correct ReadGeometry
-				final Parameter<GridGeometry2D> readGG = new Parameter<GridGeometry2D>(AbstractGridFormat.READ_GRIDGEOMETRY2D);
-				readGG.setValue(new GridGeometry2D(new GridEnvelope2D(screenSize), mapExtent));
-				final AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) grid;
-				// then I try to get read parameters associated with this
-				// coverage if there are any.
-				final Object params = paramsPropertyName.evaluate(drawMe);
-				if (params != null) {
-					// //
-					//
-					// Getting parameters to control how to read this coverage.
-					// Remember to check to actually have them before forwarding
-					// them to the reader.
-					//
-					// //
-					GeneralParameterValue[] readParams = (GeneralParameterValue[]) params;
-					final int length = readParams.length;
-					if (length > 0) {
-						// we have a valid number of parameters, let's check if
-						// also have a READ_GRIDGEOMETRY2D. In such case we just
-						// override it with the one we just build for this
-						// request.
-						final String name = AbstractGridFormat.READ_GRIDGEOMETRY2D
-								.getName().toString();
-						int i = 0;
-						for (; i < length; i++)
-							if (readParams[i].getDescriptor().getName()
-									.toString().equalsIgnoreCase(name))
-								break;
-						// did we find anything?
-						if (i < length) {
-							//we found another READ_GRIDGEOMETRY2D, let's override it.
-							((Parameter) readParams[i]).setValue(readGG);
-							coverage = (GridCoverage2D) reader.read(readParams);
-						} else {
-							// add the correct read geometry to the supplied
-							// params since we did not find anything
-							GeneralParameterValue[] readParams2 = new GeneralParameterValue[length + 1];
-							System.arraycopy(readParams, 0, readParams2, 0,length);
-							readParams2[length] = readGG;
-							coverage = (GridCoverage2D) reader.read(readParams2);
-						}
-					} else
-						// we have no parameters hence we just use the read grid
-						// geometry to get a coverage
-						coverage = (GridCoverage2D) reader.read(new GeneralParameterValue[] { readGG });
-				} else {
-					coverage = (GridCoverage2D) reader.read(new GeneralParameterValue[] { readGG });
-				}
-				try{
+         // //
+         // It is a grid coverage
+         // //
+         if (grid instanceof GridCoverage)
+            gcr.paint(graphics, (GridCoverage2D) grid, symbolizer);
+         else if (grid instanceof AbstractGridCoverage2DReader) {
+            
+            // //
+            // It is an AbstractGridCoverage2DReader, let's use parameters
+            // if we have any supplied by a user.
+            // //
+            // first I created the correct ReadGeometry
+            final Parameter<GridGeometry2D> readGG = new Parameter<GridGeometry2D>(AbstractGridFormat.READ_GRIDGEOMETRY2D);
+            readGG.setValue(new GridGeometry2D(new GridEnvelope2D(screenSize), mapExtent));
+            final AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) grid;
+            // then I try to get read parameters associated with this
+            // coverage if there are any.
+            final Object params = paramsPropertyName.evaluate(drawMe);
+            if (params != null) {
+               // //
+               //
+               // Getting parameters to control how to read this coverage.
+               // Remember to check to actually have them before forwarding
+               // them to the reader.
+               //
+               // //
+               GeneralParameterValue[] readParams = (GeneralParameterValue[]) params;
+               final int length = readParams.length;
+               if (length > 0) {
+                  // we have a valid number of parameters, let's check if
+                  // also have a READ_GRIDGEOMETRY2D. In such case we just
+                  // override it with the one we just build for this
+                  // request.
+                  final String name = AbstractGridFormat.READ_GRIDGEOMETRY2D
+                        .getName().toString();
+                  int i = 0;
+                  for (; i < length; i++)
+                     if (readParams[i].getDescriptor().getName()
+                           .toString().equalsIgnoreCase(name))
+                        break;
+                  // did we find anything?
+                  if (i < length) {
+                     //we found another READ_GRIDGEOMETRY2D, let's override it.
+                     ((Parameter) readParams[i]).setValue(readGG);
+                     coverage = (GridCoverage2D) reader.read(readParams);
+                  } else {
+                     // add the correct read geometry to the supplied
+                     // params since we did not find anything
+                     GeneralParameterValue[] readParams2 = new GeneralParameterValue[length + 1];
+                     System.arraycopy(readParams, 0, readParams2, 0,length);
+                     readParams2[length] = readGG;
+                     coverage = (GridCoverage2D) reader.read(readParams2);
+                  }
+               } else
+                  // we have no parameters hence we just use the read grid
+                  // geometry to get a coverage
+                  coverage = (GridCoverage2D) reader.read(new GeneralParameterValue[] { readGG });
+            } else {
+               coverage = (GridCoverage2D) reader.read(new GeneralParameterValue[] { readGG });
+            }
+            try{
 					if(coverage!=null)
 						gcr.paint(graphics, coverage, symbolizer);
-				}
-				finally {
+            }
+            finally {
 
-					//we need to try and dispose this coverage since it was created on purpose for rendering 
-					if(coverage!=null)
-						coverage.dispose(true);
-				}
-			}
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER.fine("Raster rendered");
+               //we need to try and dispose this coverage since it was created on purpose for rendering 
+               if(coverage!=null)
+                  coverage.dispose(true);
+            }
+         }
+         if (LOGGER.isLoggable(Level.FINE))
+            LOGGER.fine("Raster rendered");
 
-		} catch (FactoryException e) {
-			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-			fireErrorEvent(e);
-		} catch (TransformException e) {
-			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-			fireErrorEvent(e);
-		} catch (NoninvertibleTransformException e) {
-			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-			fireErrorEvent(e);
-		} catch (IllegalArgumentException e) {
-			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-			fireErrorEvent(e);
-		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-			fireErrorEvent(e);
-		}
+      } catch (FactoryException e) {
+         LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+         fireErrorEvent(e);
+      } catch (TransformException e) {
+         LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+         fireErrorEvent(e);
+      } catch (NoninvertibleTransformException e) {
+         LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+         fireErrorEvent(e);
+      } catch (IllegalArgumentException e) {
+         LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+         fireErrorEvent(e);
+      } catch (IOException e) {
+         LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+         fireErrorEvent(e);
+      }
 
-	}
+   }
 
 
-	/**
-	 * Finds the geometric attribute requested by the symbolizer
-	 * 
-	 * @param drawMe
-	 *            The feature
-	 * @param s
-	 * 
-	 * /** Finds the geometric attribute requested by the symbolizer
-	 * 
-	 * @param drawMe
-	 *            The feature
-	 * @param s
-	 *            The symbolizer
-	 * @return The geometry requested in the symbolizer, or the default geometry
-	 *         if none is specified
-	 */
-	private com.vividsolutions.jts.geom.Geometry findGeometry(Object drawMe,
-			Symbolizer s) {
+   /**
+    * Finds the geometric attribute requested by the symbolizer
+    * 
+    * @param drawMe
+    *            The feature
+    * @param s
+    * 
+    * /** Finds the geometric attribute requested by the symbolizer
+    * 
+    * @param drawMe
+    *            The feature
+    * @param s
+    *            The symbolizer
+    * @return The geometry requested in the symbolizer, or the default geometry
+    *         if none is specified
+    */
+   private com.vividsolutions.jts.geom.Geometry findGeometry(Object drawMe,
+         Symbolizer s) {
 		Expression geomExpr = s.getGeometry();
 
-		// get the geometry
-		Geometry geom;
+      // get the geometry
+      Geometry geom;
 		if(geomExpr == null) {
-		    if(drawMe instanceof SimpleFeature)
-		        geom = (Geometry) ((SimpleFeature) drawMe).getDefaultGeometry();
-		    else
-		        geom = (Geometry) defaultGeometryPropertyName.evaluate(drawMe, Geometry.class);
-		} else {
+          if(drawMe instanceof SimpleFeature)
+              geom = (Geometry) ((SimpleFeature) drawMe).getDefaultGeometry();
+          else
+              geom = (Geometry) defaultGeometryPropertyName.evaluate(drawMe, Geometry.class);
+      } else {
 		    geom = (Geometry) geomExpr.evaluate(drawMe, Geometry.class);
-		}
-		    
-		return geom;    
-	}
+      }
+          
+      return geom;    
+   }
 
-	/**
-	 * Finds the geometric attribute coordinate reference system.
-	 * @param drawMe2 
-	 * 
-	 * @param f The feature
-	 * @param s The symbolizer
-	 * @return The geometry requested in the symbolizer, or the default geometry if none is specified
-	 */
-	private org.opengis.referencing.crs.CoordinateReferenceSystem findGeometryCS(
-			MapLayer currLayer, Object drawMe, Symbolizer s) {
+   /**
+    * Finds the geometric attribute coordinate reference system.
+    * @param drawMe2 
+    * 
+    * @param f The feature
+    * @param s The symbolizer
+    * @return The geometry requested in the symbolizer, or the default geometry if none is specified
+    */
+   private org.opengis.referencing.crs.CoordinateReferenceSystem findGeometryCS(
+         MapLayer currLayer, Object drawMe, Symbolizer s) {
 
 
         if( drawMe instanceof SimpleFeature ){
@@ -2296,52 +2296,52 @@ public final class StreamingRenderer implements GTRenderer {
         }
     }
 
-	/**
-	 * Getter for property interactive.
-	 * 
-	 * @return Value of property interactive.
-	 */
-	public boolean isInteractive() {
-		return interactive;
-	}
+   /**
+    * Getter for property interactive.
+    * 
+    * @return Value of property interactive.
+    */
+   public boolean isInteractive() {
+      return interactive;
+   }
 
-	/**
-	 * Sets the interactive status of the renderer. An interactive renderer
-	 * won't wait for long image loading, preferring an alternative mark instead
-	 * 
-	 * @param interactive
-	 *            new value for the interactive property
-	 */
-	public void setInteractive(boolean interactive) {
-		this.interactive = interactive;
-	}
+   /**
+    * Sets the interactive status of the renderer. An interactive renderer
+    * won't wait for long image loading, preferring an alternative mark instead
+    * 
+    * @param interactive
+    *            new value for the interactive property
+    */
+   public void setInteractive(boolean interactive) {
+      this.interactive = interactive;
+   }
 
-	/**
-	 * <p>
-	 * Returns true if the optimized data loading is enabled, false otherwise.
-	 * </p>
-	 * <p>
-	 * When optimized data loading is enabled, lite renderer will try to load
-	 * only the needed feature attributes (according to styles) and to load only
-	 * the features that are in (or overlaps with)the bounding box requested for
-	 * painting
-	 * </p>
-	 * 
-	 */
-	private boolean isOptimizedDataLoadingEnabled() {
-		if (rendererHints == null)
-			return optimizedDataLoadingEnabledDEFAULT;
-		Object result = null;
-		try{
-			result=rendererHints
-					.get("optimizedDataLoadingEnabled");
-		}catch (ClassCastException e) {
-			
-		}
-		if (result == null)
-			return optimizedDataLoadingEnabledDEFAULT;
-		return ((Boolean)result).booleanValue();
-	}
+   /**
+    * <p>
+    * Returns true if the optimized data loading is enabled, false otherwise.
+    * </p>
+    * <p>
+    * When optimized data loading is enabled, lite renderer will try to load
+    * only the needed feature attributes (according to styles) and to load only
+    * the features that are in (or overlaps with)the bounding box requested for
+    * painting
+    * </p>
+    * 
+    */
+   private boolean isOptimizedDataLoadingEnabled() {
+      if (rendererHints == null)
+         return optimizedDataLoadingEnabledDEFAULT;
+      Object result = null;
+      try{
+         result=rendererHints
+               .get("optimizedDataLoadingEnabled");
+      }catch (ClassCastException e) {
+         
+      }
+      if (result == null)
+         return optimizedDataLoadingEnabledDEFAULT;
+      return ((Boolean)result).booleanValue();
+   }
     
     /**
      * <p>
@@ -2388,177 +2388,177 @@ public final class StreamingRenderer implements GTRenderer {
         return result;
     }
     
-	/**
-	 * Returns the generalization distance in the screen space.
-	 * 
-	 */
-	public double getGeneralizationDistance() {
-		return generalizationDistance;
-	}
+   /**
+    * Returns the generalization distance in the screen space.
+    * 
+    */
+   public double getGeneralizationDistance() {
+      return generalizationDistance;
+   }
 
-	/**
-	 * <p>
-	 * Sets the generalizazion distance in the screen space.
-	 * </p>
-	 * <p>
-	 * Default value is 0.8, meaning that two subsequent points are collapsed to
-	 * one if their on screen distance is less than one pixel
-	 * </p>
-	 * <p>
-	 * Set the distance to 0 if you don't want any kind of generalization
-	 * </p>
-	 * 
-	 * @param d
-	 */
-	public void setGeneralizationDistance(double d) {
-		generalizationDistance = d;
-	}
+   /**
+    * <p>
+    * Sets the generalizazion distance in the screen space.
+    * </p>
+    * <p>
+    * Default value is 0.8, meaning that two subsequent points are collapsed to
+    * one if their on screen distance is less than one pixel
+    * </p>
+    * <p>
+    * Set the distance to 0 if you don't want any kind of generalization
+    * </p>
+    * 
+    * @param d
+    */
+   public void setGeneralizationDistance(double d) {
+      generalizationDistance = d;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.renderer.GTRenderer#setJava2DHints(java.awt.RenderingHints)
-	 */
-	public void setJava2DHints(RenderingHints hints) {
-		this.java2dHints = hints;
-		styleFactory.setRenderingHints(hints);
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.geotools.renderer.GTRenderer#setJava2DHints(java.awt.RenderingHints)
+    */
+   public void setJava2DHints(RenderingHints hints) {
+      this.java2dHints = hints;
+      styleFactory.setRenderingHints(hints);
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.renderer.GTRenderer#getJava2DHints()
-	 */
-	public RenderingHints getJava2DHints() {
-		return java2dHints;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.geotools.renderer.GTRenderer#getJava2DHints()
+    */
+   public RenderingHints getJava2DHints() {
+      return java2dHints;
+   }
 
     public void setRendererHints(Map hints) {
-    	if( hints!=null && hints.containsKey(LABEL_CACHE_KEY) ){
-    		LabelCache cache=(LabelCache) hints.get(LABEL_CACHE_KEY);
-    		if( cache==null )
-    			throw new NullPointerException("Label_Cache_Hint has a null value for the labelcache");
-    		
-    		this.labelCache=cache;
-    		this.painter=new StyledShapePainter(cache);
-    	}
-    	if(hints != null && hints.containsKey(LINE_WIDTH_OPTIMIZATION_KEY)) {
-    	    styleFactory.setLineOptimizationEnabled(Boolean.TRUE.equals(hints.get(LINE_WIDTH_OPTIMIZATION_KEY)));
-    	}
+      if( hints!=null && hints.containsKey(LABEL_CACHE_KEY) ){
+         LabelCache cache=(LabelCache) hints.get(LABEL_CACHE_KEY);
+         if( cache==null )
+            throw new NullPointerException("Label_Cache_Hint has a null value for the labelcache");
+         
+         this.labelCache=cache;
+         this.painter=new StyledShapePainter(cache);
+      }
+      if(hints != null && hints.containsKey(LINE_WIDTH_OPTIMIZATION_KEY)) {
+          styleFactory.setLineOptimizationEnabled(Boolean.TRUE.equals(hints.get(LINE_WIDTH_OPTIMIZATION_KEY)));
+      }
         rendererHints = hints;
 
         // sets whether vector rendering is enabled in the SLDStyleFactory
     	styleFactory.setVectorRenderingEnabled(isVectorRenderingEnabled());
     }
     
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.renderer.GTRenderer#getRendererHints()
-	 */
-	public Map getRendererHints() {
-		return rendererHints;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.geotools.renderer.GTRenderer#getRendererHints()
+    */
+   public Map getRendererHints() {
+      return rendererHints;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.renderer.GTRenderer#setContext(org.geotools.map.MapContext)
-	 */
-	public void setContext(MapContext context) {
-		this.context = context;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.geotools.renderer.GTRenderer#setContext(org.geotools.map.MapContext)
+    */
+   public void setContext(MapContext context) {
+      this.context = context;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.renderer.GTRenderer#getContext()
-	 */
-	public MapContext getContext() {
-		return context;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.geotools.renderer.GTRenderer#getContext()
+    */
+   public MapContext getContext() {
+      return context;
+   }
 
-	public boolean isCanTransform() {
-		return canTransform;
-	}
+   public boolean isCanTransform() {
+      return canTransform;
+   }
 
-	public static MathTransform getMathTransform(
-			CoordinateReferenceSystem sourceCRS,
-			CoordinateReferenceSystem destCRS) {
-		try {
-			return CRS.findMathTransform(sourceCRS, destCRS, true);
-		} catch (OperationNotFoundException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+   public static MathTransform getMathTransform(
+         CoordinateReferenceSystem sourceCRS,
+         CoordinateReferenceSystem destCRS) {
+      try {
+         return CRS.findMathTransform(sourceCRS, destCRS, true);
+      } catch (OperationNotFoundException e) {
+         LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 
-		} catch (FactoryException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-		}
-		return null;
-	}
-	
-	/**
-	 * A decimator that will just transform coordinates
-	 */
-	private static final Decimator NULL_DECIMATOR = new Decimator(-1, -1);
-	
-	/**
-	 * A class transforming (and caching) feature's geometries to shapes
-	 **/
-	private class RenderableFeature {
-		Object content;
-		private MapLayer layer;
-		private IdentityHashMap symbolizerAssociationHT = new IdentityHashMap(); // associate a value
-		private List geometries = new ArrayList();
-		private List shapes = new ArrayList();
-		private boolean clone;
-		private IdentityHashMap decimators = new IdentityHashMap();
+      } catch (FactoryException e) {
+         LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+      }
+      return null;
+   }
+   
+   /**
+    * A decimator that will just transform coordinates
+    */
+   private static final Decimator NULL_DECIMATOR = new Decimator(-1, -1);
+   
+   /**
+    * A class transforming (and caching) feature's geometries to shapes
+    **/
+   private class RenderableFeature {
+      Object content;
+      private MapLayer layer;
+      private IdentityHashMap symbolizerAssociationHT = new IdentityHashMap(); // associate a value
+      private List geometries = new ArrayList();
+      private List shapes = new ArrayList();
+      private boolean clone;
+      private IdentityHashMap decimators = new IdentityHashMap();
 
-		
+      
 		public RenderableFeature(MapLayer layer, boolean clone) {
-			this.layer = layer;
+         this.layer = layer;
 			this.clone = clone;
-		}
-		
-		public void setFeature(Object feature) {
-			this.content = feature;
-			geometries.clear();
-			shapes.clear();
-		}
-		
-		public LiteShape2 getShape(Symbolizer symbolizer, AffineTransform at) throws FactoryException {
-			Geometry g = findGeometry(content, symbolizer); // pulls the geometry
-			
-			if ( g == null )
-				return null;
-			
-			SymbolizerAssociation sa = (SymbolizerAssociation) symbolizerAssociationHT
-					.get(symbolizer);
+      }
+      
+      public void setFeature(Object feature) {
+         this.content = feature;
+         geometries.clear();
+         shapes.clear();
+      }
+      
+      public LiteShape2 getShape(Symbolizer symbolizer, AffineTransform at) throws FactoryException {
+         Geometry g = findGeometry(content, symbolizer); // pulls the geometry
+         
+         if ( g == null )
+            return null;
+         
+         SymbolizerAssociation sa = (SymbolizerAssociation) symbolizerAssociationHT
+               .get(symbolizer);
 			MathTransform2D crsTransform = null;
 			MathTransform2D atTransform = null;
 			MathTransform2D fullTransform = null;
-			if (sa == null) {
-				sa = new SymbolizerAssociation();
+         if (sa == null) {
+            sa = new SymbolizerAssociation();
 				sa.crs = (findGeometryCS(layer, content, symbolizer));
-				try {
+            try {
 					crsTransform = buildTransform(sa.crs, destinationCrs);
 					atTransform = (MathTransform2D) ProjectiveTransform.create(worldToScreenTransform);
 				    fullTransform = buildFullTransform(sa.crs, destinationCrs, at);
-				} catch (Exception e) {
-					// fall through
-					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-				}
+            } catch (Exception e) {
+               // fall through
+               LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            }
 				sa.xform = fullTransform;
 				sa.crsxform = crsTransform;
 				sa.axform = atTransform;
 				
-				symbolizerAssociationHT.put(symbolizer, sa);
-			}
+            symbolizerAssociationHT.put(symbolizer, sa);
+         }
 			
-			// some shapes may be too close to projection boundaries to
-			// get transformed, try to be lenient
-			try {
-			    if (symbolizer instanceof PointSymbolizer) {
-			        // if the coordinate transformation will occurr in place on the coordinate sequence
+         // some shapes may be too close to projection boundaries to
+         // get transformed, try to be lenient
+         try {
+             if (symbolizer instanceof PointSymbolizer) {
+                 // if the coordinate transformation will occurr in place on the coordinate sequence
                     if(!clone && g.getFactory().getCoordinateSequenceFactory() instanceof LiteCoordinateSequenceFactory) {
                         // if the symbolizer is a point symbolizer we first get the transformed
                         // geometry to make sure the coordinates have been modified once, and then
@@ -2574,23 +2574,23 @@ public final class StreamingRenderer implements GTRenderer {
                 } else {
                     return getTransformedShape(g, sa);
                 }
-			} catch (TransformException te) {
+         } catch (TransformException te) {
                                     LOGGER.log(Level.FINE, te.getLocalizedMessage(), te);
-				fireErrorEvent(te);
-				return null;
-			} catch (AssertionError ae) {
+            fireErrorEvent(te);
+            return null;
+         } catch (AssertionError ae) {
                                     LOGGER.log(Level.FINE, ae.getLocalizedMessage(), ae);
-				fireErrorEvent(new RuntimeException(ae));
-				return null;
-			}
-		}
-		
+            fireErrorEvent(new RuntimeException(ae));
+            return null;
+         }
+      }
+      
 		private final LiteShape2 getTransformedShape(Geometry originalGeom, SymbolizerAssociation sa) throws TransformException,
-				FactoryException {
-				for (int i = 0; i < geometries.size(); i++) {
+            FactoryException {
+            for (int i = 0; i < geometries.size(); i++) {
 					if(geometries.get(i) == originalGeom)
-						return (LiteShape2) shapes.get(i);
-				}
+                  return (LiteShape2) shapes.get(i);
+            }
 				
 				// we need to clone if the clone flag is high or if the coordinate sequence is not the one we asked for
 				Geometry geom = originalGeom;
@@ -2631,33 +2631,33 @@ public final class StreamingRenderer implements GTRenderer {
 				
 				// cache the result
 				geometries.add(originalGeom);
-				shapes.add(shape);
-				return shape;
-		}
-		
-		
+            shapes.add(shape);
+            return shape;
+      }
+      
+      
 
-		/**
-		 * @throws org.opengis.referencing.operation.NoninvertibleTransformException
-		 */
-		private Decimator getDecimator(MathTransform2D mathTransform)
-				throws org.opengis.referencing.operation.NoninvertibleTransformException {
-		    // returns a decimator that does nothing if the currently set generalization
-		    // distance is zero (no generalization desired) or if the datastore has
-		    // already done full generalization at the desired level
+      /**
+       * @throws org.opengis.referencing.operation.NoninvertibleTransformException
+       */
+      private Decimator getDecimator(MathTransform2D mathTransform)
+            throws org.opengis.referencing.operation.NoninvertibleTransformException {
+          // returns a decimator that does nothing if the currently set generalization
+          // distance is zero (no generalization desired) or if the datastore has
+          // already done full generalization at the desired level
             if (generalizationDistance == 0 || !inMemoryGeneralization)
                 return NULL_DECIMATOR;
-		    
-			Decimator decimator = (Decimator) decimators.get(mathTransform);
-			if (decimator == null) {
-				if (mathTransform != null && !mathTransform.isIdentity())
-					decimator = new Decimator(mathTransform.inverse(), screenSize, generalizationDistance);
-				else
-					decimator = new Decimator(null, screenSize, generalizationDistance);
+          
+         Decimator decimator = (Decimator) decimators.get(mathTransform);
+         if (decimator == null) {
+            if (mathTransform != null && !mathTransform.isIdentity())
+               decimator = new Decimator(mathTransform.inverse(), screenSize, generalizationDistance);
+            else
+               decimator = new Decimator(null, screenSize, generalizationDistance);
 
-				decimators.put(mathTransform, decimator);
-			}
-			return decimator;
-		}
-	}
+            decimators.put(mathTransform, decimator);
+         }
+         return decimator;
+      }
+   }
 }

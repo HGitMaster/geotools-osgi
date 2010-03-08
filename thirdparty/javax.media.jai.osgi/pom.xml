@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>javax.media</groupId>
+  <artifactId>javax.media.jai.osgi</artifactId>
+  <packaging>bundle</packaging>
+  <name>Java Advanced Imaging</name>
+  <version>1.1.3</version>
+  <description>Java Advanced Imaging</description>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>thirdparty</artifactId>
+    <version>2.6.0.osgi3</version>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_mlib</artifactId>
+      <version>1.1.3</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Embed-Dependency>jai_mlib;inline=true</Embed-Dependency>
+            <Bundle-SymbolicName>javax.media.jai.osgi</Bundle-SymbolicName>
+            <Bundle-DocURL>http://download.java.net/media/jai/javadoc/1.1.3/jai-apidocs/</Bundle-DocURL>
+            <Bundle-Vendor>Harman/Becker</Bundle-Vendor>
+            <Export-Package>javax.media.jai.*;version="${version}",com.sun.media.jai.*;version="${version}"</Export-Package>
+            <Import-Package>!sun.*,!com.sun.image.*,*</Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>false</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <attach>true</attach>
+          <archive>
+            <manifestEntries>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+              <Bundle-Name>${name}</Bundle-Name>
+              <Bundle-SymbolicName>javax.media.jai.osgi.source </Bundle-SymbolicName>
+              <Bundle-Version>${version}</Bundle-Version>
+              <Eclipse-SourceBundle>
+                javax.media.jai.osgi;version="${version}";roots:="." </Eclipse-SourceBundle>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <licenses>
+    <license>
+      <name>Java Distribution License (JDL)</name>
+      <url>https://jai.dev.java.net/jdl-jai.pdf</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <repositories>
+    <repository>
+      <id>jai.bin.deps</id>
+      <name>JAI binary dependencies</name>
+      <url>file:${basedir}/repository</url>
+    </repository>
+  </repositories>
+</project>

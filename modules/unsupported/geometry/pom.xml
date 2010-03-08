@@ -124,8 +124,8 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>net.java.dev.jsr-275</groupId>
-      <artifactId>jsr-275</artifactId>
+      <groupId>net.java.dev.osgi</groupId>
+      <artifactId>net.java.dev.osgi.jsr275</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -149,12 +149,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-	<dependency>
-	    <groupId>picocontainer</groupId>
-	    <artifactId>picocontainer</artifactId>
-	    <version>3</version>
-	    <scope>test</scope>
-	</dependency>       
+   <dependency>
+       <groupId>picocontainer</groupId>
+       <artifactId>picocontainer</artifactId>
+       <version>3</version>
+       <scope>test</scope>
+   </dependency>       
   </dependencies>
 
 </project>

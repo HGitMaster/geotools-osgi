@@ -115,28 +115,28 @@
       </exclusions>
     </dependency>
 
-    <!-- api-2.6-SNAPSHOT.jar -->
+    <!-- api-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- coverage-2.6-SNAPSHOT.jar -->
+    <!-- coverage-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-<!-- epsg-hsql-2.6-SNAPSHOT.jar -->
+<!-- epsg-hsql-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- geotiff-2.6-SNAPSHOT.jar -->
+    <!-- geotiff-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-geotiff</artifactId>
@@ -155,14 +155,14 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- main-2.6-SNAPSHOT.jar -->
+    <!-- main-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- metadata-2.6-SNAPSHOT.jar -->
+    <!-- metadata-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-metadata</artifactId>
@@ -187,49 +187,49 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- referencing-2.6-SNAPSHOT.jar -->
+    <!-- referencing-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- render-2.6-SNAPSHOT.jar -->
+    <!-- render-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-render</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- shapefile-2.6-SNAPSHOT.jar -->
+    <!-- shapefile-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- shapefile-renderer-2.6-SNAPSHOT.jar -->
+    <!-- shapefile-renderer-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-shapefile-renderer</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- xml-2.6-SNAPSHOT.jar -->
+    <!-- xml-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- xml-filter-2.6-SNAPSHOT.jar -->
+    <!-- xml-filter-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools.xsd</groupId>
       <artifactId>gt-xsd-filter</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- xml-gml2-2.6-SNAPSHOT.jar -->
+    <!-- xml-gml2-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools.xsd</groupId>
       <artifactId>gt-xsd-gml2</artifactId>
@@ -242,7 +242,7 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- xml-sld-2.6-SNAPSHOT.jar -->
+    <!-- xml-sld-2.6.0.osgi3.jar -->
     <dependency>
       <groupId>org.geotools.xsd</groupId>
       <artifactId>gt-xsd-sld</artifactId>

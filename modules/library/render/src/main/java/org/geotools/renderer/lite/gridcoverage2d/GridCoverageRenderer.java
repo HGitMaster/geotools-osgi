@@ -260,6 +260,18 @@ public final class GridCoverageRenderer {
      * 
      * @param java2dHints
      *                to control this rendering process.
+     * @param envelope
+     *                delineating the area to be rendered.
+     * @param screenSize
+     *                at which we want to rendere the source
+     *                {@link GridCoverage2D}.
+     * @param worldToScreen if not <code>null</code> and if it contains a rotation,
+     * this Affine Tranform is used directly to convert from world coordinates
+     * to screen coordinates. Otherwise, a standard {@link GridToEnvelopeMapper}
+     * is used to calculate the affine transform.
+     * 
+     * @param java2dHints
+     *                to control this rendering process.
      * @throws TransformException
      * @throws NoninvertibleTransformException
      */

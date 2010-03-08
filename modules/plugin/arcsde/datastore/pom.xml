@@ -167,6 +167,7 @@
 		</dependency>
 		<dependency>
 			<groupId>simple-jndi</groupId>
+      <artifactId>javax.media.jai.osgi</artifactId>
 			<artifactId>simple-jndi</artifactId>
 			<scope>test</scope>
 		</dependency>

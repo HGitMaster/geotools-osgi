@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Geotools Image Mosaic Base
+Bundle-SymbolicName: org.geotools.imagemosaic.base
+Bundle-Version: 2.6.0.osgi3
+Bundle-Vendor: Harman/Becker
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.geotools.main;bundle-version="2.6.0",
+ org.geotools.referencing;bundle-version="2.6.0",
+ org.geotools.coverage;bundle-version="2.6.0",
+ org.geotools.shapefile;bundle-version="2.6.0",
+ org.geotools.metadata;bundle-version="2.6.0",
+ org.opengis.geoapi;bundle-version="2.2.0"
+Import-Package: com.vividsolutions.jts.geom,
+ com.vividsolutions.jts.index.strtree,
+ javax.measure.unit,
+ javax.media.jai,
+ javax.media.jai.operator
+Eclipse-RegisterBuddy: org.geotools.metadata
+Export-Package: org.geotools.gce.imagemosaic.base
