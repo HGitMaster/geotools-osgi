@@ -28,7 +28,6 @@ import javax.media.jai.ROI;
 import javax.media.jai.operator.MosaicDescriptor;
 
 import org.geotools.coverage.grid.GeneralGridEnvelope;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.geometry.GeneralEnvelope;
@@ -572,7 +571,7 @@ class ImageMosaicLoader
             String msg = "Problem when creating this mosaic.";
             try
             {
-                GeneralGridRange gridRange = new GeneralGridRange(loadedRange);
+                GeneralGridEnvelope gridRange = new GeneralGridEnvelope(loadedRange, 2);
                 GridToEnvelopeMapper gridToEnvelopeMapper 
                     = new GridToEnvelopeMapper(gridRange, loadedTilesBoundEnv);
                 gridToEnvelopeMapper.setPixelAnchor(PixelInCell.CELL_CORNER);

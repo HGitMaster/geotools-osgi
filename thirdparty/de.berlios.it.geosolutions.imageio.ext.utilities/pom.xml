@@ -5,7 +5,7 @@
   <artifactId>de.berlios.it.geosolutions.imageio.ext.utilities</artifactId>
   <packaging>bundle</packaging>
   <name>ImageIO Extensions Utilities</name>
-  <version>1.0.2</version>
+  <version>1.0.5</version>
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>thirdparty</artifactId>
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
       <artifactId>imageio-ext-utilities</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.5</version>
     </dependency>
   </dependencies>
   <build>

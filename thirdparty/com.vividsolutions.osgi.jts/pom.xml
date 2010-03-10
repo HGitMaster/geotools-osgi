@@ -5,7 +5,7 @@
   <artifactId>com.vividsolutions.osgi.jts</artifactId>
   <packaging>bundle</packaging>
   <name>Java Topology Suite</name>
-  <version>1.9</version>
+  <version>1.10</version>
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>thirdparty</artifactId>
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>com.vividsolutions</groupId>
       <artifactId>jts</artifactId>
-      <version>1.9</version>
+      <version>1.10</version>
       <optional>true</optional>
       <scope>compile</scope>
     </dependency>
@@ -31,7 +31,7 @@
             <Bundle-Name>Java Topology Suite</Bundle-Name>
             <Bundle-SymbolicName>com.vividsolutions.osgi.jts</Bundle-SymbolicName>
             <Bundle-Description>OSGI bundle for Java Topology Suite</Bundle-Description>
-            <Bundle-Version>1.9</Bundle-Version>
+            <Bundle-Version>1.10</Bundle-Version>
             <Export-Package>com.vividsolutions.jts.*</Export-Package>
             <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
           </instructions>

@@ -11,6 +11,8 @@ Require-Bundle: org.geotools.api;bundle-version="2.6.0",
  org.geotools.metadata;bundle-version="2.6.0",
  org.opengis.geoapi;bundle-version="2.3.0"
 Import-Package: com.sun.media.imageio.plugins.tiff,
+ com.sun.media.imageioimpl.common,
+ com.sun.media.imageioimpl.plugins.jpeg,
  com.sun.media.jai.operator,
  com.sun.media.jai.util,
  com.vividsolutions.jts.geom,

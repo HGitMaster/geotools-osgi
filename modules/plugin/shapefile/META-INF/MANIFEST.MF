@@ -24,11 +24,5 @@ Export-Package: org.geotools.data.shapefile,
  org.geotools.data.shapefile.shp.xml,
  org.geotools.index,
  org.geotools.index.quadtree,
- org.geotools.index.quadtree.fs,
- org.geotools.index.rtree,
- org.geotools.index.rtree.cachefs,
- org.geotools.index.rtree.database,
- org.geotools.index.rtree.database.mysql,
- org.geotools.index.rtree.fs,
- org.geotools.index.rtree.memory
+ org.geotools.index.quadtree.fs
 Bundle-Vendor: Harman/Becker

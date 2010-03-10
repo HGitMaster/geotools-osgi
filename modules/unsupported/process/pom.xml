@@ -109,39 +109,42 @@
             <artifactId>gt-shapefile</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_core</artifactId>
-            <!-- The version number is specified in the parent POM. -->
-            <scope>provided</scope>  <!-- Users should execute JAI installer. -->
-        </dependency>
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_imageio</artifactId>
-            <!-- The version number is specified in the parent POM. -->
-            <scope>provided</scope>  <!-- Users should execute JAI installer. -->
-        </dependency>
-            <plugin> <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-clover-plugin</artifactId> <executions>
-            <execution> <goals> <goal></goal> </goals> </execution>
-            </executions> </plugin>
-         -->
 
-            <artifactId>maven-jar-plugin</artifactId>
-            <configuration>
-               <archive>
-                  <manifestFile>META-INF/MANIFEST.MF</manifestFile>
-                  <manifest>
-                     <addClasspath>false</addClasspath>
-                  </manifest>
-               </archive>
-            </configuration>
-         </plugin>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-sample-data</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+	  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+            <manifest>
+              <addClasspath>false</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
       <plugin>
         <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
         <version>2.1.1</version>
+        <executions>
+          <execution>
             <id>attach-sources</id>
             <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration> 
           <attach>true</attach>                 
           <archive>
@@ -157,20 +160,7 @@
             </manifestEntries>
           </archive>
         </configuration>
-
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-sample-data</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_codec</artifactId>
-	    <!-- The version number is specified in the parent POM. -->
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
+      </plugin>
+    </plugins>
+  </build>
 </project>

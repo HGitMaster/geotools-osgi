@@ -32,7 +32,8 @@ import javax.media.jai.PlanarImage;
 import javax.media.jai.operator.ConstantDescriptor;
 
 import org.geotools.coverage.CoverageFactoryFinder;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
@@ -42,7 +43,6 @@ import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ImageUtilities;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
@@ -177,7 +177,7 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
         long width  = Math.round(originalEnvelope.getSpan(0) / highestRes[0]);
         long height = Math.round(originalEnvelope.getSpan(1) / highestRes[1]);
         Rectangle rect = new Rectangle((int) width, (int) height);
-        originalGridRange = new GeneralGridRange(rect);
+        originalGridRange = new GeneralGridEnvelope(rect, 2);
 
         GridToEnvelopeMapper geMapper 
             = new GridToEnvelopeMapper(originalGridRange, originalEnvelope);
@@ -186,7 +186,7 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
         raster2Model = geMapper.createTransform();
     }
 
-    public GridCoverage read(GeneralParameterValue[] params) throws IOException
+    public GridCoverage2D read(GeneralParameterValue[] params) throws IOException
     {
         evaluateMetadata();        
 
@@ -226,7 +226,7 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
      *         , or null in case nothing existed in the requested area.
      * @throws IOException
      */
-    private GridCoverage loadTiles(ImageMosaicParameters mp)
+    private GridCoverage2D loadTiles(ImageMosaicParameters mp)
             throws IOException
     {
 
@@ -332,7 +332,7 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
     
     
 
-    private GridCoverage background(ImageMosaicParameters mp)
+    private GridCoverage2D background(ImageMosaicParameters mp)
     {
         GeneralEnvelope requestedEnvelope = mp.getRequestedEnvelope();
         Rectangle dim = mp.getBounds();
@@ -363,7 +363,7 @@ public abstract class AbstractImageMosaicReader extends AbstractGridCoverage2DRe
      * @throws DataSourceException
      * @throws TransformException
      */
-    private GridCoverage loadRequestedTiles(ImageMosaicParameters mp,
+    private GridCoverage2D loadRequestedTiles(ImageMosaicParameters mp,
             ReferencedEnvelope intersectionJTSEnvelope, List<?> imageRefs)
             throws TransformException, IOException
     {

@@ -94,12 +94,12 @@
       <version>${project.version}</version>
     </dependency>
      <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
+       <groupId>org.apache.commons</groupId>
+       <artifactId>com.springsource.org.apache.commons.collections</artifactId>
     </dependency>
     <dependency>
       <groupId>com.mockrunner</groupId>

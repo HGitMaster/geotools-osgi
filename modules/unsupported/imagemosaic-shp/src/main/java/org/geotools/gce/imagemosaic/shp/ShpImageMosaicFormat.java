@@ -15,11 +15,11 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.Hints;
 import org.geotools.gce.imagemosaic.base.AbstractImageMosaicFormat;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -245,7 +245,7 @@ public class ShpImageMosaicFormat extends AbstractImageMosaicFormat
     
 
     @Override
-    public GridCoverageReader getReader(Object source, Hints hints)
+    public AbstractGridCoverage2DReader getReader(Object source, Hints hints)
     {
         try
         {
