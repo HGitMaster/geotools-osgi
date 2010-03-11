@@ -33,6 +33,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
+    <module>de.berlios.com.miglayout</module>
     <module>de.berlios.it.geosolutions.imageio.ext.tiff</module>
     <module>de.berlios.it.geosolutions.imageio.ext.utilities</module>
     <module>de.berlios.org.apache.commons.cli2</module>
