@@ -19,7 +19,7 @@ package org.geotools.util.logging;
 import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.Jdk14Logger;
+//import org.apache.commons.logging.impl.Jdk14Logger;
 
 
 /**
@@ -64,9 +64,9 @@ public class CommonsLoggerFactory extends LoggerFactory<Log> {
      */
     protected Log getImplementation(final String name) {
         final Log log = LogFactory.getLog(name);
-        if (log instanceof Jdk14Logger) {
-            return null;
-        }
+//        if (log instanceof Jdk14Logger) {
+//            return null;
+//        }
         return log;
     }
 
