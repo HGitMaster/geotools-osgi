@@ -96,7 +96,7 @@
          <module>coverageio</module>
          <module>coverageio-netcdf</module>
          <module>coveragetools</module>
-         <!--module>imagemosaic-sql</module-->
+         <module>imagemosaic-sql</module>
          <module>imagemosaic-base</module>
          <module>imagemosaic-shp</module>
        </modules>

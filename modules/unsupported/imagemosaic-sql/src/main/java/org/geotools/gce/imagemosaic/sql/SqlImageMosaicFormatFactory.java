@@ -1,5 +1,6 @@
 package org.geotools.gce.imagemosaic.sql;
 
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.gce.imagemosaic.base.AbstractImageMosaicFormatFactory;
 import org.opengis.coverage.grid.Format;
 
@@ -7,7 +8,7 @@ import org.opengis.coverage.grid.Format;
 public class SqlImageMosaicFormatFactory extends AbstractImageMosaicFormatFactory
 {
 
-    public Format createFormat()
+    public AbstractGridFormat createFormat()
     {
         return new SqlImageMosaicFormat();
     }

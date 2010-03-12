@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.factory.Hints;
 import org.geotools.gce.imagemosaic.base.AbstractImageMosaicFormat;
 import org.geotools.util.logging.Logging;
@@ -126,7 +127,7 @@ public class SqlImageMosaicFormat extends AbstractImageMosaicFormat
     }
 
     @Override
-    public GridCoverageReader getReader(Object source, Hints hints)
+    public AbstractGridCoverage2DReader getReader(Object source, Hints hints)
     {
         try
         {
