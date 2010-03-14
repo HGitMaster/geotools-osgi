@@ -81,4 +81,55 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>        
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration> 
+          <attach>true</attach>                 
+          <archive>
+            <manifestEntries>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+              <Bundle-Name>${name}</Bundle-Name>
+              <Bundle-SymbolicName>${groupId}.jdbc.postgis.source
+              </Bundle-SymbolicName>
+              <Bundle-Version>${version}</Bundle-Version>
+              <Eclipse-SourceBundle>
+                ${groupId}.jdbc.postgis;version="${version}";roots:="."
+              </Eclipse-SourceBundle>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
 </project>
