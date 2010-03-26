@@ -12,6 +12,7 @@ Require-Bundle: org.geotools.api;bundle-version="2.6.0",
  org.geotools.metadata;bundle-version="2.6.0",
  org.geotools.referencing;bundle-version="2.6.0",
  org.geotools.data;bundle-version="2.6.0"
+DynamicImport-Package: * 
 Import-Package: com.vividsolutions.jts.geom,
  com.vividsolutions.jts.geom.impl,
  com.vividsolutions.jts.io,
@@ -21,4 +22,5 @@ Export-Package: org.geotools.data.jdbc,
  org.geotools.data.jdbc.datasource,
  org.geotools.data.jdbc.fidmapper,
  org.geotools.data.jdbc.referencing,
- org.geotools.filter
+ org.geotools.filter,
+ org.geotools.jdbc
