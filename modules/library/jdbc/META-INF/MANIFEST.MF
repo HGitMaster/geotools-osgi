@@ -21,4 +21,5 @@ Export-Package: org.geotools.data.jdbc,
  org.geotools.data.jdbc.datasource,
  org.geotools.data.jdbc.fidmapper,
  org.geotools.data.jdbc.referencing,
- org.geotools.filter
+ org.geotools.filter,
+ org.geotools.jdbc
