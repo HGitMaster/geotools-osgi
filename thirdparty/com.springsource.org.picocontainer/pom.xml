@@ -6,6 +6,11 @@
   <packaging>jar</packaging>
   <name>PicoContainer</name>
   <version>1.2.0</version>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>thirdparty</artifactId>
+    <version>2.6.2.osgi1</version>
+  </parent>
   <build>
     <plugins>
       <plugin>

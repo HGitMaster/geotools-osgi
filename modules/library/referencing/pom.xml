@@ -206,6 +206,14 @@
   
   <build>
       <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/WarpTransformTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
          <plugin>
             <artifactId>maven-jar-plugin</artifactId>
             <configuration>

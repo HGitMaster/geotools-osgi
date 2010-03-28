@@ -111,7 +111,7 @@
       <groupId>javax.media</groupId>
       <artifactId>javax.media.jai.osgi</artifactId>
       <!-- The version number is specified in the parent POM. -->
-      <scope>test</scope>
+      <!--scope>test</scope-->
     </dependency>
   </dependencies>
 
