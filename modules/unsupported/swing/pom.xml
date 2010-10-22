@@ -136,11 +136,11 @@
             <manifestEntries>
               <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
               <Bundle-Name>${name}</Bundle-Name>
-              <Bundle-SymbolicName>${groupId}.process.source
+              <Bundle-SymbolicName>${groupId}.swing.source
               </Bundle-SymbolicName>
               <Bundle-Version>${version}</Bundle-Version>
               <Eclipse-SourceBundle>
-                ${groupId}.process;version="${version}";roots:="."
+                ${groupId}.swing;version="${version}";roots:="."
               </Eclipse-SourceBundle>
             </manifestEntries>
           </archive>
