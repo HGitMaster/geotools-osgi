@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 0.9.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/LabelingTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/renderer/lite/LabelingTest.java $
  */
 public class LabelingTest extends TestCase {
 

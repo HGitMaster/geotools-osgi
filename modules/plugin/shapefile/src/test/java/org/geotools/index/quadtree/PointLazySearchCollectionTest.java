@@ -28,7 +28,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * @author Jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/test/java/org/geotools/index/quadtree/PointLazySearchCollectionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/test/java/org/geotools/index/quadtree/PointLazySearchCollectionTest.java $
  */
 public class PointLazySearchCollectionTest extends TestCaseSupport {
 

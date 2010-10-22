@@ -75,7 +75,7 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Jody
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/geometry/MockGeometryFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/geometry/MockGeometryFactory.java $
  */
 public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
     CoordinateReferenceSystem crs;

@@ -17,9 +17,16 @@
 package org.geotools.styling.visitor;
 
 import java.awt.Color;
+import java.awt.RenderingHints.Key;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.measure.unit.Unit;
+import javax.swing.Icon;
 import javax.xml.transform.TransformerException;
 
 import junit.framework.TestCase;
@@ -28,44 +35,79 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.resources.Utilities;
 import org.geotools.styling.AnchorPoint;
+import org.geotools.styling.ChannelSelection;
+import org.geotools.styling.ColorMap;
 import org.geotools.styling.ColorMapEntry;
+import org.geotools.styling.ColorReplacement;
+import org.geotools.styling.ContrastEnhancement;
+import org.geotools.styling.Description;
 import org.geotools.styling.Displacement;
+import org.geotools.styling.ExtensionSymbolizer;
+import org.geotools.styling.Extent;
 import org.geotools.styling.ExternalGraphic;
+import org.geotools.styling.ExternalMark;
 import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Font;
 import org.geotools.styling.Graphic;
+import org.geotools.styling.GraphicImpl;
+import org.geotools.styling.GraphicLegend;
 import org.geotools.styling.Halo;
+import org.geotools.styling.ImageOutline;
 import org.geotools.styling.LabelPlacement;
+import org.geotools.styling.LayerFeatureConstraints;
 import org.geotools.styling.LinePlacement;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
+import org.geotools.styling.NamedLayer;
+import org.geotools.styling.NamedStyle;
+import org.geotools.styling.OtherTextImpl;
 import org.geotools.styling.PointPlacement;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.RasterSymbolizer;
+import org.geotools.styling.RemoteOWS;
 import org.geotools.styling.Rule;
 import org.geotools.styling.SLDTransformer;
+import org.geotools.styling.ShadedRelief;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactory2;
+import org.geotools.styling.StyleFactoryImpl2;
 import org.geotools.styling.StyledLayerDescriptor;
+import org.geotools.styling.Symbol;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.TextSymbolizer2;
 import org.geotools.styling.UomOgcMapping;
 import org.geotools.styling.UserLayer;
+import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Id;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
+import org.opengis.metadata.citation.OnLineResource;
+import org.opengis.style.ContrastMethod;
+import org.opengis.style.GraphicFill;
+import org.opengis.style.GraphicStroke;
+import org.opengis.style.GraphicalSymbol;
+import org.opengis.style.OverlapBehavior;
+import org.opengis.style.SelectedChannelType;
+import org.opengis.style.SemanticType;
 import org.opengis.util.Cloneable;
+import org.opengis.util.InternationalString;
 
 
 /**
  * Unit test for DuplicatorStyleVisitor.
  *
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/visitor/DuplicatorStyleVisitorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/styling/visitor/DuplicatorStyleVisitorTest.java $
  */
 public class DuplicatorStyleVisitorTest extends TestCase {
     StyleBuilder sb;
@@ -96,6 +138,7 @@ public class DuplicatorStyleVisitorTest extends TestCase {
     	assertNotNull(copy);
     	assertEquals(original, copy);
     }
+    
     
     public void testStyleDuplication() throws IllegalFilterException {
     	//create a style
@@ -634,4 +677,122 @@ public class DuplicatorStyleVisitorTest extends TestCase {
                 .getOpacity());
     }
     
+
+    public void testPointSymbolizerWithGeomFunction() throws Exception {
+        URL urlExternal = getClass().getResource("/data/sld/blob.gif");
+        ExternalGraphic extg = sb.createExternalGraphic(urlExternal, "image/svg+xml");
+        Graphic graphic = sb.createGraphic(extg, null, null);
+        PointSymbolizer pointSymb = sb.createPointSymbolizer(graphic);
+        
+        // Set a function as geometry
+        Function geomFunc = ff.function("centroid", ff.property("thr_geom"));
+        pointSymb.setGeometry(geomFunc);
+
+        pointSymb.accept(visitor);
+        PointSymbolizer copy = (PointSymbolizer) visitor.getCopy();
+
+        assertEquals("Any Expression set as Geometry must be correctly replicated",geomFunc, copy.getGeometry());
+    }
+    
+    public void testRasterSymbolizerDuplicationWithGeometryFunction() {
+        // create a default RasterSymbolizer
+        RasterSymbolizer original = sb.createRasterSymbolizer();
+
+        // Set a function as geometry
+        Function geomFunc = ff.function("centroid", ff.property("thr_geom"));
+        original.setGeometry(geomFunc);
+
+        // duplicate it
+        original.accept(visitor);
+        RasterSymbolizer copy = (RasterSymbolizer) visitor.getCopy();
+
+        // compare it
+        assertEquals("Any Expression set as Geometry must be correctly replicated", geomFunc, copy
+                .getGeometry());
+    }
+
+    public void testLineSymbolizerWithGeometryFunction() {
+        LineSymbolizer lineSymb = sf.createLineSymbolizer();
+
+        // Set a function as geometry
+        Function geomFunc = ff.function("centroid", ff.property("thr_geom"));
+        lineSymb.setGeometry(geomFunc);
+
+        LineSymbolizer copy = (LineSymbolizer) visitor.copy(lineSymb);
+
+        // compare it
+        assertEquals("Any Expression set as Geometry must be correctly replicated", geomFunc, copy
+                .getGeometry());
+    }
+
+    public void testPolygonSymbolizerWithGeometryFunction() {
+        PolygonSymbolizer symb = sf.createPolygonSymbolizer();
+
+        // Set a function as geometry
+        Function geomFunc = ff.function("centroid", ff.property("thr_geom"));
+        symb.setGeometry(geomFunc);
+
+        PolygonSymbolizer copy = (PolygonSymbolizer) visitor.copy(symb);
+
+        // compare it
+        assertEquals("Any Expression set as Geometry must be correctly replicated", geomFunc, copy
+                .getGeometry());
+    }
+
+    public void testTextSymbolizerWithGeometryFunction() {
+        TextSymbolizer symb = sf.createTextSymbolizer();
+
+        // Set a function as geometry
+        Function geomFunc = ff.function("centroid", ff.property("the_geom"));
+        symb.setGeometry(geomFunc);
+
+        TextSymbolizer copy = (TextSymbolizer) visitor.copy(symb);
+
+        // compare it
+        assertEquals("Any Expression set as Geometry must be correctly replicated", geomFunc, copy
+                .getGeometry());
+    }
+    
+
+    /**
+     * Test that {@link TextSymbolizer2} is correctly duplicated. 
+     * @author Stefan Tzeggai, June 29th 2010  
+     */
+    public void testTextSymbolizer2() {
+        TextSymbolizer2 symb = (TextSymbolizer2) sf.createTextSymbolizer();
+        
+        // Create a Graphic with two recognizable values
+        GraphicImpl gr = new GraphicImpl(ff);
+        gr.setOpacity(ff.literal(0.77));
+        gr.setSize(ff.literal(77));
+        symb.setGraphic(gr);
+        Literal snippet = ff.literal("no idea what a snipet is good for");
+		symb.setSnippet(snippet);
+        Literal fD = ff.literal("some description");
+		symb.setFeatureDescription(fD);
+        OtherTextImpl otherText = new OtherTextImpl();
+        otherText.setTarget("otherTextTarget");
+        otherText.setText(ff.literal("otherTextText"));
+		symb.setOtherText(otherText);
+
+		// copy it
+        TextSymbolizer2 copy = (TextSymbolizer2) visitor.copy(symb);
+
+        // compare it
+        assertEquals("Graphic of TextSymbolizer2 has not been correctly duplicated", gr, copy
+                .getGraphic());
+        assertEquals("Graphic of TextSymbolizer2 has not been correctly duplicated", gr.getOpacity(), copy
+                .getGraphic().getOpacity());
+        assertEquals("Graphic of TextSymbolizer2 has not been correctly duplicated", gr.getSize(), copy
+                .getGraphic().getSize());        
+        assertEquals("Snippet of TextSymbolizer2 has not been correctly duplicated", snippet, copy
+                .getSnippet());
+        assertEquals("FeatureDescription of TextSymbolizer2 has not been correctly duplicated", fD, copy
+                .getFeatureDescription());
+        assertEquals("OtherText of TextSymbolizer2 has not been correctly duplicated", otherText.getTarget(), copy
+                .getOtherText().getTarget());
+        assertEquals("OtherText of TextSymbolizer2 has not been correctly duplicated", otherText.getText(), copy
+                .getOtherText().getText());        
+    }
+
 }

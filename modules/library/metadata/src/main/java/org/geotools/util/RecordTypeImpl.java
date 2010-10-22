@@ -40,7 +40,7 @@ import org.opengis.util.TypeName;
  * and are usually defined in the context of a schema.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/RecordTypeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/RecordTypeImpl.java $
  * @version $Id: RecordTypeImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Jody Garnet
  * @author Martin Desruisseaux

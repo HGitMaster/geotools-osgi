@@ -29,7 +29,7 @@ import java.util.Locale;
  * other implementations provided in this package.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/SimpleInternationalString.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/SimpleInternationalString.java $
  * @version $Id: SimpleInternationalString.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

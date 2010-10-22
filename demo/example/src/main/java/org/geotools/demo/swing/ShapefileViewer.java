@@ -50,7 +50,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/swing/ShapefileViewer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/swing/ShapefileViewer.java $
  * @version $Id: ShapefileViewer.java 34322 2009-11-04 12:17:11Z mbedward $
  */
 public class ShapefileViewer extends JMapFrame {

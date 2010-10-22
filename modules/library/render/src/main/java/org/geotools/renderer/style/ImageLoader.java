@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  * $Id: ImageLoader.java 30649 2008-06-12 19:44:08Z acuster $
  *
  * @author Ian Turton
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/ImageLoader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/ImageLoader.java $
  */
 public class ImageLoader implements Runnable {
     /** The logger for the rendering module. */

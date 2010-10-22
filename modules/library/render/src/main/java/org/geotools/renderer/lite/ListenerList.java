@@ -42,7 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * }
  * </pre>
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/ListenerList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/ListenerList.java $
  * @deprecated Use {@link CopyOnWriteArrayList} instead, it's part of the JDK and it's more efficient
  */
 public final class ListenerList {

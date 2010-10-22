@@ -36,7 +36,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *
  * @author jgarnett, Refractions Research, Inc.
  * @author $Author: aaime $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/test/java/org/geotools/data/mysql/MySQLDataStoreFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/mysql/src/test/java/org/geotools/data/mysql/MySQLDataStoreFactoryTest.java $
  * @version $Id: MySQLDataStoreFactoryTest.java 30703 2008-06-13 15:03:59Z acuster $
  */
 public class MySQLDataStoreFactoryTest extends TestCase {

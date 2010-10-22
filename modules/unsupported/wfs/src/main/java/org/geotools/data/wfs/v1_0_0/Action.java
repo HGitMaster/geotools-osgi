@@ -35,7 +35,7 @@ import org.opengis.filter.identity.FeatureId;
  * This interface represents pending actions within a transaction.
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/v1_0_0/Action.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/v1_0_0/Action.java $
  */
 public interface Action {
 	/**

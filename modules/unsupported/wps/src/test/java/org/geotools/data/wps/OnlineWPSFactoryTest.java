@@ -55,7 +55,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author GDavis
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wps/src/test/java/org/geotools/data/wps/OnlineWPSFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wps/src/test/java/org/geotools/data/wps/OnlineWPSFactoryTest.java $
  */
 public class OnlineWPSFactoryTest extends TestCase {
 	

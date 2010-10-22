@@ -77,7 +77,7 @@ import org.geotools.xml.schema.impl.AttributeGT;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/filter/FilterSchema.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/filter/FilterSchema.java $
  */
 public class FilterSchema implements Schema {
     // hint key for FilterCapabilities

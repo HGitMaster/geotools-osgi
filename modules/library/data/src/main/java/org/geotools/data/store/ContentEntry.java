@@ -53,7 +53,7 @@ import org.opengis.feature.type.Name;
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentEntry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/data/src/main/java/org/geotools/data/store/ContentEntry.java $
  */
 public final class ContentEntry {
     /**

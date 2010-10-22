@@ -85,7 +85,7 @@ import org.geotools.util.NumberRange;
  *
  * @since 2.5
  * @author Martin Desruisseaux
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoverageBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoverageBuilder.java $
  * @version $Id: GridCoverageBuilder.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  */
 public class GridCoverageBuilder {
@@ -431,7 +431,7 @@ public class GridCoverageBuilder {
      *
      * @since 2.5
      * @author Martin Desruisseaux
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoverageBuilder.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoverageBuilder.java $
      * @version $Id: GridCoverageBuilder.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
      */
     public class Variable {

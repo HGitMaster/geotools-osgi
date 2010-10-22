@@ -32,6 +32,7 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.data.jdbc.datasource.DBCPDataSource;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
+import org.geotools.test.OnlineTestCase;
 
 
 /**
@@ -49,13 +50,32 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCTestSetup.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCTestSetup.java $
  */
 public abstract class JDBCTestSetup {
     static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.jdbc");
+    protected Properties fixture = null;
     private DataSource dataSource = null;
 
+    public void setFixture(Properties fixture) {
+        this.fixture = fixture;
+    }
+    
+    /**
+     * @see {@link OnlineTestCase#createOfflineFixture}
+     */
+    protected Properties createOfflineFixture() {
+        return null;
+    }
+    
+    /**
+     * @see {@link OnlineTestCase#createExampleFixture}
+     */
+    protected Properties createExampleFixture() {
+        return null;
+    }
+    
     public DataSource getDataSource() throws IOException {
         if(dataSource == null)
             dataSource = createDataSource();
@@ -114,8 +134,7 @@ public abstract class JDBCTestSetup {
         BufferedReader reader = new BufferedReader(new InputStreamReader(script));
 
         //connect
-        Connection conn = getDataSource().getConnection();
-        createDataStoreFactory().createSQLDialect(new JDBCDataStore()).initializeConnection(conn);
+        Connection conn = getConnection();
         
         try {
             Statement st = conn.createStatement();
@@ -136,6 +155,16 @@ public abstract class JDBCTestSetup {
             conn.close();
         }
     }
+    
+    /**
+     * Returns a properly initialized connection. It's up to the calling code to close it
+     */
+    protected Connection getConnection() throws SQLException, IOException {
+        Connection conn = getDataSource().getConnection();
+        createDataStoreFactory().createSQLDialect(new JDBCDataStore()).initializeConnection(conn);
+        return conn;
+    }
+
 
     /**
      * This method is used whenever referencing the name
@@ -169,16 +198,18 @@ public abstract class JDBCTestSetup {
      * located paralell to the test setup instance.
      */
     protected DataSource createDataSource() throws IOException {
-        Properties db = new Properties();
-        fillConnectionProperties(db);
+        Properties db = fixture;
 
         BasicDataSource dataSource = new BasicDataSource();
         
         dataSource.setDriverClassName(db.getProperty( "driver") );
         dataSource.setUrl( db.getProperty( "url") );
         
-        if ( db.containsKey( "username") ) {
-            dataSource.setUsername(db.getProperty("username"));    
+        if ( db.containsKey( "user") ) {
+            dataSource.setUsername(db.getProperty("user"));
+        }
+        else if ( db.containsKey( "username") ) {
+            dataSource.setUsername(db.getProperty("username"));
         }
         if ( db.containsKey( "password") ) {
             dataSource.setPassword(db.getProperty("password"));
@@ -198,16 +229,7 @@ public abstract class JDBCTestSetup {
         return new DBCPDataSource(dataSource);
     }
 
-    /**
-     * Fills in the connection properties. Default implementation uses a db.properties
-     * file to be located in the same package as the test class.
-     * @param db
-     * @throws IOException
-     */
-    protected void fillConnectionProperties(Properties db) throws IOException {
-        db.load( getClass().getResourceAsStream( "db.properties") );
-    }
-    
+   
     protected void initializeDataSource( BasicDataSource ds, Properties db ) {
         
     }

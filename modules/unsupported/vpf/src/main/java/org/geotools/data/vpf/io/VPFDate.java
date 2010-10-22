@@ -27,7 +27,7 @@ import java.util.TimeZone;
  * VPFDate.java Created: Tue Jan 28 20:50:51 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/VPFDate.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/VPFDate.java $
  * 
  */
 public class VPFDate {

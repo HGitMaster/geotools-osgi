@@ -26,7 +26,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * ResultSetFIDReader should be used.
  *
  * @author Chris Holmes
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/DefaultFIDReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/DefaultFIDReader.java $
  * @version $Id: DefaultFIDReader.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public class DefaultFIDReader implements FIDReader {

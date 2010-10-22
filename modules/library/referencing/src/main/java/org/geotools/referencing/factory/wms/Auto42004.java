@@ -47,7 +47,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * ${central_meridian}  = ${lon0}
  * </pre>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Auto42004.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Auto42004.java $
  * @version $Id: Auto42004.java 34859 2010-02-03 19:30:23Z aaime $
  * @author Jody Garnett
  * @author Rueben Schulz

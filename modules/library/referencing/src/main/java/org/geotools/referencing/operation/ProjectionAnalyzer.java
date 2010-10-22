@@ -69,7 +69,7 @@ import static org.geotools.referencing.AbstractIdentifiedObject.nameMatches;
  * conversion. For example if only false easting/northing differ, then the coordinate conversion
  * is simply a translation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/ProjectionAnalyzer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/ProjectionAnalyzer.java $
  * @version $Id: ProjectionAnalyzer.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import net.opengis.wfs.GetFeatureType;
+import net.opengis.wfs.ResultTypeType;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.wfs.protocol.wfs.GetFeature;
@@ -54,9 +55,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * Unit test suite for {@link CubeWerxStrategy}
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: CubeWerxStrategyTest.java 34133 2009-10-12 08:14:05Z mbedward $
+ * @version $Id: CubeWerxStrategyTest.java 35134 2010-03-29 14:25:33Z groldan $
  * @since 2.6.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/test/java/org/geotools/data/wfs/v1_1_0/CubeWerxStrategyTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/test/java/org/geotools/data/wfs/v1_1_0/CubeWerxStrategyTest.java $
  */
 public class CubeWerxStrategyTest {
 
@@ -75,7 +76,8 @@ public class CubeWerxStrategyTest {
                 CUBEWERX_GOVUNITCE.FEATURETYPENAME), "GML2", "EPSG:4326", ResultType.RESULTS);
         RequestComponents getFeatureRequest = strategy.createGetFeatureRequest(wfs, query);
         GetFeatureType serverRequest = getFeatureRequest.getServerRequest();
-        assertNull(serverRequest.getResultType());
+        ResultTypeType resultType = serverRequest.getResultType();
+        assertNull(resultType);
         Map<String, String> kvpParameters = getFeatureRequest.getKvpParameters();
         assertNull(kvpParameters.get("RESULTTYPE"));
     }

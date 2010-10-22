@@ -63,7 +63,7 @@ import static java.lang.Math.*;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/orthographic.html">"Orthographic" on www.remotesensing.org</A>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Orthographic.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Orthographic.java $
  * @version $Id: Orthographic.java 34859 2010-02-03 19:30:23Z aaime $
  * @author Rueben Schulz
  */

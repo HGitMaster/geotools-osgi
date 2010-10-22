@@ -50,8 +50,8 @@ public class PostgisNGDataStoreFactoryTest extends JDBCTestSupport {
     }
     
     private void checkCreateConnection(PostgisNGDataStoreFactory factory, String dbtype) throws IOException {
-        Properties db = new Properties();
-        db.load(getClass().getResourceAsStream("factory.properties"));
+        Properties db = fixture;
+        
         Map<String, Object> params = new HashMap<String, Object>();
         params.put(HOST.key, db.getProperty(HOST.key));
         params.put(DATABASE.key, db.getProperty(DATABASE.key));

@@ -37,7 +37,7 @@ import org.geotools.data.DataSourceException;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/FIDSequence.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/FIDSequence.java $
  * @version $Id: FIDSequence.java 30706 2008-06-13 15:47:21Z acuster $
  *
  * @task REVISIT: This assumes that the DB does not manage the PK itself.  I need to work out a way

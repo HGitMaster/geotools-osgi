@@ -28,7 +28,7 @@ import org.xml.sax.Attributes;
  * PrintHandler accepts SAXish events and generated output.
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/PrintHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/PrintHandler.java $
  */
 public interface PrintHandler {
     /**

@@ -54,7 +54,6 @@
           </gml:polygonMember>
           <gml:polygonMember>
             <gml:Polygon srsName="EPSG:4269">
-
               <gml:exterior>
                 <gml:LinearRing srsName="EPSG:4269">
                   <gml:pos>-73.320496 44.22399</gml:pos>
@@ -67,7 +66,6 @@
               </gml:exterior>
             </gml:Polygon>
           </gml:polygonMember>
-          
         </gml:MultiPolygon>
       </gubs:geometry>
       <gubs:typeDefinition>Census Tract</gubs:typeDefinition>

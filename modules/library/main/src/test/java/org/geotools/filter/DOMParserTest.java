@@ -30,6 +30,10 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.test.TestData;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.DWithin;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,6 +41,7 @@ import org.w3c.dom.NodeList;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
@@ -48,7 +53,7 @@ import org.opengis.filter.PropertyIsNotEqualTo;
  * @author James MacGill, CCG
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/DOMParserTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/DOMParserTest.java $
  */
 public class DOMParserTest extends FilterTestSupport {
     /** Feature on which to preform tests */
@@ -198,6 +203,39 @@ public class DOMParserTest extends FilterTestSupport {
         Filter test = parseDocument("test27.xml");
         LOGGER.fine("parsed filter is " + test);
     }
+    
+    public void testDWithin() throws Exception {
+        Filter test = parseDocument("dwithin.xml");
+        assertTrue(test instanceof DWithin);
+        DWithin dw = (DWithin) test;
+        assertEquals("the_geom", ((PropertyName) dw.getExpression1()).getPropertyName());
+        assertTrue(((Literal) dw.getExpression2()).getValue() instanceof Point);
+        assertEquals(5000.0, dw.getDistance());
+        assertEquals("metre", dw.getDistanceUnits());
+        LOGGER.fine("parsed filter is " + test);
+    }
+    
+    public void testDWithinQualified() throws Exception {
+        Filter test = parseDocument("dwithin-qualified.xml");
+        assertTrue(test instanceof DWithin);
+        DWithin dw = (DWithin) test;
+        assertEquals("the_geom", ((PropertyName) dw.getExpression1()).getPropertyName());
+        assertTrue(((Literal) dw.getExpression2()).getValue() instanceof Point);
+        assertEquals(5000.0, dw.getDistance());
+        assertEquals("metre", dw.getDistanceUnits());
+        LOGGER.fine("parsed filter is " + test);
+    }
+    
+    public void testBeyond() throws Exception {
+        Filter test = parseDocument("beyond.xml");
+        assertTrue(test instanceof Beyond);
+        Beyond bd = (Beyond) test;
+        assertEquals("the_geom", ((PropertyName) bd.getExpression1()).getPropertyName());
+        assertTrue(((Literal) bd.getExpression2()).getValue() instanceof Point);
+        assertEquals(5000.0, bd.getDistance());
+        assertEquals("metre", bd.getDistanceUnits());
+        LOGGER.fine("parsed filter is " + test);
+    }
 
     public void test28() throws Exception {
         FidFilter filter = (FidFilter) parseDocumentFirst("test28.xml");
@@ -225,6 +263,9 @@ public class DOMParserTest extends FilterTestSupport {
 
         // first grab a filter node
         NodeList nodes = dom.getElementsByTagName("Filter");
+        if(nodes.getLength() == 0) {
+            nodes = dom.getElementsByTagName("ogc:Filter");
+        }
 
         for (int j = 0; j < nodes.getLength(); j++) {
             Element filterNode = (Element) nodes.item(j);

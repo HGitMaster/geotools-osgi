@@ -349,9 +349,9 @@ void BooleanPrimary() #void:
 {}
 {
 	   LOOKAHEAD(Predicate()) Predicate() 
-	|  LOOKAHEAD(3)IncludeExcludePredicate()
-	|  LOOKAHEAD(3)<LP>SearchCondition()<RP> 
-	|  LOOKAHEAD(3)<LSP>SearchCondition()<RSP> 
+	|  IncludeExcludePredicate()
+	|  <LP>SearchCondition()<RP> 
+	|  <LSP>SearchCondition()<RSP> 
 	|  RoutineInvocation() 
 }
 
@@ -407,7 +407,9 @@ void IdList() #void:
 void IdValue() #FEATURE_ID_NODE:
 {}
 {
-	<STRING_LITERAL>	
+		<STRING_LITERAL>	
+	| 	<INTEGER_LITERAL>
+
 }
 
 /* ---------------------------------------- *
@@ -884,7 +886,7 @@ void Evaluate() #void:
 void Identifier() #Identifier_Node:
 {}
 {
-	IdentifierPart() ( LOOKAHEAD(2) <COLON> | IdentifierPart() )*	
+	IdentifierPart() ( <COLON> | IdentifierPart() )*	
 }
 void IdentifierPart() #Identifier_Part_Node:
  {}
@@ -999,9 +1001,17 @@ void StringLiteral() #StringNode :
 void Function() #Function_Node:
 {}
 {
-  		<IDENTIFIER> #FunctionName_Node
+  		 FunctionName()
   			<LP>( FunctionArg() (<COMMA> FunctionArg() )* )? <RP>
 }
+
+
+void FunctionName() #FunctionName_Node:
+{}
+{
+    <IDENTIFIER>
+}
+
 /*
  * <argument>  ::= 
  *      <literal>  

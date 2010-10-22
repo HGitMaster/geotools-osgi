@@ -25,7 +25,7 @@ import org.opengis.metadata.quality.TemporalValidity;
 /**
  * Validity of data specified by the scope with respect to time.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/TemporalValidityImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/TemporalValidityImpl.java $
  * @version $Id: TemporalValidityImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

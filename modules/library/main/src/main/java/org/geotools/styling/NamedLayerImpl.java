@@ -28,7 +28,7 @@ import org.geotools.util.Utilities;
  * Default implementation of named layer.
  *
  * @author jamesm
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/NamedLayerImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/NamedLayerImpl.java $
  */
 public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
     List<Style> styles = new ArrayList<Style>();

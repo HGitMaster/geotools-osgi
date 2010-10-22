@@ -24,7 +24,7 @@ import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
  * @author Christian Mueller
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-spatialite/src/main/java/org/geotools/data/spatialite/SpatiaLiteJNDIDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-spatialite/src/main/java/org/geotools/data/spatialite/SpatiaLiteJNDIDataStoreFactory.java $
  */
 public class SpatiaLiteJNDIDataStoreFactory extends JDBCJNDIDataStoreFactory {
 

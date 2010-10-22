@@ -51,7 +51,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * </pre></blockquote>
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/LongitudeFirstEpsgDecorator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/LongitudeFirstEpsgDecorator.java $
  * @version $Id: LongitudeFirstEpsgDecorator.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Jody Garnett
  *

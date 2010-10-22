@@ -29,7 +29,7 @@ import org.opengis.referencing.operation.MathTransform1D;
  * @see DomainElement1D
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/referencing/piecewise/PiecewiseTransform1DElement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/referencing/piecewise/PiecewiseTransform1DElement.java $
  */
 public interface PiecewiseTransform1DElement extends DomainElement1D, MathTransform1D {
 

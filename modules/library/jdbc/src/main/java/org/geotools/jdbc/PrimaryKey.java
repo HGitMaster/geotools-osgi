@@ -29,7 +29,7 @@ import java.util.List;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/PrimaryKey.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/PrimaryKey.java $
  */
 public class PrimaryKey {
     /**

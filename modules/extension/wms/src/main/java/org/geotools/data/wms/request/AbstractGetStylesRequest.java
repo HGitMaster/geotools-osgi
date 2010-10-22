@@ -25,7 +25,7 @@ import org.geotools.data.ows.Layer;
  * Provides functionality for a basic getStyles request
  * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractGetStylesRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractGetStylesRequest.java $
  */
 public abstract class AbstractGetStylesRequest extends AbstractWMSRequest implements GetStylesRequest {
 

@@ -15,7 +15,7 @@ import org.geotools.swing.ExceptionMonitor;
  * </p>
  * TODO: provide a background Runnable...
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/action/SafeAction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/action/SafeAction.java $
  */
 public abstract class SafeAction extends AbstractAction {
     private static final long serialVersionUID = 1118122797759176800L;

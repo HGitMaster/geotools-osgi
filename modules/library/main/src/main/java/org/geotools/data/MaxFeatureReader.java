@@ -29,7 +29,7 @@ import org.opengis.feature.type.FeatureType;
  * features passed in.
  *
  * @author Chris Holmes
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/MaxFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/MaxFeatureReader.java $
  * @version $Id: MaxFeatureReader.java 31406 2008-09-05 02:11:38Z jdeolive $
  */
 public class MaxFeatureReader<T extends FeatureType, F extends Feature> implements DelegatingFeatureReader<T,F>{

@@ -43,7 +43,7 @@ import org.opengis.filter.expression.Literal;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/styling/JFontChooser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/styling/JFontChooser.java $
  * @version $Id: JFontChooser.java 33931 2009-09-20 11:51:08Z mbedward $
  */
 class JFontChooser extends JDialog {

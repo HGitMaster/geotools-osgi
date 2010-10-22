@@ -33,7 +33,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
+public abstract class AbstractVersionedPostgisDataTestCase extends DataTestCase {
     Fixture f;
 
     ManageableDataSource pool;
@@ -81,6 +81,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         setUpTreeTable();
         setUpEmptyTable();
         setUpPointTable();
+        setUpGeometrylessTable();
     }
 
     protected void dataSetUp() throws Exception {
@@ -495,6 +496,31 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
             s.execute("INSERT INTO " + f.schema
                     + ".point (fid, id, geom) VALUES (" + "'point1',1," +
                     "GeometryFromText('POINT (0.0 0.0)',4326))");
+        } finally {
+            conn.close();
+        }
+    }
+    
+    protected void setUpGeometrylessTable() throws Exception {
+        Connection conn = pool.getConnection();
+
+        try {
+            Statement s = conn.createStatement();
+            s.execute("DROP TABLE " + f.schema + ".gless cascade");
+        } catch (Exception ignore) {
+        }
+
+        try {
+            Statement s = conn.createStatement();
+
+            // postgis = new PostgisDataSource(connection, FEATURE_TABLE);
+            s.execute("CREATE TABLE " + f.schema
+                    + ".gless(fid uuid primary key, name varchar(256), flow double precision)");
+            
+            s.execute("INSERT INTO " + f.schema
+                    + ".gless (fid, name, flow) VALUES ('3228895e-4c83-451d-b793-55c795300be9', 'first', 10.5)");
+            s.execute("INSERT INTO " + f.schema
+                    + ".gless (fid, name, flow) VALUES ('611e9785-e775-481e-b5ca-02f59a6998aa', 'second', 0.0)");
         } finally {
             conn.close();
         }

@@ -63,7 +63,7 @@ import org.xml.sax.SAXNotSupportedException;
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/ComplexTypeHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/ComplexTypeHandler.java $
  * @version $Id: ComplexTypeHandler.java 30921 2008-07-05 07:51:23Z jgarnett $
  */
 public class ComplexTypeHandler extends XSIElementHandler {

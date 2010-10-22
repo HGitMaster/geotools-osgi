@@ -17,6 +17,8 @@
  */
 package org.geotools.gce.image;
 
+import it.geosolutions.imageio.stream.input.FileImageInputStreamExt;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -52,8 +54,8 @@ import org.opengis.parameter.ParameterDescriptor;
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/image/src/org/geotools/gce/image/WorldImageFormat.java $
  * @author Simone Giannecchini
  */
-public final class WorldImageFormat extends AbstractGridFormat implements
-		Format {
+@SuppressWarnings("deprecation")
+public final class WorldImageFormat extends AbstractGridFormat implements Format {
 
 	/** {@link Set} of supported extensions for png world files. */
 	private final static Set<String> PNG_WFILE_EXT;
@@ -198,7 +200,12 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 */
 	public boolean accepts(Object input) {
 		String pathname = "";
-
+		
+		if (input instanceof FileImageInputStreamExt) {		
+			input=((FileImageInputStreamExt)input).getFile();
+		}
+		
+		
 		if (input instanceof URL) {
 			final URL url = (URL) input;
 			final String protocol = url.getProtocol();
@@ -231,11 +238,11 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 			pathname = file.getAbsolutePath();
 		} else if (input instanceof String)
 			pathname = (String) input;
-		// else if (input instanceof InputStream
-		// || input instanceof ImageInputStream)
-		// return true;// @ask TODO is this right?????
-		else
-			return false;
+			// else if (input instanceof InputStream
+			// || input instanceof ImageInputStream)
+			// return true;// @ask TODO is this right?????
+			else
+				return false;
 		// check if we can decode this file
 		if (!(pathname.endsWith(".gif") || pathname.endsWith(".jpg")
 				|| pathname.endsWith(".jpeg") || pathname.endsWith(".tif")
@@ -260,10 +267,10 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 				suffix = pathname.substring(dotIndex + 1, pathname.length());
 				final Set<String> suffixes = WorldImageFormat.getWorldExtension(suffix);
 				final Iterator<String> it = suffixes.iterator();
-				StringBuffer buff = new StringBuffer(fileName);
+				StringBuilder buff = new StringBuilder(fileName);
 				do {
 					answer = new File(buff.append(it.next()).toString()).exists();
-					buff = new StringBuffer(fileName);
+					buff = new StringBuilder(fileName);
 				} while (!answer && it.hasNext());
 				if (!answer) {
 					buff.setLength(0);

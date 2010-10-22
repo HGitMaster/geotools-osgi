@@ -48,7 +48,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * </TD></TR></TABLE>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultEllipsoidalCS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultEllipsoidalCS.java $
  * @version $Id: DefaultEllipsoidalCS.java 31487 2008-09-10 08:57:36Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

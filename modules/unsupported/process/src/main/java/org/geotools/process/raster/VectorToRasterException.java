@@ -33,7 +33,7 @@ import org.geotools.process.ProcessException;
  * @author Steve Ansari, NOAA
  * @author Michael Bedward
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/raster/VectorToRasterException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/raster/VectorToRasterException.java $
  */
 public class VectorToRasterException extends ProcessException {
 

@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * CrossesIntegrity<br>
  * @author bowens, ptozer<br>
  * Created Apr 27, 2004<br>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/CrossesIntegrity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/relate/CrossesIntegrity.java $
  * @version <br>
  * 
  * <b>Puropse:</b><br>

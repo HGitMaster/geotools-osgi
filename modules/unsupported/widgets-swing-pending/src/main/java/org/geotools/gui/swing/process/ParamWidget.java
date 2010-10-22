@@ -24,7 +24,7 @@ import javax.swing.JComponent;
  * 
  * @author Graham Davis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ParamWidget.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ParamWidget.java $
  */
 public interface ParamWidget {
 	

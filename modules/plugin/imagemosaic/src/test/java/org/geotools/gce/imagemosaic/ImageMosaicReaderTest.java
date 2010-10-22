@@ -213,7 +213,7 @@ public class ImageMosaicReaderTest{
 	 * @throws NoSuchAuthorityCodeException
 	 */
 	@Test
-	@Ignore
+//	@Ignore
 	public void overviews() throws IOException,	
 			MismatchedDimensionException, NoSuchAuthorityCodeException {
 		final AbstractGridFormat format = getFormat(overviewURL);
@@ -249,6 +249,7 @@ public class ImageMosaicReaderTest{
 	 * @throws NoSuchAuthorityCodeException
 	 */
 	@Test
+	@Ignore
 	public void defaultParameterValue() throws IOException,	
 			MismatchedDimensionException, NoSuchAuthorityCodeException {
 

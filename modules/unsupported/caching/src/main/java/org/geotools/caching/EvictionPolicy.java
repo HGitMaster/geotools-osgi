@@ -23,7 +23,7 @@ import org.geotools.caching.spatialindex.NodeIdentifier;
  * from the cache when the maximum cache size is reached.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/EvictionPolicy.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/EvictionPolicy.java $
  */
 public interface EvictionPolicy {
    

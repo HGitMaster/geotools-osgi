@@ -27,7 +27,7 @@ package org.geotools.jdbc;
  * @author Justin Deoliveira, OpenGEO
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/SequencedPrimaryKeyColumn.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/SequencedPrimaryKeyColumn.java $
  */
 public class SequencedPrimaryKeyColumn extends PrimaryKeyColumn {
 

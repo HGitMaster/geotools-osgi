@@ -31,7 +31,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Justin Deoliveira, OpenGeo
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/ValidatorHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/ValidatorHandler.java $
  */
 public class ValidatorHandler extends DefaultHandler {
     

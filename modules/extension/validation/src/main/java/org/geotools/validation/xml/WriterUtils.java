@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  * <p></p>
  *
  * @author dzwiers, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/xml/WriterUtils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/xml/WriterUtils.java $
  * @version $Id: WriterUtils.java 30662 2008-06-12 21:44:16Z acuster $
  */
 class WriterUtils {

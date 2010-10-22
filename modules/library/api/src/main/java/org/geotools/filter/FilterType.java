@@ -27,7 +27,7 @@ package org.geotools.filter;
  * </code></pre>
  *
  * @author aaime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/FilterType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/FilterType.java $
  * @deprecated please use instance of check against geoapi class.
  */
 public interface FilterType {

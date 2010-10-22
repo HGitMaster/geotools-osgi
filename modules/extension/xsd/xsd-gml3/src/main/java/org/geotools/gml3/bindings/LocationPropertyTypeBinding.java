@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/LocationPropertyTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/LocationPropertyTypeBinding.java $
  */
 public class LocationPropertyTypeBinding extends AbstractComplexBinding {
     /**

@@ -20,7 +20,7 @@ import java.util.*;
  * Represents a TrackSegment. A TrackSegment is part of a Track. It contains 
  * two (2) or more "track points", which are represented by SimpleWaypoints.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/gpx2/org/geotools/gpx2/gpxentities/TrackSegment.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/gpx2/org/geotools/gpx2/gpxentities/TrackSegment.java $
  */
 public interface TrackSegment 
 {

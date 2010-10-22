@@ -26,7 +26,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Type of test applied to the data specified by a data quality scope.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/ResultImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/ResultImpl.java $
  * @version $Id: ResultImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

@@ -27,7 +27,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @author Andrea Aime, TOPP
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/VersioningFeatureLocking.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/VersioningFeatureLocking.java $
  */
 public interface VersioningFeatureLocking extends VersioningFeatureStore,
         FeatureLocking<SimpleFeatureType, SimpleFeature> {

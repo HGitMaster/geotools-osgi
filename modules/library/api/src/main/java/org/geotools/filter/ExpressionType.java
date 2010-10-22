@@ -22,7 +22,7 @@ package org.geotools.filter;
  * be replaced by a type safe enum when we move to Java 1.5
  *
  * @author wolf
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/ExpressionType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/ExpressionType.java $
  */
 public interface ExpressionType {
     /* This is a listing of all possible expression types, grouped by

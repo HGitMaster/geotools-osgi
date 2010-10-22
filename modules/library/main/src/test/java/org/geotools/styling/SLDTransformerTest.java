@@ -728,7 +728,7 @@ public class SLDTransformerTest extends TestCase {
       
       // Test type = ramp
       cm.setType(ColorMap.TYPE_RAMP);
-      assertTrue("parsed xml must contain attribbute type with correct value", st.transform(cm).contains("type=\"ramp\""));
+      assertEquals("parsed xml must contain attribbute type with correct value", -1, st.transform(cm).indexOf("type="));
     }
 
 }

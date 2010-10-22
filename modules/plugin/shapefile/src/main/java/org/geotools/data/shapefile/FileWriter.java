@@ -22,7 +22,7 @@ package org.geotools.data.shapefile;
  * 
  * @author jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/FileWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/FileWriter.java $
  */
 public interface FileWriter extends FileReader {
     /**

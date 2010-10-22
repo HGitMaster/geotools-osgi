@@ -6,7 +6,7 @@ package com.esri.sde.sdk;
  * @author sfarber
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcsde/sde-dummy/src/main/java/com/esri/sde/sdk/GeoToolsDummyAPI.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcsde/sde-dummy/src/main/java/com/esri/sde/sdk/GeoToolsDummyAPI.java $
  */
 public class GeoToolsDummyAPI {
     

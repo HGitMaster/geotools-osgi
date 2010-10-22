@@ -30,7 +30,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * A code parsed by the {@link AutoCRSFactory} methods.
  * The expected format is {@code AUTO:code,unit,lon0,lat0} where {@code AUTO} is optional.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Code.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Code.java $
  * @version $Id: Code.java 34857 2010-02-03 10:35:14Z aaime $
  * @author Jody Garnett
  * @author Martin Desruisseaux

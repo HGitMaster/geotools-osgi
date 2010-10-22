@@ -187,7 +187,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * {@link #transform}.</p>
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/ZoomPane.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/ZoomPane.java $
  * @version $Id: ZoomPane.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

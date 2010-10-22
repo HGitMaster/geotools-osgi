@@ -29,7 +29,7 @@ import org.opengis.feature.Feature;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @version $Id: SampleDataAccessDataTest.java 32071 2008-12-24 03:03:33Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/sample-data-access-isogeom/src/test/java/org/geotools/data/SampleDataAccessDataTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/sample-data-access-isogeom/src/test/java/org/geotools/data/SampleDataAccessDataTest.java $
  * @since 2.6
  */
 public class SampleDataAccessDataTest extends TestCase {

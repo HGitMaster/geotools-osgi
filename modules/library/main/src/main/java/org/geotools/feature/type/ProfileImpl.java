@@ -45,7 +45,7 @@ import org.opengis.feature.type.Schema;
  * </p>
  * @author Jody Garnett, Refractions Research Inc.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/ProfileImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/type/ProfileImpl.java $
  */
 public class ProfileImpl implements Schema {
 

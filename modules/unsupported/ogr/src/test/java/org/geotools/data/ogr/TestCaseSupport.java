@@ -45,7 +45,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * <p>
  * Note: a nearly identical copy of this file exists in the {@code ext/shape} module.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/ogr/src/test/java/org/geotools/data/ogr/TestCaseSupport.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/ogr/src/test/java/org/geotools/data/ogr/TestCaseSupport.java $
  * @version $Id: TestCaseSupport.java 34093 2009-10-08 15:45:40Z aaime $
  * @author  Ian Schneider
  * @author  Martin Desruisseaux

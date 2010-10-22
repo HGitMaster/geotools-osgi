@@ -88,7 +88,7 @@ import org.opengis.util.InternationalString;
  * </p>
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/CachedAuthorityDecorator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/CachedAuthorityDecorator.java $
  * @version $Id: CachedAuthorityDecorator.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Jody Garnett
  */

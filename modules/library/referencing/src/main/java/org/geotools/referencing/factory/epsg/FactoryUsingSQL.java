@@ -30,7 +30,7 @@ import org.geotools.factory.Hints;
  * Please use {@link AccessDialectEpsgFactory}.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingSQL.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingSQL.java $
  * @version $Id: FactoryUsingSQL.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Jody Garnett
  *

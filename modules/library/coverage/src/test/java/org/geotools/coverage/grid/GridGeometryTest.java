@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 /**
  * Test the {@link GridGeometry} implementation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridGeometryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/coverage/grid/GridGeometryTest.java $
  * @version $Id: GridGeometryTest.java 33828 2009-09-03 06:44:06Z mbedward $
  * @author Martin Desruisseaux (IRD)
  */

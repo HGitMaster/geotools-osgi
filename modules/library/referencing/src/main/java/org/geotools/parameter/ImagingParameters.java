@@ -58,7 +58,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
  * method.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/ImagingParameters.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/parameter/ImagingParameters.java $
  * @version $Id: ImagingParameters.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

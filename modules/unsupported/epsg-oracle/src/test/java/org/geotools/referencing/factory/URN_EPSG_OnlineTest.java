@@ -30,7 +30,7 @@ import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
 /**
  * Tests the {@link org.geotools.referencing.factory.URN_AuthorityFactory} with EPSG codes.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/URN_EPSG_OnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/URN_EPSG_OnlineTest.java $
  * @version $Id: URN_EPSG_OnlineTest.java 30691 2008-06-13 13:20:02Z acuster $
  * @author Justin Deoliveira
  * @author Martin Desruisseaux

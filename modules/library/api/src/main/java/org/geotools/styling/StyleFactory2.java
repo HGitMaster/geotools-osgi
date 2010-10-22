@@ -21,7 +21,7 @@ import org.opengis.filter.expression.Expression;
 
 /**
  * Abstract base class for implementing style factories.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/StyleFactory2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/StyleFactory2.java $
  */
 public interface StyleFactory2 extends StyleFactory {
     /**

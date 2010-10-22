@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.LineString;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLLineStringPropertyTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLLineStringPropertyTypeBinding.java $
  */
 public class GMLLineStringPropertyTypeBinding extends AbstractComplexBinding {
     /**

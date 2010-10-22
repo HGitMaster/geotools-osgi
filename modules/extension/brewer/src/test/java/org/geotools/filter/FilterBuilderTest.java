@@ -17,7 +17,7 @@ import org.opengis.filter.spatial.Equals;
  * FilterBuilder is a main entry from a fluent programming point of view. We will mostly test using
  * this as a starting point; and break out other test cases on an as needed basis.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/test/java/org/geotools/filter/FilterBuilderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/test/java/org/geotools/filter/FilterBuilderTest.java $
  */
 public class FilterBuilderTest {
     protected FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);

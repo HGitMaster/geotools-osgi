@@ -16,11 +16,13 @@
  */
 package org.geotools.data;
 
+import org.geotools.factory.Hints;
+import org.opengis.feature.Feature;
 import org.opengis.filter.sort.SortBy;
 
 /**
  * Describes the query capabilities for a specific FeatureType, so client code can request which
- * features are nativelly supported by a FeatureSource.
+ * features are natively supported by a FeatureSource.
  * <p>
  * This is the minimal Query capabilities we could come up in order to reliably support paging. Yet,
  * the need for a more complete set of capabilities is well known and a new proposal should be done
@@ -28,7 +30,7 @@ import org.opengis.filter.sort.SortBy;
  * </p>
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: QueryCapabilities.java 32187 2009-01-08 20:41:14Z jdeolive $
+ * @version $Id: QueryCapabilities.java 35735 2010-06-19 15:17:07Z aaime $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/api/src/main/java/org/geotools/data/QueryCapabilities.java $
@@ -91,5 +93,18 @@ public class QueryCapabilities {
      */
     public boolean isReliableFIDSupported() {
         return true;
+    }
+    
+    /**
+     * If true the datastore supports using the provided feature id in the data insertion
+     * workflow as opposed to generating a new id. In that case it will look into the user data 
+     * map ({@link Feature#getUserData()}) for a {@link Hints#USE_PROVIDED_FID} key associated to a
+     * {@link Boolean#TRUE} value, if the key/value pair is there an attempt to use the provided 
+     * id will be made, and the operation will fail of the key cannot be parsed into a valid 
+     * storage identifier.
+     * @return
+     */
+    public boolean isUseProvidedFIDSupported() {
+        return false;
     }
 }

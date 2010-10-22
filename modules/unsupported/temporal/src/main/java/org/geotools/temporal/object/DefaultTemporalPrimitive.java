@@ -28,7 +28,7 @@ import org.opengis.temporal.TemporalPrimitive;
  * @author Mehdi Sidhoum (Geomatys)
  * @author Simone Giannecchini, GeoSolutions SAS
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultTemporalPrimitive.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultTemporalPrimitive.java $
  */
 public abstract class DefaultTemporalPrimitive extends DefaultTemporalObject implements TemporalPrimitive, TemporalOrder, Comparable<TemporalPrimitive> {
 

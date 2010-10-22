@@ -5,8 +5,9 @@ import org.geotools.jdbc.JDBCPrimaryKeyFinderTestSetup;
 
 public class DB2PrimaryKeyFinderTest extends JDBCPrimaryKeyFinderTest {
 
-    protected void setUp() throws Exception {
-        super.setUp();        
+    @Override
+    protected void connect() throws Exception {
+        super.connect();
         dataStore.setDatabaseSchema(DB2TestUtil.SCHEMA);
     }
 

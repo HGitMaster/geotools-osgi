@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.LineString;
  * @author wolf
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/ReprojectionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/renderer/lite/ReprojectionTest.java $
  */
 public class ReprojectionTest extends TestCase {
 

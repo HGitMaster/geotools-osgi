@@ -21,7 +21,7 @@ package org.geotools.referencing;
  * Predefined CRS as WKT strings. Hard-coded constants are more convenient for debugging
  * than strings read from a file.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/WKT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/WKT.java $
  * @version $Id: WKT.java 34842 2010-01-27 16:44:20Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

@@ -36,7 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * Field that uses the converter API to hack away at a text representation of the provided value.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JField.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JField.java $
  */
 public class JField extends ParamField {
     private JTextComponent text;

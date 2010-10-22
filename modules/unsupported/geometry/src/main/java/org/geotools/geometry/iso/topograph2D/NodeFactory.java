@@ -21,7 +21,7 @@ package org.geotools.geometry.iso.topograph2D;
 /**
  * Factory for creating {@link Node}s
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/NodeFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/NodeFactory.java $
  */
 public class NodeFactory {
 	

@@ -30,7 +30,7 @@ import java.util.StringTokenizer;
  * A class that provides functionality for performing basic requests
  *
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ows/AbstractRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/ows/AbstractRequest.java $
  */
 public abstract class AbstractRequest implements Request{
     /** Represents OGC Exception MIME types */

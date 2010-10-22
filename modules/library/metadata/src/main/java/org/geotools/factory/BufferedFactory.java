@@ -21,7 +21,7 @@ package org.geotools.factory;
  * A marker interface for factories that are buffering their objects in some way.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/BufferedFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/BufferedFactory.java $
  * @version $Id: BufferedFactory.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

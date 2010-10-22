@@ -34,7 +34,7 @@ import org.opengis.util.ScopedName;
  * one step closer to the target of the identifier.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/LocalName.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/LocalName.java $
  * @version $Id: LocalName.java 31148 2008-08-07 13:37:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

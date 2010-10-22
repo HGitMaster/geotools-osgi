@@ -16,14 +16,23 @@
  */
 package org.geotools.styling.visitor;
 
+import static org.geotools.styling.TextSymbolizer.*;
+
+import java.util.Map;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.styling.Displacement;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.Font;
 import org.geotools.styling.Graphic;
+import org.geotools.styling.LabelPlacement;
+import org.geotools.styling.LinePlacement;
 import org.geotools.styling.Mark;
+import org.geotools.styling.PointPlacement;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Symbol;
+import org.geotools.styling.TextSymbolizer;
+import org.geotools.util.Converters;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
@@ -47,7 +56,7 @@ import org.opengis.filter.expression.Literal;
  * 
  * @author Jody Garnett (Refractions Research)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/visitor/RescaleStyleVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/visitor/RescaleStyleVisitor.java $
  */
 public class RescaleStyleVisitor extends DuplicatingStyleVisitor {
     
@@ -82,7 +91,14 @@ public class RescaleStyleVisitor extends DuplicatingStyleVisitor {
      * @param expr
      * @return expr multiplied by the provided scale
      */
-    protected Expression rescale( Expression expr ){
+    protected Expression rescale( Expression expr ) {
+        if(expr == null) {
+            return null;
+        }
+        if(expr == Expression.NIL) {
+            return Expression.NIL;
+        }
+        
         Expression rescale = ff.multiply( scale, expr );
         if( expr instanceof Literal && scale instanceof Literal){
             double constant = (double) rescale.evaluate(null, Double.class);
@@ -100,8 +116,8 @@ public class RescaleStyleVisitor extends DuplicatingStyleVisitor {
     public void visit(org.geotools.styling.Stroke stroke) {
         Stroke copy = sf.getDefaultStroke();
         copy.setColor( copy(stroke.getColor()));
-        copy.setDashArray( copy(stroke.getDashArray()));
-        copy.setDashOffset( copy( stroke.getDashOffset()));
+        copy.setDashArray( rescale(stroke.getDashArray()));
+        copy.setDashOffset( rescale(stroke.getDashOffset()));
         copy.setGraphicFill( copy(stroke.getGraphicFill()));
         copy.setGraphicStroke( copy( stroke.getGraphicStroke()));
         copy.setLineCap(copy(stroke.getLineCap()));
@@ -111,18 +127,24 @@ public class RescaleStyleVisitor extends DuplicatingStyleVisitor {
         pages.push(copy);
     }   
     
-    /** Increase font size */
-    protected Font copy(Font font) {
-        if( font == null) return font;
+    float[] rescale(float[] original) {
+        if(original == null) {
+            return null;
+        }
         
-        Expression fontFamily = copy( font.getFontFamily() );
-        Expression fontStyle = copy( font.getFontStyle() );
-        Expression fontWeight = copy( font.getFontWeight() );
-        Expression fontSize = rescale( font.getFontSize() );
-        Font copy = sf.createFont(fontFamily, fontStyle, fontWeight, fontSize);
-        return copy;
+        // rescale the dash array if possible
+        float[] rescaled = new float[original.length];
+        float scaleFactor = 1;
+        if( scale instanceof Literal){
+            scaleFactor = scale.evaluate(null, Float.class);
+        }
+        for (int i = 0; i < rescaled.length; i++) {
+            rescaled[i] = scaleFactor * original[i];
+        }
+        
+        return rescaled;
     }
-    
+
     /** Make graphics (such as used with PointSymbolizer) bigger */
     public void visit(Graphic gr) {
         Graphic copy = null;
@@ -173,5 +195,87 @@ public class RescaleStyleVisitor extends DuplicatingStyleVisitor {
 
         pages.push(copy);
     }
+    
+    @Override
+    public void visit(TextSymbolizer text) {
+        super.visit(text);
+        TextSymbolizer copy = (TextSymbolizer) pages.peek();
+
+        // rescales fonts
+        Font[] fonts = copy.getFonts();
+        for (Font font : fonts) {
+            font.setSize(rescale(font.getSize()));
+        }
+        copy.setFonts(fonts);
+
+        // rescales label placement
+        LabelPlacement placement = copy.getLabelPlacement();
+        if (placement instanceof PointPlacement) {
+            // rescales point label placement
+            PointPlacement pointPlacement = (PointPlacement) placement;
+            Displacement disp = pointPlacement.getDisplacement();
+            if (disp != null) {
+                disp.setDisplacementX(rescale(disp.getDisplacementX()));
+                disp.setDisplacementY(rescale(disp.getDisplacementY()));
+                pointPlacement.setDisplacement(disp);
+            }
+        } else if (placement instanceof LinePlacement) {
+            // rescales line label placement
+            LinePlacement linePlacement = (LinePlacement) placement;
+            linePlacement.setGap(rescale(linePlacement.getGap()));
+            linePlacement.setInitialGap(rescale(linePlacement.getInitialGap()));
+            linePlacement.setPerpendicularOffset(rescale(linePlacement.getPerpendicularOffset()));
+        }
+        copy.setLabelPlacement(placement);
+        
+        // rescale the halo
+        if(copy.getHalo() != null) {
+            copy.getHalo().setRadius(rescale(copy.getHalo().getRadius()));
+        }
+        
+        // deal with the format options specified in pixels
+        Map<String, String> options = copy.getOptions();
+        rescaleOption(options, SPACE_AROUND_KEY, DEFAULT_SPACE_AROUND);
+        rescaleOption(options, MAX_DISPLACEMENT_KEY, DEFAULT_MAX_DISPLACEMENT);
+        rescaleOption(options, MIN_GROUP_DISTANCE_KEY, DEFAULT_MIN_GROUP_DISTANCE);
+        rescaleOption(options, LABEL_REPEAT_KEY, DEFAULT_LABEL_REPEAT);
+        rescaleOption(options, AUTO_WRAP_KEY, DEFAULT_AUTO_WRAP);
+    }
+    
+    /**
+     * Rescales the specified vendor option
+     * @param options
+     * @param key
+     * @param defaultAutoWrap
+     * @param value
+     */
+    protected void rescaleOption(Map<String, String> options, String key, double defaultValue) {
+        double scaleFactor = (double) scale.evaluate(null, Double.class);
+        if(options.get(key) != null) {
+            double rescaled = Converters.convert(options.get(key), Double.class) * scaleFactor;
+            options.put(key, String.valueOf(rescaled));
+        } else if(defaultValue != 0) {
+            options.put(key, String.valueOf(defaultValue * scaleFactor));
+        }
+        
+    };
+    
+    /**
+     * Rescales the specified vendor option
+     * @param options
+     * @param key
+     * @param defaultAutoWrap
+     * @param value
+     */
+    protected void rescaleOption(Map<String, String> options, String key, int defaultValue) {
+        double scaleFactor = (double) scale.evaluate(null, Double.class);
+        if(options.get(key) != null) {
+            int rescaled = (int) Math.round(Converters.convert(options.get(key), Double.class) * scaleFactor);
+            options.put(key, String.valueOf(rescaled));
+        } else if(defaultValue != 0) {
+            options.put(key, String.valueOf((int) Math.round(defaultValue * scaleFactor)));
+        }
+        
+    };
         
 }

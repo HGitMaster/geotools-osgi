@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.LinearRing;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLLinearRingMemberTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLLinearRingMemberTypeBinding.java $
  */
 public class GMLLinearRingMemberTypeBinding extends AbstractComplexBinding {
     /**

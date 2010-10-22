@@ -31,7 +31,7 @@ import java.util.AbstractList;
  * 
  * @see net.refractions.jspatial.jts
  * @author jgarnett, Refractions Reasearch Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/AttributeList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/AttributeList.java $
  * @version CVS Version
  */
 public class AttributeList extends AbstractList

@@ -34,7 +34,7 @@ import org.geotools.factory.Hints;
  * removes them programmatically here.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/HsqlDialectEpsgFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/HsqlDialectEpsgFactory.java $
  * @version $Id: HsqlDialectEpsgFactory.java 30656 2008-06-12 20:32:50Z acuster $
  * @author Martin Desruisseaux
  */

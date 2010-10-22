@@ -32,7 +32,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * default geometry is at position 0, and all dbf columns follow. <BR/>The dbf
  * file may not be necessary, if not, just pass null as the DbaseFileReader
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/IndexedShapefileAttributeReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/IndexedShapefileAttributeReader.java $
  */
 public class IndexedShapefileAttributeReader extends ShapefileAttributeReader
         implements RecordNumberTracker {

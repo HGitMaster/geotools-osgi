@@ -40,7 +40,7 @@ import org.opengis.geometry.primitive.SurfacePatch;
  * Factory that knows how to create instances of the 19107 primitives as
  * implemented in LiteGO1.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/PrimitiveFactoryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/PrimitiveFactoryImpl.java $
  */
 public class PrimitiveFactoryImpl implements PrimitiveFactory {
 

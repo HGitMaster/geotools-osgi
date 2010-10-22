@@ -84,7 +84,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  *
  * @author James MacGill, CCG
  * @author Rob Hranac, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/FilterTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/FilterTest.java $
  */
 public class FilterTest extends TestCase {
     /** The logger for the filter module. */

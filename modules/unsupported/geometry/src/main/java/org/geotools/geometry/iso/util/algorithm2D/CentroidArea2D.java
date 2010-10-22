@@ -44,7 +44,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * <code>http://www.faqs.org/faqs/graphics/algorithms-faq/</code> for further
  * details of the basic approach.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/CentroidArea2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/CentroidArea2D.java $
  */
 public class CentroidArea2D {
 

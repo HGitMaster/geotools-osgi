@@ -72,7 +72,7 @@ import java.util.zip.ZipFile;
  * of this one.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/sample-data/src/main/java/org/geotools/test/TestData.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/sample-data/src/main/java/org/geotools/test/TestData.java $
  * @version $Id: TestData.java 34820 2010-01-19 17:00:00Z danieleromagnoli $
  * @author James McGill
  * @author Simone Giannecchini

@@ -38,7 +38,7 @@ import org.opengis.util.InternationalString;
  * delegate its schema related operations to its feature class.
  *
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFFeatureType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFFeatureType.java $
  */
 public class VPFFeatureType implements SimpleFeatureType {
     /**

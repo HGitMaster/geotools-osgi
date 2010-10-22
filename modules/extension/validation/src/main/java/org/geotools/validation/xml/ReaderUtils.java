@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
  * <p></p>
  *
  * @author dzwiers, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/xml/ReaderUtils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/xml/ReaderUtils.java $
  * @version $Id: ReaderUtils.java 30662 2008-06-12 21:44:16Z acuster $
  *
  * @see XMLConfigReader

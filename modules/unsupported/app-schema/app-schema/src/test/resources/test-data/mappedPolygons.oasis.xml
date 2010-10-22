@@ -3,4 +3,6 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
 	<rewriteURI uriStartString="http://schemas.opengis.net/"
 		rewritePrefix="commonSchemas_new/" />
+	<rewriteURI uriStartString="http://www.earthresourceml.org/"
+		rewritePrefix="commonSchemas_new/" />
 </catalog>

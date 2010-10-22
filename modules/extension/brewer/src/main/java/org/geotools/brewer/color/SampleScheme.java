@@ -21,7 +21,7 @@ package org.geotools.brewer.color;
  * DOCUMENT ME!
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/brewer/color/SampleScheme.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/brewer/color/SampleScheme.java $
  */
 public class SampleScheme {
     int[][] sampleScheme = new int[15][];

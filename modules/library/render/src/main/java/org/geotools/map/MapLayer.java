@@ -32,7 +32,7 @@ import org.opengis.feature.type.FeatureType;
  *
  * @author Cameron Shorter
  * @author Martin Desruisseaux
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/MapLayer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/map/MapLayer.java $
  * @version $Id: MapLayer.java 32675 2009-03-24 00:11:46Z mbedward $
  */
 public interface MapLayer {

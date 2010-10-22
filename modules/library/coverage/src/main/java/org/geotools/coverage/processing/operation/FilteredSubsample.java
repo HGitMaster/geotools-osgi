@@ -23,7 +23,7 @@ import org.geotools.coverage.processing.BaseScaleOperationJAI;
 /**
  * This operation is simply a wrapper for the JAI FilteredSubsample operation which allows
  * me to arbitrarly scale a rendered image while smoothing it out.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/FilteredSubsample.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/FilteredSubsample.java $
  * @version $Id: FilteredSubsample.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Simone Giannecchini, GeoSolutions
  * @since 2.3

@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link Source} taglet.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $
  * @version $Id: SourceTest.java 34116 2009-10-10 08:45:31Z mbedward $
  * @author Martin Desruisseaux
  */
@@ -37,11 +37,11 @@ public class SourceTest {
         Source  s = new Source();
         Matcher m;
         String tag, url, group, category, module;
-        tag = "$URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $";
-        //The url above is only converted from $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $ if we have obtained the 
+        tag = "$URL: http://svn.osgeo.org/geotools/tags/2.6.5/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $";
+        //The url above is only converted from $URL: http://svn.osgeo.org/geotools/tags/2.6.5/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $ if we have obtained the 
         //  file using a standard access mechanism to SVN. This fails, for 
         //  example, with mercurial converstion 'hg convert svnrepo hgrepo'
-        if ( !tag.equals("$URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $") ){
+        if ( !tag.equals("$URL: http://svn.osgeo.org/geotools/tags/2.6.5/build/maven/javadoc/src/test/java/org/geotools/maven/taglet/SourceTest.java $") ){
             m = s.findURL.matcher(tag);
             assertTrue(m.matches());
 

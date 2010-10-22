@@ -24,7 +24,7 @@ import java.sql.Connection;
  * Exercise DB2SpatialCatalog.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2SpatialCatalogOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2SpatialCatalogOnlineTest.java $
  */
 public class DB2SpatialCatalogOnlineTest extends AbstractDB2OnlineTestCase {
     private Connection conn;
@@ -38,8 +38,8 @@ public class DB2SpatialCatalogOnlineTest extends AbstractDB2OnlineTestCase {
      *
      * @throws Exception
      */
-    public void setUp() throws Exception {
-        super.setUp();
+    public void connect() throws Exception {
+        super.connect();
         conn = getConnection();
         tabSchema = getDataStore().getTableSchema();
         dbUrl = getDataStore().getDbURL();
@@ -50,9 +50,9 @@ public class DB2SpatialCatalogOnlineTest extends AbstractDB2OnlineTestCase {
      *
      * @throws Exception
      */
-    protected void tearDown() throws Exception {
+    protected void disconnect() throws Exception {
         conn.close();
-        super.tearDown();
+        super.disconnect();
     }
 
     /**

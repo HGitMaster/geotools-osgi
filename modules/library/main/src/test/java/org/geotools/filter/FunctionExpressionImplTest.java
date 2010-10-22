@@ -45,7 +45,7 @@ import org.opengis.filter.expression.Subtract;
  * 
  * @author Gabriel Roldan, Axios Engineering
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/FunctionExpressionImplTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/FunctionExpressionImplTest.java $
  * @version $Id: FunctionExpressionImplTest.java 34126 2009-10-12 06:35:18Z mbedward $
  */
 public class FunctionExpressionImplTest extends TestCase {

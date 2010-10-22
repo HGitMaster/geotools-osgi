@@ -57,7 +57,7 @@ import org.xml.sax.SAXException;
  * @author dzwiers www.refractions.net
  *
  * @see Schema
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/xLink/XLinkSchema.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/xLink/XLinkSchema.java $
  */
 public class XLinkSchema implements Schema {
     private static Schema instance = new XLinkSchema();

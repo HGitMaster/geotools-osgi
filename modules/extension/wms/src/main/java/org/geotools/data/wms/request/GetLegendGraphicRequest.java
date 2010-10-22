@@ -22,7 +22,7 @@ import org.geotools.data.ows.Request;
  * A request used to get the legend graphic for a given layer
  * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/GetLegendGraphicRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/GetLegendGraphicRequest.java $
  */
 public interface GetLegendGraphicRequest extends Request {
     /* Parameters */

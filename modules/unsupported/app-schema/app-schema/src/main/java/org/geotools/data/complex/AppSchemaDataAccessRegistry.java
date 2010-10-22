@@ -18,6 +18,7 @@
 package org.geotools.data.complex;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.FeatureSource;
@@ -42,15 +43,32 @@ public class AppSchemaDataAccessRegistry extends DataAccessRegistry {
      * @return feature type mapping
      * @throws IOException
      */
-    public static FeatureTypeMapping getMapping(Name featureTypeName) throws IOException {
+    public static FeatureTypeMapping getMappingByName(Name featureTypeName) throws IOException {
         if (registry == null) {
             throw new UnsupportedOperationException("No registered data access found for: "
                     + featureTypeName.toString());
         }
         for (DataAccess<FeatureType, Feature> dataAccess : registry) {
             if (dataAccess instanceof AppSchemaDataAccess) {
-                if (((AppSchemaDataAccess) dataAccess).hasMapping(featureTypeName)) {
-                    return ((AppSchemaDataAccess) dataAccess).getMapping(featureTypeName);
+                if (((AppSchemaDataAccess) dataAccess).hasName(featureTypeName)) {
+                    return ((AppSchemaDataAccess) dataAccess).getMappingByName(featureTypeName);
+                }
+            }
+        }
+        throwDataSourceException(featureTypeName);
+
+        return null;
+    }
+
+    public static FeatureTypeMapping getMappingByElement(Name featureTypeName) throws IOException {
+        if (registry == null) {
+            throw new UnsupportedOperationException("No registered data access found for: "
+                    + featureTypeName.toString());
+        }
+        for (DataAccess<FeatureType, Feature> dataAccess : registry) {
+            if (dataAccess instanceof AppSchemaDataAccess) {
+                if (((AppSchemaDataAccess) dataAccess).hasElement(featureTypeName)) {
+                    return ((AppSchemaDataAccess) dataAccess).getMappingByElement(featureTypeName);
                 }
             }
         }
@@ -68,11 +86,13 @@ public class AppSchemaDataAccessRegistry extends DataAccessRegistry {
      */
     public static FeatureSource<FeatureType, Feature> getSimpleFeatureSource(Name featureTypeName)
             throws IOException {
-        return getMapping(featureTypeName).getSource();
+        return getMappingByElement(featureTypeName).getSource();
     }
 
     /**
-     * Return true if a type name is mapped in one of the registered app-schema data accesses.
+     * Return true if a type name is mapped in one of the registered app-schema data accesses. If
+     * the type mapping has mappingName, then it will be the key that is matched in the search. If
+     * it doesn't, then it will match the targetElementName.
      * 
      * @param featureTypeName
      *            Feature type name
@@ -86,7 +106,31 @@ public class AppSchemaDataAccessRegistry extends DataAccessRegistry {
         }
         for (DataAccess<FeatureType, Feature> dataAccess : registry) {
             if (dataAccess instanceof AppSchemaDataAccess
-                    && dataAccess.getNames().contains(featureTypeName)) {
+                    && (((AppSchemaDataAccess) dataAccess).hasName(featureTypeName) || ((AppSchemaDataAccess) dataAccess)
+                            .hasElement(featureTypeName))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Return true if a type name is mapped in one of the registered app-schema data accesses as
+     * targetElementName, regardless whether or not mappingName exists.
+     * 
+     * @param featureTypeName
+     * @return
+     * @throws IOException
+     */
+    public static boolean hasTargetElement(Name featureTypeName) throws IOException {
+        if (registry == null) {
+            // nothing's been registered, but it's OK, return false
+            return false;
+        }
+        for (DataAccess<FeatureType, Feature> dataAccess : registry) {
+            if (dataAccess instanceof AppSchemaDataAccess
+                    && Arrays.asList(((AppSchemaDataAccess) dataAccess).getTypeNames()).contains(
+                            featureTypeName)) {
                 return true;
             }
         }

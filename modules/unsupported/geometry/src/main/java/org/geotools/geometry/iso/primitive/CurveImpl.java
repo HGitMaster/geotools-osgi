@@ -84,7 +84,7 @@ import org.opengis.referencing.operation.TransformException;
  * list.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/CurveImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/CurveImpl.java $
  * @version <A HREF="http://www.opengis.org/docs/01-101.pdf">Abstract
  *          Specification V5</A>
  * @author Jackson Roehrig & Sanjay Jena

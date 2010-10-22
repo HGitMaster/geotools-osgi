@@ -76,7 +76,7 @@ import org.geotools.xml.InstanceComponent;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/IdentifierGenerationOptionTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/IdentifierGenerationOptionTypeBinding.java $
  */
 public class IdentifierGenerationOptionTypeBinding extends AbstractSimpleBinding {
     public IdentifierGenerationOptionTypeBinding(WfsFactory factory) {

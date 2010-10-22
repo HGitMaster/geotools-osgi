@@ -63,8 +63,8 @@ import org.geotools.resources.i18n.Errors;
  * {@link CRSAuthorityFactory} interfaces to implement.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/AuthorityFactoryAdapter.java $
- * @version $Id: AuthorityFactoryAdapter.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/AuthorityFactoryAdapter.java $
+ * @version $Id: AuthorityFactoryAdapter.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements OptionalFactory {
@@ -1262,5 +1262,20 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             return true;
         }
         return false;
+    }
+    
+    @Override
+    public void dispose() throws FactoryException {
+        super.dispose();
+        disposeAbstractAuthorityFactory(datumFactory);
+        disposeAbstractAuthorityFactory(csFactory);
+        disposeAbstractAuthorityFactory(crsFactory);
+        disposeAbstractAuthorityFactory(operationFactory);
+    }
+    
+    private void disposeAbstractAuthorityFactory(Object factory) throws FactoryException {
+        if(factory instanceof AbstractAuthorityFactory) {
+            ((AbstractAuthorityFactory) factory).dispose();
+        }
     }
 }

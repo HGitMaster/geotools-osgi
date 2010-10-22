@@ -47,7 +47,7 @@ import static org.geotools.resources.Classes.*;
  * @param <T> The type of range elements.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/RangeSet.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/RangeSet.java $
  * @version $Id: RangeSet.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Andrea Aime

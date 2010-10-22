@@ -52,7 +52,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * {@linkplain #base}<sup><var>a</var></sup>&times;({@linkplain #base}<sup><var>b</var></sup>)<sup><var>x</var></sup></p>
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ExponentialTransform1D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ExponentialTransform1D.java $
  * @version $Id: ExponentialTransform1D.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *

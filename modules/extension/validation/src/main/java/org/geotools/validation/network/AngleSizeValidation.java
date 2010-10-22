@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/network/AngleSizeValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/network/AngleSizeValidation.java $
  * @version $Id: AngleSizeValidation.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class AngleSizeValidation extends DefaultIntegrityValidation {

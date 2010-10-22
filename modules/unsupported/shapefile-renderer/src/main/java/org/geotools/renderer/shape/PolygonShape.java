@@ -24,7 +24,7 @@ import java.awt.geom.PathIterator;
  * java.awt.Shape Wrapper around geometry.
  *
  * @author jeichar
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/PolygonShape.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/PolygonShape.java $
  */
 public class PolygonShape extends AbstractShape {
     /**

@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Validator<br>
  * @author bowens<br>
  * Created Jun 25, 2004<br>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/Validator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/Validator.java $
  * @version <br>
  * 
  * <b>Puropse:</b><br>

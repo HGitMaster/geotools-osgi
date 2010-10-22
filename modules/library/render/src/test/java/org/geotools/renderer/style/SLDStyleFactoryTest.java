@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  *
  * @author jamesm
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/style/SLDStyleFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/renderer/style/SLDStyleFactoryTest.java $
  */
 public class SLDStyleFactoryTest extends TestCase {
     

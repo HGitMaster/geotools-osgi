@@ -25,7 +25,7 @@ import java.util.Stack;
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/AbstractSpatialIndex.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/AbstractSpatialIndex.java $
  */
 public abstract class AbstractSpatialIndex implements SpatialIndex {
     public static final int ContainmentQuery = 1;

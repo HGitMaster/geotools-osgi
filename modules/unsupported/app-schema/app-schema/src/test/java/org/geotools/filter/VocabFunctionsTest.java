@@ -56,7 +56,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @author Rini Angreani, Curtin University of Technology
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/filter/VocabFunctionsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/filter/VocabFunctionsTest.java $
  */
 public class VocabFunctionsTest extends TestCase {
     private DataAccess<FeatureType, Feature> dataAccess;

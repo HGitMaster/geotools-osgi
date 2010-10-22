@@ -35,7 +35,7 @@ import org.geotools.resources.NIOUtilities;
  * 
  * @author Jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/IndexedFidWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/IndexedFidWriter.java $
  */
 public class IndexedFidWriter implements FileWriter {
     public static final int HEADER_SIZE = 13;

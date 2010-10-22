@@ -58,7 +58,7 @@ import org.geotools.styling.SLD;
  * interface
  * 
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/DefaultMapContext.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/map/DefaultMapContext.java $
  */
 public class DefaultMapContext implements MapContext {
 
@@ -699,6 +699,11 @@ public class DefaultMapContext implements MapContext {
                     sourceCrs = env.getCoordinateReferenceSystem();
                     if ((sourceCrs != null) && crs != null && !CRS.equalsIgnoreMetadata(sourceCrs, crs)) {
                         env = env.transform(crs, true);
+                    }
+                    if( sourceCrs == null && crs != null ){
+                        LOGGER.log(
+                                Level.SEVERE,
+                                "It was not possible to get a projected bounds estimate");
                     }
 
                 } catch (FactoryException e) {

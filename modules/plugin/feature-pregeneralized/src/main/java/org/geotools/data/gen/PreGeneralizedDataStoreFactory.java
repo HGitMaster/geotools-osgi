@@ -48,7 +48,7 @@ import org.geotools.data.gen.info.GeneralizationInfosProviderImpl;
  * GeneralizationInfosProviderProviderParam (Object,optional) Parameter object for
  * {@link GeneralizationInfosProvider#getGeneralizationInfos(Object)}
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/PreGeneralizedDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/PreGeneralizedDataStoreFactory.java $
  */
 
 public class PreGeneralizedDataStoreFactory implements DataStoreFactorySpi {

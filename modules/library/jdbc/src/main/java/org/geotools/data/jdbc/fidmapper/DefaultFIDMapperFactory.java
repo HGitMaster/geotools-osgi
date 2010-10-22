@@ -52,7 +52,7 @@ import java.util.logging.Logger;
  * </p>
  *
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/DefaultFIDMapperFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/DefaultFIDMapperFactory.java $
  * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class DefaultFIDMapperFactory implements FIDMapperFactory {
@@ -286,6 +286,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
 
                 if (ci != null) {
                     ci.dataType = tableInfo.getInt("DATA_TYPE");
+                    ci.typeName = tableInfo.getString("TYPE_NAME");
                     ci.size = tableInfo.getInt("COLUMN_SIZE");
                     ci.decimalDigits = tableInfo.getInt("DECIMAL_DIGITS");
                     ci.autoIncrement = isAutoIncrement(catalog, schema,
@@ -373,7 +374,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     }
 
     /**
-     * Returns true if the dataType for the column can serve as a primary key.
+     * Returns true if the dataType for the column can serveget as a primary key.
      * Note that this now returns true for a DECIMAL type, because oracle
      * Numbers are returned in jdbc as DECIMAL.  This may cause errors in very
      * rare cases somewhere down the line, but only if users do something
@@ -410,6 +411,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     protected class ColumnInfo implements Comparable {
         public String colName;
         public int dataType;
+        public String typeName;
         public int size;
         public int decimalDigits;
         public boolean autoIncrement;
@@ -453,6 +455,10 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
          */
         public int getDataType() {
             return dataType;
+        }
+        
+        public String getTypeName() {
+            return typeName;
         }
 
         /**

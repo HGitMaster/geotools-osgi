@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * OverlapsIntegrityTest<br>
  * @author bowens<br>
  * Created Apr 29, 2004<br>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/relate/OverlapsIntegrityTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/test/java/org/geotools/validation/relate/OverlapsIntegrityTest.java $
  * @version <br>
  * 
  * <b>Puropse:</b><br>

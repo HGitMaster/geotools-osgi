@@ -28,7 +28,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * defined by ESRI. Those CRS will be registered both in {@code "ESRI"} and {@code "EPSG"} name space.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-extension/src/main/java/org/geotools/referencing/factory/epsg/EsriExtension.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-extension/src/main/java/org/geotools/referencing/factory/epsg/EsriExtension.java $
  * @version $Id: EsriExtension.java 30656 2008-06-12 20:32:50Z acuster $
  * @author Martin Desruisseaux
  */

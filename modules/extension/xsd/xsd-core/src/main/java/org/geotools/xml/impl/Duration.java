@@ -21,7 +21,7 @@ import java.io.Serializable;
 
 /** <p>Implementation of xs:duration.</p>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/Duration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/Duration.java $
  */
 public class Duration implements Serializable, Comparable {
 	private static final long serialVersionUID = 3257001055736117303L;

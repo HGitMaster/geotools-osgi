@@ -82,7 +82,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentFeatureSource.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/data/src/main/java/org/geotools/data/store/ContentFeatureSource.java $
  */
 public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
     /**

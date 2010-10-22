@@ -22,7 +22,7 @@ import java.sql.SQLException;
  *  
  * @author Andrea Aime
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCSkipColumnTestSetup.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCSkipColumnTestSetup.java $
  */
 public abstract class JDBCSkipColumnTestSetup extends JDBCDelegatingTestSetup {
 

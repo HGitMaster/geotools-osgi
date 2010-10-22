@@ -25,7 +25,7 @@ import java.io.IOException;
  * Interface for objects creating GeneralizsationInfos
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/info/GeneralizationInfosProvider.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/info/GeneralizationInfosProvider.java $
  */
 public interface GeneralizationInfosProvider {
 

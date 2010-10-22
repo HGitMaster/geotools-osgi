@@ -46,7 +46,7 @@ import org.geotools.util.SimpleInternationalString;
  * is {@code "EPSG"}, and EPSG codes look like {@code "EPSG:4326"}.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/Citations.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/Citations.java $
  * @version $Id: Citations.java 30852 2008-07-03 15:59:42Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Jody Garnett

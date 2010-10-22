@@ -44,7 +44,7 @@ import static java.lang.Math.*;
  * can inline on the stack. We assume that Jave 6 and above can do this optimization.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/NewZealandMapGrid.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/NewZealandMapGrid.java $
  * @version $Id: NewZealandMapGrid.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Justin Deoliveira
  * @author Martin Desruisseaux

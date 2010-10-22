@@ -29,7 +29,7 @@ import org.opengis.filter.Filter;
  * 
  * @author Andrea Aime, TOPP
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/VersioningFeatureStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/VersioningFeatureStore.java $
  */
 public interface VersioningFeatureStore extends VersioningFeatureSource, FeatureStore<SimpleFeatureType, SimpleFeature> {
     /**
@@ -53,4 +53,12 @@ public interface VersioningFeatureStore extends VersioningFeatureSource, Feature
      */
     public void rollback(String toVersion, Filter filter, String[] users) throws IOException;
 
+    
+    /**
+     * Returns the revision for the current transaction, or null if no transaction is set.
+     * This operation is optional, some datastore may not be able to determine the version before
+     * the commit, in that case an {@link UnsupportedOperationException} will be thrown
+     * @return
+     */
+    public String getVersion() throws IOException, UnsupportedOperationException;
 }

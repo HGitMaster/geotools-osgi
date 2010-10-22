@@ -32,7 +32,7 @@ import org.opengis.filter.expression.Literal;
  * properly
  *
  * @author Andrea Aime - OpenGeo
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/styling/StyleAttributeExtractor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/styling/StyleAttributeExtractor.java $
  */
 public class StyleAttributeExtractor extends FilterAttributeExtractor
     implements StyleVisitor {

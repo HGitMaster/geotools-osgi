@@ -65,8 +65,8 @@ import org.h2.jdbcx.JdbcDataSource;
  * nammed {@value #DIRECTORY_KEY}.
  *
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-h2/src/main/java/org/geotools/referencing/factory/epsg/ThreadedH2EpsgFactory.java $
- * @version $Id: ThreadedH2EpsgFactory.java 34665 2009-12-13 12:40:59Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-h2/src/main/java/org/geotools/referencing/factory/epsg/ThreadedH2EpsgFactory.java $
+ * @version $Id: ThreadedH2EpsgFactory.java 35634 2010-05-31 15:11:41Z aaime $
  * @author Martin Desruisseaux
  * @author Didier Richard
  * @author Andrea Aime
@@ -78,7 +78,7 @@ public class ThreadedH2EpsgFactory extends ThreadedEpsgFactory {
      * additional minor version number if there is some changes related to the EPSG-H2
      * plugin rather then the EPSG database itself (for example additional database index).
      */
-    public static final Version VERSION = new Version("7.4.0");
+    public static final Version VERSION = new Version("7.5.0");
     
     /**
      * The name of the ZIP file to read in order to create the cached database.
@@ -322,7 +322,11 @@ public class ThreadedH2EpsgFactory extends ThreadedEpsgFactory {
                     byte[] buf = new byte[1024];
                     int read = 0;
                     while ((ze = zin.getNextEntry()) != null) {
-                      FileOutputStream fout = new FileOutputStream(new File(directory, ze.getName()));
+                      File file = new File(directory, ze.getName());
+                      if( file.exists() ){
+                          file.delete();
+                      }                   
+                      FileOutputStream fout = new FileOutputStream(file);
                       while((read = zin.read(buf)) > 0) {
                         fout.write(buf, 0, read);
                       }
@@ -332,7 +336,11 @@ public class ThreadedH2EpsgFactory extends ThreadedEpsgFactory {
                     zin.close();
                     
                     // mark the successful creation
-                    new File(directory, MARKER_FILE).createNewFile();
+                    File marker = new File(directory, MARKER_FILE);
+                    if( marker.exists() ){
+                        marker.delete();
+                    }
+                    marker.createNewFile();
                     
                     setReadOnly(directory);
                 }

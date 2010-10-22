@@ -77,7 +77,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * identify the exact type.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/AbstractCoordinateOperation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/AbstractCoordinateOperation.java $
  * @version $Id: AbstractCoordinateOperation.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

@@ -16,14 +16,20 @@
  */
 package org.geotools.coverage.grid;
 
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;
 import java.io.IOException;
+
+import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
+import javax.media.jai.PlanarImage;
 
 import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.geometry.Envelope;
 
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -31,8 +37,8 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link Interpolator2D} implementation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/grid/InterpolatorTest.java $
- * @version $Id: InterpolatorTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/coverage/grid/InterpolatorTest.java $
+ * @version $Id: InterpolatorTest.java 35444 2010-05-10 20:46:57Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */
 public final class InterpolatorTest extends GridCoverageTestBase {
@@ -58,50 +64,43 @@ public final class InterpolatorTest extends GridCoverageTestBase {
     }
 
     /**
-     * Tests the instances to be created.
-     */
-    public void testRandomCoverage() {
-        final GridCoverage2D coverage = getRandomCoverage();
-        assertTrue(coverage instanceof Interpolator2D);
-        assertTrue(coverage.view(ViewType.GEOPHYSICS) instanceof Interpolator2D);
-        assertTrue(coverage.view(ViewType.PACKED)     instanceof Interpolator2D);
-    }
-
-    /**
      * Tests bilinear intersection at pixel edges. It should be equals
      * to the average of the four pixels around.
      */
+    @Test
     public void testInterpolationAtEdges() {
         // Following constant is pixel size (in degrees).
         // This constant must be identical to the one defined in 'getRandomCoverage()'
-        final double PIXEL_SIZE = 0.25;
         GridCoverage2D coverage = getRandomCoverage();
+        final double PIXEL_SIZE = XAffineTransform.getScale((AffineTransform) ((GridGeometry2D)coverage.getGridGeometry()).getGridToCRS());
         coverage = coverage.view(ViewType.GEOPHYSICS);
-        coverage = Interpolator2D.create(coverage, new Interpolation[] {
-            Interpolation.getInstance(Interpolation.INTERP_BILINEAR)
-        });
+        final Interpolation interpolation =  Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+        coverage = Interpolator2D.create(coverage, new Interpolation[] {interpolation});
         final int  band = 0; // Band to test.
         double[] buffer = null;
-        final Raster          data = coverage.getRenderedImage().getData();
+        final BorderExtender be =  BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+        Rectangle  rectangle = PlanarImage.wrapRenderedImage(coverage.getRenderedImage()).getBounds();
+        rectangle			 = new Rectangle(rectangle.x,rectangle.y,rectangle.width+interpolation.getWidth(), rectangle.height+interpolation.getHeight());
+        final Raster          data = PlanarImage.wrapRenderedImage(coverage.getRenderedImage()).getExtendedData(rectangle,be);
         final Envelope    envelope = coverage.getEnvelope();
         final GridEnvelope   range = coverage.getGridGeometry().getGridRange();
         final double          left = envelope.getMinimum(0);
         final double         upper = envelope.getMaximum(1);
         final Point2D.Double point = new Point2D.Double(); // Will maps to pixel upper-left corner
-        for (int j=range.getSpan(1); --j>=1;) {
-            for (int i=range.getSpan(0); --i>=1;) {
+        for (int j=range.getSpan(1); j>=0;--j) {
+            for (int i=range.getSpan(0); i>=0;--i) {
                 point.x  = left  + PIXEL_SIZE*i;
                 point.y  = upper - PIXEL_SIZE*j;
                 buffer   = coverage.evaluate(point, buffer);
                 double t = buffer[band];
 
                 // Computes the expected value:
-                double r00 = data.getSampleDouble(i-0, j-0, band);
-                double r01 = data.getSampleDouble(i-0, j-1, band);
-                double r10 = data.getSampleDouble(i-1, j-0, band);
-                double r11 = data.getSampleDouble(i-1, j-1, band);
-                double r = (r00 + r01 + r10 + r11) / 4;
-                assertEquals(r, t, EPS);
+                double s00 = data.getSampleDouble(i+0, j+0, band);
+                double s01 = data.getSampleDouble(i+0, j+1, band);
+                double s10 = data.getSampleDouble(i+1, j+0, band);
+                double s11 = data.getSampleDouble(i+1, j+1, band);
+                double s = interpolation.interpolate(s00, s01, s10, s11, 0, 0);
+                assertEquals(s, t, EPS);
             }
         }
     }

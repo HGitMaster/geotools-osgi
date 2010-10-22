@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link SoftValueHashMap}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/SoftValueHashMapTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/SoftValueHashMapTest.java $
  * @version $Id: SoftValueHashMapTest.java 34667 2009-12-13 16:37:14Z aaime $
  * @author Martin Desruisseaux
  */

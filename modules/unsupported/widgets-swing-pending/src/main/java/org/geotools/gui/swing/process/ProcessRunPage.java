@@ -43,7 +43,7 @@ import org.geotools.process.ProcessException;
  * 
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ProcessRunPage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ProcessRunPage.java $
  */
 public class ProcessRunPage extends JPage {
     ProcessFactory factory;

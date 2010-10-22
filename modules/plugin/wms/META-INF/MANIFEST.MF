@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools Web Map Server Client
 Bundle-SymbolicName: org.geotools.wms
-Bundle-Version: 2.6.2.osgi1
+Bundle-Version: 2.6.5.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.api;bundle-version="2.6.0",

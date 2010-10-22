@@ -27,7 +27,7 @@ import java.util.Set;
  * DB2 speficfic WKB Constants, contributed by David Adler
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-db2/src/main/java/org/geotools/data/db2/DB2WKBConstants.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-db2/src/main/java/org/geotools/data/db2/DB2WKBConstants.java $
  */
 public class DB2WKBConstants {
     

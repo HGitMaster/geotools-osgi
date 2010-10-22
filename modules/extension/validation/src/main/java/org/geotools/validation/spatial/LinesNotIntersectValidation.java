@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Brent Owens, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/spatial/LinesNotIntersectValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/spatial/LinesNotIntersectValidation.java $
  * @version $Id: LinesNotIntersectValidation.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class LinesNotIntersectValidation extends LineLineAbstractValidation {

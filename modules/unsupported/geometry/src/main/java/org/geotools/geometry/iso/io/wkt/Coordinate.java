@@ -36,7 +36,7 @@ import java.util.Comparator;
  * z-ordinate.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/io/wkt/Coordinate.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/io/wkt/Coordinate.java $
  * @version 1.7.2
  */
 public class Coordinate implements Comparable, Cloneable, Serializable {

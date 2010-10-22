@@ -48,7 +48,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * do not preserve any connection to the database.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AuthorityCodes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AuthorityCodes.java $
  * @version $Id: AuthorityCodes.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

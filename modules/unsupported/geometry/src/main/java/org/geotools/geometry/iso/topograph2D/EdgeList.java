@@ -30,7 +30,7 @@ import org.geotools.geometry.iso.index.quadtree.Quadtree;
  * A EdgeList is a list of Edges. It supports locating edges that are pointwise
  * equals to a target edge.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/EdgeList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/EdgeList.java $
  */
 public class EdgeList {
 	

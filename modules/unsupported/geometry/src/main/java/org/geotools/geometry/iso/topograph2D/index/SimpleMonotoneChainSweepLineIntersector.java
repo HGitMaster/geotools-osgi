@@ -32,7 +32,7 @@ import org.geotools.geometry.iso.topograph2D.Edge;
  * improvement in performance over a sweep-line alone.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/index/SimpleMonotoneChainSweepLineIntersector.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/index/SimpleMonotoneChainSweepLineIntersector.java $
  */
 public class SimpleMonotoneChainSweepLineIntersector extends EdgeSetIntersector {
 

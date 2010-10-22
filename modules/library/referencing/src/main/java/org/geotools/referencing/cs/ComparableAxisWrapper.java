@@ -28,7 +28,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * and vertical or temporal directions like {@linkplain AxisDirection#UP Up} are last.
  *
  * @version $Id: ComparableAxisWrapper.java 30641 2008-06-12 17:42:27Z acuster $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/cs/ComparableAxisWrapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/cs/ComparableAxisWrapper.java $
  * @author Martin Desruisseaux
  */
 final class ComparableAxisWrapper implements Comparable {

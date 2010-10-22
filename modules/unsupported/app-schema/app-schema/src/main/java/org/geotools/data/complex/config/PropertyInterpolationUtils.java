@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/PropertyInterpolationUtils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/PropertyInterpolationUtils.java $
  */
 public class PropertyInterpolationUtils {
 

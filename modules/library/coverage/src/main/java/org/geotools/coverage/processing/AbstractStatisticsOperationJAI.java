@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @since 2.4.x
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/AbstractStatisticsOperationJAI.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/AbstractStatisticsOperationJAI.java $
  */
 public abstract class AbstractStatisticsOperationJAI extends
 		OperationJAI {

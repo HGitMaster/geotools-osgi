@@ -34,7 +34,7 @@ import org.geotools.util.logging.Logging;
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.6.x
  * @version $Id: SimpleHttpProtocol.java 34133 2009-10-12 08:14:05Z mbedward $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/protocol/http/SimpleHttpProtocol.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/protocol/http/SimpleHttpProtocol.java $
  */
 @SuppressWarnings("nls")
 public class SimpleHttpProtocol implements HTTPProtocol {

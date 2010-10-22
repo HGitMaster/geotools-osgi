@@ -29,6 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
+
+import org.geotools.feature.FeatureImpl;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.PropertyExtractor;
 import org.geotools.xml.Schemas;
@@ -41,7 +43,7 @@ import org.geotools.xml.Schemas;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/BindingPropertyExtractor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/BindingPropertyExtractor.java $
  */
 public class BindingPropertyExtractor implements PropertyExtractor {
     Encoder encoder;
@@ -228,7 +230,106 @@ O:
                 particles.remove(name);
             }
         }
+        
+        //return properties;        
+        if (properties.size()<=1){
+            return properties;
+        }
+        
+        /*
+         feature properties in the "properties" list may not be in the same order as they appear in the schema,
+         because in the above implementation, simple attributes and complex attributes are processed separately.
+          
+         to maintain the feature properties order, sort the properties to their original order as in "children" list               
+        */
+        if (object instanceof FeatureImpl && propertiesSortable(properties, children)) {
+            List sortedProperties = new ArrayList();
+            
+            //sort properties according to their XSDParticle order in "children"
+            for (int i = 0; i<children.size(); i++) {
+                XSDParticle particle = (XSDParticle) children.get(i);
+                XSDElementDeclaration child = (XSDElementDeclaration) particle.getContent();
+                if (child.getResolvedElementDeclaration() != null) {
+                    child = child.getResolvedElementDeclaration();
+                }
 
-        return properties;
+                for (Iterator itr = properties.iterator(); itr.hasNext();) {
+                    Object[] prop = (Object[]) itr.next();
+                    XSDParticle part = (XSDParticle) prop[0];
+                    XSDElementDeclaration partContent = (XSDElementDeclaration) part.getContent();
+                    if (partContent.getResolvedElementDeclaration() != null) {
+                        partContent = partContent.getResolvedElementDeclaration();
+                    }
+                    if (child.getName().equals(partContent.getName())
+                            && ((child.getTargetNamespace() != null && partContent
+                                    .getTargetNamespace() != null) ? child.getTargetNamespace()
+                                    .equals(partContent.getTargetNamespace()) : true)) {
+                        sortedProperties.add(prop);
+                        properties.remove(prop);
+                        i--;
+                        break;
+                    }
+                }
+            }
+            //return properties in order they appear in the schema
+            return sortedProperties;
+        }
+        else{
+            return properties;
+        }
+    }
+
+    /**
+     * Check whether properties can be sorted to the order as in the "children" list.
+     * This is only possible when all properties have references (XSDParticle) in the "children" list. 
+     * 
+     * @param properties 
+     *                feature properties obtained
+     * @param children 
+     *                list of XSDParticle in the order as they appear in the schema
+     * @return
+     */    
+    private boolean propertiesSortable(List properties, List children) {
+        /*
+         *feature properties contains more elements than it's containing feature (_Feature),
+         *for example: 
+	     * 	<gsml:specification>
+	     *		<gsml:GeologicUnit>
+	     *		...
+	     *		</gsml:GeologicUnit>
+	     *	</gsml:specification>  
+    	 *in this case, "properties" for GeologicUnit has more elements than "children" for specification 
+    	 */
+    	
+        if (properties.size() > children.size()) {
+            return false;
+        }
+
+        for (Iterator itr = properties.iterator(); itr.hasNext();) {
+            Object[] prop = (Object[]) itr.next();
+            XSDParticle part = (XSDParticle) prop[0];
+            XSDElementDeclaration partContent = (XSDElementDeclaration) part.getContent();
+            if (partContent.getResolvedElementDeclaration() != null) {
+                partContent = partContent.getResolvedElementDeclaration();
+            }
+            boolean notFound = true;
+            for (int i = 0; i < children.size(); i++) {
+                XSDParticle particle = (XSDParticle) children.get(i);
+                XSDElementDeclaration child = (XSDElementDeclaration) particle.getContent();
+                if (child.getResolvedElementDeclaration() != null) {
+                    child = child.getResolvedElementDeclaration();
+                }
+                if (child.getName().equals(partContent.getName())) {
+                    notFound = false;
+                    break;
+                }
+            }
+            if (notFound){
+                return false;
+            }
+            
+        }
+
+        return true;
     }
 }

@@ -51,7 +51,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  *
  * Testing {@link ErdasImgReader}
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/erdasimg/ErdasImgTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/erdasimg/ErdasImgTest.java $
  */
 public final class ErdasImgTest extends GDALTestCase {
     protected final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(

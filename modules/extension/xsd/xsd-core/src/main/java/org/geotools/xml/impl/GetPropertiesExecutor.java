@@ -31,7 +31,7 @@ import org.geotools.xml.ComplexBinding;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/GetPropertiesExecutor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/GetPropertiesExecutor.java $
  */
 public class GetPropertiesExecutor implements BindingWalker.Visitor {
     /** the parent object */

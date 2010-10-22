@@ -35,7 +35,7 @@ import org.opengis.filter.identity.Identifier;
  * @author Jody Garnett
  * @author Gabriel Roldan
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/AttributeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/AttributeImpl.java $
  * @version $Id: AttributeImpl.java 34126 2009-10-12 06:35:18Z mbedward $
  */
 public class AttributeImpl extends PropertyImpl implements Attribute {

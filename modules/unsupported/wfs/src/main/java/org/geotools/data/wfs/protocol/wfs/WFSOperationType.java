@@ -22,7 +22,7 @@ package org.geotools.data.wfs.protocol.wfs;
  * @author Gabriel Roldan
  * @version $Id: WFSOperationType.java 31731 2008-10-29 13:51:20Z groldan $
  * @since 2.5.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/protocol/wfs/WFSOperationType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/protocol/wfs/WFSOperationType.java $
  */
 public enum WFSOperationType {
     GET_CAPABILITIES("GetCapabilities"), 

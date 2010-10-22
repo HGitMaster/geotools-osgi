@@ -81,7 +81,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/EnvelopeTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/EnvelopeTypeBinding.java $
  */
 public class EnvelopeTypeBinding extends AbstractComplexBinding {
     /**
@@ -171,10 +171,19 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
             return new DirectPosition2D(envelope.getMaxX(), envelope.getMaxY());
         }
 
-        if (name.getLocalPart().equals("srsName") && envelope instanceof ReferencedEnvelope) {
-            return GML3EncodingUtils.crs(((ReferencedEnvelope) envelope)
-                .getCoordinateReferenceSystem());
-        }
+        if (envelope instanceof ReferencedEnvelope) {
+			String localName = name.getLocalPart();
+			if (localName.equals("srsName")) {
+				return GML3EncodingUtils.toURI(((ReferencedEnvelope) envelope)
+						.getCoordinateReferenceSystem());
+			} else if (localName.equals("srsDimension")) {
+				CoordinateReferenceSystem crs = ((ReferencedEnvelope) envelope)
+						.getCoordinateReferenceSystem();
+				if (crs != null) {
+					return crs.getCoordinateSystem().getDimension();
+				}
+			}
+		}
 
         return null;
     }

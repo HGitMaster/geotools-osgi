@@ -63,7 +63,7 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLCoordinatesTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLCoordinatesTypeBinding.java $
  */
 public class GMLCoordinatesTypeBinding extends AbstractComplexBinding {
     CoordinateSequenceFactory csFactory;

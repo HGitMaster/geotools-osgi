@@ -85,7 +85,7 @@ import com.sun.media.jai.util.DataBufferUtils;
  * 
  * @since JAI 1.1.2
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/imageio/RecyclingTileFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/imageio/RecyclingTileFactory.java $
  */
 public class RecyclingTileFactory extends Observable implements TileFactory,
 		TileRecycler, Observer {

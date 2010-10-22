@@ -25,6 +25,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.process.Process;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 
@@ -32,20 +33,19 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import org.geotools.feature.NameImpl;
+import org.geotools.process.ProcessFactory;
+import org.geotools.process.Processors;
 
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class BufferFeatureCollectionProcessTest {
     
     FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
-    /**
-     * FIXME: test fails at line 79
-     */
     @Test
-    public void test() throws Exception {
+    public void testBufferFeatures() throws Exception {
         SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.setName( "featureType" );
         tb.add( "geometry", Point.class );
@@ -81,5 +81,16 @@ public class BufferFeatureCollectionProcessTest {
             assertTrue(expected.equals((Geometry) sf.getDefaultGeometry()));
             iterator.close();
         }
+    }
+
+    /**
+     * Tests finding the process via the Processors class
+     */
+    @Test
+    public void testFindProcess() {
+        String GT_NAMESPACE = "gt";
+        Process p = Processors.createProcess(new NameImpl(GT_NAMESPACE, "BufferFeatureCollection"));
+        assertNotNull(p);
+        assertTrue(p instanceof BufferFeatureCollectionProcess);
     }
 }

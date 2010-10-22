@@ -37,7 +37,7 @@ import com.vividsolutions.jts.io.WKBWriter;
  * An attribute IO implementation that can manage the WKB
  *
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-postgis/src/main/java/org/geotools/data/postgis/WKBAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-postgis/src/main/java/org/geotools/data/postgis/WKBAttributeIO.java $
  * @since 2.4.1
  */
 public class WKBAttributeIO {

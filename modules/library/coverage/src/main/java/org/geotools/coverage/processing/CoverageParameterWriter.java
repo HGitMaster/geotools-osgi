@@ -35,7 +35,7 @@ import org.geotools.resources.image.ImageUtilities;
  * Format grid coverage operation parameters in a tabular format.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/CoverageParameterWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/CoverageParameterWriter.java $
  * @version $Id: CoverageParameterWriter.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux
  */

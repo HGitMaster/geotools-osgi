@@ -86,7 +86,7 @@ import org.opengis.feature.type.Name;
  * @param <T> Type of Feature Content, may be SimpleFeatureType
  * @param <F> Feature Content, may be SimpleFetaure
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/DataAccess.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/DataAccess.java $
  */
 public interface DataAccess<T extends FeatureType, F extends Feature> {
 

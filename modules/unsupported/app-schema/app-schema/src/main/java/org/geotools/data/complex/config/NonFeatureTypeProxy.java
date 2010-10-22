@@ -20,9 +20,9 @@ package org.geotools.data.complex.config;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.geotools.data.complex.ComplexFeatureConstants;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.feature.type.ComplexFeatureTypeFactoryImpl;
-import org.geotools.feature.type.ComplexFeatureTypeImpl;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -39,7 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Rini Angreani, Curtin University of Technology
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/NonFeatureTypeProxy.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/NonFeatureTypeProxy.java $
  */
 public class NonFeatureTypeProxy extends ComplexTypeProxy implements FeatureType {
 
@@ -80,7 +80,7 @@ public class NonFeatureTypeProxy extends ComplexTypeProxy implements FeatureType
         // smuggle FEATURE_LINK descriptor
         descriptors = new ArrayList<PropertyDescriptor>(subject.getDescriptors()) {
             {
-                add(ComplexFeatureTypeImpl.FEATURE_CHAINING_LINK);
+                add(ComplexFeatureConstants.FEATURE_CHAINING_LINK);
             }
         };
     }
@@ -95,8 +95,8 @@ public class NonFeatureTypeProxy extends ComplexTypeProxy implements FeatureType
 
     @Override
     public PropertyDescriptor getDescriptor(Name name) {
-        if (name.equals(ComplexFeatureTypeImpl.FEATURE_CHAINING_LINK_NAME)) {
-            return ComplexFeatureTypeImpl.FEATURE_CHAINING_LINK;
+        if (name.equals(ComplexFeatureConstants.FEATURE_CHAINING_LINK_NAME)) {
+            return ComplexFeatureConstants.FEATURE_CHAINING_LINK;
         }
         return super.getDescriptor(name);
     }
@@ -108,6 +108,7 @@ public class NonFeatureTypeProxy extends ComplexTypeProxy implements FeatureType
 
     /**
      * Return only the schema descriptors
+     * 
      * @return
      */
     public Collection<PropertyDescriptor> getTypeDescriptors() {

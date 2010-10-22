@@ -11,7 +11,7 @@ import java.util.List;
  * 
  * @author jody
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/KVP.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/KVP.java $
  */
 public class KVP extends LinkedHashMap<String, Object> {
     /**

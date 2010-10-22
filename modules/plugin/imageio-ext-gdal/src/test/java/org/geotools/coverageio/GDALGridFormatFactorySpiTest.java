@@ -28,7 +28,7 @@ import org.junit.Test;
  * 
  * Test class invoking BaseGridFormatFactorySpi methods.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/GDALGridFormatFactorySpiTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/GDALGridFormatFactorySpiTest.java $
  */
 public class GDALGridFormatFactorySpiTest {
 

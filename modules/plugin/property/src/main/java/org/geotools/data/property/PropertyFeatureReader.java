@@ -32,7 +32,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * DOCUMENT ME!
  *
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyFeatureReader.java $
  * @version $Id
  */
 public class PropertyFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {

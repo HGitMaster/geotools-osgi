@@ -46,8 +46,8 @@ import javax.swing.JList;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/control/DnDList.java $
- * @version $Id: DnDList.java 34290 2009-10-30 12:36:40Z mbedward $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/control/DnDList.java $
+ * @version $Id: DnDList.java 35639 2010-06-01 09:35:04Z mbedward $
  */
 public class DnDList<T> extends JList implements DragGestureListener, DragSourceListener, DropTargetListener {
     private static final long serialVersionUID = 3310751294076288683L;
@@ -88,7 +88,6 @@ public class DnDList<T> extends JList implements DragGestureListener, DragSource
 
         tgt = new DropTarget(this, this);
 
-        setDragEnabled(true);
         movingItems = false;
         overIndex = -1;
     }

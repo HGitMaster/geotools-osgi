@@ -24,7 +24,7 @@ import java.util.Iterator;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/EmptyIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/store/EmptyIterator.java $
  */
 public class EmptyIterator implements Iterator {
 

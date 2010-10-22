@@ -25,7 +25,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Emily
  * @since 1.2.0
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/featurecache/readers/GridCacheFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/featurecache/readers/GridCacheFeatureReader.java $
  */
 public class GridCacheFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFeature> {
 

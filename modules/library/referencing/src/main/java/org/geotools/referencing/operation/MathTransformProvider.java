@@ -63,7 +63,7 @@ import org.geotools.referencing.operation.transform.MathTransformProxy;
  * {@linkplain DefaultCoordinateOperationFactory math transform factory} will read all of them.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/MathTransformProvider.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/MathTransformProvider.java $
  * @version $Id: MathTransformProvider.java 34038 2009-10-01 21:02:24Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

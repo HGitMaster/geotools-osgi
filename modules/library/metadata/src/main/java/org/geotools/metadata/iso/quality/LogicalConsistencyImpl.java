@@ -26,7 +26,7 @@ import org.opengis.metadata.quality.LogicalConsistency;
  * Degree of adherence to logical rules of data structure, attribution and relationships (data
  * structure can be conceptual, logical or physical).
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/LogicalConsistencyImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/LogicalConsistencyImpl.java $
  * @version $Id: LogicalConsistencyImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

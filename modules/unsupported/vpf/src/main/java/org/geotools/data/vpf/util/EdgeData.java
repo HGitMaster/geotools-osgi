@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * Created on 6. april 2004, 14:54
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/util/EdgeData.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/util/EdgeData.java $
  */
 public class EdgeData extends HashMap {
     public Object put(Object key, Object value) {

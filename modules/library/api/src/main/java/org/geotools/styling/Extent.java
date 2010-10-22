@@ -41,7 +41,7 @@ package org.geotools.styling;
  * </p>
  *
  * @author Justin Deoliveira, The Open Planning Project
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Extent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Extent.java $
  */
 public interface Extent {
     /**

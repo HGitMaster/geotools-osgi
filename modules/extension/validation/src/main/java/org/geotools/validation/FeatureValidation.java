@@ -86,7 +86,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/FeatureValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/FeatureValidation.java $
  * @version $Id: FeatureValidation.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public interface FeatureValidation extends Validation {

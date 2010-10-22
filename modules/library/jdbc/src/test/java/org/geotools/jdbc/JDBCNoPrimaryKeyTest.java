@@ -41,9 +41,8 @@ public abstract class JDBCNoPrimaryKeyTest extends JDBCTestSupport {
     protected abstract JDBCNoPrimaryKeyTestSetup createTestSetup();
     
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        
+    protected void connect() throws Exception {
+        super.connect();
         lakeSchema = DataUtilities.createType(dataStore.getNamespaceURI() + "." + LAKE, 
                 ID + ":0," + GEOM + ":Polygon," + NAME +":String");
     }

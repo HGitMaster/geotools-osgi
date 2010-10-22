@@ -31,7 +31,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @author Jody Garnett (Refractions Research Inc)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileFeatureStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileFeatureStore.java $
  */
 public class ShapefileFeatureStore extends AbstractFeatureStore {
     private final ShapefileDataStore shapefile;

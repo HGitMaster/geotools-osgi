@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLRelGeoOpTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLRelGeoOpTest.java $
  */
 public class ECQLRelGeoOpTest extends CQLRelGeoOpTest {
     protected static final FilterFactory FILTER_FACTORY = CommonFactoryFinder.getFilterFactory((Hints) null);

@@ -62,7 +62,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * out since both renderers do use the same painting logic.
  * 
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/StyledShapePainter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/StyledShapePainter.java $
  */
 public final class StyledShapePainter {
 	private final static AffineTransform IDENTITY_TRANSFORM = new AffineTransform();
@@ -202,7 +202,12 @@ public final class StyledShapePainter {
 					fillLiteShape(graphics, shape);
 				}
 				if (ps2d.getGraphicFill() != null) {
+				    Shape oldClip = graphics.getClip();
+				    try {
 					paintGraphicFill(graphics, shape, ps2d.getGraphicFill(), scale);
+				    } finally {
+				        graphics.setClip(oldClip);
+				    }
 				}
 			}
 
@@ -537,8 +542,8 @@ public final class StyledShapePainter {
         }
 
         // computes the number of times the graphic will be painted as a stipple
-        int nStippleX = (int) Math.ceil(boundsShape.getWidth() / stippleSize.getWidth());
-        int nStippleY = (int) Math.ceil(boundsShape.getHeight() / stippleSize.getHeight());
+        int toX = (int) Math.ceil(boundsShape.getWidth() / stippleSize.getWidth());
+        int toY = (int) Math.ceil(boundsShape.getHeight() / stippleSize.getHeight());
         
         // creates a copy of the Graphics so that we can change it freely
         Graphics2D g = (Graphics2D)graphics.create();
@@ -546,11 +551,30 @@ public final class StyledShapePainter {
         g.clip(shape);
         // retrieves the full clip region
         Shape clipShape = g.getClip();
+        Rectangle2D boundsClip = clipShape.getBounds2D();
+        
+        // adjust the iteration indexes to avoid iterating a lot over areas that we won't be rendering
+        int fromX = 0;
+        if(boundsClip.getMinX() > boundsShape.getMinX()) {
+            fromX = (int) Math.floor((boundsClip.getMinX() - boundsShape.getMinX()) / stippleSize.getWidth());
+        }
+        if(boundsClip.getMaxX() < boundsShape.getMaxX()) {
+            toX -= (int) Math.floor((boundsShape.getMaxX() - boundsClip.getMaxX()) / stippleSize.getWidth());
+        }
+        
+        // adjust the iteration indexes to avoid iterating a lot over areas that we won't be rendering
+        int fromY = 0;
+        if(boundsClip.getMinY() > boundsShape.getMinY()) {
+            fromY = (int) Math.floor((boundsClip.getMinY() - boundsShape.getMinY()) / stippleSize.getHeight());
+        }
+        if(boundsClip.getMaxY() < boundsShape.getMaxY()) {
+            toY -= (int) Math.floor((boundsShape.getMaxY() - boundsClip.getMaxY()) / stippleSize.getHeight());
+        }
         
         // paints graphic fill as a stipple
-        for (int i = 0; i < nStippleX; i++)
+        for (int i = fromX; i < toX; i++)
         {
-            for (int j = 0; j < nStippleY; j++)
+            for (int j = fromY; j < toY; j++)
             {
             	// computes this stipple's shift in the X and Y directions
             	double translateX = boundsShape.getMinX() + i * stippleSize.getWidth();

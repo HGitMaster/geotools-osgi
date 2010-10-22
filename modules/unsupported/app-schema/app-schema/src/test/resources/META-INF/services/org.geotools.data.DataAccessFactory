@@ -1,2 +1,2 @@
 org.geotools.data.complex.DataAccessIntegrationTest$InputDataAccessFactory
-org.geotools.data.complex.AppSchemaDataAccessIntegrationTest$MinOccDataAccessFactory
+org.geotools.data.complex.AppSchemaDataAccessIntegrationTest$EarthResourceDataAccessFactory

@@ -49,7 +49,7 @@ import com.vividsolutions.jts.simplify.TopologyPreservingSimplifier;
  * @author Chrisitan Mueller
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/tool/Toolbox.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/tool/Toolbox.java $
  */
 public class Toolbox {
     /**

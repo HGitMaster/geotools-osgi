@@ -48,7 +48,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  *
  * @author wolf
  * @author Gary Sheppard garysheppard@psu.edu
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLFeatureWriter.java $
  */
 public class MySQLFeatureWriter extends JDBCTextFeatureWriter {
     private static WKTWriter geometryWriter = new WKTWriter();

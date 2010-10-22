@@ -26,7 +26,7 @@ import org.geotools.util.Utilities;
  * Compares two factories for equality.
  * Used internally for {@link AbstractFactory#equals} implementation only.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/FactoryComparator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/FactoryComparator.java $
  * @version $Id: FactoryComparator.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

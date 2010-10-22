@@ -117,7 +117,7 @@ import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
  * {@code CoverageStack} implementation is thread-safe.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/CoverageStack.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/CoverageStack.java $
  * @version $Id: CoverageStack.java 32440 2009-02-09 11:14:54Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

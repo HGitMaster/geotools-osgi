@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/LiteCoordinateSequenceFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/LiteCoordinateSequenceFactory.java $
  */
 public class LiteCoordinateSequenceFactory implements CoordinateSequenceFactory {
 

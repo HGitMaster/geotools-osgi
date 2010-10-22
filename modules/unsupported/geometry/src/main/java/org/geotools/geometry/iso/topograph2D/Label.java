@@ -42,7 +42,7 @@ package org.geotools.geometry.iso.topograph2D;
  * <code>TopologyLocation</code>s with specific geometries.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Label.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Label.java $
  * @version 1.7.2
  * 
  */

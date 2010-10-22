@@ -101,7 +101,7 @@ public final class ShapeType {
             mp = false;
         } else if (this == NULL) {
             mp = false;
-        } else if (this == POINT) {
+        } else if (this == POINT || this == POINTM || this == POINTZ) {
             mp = false;
         }
         return mp;

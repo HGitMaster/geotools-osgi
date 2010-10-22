@@ -59,7 +59,7 @@ import org.geotools.factory.Hints;
  *
  *
  * @author Chris Holmes
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/Query.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/Query.java $
  * @version $Id: Query.java 30642 2008-06-12 17:52:06Z acuster $
  */
 public interface Query {

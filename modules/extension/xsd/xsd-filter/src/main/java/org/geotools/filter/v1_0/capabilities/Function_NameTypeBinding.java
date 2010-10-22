@@ -45,7 +45,7 @@ import org.geotools.xml.*;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/capabilities/Function_NameTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/capabilities/Function_NameTypeBinding.java $
  */
 public class Function_NameTypeBinding extends AbstractComplexBinding {
     FilterFactory factory;

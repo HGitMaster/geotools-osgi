@@ -32,7 +32,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
  * Convenience class for linear transformations that maps an interval to another interval.
  * @author  Simone Giannecchini, GeoSolutions
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/referencing/piecewise/DefaultLinearPiecewiseTransform1DElement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/referencing/piecewise/DefaultLinearPiecewiseTransform1DElement.java $
  */
 public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTransform1DElement implements
 		PiecewiseTransform1DElement {

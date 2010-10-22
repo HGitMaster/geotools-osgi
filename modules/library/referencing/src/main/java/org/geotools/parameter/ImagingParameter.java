@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * A particular parameter in a JAI's {@link ParameterList}.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/ImagingParameter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/parameter/ImagingParameter.java $
  * @version $Id: ImagingParameter.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

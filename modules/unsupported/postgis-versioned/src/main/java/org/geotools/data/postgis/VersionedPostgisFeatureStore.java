@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -40,6 +42,7 @@ import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
 import org.geotools.data.Transaction;
 import org.geotools.data.VersioningFeatureStore;
+import org.geotools.data.jdbc.MutableFIDFeature;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.data.store.ReTypingFeatureCollection;
@@ -55,6 +58,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 
@@ -73,7 +77,7 @@ import org.opengis.filter.sort.SortOrder;
  * @since 2.4
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/VersionedPostgisFeatureStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/VersionedPostgisFeatureStore.java $
  */
 public class VersionedPostgisFeatureStore extends AbstractFeatureStore implements VersioningFeatureStore {
 
@@ -158,21 +162,25 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         
         // we need to mark the modified bounds and store their wgs84 version into the transaction
         ReferencedEnvelope bounds = locking.getBounds(new DefaultQuery(schema.getTypeName(), versionedFilter));
-        if(bounds.getCoordinateReferenceSystem() == null)
-            bounds = new ReferencedEnvelope(bounds, getSchema().getCoordinateReferenceSystem());
-        try {
-            ReferencedEnvelope wgsBounds = null;
-            if(bounds.getCoordinateReferenceSystem() != null)
-                wgsBounds = bounds.transform(DefaultGeographicCRS.WGS84, true);
-            else
-                wgsBounds = bounds;
-            state.expandDirtyBounds(wgsBounds);
-        } catch(Exception e) {
-            throw new DataSourceException("Problems computing and storing the " +
-            		"bounds affected by this feature removal", e);
+        if(bounds != null) { 
+            if(bounds.getCoordinateReferenceSystem() == null) {
+                bounds = new ReferencedEnvelope(bounds, getSchema().getCoordinateReferenceSystem());
+            }
+            try {
+                ReferencedEnvelope wgsBounds = null;
+                if(bounds.getCoordinateReferenceSystem() != null)
+                    wgsBounds = bounds.transform(DefaultGeographicCRS.WGS84, true);
+                else
+                    wgsBounds = bounds;
+                state.expandDirtyBounds(wgsBounds);
+                state.setTypeNameDirty(schema.getTypeName());
+            } catch(Exception e) {
+                throw new DataSourceException("Problems computing and storing the " +
+                		"bounds affected by this feature removal", e);
+            }
         }
         
-        // now we can run the 
+        // now we can run the update
         locking.modifyFeatures(locking.getSchema().getDescriptor("expired"), new Long(state
                 .getRevision()), versionedFilter);
         
@@ -243,24 +251,80 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         return getVersionedFeatures(new DefaultQuery(getSchema().getTypeName()));
     }
     
+    public List<FeatureId> addFeatures(
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection) throws IOException {
+        List<FeatureId> addedFids = new LinkedList<FeatureId>();
+        String typeName = getSchema().getTypeName();
+        SimpleFeature feature = null;
+        SimpleFeature newFeature;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore()
+                .getFeatureWriterAppend(typeName, getTransaction());
+
+        Iterator iterator = collection.iterator();
+        try {
+
+            while (iterator.hasNext()) {
+                feature = (SimpleFeature) iterator.next();
+                newFeature = (SimpleFeature) writer.next();
+                try {
+                    newFeature.setAttributes(feature.getAttributes());
+                } catch (Exception writeProblem) {
+                    throw new DataSourceException("Could not create " + typeName
+                            + " out of provided feature: " + feature.getID(), writeProblem);
+                }
+                
+                // preserve the FID, it could come from another node
+                ((MutableFIDFeature) newFeature).setID(feature.getID());
+
+                writer.write();
+                addedFids.add(newFeature.getIdentifier());
+            }
+        } finally {
+            collection.close(iterator);
+            writer.close();
+        }
+        return addedFids;
+    }
+    
     // ---------------------------------------------------------------------------------------------
     // VERSIONING EXTENSIONS
     // ---------------------------------------------------------------------------------------------
+    
+    public String getVersion() throws IOException {
+        Transaction t = getTransaction();
+        if(t == Transaction.AUTO_COMMIT) {
+            return null;
+        } else {
+            return String.valueOf(store.wrapped.getVersionedJdbcTransactionState(t).getRevision());
+        }
+    }
 
     public void rollback(String toVersion, Filter filter, String[] userIds) throws IOException {
         // TODO: build an optimized version of this that can do the same work with a couple
         // of queries assuming the filter is fully encodable
+        
+        Transaction t = getTransaction();
+        boolean autoCommit = false;
+        if (Transaction.AUTO_COMMIT.equals(t)) {
+            t = new DefaultTransaction();
+            autoCommit = true;
+        }
 
         // Gather feature modified after toVersion
         ModifiedFeatureIds mfids = store.getModifiedFeatureFIDs(schema.getTypeName(), toVersion,
-                null, filter, userIds, getTransaction());
+                null, filter, userIds, t);
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        
+        // grab the state, we need to mark as dirty all the features we are going to modify/re-insert
+        VersionedJdbcTransactionState state = store.wrapped.getVersionedJdbcTransactionState(t);
 
         // remove all features that have been created and not deleted
         Set fidsToRemove = new HashSet(mfids.getCreated());
         fidsToRemove.removeAll(mfids.getDeleted());
-        if (!fidsToRemove.isEmpty())
+        if (!fidsToRemove.isEmpty()) {
             removeFeatures(store.buildFidFilter(fidsToRemove));
+            state.setTypeNameDirty(getSchema().getTypeName());
+        }
 
         // reinstate all features that were there before toVersion and that
         // have been deleted after it. Notice this is an insertion, so to preserve
@@ -270,16 +334,18 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         Set fidsToRecreate = new HashSet(mfids.getDeleted());
         fidsToRecreate.removeAll(mfids.getCreated());
         if (!fidsToRecreate.isEmpty()) {
-            long revision = store.wrapped.getVersionedJdbcTransactionState(getTransaction())
-                    .getRevision();
+            state.setTypeNameDirty(getSchema().getTypeName());
+            state.setFidsDirty(getSchema().getTypeName(), fidsToRecreate);
+            
+            long revision = store.wrapped.getVersionedJdbcTransactionState(t).getRevision();
             Filter recreateFilter = store.buildVersionedFilter(schema.getTypeName(), store
                     .buildFidFilter(fidsToRecreate), mfids.fromRevision);
             FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
             FeatureWriter<SimpleFeatureType, SimpleFeature> fw = null;
             try {
                 DefaultQuery q = new DefaultQuery(schema.getTypeName(), recreateFilter);
-                fr = store.wrapped.getFeatureReader(q, getTransaction());
-                fw = store.wrapped.getFeatureWriterAppend(schema.getTypeName(), getTransaction());
+                fr = store.wrapped.getFeatureReader(q, t);
+                fw = store.wrapped.getFeatureWriterAppend(schema.getTypeName(), t);
                 while (fr.hasNext()) {
                     SimpleFeature original = fr.next();
                     SimpleFeature restored = fw.next();
@@ -308,13 +374,16 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // Here it's possible to work against the external API, thought it would be more
         // efficient (but more complex) to work against the wrapped one.
         if (!mfids.getModified().isEmpty()) {
+            state.setTypeNameDirty(getSchema().getTypeName());
+            state.setFidsDirty(getSchema().getTypeName(), mfids.getModified());
+            
             Filter modifiedIdFilter = store.buildFidFilter(mfids.getModified());
             Filter mifCurrent = store.buildVersionedFilter(schema.getTypeName(), modifiedIdFilter,
                     new RevisionInfo());
              FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
             FeatureWriter<SimpleFeatureType, SimpleFeature> fw = null;
             try {
-                fw = store.getFeatureWriter(schema.getTypeName(), mifCurrent, getTransaction());
+                fw = store.getFeatureWriter(schema.getTypeName(), mifCurrent, t);
                 while (fw.hasNext()) {
                     SimpleFeature current = fw.next();
                     Filter currIdFilter = ff.id(Collections
@@ -323,7 +392,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
                             currIdFilter, mfids.fromRevision);
                     DefaultQuery q = new DefaultQuery(schema.getTypeName(), cidToVersion);
                     q.setVersion(mfids.fromRevision.toString());
-                    fr = store.getFeatureReader(q, getTransaction());
+                    fr = store.getFeatureReader(q, t);
                     SimpleFeature original = fr.next();
                     for (int i = 0; i < original.getFeatureType().getAttributeCount(); i++) {
                         current.setAttribute(i, original.getAttribute(i));
@@ -340,6 +409,12 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
                 if (fw != null)
                     fw.close();
             }
+        }
+        
+        // if it's auto commit, don't forget to actually commit
+        if (autoCommit) {
+            t.commit();
+            t.close();
         }
 
     }
@@ -444,7 +519,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         return changesets.getFeatures(sq);
     }
 
-    public FeatureDiffReader getDifferences(String fromVersion, String toVersion, Filter filter, String[] userIds)
+    public FeatureDiffReaderImpl getDifferences(String fromVersion, String toVersion, Filter filter, String[] userIds)
             throws IOException {
         if(filter == null)
             filter = Filter.INCLUDE;
@@ -461,7 +536,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         VersionedFIDMapper mapper = (VersionedFIDMapper) store.getFIDMapper(schema.getTypeName());
 
-        return new FeatureDiffReader(store, getTransaction(), schema, r1, r2, mapper, mfids);
+        return new FeatureDiffReaderImpl(store, getTransaction(), schema, r1, r2, mapper, mfids);
     }
     
     // ----------------------------------------------------------------------------------------------

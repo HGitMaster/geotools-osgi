@@ -55,7 +55,7 @@ import org.geotools.xml.*;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/_ExceptionReportBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/_ExceptionReportBinding.java $
  */
 public class _ExceptionReportBinding extends AbstractComplexEMFBinding {
     public _ExceptionReportBinding(Ows10Factory factory) {

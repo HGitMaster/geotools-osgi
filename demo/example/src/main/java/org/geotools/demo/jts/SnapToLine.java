@@ -55,7 +55,7 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  * 
  * @author Jody Garnett (Refractions Research)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/jts/SnapToLine.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/jts/SnapToLine.java $
  */
 public class SnapToLine {
     

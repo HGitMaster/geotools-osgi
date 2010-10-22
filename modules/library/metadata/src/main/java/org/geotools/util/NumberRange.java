@@ -29,7 +29,7 @@ import static org.geotools.resources.ClassChanger.getWidestClass;
  * are computed as usual, except that widening conversions will be applied as needed.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/NumberRange.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/NumberRange.java $
  * @version $Id: NumberRange.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

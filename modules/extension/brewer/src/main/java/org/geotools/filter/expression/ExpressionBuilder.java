@@ -16,7 +16,7 @@ import org.opengis.filter.expression.Subtract;
 /**
  * ExpressionBuilder acting as a simple wrapper around an Expression.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/filter/expression/ExpressionBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/filter/expression/ExpressionBuilder.java $
  */
 public class ExpressionBuilder implements Builder<Expression> {
     protected FilterFactory ff = CommonFactoryFinder.getFilterFactory2(null);

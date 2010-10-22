@@ -28,7 +28,7 @@ import org.geotools.data.DataStoreFinder;
  * Abstract test class for getting a jdbc data source via JNDI lookup
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCJNDIDataSourceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCJNDIDataSourceTest.java $
  */
 public abstract class JDBCJNDIDataSourceTest extends JDBCTestSupport {
 

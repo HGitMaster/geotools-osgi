@@ -46,7 +46,7 @@ import org.geotools.util.Utilities;
  * capability, no user interaction and ignores the coordinate system. It is just
  * for quick test of grid coverage.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/grid/Viewer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/coverage/grid/Viewer.java $
  * @version $Id: Viewer.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

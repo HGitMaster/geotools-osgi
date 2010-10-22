@@ -35,7 +35,7 @@ import org.opengis.util.Cloneable;
  * @author ISO/DIS 19107
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/DirectPositionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/DirectPositionImpl.java $
  * @version $Revision: 1.9 $, $Date: 2005/11/02 05:39:33 $
  *
  * @revisit Version number: I suggest to use <strong>specification</strong> version number

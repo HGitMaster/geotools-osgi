@@ -32,7 +32,7 @@ import org.geotools.util.SimpleInternationalString;
  * @author Martin Desruisseaux
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/SeriesImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/SeriesImpl.java $
  */
 public class SeriesImpl extends MetadataEntity implements Series {
     /**

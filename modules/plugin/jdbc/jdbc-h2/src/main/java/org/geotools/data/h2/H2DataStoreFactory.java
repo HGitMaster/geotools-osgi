@@ -34,7 +34,7 @@ import org.geotools.jdbc.SQLDialect;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-h2/src/main/java/org/geotools/data/h2/H2DataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-h2/src/main/java/org/geotools/data/h2/H2DataStoreFactory.java $
  */
 public class H2DataStoreFactory extends JDBCDataStoreFactory {
     /** parameter for database type */

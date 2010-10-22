@@ -44,7 +44,7 @@ import org.geotools.resources.OptionalDependencies;
  * needed for concurrent access in different threads. The {@link TreeNode} will not be duplicated
  * so cloning an {@link RTree} can be seen as creating a new worker for the same tree.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/RTree.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/RTree.java $
  * @version $Id: RTree.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux
  */

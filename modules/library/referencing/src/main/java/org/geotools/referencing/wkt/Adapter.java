@@ -26,7 +26,7 @@ import org.geotools.util.UnsupportedImplementationException;
  * This method looks for a {@code toWKT()} method using reflection.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Adapter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Adapter.java $
  * @version $Id: Adapter.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

@@ -64,7 +64,7 @@ import org.geotools.util.Utilities;
  * </li>
  * </ul>
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/StyledLayerDescriptorImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/StyledLayerDescriptorImpl.java $
  */
 public class StyledLayerDescriptorImpl implements StyledLayerDescriptor {
     /** The logger for the default core module. */

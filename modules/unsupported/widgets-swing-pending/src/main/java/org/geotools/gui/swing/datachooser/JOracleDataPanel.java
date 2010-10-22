@@ -43,7 +43,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/datachooser/JOracleDataPanel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/datachooser/JOracleDataPanel.java $
  */
 public class JOracleDataPanel extends javax.swing.JPanel implements DataPanel {
 

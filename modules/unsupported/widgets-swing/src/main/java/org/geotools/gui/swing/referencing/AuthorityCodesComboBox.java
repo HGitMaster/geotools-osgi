@@ -60,7 +60,7 @@ import org.geotools.gui.swing.IconFactory;
  * and a info button displaying the CRS {@linkplain PropertiesSheet properties sheet}.
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/referencing/AuthorityCodesComboBox.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/referencing/AuthorityCodesComboBox.java $
  * @version $Id: AuthorityCodesComboBox.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

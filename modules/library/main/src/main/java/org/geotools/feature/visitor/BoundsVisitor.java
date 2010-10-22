@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/BoundsVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/visitor/BoundsVisitor.java $
  */
 public class BoundsVisitor implements FeatureCalc {
     ReferencedEnvelope bounds = new ReferencedEnvelope();    

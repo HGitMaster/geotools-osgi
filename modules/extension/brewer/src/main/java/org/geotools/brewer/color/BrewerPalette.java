@@ -24,7 +24,7 @@ import java.awt.Color;
  *
  * @author James Macgill
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/brewer/color/BrewerPalette.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/brewer/color/BrewerPalette.java $
  */
 public class BrewerPalette extends ColorPalette {
     private PaletteSuitability suitability;

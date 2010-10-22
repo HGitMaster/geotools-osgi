@@ -86,7 +86,7 @@ import org.geotools.resources.image.ImageUtilities;
  *  &#064;version 0.3
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/imageoverviews/OverviewsEmbedder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/imageoverviews/OverviewsEmbedder.java $
  */
 public class OverviewsEmbedder extends BaseArgumentsManager implements
 		Runnable, ProcessingEventListener {

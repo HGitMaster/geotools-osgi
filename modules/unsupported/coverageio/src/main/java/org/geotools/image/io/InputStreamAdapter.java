@@ -24,7 +24,7 @@ import javax.imageio.stream.ImageInputStream;
 /**
  * Wraps an {@link ImageInputStream} into a standard {@link InputStream}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/InputStreamAdapter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/InputStreamAdapter.java $
  * @version $Id: InputStreamAdapter.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

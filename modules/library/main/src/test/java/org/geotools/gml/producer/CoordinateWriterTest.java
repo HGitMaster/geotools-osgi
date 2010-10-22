@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * @author Jody
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/gml/producer/CoordinateWriterTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/gml/producer/CoordinateWriterTest.java $
  */
 public class CoordinateWriterTest extends TestCase {
     

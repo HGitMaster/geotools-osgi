@@ -35,7 +35,6 @@ import org.opengis.filter.spatial.Equals;
 import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
-import org.opengis.filter.spatial.Within;
 
 /**
  * ECQL Geo Operation Test
@@ -71,7 +70,7 @@ import org.opengis.filter.spatial.Within;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLGeoOperationTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLGeoOperationTest.java $
  */
 public final class ECQLGeoOperationTest extends CQLGeoOperationTest{
 

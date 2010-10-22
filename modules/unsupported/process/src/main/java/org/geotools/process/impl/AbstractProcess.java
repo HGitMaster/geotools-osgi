@@ -27,7 +27,7 @@ import org.geotools.process.ProcessFactory;
  * </p>
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/impl/AbstractProcess.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/impl/AbstractProcess.java $
  */
 public abstract class AbstractProcess implements Process {   
     protected ProcessFactory factory;

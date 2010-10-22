@@ -40,7 +40,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/OGCContainsBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/OGCContainsBinding.java $
  */
 public class OGCContainsBinding extends AbstractComplexBinding {
     FilterFactory2 filterFactory;

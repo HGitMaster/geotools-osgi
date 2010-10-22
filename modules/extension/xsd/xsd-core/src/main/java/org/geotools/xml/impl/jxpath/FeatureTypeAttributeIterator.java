@@ -27,7 +27,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/jxpath/FeatureTypeAttributeIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/jxpath/FeatureTypeAttributeIterator.java $
  */
 public class FeatureTypeAttributeIterator implements NodeIterator {
     /**

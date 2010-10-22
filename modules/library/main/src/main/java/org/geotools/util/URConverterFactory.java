@@ -39,7 +39,7 @@ import org.geotools.factory.Hints;
  * @author Justin Deoliveira, OpenGEO
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/util/URConverterFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/util/URConverterFactory.java $
  */
 public class URConverterFactory implements ConverterFactory {
 

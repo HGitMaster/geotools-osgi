@@ -31,7 +31,7 @@ import org.opengis.filter.expression.PropertyName;
 /**
  * A new function to check if a property exists.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/function/PropertyExistsFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/main/java/org/geotools/filter/function/PropertyExistsFunction.java $
  */
 public class PropertyExistsFunction extends FunctionExpressionImpl {
 

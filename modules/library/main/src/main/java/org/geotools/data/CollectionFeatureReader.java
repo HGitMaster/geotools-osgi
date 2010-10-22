@@ -33,7 +33,7 @@ import java.util.NoSuchElementException;
  * an array of features or a FeatureCollection.
  *
  * @author jones
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/CollectionFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/CollectionFeatureReader.java $
  */
 public class CollectionFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     private FeatureCollection<SimpleFeatureType, SimpleFeature> collection;

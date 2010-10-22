@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/ConstantExpression.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/ConstantExpression.java $
  */
 public class ConstantExpression implements LiteralExpression, Cloneable {
     public static final ConstantExpression NULL = constant(null);

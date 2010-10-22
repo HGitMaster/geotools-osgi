@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/gml/FCBuffer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/gml/FCBuffer.java $
  */
 public class FCBuffer extends Thread implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     /** Last feature is in the buffer */

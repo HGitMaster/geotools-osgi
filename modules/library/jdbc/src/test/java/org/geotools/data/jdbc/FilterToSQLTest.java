@@ -40,7 +40,7 @@ import org.opengis.filter.expression.Expression;
  * @author Chris Holmes, TOPP
  * @author Saul Farber, MassGIS
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/data/jdbc/FilterToSQLTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/data/jdbc/FilterToSQLTest.java $
  */
 public class FilterToSQLTest extends TestCase {
     private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);

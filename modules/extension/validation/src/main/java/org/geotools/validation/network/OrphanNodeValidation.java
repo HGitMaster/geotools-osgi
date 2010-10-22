@@ -39,7 +39,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/network/OrphanNodeValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/network/OrphanNodeValidation.java $
  * @version $Id: OrphanNodeValidation.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class OrphanNodeValidation extends DefaultIntegrityValidation {

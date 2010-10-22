@@ -68,6 +68,7 @@ import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.UserLayer;
 import org.geotools.test.TestData;
+import org.junit.Test;
 import org.opengis.style.ContrastMethod;
 
 import com.sun.media.jai.widget.DisplayJAI;
@@ -75,7 +76,7 @@ import com.sun.media.jai.widget.DisplayJAI;
 /**
  * @author  Simone Giannecchini, GeoSolutions.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/gridcoverage2d/RasterSymbolizerTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/renderer/lite/gridcoverage2d/RasterSymbolizerTest.java $
  */
 public class RasterSymbolizerTest  {
 
@@ -973,7 +974,7 @@ public class RasterSymbolizerTest  {
 
 	}
 	@org.junit.Test
-	public void RGB() throws IOException, TransformerException {
+	public void rgb() throws IOException, TransformerException {
 		java.net.URL surl = TestData.url(this, "testrgb.sld");
 		SLDParser stylereader = new SLDParser(sf, surl);
 		StyledLayerDescriptor sld = stylereader.parseSLD();
@@ -1004,7 +1005,7 @@ public class RasterSymbolizerTest  {
 	}
 
 	@org.junit.Test
-	public void DEM() throws IOException, TransformerException {
+	public void dem() throws IOException, TransformerException {
 		
 		////
 		//
@@ -1110,9 +1111,6 @@ public class RasterSymbolizerTest  {
 	}
 
 	private static void testRasterSymbolizerHelper(final SubchainStyleVisitorCoverageProcessingAdapter rsh) {
-		
-//		RenderedImageBrowser.showChain(((GridCoverage2D)rsh.getOutput()).getRenderedImage());
-		
 		if (TestData.isInteractiveTest()) {
 			visualize(((GridCoverage2D)rsh.getOutput()).getRenderedImage(), rsh.getName()
 					.toString());
@@ -1150,5 +1148,50 @@ public class RasterSymbolizerTest  {
 
 	}
 
+	@Test
+	public void twoColorsTest() throws IOException{
+		java.net.URL surl = TestData.url(this, "raster_discretecolors.sld");
+		SLDParser stylereader = new SLDParser(sf, surl);
+		StyledLayerDescriptor sld = stylereader.parseSLD();
+
+		// get a coverage
+		GridCoverage2D gc = CoverageFactoryFinder.getGridCoverageFactory(null)
+				.create(
+						"name",
+						JAI.create("ImageRead", TestData.file(this,"smalldem.tif")),
+						new GeneralEnvelope(new double[] { -90, -180 },
+								new double[] { 90, 180 }),new GridSampleDimension[]{new GridSampleDimension("dem")},null,null);
+		SubchainStyleVisitorCoverageProcessingAdapter rsh = new RasterSymbolizerHelper(gc, null);
+		final RasterSymbolizer rs = extractRasterSymbolizer(sld);
+		rsh.visit(rs);
+		
+		//test
+		final RenderedImage ri = ((GridCoverage2D)rsh.getOutput()).getRenderedImage();
+		Assert.assertTrue(ri.getColorModel() instanceof IndexColorModel);
+		final IndexColorModel icm= (IndexColorModel) ri.getColorModel();
+		final int mapSize=icm.getMapSize();
+		Assert.assertEquals(3, mapSize);
+		
+		//get colors
+		final int rgb[]= new int[mapSize];		
+		rgb[0]=0xFFFFFF&icm.getRGB(0);
+		rgb[1]=0xFFFFFF&icm.getRGB(1);
+		rgb[2]=0xFFFFFF&icm.getRGB(2);
+		
+		int found=0;
+		for(int i =0;i<mapSize;i++){
+			switch(rgb[i]){
+			case 0x008000:case 0x663333:case 0:
+				found++;
+				break;
+			default:
+				throw new IllegalStateException("Found unexpected colors:"+rgb[i]);
+			}
+		}
+			
+		
+		testRasterSymbolizerHelper(rsh);
+		
+	}
 
 }

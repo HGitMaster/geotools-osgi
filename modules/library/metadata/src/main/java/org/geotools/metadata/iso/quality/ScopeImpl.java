@@ -31,7 +31,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Description of the data specified by the scope.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/ScopeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/ScopeImpl.java $
  * @version $Id: ScopeImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

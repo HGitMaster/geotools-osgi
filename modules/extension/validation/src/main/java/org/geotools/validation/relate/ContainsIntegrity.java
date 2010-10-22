@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * contains part of itself.
  * </p>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/ContainsIntegrity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/relate/ContainsIntegrity.java $
  */
 public class ContainsIntegrity extends RelationIntegrity {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.validation");

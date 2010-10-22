@@ -55,7 +55,7 @@ import org.opengis.parameter.ParameterValue;
  * }</code></pre>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/AbstractDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/AbstractDataStoreFactory.java $
  */
 public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
     

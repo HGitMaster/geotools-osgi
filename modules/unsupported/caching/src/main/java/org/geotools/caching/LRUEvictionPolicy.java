@@ -29,7 +29,7 @@ import org.geotools.caching.spatialindex.NodeIdentifier;
  * Removes the oldest items from the cache.
  * </p>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/LRUEvictionPolicy.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/LRUEvictionPolicy.java $
  */
 public class LRUEvictionPolicy implements EvictionPolicy {
 	private Map<NodeIdentifier, Object> queue;

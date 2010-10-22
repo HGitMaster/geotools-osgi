@@ -27,7 +27,7 @@ import javax.swing.Icon;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/styling/JColorIcon.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/styling/JColorIcon.java $
  * @version $Id: JColorIcon.java 33920 2009-09-18 08:56:40Z mbedward $
  */
 public class JColorIcon implements Icon {

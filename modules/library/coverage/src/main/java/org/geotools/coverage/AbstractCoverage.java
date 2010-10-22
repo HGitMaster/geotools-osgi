@@ -113,7 +113,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </ul>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/AbstractCoverage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/AbstractCoverage.java $
  * @version $Id: AbstractCoverage.java 33884 2009-09-10 16:33:05Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */

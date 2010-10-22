@@ -52,8 +52,23 @@ class BufferProcess extends AbstractProcess {
             monitor.started();
             monitor.setTask( Text.text("Grabbing arguments") );
             monitor.progress( 10.0f );
-            Geometry geom1 = (Geometry) input.get( BufferFactory.GEOM1.key );          
-            Double buffer = (Double) input.get( BufferFactory.BUFFER.key );
+            Object value = input.get( BufferFactory.GEOM1.key );
+            if( value == null ){
+                throw new NullPointerException("geom1 parameter required");
+            }
+            if( !(value instanceof Geometry)){
+                throw new ClassCastException("geom1 requied Geometry, not "+value );
+            }
+            Geometry geom1 = (Geometry) value;
+             
+            value = input.get( BufferFactory.BUFFER.key );
+            if( value == null ){
+                throw new ClassCastException("geom1 requied Geometry, not "+value );
+            }
+            if( !(value instanceof Number)){
+                throw new ClassCastException("buffer requied number, not "+value );
+            }
+            Double buffer = ((Number) value).doubleValue();
             
             monitor.setTask( Text.text("Processing Buffer") );
             monitor.progress( 25.0f );

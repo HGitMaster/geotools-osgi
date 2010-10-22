@@ -43,7 +43,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author Chris Holmes
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/ConnectionPool.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/ConnectionPool.java $
  * @version $Id: ConnectionPool.java 33484 2009-07-06 02:17:34Z jdeolive $
  * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  * 

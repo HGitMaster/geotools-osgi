@@ -37,7 +37,7 @@ import org.opengis.filter.Filter;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FilteringFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/FilteringFeatureWriter.java $
  */
 public class FilteringFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
     FeatureWriter<SimpleFeatureType, SimpleFeature> writer;

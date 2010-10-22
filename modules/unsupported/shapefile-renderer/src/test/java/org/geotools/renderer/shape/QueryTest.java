@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/QueryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/QueryTest.java $
  */ 
 public class QueryTest extends TestCase {
     private static final boolean INTERACTIVE = false;

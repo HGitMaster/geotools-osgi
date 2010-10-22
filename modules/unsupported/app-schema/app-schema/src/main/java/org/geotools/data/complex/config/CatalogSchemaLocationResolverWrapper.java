@@ -31,7 +31,7 @@ import org.geotools.xml.SchemaLocationResolver;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @version $Id: CatalogSchemaLocationResolverWrapper.java 31815 2008-11-10 07:53:14Z bencd $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/CatalogSchemaLocationResolverWrapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/CatalogSchemaLocationResolverWrapper.java $
  * @since 2.6
  */
 public class CatalogSchemaLocationResolverWrapper extends SchemaLocationResolver {

@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * tests!
  *
  * @author James
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/MathTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/MathTest.java $
  */
 public class MathTest extends TestCase {
     SimpleFeatureType schema = null;

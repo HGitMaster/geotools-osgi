@@ -196,7 +196,7 @@ public class DbaseFileReader implements FileReader {
 
         // check if we working with a latin-1 char Charset
         final String cname = stringCharset.name();
-        oneBytePerChar = "ISO-8869-1".equals(cname) || "US-ASCII".equals(cname);
+        oneBytePerChar = "ISO-8859-1".equals(cname) || "US-ASCII".equals(cname);
         
         row = new Row();
     }
@@ -443,9 +443,8 @@ public class DbaseFileReader implements FileReader {
                     object = Boolean.FALSE;
                     break;
                 default:
-
-                    throw new IOException("Unknown logical value : '"
-                            + c + "'");
+                    // 0x20 should be interpreted as null, but we're going to be a bit more lax
+                    object = null;
                 }
                 break;
             // (C)character (String)

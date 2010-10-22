@@ -28,7 +28,7 @@ import org.opengis.util.Cloneable;
 
 
 /**
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/FillImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/FillImpl.java $
  * @version $Id: FillImpl.java 33833 2009-09-04 12:26:28Z jive $
  * @author James Macgill, CCG
  */

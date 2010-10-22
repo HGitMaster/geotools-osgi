@@ -12,7 +12,7 @@
 		-->
 		<Namespace>
 			<prefix>gsml</prefix>
-			<uri>http://www.cgi-iugs.org/xml/GeoSciML/2</uri>
+			<uri>urn:cgi:xmlns:CGI:GeoSciML:2.0</uri>
 		</Namespace>
 		<Namespace>
 			<prefix>gml</prefix>
@@ -31,16 +31,9 @@
 			</parameters>
 		</DataStore>
 	</sourceDataStores>
-	<catalog>mappedPolygons.oasis.xml</catalog>
 	<targetTypes>
 		<FeatureType>
-			<!--
-				State the needed xsd schemas to be loaded in order to make the
-				schema-to-FeatureModel parse. Paths are relative to this file, or
-				may be absolute URL's. Imports and includes at the schemas will be
-				followed as long as they're relative paths.
-			-->
-			<schemaUri>http://schemas.opengis.net/GeoSciML/geosciml.xsd </schemaUri>
+			<schemaUri>http://www.geosciml.org/geosciml/2.0/xsd/geosciml.xsd</schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>

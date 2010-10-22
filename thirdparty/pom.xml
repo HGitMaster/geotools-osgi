@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>geotools</artifactId>
-    <version>2.6.2.osgi1</version>
+    <version>2.6.5.osgi1</version>
   </parent>
 
 
@@ -21,7 +21,7 @@
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>thirdparty</artifactId>
-  <version>2.6.2.osgi1</version>
+  <version>2.6.5.osgi1</version>
   <packaging>pom</packaging>
   <name>Geotools thirdparty libs</name>
   <description>
@@ -35,7 +35,8 @@
   <modules>
     <module>de.berlios.com.miglayout</module>
     <module>de.berlios.it.geosolutions.imageio.ext.tiff</module>
-    <module>de.berlios.it.geosolutions.imageio.ext.utilities</module>
+    <module>de.berlios.it.geosolutions.imageio.ext.customstreams</module>
+    <module>de.berlios.it.geosolutions.imageio.ext.utilities</module>    
     <module>de.berlios.org.apache.commons.cli2</module>
     <module>javax.media.jai.osgi</module>
     <module>javax.media.jai.osgi.linux.x86_64</module>
@@ -74,5 +75,6 @@
     <module>com.springsource.org.apache.batik.xml</module>
     <module>com.springsource.org.junit</module>
     <module>com.springsource.org.hamcrest.core</module>
+    <module>de.berlios.com.google.google-collections</module>
   </modules>
 </project>

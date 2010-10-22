@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.TopologyException;
  * </code>
  * 
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/BBoxExpressionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/BBoxExpressionImpl.java $
  * @version $Id: BBoxExpressionImpl.java 32203 2009-01-12 12:51:24Z jesseeichar $
  */
 public class BBoxExpressionImpl

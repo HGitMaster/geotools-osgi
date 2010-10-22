@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the crop operation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/processing/CropTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/coverage/processing/CropTest.java $
  * @version $Id: CropTest.java 31064 2008-07-23 23:26:34Z simboss $
  * @author Simone Giannecchini (GeoSolutions)
  * @author Martin Desruisseaux (Geomatys)

@@ -34,7 +34,7 @@ import org.geotools.swing.event.MapMouseListener;
  * 
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/MapToolManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/MapToolManager.java $
  * @version $Id: MapToolManager.java 34138 2009-10-13 06:35:19Z mbedward $
  */
 public class MapToolManager implements MouseInputListener, MouseWheelListener {

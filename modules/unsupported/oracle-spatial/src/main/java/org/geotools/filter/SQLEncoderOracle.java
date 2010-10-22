@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  *
  * @author $Author: seangeo $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/filter/SQLEncoderOracle.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/oracle-spatial/src/main/java/org/geotools/filter/SQLEncoderOracle.java $
  * @version $Id: SQLEncoderOracle.java 31943 2008-12-03 15:39:14Z aaime $
  */
 public class SQLEncoderOracle extends SQLEncoder {

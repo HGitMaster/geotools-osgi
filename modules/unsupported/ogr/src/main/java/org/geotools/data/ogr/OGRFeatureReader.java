@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  * @author aaime
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/ogr/src/main/java/org/geotools/data/ogr/OGRFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/ogr/src/main/java/org/geotools/data/ogr/OGRFeatureReader.java $
  */
 public class OGRFeatureReader implements FeatureReader {
 

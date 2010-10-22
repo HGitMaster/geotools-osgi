@@ -30,7 +30,7 @@ import org.geotools.data.jdbc.JDBCFeatureSource;
  * 
  * @author Cory Horner, Refractions Research
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/collection/PostgisFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/collection/PostgisFeatureCollection.java $
  */
 public class PostgisFeatureCollection extends JDBCFeatureCollection  {
 

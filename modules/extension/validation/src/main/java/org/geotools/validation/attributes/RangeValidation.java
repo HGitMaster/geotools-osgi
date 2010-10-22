@@ -62,7 +62,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *
  * @author rgould, Refractions Research, Inc.
  * @author $Author: cholmesny $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/attributes/RangeValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/attributes/RangeValidation.java $
  * @version $Id: RangeValidation.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class RangeValidation extends DefaultFeatureValidation {

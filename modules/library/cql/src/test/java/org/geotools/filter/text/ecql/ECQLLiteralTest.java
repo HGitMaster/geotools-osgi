@@ -28,7 +28,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLLiteralTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLLiteralTest.java $
  */
 public class ECQLLiteralTest extends CQLLiteralTest {
 

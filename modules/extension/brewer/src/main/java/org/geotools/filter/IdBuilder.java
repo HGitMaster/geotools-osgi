@@ -15,7 +15,7 @@ import org.opengis.filter.identity.Identifier;
 /**
  * FitlerBuilder acting as a simple wrapper around an Expression.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/filter/IdBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/filter/IdBuilder.java $
  */
 public class IdBuilder<P> implements Builder<Id> {
     protected Filter filter; // placeholder just to keep us going right now

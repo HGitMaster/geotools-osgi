@@ -17,6 +17,7 @@
  */
 package org.geotools.arcsde.raster.info;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.awt.image.IndexColorModel;
@@ -25,7 +26,7 @@ import java.awt.image.IndexColorModel;
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: RasterBandInfo.java 34355 2009-11-09 19:05:33Z groldan $
+ * @version $Id: RasterBandInfo.java 35100 2010-03-23 15:02:18Z groldan $
  * @source $URL:
  *         http://svn.osgeo.org/geotools/trunk/modules/plugin/arcsde/datastore/src/main/java/org
  *         /geotools/arcsde/raster/info/RasterBandInfo.java $
@@ -69,7 +70,7 @@ public class RasterBandInfo {
 
     boolean hasStats;
 
-    Point2D.Double tileOrigin;
+    Point tileOrigin;
 
     double statsMin;
 
@@ -131,7 +132,7 @@ public class RasterBandInfo {
         return hasStats;
     }
 
-    public Double getTileOrigin() {
+    public Point getTileOrigin() {
         return tileOrigin;
     }
 

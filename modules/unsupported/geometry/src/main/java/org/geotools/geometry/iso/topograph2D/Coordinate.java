@@ -37,7 +37,7 @@ import org.geotools.geometry.iso.util.Assert;
  * <code>NaN</code>. The standard comparison functions will ignore the
  * z-ordinate.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Coordinate.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Coordinate.java $
  */
 public class Coordinate implements Comparable, Cloneable, Serializable {
 

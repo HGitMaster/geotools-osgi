@@ -37,7 +37,7 @@ import org.opengis.util.NameSpace;
  * as {@linkplain #getScope tail}.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/ScopedName.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/ScopedName.java $
  * @version $Id: ScopedName.java 31177 2008-08-13 22:09:25Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
  * one test, and using a 2D + vertical CRS compound for the second test. This test constructs most
  * objects using GeoAPI only (except for a few helper classes).
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/Transform3DTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/operation/Transform3DTest.java $
  * @version $Id: Transform3DTest.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Justin Couch
  * @author Martin Desruisseaux

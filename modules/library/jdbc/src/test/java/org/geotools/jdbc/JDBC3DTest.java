@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author Andrea Aime - OpenGeo
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBC3DTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBC3DTest.java $
  */
 public abstract class JDBC3DTest extends JDBCTestSupport {
     
@@ -86,8 +86,8 @@ public abstract class JDBC3DTest extends JDBCTestSupport {
     
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
 
         line3DType = DataUtilities.createType(dataStore.getNamespaceURI() + "." + tname(LINE3D),
                 aname(ID) + ":0," + aname(GEOM) + ":LineString:srid=4326," + aname(NAME)

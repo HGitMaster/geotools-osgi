@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * numbers, and for performing comparaisons.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/Version.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/Version.java $
  * @version $Id: Version.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux
  *

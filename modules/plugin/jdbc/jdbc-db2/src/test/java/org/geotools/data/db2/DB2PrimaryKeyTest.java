@@ -27,8 +27,8 @@ public class DB2PrimaryKeyTest extends JDBCPrimaryKeyTest {
     }
     
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
         
         dataStore.setDatabaseSchema(DB2TestUtil.SCHEMA);
     }

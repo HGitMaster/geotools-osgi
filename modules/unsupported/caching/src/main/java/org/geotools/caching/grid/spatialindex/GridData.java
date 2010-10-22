@@ -34,7 +34,7 @@ import org.opengis.feature.IllegalAttributeException;
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/GridData.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/GridData.java $
  */
 public class GridData implements Data<Object>, Externalizable {
     private static final long serialVersionUID = 2435341100521921266L;

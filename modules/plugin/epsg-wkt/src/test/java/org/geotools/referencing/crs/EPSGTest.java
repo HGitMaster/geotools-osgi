@@ -39,7 +39,7 @@ import junit.framework.TestCase;
  *
  * @author Jody Garnett
  * @since 2.1.M3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-wkt/src/test/java/org/geotools/referencing/crs/EPSGTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-wkt/src/test/java/org/geotools/referencing/crs/EPSGTest.java $
  * @version 2.1.M3
  */
 public class EPSGTest extends TestCase {

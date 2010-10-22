@@ -38,7 +38,7 @@ import org.opengis.geometry.primitive.CurveBoundary;
  * any number of CurveSegment objects (such as LineStrings) that must be
  * connected end-to-end.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/CurveImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/CurveImpl.java $
  */
 public class CurveImpl extends GeometryImpl implements Curve {
     /**

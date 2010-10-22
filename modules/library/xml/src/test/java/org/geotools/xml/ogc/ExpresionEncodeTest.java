@@ -38,7 +38,7 @@ import org.geotools.xml.filter.FilterSchema;
  *  For now just writes the expression built.
  *  
  * @author David Zwiers, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/ogc/ExpresionEncodeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/test/java/org/geotools/xml/ogc/ExpresionEncodeTest.java $
  */
 public class ExpresionEncodeTest extends TestCase {
     /** Standard logging instance */

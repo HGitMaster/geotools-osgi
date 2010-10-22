@@ -37,7 +37,7 @@ import org.opengis.referencing.crs.ProjectedCRS;
 /**
  * Tests {@link AutoCRSFactory}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/factory/wms/AUTOTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/factory/wms/AUTOTest.java $
  * @version $Id: AUTOTest.java 34859 2010-02-03 19:30:23Z aaime $
  * @author Jody Garnett
  * @author Martin Desruisseaux

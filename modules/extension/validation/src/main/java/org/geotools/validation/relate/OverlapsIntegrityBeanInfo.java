@@ -22,7 +22,7 @@ import java.beans.PropertyDescriptor;
 /**
  * @author bowens
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/OverlapsIntegrityBeanInfo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/relate/OverlapsIntegrityBeanInfo.java $
  */
 public class OverlapsIntegrityBeanInfo extends RelationIntegrityBeanInfo 
 {

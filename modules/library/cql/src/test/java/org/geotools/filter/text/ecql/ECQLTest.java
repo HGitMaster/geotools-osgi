@@ -38,6 +38,7 @@ import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.DistanceBufferOperator;
 import org.opengis.filter.spatial.Intersects;
@@ -61,7 +62,7 @@ import org.opengis.filter.spatial.Intersects;
  * @author Mauricio Pazos (Axios Engineering)
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLTest.java $
  * @version Revision: 1.9
  * @since 2.6
  */
@@ -103,7 +104,7 @@ public final class ECQLTest  {
         
         Assert.assertTrue(filter instanceof PropertyIsLessThan);
     }
-// FIXME the syntax is under debate. It will be eliminate from release    
+// TODO the syntax is under debate. It will be eliminate from release    
 //    /**
 //     * Spatial relate like Intersection Matrix (DE-9IM)
 //     * 
@@ -237,9 +238,19 @@ public final class ECQLTest  {
     @Test 
     public void likePredicate() throws Exception{
         
+        // using a property as expression
         Filter filter = ECQL.toFilter("aProperty like '%bb%'");
         
         Assert.assertTrue(filter instanceof PropertyIsLike);
+           
+        // using function as expression
+        filter = ECQL.toFilter( "strToUpperCase(anAttribute) like '%BB%'");
+        
+        Assert.assertTrue(filter instanceof PropertyIsLike);
+
+        PropertyIsLike like = (PropertyIsLike) filter;
+        
+        Assert.assertTrue(like.getExpression() instanceof Function );
     }
     
     /**

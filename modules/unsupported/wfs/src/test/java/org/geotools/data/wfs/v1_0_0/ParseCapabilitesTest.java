@@ -37,7 +37,7 @@ import org.geotools.xml.DocumentFactory;
  * 
  * @author Jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/test/java/org/geotools/data/wfs/v1_0_0/ParseCapabilitesTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/test/java/org/geotools/data/wfs/v1_0_0/ParseCapabilitesTest.java $
  */
 public class ParseCapabilitesTest extends TestCase {
 

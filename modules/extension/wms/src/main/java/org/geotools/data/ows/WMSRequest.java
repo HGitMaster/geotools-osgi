@@ -21,7 +21,7 @@ package org.geotools.data.ows;
  * Available WMS Operations are listed in a Request element.
  *
  * @author rgould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/ows/WMSRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/ows/WMSRequest.java $
  */
 public class WMSRequest {
     private OperationType getCapabilities;

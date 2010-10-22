@@ -28,7 +28,7 @@ import org.geotools.coverage.grid.io.GridFormatFinder;
  * @author Simone Giannecchini
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic-jdbc/src/test/java/org/geotools/gce/imagemosaic/jdbc/ImageMosaicJDBCServiceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic-jdbc/src/test/java/org/geotools/gce/imagemosaic/jdbc/ImageMosaicJDBCServiceTest.java $
  */
 public class ImageMosaicJDBCServiceTest extends TestCase {
 	/**

@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  *
  * @author Cory Horner (Refractions Research)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/WeakObjectCacheTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/WeakObjectCacheTest.java $
  */
 public final class WeakObjectCacheTest {
     private Integer  key1 = 1;

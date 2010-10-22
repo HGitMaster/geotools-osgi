@@ -37,7 +37,7 @@ import org.opengis.feature.type.FeatureType;
  * will be duplicated.
  * </p>
  * @author Jody Garnett, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/collection/DelegateFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/collection/DelegateFeatureReader.java $
  */
 public class DelegateFeatureReader<T extends FeatureType, F extends Feature> implements FeatureReader<T, F> {
 	FeatureIterator<F> delegate;

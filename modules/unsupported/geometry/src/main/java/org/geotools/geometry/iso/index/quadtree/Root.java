@@ -26,7 +26,7 @@ import org.geotools.geometry.iso.util.Assert;
  * does not have a defined extent.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/Root.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/Root.java $
  * @version 1.7.2
  */
 public class Root extends NodeBase {

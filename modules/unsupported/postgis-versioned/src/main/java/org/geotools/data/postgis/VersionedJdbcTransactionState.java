@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
+import org.geotools.data.VersioningDataStore;
 import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.factory.CommonFactoryFinder;
@@ -133,12 +135,30 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
      * @param fid
      */
     public void setFidDirty(String typeName, String fid) {
+        getCreateDirtyFids(typeName).add(fid);
+    }
+    
+    /**
+     * Marks a set of FIDs as dirty. This is used to avoid to do versioned operations
+     * on the same feature multiple times in the same transaction. The first must create 
+     * the new versions, the others should operate against the new record
+     * @param ft
+     * @param fid
+     */
+    public void setFidsDirty(String typeName, Collection<String> fids) {
+        getCreateDirtyFids(typeName).addAll(fids);
+    }
+
+    /**
+     * Returns (and eventually builds) the dirty fid set for the specified type name
+     */
+    Set<String> getCreateDirtyFids(String typeName) {
         Set fids = (Set) dirtyFids.get(typeName);
         if(fids == null) {
             fids = new HashSet();
             dirtyFids.put(typeName, fids);
         }
-        fids.add(fid);
+        return fids;
     }
         
     /**
@@ -168,6 +188,10 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
     public void commit() throws IOException {
         // first, check we touched at least one versioned table
         if (!dirtyTypes.isEmpty()) {
+            // grab author and message, they might have been updated since revsion insertion
+            String author = (String) transaction.getProperty(VersioningDataStore.AUTHOR);
+            String message = (String) transaction.getProperty(VersioningDataStore.MESSAGE);
+            
             // first write down modified envelope
             SimpleFeature f = null;
             FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
@@ -188,6 +212,8 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
                 
                 // update it
                 f = writer.next();
+                f.setAttribute("author", author);
+                f.setAttribute("message", message);
                 f.setDefaultGeometry(toLatLonRectange(bbox));
                 writer.write();
             } catch (IllegalAttributeException e) {
@@ -264,7 +290,6 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
 
     /**
      * Stores a commit message in the CHANGESETS table and return the associated revision number.
-     * TODO: this may well be moved to the {@link VersionedJdbcTransactionState} class?
      * 
      * @param conn
      * @return
@@ -273,9 +298,15 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
     protected long writeRevision(Transaction t, ReferencedEnvelope bbox) throws IOException {
         SimpleFeature f = null;
         FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
-        String author = (String) t.getProperty(VersionedPostgisDataStore.AUTHOR);
-        String message = (String) t.getProperty(VersionedPostgisDataStore.MESSAGE);
+        String author = (String) t.getProperty(VersioningDataStore.AUTHOR);
+        String message = (String) t.getProperty(VersioningDataStore.MESSAGE);
+        Statement st = null;
         try {
+            // we need to make sure that revision N+1 is committed after N is committed, otherwise
+            // the history will be ruined
+            st = getConnection().createStatement();
+            st.execute("LOCK TABLE " + VersionedPostgisDataStore.TBL_CHANGESETS + " IN EXCLUSIVE MODE");
+            
             writer = wrapped.getFeatureWriterAppend(VersionedPostgisDataStore.TBL_CHANGESETS, t);
             f = writer.next();
             f.setAttribute("author", author);
@@ -288,9 +319,13 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
             // if this happens there's a programming error
             throw new IOException("Could not set an attribute in changesets, "
                     + "most probably the table schema has been tampered with.");
+        } catch (SQLException e) {
+            throw new DataSourceException("Could not set a lock on the table changesets", e);
         } finally {
-            if (writer != null)
-                writer.close();
+            if(st != null)
+              JDBCUtils.close(st);  
+            if(writer != null)
+              writer.close();
         }
 
         return ((Long) f.getAttribute("revision")).longValue();

@@ -40,7 +40,7 @@ import org.opengis.filter.Filter;
  * </p>
  *  
  * @author Jody Garnett, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/collection/FilteredIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/collection/FilteredIterator.java $
  */
 public class FilteredIterator<F extends Feature> implements Iterator<F> {
 	/** Used to close the delgate, or null */

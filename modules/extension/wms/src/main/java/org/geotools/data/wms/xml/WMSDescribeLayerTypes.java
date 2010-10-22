@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/xml/WMSDescribeLayerTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/xml/WMSDescribeLayerTypes.java $
  */
 public class WMSDescribeLayerTypes {
     public static class WMS_DescribeLayerResponse extends WMSSchema.WMSComplexType {

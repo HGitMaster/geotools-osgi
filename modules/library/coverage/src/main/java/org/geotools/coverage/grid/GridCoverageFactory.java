@@ -89,7 +89,7 @@ import org.opengis.referencing.operation.MathTransform;
  *
  * @since 2.1
  * @author Martin Desruisseaux
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoverageFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoverageFactory.java $
  * @version $Id: GridCoverageFactory.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  */
 public class GridCoverageFactory extends AbstractFactory {

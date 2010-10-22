@@ -127,7 +127,7 @@ import static java.lang.Math.*;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/random_issues.html#stereographic">Some Random Stereographic Issues</A>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Stereographic.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Stereographic.java $
  * @version $Id: Stereographic.java 32866 2009-04-25 20:56:09Z aaime $
  * @author André Gosselin
  * @author Martin Desruisseaux (PMO, IRD)

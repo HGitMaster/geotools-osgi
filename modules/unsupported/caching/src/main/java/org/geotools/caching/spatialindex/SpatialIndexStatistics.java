@@ -12,7 +12,7 @@ package org.geotools.caching.spatialindex;
 * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
 *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/SpatialIndexStatistics.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/SpatialIndexStatistics.java $
 */
 public class SpatialIndexStatistics implements Statistics {
 

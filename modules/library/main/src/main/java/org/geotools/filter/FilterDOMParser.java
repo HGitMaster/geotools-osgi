@@ -47,8 +47,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * A dom based parser to build filters as per OGC 01-067
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterDOMParser.java $
- * @version $Id: FilterDOMParser.java 32694 2009-03-25 09:45:28Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FilterDOMParser.java $
+ * @version $Id: FilterDOMParser.java 35348 2010-05-04 13:53:54Z aaime $
  *
  * @task TODO: split this class up into multiple methods.
  */
@@ -102,7 +102,8 @@ public final class FilterDOMParser {
         spatial.put("BBOX", new Integer(AbstractFilter.GEOMETRY_BBOX));
 
         // Beyond and DWithin not handled well
-        //spatial.put("Beyond", new Integer(AbstractFilter.GEOMETRY_BEYOND));
+        spatial.put("Beyond", new Integer(AbstractFilter.GEOMETRY_BEYOND));
+        spatial.put("DWithin", new Integer(AbstractFilter.GEOMETRY_DWITHIN));
         
         logical.put("And", new Integer(AbstractFilter.LOGIC_AND));
         logical.put("Or", new Integer(AbstractFilter.LOGIC_OR));
@@ -402,17 +403,26 @@ public final class FilterDOMParser {
                 	//the DOM parser was not properly set to handle namespaces...
                 	valueName = valueName.substring(valueName.indexOf(':')+1);
                 }
-                
+               
+                // need to cache the next node as the following parsing trick will
+                // ruin the DOM hierarchy
+                Node nextNode = value.getNextSibling();
+                Expression right;
                 if (!(valueName.equalsIgnoreCase("Literal")
                         || valueName.equalsIgnoreCase("propertyname"))) {
                     Element literal = value.getOwnerDocument().createElement("literal");
 
                     literal.appendChild(value);
                     LOGGER.finest("Built new literal " + literal);
-                    value = literal;
+                    right = ExpressionDOMParser.parseExpression(literal);
+                } else {
+                    right = ExpressionDOMParser.parseExpression(value);
                 }
-                Expression right = ExpressionDOMParser.parseExpression(value);
                 
+                
+                double distance;
+                String units = null;
+                String nodeName = null;
                 switch ( type ){
                 case FilterType.GEOMETRY_EQUALS:
                     return FILTER_FACT.equal( left, right );
@@ -438,8 +448,47 @@ public final class FilterDOMParser {
                 case FilterType.GEOMETRY_OVERLAPS:
                     return FILTER_FACT.overlaps( left, right );
                     
-                // case FilterType.GEOMETRY_BEYOND:
-                //    return FILTER_FACT.beyond( left, right, distance, units );
+                case FilterType.GEOMETRY_DWITHIN:
+                    value = nextNode;
+                    while (value != null && value.getNodeType() != Node.ELEMENT_NODE) {
+                        value = value.getNextSibling();
+                    }
+                    if(value == null) {
+                        throw new IllegalFilterException("DWithin is missing the Distance element");
+                    } 
+                    
+                    nodeName = value.getNodeName();
+                    if(nodeName.indexOf(':') > 0) {
+                        nodeName = nodeName.substring(nodeName.indexOf(":") + 1);
+                    }
+                    if(!"Distance".equals(nodeName)) {
+                        throw new IllegalFilterException("Parsing DWithin, was expecting to find Distance but found " + value.getLocalName());
+                    }
+                    distance = Double.parseDouble(value.getTextContent());
+                    if(value.getAttributes().getNamedItem("units") != null)
+                        units = value.getAttributes().getNamedItem("units").getTextContent();
+                    return FILTER_FACT.dwithin(left, right, distance, units );
+                    
+                case FilterType.GEOMETRY_BEYOND:
+                    value = nextNode;
+                    while (value != null && value.getNodeType() != Node.ELEMENT_NODE) {
+                        value = value.getNextSibling();
+                    }
+                    if(value == null) {
+                        throw new IllegalFilterException("Beyond is missing the Distance element");
+                    } 
+                    nodeName = value.getNodeName();
+                    if(nodeName.indexOf(':') > 0) {
+                        nodeName = nodeName.substring(nodeName.indexOf(":") + 1);
+                    }
+                    if(!"Distance".equals(nodeName)) {
+                        throw new IllegalFilterException("Parsing Beyond, was expecting to find Distance but found " + value.getLocalName());
+                    }
+                    distance = Double.parseDouble(value.getTextContent());
+                    if(value.getAttributes().getNamedItem("units") != null)
+                        units = value.getAttributes().getNamedItem("units").getTextContent();
+                    return FILTER_FACT.beyond(left, right, distance, units );
+                    
                     
                 case FilterType.GEOMETRY_BBOX:
                 {

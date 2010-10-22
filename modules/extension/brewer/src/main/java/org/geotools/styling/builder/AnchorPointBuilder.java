@@ -16,7 +16,7 @@ import org.geotools.styling.StyleFactory;
  * 
  * @author Jody Garnett (LISAsoft)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/styling/builder/AnchorPointBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/styling/builder/AnchorPointBuilder.java $
  */
 public class AnchorPointBuilder<P> implements Builder<AnchorPoint> {
     private StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);

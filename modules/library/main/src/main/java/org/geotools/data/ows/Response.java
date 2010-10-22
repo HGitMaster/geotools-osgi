@@ -28,7 +28,7 @@ import org.jdom.JDOMException;
  * for a ServiceException and parses it if it encounters one.
  *
  * @author rgould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ows/Response.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/ows/Response.java $
  */
 public abstract class Response {
     protected InputStream inputStream;

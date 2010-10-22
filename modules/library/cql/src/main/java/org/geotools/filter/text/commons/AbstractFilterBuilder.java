@@ -74,7 +74,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/commons/AbstractFilterBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/main/java/org/geotools/filter/text/commons/AbstractFilterBuilder.java $
  */
 public abstract class AbstractFilterBuilder {
 

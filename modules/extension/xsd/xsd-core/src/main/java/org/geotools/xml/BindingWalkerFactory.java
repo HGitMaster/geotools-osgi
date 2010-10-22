@@ -27,7 +27,7 @@ import org.geotools.xml.impl.BindingWalker;
  *
  * TODO: rename, this isnt really a factory!!
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/BindingWalkerFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/BindingWalkerFactory.java $
  */
 public interface BindingWalkerFactory {
     /**

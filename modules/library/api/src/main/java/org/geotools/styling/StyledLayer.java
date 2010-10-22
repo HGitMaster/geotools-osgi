@@ -25,7 +25,7 @@ package org.geotools.styling;
  * <p>
  * TODO: investigate why this is here.
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/StyledLayer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/StyledLayer.java $
  */
 public interface StyledLayer {
     public String getName();

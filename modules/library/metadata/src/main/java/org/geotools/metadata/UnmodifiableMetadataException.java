@@ -22,7 +22,7 @@ package org.geotools.metadata;
  * metadata entity}, but this entity was declared unmodifiable.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/UnmodifiableMetadataException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/UnmodifiableMetadataException.java $
  * @version $Id: UnmodifiableMetadataException.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (Geomatys)
  */

@@ -47,7 +47,7 @@ import org.geotools.ows.ServiceException;
  * 
  * @author Jody Garnett, Refractions Research
  * @author rgould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/WMS1_0_0.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/WMS1_0_0.java $
  */
 public class WMS1_0_0 extends WMSSpecification {
     static final Map formatMimeTypes = new HashMap();

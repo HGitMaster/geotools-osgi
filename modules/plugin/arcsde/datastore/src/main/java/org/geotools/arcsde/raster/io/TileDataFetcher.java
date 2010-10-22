@@ -25,9 +25,9 @@ import com.esri.sde.sdk.client.SeRasterTile;
  * {@link SeRasterTile#getBitMaskData() bitmask data}).
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: TileDataFetcher.java 34789 2010-01-13 16:44:32Z groldan $
+ * @version $Id: TileDataFetcher.java 35100 2010-03-23 15:02:18Z groldan $
  * @since 2.5.9
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/raster/io/TileDataFetcher.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/raster/io/TileDataFetcher.java $
  * @see NativeTileReader
  */
 abstract class TileDataFetcher {
@@ -169,7 +169,7 @@ abstract class TileDataFetcher {
                     final byte[] bitmaskData = tileInfo.getBitmaskData();
                     for (int pn = 0; pn < numPixelsRead; pn++) {
                         if (isNoData(pn, bitmaskData)) {
-                            pixelData[pn] = nodata;
+                            tileData[pn] = nodata;
                         }
                     }
                 }
@@ -374,16 +374,17 @@ abstract class TileDataFetcher {
 
             final short nodata = (short) (tileInfo.getNoDataValue().intValue() & 0xFFFF);
 
+            final short[] tileDataUShorts = tileInfo.getTileDataAsUnsignedShorts();
+            
+            //Arrays.fill(tileDataUShorts, nodata);
             if (numPixelsRead == 0) {
-                short[] tileData = tileInfo.getTileDataAsShorts();
-                Arrays.fill(tileData, nodata);
+                Arrays.fill(tileDataUShorts, nodata);
             } else {
                 /*
                  * getPixelData returns the SeRasterTile internal buffer with no extra copy. It may
                  * contain extra elements for the bitmask array in case there are no-data pixels
                  */
                 final byte[] pixelData = tile.getPixelData();
-                final short[] tileDataUShorts = tileInfo.getTileDataAsUnsignedShorts();
 
                 final boolean hasNoDataPixels = tileInfo.hasNoDataPixels();
                 final byte[] bitmaskData = tileInfo.getBitmaskData();

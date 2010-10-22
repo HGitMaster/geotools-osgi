@@ -29,7 +29,7 @@ import java.io.IOException;
  * dataSourceNameSpace the namespace of the datasource, may be null
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/info/Generalization.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/info/Generalization.java $
  */
 public class Generalization implements Comparable<Generalization> {
     private Double distance;

@@ -29,7 +29,7 @@ package org.geotools.caching.spatialindex;
  * For tracking spatial index statistics.
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/Statistics.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/Statistics.java $
  */
 public interface Statistics {
     public long getReads();

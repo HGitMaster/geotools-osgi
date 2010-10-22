@@ -62,7 +62,7 @@ import org.geotools.xml.Configuration;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/OWSConfiguration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/OWSConfiguration.java $
  */
 public class OWSConfiguration extends Configuration {
     /**

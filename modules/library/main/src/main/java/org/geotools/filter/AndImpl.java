@@ -28,7 +28,7 @@ import org.opengis.filter.FilterVisitor;
  *
  * @author jdeolive
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/AndImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/AndImpl.java $
  */
 public class AndImpl extends LogicFilterImpl implements And {
 	

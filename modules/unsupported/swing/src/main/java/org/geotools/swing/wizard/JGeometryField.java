@@ -36,7 +36,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 /**
  * Text field for filling in a Geometry parameter using WKT.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JGeometryField.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JGeometryField.java $
  */
 public class JGeometryField extends ParamField {
     private JTextArea text;

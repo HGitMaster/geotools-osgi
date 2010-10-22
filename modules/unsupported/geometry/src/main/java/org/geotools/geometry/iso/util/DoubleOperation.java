@@ -25,7 +25,7 @@ package org.geotools.geometry.iso.util;
  * @author Sanjay Jena
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/DoubleOperation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/DoubleOperation.java $
  */
 public class DoubleOperation {
 	

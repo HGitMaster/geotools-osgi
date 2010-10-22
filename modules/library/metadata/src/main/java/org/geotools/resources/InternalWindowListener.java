@@ -27,7 +27,7 @@ import javax.swing.event.InternalFrameListener;
  * {@link java.awt.Frame} and {@link javax.swing.JInternalFrame}.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/InternalWindowListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/InternalWindowListener.java $
  * @version $Id: InternalWindowListener.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

@@ -43,7 +43,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * However <var>n</var>-dimensional grid coverages may contains additional entries.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/ImageGeometry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/ImageGeometry.java $
  * @version $Id: ImageGeometry.java 30998 2008-07-10 15:08:09Z cedricbr $
  * @author Martin Desruisseaux
  * @author Cédric Briançon

@@ -29,7 +29,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * A feature reader for the VPFFile object
  *
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/file/VPFFileFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/file/VPFFileFeatureReader.java $
  */
 public class VPFFileFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFeature> {
     private final VPFFile featureType;

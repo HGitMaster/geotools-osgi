@@ -42,7 +42,7 @@ import org.geotools.data.DataUtilities;
  * 
  * @author Manuele Ventoruzzo
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/attribute/AttributeIndexSummary.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/attribute/AttributeIndexSummary.java $
  */
 public class AttributeIndexSummary {
 

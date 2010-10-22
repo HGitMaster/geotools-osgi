@@ -92,7 +92,7 @@ import org.opengis.referencing.operation.MathTransform;
  * coverage. The key for this property will be GC_ROI and the type of the object
  * {@link Polygon}.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Crop.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Crop.java $
  * @todo make this operation work with a general polygon. instead of an envelope.
  * @todo make this operation more t,z friendly
  * @version $Id: Crop.java 31040 2008-07-21 23:06:58Z simboss $

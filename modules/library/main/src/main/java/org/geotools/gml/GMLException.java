@@ -20,7 +20,7 @@ package org.geotools.gml;
  * An exception used to represent any GML related errors.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/GMLException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/gml/GMLException.java $
  * @version $Id: GMLException.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public class GMLException extends java.lang.Exception {

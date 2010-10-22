@@ -31,7 +31,7 @@ import org.opengis.referencing.operation.ConicProjection;
 /**
  * Base class for conical map projections.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultConicProjection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/DefaultConicProjection.java $
  * @version $Id: DefaultConicProjection.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

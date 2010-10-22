@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author Cory Horner, Refractions
  * 
  * @since 2.2.M2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/AbstractCalcResult.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/visitor/AbstractCalcResult.java $
  */
 public class AbstractCalcResult implements CalcResult {
     public boolean isCompatible(CalcResult targetResults) {

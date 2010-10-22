@@ -16,7 +16,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author Michael Bedward
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/feature/AbstractFeatureCollectionProcess.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/feature/AbstractFeatureCollectionProcess.java $
  */
 public abstract class AbstractFeatureCollectionProcess extends AbstractProcess {
 

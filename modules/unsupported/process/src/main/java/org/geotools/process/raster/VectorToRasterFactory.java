@@ -31,9 +31,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.Parameter;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.process.feature.AbstractFeatureCollectionProcessFactory;
 import org.geotools.text.Text;
+import org.opengis.geometry.Envelope;
 import org.opengis.util.InternationalString;
 
 /**
@@ -42,7 +42,7 @@ import org.opengis.util.InternationalString;
  * @author Steve Ansari, NOAA
  * @author Michael Bedward
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/raster/VectorToRasterFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/raster/VectorToRasterFactory.java $
  */
 public class VectorToRasterFactory extends AbstractFeatureCollectionProcessFactory {
 
@@ -72,13 +72,16 @@ public class VectorToRasterFactory extends AbstractFeatureCollectionProcessFacto
             1, 1, null, null);
 
     /**
-     * The name of the feature attribute that will be used to set the
-     * value of cells in the output grid. The attribute must be numeric.
-     * Mandatory.
+     * The source of values for cells in the output grid coverage. 
+     * This is either the name ({@code String}) of a numeric feature property
+     * or an {@code org.opengis.filter.expression.Expression} that can be
+     * evaluated to a numeric value.
+     * <p>
+     * This parameter is mandatory.
      */
-    static final Parameter<String> ATTRIBUTE = new Parameter<String>(
+    static final Parameter<Object> ATTRIBUTE = new Parameter<Object>(
             "attribute",
-            String.class,
+            Object.class,
             Text.text("Attribute"),
             Text.text("The feature attribute to use for raster cell values"),
             true, // this parameter is mandatory
@@ -89,9 +92,9 @@ public class VectorToRasterFactory extends AbstractFeatureCollectionProcessFacto
      * Optional: if not provided the bounds of the input FeatureCollection
      * will be used.
      */
-    static final Parameter<ReferencedEnvelope> BOUNDS = new Parameter<ReferencedEnvelope>(
+    static final Parameter<Envelope> BOUNDS = new Parameter<Envelope>(
             "bounds",
-            ReferencedEnvelope.class,
+            Envelope.class,
             Text.text("Bounds"),
             Text.text("Bounds of the area to rasterize"),
             false, // this parameter is optional

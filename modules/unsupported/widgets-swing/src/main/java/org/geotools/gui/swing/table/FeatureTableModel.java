@@ -28,7 +28,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * An implementation of Swing's table model which allows feature tables to be displayed.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/table/FeatureTableModel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/table/FeatureTableModel.java $
  * @version $Id: FeatureTableModel.java 30921 2008-07-05 07:51:23Z jgarnett $
  * @author James Macgill, CCG
  *

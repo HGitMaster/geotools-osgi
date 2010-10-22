@@ -41,7 +41,7 @@ import org.opengis.util.InternationalString;
  * character separator} between name elements.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/GenericName.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/GenericName.java $
  * @version $Id: GenericName.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

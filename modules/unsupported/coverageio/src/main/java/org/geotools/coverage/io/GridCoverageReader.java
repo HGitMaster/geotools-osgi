@@ -39,7 +39,7 @@ import org.opengis.referencing.operation.MathTransform;
  * </pre></blockquote>
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/GridCoverageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/GridCoverageReader.java $
  * @version $Id: GridCoverageReader.java 33009 2009-05-14 19:40:06Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */

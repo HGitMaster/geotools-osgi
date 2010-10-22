@@ -48,7 +48,7 @@ import org.geotools.filter.ConstantExpression;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/OverlapBehavior.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/OverlapBehavior.java $
  * @deprecated Please use org.opengis.style.OverlapBehavior
  */
 public class OverlapBehavior extends ConstantExpression {

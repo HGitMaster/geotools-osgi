@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Defines an expression that holds a literal for return.
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/LiteralExpressionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/LiteralExpressionImpl.java $
  * @version $Id: LiteralExpressionImpl.java 34698 2009-12-18 09:33:36Z aaime $
  */
 public class LiteralExpressionImpl extends DefaultExpression

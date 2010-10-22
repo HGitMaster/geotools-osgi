@@ -68,7 +68,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Subclass must override encode and getValue as usual.
  * </p>
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/filter/FilterComplexTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/filter/FilterComplexTypes.java $
  */
 public class FilterComplexTypes {
     public final static String CACHE_SERVICE_EXCEPTIONS = "FilterComplexTypes.CACHE_SERVICE_EXCEPTIONS";

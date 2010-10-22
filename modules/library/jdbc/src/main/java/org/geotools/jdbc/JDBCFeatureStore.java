@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCFeatureStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCFeatureStore.java $
  */
 public final class JDBCFeatureStore extends ContentFeatureStore {
     

@@ -28,7 +28,7 @@ import org.geotools.resources.Utilities;
  * Style to represent points as small filled and stroked shapes
  *
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/MarkStyle2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/MarkStyle2D.java $
  * @version $Id: MarkStyle2D.java 34849 2010-01-29 16:07:40Z aaime $
  */
 public class MarkStyle2D extends PolygonStyle2D {

@@ -24,7 +24,7 @@ package org.geotools.feature.visitor;
  *
  * @see FeatureVisitor
  * @since 2.2.M2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/FeatureCalc.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/visitor/FeatureCalc.java $
  */
 public interface FeatureCalc extends FeatureVisitor {
     /**

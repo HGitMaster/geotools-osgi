@@ -64,7 +64,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/featurecache/AbstractFeatureCache.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/featurecache/AbstractFeatureCache.java $
  */
 public abstract class AbstractFeatureCache implements FeatureCache, FeatureListener {
 

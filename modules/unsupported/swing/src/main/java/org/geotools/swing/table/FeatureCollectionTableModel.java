@@ -21,7 +21,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * {@code JTable}
  * <p>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/table/FeatureCollectionTableModel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/table/FeatureCollectionTableModel.java $
  */
 public class FeatureCollectionTableModel extends AbstractTableModel {
     private static final long serialVersionUID = -7119885084300393935L;

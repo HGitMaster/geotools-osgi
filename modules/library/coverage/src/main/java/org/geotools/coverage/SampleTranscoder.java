@@ -53,7 +53,7 @@ import org.geotools.image.TransfertRectIter;
  * {@link java.awt.image.renderable.ContextualRenderedImageFactory}. The image
  * operation name is {@code "org.geotools.SampleTranscode"}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/SampleTranscoder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/SampleTranscoder.java $
  * @version $Id: SampleTranscoder.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

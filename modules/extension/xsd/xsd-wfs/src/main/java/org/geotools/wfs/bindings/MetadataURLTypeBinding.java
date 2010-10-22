@@ -18,6 +18,7 @@ package org.geotools.wfs.bindings;
 
 import javax.xml.namespace.QName;
 
+import net.opengis.wfs.MetadataURLType;
 import net.opengis.wfs.WfsFactory;
 
 import org.geotools.wfs.WFS;
@@ -78,7 +79,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/MetadataURLTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/MetadataURLTypeBinding.java $
  */
 public class MetadataURLTypeBinding extends AbstractComplexEMFBinding {
     public MetadataURLTypeBinding(WfsFactory factory) {
@@ -99,7 +100,7 @@ public class MetadataURLTypeBinding extends AbstractComplexEMFBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return MetadataURLType.class;
     }
 
     /**

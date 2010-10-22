@@ -30,7 +30,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/ValidationResults.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/ValidationResults.java $
  */
 public interface ValidationResults {
     /**

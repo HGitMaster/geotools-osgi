@@ -85,7 +85,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  *
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/AbstractDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/AbstractDataStore.java $
  */
 public abstract class AbstractDataStore implements DataStore {
     /** The logger for the filter module. */

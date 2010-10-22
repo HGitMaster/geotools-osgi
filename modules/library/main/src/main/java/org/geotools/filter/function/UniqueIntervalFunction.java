@@ -36,7 +36,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Clone of EqualIntervalFunction for unique values
  *
  * @author Cory Horner
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/UniqueIntervalFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/function/UniqueIntervalFunction.java $
  */
 public class UniqueIntervalFunction extends ClassificationFunction {
     

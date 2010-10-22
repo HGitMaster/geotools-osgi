@@ -25,7 +25,7 @@ import org.opengis.metadata.quality.AccuracyOfATimeMeasurement;
 /**
  * Correctness of the temporal references of an item (reporting of error in time measurement).
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/AccuracyOfATimeMeasurementImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/AccuracyOfATimeMeasurementImpl.java $
  * @version $Id: AccuracyOfATimeMeasurementImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

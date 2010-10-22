@@ -59,7 +59,7 @@ import org.geotools.swing.action.InfoAction;
  * @author Michael Bedward
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/JMapFrame.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/JMapFrame.java $
  */
 public class JMapFrame extends JFrame {
 

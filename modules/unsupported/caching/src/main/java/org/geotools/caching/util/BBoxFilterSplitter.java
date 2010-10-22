@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/util/BBoxFilterSplitter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/util/BBoxFilterSplitter.java $
  */
 public class BBoxFilterSplitter implements FilterVisitor {
     private static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory2(null);

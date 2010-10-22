@@ -28,7 +28,7 @@ import org.junit.Test;
  * @author Simone Giannecchini,GeoSolutions
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic/src/test/java/org/geotools/gce/imagemosaic/ImageMosaicServiceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic/src/test/java/org/geotools/gce/imagemosaic/ImageMosaicServiceTest.java $
  */
 public class ImageMosaicServiceTest  {
 	@Test

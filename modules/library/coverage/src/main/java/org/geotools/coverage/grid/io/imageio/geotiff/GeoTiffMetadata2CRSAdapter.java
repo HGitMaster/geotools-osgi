@@ -50,6 +50,7 @@ import javax.measure.unit.Unit;
 import org.geotools.coverage.grid.io.imageio.geotiff.codes.GeoTiffCoordinateTransformationsCodes;
 import org.geotools.coverage.grid.io.imageio.geotiff.codes.GeoTiffGCSCodes;
 import org.geotools.coverage.grid.io.imageio.geotiff.codes.GeoTiffPCSCodes;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.CRS;
@@ -154,7 +155,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * Cached {@link MathTransformFactory} for building {@link MathTransform}
 	 * objects.
 	 */
-	private final static MathTransformFactory mtFactory = new DefaultMathTransformFactory();
+	private MathTransformFactory mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
 
 	/**
 	 * The default value for {@link #maxStrongReferences} .
@@ -1799,4 +1800,5 @@ public final class GeoTiffMetadata2CRSAdapter {
 	public Hints getHints() {
 		return hints;
 	}
+	
 }

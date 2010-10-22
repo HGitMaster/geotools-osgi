@@ -22,7 +22,7 @@ package org.geotools.gce.imagemosaic.jdbc;
  * @author mcr
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/DB2Dialect.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/DB2Dialect.java $
  */
 public class DB2Dialect extends DBDialect {
 	public DB2Dialect(Config config) {

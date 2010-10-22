@@ -88,7 +88,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *
  * @author sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/demo/widgets/StreamWidgetsDemo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/demo/widgets/StreamWidgetsDemo.java $
  */
 public class StreamWidgetsDemo extends JFrame{
 

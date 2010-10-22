@@ -27,7 +27,7 @@ import org.geotools.geometry.iso.topograph2D.Coordinate;
  *  A {@link CoordinateFilter} that builds a set of <code>Coordinate</code>s.
  *  The set of coordinates contains no duplicate points.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/util/UniqueCoordinateArrayFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/util/UniqueCoordinateArrayFilter.java $
  */
 public class UniqueCoordinateArrayFilter implements CoordinateFilter {
   TreeSet treeSet = new TreeSet();

@@ -34,7 +34,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Breaks a FeatureCollection<SimpleFeatureType, SimpleFeature> into classes with an equal number of items in each.
  * 
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/QuantileFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/function/QuantileFunction.java $
  */
 public class QuantileFunction extends ClassificationFunction {
 

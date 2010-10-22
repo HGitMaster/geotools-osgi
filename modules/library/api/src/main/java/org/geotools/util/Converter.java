@@ -24,7 +24,7 @@ package org.geotools.util;
  *
  * @since 2.4
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/util/Converter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/util/Converter.java $
  */
 public interface Converter {
     /**

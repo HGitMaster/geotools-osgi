@@ -71,7 +71,7 @@ import org.opengis.filter.sort.SortBy;
  * </p>
  * @author jgarnett
  * @since 2.1.RC0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/DataFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/store/DataFeatureCollection.java $
  */
 public abstract class DataFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
     

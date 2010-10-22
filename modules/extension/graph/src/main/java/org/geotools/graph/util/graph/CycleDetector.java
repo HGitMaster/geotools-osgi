@@ -32,7 +32,7 @@ import org.geotools.graph.traverse.standard.BreadthFirstTopologicalIterator;
  * @see org.geotools.graph.traverse.standard.BreadthFirstTopologicalIterator
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/util/graph/CycleDetector.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/util/graph/CycleDetector.java $
  */
 public class CycleDetector implements GraphWalker {
   

@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * Simple data store wrapper for feature collections. Allows to use feature collections in the user
  * interface layer and everything else where a data store or a feature source is needed.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/collection/CollectionDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/collection/CollectionDataStore.java $
  */
 public class CollectionDataStore extends AbstractDataStore {
     SimpleFeatureType featureType;
@@ -72,16 +72,25 @@ public class CollectionDataStore extends AbstractDataStore {
         if (collection.size() == 0) {
             this.featureType = FeatureTypes.EMPTY;
         } else {
-            Iterator iter = null;
+            // because this is a feature collection we can sort this one out
+            this.featureType = collection.getSchema();
+            /*
+            Iterator<SimpleFeature> iter = null;
             try {
                 iter = collection.iterator();
-                this.featureType = ((SimpleFeature) iter.next()).getFeatureType();
+                if( iter.hasNext() ){
+                    SimpleFeature feature = iter.next();
+                    this.featureType = feature.getFeatureType();                    
+                }
+                else {
+                    this.featureType = null;
+                }
             } finally {
                 if (iter != null)
                     collection.close(iter);
             }
+            */
         }
-
         collection.addListener(new FeatureCollectionListener());
     }
 

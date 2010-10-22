@@ -28,7 +28,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * row-based approach for accessing the data.
  *
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/AttributeReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/AttributeReader.java $
  * @version $Id: AttributeReader.java 30648 2008-06-12 19:22:35Z acuster $
  *
  * @see AttributeAcceptor

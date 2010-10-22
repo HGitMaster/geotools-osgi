@@ -18,36 +18,23 @@ package org.geotools.gce.imagepyramid;
 
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
+import junit.framework.Assert;
 
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 import org.geotools.coverage.grid.io.GridFormatFinder;
+import org.junit.Test;
 
 /**
  * @author Simone Giannecchini
  * @since 2.3
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagepyramid/src/test/java/org/geotools/gce/imagepyramid/ImagePyramidServiceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagepyramid/src/test/java/org/geotools/gce/imagepyramid/ImagePyramidServiceTest.java $
  */
-public class ImagePyramidServiceTest extends TestCase {
+public class ImagePyramidServiceTest extends Assert {
 
-	/**
-	 * 
-	 */
-	public ImagePyramidServiceTest() {
 
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		TestRunner.run(ImagePyramidServiceTest.class);
-
-	}
-
+	@Test
 	public void testIsAvailable() {
 		final Iterator<GridFormatFactorySpi> list = GridFormatFinder.getAvailableFormats().iterator();
 		boolean found = false;

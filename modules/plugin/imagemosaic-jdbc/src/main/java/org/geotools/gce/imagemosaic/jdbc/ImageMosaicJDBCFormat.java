@@ -34,7 +34,6 @@ import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
@@ -59,7 +58,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * @author mcr
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/ImageMosaicJDBCFormat.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/ImageMosaicJDBCFormat.java $
  */
 public class ImageMosaicJDBCFormat extends AbstractGridFormat implements Format {
 	/** Logger. */

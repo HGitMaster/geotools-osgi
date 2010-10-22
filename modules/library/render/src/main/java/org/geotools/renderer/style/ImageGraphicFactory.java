@@ -23,14 +23,15 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import org.geotools.util.SoftValueHashMap;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.Feature;
 import org.opengis.filter.expression.Expression;
@@ -43,7 +44,7 @@ import org.opengis.filter.expression.Expression;
  * @author Andrea Aime - TOPP
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/ImageGraphicFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/ImageGraphicFactory.java $
  */
 public class ImageGraphicFactory implements ExternalGraphicFactory {
 
@@ -51,7 +52,7 @@ public class ImageGraphicFactory implements ExternalGraphicFactory {
     private static final Logger LOGGER = Logging.getLogger(ImageGraphicFactory.class);
 
     /** Current way to load images */
-    ImageLoader imageLoader = new ImageLoader();
+    static Map<URL, BufferedImage> imageCache = Collections.synchronizedMap(new SoftValueHashMap<URL, BufferedImage>());
 
     /** Holds the of graphic formats supported by the current jdk */
     static Set<String> supportedGraphicFormats = new HashSet<String>(Arrays.asList(ImageIO
@@ -68,14 +69,11 @@ public class ImageGraphicFactory implements ExternalGraphicFactory {
             throw new IllegalArgumentException(
                     "The provided expression cannot be evaluated to a URL");
 
-        // imageLoader is not thread safe
-        BufferedImage image;
-        synchronized (imageLoader) {
-            image = imageLoader.get(location, false);
-        }
+        // get the image from the cache, or load it
+        BufferedImage image = imageCache.get(location);
         if(image == null) {
-            LOGGER.log(Level.FINE, "Failed to load image {0}", location);
-            return null;
+            image = ImageIO.read(location);
+            imageCache.put(location, image);
         }
         
         // if scaling is needed, perform it
@@ -101,4 +99,10 @@ public class ImageGraphicFactory implements ExternalGraphicFactory {
         return Collections.unmodifiableSet(supportedGraphicFormats);
     }
 
+    /**
+     * Images are cached by the factory, this method can be used to drop the cache 
+     */
+    public static void resetCache() {
+        imageCache.clear();
+    }
 }

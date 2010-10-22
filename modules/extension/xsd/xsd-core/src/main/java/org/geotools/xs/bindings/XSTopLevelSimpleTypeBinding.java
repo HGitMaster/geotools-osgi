@@ -54,7 +54,7 @@ import org.geotools.xs.XS;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/bindings/XSTopLevelSimpleTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/bindings/XSTopLevelSimpleTypeBinding.java $
  */
 public class XSTopLevelSimpleTypeBinding extends AbstractComplexBinding {
     /**

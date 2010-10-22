@@ -28,7 +28,7 @@ import org.opengis.metadata.spatial.GridSpatialRepresentation;
 /**
  * Basic information required to uniquely identify a resource or resources.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/spatial/GridSpatialRepresentationImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/spatial/GridSpatialRepresentationImpl.java $
  * @version $Id: GridSpatialRepresentationImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

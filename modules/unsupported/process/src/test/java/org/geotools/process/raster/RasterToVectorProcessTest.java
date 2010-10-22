@@ -16,6 +16,7 @@
  */
 package org.geotools.process.raster;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import java.awt.geom.Rectangle2D;
@@ -32,7 +33,11 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.NameImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.process.Process;
+import org.geotools.process.ProcessFactory;
+import org.geotools.process.Processors;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -44,19 +49,30 @@ import static org.junit.Assert.*;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/test/java/org/geotools/process/raster/RasterToVectorProcessTest.java $
- * @version $Id: RasterToVectorProcessTest.java 34608 2009-12-03 07:44:20Z mbedward $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/test/java/org/geotools/process/raster/RasterToVectorProcessTest.java $
+ * @version $Id: RasterToVectorProcessTest.java 35796 2010-07-01 04:28:28Z jive $
  */
 public class RasterToVectorProcessTest {
 
     private static final GridCoverageFactory covFactory = CoverageFactoryFinder.getGridCoverageFactory(null);
 
     /**
+     * Tests creating the process via the Processors class
+     */
+    @Test
+    public void testCreateProcess() {
+        System.out.println("   create process");
+        Process p = Processors.createProcess(new NameImpl("gt", "RasterToVector"));
+        assertNotNull(p);
+        assertTrue(p instanceof RasterToVectorProcess);
+    }
+
+    /**
      * Test conversion with a tiny coverage
      */
     @Test
     public void testConvert() throws Exception {
-        System.out.println("   convert simple raster");
+        System.out.println("   simple grid");
 
         // small raster with 3 regions, two which touch at a corner
         final float[][] DATA = {
@@ -79,7 +95,7 @@ public class RasterToVectorProcessTest {
 
         ProgressListener progress = null;
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc =
-                RasterToVectorProcess.process(cov, band, null, outsideValues, progress);
+                RasterToVectorProcess.process(cov, band, null, outsideValues, true, progress);
 
         double perimeter = 0;
         double area = 0;
@@ -104,7 +120,7 @@ public class RasterToVectorProcessTest {
      */
     @Test
     public void testHoles() throws Exception {
-        System.out.println("   test conversion with holes");
+        System.out.println("   grid with holes");
 
         final float[][] DATA = {
             {1, 1, 1, 1, 0, 1, 1, 1, 1},
@@ -125,7 +141,7 @@ public class RasterToVectorProcessTest {
 
         ProgressListener progress = null;
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc =
-                RasterToVectorProcess.process(cov, band, null, outsideValues, progress);
+                RasterToVectorProcess.process(cov, band, null, outsideValues, true, progress);
 
         assertEquals(NUM_POLYS, fc.size());
 
@@ -146,7 +162,7 @@ public class RasterToVectorProcessTest {
      */
     @Test
     public void testNoOutside() throws Exception {
-        System.out.println("   test conversion with no outside values");
+        System.out.println("   no outside values");
 
         final float[][] DATA = {
             {1, 1, 1, 1, 0, 1, 1, 1, 1},
@@ -166,9 +182,44 @@ public class RasterToVectorProcessTest {
 
         ProgressListener progress = null;
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc =
-                RasterToVectorProcess.process(cov, band, null, null, progress);
+                RasterToVectorProcess.process(cov, band, null, null, true, progress);
 
         assertEquals(NUM_POLYS, fc.size());
+    }
+
+    @Test
+    public void testNoInside() throws Exception {
+        System.out.println("   ignore inside edges");
+
+        final float[][] DATA = {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 1, 1, 1, 2, 2, 2, 3, 3, 0},
+            {0, 1, 1, 1, 2, 2, 2, 3, 3, 0},
+            {0, 1, 1, 1, 2, 2, 2, 3, 3, 0},
+            {0, 4, 4, 5, 5, 5, 6, 6, 6, 0},
+            {0, 4, 4, 5, 5, 5, 6, 6, 6, 0},
+            {0, 4, 4, 5, 5, 5, 6, 6, 6, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        };
+
+        final int width = DATA[0].length;
+        final int height = DATA.length;
+
+        GridCoverage2D cov = covFactory.create(
+                "coverage",
+                DATA,
+                new ReferencedEnvelope(0, width, 0, height, null));
+
+        int band = 0;
+
+        ProgressListener progress = null;
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc =
+                RasterToVectorProcess.process(cov, band, null, Collections.singleton(0.0), false, progress);
+
+        assertEquals(1, fc.size());
+        Geometry geom = (Geometry) fc.features().next().getDefaultGeometry();
+        Envelope env = geom.getEnvelopeInternal();
+        assertEquals(new Envelope(1, width-1, 1, height-1), env);
     }
 
     /**
@@ -176,7 +227,7 @@ public class RasterToVectorProcessTest {
      */
     @Test
     public void testProblemTiff() throws Exception {
-        System.out.println("   convert problem image");
+        System.out.println("   test problem image");
 
         final double ROUND_OFF_TOLERANCE = 1.0e-4D;
 
@@ -190,12 +241,12 @@ public class RasterToVectorProcessTest {
         GridCoverage2D cov = covFactory.create("coverage", img, env);
 
         int band = 0;
-        int outside = -1;
-        Set<Double> outsideValues = Collections.singleton(Double.valueOf(outside));
+        double outside = -1.0;
+        Set<Double> outsideValues = Collections.singleton(outside);
 
         ProgressListener progress = null;
         FeatureCollection<SimpleFeatureType, SimpleFeature> fc =
-                RasterToVectorProcess.process(cov, band, null, outsideValues, progress);
+                RasterToVectorProcess.process(cov, band, null, outsideValues, true, progress);
 
         // validate geometries and sum areas
         FeatureIterator<SimpleFeature> iter = fc.features();
@@ -206,14 +257,14 @@ public class RasterToVectorProcessTest {
                 Geometry geom = (Geometry) feature.getDefaultGeometry();
                 assertTrue(geom.isValid());
 
-                int code = ((Number) feature.getAttribute("code")).intValue();
-                if (code != outside) {
-                    Double sum = areas.get(code);
+                double gridvalue = (Double) feature.getAttribute("gridvalue");
+                if (gridvalue != outside) {
+                    Double sum = areas.get((int)gridvalue);
                     if (sum == null) {
                         sum = 0.0d;
                     }
                     sum += geom.getArea();
-                    areas.put(code, sum);
+                    areas.put((int)gridvalue, sum);
                 }
             }
         } finally {
@@ -225,21 +276,21 @@ public class RasterToVectorProcessTest {
         Raster tile = img.getTile(0, 0);
         for (int y = img.getMinY(), ny = 0; ny < img.getHeight(); y++, ny++) {
             for (int x = img.getMinX(), nx = 0; nx < img.getWidth(); x++, nx++) {
-                int code = tile.getSample(x, y, 0);
-                if (code != outside) {
-                    Double sum = areas.get(code);
+                double gridvalue = tile.getSampleDouble(x, y, 0);
+                if (gridvalue != outside) {
+                    Double sum = areas.get((int)gridvalue);
                     if (sum == null) {
                         sum = 1.0D;
                     } else {
                         sum += 1.0D;
                     }
-                    areas.put(code, sum);
+                    areas.put((int)gridvalue, sum);
                 }
             }
         }
 
-        for (Integer code : imgAreas.keySet()) {
-            double ratio = areas.get(code) / imgAreas.get(code);
+        for (Integer i : imgAreas.keySet()) {
+            double ratio = areas.get(i) / imgAreas.get(i);
             assertTrue(Math.abs(1.0D - ratio) < ROUND_OFF_TOLERANCE);
         }
     }

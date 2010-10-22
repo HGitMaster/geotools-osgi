@@ -27,7 +27,8 @@ import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-
+import org.opengis.filter.expression.Expression;
+import org.geotools.data.complex.ComplexFeatureConstants;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeBuilder;
 import org.geotools.feature.AttributeImpl;
@@ -35,7 +36,6 @@ import org.geotools.feature.NameImpl;
 import org.geotools.feature.Types;
 import org.geotools.feature.ValidatingFeatureFactoryImpl;
 import org.geotools.feature.type.AttributeDescriptorImpl;
-import org.geotools.feature.type.ComplexFeatureTypeImpl;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.util.CheckedArrayList;
 import org.geotools.xs.XSSchema;
@@ -67,8 +67,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: XPath.java 34894 2010-02-16 07:51:16Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/XPath.java $
+ * @version $Id: XPath.java 35958 2010-07-28 08:20:20Z victortey $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/XPath.java $
  * @since 2.4
  */
 public class XPath {
@@ -180,8 +180,14 @@ public class XPath {
             while (mine.hasNext()) {
                 myStep = (Step) mine.next();
                 hisStep = (Step) him.next();
-                if (!myStep.equalsIgnoreIndex(hisStep)) {
-                    return false;
+                if (myStep.isIndexed()) {
+                    if (!myStep.equals(hisStep)) {
+                        return false;
+                    }
+                } else {
+                    if (!myStep.equalsIgnoreIndex(hisStep)) {
+                        return false;
+                    }
                 }
             }
             return true;
@@ -279,11 +285,16 @@ public class XPath {
             if (other == this) {
                 return true;
             }
-            return other.getName().equals(getName());
+            return attributeName.equals(other.attributeName)
+                    && isXmlAttribute == other.isXmlAttribute;
         }
 
         public int getIndex() {
             return index;
+        }
+
+        public boolean isIndexed() {
+            return isIndexed;
         }
 
         public QName getName() {
@@ -474,7 +485,7 @@ public class XPath {
             final Name rootName = root.getName();
             // don't use default namespace for client properties (xml attribute), and FEATURE_LINK
             final String defaultNamespace = (isXmlAttribute
-                    || localName.equals(ComplexFeatureTypeImpl.FEATURE_CHAINING_LINK_NAME
+                    || localName.equals(ComplexFeatureConstants.FEATURE_CHAINING_LINK_NAME
                             .getLocalPart()) || rootName.getNamespaceURI() == null) ? XMLConstants.NULL_NS_URI
                     : rootName.getNamespaceURI();
             namespaceUri = defaultNamespace;
@@ -525,7 +536,13 @@ public class XPath {
      * @return
      */
     public Attribute set(final Attribute att, final StepList xpath, Object value, String id,
-            AttributeType targetNodeType, boolean isXlinkRef) {
+            AttributeType targetNodeType, boolean isXlinkRef, Expression sourceExpression) {
+        return set(att, xpath, value, id, targetNodeType, isXlinkRef, null, sourceExpression);
+    }
+
+    public Attribute set(final Attribute att, final StepList xpath, Object value, String id,
+            AttributeType targetNodeType, boolean isXlinkRef, AttributeDescriptor targetDescriptor,
+            Expression sourceExpression) {
         if (XPath.LOGGER.isLoggable(Level.CONFIG)) {
             XPath.LOGGER.entering("XPath", "set", new Object[] { att, xpath, value, id,
                     targetNodeType });
@@ -538,7 +555,7 @@ public class XPath {
         // xpath);
         // }
 
-        ComplexAttribute parent = (ComplexAttribute) att;
+        Attribute parent = att;
         Name rootName = null;
         if (parent.getDescriptor() != null) {
             rootName = parent.getDescriptor().getName();
@@ -557,78 +574,91 @@ public class XPath {
 
         for (; stepsIterator.hasNext();) {
             final XPath.Step currStep = (Step) stepsIterator.next();
-            final ComplexType parentType = (ComplexType) parent.getType();
+            AttributeDescriptor currStepDescriptor = null;
+            final boolean isLastStep = !stepsIterator.hasNext();
             final QName stepName = currStep.getName();
             final Name attributeName = Types.toName(stepName);
 
-            final boolean isLastStep = !stepsIterator.hasNext();
+            final AttributeType _parentType = parent.getType();
+            if (_parentType.equals(XSSchema.ANYTYPE_TYPE) && targetDescriptor != null) {
+                // this needs to be passed on if casting anyType to something else, since it won't
+                // exist in the schema
+                currStepDescriptor = targetDescriptor;
+            } else {
+                ComplexType parentType = (ComplexType) _parentType;
 
-            AttributeDescriptor currStepDescriptor = null;
+                if (!isLastStep || targetNodeType == null) {
+                    if (null == attributeName.getNamespaceURI()) {
+                        currStepDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
+                                attributeName.getLocalPart());
+                    } else {
+                        currStepDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
+                                attributeName);
+                    }
 
-            if (!isLastStep || targetNodeType == null) {
-                if (null == attributeName.getNamespaceURI()) {
-                    currStepDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
-                            attributeName.getLocalPart());
+                    if (currStepDescriptor == null) {
+                        // need to take the non easy way, may be the instance has a
+                        // value for this step with a different name, of a derived
+                        // type of the one declared in the parent type
+                        String prefixedStepName = currStep.toString();
+                        PropertyName name = FF.property(prefixedStepName);
+                        Attribute child = (Attribute) name.evaluate(parent);
+                        if (child != null) {
+                            currStepDescriptor = child.getDescriptor();
+                        }
+                    }
                 } else {
-                    currStepDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
-                            attributeName);
+                    AttributeDescriptor actualDescriptor;
+                    if (null == attributeName.getNamespaceURI()) {
+                        actualDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
+                                attributeName.getLocalPart(), targetNodeType);
+                    } else {
+                        actualDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
+                                attributeName, targetNodeType);
+                    }
+
+                    if (actualDescriptor != null) {
+                        int minOccurs = actualDescriptor.getMinOccurs();
+                        int maxOccurs = actualDescriptor.getMaxOccurs();
+                        boolean nillable = actualDescriptor.isNillable();
+                        currStepDescriptor = descriptorFactory
+                                .createAttributeDescriptor(targetNodeType, attributeName,
+                                        minOccurs, maxOccurs, nillable, null);
+                    }
                 }
 
                 if (currStepDescriptor == null) {
-                    // need to take the non easy way, may be the instance has a
-                    // value for this step with a different name, of a derived
-                    // type of the one declared in the parent type
-                    String prefixedStepName = currStep.toString();
-                    PropertyName name = FF.property(prefixedStepName);
-                    Attribute child = (Attribute) name.evaluate(parent);
-                    if (child != null) {
-                        currStepDescriptor = child.getDescriptor();
+                    StringBuffer parentAtts = new StringBuffer();
+                    Collection properties = parentType.getDescriptors();
+                    for (Iterator it = properties.iterator(); it.hasNext();) {
+                        PropertyDescriptor desc = (PropertyDescriptor) it.next();
+                        Name name = desc.getName();
+                        parentAtts.append(name.getNamespaceURI());
+                        parentAtts.append("#");
+                        parentAtts.append(name.getLocalPart());
+                        if (it.hasNext()) {
+                            parentAtts.append(", ");
+                        }
                     }
-                }
-            } else {
-                AttributeDescriptor actualDescriptor;
-                if (null == attributeName.getNamespaceURI()) {
-                    actualDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
-                            attributeName.getLocalPart(), targetNodeType);
-                } else {
-                    actualDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
-                            attributeName, targetNodeType);
-                }
-
-                if (actualDescriptor != null) {
-                    int minOccurs = actualDescriptor.getMinOccurs();
-                    int maxOccurs = actualDescriptor.getMaxOccurs();
-                    boolean nillable = actualDescriptor.isNillable();
-                    currStepDescriptor = descriptorFactory.createAttributeDescriptor(
-                            targetNodeType, attributeName, minOccurs, maxOccurs, nillable, null);
+                    throw new IllegalArgumentException(currStep
+                            + " is not a valid location path for type " + parentType.getName()
+                            + ". " + currStep + " ns: " + currStep.getName().getNamespaceURI()
+                            + ", " + parentType.getName().getLocalPart() + " properties: "
+                            + parentAtts);
                 }
             }
 
-            if (currStepDescriptor == null) {
-                StringBuffer parentAtts = new StringBuffer();
-                Collection properties = parentType.getDescriptors();
-                for (Iterator it = properties.iterator(); it.hasNext();) {
-                    PropertyDescriptor desc = (PropertyDescriptor) it.next();
-                    Name name = desc.getName();
-                    parentAtts.append(name.getNamespaceURI());
-                    parentAtts.append("#");
-                    parentAtts.append(name.getLocalPart());
-                    if (it.hasNext()) {
-                        parentAtts.append(", ");
-                    }
-                }
-                throw new IllegalArgumentException(currStep
-                        + " is not a valid location path for type " + parentType.getName() + ". "
-                        + currStep + " ns: " + currStep.getName().getNamespaceURI() + ", "
-                        + parentType.getName().getLocalPart() + " properties: " + parentAtts);
-            }
-
- 
             if (isLastStep) {
                 // reached the leaf
                 if (currStepDescriptor == null) {
                     throw new IllegalArgumentException(currStep
-                            + " is not a valid location path for type " + parentType.getName());
+                            + " is not a valid location path for type " + _parentType.getName());
+                }
+                if (value == null && !currStepDescriptor.isNillable() && sourceExpression != null
+                        && !sourceExpression.equals(Expression.NIL)) {
+                    if (currStepDescriptor.getMinOccurs() == 0) {
+                        return null;
+                    }
                 }
                 int index = currStep.getIndex();
                 Attribute attribute = setValue(currStepDescriptor, id, value, index, parent,
@@ -638,49 +668,50 @@ public class XPath {
                 // parent = appendComplexProperty(parent, currStep,
                 // currStepDescriptor);
                 int index = currStep.getIndex();
-                Attribute _parent = setValue(currStepDescriptor, null, null, index, parent, null,
-                        isXlinkRef);
-                parent = (ComplexAttribute) _parent;
+                parent = setValue(currStepDescriptor, null, new ArrayList<Property>(), index,
+                        parent, null, isXlinkRef);
             }
         }
         throw new IllegalStateException();
     }
 
     private Attribute setValue(final AttributeDescriptor descriptor, final String id,
-            final Object value, final int index, final ComplexAttribute parent,
+            final Object value, final int index, final Attribute parent,
             final AttributeType targetNodeType, boolean isXlinkRef) {
         // adapt value to context
         Object convertedValue = convertValue(descriptor, value);
         Attribute leafAttribute = null;
         final Name attributeName = descriptor.getName();
-        Object currStepValue = parent.getProperties(attributeName);
-        if (!isXlinkRef) {
-            // skip this process if the attribute would only contain xlink:ref
-            // that is chained, because it won't contain any values, and we
-            // want to create a new empty leaf attribute
-            if (currStepValue instanceof Collection) {
-                List<Attribute> values = new ArrayList((Collection) currStepValue);
-                if (convertedValue == null && values.size() >= index) {
-                    leafAttribute = (Attribute) values.get(index - 1);
-                }
-                for (Attribute stepValue : values) {
-                    // eliminate duplicates in case the values come from denormalized view..
-                    if (stepValue.getValue().equals(convertedValue)) {
-                        return stepValue;
+        if (parent instanceof ComplexAttribute) {
+            Object currStepValue = ((ComplexAttribute) parent).getProperties(attributeName);
+            if (!isXlinkRef) {
+                // skip this process if the attribute would only contain xlink:ref
+                // that is chained, because it won't contain any values, and we
+                // want to create a new empty leaf attribute
+                if (currStepValue instanceof Collection) {
+                    List<Attribute> values = new ArrayList((Collection) currStepValue);
+                    if (isEmpty(convertedValue) && values.size() >= index) {
+                        leafAttribute = (Attribute) values.get(index - 1);
                     }
+                    for (Attribute stepValue : values) {
+                        // eliminate duplicates in case the values come from denormalized view..
+                        if (stepValue.getValue().equals(convertedValue)) {
+                            return stepValue;
+                        }
+                    }
+                } else if (currStepValue instanceof Attribute) {
+                    leafAttribute = (Attribute) currStepValue;
+                } else if (currStepValue != null) {
+                    throw new IllegalStateException("Unknown addressed object. Xpath:"
+                            + attributeName + ", addressed: " + currStepValue.getClass().getName()
+                            + " [" + currStepValue.toString() + "]");
                 }
-            } else if (currStepValue instanceof Attribute) {
-                leafAttribute = (Attribute) currStepValue;
-            } else if (currStepValue != null) {
-                throw new IllegalStateException("Unknown addressed object. Xpath:" + attributeName
-                        + ", addressed: " + currStepValue.getClass().getName() + " ["
-                        + currStepValue.toString() + "]");
             }
         }
         if (leafAttribute == null) {
             AttributeBuilder builder = new AttributeBuilder(featureFactory);
             builder.setDescriptor(parent.getDescriptor());
-            //check for mapped type override
+            // check for mapped type override
 
             builder.setType(parent.getType());
             if (parent instanceof ComplexAttribute) {
@@ -688,10 +719,11 @@ public class XPath {
                 Collection properties = (Collection) complex.getValue();
                 for (Iterator itr = properties.iterator(); itr.hasNext();) {
                     Property property = (Property) itr.next();
-                    if (property instanceof Attribute && ! property.getName().getLocalPart().equals("simpleContent")) {
+                    if (property instanceof Attribute
+                            && !property.getName().getLocalPart().equals("simpleContent")) {
                         Attribute att = (Attribute) property;
-                        builder.add(att.getIdentifier() == null ? null : att.getIdentifier().toString(), att
-                                .getValue(), att.getName());
+                        builder.add(att.getIdentifier() == null ? null : att.getIdentifier()
+                                .toString(), att.getValue(), att.getName());
                     } else if (property instanceof Association) {
                         Association assoc = (Association) property;
                         builder.associate(assoc.getValue(), assoc.getName());
@@ -700,7 +732,17 @@ public class XPath {
             }
 
             if (targetNodeType != null) {
-                leafAttribute = builder.add(id, convertedValue, attributeName, targetNodeType);
+                if (parent.getType().equals(XSSchema.ANYTYPE_TYPE)) {
+                    // special handling for casting any type since there's no attributes in its
+                    // schema
+                    leafAttribute = builder.addAnyTypeValue(convertedValue, targetNodeType,
+                            descriptor, id);
+                } else {
+                    leafAttribute = builder.add(id, convertedValue, attributeName, targetNodeType);
+                }
+            } else if (value == null && descriptor.getType().equals(XSSchema.ANYTYPE_TYPE)) {
+                // casting anyType as a complex attribute so we can set xlink:href
+                leafAttribute = builder.addComplexAnyTypeAttribute(convertedValue, descriptor, id);
             } else {
                 leafAttribute = builder.add(id, convertedValue, attributeName);
             }
@@ -710,10 +752,20 @@ public class XPath {
             parent.setValue(newValue);
         }
 
-        if (convertedValue != null) {
+        if (!isEmpty(convertedValue)) {
             leafAttribute.setValue(convertedValue);
         }
         return leafAttribute;
+    }
+
+    private boolean isEmpty(Object convertedValue) {
+        if (convertedValue == null) {
+            return true;
+        } else if (convertedValue instanceof Collection && ((Collection) convertedValue).isEmpty()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -727,12 +779,16 @@ public class XPath {
     private Object convertValue(final AttributeDescriptor descriptor, final Object value) {
         final AttributeType type = descriptor.getType();
         Class<?> binding = type.getBinding();
+
         if (type instanceof ComplexType && binding == Collection.class) {
             if (!(value instanceof Collection) && isSimpleContentType(type)) {
                 ArrayList<Property> list = new ArrayList<Property>();
+                if (value == null && !descriptor.isNillable()) {
+                    return list;
+                }
                 list.add(buildSimpleContent(type, value));
                 return list;
-            } 
+            }
         }
         if (binding == String.class && value instanceof Collection) {
             // if it's a single value in a collection, strip the square brackets

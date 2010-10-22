@@ -27,7 +27,7 @@ import org.opengis.util.InternationalString;
  *
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/Parameter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/Parameter.java $
  */
 public class Parameter<T> {
     /**

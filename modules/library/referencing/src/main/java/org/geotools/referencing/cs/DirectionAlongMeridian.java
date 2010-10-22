@@ -29,7 +29,7 @@ import org.opengis.referencing.cs.AxisDirection;
  * used in the EPSG database for polar stereographic projections.
  *
  * @version $Id: DirectionAlongMeridian.java 34713 2009-12-21 16:57:52Z aaime $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DirectionAlongMeridian.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DirectionAlongMeridian.java $
  * @author Martin Desruisseaux
  */
 final class DirectionAlongMeridian implements Comparable, Serializable {

@@ -23,7 +23,7 @@ import org.geotools.data.ows.Request;
  * Represents a PutStyles request
  * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/PutStylesRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/PutStylesRequest.java $
  */
 public interface PutStylesRequest extends Request {
     public static final String MODE = "MODE";

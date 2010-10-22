@@ -9,7 +9,7 @@ The database in the zip file is a HSQL version of the official EPSG database.
    <version> is the the version of the EPSG database ("7_1" at the time of writing)  
 3) Remove the _v<version.mdb part from all names, resulting in names like EPSG_Data_PostgreSQL.sql
 5) Hand modify the EPSG_Tables_PostgreSQL.sql file and replace all TEXT types with VARCHAR(4096)
-6) Update ThreadedHsqlEpsgFactory.VERSION to the current version
+6) Update ThreadedH2EpsgFactory.VERSION to the current version
 7) Run the DatabaseCreationScript.java
 8) Check the EPSG.zip file has been updated
 9) Run the build with extensive tests in the epsg-h2 module:

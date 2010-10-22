@@ -27,7 +27,7 @@ import org.geotools.resources.Utilities;
  * A style that contains the specification to renderer both the contour and the interior of a shape
  *
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/PolygonStyle2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/PolygonStyle2D.java $
  * @version $Id: PolygonStyle2D.java 34849 2010-01-29 16:07:40Z aaime $
  */
 public class PolygonStyle2D extends LineStyle2D {

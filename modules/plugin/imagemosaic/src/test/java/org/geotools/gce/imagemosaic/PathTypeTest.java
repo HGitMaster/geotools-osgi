@@ -18,7 +18,7 @@ import org.junit.Test;
  * @author Simone Giannecchini, GeoSolutions SAS
  * @author Stefan Alfons Krueger (alfonx), Wikisquare.de : Support for jar:file:foo.jar/bar.properties like URLs
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic/src/test/java/org/geotools/gce/imagemosaic/PathTypeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic/src/test/java/org/geotools/gce/imagemosaic/PathTypeTest.java $
  */
 public class PathTypeTest extends Assert {
 

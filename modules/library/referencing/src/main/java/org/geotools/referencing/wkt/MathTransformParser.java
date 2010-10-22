@@ -41,7 +41,7 @@ import org.geotools.resources.i18n.Errors;
  * Known Text</cite> (WKT)</A> of math transform.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/MathTransformParser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/MathTransformParser.java $
  * @version $Id: MathTransformParser.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)

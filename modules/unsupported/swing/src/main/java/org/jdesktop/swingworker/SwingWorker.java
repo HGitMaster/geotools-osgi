@@ -194,7 +194,7 @@ import javax.swing.Timer;
  *  
  * @author Igor Kushnirskiy
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/jdesktop/swingworker/SwingWorker.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/jdesktop/swingworker/SwingWorker.java $
  * @version $Revision: 1.6 $ $Date: 2008/07/25 19:32:29 $
  * 
  * @param <T> the result type returned by this {@code SwingWorker's}

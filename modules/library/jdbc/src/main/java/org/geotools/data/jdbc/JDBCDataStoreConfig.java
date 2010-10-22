@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: aaime $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCDataStoreConfig.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCDataStoreConfig.java $
  * @version $Id: JDBCDataStoreConfig.java 33484 2009-07-06 02:17:34Z jdeolive $ Last Modified: $Date: 2004/04/18 09:19:43 $
  * 
  * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc

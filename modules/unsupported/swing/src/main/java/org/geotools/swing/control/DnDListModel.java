@@ -32,7 +32,7 @@ import javax.swing.AbstractListModel;
  * </p>
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/control/DnDListModel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/control/DnDListModel.java $
  * @version $Id: DnDListModel.java 34290 2009-10-30 12:36:40Z mbedward $
  */
 public class DnDListModel<T> extends AbstractListModel {

@@ -25,7 +25,7 @@ import org.opengis.metadata.quality.CompletenessOmission;
 /**
  * Data absent from the dataset, as described by the scope.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/CompletenessOmissionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/CompletenessOmissionImpl.java $
  * @version $Id: CompletenessOmissionImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

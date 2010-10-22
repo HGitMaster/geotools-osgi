@@ -44,7 +44,7 @@ import com.vividsolutions.jts.util.Assert;
  * for JTS Java Doc
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-db2/src/main/java/org/geotools/data/db2/DB2WKBWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-db2/src/main/java/org/geotools/data/db2/DB2WKBWriter.java $
  */
 
 
@@ -97,13 +97,14 @@ public class DB2WKBWriter {
     private OutStream byteArrayOutStream = new OutputStreamOutStream(byteArrayOS);
     // holds output data values
     private byte[] buf = new byte[8];
+    private boolean hasOGCWkbZTyps;
 
     /**
      * Creates a writer that writes {@link Geometry}s with
      * output dimension = 2 and BIG_ENDIAN byte order
      */
-    public DB2WKBWriter() {
-      this(2, ByteOrderValues.BIG_ENDIAN);
+    public DB2WKBWriter(boolean hasOGCWkbZTyps ) {
+      this(2, ByteOrderValues.BIG_ENDIAN, hasOGCWkbZTyps);
     }
 
     /**
@@ -115,8 +116,8 @@ public class DB2WKBWriter {
      *
      * @param outputDimension the coordinate dimension to output (2 or 3)
      */
-    public DB2WKBWriter(int outputDimension) {
-      this(outputDimension, ByteOrderValues.BIG_ENDIAN);
+    public DB2WKBWriter(int outputDimension, boolean hasOGCWkbZTyps) {
+      this(outputDimension, ByteOrderValues.BIG_ENDIAN,hasOGCWkbZTyps);
     }
 
     /**
@@ -129,9 +130,10 @@ public class DB2WKBWriter {
      * @param outputDimension the coordinate dimension to output (2 or 3)
      * @param byteOrder the byte ordering to use
      */
-    public DB2WKBWriter(int outputDimension, int byteOrder) {
+    public DB2WKBWriter(int outputDimension, int byteOrder, boolean hasOGCWkbZTyps) {
       this.outputDimension = outputDimension;
       this.byteOrder = byteOrder;
+      this.hasOGCWkbZTyps=hasOGCWkbZTyps;
 
       if (outputDimension < 2 || outputDimension > 3)
         throw new IllegalArgumentException("Output dimension must be 2 or 3");
@@ -241,13 +243,24 @@ public class DB2WKBWriter {
     {
       int typeInt = geometryType;  
       if (outputDimension==3) {  // DB2 specific for z support
-          if (geometryType==DB2WKBConstants.wkbPoint2D) typeInt=DB2WKBConstants.wkbPointZ;
-          if (geometryType==DB2WKBConstants.wkbLineString2D) typeInt=DB2WKBConstants.wkbLineStringZ;
-          if (geometryType==DB2WKBConstants.wkbPolygon2D) typeInt=DB2WKBConstants.wkbPolygonZ;
-          if (geometryType==DB2WKBConstants.wkbMultiPoint2D) typeInt=DB2WKBConstants.wkbMultiPointZ;
-          if (geometryType==DB2WKBConstants.wkbMultiLineString2D) typeInt=DB2WKBConstants.wkbMultiLineStringZ;
-          if (geometryType==DB2WKBConstants.wkbMultiPolygon2D) typeInt=DB2WKBConstants.wkbMultiPolygonZ;
-          if (geometryType==DB2WKBConstants.wkbGeomCollection2D) typeInt=DB2WKBConstants.wkbGeomCollectionZ;
+          if (hasOGCWkbZTyps) {
+              if (geometryType==DB2WKBConstants.wkbPoint2D) typeInt=DB2WKBConstants.wkbOGCPointZ;
+              if (geometryType==DB2WKBConstants.wkbLineString2D) typeInt=DB2WKBConstants.wkbOGCLineStringZ;
+              if (geometryType==DB2WKBConstants.wkbPolygon2D) typeInt=DB2WKBConstants.wkbOGCPolygonZ;
+              if (geometryType==DB2WKBConstants.wkbMultiPoint2D) typeInt=DB2WKBConstants.wkbOGCMultiPointZ;
+              if (geometryType==DB2WKBConstants.wkbMultiLineString2D) typeInt=DB2WKBConstants.wkbOGCMultiLineStringZ;
+              if (geometryType==DB2WKBConstants.wkbMultiPolygon2D) typeInt=DB2WKBConstants.wkbOGCMultiPolygonZ;
+              if (geometryType==DB2WKBConstants.wkbGeomCollection2D) typeInt=DB2WKBConstants.wkbOGCGeomCollectionZ;
+          }
+          else {    
+              if (geometryType==DB2WKBConstants.wkbPoint2D) typeInt=DB2WKBConstants.wkbPointZ;
+              if (geometryType==DB2WKBConstants.wkbLineString2D) typeInt=DB2WKBConstants.wkbLineStringZ;
+              if (geometryType==DB2WKBConstants.wkbPolygon2D) typeInt=DB2WKBConstants.wkbPolygonZ;
+              if (geometryType==DB2WKBConstants.wkbMultiPoint2D) typeInt=DB2WKBConstants.wkbMultiPointZ;
+              if (geometryType==DB2WKBConstants.wkbMultiLineString2D) typeInt=DB2WKBConstants.wkbMultiLineStringZ;
+              if (geometryType==DB2WKBConstants.wkbMultiPolygon2D) typeInt=DB2WKBConstants.wkbMultiPolygonZ;
+              if (geometryType==DB2WKBConstants.wkbGeomCollection2D) typeInt=DB2WKBConstants.wkbGeomCollectionZ;
+          }
       }
       writeInt(typeInt, os);
     }

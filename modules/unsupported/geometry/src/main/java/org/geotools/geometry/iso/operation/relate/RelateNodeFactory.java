@@ -26,7 +26,7 @@ import org.geotools.geometry.iso.topograph2D.NodeMap;
  * Used by the {@link NodeMap} in a {@link RelateNodeGraph} to create
  * {@link RelateNode}s.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/relate/RelateNodeFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/relate/RelateNodeFactory.java $
  */
 public class RelateNodeFactory extends NodeFactory {
 	public Node createNode(Coordinate coord) {

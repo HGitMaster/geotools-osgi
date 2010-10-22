@@ -27,7 +27,7 @@ import junit.framework.TestCase;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @version $Id: RegisteredFunctionTest.java 31819 2008-11-11 02:31:21Z bencd $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/jdbc-regfunc/src/test/java/org/geotools/filter/RegisteredFunctionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/jdbc-regfunc/src/test/java/org/geotools/filter/RegisteredFunctionTest.java $
  * @since 2.4
  */
 public class RegisteredFunctionTest extends TestCase {

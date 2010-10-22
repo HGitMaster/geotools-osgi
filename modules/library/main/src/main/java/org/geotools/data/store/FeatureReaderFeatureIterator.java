@@ -34,7 +34,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * <p>
  * @author jgarnett
  * @since 2.1.RC0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/FeatureReaderFeatureIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/store/FeatureReaderFeatureIterator.java $
  */
 final class FeatureReaderFeatureIterator implements FeatureIterator<SimpleFeature> {
      FeatureReader<SimpleFeatureType, SimpleFeature> reader;

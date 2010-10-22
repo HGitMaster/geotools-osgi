@@ -37,7 +37,7 @@ import org.opengis.filter.expression.Function;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @version $Id: RegfuncFilterFactoryImpl.java 31819 2008-11-11 02:31:21Z bencd $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/jdbc-regfunc/src/main/java/org/geotools/filter/RegfuncFilterFactoryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/jdbc-regfunc/src/main/java/org/geotools/filter/RegfuncFilterFactoryImpl.java $
  * @since 2.4
  */
 public class RegfuncFilterFactoryImpl extends FilterFactoryImpl {

@@ -28,7 +28,7 @@ import org.geotools.filter.expression.AddImpl;
  * Unit test for SQLUnpacker.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/filter/SQLUnpackerTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/filter/SQLUnpackerTest.java $
  */
 public class SQLUnpackerTest extends SQLFilterTestSupport {
     /** Standard logging instance */

@@ -78,7 +78,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  * do some solid tests to see which is actually faster.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureStore.java $
  * @version $Id: PostgisFeatureStore.java 32187 2009-01-08 20:41:14Z jdeolive $
  *
  * @task HACK: too little code reuse with PostgisDataStore.

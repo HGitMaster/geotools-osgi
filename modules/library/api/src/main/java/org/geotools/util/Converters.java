@@ -36,7 +36,7 @@ import org.geotools.util.logging.Logging;
  * @author Justin Deoliveira, The Open Planning Project
  * @since 2.4
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/util/Converters.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/util/Converters.java $
  */
 public final class Converters {
     

@@ -27,7 +27,7 @@ import java.util.Iterator;
  * This set is constructed by {@link org.geotools.referencing.FactoryFinder}.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/LazySet.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/LazySet.java $
  * @version $Id: LazySet.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

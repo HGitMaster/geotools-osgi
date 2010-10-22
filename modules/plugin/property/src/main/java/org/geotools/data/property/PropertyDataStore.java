@@ -45,7 +45,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @author Jody Garnett, Refractions Research Inc.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyDataStore.java $
  */
 public class PropertyDataStore extends AbstractDataStore {
     protected File directory;

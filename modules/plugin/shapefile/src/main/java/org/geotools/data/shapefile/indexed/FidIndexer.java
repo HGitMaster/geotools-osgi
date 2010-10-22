@@ -32,7 +32,7 @@ import org.geotools.data.shapefile.shp.IndexFile;
  * 
  * @author Jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/FidIndexer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/FidIndexer.java $
  */
 public class FidIndexer {
     static Logger LOGGER = org.geotools.util.logging.Logging

@@ -22,7 +22,7 @@ package org.geotools.renderer.style;
  * particular output device may need to be choosen for concrete subclasses, for example {@link
  * Style2D} for targeting <A HREF="http://java.sun.com/products/java-media/2D/">Java2D</A>.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/Style.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/Style.java $
  * @version $Id: Style.java 30649 2008-06-12 19:44:08Z acuster $
  */
 public abstract class Style {

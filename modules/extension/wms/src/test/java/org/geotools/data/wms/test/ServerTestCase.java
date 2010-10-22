@@ -39,7 +39,7 @@ import junit.framework.TestCase;
  * by setup() and test*() methods.
  * 
  * @author rgould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/test/java/org/geotools/data/wms/test/ServerTestCase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/test/java/org/geotools/data/wms/test/ServerTestCase.java $
  */
 public class ServerTestCase extends TestCase {
 

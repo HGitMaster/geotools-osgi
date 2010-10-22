@@ -26,7 +26,7 @@ import org.opengis.feature.Feature;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/MaxFeaturesIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/store/MaxFeaturesIterator.java $
  */
 public class MaxFeaturesIterator<F extends Feature> implements Iterator<F> {
 

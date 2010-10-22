@@ -26,7 +26,6 @@
 package org.geotools.process.raster;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -67,6 +66,9 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.ProgressListener;
 import org.geotools.util.NullProgressListener;
+import org.geotools.util.SimpleInternationalString;
+import org.opengis.filter.expression.Expression;
+import org.opengis.geometry.Envelope;
 
 /**
  * A Process to rasterize vector features in an input FeatureCollection.
@@ -81,7 +83,7 @@ import org.geotools.util.NullProgressListener;
  * @author Steve Ansari, NOAA
  * @author Michael Bedward
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/raster/VectorToRasterProcess.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/raster/VectorToRasterProcess.java $
  */
 public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
 
@@ -92,6 +94,12 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
         FLOAT;
     }
     private TransferType transferType;
+
+    private static enum ValueSource {
+        PROPERTY_NAME,
+        EXPRESSION;
+    }
+    private ValueSource valueSource;
 
     GridCoverage2D result;
     private Number minAttValue;
@@ -110,7 +118,7 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
 
     /**
      * Constructor
-     * 
+     *
      * @param factory
      */
     public VectorToRasterProcess(VectorToRasterFactory factory) {
@@ -124,28 +132,39 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
      * dynamic applications, but for 'hands on' coding this method is much more
      * convenient than working via the {@linkplain org.geotools.process.Process#execute }.
      *
-     * @param features
-     * @param attributeName
-     * @param gridWidthInCells
-     * @param gridHeightInCells
-     * @param bounds
-     * @param covName
-     * @param monitor
-     * @return
+     * @param features the feature collection to be (wholly or partially) rasterized
+     *
+     * @param attribute source of values for the output grid: either a
+     *        {@code String} for the name of a numeric feature property or
+     *        an {@code org.opengis.filter.expression.Expression} that
+     *        evaluates to a numeric value
+     *
+     * @param gridWidthInCells width (cell) of the output raster
+     *
+     * @param gridHeightInCells height (cell) of the output raster
+     *
+     * @param bounds bounds (world coordinates) of the output raster
+     *
+     * @param covName a name for the output raster
+     *
+     * @param monitor an optional {@code ProgressListener} (may be {@code null}
+     *
+     * @return a new grid coverage
+     *
      * @throws org.geotools.process.raster.VectorToRasterException
      */
     public static GridCoverage2D process(
             FeatureCollection<SimpleFeatureType, SimpleFeature> features,
-            String attributeName,
+            Object attribute,
             Dimension gridDim,
-            ReferencedEnvelope bounds,
+            Envelope bounds,
             String covName,
             ProgressListener monitor) throws VectorToRasterException {
 
         VectorToRasterFactory factory = new VectorToRasterFactory();
         VectorToRasterProcess process = factory.create();
 
-        return process.convert(features, attributeName, gridDim, bounds, covName, monitor);
+        return process.convert(features, attribute, gridDim, bounds, covName, monitor);
     }
 
     /**
@@ -162,7 +181,7 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
      *
      * @throws org.geotools.process.raster.VectorToRasterException if unable to
      * rasterize the features as requested
-     * 
+     *
      * @see VectorToRasterFactory#getResultInfo(java.util.Map)
      */
     public Map<String, Object> execute( Map<String, Object> input, ProgressListener monitor )
@@ -171,7 +190,7 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = (FeatureCollection<SimpleFeatureType, SimpleFeature>)
             input.get(AbstractFeatureCollectionProcessFactory.FEATURES.key);
 
-        String attributeName = (String) input.get(VectorToRasterFactory.ATTRIBUTE.key);
+        Object attribute = input.get(VectorToRasterFactory.ATTRIBUTE.key);
 
         Dimension gridDim = (Dimension) input.get(VectorToRasterFactory.GRID_DIM.key);
 
@@ -179,7 +198,7 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
 
         String title = (String) input.get(VectorToRasterFactory.TITLE.key);
 
-        GridCoverage2D cov = convert(features, attributeName, gridDim, env, title, monitor);
+        GridCoverage2D cov = convert(features, attribute, gridDim, env, title, monitor);
 
         Map<String, Object> results = new HashMap<String, Object>();
         results.put(VectorToRasterFactory.RESULT.key, cov);
@@ -200,16 +219,14 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
     @Override
     protected void processFeature(SimpleFeature feature, Map<String, Object> input) throws Exception {
 
-        String attName = (String) input.get(VectorToRasterFactory.ATTRIBUTE.key);
+        Object attribute = input.get(VectorToRasterFactory.ATTRIBUTE.key);
         Geometry geometry = (Geometry) feature.getDefaultGeometry();
 
         if (geometry.intersects(extentGeometry)) {
 
-            Number value = null;
+            Number value = getFeatureValue(feature, attribute);
             switch (transferType) {
                 case FLOAT:
-                    value = Float.valueOf(feature.getAttribute(attName).toString());
-
                     if (minAttValue == null) {
                         minAttValue = maxAttValue = Float.valueOf(value.floatValue());
                     } else if (Float.compare(value.floatValue(), minAttValue.floatValue()) < 0) {
@@ -221,8 +238,6 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
                     break;
 
                 case INTEGRAL:
-                    value = Integer.valueOf(feature.getAttribute(attName).toString());
-
                     if (minAttValue == null) {
                         minAttValue = maxAttValue = Integer.valueOf(value.intValue());
                     } else if (value.intValue() < minAttValue.intValue()) {
@@ -261,11 +276,20 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
 
     }
 
+    private Number getFeatureValue(SimpleFeature feature, Object attribute) {
+        Class<? extends Number> rtnType = transferType == TransferType.FLOAT ? Float.class : Integer.class;
+        if (valueSource == ValueSource.PROPERTY_NAME) {
+            return rtnType.cast(feature.getAttribute((String)attribute));
+        } else {
+            return ((Expression)attribute).evaluate(feature, rtnType);
+        }
+    }
+
     private GridCoverage2D convert(
             FeatureCollection<SimpleFeatureType, SimpleFeature> features,
-            String attributeName,
+            Object attribute,
             Dimension gridDim,
-            ReferencedEnvelope bounds,
+            Envelope bounds,
             String covName,
             ProgressListener monitor)
         throws VectorToRasterException {
@@ -274,12 +298,14 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
             monitor = new NullProgressListener();
         }
 
-        initialize( features, bounds, attributeName, gridDim );
+        initialize( features, bounds, attribute, gridDim );
 
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put(VectorToRasterFactory.ATTRIBUTE.key, attributeName);
+        params.put(VectorToRasterFactory.ATTRIBUTE.key, attribute);
 
-        float scale = 100f / features.size();
+        monitor.setTask(new SimpleInternationalString("Rasterizing features..."));
+
+        float scale = 100.0f / features.size();
         monitor.started();
 
         FeatureIterator<SimpleFeature> fi = features.features();
@@ -308,35 +334,45 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
     }
 
     private void initialize(FeatureCollection<SimpleFeatureType, SimpleFeature> features,
-            ReferencedEnvelope bounds, String attributeName,
-            Dimension gridDim ) throws VectorToRasterException {
+            Envelope bounds, Object attribute, Dimension gridDim ) throws VectorToRasterException {
 
-        // check that the attribute exists and is numeric
-        AttributeDescriptor attDesc = features.getSchema().getDescriptor(attributeName);
-        if (attDesc == null) {
-            throw new VectorToRasterException(attributeName + " not found");
-        }
+        // check the attribute argument
+        if (attribute instanceof String) {
+            String propName = (String) attribute;
+            AttributeDescriptor attDesc = features.getSchema().getDescriptor(propName);
+            if (attDesc == null) {
+                throw new VectorToRasterException(propName + " not found");
+            }
 
-        Class<?> attClass = attDesc.getType().getBinding();
-        if (!Number.class.isAssignableFrom(attClass)) {
-            throw new VectorToRasterException(attributeName + " is not numeric");
-        }
-        
-        if (Float.class.isAssignableFrom(attClass)) {
-            transferType = TransferType.FLOAT;
-        
-        } else if (Double.class.isAssignableFrom(attClass)) {
-            transferType = TransferType.FLOAT;
-            Logger.getLogger(VectorToRasterProcess.class.getName())
-                    .log(Level.WARNING, "coercing double feature values to float raster values");
+            Class<?> attClass = attDesc.getType().getBinding();
+            if (!Number.class.isAssignableFrom(attClass)) {
+                throw new VectorToRasterException(propName + " is not numeric");
+            }
 
-        } else if (Long.class.isAssignableFrom(attClass)) {
-            transferType = TransferType.INTEGRAL;
-            Logger.getLogger(VectorToRasterProcess.class.getName())
-                    .log(Level.WARNING, "coercing long feature values to int raster values");
+            if (Float.class.isAssignableFrom(attClass)) {
+                transferType = TransferType.FLOAT;
+
+            } else if (Double.class.isAssignableFrom(attClass)) {
+                transferType = TransferType.FLOAT;
+                Logger.getLogger(VectorToRasterProcess.class.getName()).log(Level.WARNING, "coercing double feature values to float raster values");
+
+            } else if (Long.class.isAssignableFrom(attClass)) {
+                transferType = TransferType.INTEGRAL;
+                Logger.getLogger(VectorToRasterProcess.class.getName()).log(Level.WARNING, "coercing long feature values to int raster values");
+
+            } else {
+                transferType = TransferType.INTEGRAL;
+            }
+
+            valueSource = ValueSource.PROPERTY_NAME;
+
+        } else if (attribute instanceof Expression) {
+            valueSource = ValueSource.EXPRESSION;
 
         } else {
-            transferType = TransferType.INTEGRAL;
+            throw new VectorToRasterException(
+                    "value attribute must be a feature property name" +
+                    "or an org.opengis.filter.expression.Expression object");
         }
 
         minAttValue = maxAttValue = null;
@@ -351,34 +387,34 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
      * @throws org.geotools.process.raster.VectorToRasterException
      */
     private void setBounds( FeatureCollection<SimpleFeatureType, SimpleFeature> features,
-            ReferencedEnvelope bounds,
-            Dimension gridDim ) throws VectorToRasterException {
+            Envelope bounds, Dimension gridDim ) throws VectorToRasterException {
 
         ReferencedEnvelope featureBounds = features.getBounds();
 
         if (bounds != null) {
+            ReferencedEnvelope inputBounds = new ReferencedEnvelope(bounds);
             CoordinateReferenceSystem featuresCRS = featureBounds.getCoordinateReferenceSystem();
             CoordinateReferenceSystem envCRS = bounds.getCoordinateReferenceSystem();
 
-            ReferencedEnvelope tEnv;
+            ReferencedEnvelope trEnv;
             if (!CRS.equalsIgnoreMetadata(envCRS, featuresCRS)) {
                 try {
-                    tEnv = bounds.transform(featuresCRS, true);
+                    trEnv = inputBounds.transform(featuresCRS, true);
                 } catch (Exception tex) {
                     throw new VectorToRasterException(tex);
                 }
 
             } else {
-                tEnv = bounds;
+                trEnv = inputBounds;
             }
 
-            Envelope intEnv = tEnv.intersection(features.getBounds());
-            if (intEnv == null) {
+            com.vividsolutions.jts.geom.Envelope common = trEnv.intersection(features.getBounds());
+            if (common == null || common.isNull()) {
                 throw new VectorToRasterException(
                         "Features do not lie within the requested rasterizing bounds");
             }
 
-            extent = new ReferencedEnvelope(intEnv, featuresCRS);
+            extent = new ReferencedEnvelope(common, featuresCRS);
 
         } else {
 
@@ -527,7 +563,7 @@ public class VectorToRasterProcess extends AbstractFeatureCollectionProcess {
             graphics.drawPolyline(coordGridX, coordGridY, coords.length);
         }
     }
-    
+
     /**
      * Encode a value as a Color. The value will be Integer or Float.
      * @param value the value to enclode

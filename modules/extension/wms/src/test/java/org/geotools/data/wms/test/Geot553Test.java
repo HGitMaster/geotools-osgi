@@ -34,7 +34,7 @@ import org.opengis.geometry.Envelope;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/test/java/org/geotools/data/wms/test/Geot553Test.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/test/java/org/geotools/data/wms/test/Geot553Test.java $
  */
 public class Geot553Test extends TestCase {
     

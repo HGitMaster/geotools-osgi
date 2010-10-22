@@ -30,7 +30,7 @@ import org.geotools.data.vpf.io.VPFDate;
  * </p>
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/util/DataUtils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/util/DataUtils.java $
  * @version $Id: DataUtils.java 30687 2008-06-13 11:03:06Z acuster $
  */
 public class DataUtils implements DataTypesDefinition {

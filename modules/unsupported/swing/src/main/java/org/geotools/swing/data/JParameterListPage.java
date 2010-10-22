@@ -42,7 +42,7 @@ import org.geotools.util.Converters;
  * - but will only show parameters that match the indicated "level". If level is null it
  * assumed to be "user".
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JParameterListPage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JParameterListPage.java $
  */
 public class JParameterListPage extends JPage {
     String title;

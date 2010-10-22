@@ -63,7 +63,7 @@ import org.geotools.resources.GraphicsUtilities;
  * <p>&nbsp;</p>
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/ExceptionMonitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/ExceptionMonitor.java $
  * @version $Id: ExceptionMonitor.java 34138 2009-10-13 06:35:19Z mbedward $
  * @author Martin Desruisseaux (IRD)
  */

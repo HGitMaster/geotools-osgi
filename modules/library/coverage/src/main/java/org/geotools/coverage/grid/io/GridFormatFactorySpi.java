@@ -51,7 +51,7 @@ import org.geotools.factory.OptionalFactory;
  *
  * @author Jody Garnett, Refractions Research
  * @author Simone Giannecchini, GeoSolutions
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/GridFormatFactorySpi.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/GridFormatFactorySpi.java $
  */
 @SuppressWarnings("deprecation")
 public interface GridFormatFactorySpi extends OptionalFactory {

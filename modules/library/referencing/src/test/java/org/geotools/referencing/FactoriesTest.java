@@ -68,7 +68,7 @@ import static org.junit.Assert.*;
  * Tests the creation of {@link CoordinateReferenceSystem} objects and dependencies through
  * factories (not authority factories).
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/FactoriesTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/FactoriesTest.java $
  * @version $Id: FactoriesTest.java 34723 2009-12-22 10:55:34Z aaime $
  */
 public final class FactoriesTest {

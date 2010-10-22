@@ -26,7 +26,7 @@ import org.geotools.jdbc.JDBCTestSetup;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-mysql/src/test/java/org/geotools/data/mysql/MySQLFeatureStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-mysql/src/test/java/org/geotools/data/mysql/MySQLFeatureStoreTest.java $
  */
 public class MySQLFeatureStoreTest extends JDBCFeatureStoreTest {
     protected JDBCTestSetup createTestSetup() {

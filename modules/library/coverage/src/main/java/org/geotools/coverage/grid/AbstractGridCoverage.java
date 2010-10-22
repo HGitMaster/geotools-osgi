@@ -48,7 +48,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Base class for Geotools implementation of grid coverage.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/AbstractGridCoverage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/AbstractGridCoverage.java $
  * @version $Id: AbstractGridCoverage.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */

@@ -352,7 +352,7 @@ void SequenceOfSearchConditions() #void:
 void BooleanValueExpression() #void:
 {}
 {
-		BooleanTerm()( <OR> BooleanTerm() #Boolean_Or_Node(2) )*
+		BooleanTerm()( <OR> BooleanTerm() #Boolean_Or_Node )*
 }
 
 
@@ -371,18 +371,18 @@ void BooleanTerm() #void :
 void BooleanFactor() #void:
 {}
 {
-		BooleanPrimary()
-	| 	<NOT> BooleanPrimary() #Boolean_Not_Node
+	 	<NOT> BooleanPrimary() #Boolean_Not_Node
+	|	BooleanPrimary()
 }
 
 void BooleanPrimary() #void:
 {}
 {
-	LOOKAHEAD(1) IncludeExcludePredicate()
-	|   LOOKAHEAD(1) Predicate() 
-	|  RoutineInvocation() 
-	|  <LP>SearchCondition()<RP> 
-	|  <LSP>SearchCondition()<RSP> 
+		LOOKAHEAD(Predicate()) Predicate() 
+	|	IncludeExcludePredicate() 
+	|  	<LP>SearchCondition()<RP> 
+	|  	<LSP>SearchCondition()<RSP>
+	| 	RoutineInvocation() 
 }
 
 /*
@@ -393,7 +393,7 @@ void BooleanPrimary() #void:
  * 	| <classification predicate> (*not supported*)
  * 	| <existence predicate> 
  * 	| <between predicate> (*extension*)
- *  | <includeexclude predicate> (*extesion*)
+ *  | <includeexclude predicate> (*extension*)
  */
 void Predicate() #void:
 {}
@@ -793,9 +793,9 @@ void MultiplicativeExpression() #void :
 void UnaryExpression() #void:
 {}
 {
-	  LOOKAHEAD(2) Function() 
+	  LOOKAHEAD(Function()) Function() 
+	| LOOKAHEAD(Attribute()) Attribute() 
 	| Literal()
-	| Attribute()
 	| <LP> Expression()<RP>
 	| <LSP> Expression()<RSP>
 }
@@ -803,23 +803,24 @@ void UnaryExpression() #void:
 void Evaluate() #void:
 {}
 {
-  	LOOKAHEAD(2) Function() 
+  	LOOKAHEAD(Function()) Function() 
   |	Attribute()
 }
 
 /*
- * <identifier> ::= <identifier part [ { <colon> | <identifier part> }... ]
+ * <identifier> ::= <identifier part> [ { <colon> | <identifier part> }... ] 
  */
 void Identifier() #Identifier_Node:
 {}
-{
-	IdentifierPart() ( LOOKAHEAD(2) <COLON> | IdentifierPart() )*	
+{		
+	IdentifierPart() (  <COLON> | IdentifierPart() )*	
 }
 void IdentifierPart() #Identifier_Part_Node:
  {}
  {
-	<IDENTIFIER>
+ 	<IDENTIFIER>
  }
+ 
  
   
 /*
@@ -916,19 +917,27 @@ void StringLiteral() #StringNode :
  *  <function>
  * ---------------------------------------- */
 /*
- * <function> ::= <identifier> "("<function arg> [,<function arg>]*)
+ * <function> ::= <function name> "("<function arg> [,<function arg>]*)
  */
 void Function() #Function_Node:
 {}
 {
-  		<IDENTIFIER> #FunctionName_Node
+  		FunctionName() 
   			<LP>( FunctionArg() (<COMMA> FunctionArg() )* )? <RP>
+
 }
+
+void FunctionName() #FunctionName_Node:
+{}
+{
+    <IDENTIFIER>
+}
+
 /*
  * <argument>  ::= 
  *      <literal>  
  *  |   <attribute name>                                            
- * 	|	<expression> (*extension: expresion inclue literal and attributes*) 
+ * 	|	<expression> (*extension: expression includes literal and attributes*) 
  */
 void FunctionArg() #FunctionArg_Node:
 {}

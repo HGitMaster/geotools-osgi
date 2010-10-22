@@ -55,7 +55,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/bindings/StyleTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/bindings/StyleTypeBinding.java $
  */
 public class StyleTypeBinding extends AbstractComplexBinding {
     StyleBuilder sb;

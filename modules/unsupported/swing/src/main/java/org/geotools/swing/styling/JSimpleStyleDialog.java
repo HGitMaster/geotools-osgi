@@ -96,7 +96,7 @@ import org.opengis.filter.expression.Expression;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/styling/JSimpleStyleDialog.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/styling/JSimpleStyleDialog.java $
  * @version $Id: JSimpleStyleDialog.java 34366 2009-11-12 13:52:35Z mbedward $
  */
 public class JSimpleStyleDialog extends JDialog {

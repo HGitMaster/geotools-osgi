@@ -57,7 +57,7 @@ import org.opengis.referencing.operation.MathTransform;
  * This is a visual example of changing the coordinate reference
  * system of a feature layer.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/CRSLab.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/CRSLab.java $
  */
 public class CRSLab {
 

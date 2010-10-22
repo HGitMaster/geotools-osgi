@@ -51,7 +51,7 @@ import org.geotools.swing.wizard.JWizard;
         File shapeFile = (File) wizard.getConnectionParameters().get("shape");
  * </pre></code>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JParameterListWizard.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JParameterListWizard.java $
  */
 public class JParameterListWizard extends JWizard {
     private static final long serialVersionUID = -3961250234483352643L;

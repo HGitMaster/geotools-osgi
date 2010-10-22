@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp_belgium.html">lambert_conic_conformal_2sp_belgium</A>
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertConformalBelgium.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertConformalBelgium.java $
  * @version $Id: LambertConformalBelgium.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Rueben Schulz
  * @author Martin Desruisseaux

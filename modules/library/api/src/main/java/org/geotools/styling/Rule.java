@@ -77,7 +77,7 @@ import org.opengis.style.GraphicLegend;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Rule.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Rule.java $
  */
 public interface Rule extends org.opengis.style.Rule {
 

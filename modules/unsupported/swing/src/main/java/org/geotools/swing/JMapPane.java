@@ -81,8 +81,8 @@ import org.opengis.geometry.Envelope;
  * @author Michael Bedward
  * @author Ian Turton
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/JMapPane.java $
- * @version $Id: JMapPane.java 34840 2010-01-27 02:37:50Z mbedward $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/JMapPane.java $
+ * @version $Id: JMapPane.java 35086 2010-03-22 11:33:31Z mbedward $
  */
 public class JMapPane extends JPanel implements MapLayerListListener, MapBoundsListener {
 
@@ -110,7 +110,6 @@ public class JMapPane extends JPanel implements MapLayerListListener, MapBoundsL
      * layers.
      */
     private ReferencedEnvelope fullExtent;
-    
 
     /**
      * Encapsulates XOR box drawing logic used with mouse dragging
@@ -601,7 +600,9 @@ public class JMapPane extends JPanel implements MapLayerListListener, MapBoundsL
      *       way for the map pane to handle this.
      */
     private boolean equalsFullExtent(final Envelope envelope) {
-        assert(fullExtent != null);
+        if (fullExtent == null || envelope == null) {
+            return false;
+        }
 
         final double TOL = 1.0e-6d * (fullExtent.getWidth() + fullExtent.getHeight());
 
@@ -922,8 +923,9 @@ public class JMapPane extends JPanel implements MapLayerListListener, MapBoundsL
             addComponentListener( (ComponentListener) layer );
         }
 
-        if (context.getLayerCount() == 1) {
-            setFullExtent();
+        boolean atFullExtent = equalsFullExtent(getDisplayArea());
+        setFullExtent();
+        if (context.getLayerCount() == 1 || atFullExtent) {
             reset();
         }
 
@@ -943,7 +945,12 @@ public class JMapPane extends JPanel implements MapLayerListListener, MapBoundsL
             addComponentListener( (ComponentListener) layer );
         }
 
-        setFullExtent();
+        if (context.getLayerCount() == 0) {
+            clearFields();
+        } else {
+            setFullExtent();
+        }
+
         repaint();
     }
 
@@ -1126,4 +1133,14 @@ public class JMapPane extends JPanel implements MapLayerListListener, MapBoundsL
             }
         }
     }
+
+    /**
+     * This method is called if all layers are removed from the context.
+     */
+    private void clearFields() {
+        fullExtent = null;
+        worldToScreen = null;
+        screenToWorld = null;
+    }
+
 }

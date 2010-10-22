@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/v1_0_0/WFSSchemaFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/v1_0_0/WFSSchemaFactory.java $
  */
 public class WFSSchemaFactory extends SchemaFactory {
     // HACK for setting up the static field to use.

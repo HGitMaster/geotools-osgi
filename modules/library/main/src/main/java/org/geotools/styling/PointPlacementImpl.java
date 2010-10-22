@@ -31,7 +31,7 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/PointPlacementImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/PointPlacementImpl.java $
  * @version $Id: PointPlacementImpl.java 33833 2009-09-04 12:26:28Z jive $
  */
 public class PointPlacementImpl implements PointPlacement, Cloneable {

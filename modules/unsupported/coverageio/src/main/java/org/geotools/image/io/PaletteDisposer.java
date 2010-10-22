@@ -26,7 +26,7 @@ import java.util.Set;
  * Allows garbage-collection of {@link Palette} after their index color model has been
  * garbage collected.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/PaletteDisposer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/PaletteDisposer.java $
  * @version $Id: PaletteDisposer.java 34711 2009-12-21 08:22:45Z aaime $
  * @author Martin Desruisseaux
  */

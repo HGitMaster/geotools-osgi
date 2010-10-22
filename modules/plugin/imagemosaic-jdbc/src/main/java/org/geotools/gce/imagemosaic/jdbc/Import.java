@@ -81,7 +81,7 @@ import com.vividsolutions.jts.io.WKBWriter;
  * @author mcr
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/Import.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/Import.java $
  */
 public class Import extends AbstractCmd {
 	class ImageFilter extends Object implements FileFilter {
@@ -123,6 +123,8 @@ public class Import extends AbstractCmd {
 			+ "-config URLOrFile -spatialTN spatialTableName -tileTN tileTableName [-commitCount commitCount] -dir directory -ext extension"
 			+ "\n\n" + "The default for commitCount is 100\n";
 
+	private final static String NotSupported = "Imporft not supported for type ";
+	
 	private Config config;
 
 	private ImportTyp typ;
@@ -247,6 +249,11 @@ public class Import extends AbstractCmd {
 					e.printStackTrace();
 					System.exit(1);
 				}
+		                if (config !=null && (config.getSpatialExtension()==SpatialExtension.GEORASTER ||
+		                        config.getSpatialExtension()==SpatialExtension.CUSTOM)) {
+		                    System.out.println(NotSupported+config.getSpatialExtension().toString());
+		                    System.exit(1);
+		                }
 
 				i++;
 			} else if (args[i].equals("-spatialTN")) {
@@ -305,6 +312,7 @@ public class Import extends AbstractCmd {
 			System.out.println(UsageInfo);
 			System.exit(1);
 		}
+		
 
 		// check if prefix or level import
 		boolean isLevelImport = false, isPrefixImport = false;

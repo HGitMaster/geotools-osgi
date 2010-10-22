@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  * Tests the {@link LoggingAdapter} class.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/logging/LoggingAdapterTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/logging/LoggingAdapterTest.java $
  * @version $Id: LoggingAdapterTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

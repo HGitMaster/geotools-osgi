@@ -29,7 +29,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author Jody Garnett
  * @since 2.2, 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/IDFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/function/IDFunction.java $
  */
 public class IDFunction extends FunctionExpressionImpl {
 

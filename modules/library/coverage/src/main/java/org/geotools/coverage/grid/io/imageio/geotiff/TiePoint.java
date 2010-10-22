@@ -78,7 +78,7 @@ import org.geotools.util.Utilities;
  * @author Simone Giannecchini, GeoSolutions
  * @since 2.3
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/imageio/geotiff/TiePoint.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/imageio/geotiff/TiePoint.java $
  */
 public final class TiePoint {
 	private double[] values = new double[6];

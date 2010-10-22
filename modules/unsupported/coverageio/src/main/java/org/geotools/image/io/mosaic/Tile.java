@@ -115,7 +115,7 @@ import static java.lang.Math.max;
  * serializable, but its class must be known to {@link IIORegistry} at deserialization time.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/Tile.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/Tile.java $
  * @version $Id: Tile.java 32440 2009-02-09 11:14:54Z acuster $
  * @author Martin Desruisseaux
  */

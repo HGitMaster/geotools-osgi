@@ -18,7 +18,6 @@ package org.geotools.data;
 
 import java.io.IOException;
 
-import org.geotools.data.postgis.FeatureDiffReader;
 import org.geotools.data.postgis.VersionedPostgisDataStore;
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
@@ -36,7 +35,7 @@ import org.opengis.filter.Filter;
  * @author Andrea Aime, TOPP TODO: this shall be moved in a more generic module
  *         (api?) once the interfaces are good
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/VersioningFeatureSource.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/VersioningFeatureSource.java $
  */
 public interface VersioningFeatureSource extends FeatureSource<SimpleFeatureType, SimpleFeature> {
 

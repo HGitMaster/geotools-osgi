@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
  * @author James MacGill, CCG
  * @author Rob Hranac, TOPP
  * @author David Zwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/ogc/XMLEncoderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/test/java/org/geotools/xml/ogc/XMLEncoderTest.java $
  */
 public class XMLEncoderTest extends TestCase {
 

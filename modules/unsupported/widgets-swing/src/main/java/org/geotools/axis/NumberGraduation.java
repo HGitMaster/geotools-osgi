@@ -31,7 +31,7 @@ import javax.measure.converter.ConversionException;
  * A graduation using numbers on a linear axis.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/NumberGraduation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/NumberGraduation.java $
  * @version $Id: NumberGraduation.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (PMO, IRD)
  */

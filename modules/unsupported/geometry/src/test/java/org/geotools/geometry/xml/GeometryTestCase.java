@@ -35,7 +35,7 @@ import org.opengis.geometry.Geometry;
  * to those geometries
  * @author <a href="mailto:joel@lggi.com">Joel Skelton</a>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/xml/GeometryTestCase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/test/java/org/geotools/geometry/xml/GeometryTestCase.java $
  */
 public class GeometryTestCase implements Test {
     private String name;

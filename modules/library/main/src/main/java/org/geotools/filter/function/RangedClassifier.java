@@ -37,7 +37,7 @@ package org.geotools.filter.function;
  * @author Cory Horner, Refractions Research
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/RangedClassifier.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/function/RangedClassifier.java $
  */
 public final class RangedClassifier extends Classifier {
 

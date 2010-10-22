@@ -20,7 +20,7 @@ package org.geotools.geometry.iso.io.wkt;
 /**
  * Thrown by a <code>WKTReader</code> when a parsing problem occurs.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/io/wkt/ParseException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/io/wkt/ParseException.java $
  */
 public class ParseException extends Exception {
 

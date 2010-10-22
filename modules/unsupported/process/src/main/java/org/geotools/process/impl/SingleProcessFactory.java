@@ -25,6 +25,7 @@ import org.geotools.data.Parameter;
 import org.geotools.feature.NameImpl;
 import org.geotools.process.Process;
 import org.geotools.process.ProcessFactory;
+import org.geotools.util.SimpleInternationalString;
 import org.opengis.feature.type.Name;
 import org.opengis.util.InternationalString;
 
@@ -33,7 +34,7 @@ import org.opengis.util.InternationalString;
  * 
  * @author Andrea Aime - OpenGeo
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/impl/SingleProcessFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/impl/SingleProcessFactory.java $
  */
 public abstract class SingleProcessFactory implements ProcessFactory {
 
@@ -51,6 +52,7 @@ public abstract class SingleProcessFactory implements ProcessFactory {
         } else {
             localName = factoryName;
         }
+        String GT_NAMESPACE = "gt";
         processName = new NameImpl(GT_NAMESPACE, localName);
     }
 
@@ -73,7 +75,7 @@ public abstract class SingleProcessFactory implements ProcessFactory {
     void checkName(Name name) {
         if(name == null)
             throw new NullPointerException("Process name cannot be null");
-        if(!processName.equals(processName))
+        if(!processName.equals(name))
             throw new IllegalArgumentException("Unknown process '" + name 
                     + "', this factory knows only about '" + processName +  "'");
     }
@@ -142,7 +144,14 @@ public abstract class SingleProcessFactory implements ProcessFactory {
     protected abstract Map<String, Parameter<?>> getResultInfo(Map<String, Object> parameters)
             throws IllegalArgumentException;
 
-    protected abstract InternationalString getTitle();
+    /**
+     * Name suitable for display to end user.
+     *
+     * @return A short name suitable for display in a user interface.
+     */
+    public InternationalString getTitle(){
+        return new SimpleInternationalString(processName.getLocalPart());
+    }
 
     protected abstract String getVersion();
 

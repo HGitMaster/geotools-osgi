@@ -83,4 +83,16 @@ public class TransparentVersionedOnlineTest extends
     public void testGetFeatureLockingExpire() throws Exception {
         // disable this test, we don't support locking at the moment
     }
+    
+    public void testGetFeatureWriterTransaction() throws Exception {
+        // disable this test, the datastore does not support concurrent transactions
+        // from the same thread, one will lock the changesets and the second will
+        // wait indefinitely. Mind, this does not prevent really concurrent transactions 
+        // from executing, it prevents the single thread to mix two transactions
+    }
+    
+    @Override
+    public void testGetFeatureWriterConcurrency() throws Exception {
+        // see above
+    }
 }

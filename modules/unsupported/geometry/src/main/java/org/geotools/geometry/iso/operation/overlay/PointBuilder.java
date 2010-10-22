@@ -38,7 +38,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Constructs {@link org.opengis.geometry.primitive.Point}s from the nodes of an overlay graph.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/overlay/PointBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/overlay/PointBuilder.java $
  * @version 1.7.2
  */
 public class PointBuilder {

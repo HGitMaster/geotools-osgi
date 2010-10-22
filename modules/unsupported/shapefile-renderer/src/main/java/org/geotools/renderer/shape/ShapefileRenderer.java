@@ -16,7 +16,6 @@
  */
 package org.geotools.renderer.shape;
 
-import static org.geotools.data.shapefile.ShpFileType.GRX;
 import static org.geotools.data.shapefile.ShpFileType.QIX;
 import static org.geotools.data.shapefile.ShpFileType.SHX;
 
@@ -98,6 +97,8 @@ import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.visitor.DuplicatingStyleVisitor;
+import org.geotools.styling.visitor.RescaleStyleVisitor;
+import org.geotools.styling.visitor.UomRescaleStyleVisitor;
 import org.geotools.util.NumberRange;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -324,8 +325,8 @@ public class ShapefileRenderer implements GTRenderer {
                     || typeName .equalsIgnoreCase(fts.getFeatureTypeName()))) {
                 // get applicable rules at the current scale
                 Rule[] rules = fts.getRules();
-                List ruleList = new ArrayList();
-                List elseRuleList = new ArrayList();
+                List<Rule> ruleList = new ArrayList<Rule>();
+                List<Rule> elseRuleList = new ArrayList<Rule>();
                 
                 // TODO process filter for geometry expressions and restrict bbox further based on 
                 // the result
@@ -358,6 +359,36 @@ public class ShapefileRenderer implements GTRenderer {
                             elseRuleList.add(r);
                         } else {
                             ruleList.add(r);
+                        }
+                    }
+                }
+
+                if(StreamingRenderer.RESCALE_SUPPORT_ENABLED) {
+                    // apply uom rescaling
+                    double pixelsPerMeters = RendererUtilities.calculatePixelsPerMeterRatio(scaleDenominator, rendererHints);
+                    UomRescaleStyleVisitor rescaleVisitor = new UomRescaleStyleVisitor(pixelsPerMeters);
+                    for (int j = 0; j < ruleList.size(); j++) {
+                        rescaleVisitor.visit(ruleList.get(j));
+                        ruleList.set(j, (Rule) rescaleVisitor.getCopy());
+                    }
+                    for (int j = 0; j < elseRuleList.size(); j++) {
+                        rescaleVisitor.visit(elseRuleList.get(j));
+                        elseRuleList.set(j, (Rule) rescaleVisitor.getCopy());
+                    }
+                    
+                    // apply dpi rescale
+                    double dpi = RendererUtilities.getDpi(getRendererHints());
+                    double standardDpi = RendererUtilities.getDpi(Collections.emptyMap());
+                    if(dpi != standardDpi) {
+                        double scaleFactor = dpi / standardDpi;
+                        RescaleStyleVisitor dpiVisitor = new RescaleStyleVisitor(scaleFactor);
+                        for (int j = 0; j < ruleList.size(); j++) {
+                            dpiVisitor.visit(ruleList.get(j));
+                            ruleList.set(j, (Rule) dpiVisitor.getCopy());
+                        }
+                        for (int j = 0; j < elseRuleList.size(); j++) {
+                            dpiVisitor.visit(elseRuleList.get(j));
+                            elseRuleList.set(j, (Rule) dpiVisitor.getCopy());
                         }
                     }
                 }
@@ -1390,9 +1421,16 @@ public class ShapefileRenderer implements GTRenderer {
                 CoordinateOperation op;
 
                 try {
-                    op = CRS.getCoordinateOperationFactory(true).createOperation(dataCRS, destinationCrs);
-                    mt = op.getMathTransform();
-                    bbox = bbox.transform(dataCRS, true, 10);
+                    if( dataCRS != null ){
+                        op = CRS.getCoordinateOperationFactory(true).createOperation(dataCRS, destinationCrs);
+                        mt = op.getMathTransform();
+                        bbox = bbox.transform(dataCRS, true, 10);
+                    }
+                    else {
+                        LOGGER.log(Level.WARNING, "Could not reproject the bounding boxes as data CRS was null, proceeding in non reprojecting mode");
+                        op = null;
+                        mt = null;
+                    }
                 } catch (Exception e) {
                     fireErrorEvent(e);
                     LOGGER.log(Level.WARNING, "Could not reproject the bounding boxes, proceeding in non reprojecting mode", e);

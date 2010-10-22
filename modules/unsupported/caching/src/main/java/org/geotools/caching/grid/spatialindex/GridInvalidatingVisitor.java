@@ -11,7 +11,7 @@ import org.geotools.caching.spatialindex.Visitor;
  * @author Emily
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/GridInvalidatingVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/GridInvalidatingVisitor.java $
  */
 public class GridInvalidatingVisitor implements Visitor {
 	

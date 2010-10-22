@@ -62,7 +62,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author dblasby
  * @author Simone Giannecchini
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/RendererUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/RendererUtilities.java $
  */
 public final class RendererUtilities {
 
@@ -390,6 +390,26 @@ public final class RendererUtilities {
     
     final static double OGC_DEGREE_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360;
     
+    
+	/**
+	 * Calculates the pixels per meter ratio based on a scale denominator.
+	 * 
+	 * @param scaleDenominator
+	 *            The scale denominator value.
+	 * @param hints
+	 *            The hints used in calculation. if "dpi" key is present, it
+	 *            uses it's Integer value as the dpi of the current device. if
+	 *            not it uses 90 that is the OGC default value.
+	 * @return The pixels per meter ratio for the given scale denominator.
+	 */
+	public static double calculatePixelsPerMeterRatio(double scaleDenominator, Map hints) {
+		if (scaleDenominator <= 0.0)
+			throw new IllegalArgumentException("The scale denominator must be positive.");
+		double scale = 1.0 / scaleDenominator;
+		return scale * (getDpi(hints) / 0.0254);
+	}
+    
+    
     /**
      * This method performs the computation using the methods suggested by the OGC SLD specification, page 26.
      * @param envelope
@@ -449,7 +469,7 @@ public final class RendererUtilities {
      * @param hints 
      * @return DPI as doubles, to avoid issues with integer trunking in scale computation expression
      */
-    private static double getDpi(Map hints) {
+    public static double getDpi(Map hints) {
         if( hints!=null && hints.containsKey("dpi") ){
             return ((Integer)hints.get("dpi")).intValue();
         }else{
@@ -515,8 +535,7 @@ public final class RendererUtilities {
 	                      envelope.getCoordinateReferenceSystem()));
 			// make sure the crs is 2d
 			envelope = new ReferencedEnvelope((Envelope) envelope, tempCRS);
-			final MathTransform toWGS84 = CRS.findMathTransform(tempCRS,
-					DefaultGeographicCRS.WGS84);
+			final MathTransform toWGS84 = CRS.findMathTransform(tempCRS, DefaultGeographicCRS.WGS84, true);
 
 			// //
 			// Try to compute the source crs envelope, either by asking CRS or
@@ -698,22 +717,24 @@ public final class RendererUtilities {
     }
     
     private static Geometry pointInGeometry(Geometry g) {
+        Point p = g.getCentroid();
         if(g instanceof Polygon) {
-            Point p = g.getCentroid();
             // if the geometry is heavily generalized centroid computation may fail and return NaN
             if(Double.isNaN(p.getX()) || Double.isNaN(p.getY()))
                 return g.getFactory().createPoint(g.getCoordinate());
-            if(!g.contains(p))
+            // otherwise let's check if the point is inside. Again, this check and "getInteriorPoint"
+            // will work only if the geometry is valid
+            if(g.isValid() && !g.contains(p)) {
                 try {
-                    return g.getInteriorPoint();
+                    p = g.getInteriorPoint();
                 } catch(Exception e) {
                     // generalized geometries might make interior point go bye bye
                     return p;
                 }
-            else
+            } else {
                 return p;
-        } else {
-            return g.getCentroid();
+            }
         }
+        return p;
     }
 }

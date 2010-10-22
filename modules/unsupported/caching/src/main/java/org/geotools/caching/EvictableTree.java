@@ -23,7 +23,7 @@ import org.geotools.caching.spatialindex.NodeIdentifier;
  * 
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/EvictableTree.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/EvictableTree.java $
  */
 public interface EvictableTree {
 	

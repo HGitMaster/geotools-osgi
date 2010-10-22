@@ -24,7 +24,7 @@ package org.geotools.filter.expression;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/expression/PropertyAccessor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/expression/PropertyAccessor.java $
  */
 public interface PropertyAccessor {
     /**

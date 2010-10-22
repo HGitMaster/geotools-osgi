@@ -40,7 +40,7 @@ import org.opengis.feature.type.Name;
  * 
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/Descriptors.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/type/Descriptors.java $
  */
 public class Descriptors {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(Descriptors.class.getPackage().getName());

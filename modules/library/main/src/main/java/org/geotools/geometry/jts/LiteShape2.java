@@ -51,8 +51,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * geometry classes.
  * </p>
  * @author Jesse Eichar
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/LiteShape2.java $
- * @version $Id: LiteShape2.java 34897 2010-02-16 10:26:03Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/LiteShape2.java $
+ * @version $Id: LiteShape2.java 35166 2010-04-05 10:01:34Z aaime $
  */
 public final class LiteShape2 implements Shape, Cloneable {
 
@@ -62,13 +62,6 @@ public final class LiteShape2 implements Shape, Cloneable {
 	private boolean generalize = false;
 
 	private double maxDistance = 1;
-
-	// cached iterators
-	private LineIterator2 lineIterator = new LineIterator2();
-
-	private GeomCollectionIterator collIterator = new GeomCollectionIterator();
-    
-    private EmptyIterator emptyiterator = new EmptyIterator();
 
 	private static GeometryFactory geomFac;
 
@@ -161,6 +154,7 @@ public final class LiteShape2 implements Shape, Cloneable {
 		        // if we have a transform a decimation span can be detected, so try to decimate anyways
 			if (mathTransform != null && !mathTransform.isIdentity() && generalize)
 				new Decimator(mathTransform.inverse()).decimate(this.geometry);
+			    this.geometry.geometryChanged();
 			if (geometry != null) {
 				transformGeometry(geometry);
 				this.geometry.geometryChanged();
@@ -366,54 +360,11 @@ public final class LiteShape2 implements Shape, Cloneable {
 	 * @see #getBounds2D
 	 */
 	public Rectangle getBounds() {
-		Coordinate[] coords = geometry.getEnvelope().getCoordinates();
-
-		// get out corners. the documentation doens't specify in which
-		// order the bounding box coordinates are returned
-		double x1;
-
-		// get out corners. the documentation doens't specify in which
-		// order the bounding box coordinates are returned
-		double y1;
-
-		// get out corners. the documentation doens't specify in which
-		// order the bounding box coordinates are returned
-		double x2;
-
-		// get out corners. the documentation doens't specify in which
-		// order the bounding box coordinates are returned
-		double y2;
-		x1 = x2 = coords[0].x;
-		y1 = y2 = coords[0].y;
-
-		for (int i = 1; i < 3; i++) {
-			double x = coords[i].x;
-			double y = coords[i].y;
-
-			if (x < x1) {
-				x1 = x;
-			}
-
-			if (x > x2) {
-				x2 = x;
-			}
-
-			if (y < y1) {
-				y1 = y;
-			}
-
-			if (y > y2) {
-				y2 = y;
-			}
-		}
-
-		x1 = Math.ceil(x1);
-		x2 = Math.floor(x2);
-		y1 = Math.ceil(y1);
-		y2 = Math.floor(y2);
-
-		return new Rectangle((int) x1, (int) y1, (int) (x2 - x1),
-				(int) (y2 - y1));
+	    Rectangle2D env = getBounds2D();
+	    return new Rectangle((int) Math.round(env.getMinX()), 
+	            (int) Math.round(env.getMinY()), 
+	            (int) Math.ceil(env.getWidth()),
+	            (int) Math.ceil(env.getHeight()));
 	}
 
 	/**
@@ -434,8 +385,10 @@ public final class LiteShape2 implements Shape, Cloneable {
 	 * @see #getBounds
 	 */
 	public Rectangle2D getBounds2D() {
-		Envelope env = geometry.getEnvelopeInternal();
-		return new Rectangle2D.Double(env.getMinX(), env.getMinY(), env.getWidth(), env.getHeight());
+	    Envelope env = geometry.getEnvelopeInternal();
+	    // note, we dont' use getWidth/getHeight since they are slower
+		return new Rectangle2D.Double(env.getMinX(), env.getMinY(), env.getMaxX() - env.getMinX(), 
+		        env.getMaxY() - env.getMinY());
 	}
 
 	/**
@@ -477,25 +430,19 @@ public final class LiteShape2 implements Shape, Cloneable {
 		PathIterator pi = null;
         
         if(this.geometry == null || this.geometry.isEmpty())
-            return emptyiterator;
+            return EmptyIterator.INSTANCE;
 
 		// return iterator according to the kind of geometry we include
 		if (this.geometry instanceof Point) {
 			pi = new PointIterator((Point) geometry, at);
 		}
 
-		if (this.geometry instanceof Polygon) 
-		{
-
-			pi = new PolygonIterator((Polygon) geometry, at, generalize,
-					maxDistance);
+		if (this.geometry instanceof Polygon) {
+			pi = new PolygonIterator((Polygon) geometry, at, generalize, maxDistance);
 		} else if (this.geometry instanceof LineString) {
-			lineIterator.init((LineString) geometry, at);
-			pi = lineIterator;
+			pi = new LineIterator((LineString) geometry, at, generalize, (float) maxDistance);
 		} else if (this.geometry instanceof GeometryCollection) {
-			collIterator.init((GeometryCollection) geometry, at, generalize,
-					maxDistance);
-			pi = collIterator;
+		    pi = new GeomCollectionIterator((GeometryCollection) geometry, at, generalize, maxDistance);
 		}
 		return pi;
 	}

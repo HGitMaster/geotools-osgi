@@ -34,7 +34,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
 /**
  * Creates ConnectionPool objects for a certain MySQL database instance.
  * @author Gary Sheppard garysheppard@psu.edu
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLConnectionFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLConnectionFactory.java $
  * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */
 public class MySQLConnectionFactory {

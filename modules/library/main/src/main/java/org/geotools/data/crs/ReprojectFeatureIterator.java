@@ -66,7 +66,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author jgarnett, Refractions Research, Inc.
  * @author aaime
  * @author $Author: jive $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/crs/ReprojectFeatureIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/crs/ReprojectFeatureIterator.java $
  * @version $Id: ReprojectFeatureIterator.java 31101 2008-07-29 14:23:19Z aaime $
  */
 public class ReprojectFeatureIterator implements Iterator {

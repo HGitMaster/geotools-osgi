@@ -90,7 +90,7 @@ import org.opengis.referencing.operation.MathTransform;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">"Transverse_Mercator" on RemoteSensing.org</A>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/TransverseMercator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/TransverseMercator.java $
  * @version $Id: TransverseMercator.java 34438 2009-11-22 17:21:43Z aaime $
  * @author André Gosselin
  * @author Martin Desruisseaux (PMO, IRD)

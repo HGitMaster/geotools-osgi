@@ -42,7 +42,7 @@ import org.geotools.swing.wizard.JWizard.Controller;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JFileField.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JFileField.java $
  */
 public class JFileField extends ParamField {
 
@@ -68,9 +68,10 @@ public class JFileField extends ParamField {
         return panel;
     }
 
+    @SuppressWarnings("unchecked")
     protected void browse() {
         JFileChooser dialog;
-        Object format = this.parameter.metadata.get( Parameter.EXT );
+        Object format = this.parameter.metadata == null ? null : this.parameter.metadata.get( Parameter.EXT );
         if (format instanceof FileDataStoreFactorySpi) {
             dialog = new JFileDataStoreChooser((FileDataStoreFactorySpi) format);
         } else if (format instanceof String) {

@@ -60,7 +60,7 @@ import org.geotools.data.vpf.ifc.DataTypesDefinition;
  *     </ol>
  *   </li>
  * </ul>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/test/java/org/geotools/data/vpf/util/DataUtilsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/test/java/org/geotools/data/vpf/util/DataUtilsTest.java $
  */
 public class DataUtilsTest extends TestCase
   implements DataTypesDefinition

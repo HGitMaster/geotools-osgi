@@ -47,7 +47,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorTest.java $
  */
 public class StyleGeneratorTest extends DataTestCase {
     public StyleGeneratorTest(String arg0) {

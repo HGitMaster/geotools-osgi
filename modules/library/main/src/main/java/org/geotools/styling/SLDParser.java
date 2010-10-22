@@ -391,11 +391,11 @@ public class SLDParser {
             }
 
             if (childName.equalsIgnoreCase("Name")) {
-                sld.setName(child.getFirstChild().getNodeValue());
+                sld.setName(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("Title")) {
-                sld.setTitle(child.getFirstChild().getNodeValue());
+                sld.setTitle(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("Abstract")) {
-                sld.setAbstract(child.getFirstChild().getNodeValue());
+                sld.setAbstract(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("NamedLayer")) {
                 NamedLayer layer = parseNamedLayer(child);
                 sld.addStyledLayer(layer);
@@ -406,6 +406,18 @@ public class SLDParser {
         }
 
         return sld;
+    }
+
+    /**
+     * Returns the first child node value, or null if there is no child
+     * @param child
+     * @return
+     */
+    String getFirstChildValue(Node child) {
+        if(child.getFirstChild() != null)
+            return child.getFirstChild().getNodeValue();
+        else
+            return null;
     }
 
     private StyledLayer parseUserLayer(Node root) {
@@ -430,7 +442,7 @@ public class SLDParser {
                 Style user = parseStyle(child);
                 layer.addUserStyle(user);
             } else if (childName.equalsIgnoreCase("Name")) {
-                String layerName = child.getFirstChild().getNodeValue();
+                String layerName = getFirstChildValue(child);
                 layer.setName(layerName);
                 if (LOGGER.isLoggable(Level.INFO))
                     LOGGER.info("layer name: " + layer.getName());
@@ -479,7 +491,7 @@ public class SLDParser {
             }
             String childName = child.getLocalName();
             if (childName.equalsIgnoreCase("FeatureTypeName")) {
-                ftc.setFeatureTypeName(child.getFirstChild().getNodeValue());
+                ftc.setFeatureTypeName(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("Filter")) {
                 ftc.setFilter(parseFilter(child));
             }
@@ -504,7 +516,7 @@ public class SLDParser {
             String childName = child.getLocalName();
 
             if (childName.equalsIgnoreCase("Service")) {
-                ows.setService(child.getFirstChild().getNodeValue());
+                ows.setService(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("OnlineResource")) {
                 ows.setOnlineResource(parseOnlineResource(child));
             }
@@ -573,7 +585,7 @@ public class SLDParser {
             }
 
             if (childName.equalsIgnoreCase("Name")) {
-                layer.setName(child.getFirstChild().getNodeValue());
+                layer.setName(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("NamedStyle")) {
                 NamedStyle style = parseNamedStyle(child);
                 layer.addStyle(style);
@@ -647,7 +659,7 @@ public class SLDParser {
                 childName = child.getNodeName();
             }
             if (childName.equalsIgnoreCase("Name")) {
-                style.setName(child.getFirstChild().getNodeValue());
+                style.setName(getFirstChildValue(child));
             }
         }
         return style;
@@ -700,15 +712,19 @@ public class SLDParser {
             if (childName == null) {
                 childName = child.getNodeName();
             }
+            String firstChildValue = getFirstChildValue(child);
             if (childName.equalsIgnoreCase("Name")) {
-                style.setName(child.getFirstChild().getNodeValue());
+                style.setName(firstChildValue);
             } else if (childName.equalsIgnoreCase("Title")) {
-                style.setTitle(child.getFirstChild().getNodeValue());
+                style.setTitle(firstChildValue);
             } else if (childName.equalsIgnoreCase("Abstract")) {
-                style.setAbstract(child.getFirstChild().getNodeValue());
+                style.setAbstract(firstChildValue);
             } else if (childName.equalsIgnoreCase("IsDefault")) {
-                style.setDefault(Boolean.valueOf(child.getFirstChild().getNodeValue())
-                        .booleanValue());
+                if("1".equals(firstChildValue)) {
+                    style.setDefault(true);
+                } else {
+                    style.setDefault(Boolean.valueOf(firstChildValue).booleanValue());
+                }
             } else if (childName.equalsIgnoreCase("FeatureTypeStyle")) {
                 style.addFeatureTypeStyle(parseFeatureTypeStyle(child));
             }
@@ -744,15 +760,15 @@ public class SLDParser {
             }
 
             if (childName.equalsIgnoreCase("Name")) {
-                ft.setName(child.getFirstChild().getNodeValue());
+                ft.setName(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("Title")) {
-                ft.setTitle(child.getFirstChild().getNodeValue());
+                ft.setTitle(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("Abstract")) {
-                ft.setAbstract(child.getFirstChild().getNodeValue());
+                ft.setAbstract(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("FeatureTypeName")) {
-                ft.setFeatureTypeName(child.getFirstChild().getNodeValue());
+                ft.setFeatureTypeName(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("SemanticTypeIdentifier")) {
-                sti.add(child.getFirstChild().getNodeValue());
+                sti.add(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("Rule")) {
                 rules.add(parseRule(child));
             }
@@ -797,17 +813,17 @@ public class SLDParser {
             }
 
             if (childName.equalsIgnoreCase("Name")) {
-                rule.setName(child.getFirstChild().getNodeValue());
+                rule.setName(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("Title")) {
-                rule.setTitle(child.getFirstChild().getNodeValue());
+                rule.setTitle(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("Abstract")) {
-                rule.setAbstract(child.getFirstChild().getNodeValue());
+                rule.setAbstract(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("MinScaleDenominator")) {
                 rule.setMinScaleDenominator(Double
-                        .parseDouble(child.getFirstChild().getNodeValue()));
+                        .parseDouble(getFirstChildValue(child)));
             } else if (childName.equalsIgnoreCase("MaxScaleDenominator")) {
                 rule.setMaxScaleDenominator(Double
-                        .parseDouble(child.getFirstChild().getNodeValue()));
+                        .parseDouble(getFirstChildValue(child)));
             } else if (childName.equalsIgnoreCase("Filter")) {
                 Filter filter = parseFilter(child);
                 rule.setFilter(filter);
@@ -1057,7 +1073,7 @@ public class SLDParser {
      */
     private void parseVendorOption(TextSymbolizer symbol, Node child) {
         String key = child.getAttributes().getNamedItem("name").getNodeValue();
-        String value = child.getFirstChild().getNodeValue();
+        String value = getFirstChildValue(child);
 
         symbol.addToOptions(key, value);
     }
@@ -1097,7 +1113,7 @@ public class SLDParser {
             }
             if (childName.equalsIgnoreCase(opacityString)) {
                 try {
-                    final String opacityString = child.getFirstChild().getNodeValue();
+                    final String opacityString = getFirstChildValue(child);
                     Expression opacity = parseParameterValueExpression(child, false);
                     symbol.setOpacity(opacity);
                 } catch (Throwable e) {
@@ -1269,7 +1285,7 @@ public class SLDParser {
             } else if (childName.equalsIgnoreCase("SourceChannelName")) {
                 if (child.getFirstChild() != null
                         && child.getFirstChild().getNodeType() == Node.TEXT_NODE)
-                    symbol.setChannelName(child.getFirstChild().getNodeValue());
+                    symbol.setChannelName(getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("ContrastEnhancement")) {
                 symbol.setContrastEnhancement(parseContrastEnhancement(child));
 
@@ -1344,7 +1360,7 @@ public class SLDParser {
                 symbol.setExponential();
             } else if (childName.equalsIgnoreCase("GammaValue")) {
                 try {
-                    final String gammaString = child.getFirstChild().getNodeValue();
+                    final String gammaString = getFirstChildValue(child);
                     symbol.setGammaValue(ff.literal(Double.parseDouble(gammaString)));
                 } catch (Exception e) {
                     if (LOGGER.isLoggable(Level.WARNING))
@@ -1373,10 +1389,10 @@ public class SLDParser {
                 childName = child.getNodeName();
             }
             if ("BrightnessOnly".equalsIgnoreCase(childName)) {
-                symbol.setBrightnessOnly(Boolean.getBoolean(child.getFirstChild().getNodeValue()));
+                symbol.setBrightnessOnly(Boolean.getBoolean(getFirstChildValue(child)));
             } else if ("ReliefFactor".equalsIgnoreCase(childName)) {
                 try {
-                    final String reliefString = child.getFirstChild().getNodeValue();
+                    final String reliefString = getFirstChildValue(child);
                     Expression relief = ExpressionDOMParser.parseExpression(child);
                     symbol.setReliefFactor(relief);
                 } catch (Exception e) {
@@ -1523,7 +1539,7 @@ public class SLDParser {
                 mark.setFill(parseFill(child));
             } else if (childName.equalsIgnoreCase("WellKnownName")) {
                 if (LOGGER.isLoggable(Level.FINEST))
-                    LOGGER.finest("setting mark to " + child.getFirstChild().getNodeValue());
+                    LOGGER.finest("setting mark to " + getFirstChildValue(child));
                 mark.setWellKnownName(parseCssParameter(child));
             }
         }
@@ -1559,15 +1575,15 @@ public class SLDParser {
 
             if (childName.equalsIgnoreCase("format")) {
                 LOGGER.finest("format child is " + child);
-                LOGGER.finest("seting ExtGraph format " + child.getFirstChild().getNodeValue());
-                format = (child.getFirstChild().getNodeValue());
+                LOGGER.finest("seting ExtGraph format " + getFirstChildValue(child));
+                format = (getFirstChildValue(child));
             } else if (childName.equalsIgnoreCase("customProperty")) {
                 if (LOGGER.isLoggable(Level.FINEST))
                     LOGGER.finest("custom child is " + child);
                 String propName = child.getAttributes().getNamedItem("name").getNodeValue();
                 if (LOGGER.isLoggable(Level.FINEST))
                     LOGGER.finest("seting custom property " + propName + " to "
-                            + child.getFirstChild().getNodeValue());
+                            + getFirstChildValue(child));
                 Expression value = parseCssParameter(child);
                 paramList.put(propName, value);
 
@@ -1739,10 +1755,9 @@ public class SLDParser {
                 } else if (res.equalsIgnoreCase("dasharray")
                         || res.equalsIgnoreCase("stroke-dasharray")) {
                     String dashString = null;
-                    if( child.getFirstChild().getNodeType() == Node.TEXT_NODE ){
-                        dashString = child.getFirstChild().getNodeValue();                        
-                    }
-                    else {
+                    if( child.getChildNodes().getLength() == 1 && child.getFirstChild().getNodeType() == Node.TEXT_NODE ){
+                        dashString = getFirstChildValue(child);                        
+                    } else {
                         Expression definition = parseCssParameter(child);
                         if( definition instanceof Literal){
                             dashString = ((Literal)definition).getValue().toString();
@@ -1752,7 +1767,7 @@ public class SLDParser {
                         }                        
                     }
                     if( dashString != null){
-                        StringTokenizer stok = new StringTokenizer(dashString, " ");
+                        StringTokenizer stok = new StringTokenizer(dashString.trim(), " ");
                         float[] dashes = new float[stok.countTokens()];
                         for (int l = 0; l < dashes.length; l++) {
                             dashes[l] = Float.parseFloat(stok.nextToken());

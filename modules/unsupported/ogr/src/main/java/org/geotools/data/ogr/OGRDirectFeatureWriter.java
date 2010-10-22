@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  * @author aaime
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/ogr/src/main/java/org/geotools/data/ogr/OGRDirectFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/ogr/src/main/java/org/geotools/data/ogr/OGRDirectFeatureWriter.java $
  */
 public class OGRDirectFeatureWriter implements FeatureWriter {
 

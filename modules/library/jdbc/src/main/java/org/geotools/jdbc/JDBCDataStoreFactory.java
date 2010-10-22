@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCDataStoreFactory.java $
  */
 public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
     /** parameter for database type */
@@ -107,6 +107,9 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
             "Maximum number of prepared statements kept open and cached for each connection in the pool. " +
             "Set to 0 to have unbounded caching, to -1 to disable caching", false, 50);
     
+    /** expose primary key columns as attributes */
+    public static final Param EXPOSE_PK = new Param("Expose primary keys", Boolean.class, "Expose primary key columns as " +
+    		"attributes of the feature type", false, false);
     
     @Override
     public String getDisplayName() {
@@ -195,6 +198,12 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
             dataStore.setPrimaryKeyFinder(new CompositePrimaryKeyFinder(tableFinder, 
                     new HeuristicPrimaryKeyFinder()));
         }
+        
+        // expose primary keys
+        Boolean exposePk = (Boolean) EXPOSE_PK.lookUp(params);
+        if(exposePk != null) {
+            dataStore.setExposePrimaryKeyColumns(exposePk);
+        }
 
         // factories
         dataStore.setFilterFactory(CommonFactoryFinder.getFilterFactory(null));
@@ -271,6 +280,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         parameters.put(USER.key, USER);
         parameters.put(PASSWD.key, PASSWD);
         parameters.put(NAMESPACE.key, NAMESPACE);
+        parameters.put(EXPOSE_PK.key, EXPOSE_PK);
         parameters.put(MAXCONN.key, MAXCONN);
         parameters.put(MINCONN.key, MINCONN);
         parameters.put(FETCHSIZE.key, FETCHSIZE);

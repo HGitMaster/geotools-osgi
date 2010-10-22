@@ -48,9 +48,10 @@ import org.opengis.coverage.grid.GridCoverageReader;
  * </p>
  * 
  * @author <a href="mailto:simboss1@gmil.com">Simone Giannecchini (simboss)</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridVisualizationTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridVisualizationTest.java $
  * @version 1.0
  */
+@SuppressWarnings("deprecation")
 public final class ArcGridVisualizationTest extends ArcGridTestCaseAdapter {
 
 

@@ -36,7 +36,7 @@ import org.xml.sax.SAXNotRecognizedException;
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/GroupHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/GroupHandler.java $
  * @version $Id: GroupHandler.java 30650 2008-06-12 19:53:40Z acuster $
  */
 public class GroupHandler extends ElementGroupingHandler {

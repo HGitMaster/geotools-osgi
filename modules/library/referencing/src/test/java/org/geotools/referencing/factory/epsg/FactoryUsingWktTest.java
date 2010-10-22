@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link FactoryUsingWKT}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/factory/epsg/FactoryUsingWktTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/factory/epsg/FactoryUsingWktTest.java $
  * @version $Id: FactoryUsingWktTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (Geomatys)
  * @author Jody Garnett

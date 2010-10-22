@@ -34,10 +34,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * Swing does not provide a wizard construct (boo hiss) so this is a quick dialog that can step us
@@ -49,7 +52,7 @@ import javax.swing.event.DocumentListener;
  * 
  * @author Jody, gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JWizard.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JWizard.java $
  */
 public class JWizard extends JDialog {
     private static final long serialVersionUID = 1L;
@@ -135,7 +138,7 @@ public class JWizard extends JDialog {
         
         buttonPanel.add(buttonBox, java.awt.BorderLayout.EAST);
         getContentPane().add(buttonPanel, java.awt.BorderLayout.SOUTH);
-        getContentPane().add(cardPanel, java.awt.BorderLayout.CENTER);
+        getContentPane().add(new JScrollPane(cardPanel), java.awt.BorderLayout.CENTER);
     }
 
     public Boolean isCancelEnabled() {
@@ -298,7 +301,7 @@ public class JWizard extends JDialog {
     }
 
     /** The controller listens to everything and updates the buttons */
-    public class Controller implements ActionListener, KeyListener, DocumentListener {
+    public class Controller implements ActionListener, KeyListener, DocumentListener, ListSelectionListener {
         public boolean listen = true;
         
         public void actionPerformed(ActionEvent e) {
@@ -418,6 +421,10 @@ public class JWizard extends JDialog {
         }
 
         public void removeUpdate(DocumentEvent e) {
+            syncButtonsToPage();
+        }
+
+        public void valueChanged(ListSelectionEvent e) {
             syncButtonsToPage();
         }
     }

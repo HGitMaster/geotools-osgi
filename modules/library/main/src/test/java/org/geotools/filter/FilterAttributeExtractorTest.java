@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * the filters themselves.  There is a seperate unit test for expressions.
  *
  * @author Andrea Aime, SATA
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/FilterAttributeExtractorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/FilterAttributeExtractorTest.java $
  */
 public class FilterAttributeExtractorTest extends TestCase {
     boolean set = false;

@@ -42,7 +42,7 @@ import org.geotools.util.Utilities;
  * too.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/MathTransformProxy.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/MathTransformProxy.java $
  * @version $Id: MathTransformProxy.java 31549 2008-09-18 13:25:07Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

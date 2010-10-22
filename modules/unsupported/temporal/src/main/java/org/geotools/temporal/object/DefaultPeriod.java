@@ -27,7 +27,7 @@ import org.opengis.temporal.RelativePosition;
  * 
  * @author Mehdi Sidhoum (Geomatys)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultPeriod.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultPeriod.java $
  */
 public class DefaultPeriod extends DefaultTemporalGeometricPrimitive implements Period {
 

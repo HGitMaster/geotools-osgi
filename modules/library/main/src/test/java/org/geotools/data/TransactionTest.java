@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/TransactionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/data/TransactionTest.java $
  */
 public class TransactionTest extends TestCase {
     MemoryDataStore ds;

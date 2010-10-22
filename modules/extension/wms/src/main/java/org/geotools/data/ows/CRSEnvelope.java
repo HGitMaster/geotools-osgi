@@ -17,117 +17,164 @@
 package org.geotools.data.ows;
 
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 
 /**
- * A pair of coordinates and a reference system that represents a section of
- * the Earth
- *
+ * A pair of coordinates and a reference system that represents a section of the Earth
+ * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/ows/CRSEnvelope.java $
+ * @source $URL:
+ *         http://svn.osgeo.org/geotools/branches/2.6.x/modules/extension/wms/src/main/java/org
+ *         /geotools/data/ows/CRSEnvelope.java $
  */
 public class CRSEnvelope implements Envelope {
-    /** Represents the Coordinate Reference System this bounding box is in */
-    private String epsgCode;
+    /**
+     * Represents the Coordinate Reference System this bounding box is in. This is usually an EPSG
+     * code such as "EPSG:4326"
+     */
+    private String srsName;
+
     protected double minX;
+
     protected double minY;
+
     protected double maxX;
+
     protected double maxY;
+
+    private CoordinateReferenceSystem crs;
+
     /**
      * Construct an empty BoundingBox
      */
-    public CRSEnvelope() {
-        super();
+    public CRSEnvelope() {        
     }
 
     /**
      * Create a bounding box with the specified properties
-     *
-     * @param epsgCode The Coordinate Reference System this bounding box is in
+     * 
+     * @param epsgCode
+     *            The Coordinate Reference System this bounding box is in
      * @param minX
      * @param minY
      * @param maxX
      * @param maxY
      */
-    public CRSEnvelope(String epsgCode, double minX, double minY, double maxX,
-        double maxY) {
-        this.epsgCode = epsgCode;
+    public CRSEnvelope(String epsgCode, double minX, double minY, double maxX, double maxY) {
+        this.srsName = epsgCode;
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
         this.maxY = maxY;
     }
+    public CRSEnvelope(Envelope envelope) {
+        this.srsName = envelope.getCoordinateReferenceSystem().getIdentifiers().iterator().next().toString();
+        //this.srsName = epsgCode;
+        this.minX = envelope.getMinimum(0);
+        this.maxX = envelope.getMaximum(0);
+        this.minY = envelope.getMinimum(1);       
+        this.maxY = envelope.getMaximum(1);
+    }
 
     /**
-     * Returns the coordinate reference system for this envelope.
-     * Current implementation always return {@code null}, but it
-     * may change in a future version.
+     * Returns the coordinate reference system for this envelope (if known).
+     * return CoordinateReferenceSystem if known, or {@code null}
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-        return null;
+        synchronized (this) {
+            if (crs == null) {
+                try {
+                    crs = CRS.decode(srsName);
+                } catch (NoSuchAuthorityCodeException e) {
+                    crs = DefaultEngineeringCRS.CARTESIAN_2D;
+                } catch (FactoryException e) {
+                    crs = DefaultEngineeringCRS.CARTESIAN_2D;
+                }
+            }
+            return crs == DefaultEngineeringCRS.CARTESIAN_2D ? null : crs;
+        }
     }
 
     /**
      * The CRS is bounding box's Coordinate Reference System
-     *
+     * 
      * @return the CRS/SRS value
      */
+    public String getSRSName() {
+        return srsName;
+    }
+
+    /**
+     * @see setSRSName
+     */
+    public void setEPSGCode(String epsgCode) {
+        setSRSName(epsgCode);
+    }
+
+    /**
+     * @see getSRSName
+     */
     public String getEPSGCode() {
-        return epsgCode;
+        return srsName;
     }
 
     /**
      * The CRS is bounding box's Coordinate Reference System
-     *
-     * @param epsgCode the new value for the CRS/SRS
+     * 
+     * @param srsName
+     *            The SRSName for this envelope; usually an EPSG code
      */
-    public void setEPSGCode(String epsgCode) {
-        this.epsgCode = epsgCode;
+    public void setSRSName(String epsgCode) {
+        this.srsName = epsgCode;
     }
 
     public int getDimension() {
         return 2;
     }
 
-    public double getMinimum( int dimension ) {
+    public double getMinimum(int dimension) {
         if (dimension == 0) {
             return getMinX();
         }
-        
+
         return getMinY();
     }
 
-    public double getMaximum( int dimension ) {
+    public double getMaximum(int dimension) {
         if (dimension == 0) {
             return getMaxX();
         }
-        
+
         return getMaxY();
     }
 
-    public double getCenter( int dimension ) {
+    public double getCenter(int dimension) {
         return getMedian(dimension);
     }
 
-    public double getMedian( int dimension ) {
-        double min, max;
+    public double getMedian(int dimension) {
+        double min;//, max;
         if (dimension == 0) {
             min = getMinX();
-            max = getMaxX();
+            //max = getMaxX();
         } else {
             min = getMinY();
-            max = getMaxY();
+            //max = getMaxY();
         }
-        return min + ( getLength(dimension) / 2 );
+        return min + (getLength(dimension) / 2);
     }
 
-    public double getLength( int dimension ) {
+    public double getLength(int dimension) {
         return getSpan(dimension);
     }
 
-    public double getSpan( int dimension ) {
+    public double getSpan(int dimension) {
         double min, max;
         if (dimension == 0) {
             min = getMinX();
@@ -136,8 +183,8 @@ public class CRSEnvelope implements Envelope {
             min = getMinY();
             max = getMaxY();
         }
-        
-        return max-min;
+
+        return max - min;
     }
 
     public DirectPosition getUpperCorner() {
@@ -147,10 +194,10 @@ public class CRSEnvelope implements Envelope {
     public DirectPosition getLowerCorner() {
         return new GeneralDirectPosition(getMinX(), getMinY());
     }
-    
+
     /**
      * The maxX value is the higher X coordinate value
-     *
+     * 
      * @return the bounding box's maxX value
      */
     public double getMaxX() {
@@ -159,8 +206,9 @@ public class CRSEnvelope implements Envelope {
 
     /**
      * The maxX value is the higher X coordinate value
-     *
-     * @param maxX the new value for maxX. Should be greater than minX.
+     * 
+     * @param maxX
+     *            the new value for maxX. Should be greater than minX.
      */
     public void setMaxX(double maxX) {
         this.maxX = maxX;
@@ -168,7 +216,7 @@ public class CRSEnvelope implements Envelope {
 
     /**
      * The maxY value is the higher Y coordinate value
-     *
+     * 
      * @return the bounding box's maxY value
      */
     public double getMaxY() {
@@ -177,8 +225,9 @@ public class CRSEnvelope implements Envelope {
 
     /**
      * The maxY value is the higher Y coordinate value
-     *
-     * @param maxY the new value for maxY. Should be greater than minY.
+     * 
+     * @param maxY
+     *            the new value for maxY. Should be greater than minY.
      */
     public void setMaxY(double maxY) {
         this.maxY = maxY;
@@ -186,7 +235,7 @@ public class CRSEnvelope implements Envelope {
 
     /**
      * The minX value is the lower X coordinate value
-     *
+     * 
      * @return the bounding box's minX value
      */
     public double getMinX() {
@@ -195,8 +244,9 @@ public class CRSEnvelope implements Envelope {
 
     /**
      * The minX value is the lower X coordinate value
-     *
-     * @param minX the new value for minX. Should be less than maxX.
+     * 
+     * @param minX
+     *            the new value for minX. Should be less than maxX.
      */
     public void setMinX(double minX) {
         this.minX = minX;
@@ -204,7 +254,7 @@ public class CRSEnvelope implements Envelope {
 
     /**
      * The minY value is the lower Y coordinate value
-     *
+     * 
      * @return the bounding box's minY value
      */
     public double getMinY() {
@@ -213,15 +263,16 @@ public class CRSEnvelope implements Envelope {
 
     /**
      * The minY value is the lower Y coordinate value
-     *
-     * @param minY the new value for minY. Should be less than maxY.
+     * 
+     * @param minY
+     *            the new value for minY. Should be less than maxY.
      */
     public void setMinY(double minY) {
         this.minY = minY;
     }
 
-	public String toString() {
-		return epsgCode.toString()+" ["+minX+","+minY+" "+maxX+","+maxY+"]";
-	}
-    
+    public String toString() {
+        return srsName.toString() + " [" + minX + "," + minY + " " + maxX + "," + maxY + "]";
+    }
+
 }

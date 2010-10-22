@@ -51,7 +51,7 @@ import org.opengis.geometry.Geometry;
  * <li>Empty <code>Geometry</code>s are always simple
  * <ul>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/IsSimpleOp.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/IsSimpleOp.java $
  */
 public class IsSimpleOp {
 

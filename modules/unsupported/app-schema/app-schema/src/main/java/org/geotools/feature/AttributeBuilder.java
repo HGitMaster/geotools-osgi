@@ -21,8 +21,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import org.geotools.data.complex.ComplexFeatureConstants;
+import org.geotools.data.complex.config.NonFeatureTypeProxy;
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.opengis.feature.Association;
 import org.opengis.feature.Attribute;
@@ -48,7 +51,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/AttributeBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/AttributeBuilder.java $
  */
 public class AttributeBuilder {
     private static final Logger LOGGER = org.geotools.util.logging.Logging
@@ -370,7 +373,16 @@ public class AttributeBuilder {
             descriptor = new AttributeDescriptorImpl(type, name, minOccurs, maxOccurs, nillable,
                     defaultValue);
         }
-        Attribute attribute = create(value, null, descriptor, id);
+        Attribute attribute;
+        if (descriptor != null && descriptor.getType() instanceof NonFeatureTypeProxy) {
+            // we don't want a feature. NonFeatureTypeProxy is used to make non feature types
+            // a fake feature type, so it can be created as top level feature in app-schema
+            // mapping file. When created inside other features, it should be encoded as
+            // complex features though.
+            attribute = createComplexAttribute(value, null, descriptor, id);
+        } else {
+            attribute = create(value, null, descriptor, id);
+        }
         properties().add(attribute);
         return attribute;
     }
@@ -544,7 +556,6 @@ public class AttributeBuilder {
         if (descriptor != null) {
             type = (AttributeType) descriptor.getType();
         }
-        Attribute attribute = null;
         // if (type instanceof FeatureCollectionType) {
         // attribute = descriptor != null ? attributeFactory.createFeatureCollection(
         // (Collection) value, descriptor, id) : attributeFactory.createFeatureCollection(
@@ -555,9 +566,7 @@ public class AttributeBuilder {
                     descriptor, id) : attributeFactory.createFeature((Collection) value,
                     (FeatureType) type, id);
         } else if (type instanceof ComplexType) {
-            return descriptor != null ? attributeFactory.createComplexAttribute((Collection) value,
-                    descriptor, id) : attributeFactory.createComplexAttribute((Collection) value,
-                    (ComplexType) type, id);
+            return createComplexAttribute((Collection) value, (ComplexType) type, descriptor, id);
         } else if (type instanceof GeometryType) {
             return attributeFactory.createGeometryAttribute(value, (GeometryDescriptor) descriptor,
                     id, getCRS());
@@ -566,6 +575,22 @@ public class AttributeBuilder {
         }
     }
 
+    /**
+     * Create complex attribute
+     * 
+     * @param value
+     * @param type
+     * @param descriptor
+     * @param id
+     * @return
+     */
+    public ComplexAttribute createComplexAttribute(Object value, ComplexType type,
+            AttributeDescriptor descriptor, String id) {
+        return descriptor != null ? attributeFactory.createComplexAttribute((Collection) value,
+                descriptor, id) : attributeFactory.createComplexAttribute((Collection) value, type,
+                id);
+    }
+    
     /**
      * Builds the attribute.
      * <p>
@@ -618,5 +643,46 @@ public class AttributeBuilder {
         }
         properties().clear();
         return built;
+    }
+
+    /**
+     * Special case for any type. Skip validating existence in the schema, since anyType legally can
+     * be casted into anything.
+     * 
+     * @param value
+     *            the value to be set
+     * @param type
+     *            the type of the value
+     * @param descriptor
+     *            the attribute descriptor of anyType type
+     * @param id
+     * @return
+     */
+    public Attribute addAnyTypeValue(Object value, AttributeType type,
+            AttributeDescriptor descriptor, String id) {
+        Attribute attribute = create(value, type, descriptor, id);
+        properties().add(attribute);
+        return attribute;
+    }
+    
+    /**
+     * Create a complex attribute for XS.AnyType, since it's defined as a simple type. We need a
+     * complex attribute so we can set xlink:href in it.
+     * 
+     * @param value
+     * @param descriptor
+     * @param id
+     * @return
+     */
+    public Attribute addComplexAnyTypeAttribute(Object value, AttributeDescriptor descriptor,
+            String id) {
+        // need to create a complex attribute for any type, so we can have client properties
+        // for xlink:href and so we chain features etc.
+        Map<Object, Object> userData = descriptor.getUserData();
+        descriptor = new AttributeDescriptorImpl(ComplexFeatureConstants.ANYTYPE_TYPE, descriptor
+                .getName(), descriptor.getMinOccurs(), descriptor.getMaxOccurs(), descriptor
+                .isNillable(), descriptor.getDefaultValue());
+        descriptor.getUserData().putAll(userData);
+        return createComplexAttribute(value, ComplexFeatureConstants.ANYTYPE_TYPE, descriptor, id);
     }
 }

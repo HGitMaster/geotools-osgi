@@ -60,7 +60,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author Jody
  * @author PHustad
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/StreamingRendererTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/renderer/lite/StreamingRendererTest.java $
  */
 public class StreamingRendererTest extends TestCase {
 

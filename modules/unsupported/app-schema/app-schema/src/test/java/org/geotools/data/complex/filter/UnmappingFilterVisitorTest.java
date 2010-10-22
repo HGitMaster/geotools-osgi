@@ -92,7 +92,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: UnmappingFilterVisitorTest.java 34511 2009-11-26 05:34:06Z bencaradocdavies $
+ * @version $Id: UnmappingFilterVisitorTest.java 35182 2010-04-07 06:58:28Z ang05a $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/filter/UnmappingFilterVisitorTest.java $
  * @since 2.4
@@ -341,7 +341,7 @@ public class UnmappingFilterVisitorTest {
         
         AppSchemaDataAccess complexDs = (AppSchemaDataAccess) mappingDataStore;
         
-        mapping = complexDs.getMapping(typeName);
+        mapping = complexDs.getMappingByElement(typeName);
 
         NamespaceSupport namespaces = new NamespaceSupport();
         namespaces.declarePrefix("gml", GML.NAMESPACE);
@@ -421,7 +421,7 @@ public class UnmappingFilterVisitorTest {
         final Name typeName = new NameImpl(XMMLNS, "Borehole");
         
         AppSchemaDataAccess complexDs = (AppSchemaDataAccess) mappingDataStore;
-        mapping = complexDs.getMapping(typeName);
+        mapping = complexDs.getMappingByElement(typeName);
 
         NamespaceSupport namespaces = new NamespaceSupport();
         namespaces.declarePrefix("gml", GML.NAMESPACE);

@@ -32,10 +32,10 @@ import org.opengis.filter.expression.PropertyName;
 public abstract class JDBCAggregateFunctionTest extends JDBCTestSupport {
 
     boolean visited = false;
-    
+  
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void setUpInternal() throws Exception {
+        super.setUpInternal();
         visited = false;
     }
     

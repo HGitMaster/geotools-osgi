@@ -34,7 +34,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  * Only one of {@linkplain #getStatement statement}, {@linkplain #getProcessSteps process steps}
  * and {@link #getSources sources} should be provided.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/lineage/LineageImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/lineage/LineageImpl.java $
  * @version $Id: LineageImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

@@ -72,8 +72,8 @@ import org.opengis.filter.expression.Expression;
  * standards with names and semantics which are as close as possible.
  * </ul>
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Stroke.java $
- * @version $Id: Stroke.java 33833 2009-09-04 12:26:28Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Stroke.java $
+ * @version $Id: Stroke.java 35200 2010-04-09 13:10:13Z aaime $
  * @author James Macgill
  */
 public interface Stroke extends org.opengis.style.Stroke {
@@ -102,11 +102,11 @@ public interface Stroke extends org.opengis.style.Stroke {
             }
 
             public Expression getLineJoin() {
-                return ConstantExpression.constant("butt");
+                return ConstantExpression.constant("miter");
             }
 
             public Expression getLineCap() {
-                return ConstantExpression.constant("miter");
+                return ConstantExpression.constant("butt");
             }
 
             public float[] getDashArray() {

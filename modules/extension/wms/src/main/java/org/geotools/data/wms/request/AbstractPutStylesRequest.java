@@ -25,7 +25,7 @@ import org.geotools.data.ows.AbstractRequest;
  * Presents basic functionality for a PutStyles request
  * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractPutStylesRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractPutStylesRequest.java $
  */
 public abstract class AbstractPutStylesRequest extends AbstractWMSRequest implements PutStylesRequest {
 

@@ -33,7 +33,7 @@ import junit.framework.TestCase;
  * @author gdavis
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/test/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/PointImplTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/test/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/PointImplTest.java $
  */
 public class PointImplTest extends TestCase {
 

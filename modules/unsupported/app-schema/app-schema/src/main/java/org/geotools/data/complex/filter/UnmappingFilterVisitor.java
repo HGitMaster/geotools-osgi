@@ -17,7 +17,6 @@
 
 package org.geotools.data.complex.filter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -30,18 +29,12 @@ import java.util.logging.Logger;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
-import org.geotools.data.DataAccess;
-import org.geotools.data.complex.AppSchemaDataAccess;
-import org.geotools.data.complex.AppSchemaDataAccessRegistry;
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
-import org.geotools.data.complex.NestedAttributeMapping;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.NameImpl;
 import org.geotools.feature.Types;
-import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.NestedAttributeExpression;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
@@ -113,7 +106,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: UnmappingFilterVisitor.java 34793 2010-01-15 08:08:17Z ang05a $
+ * @version $Id: UnmappingFilterVisitor.java 35836 2010-07-05 07:49:35Z ang05a $
  * @source $URL:
  *         http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main
  *         /java/org/geotools/data/complex/filter/UnmappingFilterVisitor.java $
@@ -147,7 +140,23 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         case 0:
             throw new IllegalArgumentException("No filters to combine");
         case 1:
-            return (Filter) combinedFilters.get(0);
+            Filter filter = (Filter) combinedFilters.get(0);
+            if (filter instanceof BinaryComparisonOperator) {
+                Expression exp = ((BinaryComparisonOperator) filter).getExpression1();
+                if (exp != null && exp instanceof NestedAttributeExpression) {
+                    filter = new MultiValuedOrImpl(ff, filter,
+                            (NestedAttributeExpression) ((BinaryComparisonOperator) filter)
+                                    .getExpression1());
+                } else {
+                    exp = ((BinaryComparisonOperator) filter).getExpression2();
+                    if (exp != null && exp instanceof NestedAttributeExpression) {
+                        filter = new MultiValuedOrImpl(ff, filter,
+                                (NestedAttributeExpression) ((BinaryComparisonOperator) filter)
+                                        .getExpression2());
+                    }
+                }
+            }
+            return filter;
         default:
             return ff.or(combinedFilters);
         }
@@ -357,7 +366,11 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
                 Expression prop = (Expression) exprs.next();
                 for (Iterator uppers = upperExpressions.iterator(); uppers.hasNext();) {
                     Expression roof = (Expression) uppers.next();
-                    PropertyIsBetween newFilter = ff.between(prop, floor, roof);
+                    Filter newFilter = ff.between(prop, floor, roof);
+                    if (prop instanceof NestedAttributeExpression) {
+                        newFilter = new MultiValuedOrImpl(ff, newFilter,
+                                (NestedAttributeExpression) prop);
+                    }
                     combinedFilters.add(newFilter);
                 }
             }
@@ -475,7 +488,11 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         List combined = new ArrayList(unrolledValues.size());
         for (Iterator it = unrolledValues.iterator(); it.hasNext();) {
             Expression sourceValue = (Expression) it.next();
-            PropertyIsLike newFilter = ff.like(sourceValue, literal, wildcard, single, escape);
+            Filter newFilter = ff.like(sourceValue, literal, wildcard, single, escape);
+            if (sourceValue instanceof NestedAttributeExpression) {
+                newFilter = new MultiValuedOrImpl(ff, newFilter,
+                        (NestedAttributeExpression) sourceValue);
+            }
             combined.add(newFilter);
         }
         Filter unrolled = combineOred(combined);
@@ -491,6 +508,10 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         for (Iterator it = sourceChecks.iterator(); it.hasNext();) {
             Expression sourceValue = (Expression) it.next();
             Filter newFilter = ff.isNull(sourceValue);
+            if (sourceValue instanceof NestedAttributeExpression) {
+                newFilter = new MultiValuedOrImpl(ff, newFilter,
+                        (NestedAttributeExpression) sourceValue);
+            }
             combined.add(newFilter);
         }
 
@@ -797,171 +818,7 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
 
         if (matchingMappings.isEmpty() && simplifiedSteps.size() > 1) {
             // means some attributes are probably mapped separately in feature chaining
-            if (simplifiedSteps.size() % 2 == 0) {
-                // there should be at least 3 steps:
-                // - 1st one is the attribute of root feature
-                // - 2nd one denotes the element type of the next feature type
-                // - 3rd one is the attribute of the nested feature
-                // exception is when the last attribute is an xml attribute
-                // eg. @srsName
-                Step lastStep = simplifiedSteps.get(simplifiedSteps.size() - 1);
-                if (!lastStep.isXmlAttribute()) {
-                    throw new UnsupportedOperationException(
-                            "Are you sure the filter property makes sense? "
-                                    + "Please check the property path again. "
-                                    + "Current invalid path: " + simplifiedSteps.toString());
-                }
-            }
-            boolean hasNestedFeature = false;
-
-            List<Expression> nestedMappings = new ArrayList<Expression>();            
-            // since we can mix chained(when a type is mapped separately), and normal
-            // inline attributes in the path expression, we have to try to find the mapping from the
-            // root step and check if the mapping exists for the path.. if they don't, try one step
-            // further. If they are feature-chained, the leaf attributes could be mapped in the
-            // chained type, 
-            // eg. for "gsml:specification/gsml:GeologicUnit/gsml:description",
-            // we can't tell if the path is an inline attribute specified in the main mapping
-            // or if the mapping only has "gsml:specification", and the mapping for
-            // gsml:GeologicUnit is mapped separately in a different file.
-            // If the latter is the case, we need to also find the mapping for
-            // gsml:description in gsml:GeologicUnit.
-            StepList nextSteps = simplifiedSteps.subList(0, 1);
-            // where the search index starts eg. for a/b/c, if we're searching for b/c, index = 1
-            int nextRootIndex = 0;
-            // increment step from index, eg. if we want to search for b/c from originally searching
-            // for b, increment by 1
-            int stepIncrement = 0;
-            boolean isNestedMapping = false;
-            boolean incrementStep = false;
-            FeatureTypeMapping fMapping = mappings;
-            Name featureTypeName = root.getName();
-            
-            while (nextRootIndex + stepIncrement < simplifiedSteps.size()) {
-                AttributeMapping mapping = fMapping.getAttributeMapping(nextSteps);
-                if (mapping != null) {
-                    if (mapping instanceof NestedAttributeMapping) {
-                        // mapping is found to be a chained feature
-                        hasNestedFeature = true;
-                        // add to nestedMappings : feature type name, followed by the attribute name
-                        nestedMappings.add(ff.literal(featureTypeName));
-                        nestedMappings.add(mapping.getSourceExpression());
-
-                        if (nextRootIndex < simplifiedSteps.size() - 1) {
-                            isNestedMapping = true;
-                            // if this is not the last element and it's chained, we need to get its
-                            // feature type mapping for the next attribute
-                            try {
-                                Step nextRootStep = simplifiedSteps.get(nextRootIndex
-                                        + nextSteps.size());
-                                // skip the nested feature type
-                                nextRootIndex++;
-                                Expression clientPropertyExpression = getClientPropertyExpression(
-                                        nextRootStep, fMapping, mapping, targetXPath);
-                                if (clientPropertyExpression != null) {
-                                    // if the step is a client property, it has to be the last
-                                    nestedMappings.add(ff.literal(featureTypeName));
-                                    nestedMappings.add(clientPropertyExpression);
-                                    break;
-                                }
-                                featureTypeName = new NameImpl(nextRootStep.getName()
-                                        .getNamespaceURI(), nextRootStep.getName().getLocalPart());
-                                if (AppSchemaDataAccessRegistry.hasName(featureTypeName)) {
-                                    fMapping = AppSchemaDataAccessRegistry
-                                            .getMapping(featureTypeName);
-                                    // feature chaining detected.. search the attribute in the chained
-                                    // feature type
-                                    nextSteps = simplifiedSteps.subList(++nextRootIndex,
-                                            nextRootIndex + 1);
-                                    // starting from the root only
-                                    stepIncrement = 0;
-                                } else {
-                                    // might be because the complex features aren't from an
-                                    // app-schema data access, which is possible.. stop looking
-                                    break;
-                                }
-                            } catch (IOException e) {
-                                throw new IllegalArgumentException("Don't know how to map "
-                                        + targetXPath);
-                            }
-                        }
-                    } else {
-                        // find regular attribute mapping
-                        List<Expression> matchedExpressions = findMappingsFor(fMapping, nextSteps);
-                        boolean isLast = (nextRootIndex + stepIncrement + 1) >= simplifiedSteps.size();
-                        if (isLast) {
-                            if (matchedExpressions.size() < 1) {
-                                // no matching expression is found and we can't go further
-                                throw new IllegalArgumentException(
-                                        "Can't find source expression for: " + targetXPath);
-                            }
-                        }
-                        if (isNestedMapping) {
-                            if (!matchedExpressions.get(0).equals(Expression.NIL)) {
-                                nestedMappings.add(ff.literal(featureTypeName));
-                                nestedMappings.add(matchedExpressions.get(0));
-                                nextRootIndex++;
-                                stepIncrement = 0;
-                                isNestedMapping = false;
-                            }
-                        } else if (isLast) {
-                            // must be it
-                            matchingMappings.add(matchedExpressions.get(0));
-                        } else {
-                            // not the last.. check if the leaf attributes are mapped in the back
-                            // end
-                            DataAccess da = this.mappings.getSource().getDataStore();
-                            if (da instanceof AppSchemaDataAccess) {
-                                // check if the leaf attributes are mapped in the
-                                // back end complex features mapping
-                                FeatureTypeMapping backEndMappings;
-                                try {
-                                    backEndMappings = ((AppSchemaDataAccess) da)
-                                            .getMapping(featureTypeName);
-                                } catch (IOException e) {
-                                    throw new UnsupportedOperationException("Mapping for '"
-                                            + featureTypeName + "' not found!!");
-                                }
-                                AttributeMapping wrappedMapping = backEndMappings
-                                        .getAttributeMapping(simplifiedSteps.subList(nextRootIndex,
-                                                simplifiedSteps.size()));
-                                if (wrappedMapping != null) {
-                                    // it is mapped, but in the back end
-                                    matchingMappings.add(new AttributeExpressionImpl(wrappedMapping
-                                            .getTargetXPath().toString()));
-                                    break;
-                                }
-                            }
-                        }
-                        if (isLast) {
-                            break;
-                        }
-                        // not last, keep going
-                        incrementStep = true;
-                    }
-                }
-                if (incrementStep || mapping == null) {
-                    // if mapping is not found, it could be that only the full leaf attribute
-                    // is mapped, so keep looking
-                    stepIncrement++;
-                    incrementStep = false;
-                    int nextStepIndex = nextRootIndex + stepIncrement;
-                    if (nextStepIndex < simplifiedSteps.size()) {
-                        // add the next step and try finding the next combination
-                        nextSteps.add(simplifiedSteps.get(nextStepIndex));
-                    } else {
-                        // no more steps.. leave it empty and it will throw exception later
-                        matchingMappings.clear();
-                        break;
-                    }
-                }
-            }
-            if (hasNestedFeature) {
-                // we should only go on if the path legitimately has a chained feature
-                // otherwise the mapping is invalid and continue to throw exception below as
-                // the mapping is not found
-                matchingMappings.add(new NestedAttributeExpression(targetXPath, nestedMappings));
-            }
+            matchingMappings.add(new NestedAttributeExpression(targetXPath, mappings));
         }
 
         if (matchingMappings.size() == 0) {
@@ -969,45 +826,6 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         }
 
         return matchingMappings;
-    }
-
-    /**
-     * Find the expression of a client property if the step is one.
-     * 
-     * @param nextRootStep
-     *            the step
-     * @param fMapping
-     *            feature type mapping to get namespaces from
-     * @param mapping
-     *            attribute mapping
-     * @param targetXPath
-     *            the full target xpath
-     * @return
-     */
-    private Expression getClientPropertyExpression(Step nextRootStep, FeatureTypeMapping fMapping,
-            AttributeMapping mapping, String targetXPath) {
-        if (nextRootStep.isXmlAttribute()) {
-            Map<Name, Expression> clientProperties = mapping.getClientProperties();
-            QName lastStepName = nextRootStep.getName();
-            Name lastStep;
-            if (lastStepName.getPrefix() != null
-                    && lastStepName.getPrefix().length() > 0
-                    && (lastStepName.getNamespaceURI() == null || lastStepName.getNamespaceURI()
-                            .length() == 0)) {
-                String prefix = lastStepName.getPrefix();
-                String uri = fMapping.getNamespaces().getURI(prefix);
-                lastStep = Types.typeName(uri, lastStepName.getLocalPart());
-            } else {
-                lastStep = Types.toTypeName(lastStepName);
-            }
-            if (clientProperties.containsKey(lastStep)) {
-                return (Expression) clientProperties.get(lastStep);
-            } else {
-                throw new IllegalArgumentException("Client property mapping is missing for: "
-                        + targetXPath);
-            }
-        }
-        return null;
     }
 
     /**

@@ -76,7 +76,7 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/PointSymbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/PointSymbolizer.java $
  * @version $Id: PointSymbolizer.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public interface PointSymbolizer extends org.opengis.style.PointSymbolizer, Symbolizer {

@@ -23,7 +23,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * an error occurs during rendering.  Therefore <b>VERY LITTLE WORK</b> should be done in the listener!!!
  * 
  * @author jeichar
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/RenderListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/RenderListener.java $
  */
 public interface RenderListener {
     public void featureRenderer( SimpleFeature feature );

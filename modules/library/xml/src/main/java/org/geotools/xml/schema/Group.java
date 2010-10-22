@@ -33,7 +33,7 @@ import java.net.URI;
  * </p>
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/Group.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/Group.java $
  */
 public interface Group extends ElementGrouping {
     /**

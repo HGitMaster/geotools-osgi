@@ -22,7 +22,7 @@ package org.geotools.metadata.sql;
  * is typically a {@link java.sql.SQLException}.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/sql/MetadataException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/sql/MetadataException.java $
  * @version $Id: MetadataException.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Touraïvane
  * @author Martin Desruisseaux (IRD)

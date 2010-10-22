@@ -59,7 +59,7 @@ import org.opengis.geometry.primitive.SurfaceBoundary;
  * @author SYS Technologies
  * @author crossley
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/geometry/JTSGeometryFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/geometry/JTSGeometryFactory.java $
  * @version $Revision $
  */
 public class JTSGeometryFactory implements GeometryFactory {

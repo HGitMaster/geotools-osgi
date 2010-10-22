@@ -43,7 +43,7 @@ import org.geotools.metadata.iso.spatial.PixelTranslation;
  * context is ambiguous, an explicit {@code isHighIncluded} argument is required.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GeneralGridEnvelope.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GeneralGridEnvelope.java $
  * @version $Id: GeneralGridEnvelope.java 33009 2009-05-14 19:40:06Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *

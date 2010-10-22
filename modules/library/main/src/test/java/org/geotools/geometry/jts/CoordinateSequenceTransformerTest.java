@@ -48,7 +48,7 @@ import static org.junit.Assert.*;
  * Tests the {@link DefaultCoordinateSequenceTransformer} implementation.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/geometry/jts/CoordinateSequenceTransformerTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/geometry/jts/CoordinateSequenceTransformerTest.java $
  * @version $Id: CoordinateSequenceTransformerTest.java 33341 2009-06-22 17:18:58Z aaime $
  * @author Martin Desruisseaux
  */

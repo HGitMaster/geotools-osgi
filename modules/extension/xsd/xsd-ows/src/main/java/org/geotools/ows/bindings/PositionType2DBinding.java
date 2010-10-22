@@ -45,7 +45,7 @@ import org.geotools.xml.*;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/PositionType2DBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/PositionType2DBinding.java $
  */
 public class PositionType2DBinding extends AbstractSimpleBinding {
     public PositionType2DBinding(Ows10Factory factory) {

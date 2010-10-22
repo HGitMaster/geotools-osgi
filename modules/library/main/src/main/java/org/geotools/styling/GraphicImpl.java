@@ -38,7 +38,7 @@ import org.opengis.util.Cloneable;
  *
  * @author Ian Turton, CCG
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/GraphicImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/GraphicImpl.java $
  * @version $Id: GraphicImpl.java 33974 2009-09-23 21:11:28Z jive $
  */
 public class GraphicImpl implements Graphic, Cloneable {

@@ -1,7 +1,7 @@
 /*
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
- * 
+ *
  *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
  *
  *    This library is free software; you can redistribute it and/or
@@ -22,9 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.util.Converters;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.capability.FunctionName;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.ExpressionVisitor;
@@ -32,26 +30,31 @@ import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 
 /**
- * Implementation of "Recode" as a normal function.
+ * This is an implemenation of the Recode function as defined by
+ * the OGC Symbology Encoding (SE) 1.1 specification.
  * <p>
- * This implementation is compatible with the Function interface; the parameter list can be used to
- * set the threshold values etc...
+ * The Recode function provides a lookup table facility (think HashTable)
+ * where both keys and values can be any {@code Expression}. The first
+ * parameter to the function specifies the source of the value to lookup,
+ * e.g. the name of a feature property as a {@code Literal}. The remaining
+ * parameters define the lookup table as key:value pairs. Thus there should
+ * be an odd number of parameters in total: the lookup value parameter plus
+ * the set of key value pairs.
  * <p>
- * This function expects:
- * <ol>
- * <li>PropertyName; use "Rasterdata" to indicate this is a colour map
- * <li>Literal: data 1
- * <li>Literal: value 1
- * <li>Literal: data 2
- * <li>Literal: value 2
- * </ol>
- * In reality any expression will do.
- * 
- * @author Johann Sorel (Geomatys)
+ * Where the lookup involves {@code String} values, comparisons are done
+ * case-insensitively.
+ * <p>
+ * If the lookup value does not match any of the keys defined this function
+ * returns {@code null}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/filter/RecodeFunction.java $
+ * @author Johann Sorel (Geomatys)
+ * @author Michael Bedward
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/filter/RecodeFunction.java $
+ * @version $Id: RecodeFunction.java 35579 2010-05-25 10:39:16Z mbedward $
  */
 public class RecodeFunction implements Function {
+
+    private static final FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
 
     private final List<Expression> parameters;
 
@@ -106,39 +109,29 @@ public class RecodeFunction implements Function {
         return evaluate(object, Object.class);
     }
 
-    public <T> T evaluate(Object object, Class<T> targetClass) {
-        if (parameters.size() == 2) {
-            return parameters.get(1).evaluate(object, targetClass);
+    public <T> T evaluate(Object object, Class<T> context) {
+        if (parameters.size() % 2 != 1) {
+            throw new IllegalArgumentException(
+                    "There must be an equal number of lookup data and return values");
         }
 
-        final Expression propertyNameExp = parameters.get(0);
-
-        final List<Expression> pairList;
-
-        if (parameters.size() % 2 == 1) {
-            pairList = parameters.subList(1, parameters.size());
-        } else {
-            // this should not happen
-            pairList = parameters.subList(1, parameters.size() - 1);
-        }
-
-        // we are going to use this to construct equals experssions
-        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        final Expression lookupExp = parameters.get(0);
+        final List<Expression> pairList = parameters.subList(1, parameters.size());
 
         for (int i = 0; i < pairList.size(); i += 2) {
             Expression keyExpr = pairList.get(i);
             Expression valueExpr = pairList.get(i + 1);
-
             // we are going to test our propertyNameExpression against the keyExpression
             // if they are equal we will return the valueExpression
             //
-            PropertyIsEqualTo compareFilter = ff.equals(propertyNameExp, keyExpr);
+            org.opengis.filter.Filter compareFilter = ff.equal(lookupExp, keyExpr, false);
 
             if (compareFilter.evaluate(object)) {
-                return valueExpr.evaluate(object, targetClass); // yeah!
+                return valueExpr.evaluate(object, context);
             }
         }
-        return fallback == null ? null : Converters.convert(fallback, targetClass);
+
+        return null;
     }
 
     public Literal getFallbackValue() {

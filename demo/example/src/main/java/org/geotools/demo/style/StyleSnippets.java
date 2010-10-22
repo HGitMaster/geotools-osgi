@@ -27,7 +27,7 @@ import org.opengis.style.Graphic;
  * To view the context for these examples: http://docs.codehaus.org/display/GEOTDOC/04+Styling
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/style/StyleSnippets.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/style/StyleSnippets.java $
  */
 public class StyleSnippets {
 

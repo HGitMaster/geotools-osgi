@@ -44,7 +44,7 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  *
  * @since 2.3
  * @version $Id: BufferedCoordinateOperationFactory.java 30641 2008-06-12 17:42:27Z acuster $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/BufferedCoordinateOperationFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/BufferedCoordinateOperationFactory.java $
  * @author Simone Giannecchini
  * @author Martin Desruisseaux
  */

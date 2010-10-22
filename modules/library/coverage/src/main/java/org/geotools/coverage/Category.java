@@ -73,7 +73,7 @@ import org.geotools.math.XMath;
  * All {@code Category} objects are immutable and thread-safe.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/Category.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/Category.java $
  * @version $Id: Category.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *

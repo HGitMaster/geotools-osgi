@@ -32,7 +32,10 @@
       <prefix>xlink</prefix>
       <uri>http://www.w3.org/1999/xlink</uri>
     </Namespace>
-
+	<Namespace>
+	  <prefix>xsi</prefix>
+      <uri>http://www.w3.org/2001/XMLSchema-instance</uri>
+    </Namespace>
     <Namespace>
       <prefix>swe</prefix>
       <uri>http://www.opengis.net/swe/1.0.1</uri>

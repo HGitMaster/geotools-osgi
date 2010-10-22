@@ -36,7 +36,7 @@ import org.geotools.arcsde.session.UnavailableConnectionException;
  * 
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: SharedSessionPool.java 34889 2010-02-14 15:39:01Z groldan $
+ * @version $Id: SharedSessionPool.java 35746 2010-06-21 17:25:23Z aaime $
  * @since 2.5.7
  * 
  */

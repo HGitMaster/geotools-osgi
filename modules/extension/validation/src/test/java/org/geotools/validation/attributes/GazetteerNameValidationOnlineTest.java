@@ -60,7 +60,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *  
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/attributes/GazetteerNameValidationOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/test/java/org/geotools/validation/attributes/GazetteerNameValidationOnlineTest.java $
  * @version $Id: GazetteerNameValidationOnlineTest.java 31059 2008-07-23 20:04:21Z jgarnett $
  */
 public class GazetteerNameValidationOnlineTest extends TestCase {

@@ -261,8 +261,7 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements G
 			// Getting CRS and envelope information
 			//
 			// /////////////////////////////////////////////////////////////////
-			final CoordinateReferenceSystem crs = gc
-					.getCoordinateReferenceSystem2D();
+			final CoordinateReferenceSystem crs = gc.getCoordinateReferenceSystem2D();
 
 			// /////////////////////////////////////////////////////////////////
 			//
@@ -291,7 +290,7 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements G
 			//
 			// /////////////////////////////////////////////////////////////////
 			if (!grass && forceCellSize)
-				gc = reShapeData(gc);
+				gc = reShapeData(gc,hints);
 
 			// /////////////////////////////////////////////////////////////////
 			//
@@ -337,8 +336,7 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements G
 
 			// Setting the source for the image write operation
 			mWriter.write(null, new IIOImage(source, null,
-					new AsciiGridsImageMetadata(cols, rows, cellsizeX,
-							cellsizeY, xl, yl, true, grass, inNoData)), null);
+					new AsciiGridsImageMetadata(cols, rows, cellsizeX,cellsizeY, xl, yl,  true,grass, inNoData)), null);
 
 			// writing crs info
 			writeCRSInfo(crs);
@@ -348,12 +346,13 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements G
 			// Creating the imageWrite Operation
 			//
 			// /////////////////////////////////////////////////////////////////
-			mWriter.dispose();
-			// TODO: Auto-dispose. Maybe I need to allow a manual dispose call?
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			throw new DataSourceException(e);
+		}finally{
+
+			mWriter.dispose();
 		}
 	}
 
@@ -365,7 +364,7 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements G
 	 *            Input coverage.
 	 * @return A new coverage with square pixels.
 	 */
-	private GridCoverage2D reShapeData(GridCoverage2D gc) {
+	private static GridCoverage2D reShapeData(final GridCoverage2D gc, final Hints hints) {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -523,7 +522,7 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements G
 	 *            to control the writing process.
 	 * @throws IOException
 	 */
-	private void ensureWeCanWrite(GridCoverage coverage,
+	private static void ensureWeCanWrite(GridCoverage coverage,
 			GeneralParameterValue[] parameters) throws IOException {
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -534,8 +533,7 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements G
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final AffineTransform gridToWorldTransform = new AffineTransform(
-				(AffineTransform) ((GridGeometry2D) coverage.getGridGeometry())
-						.getGridToCRS2D());
+				(AffineTransform) ((GridGeometry2D) coverage.getGridGeometry()).getGridToCRS2D());
 
 		final int swapXY = XAffineTransform.getSwapXY(gridToWorldTransform);
 		XAffineTransform.round(gridToWorldTransform, ROTATION_EPS);
@@ -594,7 +592,11 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements G
 	public void dispose() {
 
 		if (mWriter != null) {
-			mWriter.dispose();
+			try{
+				mWriter.dispose();
+			}catch (Exception e) {
+				// swallow
+			}
 			mWriter = null;
 		}
 	}

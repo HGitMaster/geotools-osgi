@@ -22,7 +22,7 @@ import javax.media.jai.iterator.RectIter;
 /**
  * A {@link RectIter} with subsampling.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/SubsampledRectIter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/SubsampledRectIter.java $
  * @version $Id: SubsampledRectIter.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux
  */

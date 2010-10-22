@@ -32,7 +32,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * 
  * @author Jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/SynchronizedLabelCache.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/SynchronizedLabelCache.java $
  */
 public class SynchronizedLabelCache implements LabelCache {
 

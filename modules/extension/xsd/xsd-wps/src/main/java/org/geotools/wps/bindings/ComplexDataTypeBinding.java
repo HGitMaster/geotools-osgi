@@ -46,7 +46,7 @@ import org.geotools.xml.Node;
  * @author Justin Deoliveira, OpenGEO
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wps/src/main/java/org/geotools/wps/bindings/ComplexDataTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wps/src/main/java/org/geotools/wps/bindings/ComplexDataTypeBinding.java $
  */
 public class ComplexDataTypeBinding extends AbstractComplexBinding
 {

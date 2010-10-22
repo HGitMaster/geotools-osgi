@@ -30,7 +30,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author svn history suggests Andrea Aime was here
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/ReprojectedFiltersTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/ReprojectedFiltersTest.java $
  */
 public class ReprojectedFiltersTest extends TestCase {
 

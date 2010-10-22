@@ -36,7 +36,7 @@ import org.geotools.map.MapLayer;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/popup/LayerFeatureItem.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/popup/LayerFeatureItem.java $
  */
 public class LayerFeatureItem extends JMenuItem implements TreePopupItem{
     

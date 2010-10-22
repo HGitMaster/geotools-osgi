@@ -105,8 +105,8 @@ import org.geotools.util.logging.Logging;
  * </table></blockquote>
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/OperationJAI.java $
- * @version $Id: OperationJAI.java 34804 2010-01-15 18:13:52Z simonegiannecchini $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/OperationJAI.java $
+ * @version $Id: OperationJAI.java 34992 2010-03-08 14:23:33Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini
  */
@@ -302,7 +302,9 @@ public class OperationJAI extends Operation2D {
         // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
         final MathTransform2D gridToCRS = coverage.getGridGeometry().getGridToCRS2D();
         for (int i=0; i<sources.length; i++) {
-            if (sources[i] == null) continue;
+            if (sources[i] == null) { 
+                continue;
+            }
             final GridCoverage2D source = sources[i];
             if (!CRS.equalsIgnoreMetadata(crs, source.getCoordinateReferenceSystem2D()) ||
                 !CRS.equalsIgnoreMetadata(gridToCRS, source.getGridGeometry().getGridToCRS2D()))
@@ -449,7 +451,9 @@ public class OperationJAI extends Operation2D {
          */
         final AbstractProcessor processor = getProcessor(hints);
         for (int i=0; i<sources.length; i++) {
-            if( sources[i] == null ) continue;
+            if (sources[i] == null) { 
+                continue;
+            }
             final GridCoverage2D            source    = sources[i];
             final GridGeometry2D            geometry  = source.getGridGeometry();
             final CoordinateReferenceSystem srcCrs2D  = source.getCoordinateReferenceSystem2D();
@@ -577,7 +581,9 @@ public class OperationJAI extends Operation2D {
          */
         final GridSampleDimension[][] list = new GridSampleDimension[sources.length][];
         for (int i=0; i<list.length; i++) {
-            if(sources[i]==null) continue;
+            if (sources[i] == null) {
+                continue;
+            }
             list[i] = sources[i].getSampleDimensions();
         }
         final GridSampleDimension[] sampleDims = deriveSampleDimension(list, parameters);
@@ -744,7 +750,9 @@ public class OperationJAI extends Operation2D {
          */
         int numBands = 1;
         for (int i=0; i<bandLists.length; i++) {
-            if(bandLists[i] == null) continue;
+            if (bandLists[i] == null) {
+                continue;
+            }
             final int nb = bandLists[i].length;
             if (nb != 1) {
                 if (numBands!=1 && nb!=numBands) {
@@ -767,7 +775,9 @@ public class OperationJAI extends Operation2D {
             int       indexOfQuantitative = 0;
             assert PRIMARY_SOURCE_INDEX == 0; // See comment below.
             for (int i=bandLists.length; --i>=0;) {
-                if(bandLists[i] == null) continue;
+                if (bandLists[i] == null) {
+                    continue;
+                }
                 /*
                  * Iterates among all sources (i) for the current band. We iterate
                  * sources in reverse order because the primary source MUST be the
@@ -792,7 +802,7 @@ public class OperationJAI extends Operation2D {
                 categoryXS[i] = categoryArray[indexOfQuantitative];
             }
             if (categoryArray == null) {
-            	continue;
+                continue;
             }
             final Category oldCategory = categoryArray[indexOfQuantitative];
             final Unit<?>  oldUnit     = sampleDim.getUnits();
@@ -837,6 +847,9 @@ public class OperationJAI extends Operation2D {
     protected Category deriveCategory(final Category[] categories, final Parameters parameters) {
         final NumberRange[] ranges = new NumberRange[categories.length];
         for (int i=0; i<ranges.length; i++) {
+            if (categories[i] == null) { 
+                continue;
+            }
             ranges[i] = categories[i].getRange();
         }
         final NumberRange range = deriveRange(ranges, parameters);
@@ -920,7 +933,7 @@ public class OperationJAI extends Operation2D {
         } else {
             names = new InternationalString[sources.length];
             for (int i=0; i<names.length; i++) {
-                if(sources[i] != null)
+                if (sources[i] != null)
                     names[i] = sources[i].getName();
             }
         }
@@ -1060,7 +1073,7 @@ public class OperationJAI extends Operation2D {
      * </ul>
      *
      * @since 2.2
-     * @version $Id: OperationJAI.java 34804 2010-01-15 18:13:52Z simonegiannecchini $
+     * @version $Id: OperationJAI.java 34992 2010-03-08 14:23:33Z danieleromagnoli $
      * @author Martin Desruisseaux (IRD)
      */
     protected static final class Parameters {

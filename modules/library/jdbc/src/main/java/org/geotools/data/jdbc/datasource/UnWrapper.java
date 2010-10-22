@@ -27,7 +27,7 @@ import java.sql.Statement;
  * @author Andrea Aime - TOPP
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/UnWrapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/UnWrapper.java $
  */
 public interface UnWrapper {
     /**

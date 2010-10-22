@@ -65,7 +65,7 @@ import org.geotools.util.SimpleInternationalString;
  * {@code CI_Telephone} table.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/sql/MetadataSource.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/sql/MetadataSource.java $
  * @version $Id: MetadataSource.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Touraïvane
  * @author Olivier Kartotaroeno (Institut de Recherche pour le Développement)

@@ -28,8 +28,8 @@ import org.opengis.feature.type.AttributeDescriptor;
 
 
 public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
 
         dataStore.setAssociations(true);
     }

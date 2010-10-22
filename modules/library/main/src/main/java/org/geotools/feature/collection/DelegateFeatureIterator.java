@@ -36,7 +36,7 @@ import org.opengis.feature.type.FeatureType;
  * see ResourceFetaureIterator.
  * </p>
  * @author Jody Garnett, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/collection/DelegateFeatureIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/collection/DelegateFeatureIterator.java $
  */
 public class DelegateFeatureIterator<F extends Feature> implements FeatureIterator<F> {
 	Iterator<F> delegate;

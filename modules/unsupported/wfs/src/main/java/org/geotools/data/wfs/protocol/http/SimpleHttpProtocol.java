@@ -25,15 +25,15 @@ import java.net.URL;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * An {@link HTTPProtocol} implementation that relies on plain {@link HttpURLConnection}
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.6.x
- * @version $Id: SimpleHttpProtocol.java 34133 2009-10-12 08:14:05Z mbedward $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/protocol/http/SimpleHttpProtocol.java $
+ * @version $Id: SimpleHttpProtocol.java 35067 2010-03-20 05:41:02Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/protocol/http/SimpleHttpProtocol.java $
  */
 @SuppressWarnings("nls")
 public class SimpleHttpProtocol extends AbstractHttpProtocol {
@@ -133,8 +133,8 @@ public class SimpleHttpProtocol extends AbstractHttpProtocol {
             String userPassword = authUsername + ":" + authPassword;
             byte[] encodedUserPassword = userPassword.getBytes();
 
-            BASE64Encoder encoder = new BASE64Encoder();
-            String base64UserAndPasswd = encoder.encode(encodedUserPassword);
+            String base64UserAndPasswd = new String(Base64.encodeBase64(encodedUserPassword));
+            
             conn.setRequestProperty("Authorization", "Basic " + base64UserAndPasswd);
         }
 

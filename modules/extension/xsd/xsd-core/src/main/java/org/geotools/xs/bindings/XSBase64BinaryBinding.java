@@ -56,7 +56,7 @@ import org.geotools.xs.XS;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/bindings/XSBase64BinaryBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/bindings/XSBase64BinaryBinding.java $
  */
 public class XSBase64BinaryBinding implements SimpleBinding {
     /**

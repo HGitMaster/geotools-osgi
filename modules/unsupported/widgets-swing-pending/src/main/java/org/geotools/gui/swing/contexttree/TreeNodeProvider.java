@@ -31,7 +31,7 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/TreeNodeProvider.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/TreeNodeProvider.java $
  */
 public final class TreeNodeProvider extends ComponentProvider<JLabel> {
 

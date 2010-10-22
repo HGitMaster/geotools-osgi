@@ -35,7 +35,7 @@ package org.geotools.data;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/FeatureLock.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/FeatureLock.java $
  * @version $Id: FeatureLock.java 30642 2008-06-12 17:52:06Z acuster $
  *
  * @see <a

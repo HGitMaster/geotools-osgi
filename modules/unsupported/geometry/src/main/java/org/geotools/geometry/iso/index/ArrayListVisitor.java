@@ -22,7 +22,7 @@ import java.util.ArrayList;
 /**
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/ArrayListVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/ArrayListVisitor.java $
  */
 public class ArrayListVisitor implements ItemVisitor {
 

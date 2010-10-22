@@ -21,7 +21,7 @@ package org.geotools.coverage.processing;
  * Throws when a coverage operation failed.
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/CoverageProcessingException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/CoverageProcessingException.java $
  * @version $Id: CoverageProcessingException.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux
  *

@@ -42,7 +42,7 @@ import org.geotools.resources.i18n.Errors;
  * {@value org.geotools.util.GenericName#DEFAULT_SEPARATOR} character.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/HTTP_AuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/HTTP_AuthorityFactory.java $
  * @version $Id: HTTP_AuthorityFactory.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux
  *

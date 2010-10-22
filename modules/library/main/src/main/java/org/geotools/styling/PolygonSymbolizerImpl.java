@@ -31,7 +31,7 @@ import org.opengis.util.Cloneable;
  *
  * @author James Macgill, CCG
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/PolygonSymbolizerImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/PolygonSymbolizerImpl.java $
  * @version $Id: PolygonSymbolizerImpl.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public class PolygonSymbolizerImpl extends AbstractSymbolizer implements PolygonSymbolizer, Cloneable {

@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.LineString;
  * the filter test suite.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/test/java/org/geotools/filter/SQLEncoderPostgisTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/test/java/org/geotools/filter/SQLEncoderPostgisTest.java $
  */
 public class SQLEncoderPostgisTest extends TestCase {
     /** Standard logging instance */

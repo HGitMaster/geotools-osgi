@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * font-style, font-weight and font-size.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Font.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Font.java $
  * @version $Id: Font.java 33833 2009-09-04 12:26:28Z jive $
  */
 public interface Font extends org.opengis.style.Font{

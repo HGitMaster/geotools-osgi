@@ -46,7 +46,7 @@ import org.junit.Test;
  * 
  * @author Gabriel Roldan (OpenGeo)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcsde/common/src/test/java/org/geotools/arcsde/jndi/ArcSDEConnectionFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcsde/common/src/test/java/org/geotools/arcsde/jndi/ArcSDEConnectionFactoryTest.java $
  * @version $Id: ArcSDEConnectionFactoryTest.java 34172 2009-10-19 20:49:25Z groldan $
  * @since 2.5.7
  */

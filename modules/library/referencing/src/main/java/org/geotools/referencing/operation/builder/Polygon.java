@@ -30,7 +30,7 @@ import java.util.List;
  * (qadrilateral), that are used for triangulation.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/Polygon.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/Polygon.java $
  * @version $Id: Polygon.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Jan Jezek
  */

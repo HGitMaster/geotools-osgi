@@ -17,6 +17,7 @@
 package org.geotools.renderer.lite.gridcoverage2d;
 
 import java.awt.Color;
+import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.PixelInterleavedSampleModel;
 import java.awt.image.RenderedImage;
@@ -46,7 +47,7 @@ import org.opengis.util.InternationalString;
 /**
  * @author        Simone Giannecchini, GeoSolutions.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/LinearColorMap.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/LinearColorMap.java $
  */
 public final class LinearColorMap extends AbstractList<LinearColorMapElement>
 		implements ColorMapTransform<LinearColorMapElement> {
@@ -446,7 +447,7 @@ public final class LinearColorMap extends AbstractList<LinearColorMapElement>
 						if(!bits.testBit(i))
 							break;
 					if(i==max){
-						max=i==max?max++:max;
+						max=i==max?max+1:max;
 						bits=bits.setBit(i);
 						final int[] tempARGB = new int[max];
 						System.arraycopy(ARGB, 0, tempARGB, 0, ARGB.length);
@@ -469,7 +470,16 @@ public final class LinearColorMap extends AbstractList<LinearColorMapElement>
 		
 	}
 
+	/**
+	 * Creates a {@link SampleModel} compatible with the underlying {@link ColorModel} having the specified width and height.
+	 * @param width represents the width for the final {@link SampleModel}
+	 * @param height represents the height for the final {@link SampleModel}
+	 */
 	public SampleModel getSampleModel(int width, int height) {
+		if(width<=0)
+			throw new IllegalArgumentException(org.geotools.resources.i18n.Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,"width",width));
+		if(height<=0)
+			throw new IllegalArgumentException(org.geotools.resources.i18n.Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,"height",height));
 		// //
 		//
 		// force color model computation
@@ -664,11 +674,17 @@ public final class LinearColorMap extends AbstractList<LinearColorMapElement>
 //	}
 
 	public LinearColorMapElement get(int index) {
-		return standardElements[index];
+		if(index<standardElements.length)
+			return standardElements[index];
+		if(preFilteringElements!=null)
+			return preFilteringElements[index-standardElements.length];
+		throw new ArrayIndexOutOfBoundsException(org.geotools.resources.i18n.Errors.format(org.geotools.resources.i18n.ErrorKeys.INDEX_OUT_OF_BOUNDS_$1,index));
 	}
 
 	public int size() {
-		return this.preFilteringElements.length+this.standardElements.length;
+		int size= this.preFilteringElements!=null?preFilteringElements.length:0;
+		size+=this.standardElements.length;
+		return size;
 	}
 
 	public double getDefaultValue() {

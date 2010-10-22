@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.LineString;
  * @author jeichar
  *
  * @since 2.1.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/shapehandler/jts/MultiLineHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/shapehandler/jts/MultiLineHandler.java $
  */
 public class MultiLineHandler extends org.geotools.renderer.shape.shapehandler.simple.MultiLineHandler {
     private static final GeometryFactory factory=new GeometryFactory(new LiteCoordinateSequenceFactory());

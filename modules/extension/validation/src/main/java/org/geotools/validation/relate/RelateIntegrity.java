@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * RelateIntegrity<br>
  * @author bowens<br>
  * Created Apr 27, 2004<br>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelateIntegrity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelateIntegrity.java $
  * @version <br>
  * 
  * <b>Puropse:</b><br>

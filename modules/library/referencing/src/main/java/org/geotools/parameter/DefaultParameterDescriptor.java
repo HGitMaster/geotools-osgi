@@ -56,7 +56,7 @@ import org.opengis.util.InternationalString;
  * @param <T> The type of elements to be returned by {@link ParameterValue#getValue}.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/DefaultParameterDescriptor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/parameter/DefaultParameterDescriptor.java $
  * @version $Id: DefaultParameterDescriptor.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *

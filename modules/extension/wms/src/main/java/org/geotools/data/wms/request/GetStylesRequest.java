@@ -23,7 +23,7 @@ import org.geotools.data.ows.Request;
  * Represents a GetStyles Request
  * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/GetStylesRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/GetStylesRequest.java $
  */
 public interface GetStylesRequest extends Request {
     public static final String LAYERS = "LAYERS";

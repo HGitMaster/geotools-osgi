@@ -41,7 +41,7 @@ import org.opengis.filter.expression.Literal;
  * 
  * @author James Macgill
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/ClassificationFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/function/ClassificationFunction.java $
  */
 public abstract class ClassificationFunction extends DefaultExpression implements FunctionExpression {
 

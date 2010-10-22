@@ -32,7 +32,7 @@ import org.opengis.util.RecordType;
 /**
  * Information about the value (or set of values) obtained from applying a data quality measure.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/QuantitativeResultImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/QuantitativeResultImpl.java $
  * @version $Id: QuantitativeResultImpl.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

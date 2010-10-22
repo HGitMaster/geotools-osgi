@@ -29,7 +29,7 @@ package org.geotools.math;
  * This class is final for performance reason.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/math/Fraction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/math/Fraction.java $
  * @version $Id: Fraction.java 30725 2008-06-13 19:29:06Z desruisseaux $
  * @author Martin Desruisseaux (MPO)
  */

@@ -53,7 +53,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/bindings/LatLonBoxTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/bindings/LatLonBoxTypeBinding.java $
  */
 public class LatLonBoxTypeBinding extends AbstractComplexBinding {
     /**

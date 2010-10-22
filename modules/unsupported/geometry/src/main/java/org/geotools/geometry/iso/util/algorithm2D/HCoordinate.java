@@ -25,7 +25,7 @@ import org.geotools.geometry.iso.topograph2D.Coordinate;
  * {@link HCoordinate}s are used as a clean way of computing intersections
  * between line segments.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/HCoordinate.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/HCoordinate.java $
  */
 public class HCoordinate {
 

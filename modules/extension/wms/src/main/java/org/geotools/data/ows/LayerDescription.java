@@ -22,7 +22,7 @@ import java.net.URL;
  * Used to hold data regarding Layers. Used by the DescribeLayerResponse
  * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/ows/LayerDescription.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/ows/LayerDescription.java $
  */
 public class LayerDescription {
     private String name;

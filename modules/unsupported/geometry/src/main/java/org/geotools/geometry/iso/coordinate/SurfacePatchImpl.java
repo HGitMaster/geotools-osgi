@@ -32,7 +32,7 @@ import org.opengis.geometry.primitive.SurfacePatch;
  * The multiplicity of the association "Segmentation" (Figure 12) specifies that
  * each GM_SurfacePatch shall be in at most one GM_Surface.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/SurfacePatchImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/SurfacePatchImpl.java $
  */
 public abstract class SurfacePatchImpl implements SurfacePatch, Serializable {
 

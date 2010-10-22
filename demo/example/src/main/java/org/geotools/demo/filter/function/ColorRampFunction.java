@@ -34,7 +34,7 @@ import org.opengis.filter.expression.Literal;
  *
  * @author Michael Bedward
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/filter/function/ColorRampFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/filter/function/ColorRampFunction.java $
  */
 public class ColorRampFunction implements Function {
 

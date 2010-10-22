@@ -23,7 +23,7 @@ package org.geotools.gce.imagemosaic.jdbc;
  * @author mcr
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/OracleDialect.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/OracleDialect.java $
  */
 public class OracleDialect extends DBDialect {
 	public OracleDialect(Config config) {

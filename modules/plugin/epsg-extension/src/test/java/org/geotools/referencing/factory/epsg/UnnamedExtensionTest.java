@@ -43,7 +43,7 @@ import junit.framework.TestSuite;
 /**
  * Tests {@link UnnamedExtension}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-extension/src/test/java/org/geotools/referencing/factory/epsg/UnnamedExtensionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-extension/src/test/java/org/geotools/referencing/factory/epsg/UnnamedExtensionTest.java $
  * @version $Id: UnnamedExtensionTest.java 30656 2008-06-12 20:32:50Z acuster $
  * @author Martin Desruisseaux
  * @author Jody Garnett

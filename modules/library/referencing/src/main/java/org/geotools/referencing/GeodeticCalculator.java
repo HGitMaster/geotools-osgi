@@ -89,7 +89,7 @@ import org.geotools.util.logging.Logging;
  * environment, create one distinct instance of {@code GeodeticCalculator} for each thread.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/GeodeticCalculator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/GeodeticCalculator.java $
  * @version $Id: GeodeticCalculator.java 33918 2009-09-17 12:59:39Z mbedward $
  * @author Daniele Franzoni
  * @author Martin Desruisseaux

@@ -33,7 +33,7 @@ import org.geotools.jdbc.SQLDialect;
  * @author David Winslow, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-mysql/src/main/java/org/geotools/data/mysql/MySQLDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-mysql/src/main/java/org/geotools/data/mysql/MySQLDataStoreFactory.java $
  */
 public class MySQLDataStoreFactory extends JDBCDataStoreFactory {
     /** parameter for database type */

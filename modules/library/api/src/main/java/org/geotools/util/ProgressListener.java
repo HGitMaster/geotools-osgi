@@ -73,7 +73,7 @@ package org.geotools.util;
  * Note the use of try and catch to report exceptions.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/util/ProgressListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/util/ProgressListener.java $
  * @version $Id: ProgressListener.java 30642 2008-06-12 17:52:06Z acuster $
  * @author Martin Desruisseaux (PMO, IRD)
  *

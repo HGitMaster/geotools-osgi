@@ -37,8 +37,8 @@ public abstract class JDBCFeatureLockingTest extends JDBCTestSupport {
 
     JDBCFeatureStore store;
     
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
     
         store = (JDBCFeatureStore) dataStore.getFeatureSource(tname("ft1"));
         store.setFeatureLock(FeatureLock.TRANSACTION);

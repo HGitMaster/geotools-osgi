@@ -25,7 +25,7 @@ import org.opengis.referencing.FactoryException;
  * An element in a {@link CodeList}. This element stores the {@linkplain #code code value}.
  * The description name will be fetched when first needed and returned by {@link #toString}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/referencing/Code.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/referencing/Code.java $
  * @version $Id: Code.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

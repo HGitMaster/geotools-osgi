@@ -25,7 +25,7 @@ import org.opengis.style.StyleVisitor;
 /**
  * Default implementation of SelectedChannelType.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/SelectedChannelTypeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/SelectedChannelTypeImpl.java $
  */
 public class SelectedChannelTypeImpl implements SelectedChannelType {
     private FilterFactory filterFactory;

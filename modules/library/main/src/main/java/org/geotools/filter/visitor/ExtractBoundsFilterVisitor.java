@@ -88,7 +88,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/ExtractBoundsFilterVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/visitor/ExtractBoundsFilterVisitor.java $
  */
 public class ExtractBoundsFilterVisitor extends NullFilterVisitor {
     static public NullFilterVisitor BOUNDS_VISITOR = new ExtractBoundsFilterVisitor();
@@ -237,9 +237,39 @@ public class ExtractBoundsFilterVisitor extends NullFilterVisitor {
     }
 
     public Object visit( DWithin filter, Object data ) {
-        data = filter.getExpression1().accept(this, data);
-        data = filter.getExpression2().accept(this, data);
-        return data;
+        ReferencedEnvelope bbox = bbox( data );
+        
+        // we have to take the reference geometry bbox and 
+        // expand it by the distance. 
+        // We ignore the unit of measure for the moment
+        Literal geometry = null;
+        if(filter.getExpression1() instanceof PropertyName 
+                && filter.getExpression2() instanceof Literal) {
+            geometry = (Literal) filter.getExpression2();
+        } if(filter.getExpression2() instanceof PropertyName 
+                && filter.getExpression1() instanceof Literal) {
+            geometry = (Literal) filter.getExpression2();
+        }
+        
+        // we cannot desume a bbox from this filter
+        if(geometry == null) {
+            return infinity();
+        }
+        
+        Geometry geom = geometry.evaluate(null, Geometry.class);
+        if(geom == null) {
+            return infinity();
+        }
+        
+        Envelope env = geom.getEnvelopeInternal();
+        env.expandBy(filter.getDistance());
+        
+        if(bbox != null) {
+            bbox.expandToInclude(env);
+            return bbox;
+        } else {
+            return bbox(env);
+        }
     }
 
     public Object visit( Equals filter, Object data ) {

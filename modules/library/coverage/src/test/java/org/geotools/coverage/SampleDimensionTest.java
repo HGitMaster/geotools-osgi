@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  * rely on {@link CategoryList} for many of its work, many {@code GridSampleDimension}
  * tests are actually {@code CategoryList} tests.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/SampleDimensionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/coverage/SampleDimensionTest.java $
  * @version $Id: SampleDimensionTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

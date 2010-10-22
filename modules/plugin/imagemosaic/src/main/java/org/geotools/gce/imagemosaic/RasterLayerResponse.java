@@ -50,6 +50,7 @@ import javax.media.jai.ROIShape;
 import javax.media.jai.operator.ConstantDescriptor;
 import javax.media.jai.operator.MosaicDescriptor;
 
+import org.apache.commons.io.FilenameUtils;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.TypeMap;
 import org.geotools.coverage.grid.GeneralGridEnvelope;
@@ -61,6 +62,7 @@ import org.geotools.data.DataUtilities;
 import org.geotools.factory.Hints;
 import org.geotools.gce.imagemosaic.RasterManager.OverviewLevel;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
@@ -75,6 +77,7 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
 import com.sun.media.jai.codecimpl.util.ImagingException;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.index.ItemVisitor;
 /**
  * A RasterLayerResponse. An instance of this class is produced everytime a
@@ -85,13 +88,40 @@ import com.vividsolutions.jts.index.ItemVisitor;
  */
 @SuppressWarnings("deprecation")
 class RasterLayerResponse{
+
+	/**
+	 * Simple plcaeholder class to store the result of 
+	 * 
+	 * @author Simone Giannecchini, S.A.S.
+	 *
+	 */
+    static class GranuleLoadingResult {
+
+        RenderedImage loadedImage;
+
+        ROIShape inclusionArea;
+
+        public ROIShape getFootprint() {
+            return inclusionArea;
+        }
+
+        public RenderedImage getRaster() {
+            return loadedImage;
+        }
+
+        GranuleLoadingResult(RenderedImage loadedImage, ROIShape inclusionArea) {
+            this.loadedImage = loadedImage;
+            this.inclusionArea = inclusionArea;
+        }
+    }
+	
 	
 	/**
 	 * 
 	 * @author Simone Giannecchini, GeoSolutions SAS
 	 *
 	 */
-	class GranuleLoader implements Callable<RenderedImage>{
+	class GranuleLoader implements Callable<GranuleLoadingResult>{
 
 		final ReferencedEnvelope cropBBox;
 		
@@ -140,7 +170,7 @@ class RasterLayerResponse{
 			return imageIndex;
 		}
 		
-		public RenderedImage call() throws Exception {
+		public GranuleLoadingResult call() throws Exception {
 			return granule.loadRaster(readParameters, imageIndex, cropBBox, mosaicWorldToGrid, request,tilesDimension);
 		}
 
@@ -148,15 +178,16 @@ class RasterLayerResponse{
 	
 	class GranuleIndexVisitor implements ItemVisitor{
 
-		
+		final URL inputURL;
 		/**
 		 * Default {@link Constructor}
+		 * @param inputURL 
 		 */
-		public GranuleIndexVisitor() {
-
+		public GranuleIndexVisitor(URL inputURL) {
+		    this.inputURL = inputURL;
 		}
 
-		private final List<Future<RenderedImage>> tasks= new ArrayList<Future<RenderedImage>>();
+		private final List<Future<GranuleLoadingResult>> tasks= new ArrayList<Future<GranuleLoadingResult>>();
 		private int   granulesNumber;
 		private boolean doInputTransparency;
 		private List<ROI> rois = new ArrayList<ROI>();
@@ -168,6 +199,8 @@ class RasterLayerResponse{
 			// Get location and envelope of the image to load.
 			final SimpleFeature feature = (SimpleFeature) item;
 			final String granuleLocation = (String) feature.getAttribute(rasterManager.getLocationAttribute());
+			Geometry inclusionGeometry = null;
+			
 			final ReferencedEnvelope granuleBBox = ReferencedEnvelope.reference(feature.getBounds());
 			
 
@@ -178,6 +211,8 @@ class RasterLayerResponse{
 			// If the granule is not there, dump a message and continue
 			final URL rasterFile = rasterManager.getPathType().resolvePath(parentLocation, granuleLocation);
 			if (rasterFile == null) {
+				if (LOGGER.isLoggable(Level.INFO))
+					LOGGER.info("File not found: "+granuleLocation);				
 				return;
 			}
 			if (LOGGER.isLoggable(Level.FINE))
@@ -188,16 +223,20 @@ class RasterLayerResponse{
 			synchronized (rasterManager.granulesCache) {
 				
 				// Comment by Stefan Krueger
-				// Before the File.toURI().toString was jused as the cache key. For URL that potentially throws an URISystaxException and i used just toString()  
+				// TODO Before the File.toURI().toString was jused as the cache key. For URL that potentially throws an URISystaxException and i used just toString()  
 				
-				if(rasterManager.granulesCache.containsKey(rasterFile.toString()))
-				{
+				// granule's information are cached
+				if (rasterManager.granulesCache.containsKey(rasterFile.toString())) {
 					granule=rasterManager.granulesCache.get(rasterFile.toString());
-				}
-				else
-				{
-					granule=new Granule(granuleBBox,rasterFile,rasterManager.parent.suggestedSPI);
-					rasterManager.granulesCache.put(rasterFile.toString(),granule);
+					inclusionGeometry = granule.inclusionGeometry;
+				} else {
+					// granule's information are NOT cached
+					//get footprint first, can be null in case we don't have any geometry
+					String featureID=feature.getID();
+					featureID=FilenameUtils.getExtension(featureID);
+					inclusionGeometry=rasterManager.getGranuleFootprint(featureID);
+    				granule=new Granule(granuleBBox,rasterFile,rasterManager.parent.suggestedSPI, inclusionGeometry);
+    				rasterManager.granulesCache.put(rasterFile.toString(),granule);
 				}
 			}
 			
@@ -205,48 +244,58 @@ class RasterLayerResponse{
 			// load raster data
 			//
 			//create a granule loader
-			final GranuleLoader loader = new GranuleLoader(baseReadParameters, imageChoice, mosaicBBox, finalWorldToGridCorner, granule, request.getTileDimensions());
-			if(!multithreadingAllowed)
-				tasks.add(new FutureTask<RenderedImage>(loader));
-			else
-				tasks.add(ImageMosaicReader.multiThreadedLoader.submit(loader));
+			final Geometry bb = JTS.toGeometry((BoundingBox)mosaicBBox);
+			if (!footprintManagement || inclusionGeometry == null || footprintManagement && inclusionGeometry.intersects(bb)){
+        			final GranuleLoader loader = new GranuleLoader(baseReadParameters, imageChoice, mosaicBBox, finalWorldToGridCorner, granule, request.getTileDimensions());
+        			if(!multithreadingAllowed)
+        				tasks.add(new FutureTask<GranuleLoadingResult>(loader));
+        			else
+        				tasks.add(ImageMosaicFormatFactory.DefaultMultiThreadedLoader.submit(loader));
+            			
+        			granulesNumber++;
+        		}
 			
-			granulesNumber++;
 			if(granulesNumber>request.getMaximumNumberOfGranules())
 				throw new IllegalStateException("The maximum number of allowed granules ("+request.getMaximumNumberOfGranules()+")has been exceeded.");
 		}
 		
-		
+
+
+
 		public void produce(){
 			
 			// reusable parameters
 			alphaChannels = new PlanarImage[granulesNumber];
 			int granuleIndex=0;
 			inputTransparentColor = request.getInputTransparentColor();
-			doInputTransparency = inputTransparentColor != null;
+			doInputTransparency = inputTransparentColor != null&&!footprintManagement;
 			// execute them all
 			boolean firstGranule=true;
 			int[] alphaIndex=null;
 			
-			for (Future<RenderedImage> future :tasks) {
-				
+			for (Future<GranuleLoadingResult> future :tasks) {
 				
 				final RenderedImage loadedImage;
+				final GranuleLoadingResult result;
 				try {
-					if(!multithreadingAllowed)
-					{
+					if(!multithreadingAllowed) {
 						//run the loading in this thread
-						final FutureTask<RenderedImage> task=(FutureTask<RenderedImage>) future;
+						final FutureTask<GranuleLoadingResult> task=(FutureTask<GranuleLoadingResult>) future;
 						task.run();
 					}
-					loadedImage=future.get();
-					if(loadedImage==null)
-					{
+					result = future.get();
+					if (result == null) {
+                        if(LOGGER.isLoggable(Level.FINE))
+                                LOGGER.log(Level.FINE,"Unable to load the raster for granule " +granuleIndex+ " with request "+request.toString());
+                        continue;
+                    }
+					loadedImage = result.getRaster();
+					if (loadedImage == null) {
 						if(LOGGER.isLoggable(Level.FINE))
 							LOGGER.log(Level.FINE,"Unable to load the raster for granule " +granuleIndex+ " with request "+request.toString());
 						continue;
 					}
-					if(firstGranule){
+					if (firstGranule) {
 						//
 						// We check here if the images have an alpha channel or some
 						// other sort of transparency. In case we have transparency
@@ -271,8 +320,8 @@ class RasterLayerResponse{
 //						if(!Double.isNaN(request.getThreshold()))
 //							pbjMosaic.setParameter("sourceThreshold", new double[][]{{request.getThreshold()}});
 //						else
-							pbjMosaic.setParameter("sourceThreshold",
-								new double[][] { { ImageMosaicUtils.getThreshold(loadedImage.getSampleModel().getDataType()) } });
+						pbjMosaic.setParameter("sourceThreshold",
+							new double[][] { { ImageMosaicUtils.getThreshold(loadedImage.getSampleModel().getDataType()) } });
 						
 						
 						firstGranule=false;
@@ -287,14 +336,11 @@ class RasterLayerResponse{
 					if(LOGGER.isLoggable(Level.SEVERE))
 						LOGGER.log(Level.SEVERE,"Unable to load the raster for granule " +granuleIndex,e);
 					continue;
-				}
-
-				catch (ImagingException e) {
+				} catch (ImagingException e) {
 					if (LOGGER.isLoggable(Level.FINE))
 						LOGGER.fine("Adding to mosaic image number " + granuleIndex+ " failed, original request was "+request);
 					continue;
-				}
-				catch (javax.media.jai.util.ImagingException e) {
+				} catch (javax.media.jai.util.ImagingException e) {
 					if (LOGGER.isLoggable(Level.FINE))
 						LOGGER.fine("Adding to mosaic image number " + granuleIndex+ " failed, original request was "+request);
 					continue;
@@ -317,8 +363,21 @@ class RasterLayerResponse{
 						inputTransparentColor);
 				
 				// we need to add its roi in order to avoid problems whith the mosaic overl
-				rois.add(new ROIShape(PlanarImage.wrapRenderedImage(raster).getBounds()));
-
+				ROI imageBounds = new ROIShape(PlanarImage.wrapRenderedImage(raster).getBounds());
+				if (footprintManagement){
+				    final ROIShape footprint = result.getFootprint();
+				    if (footprint != null){
+				        if (imageBounds.contains(footprint.getBounds())) {
+				            imageBounds = footprint;
+				        } else {
+				            imageBounds = imageBounds.intersect(footprint);
+				        }
+				    }
+				    
+				    
+				}
+				rois.add(imageBounds);
+				
 				// add to mosaic
 				pbjMosaic.addSource(raster);
 			
@@ -326,11 +385,11 @@ class RasterLayerResponse{
 				granuleIndex++;
 			}
 
-			granulesNumber=granuleIndex;
-			if(granulesNumber==0)
-			{
-				if(LOGGER.isLoggable(Level.FINE))
+			granulesNumber = granuleIndex;
+			if (granulesNumber == 0) {
+				if (LOGGER.isLoggable(Level.FINE)) {
 					LOGGER.log(Level.FINE,"Unable to load any granule ");
+				}
 				return;
 			}
 
@@ -341,7 +400,7 @@ class RasterLayerResponse{
 			// transparent color or the result of input images with internal
 			// transparency.
 
-			if (alphaIn || doInputTransparency) {
+			if ((alphaIn || doInputTransparency) && !footprintManagement) {
 				// //
 				//
 				// In case the input images have transparency information
@@ -384,7 +443,6 @@ class RasterLayerResponse{
 
 	private String parentLocation;
 
-
 	private Color finalTransparentColor;
 
 	private ParameterBlockJAI pbjMosaic;
@@ -402,6 +460,8 @@ class RasterLayerResponse{
 	private ImageReadParam baseReadParameters= new ImageReadParam();
 
 	private boolean multithreadingAllowed=false;
+	
+	private boolean footprintManagement = !ImageMosaicUtils.IGNORE_FOOTPRINT;
 	
 	private boolean alphaIn=false;
 
@@ -440,6 +500,7 @@ class RasterLayerResponse{
 		finalTransparentColor=request.getOutputTransparentColor();
 		// are we doing multithreading?
 		multithreadingAllowed= request.isMultithreadingAllowed();
+		footprintManagement = request.isFootprintManagement();
 		backgroundValues = request.getBackgroundValues();
 
 	}
@@ -525,20 +586,8 @@ class RasterLayerResponse{
 	 * This method loads the granules which overlap the requested
 	 * {@link GeneralEnvelope} using the provided values for alpha and input
 	 * ROI.
-	 * 
-	 * @param requestedOriginalEnvelope
-	 * @param intersectionEnvelope
-	 * @param finalTransparentColor
-	 * @param outputTransparentColor
-	 * @param requestedJTSEnvelope
-	 * @param inputImageThresholdValue
-	 * @param dim
-	 * @param blend
-	 * @param overviewPolicy
-	 * @param useJAIImageRead
 	 * @return
 	 * @throws DataSourceException
-	 * @throws TransformException
 	 */
 	private RenderedImage prepareResponse() throws DataSourceException {
 
@@ -548,7 +597,7 @@ class RasterLayerResponse{
 			// prepare the params for executing a mosaic operation.
 			//
 			pbjMosaic = new ParameterBlockJAI("Mosaic");
-			pbjMosaic.setParameter("backgroundValues",backgroundValues);
+			pbjMosaic.setParameter("backgroundValues", backgroundValues);
 			// It might important to set the mosaic type to blend otherwise
 			// sometimes strange results jump in.
 			if (request.isBlend()) 
@@ -604,10 +653,14 @@ class RasterLayerResponse{
 			finalGridToWorldCorner=new AffineTransform2D(g2w);
 			finalWorldToGridCorner = finalGridToWorldCorner.inverse();// compute raster bounds
 			rasterBounds=new GeneralGridEnvelope(CRS.transform(finalWorldToGridCorner, mosaicBBox),PixelInCell.CELL_CORNER,false).toRectangle();
+			if (rasterBounds.width == 0)
+			    rasterBounds.width++;
+			if (rasterBounds.height == 0)
+			    rasterBounds.height++;
 			
 			
 			// create the index visitor and visit the feature
-			final GranuleIndexVisitor visitor = new GranuleIndexVisitor();
+			final GranuleIndexVisitor visitor = new GranuleIndexVisitor(inputURL);
 			rasterManager.getFeaturesFromIndex(mosaicBBox, visitor);
 			visitor.produce();
 			
@@ -634,35 +687,20 @@ class RasterLayerResponse{
 				
 				return buildMosaic();				
 			
-			}
-			else{
+			} else {
+			    
 				// if we get here that means that we do not have anything to load
 				// but still we are inside the definition area for the mosaic,
 				// therefore we create a fake coverage using the background values,
 				// if provided (defaulting to 0), as well as the compute raster
 				// bounds, envelope and grid to world.
-				
-	
-				if (backgroundValues == null)
-					
-					//we don't have background values available
-					return ConstantDescriptor.create(
-									Float.valueOf(rasterBounds.width), 
-									Float.valueOf(rasterBounds.height),
-									new Byte[] { 0 },
-									this.rasterManager.getHints());
-				else {
-					
-					//we have background values available
-					final Double[] values = new Double[backgroundValues.length];
-					for (int i = 0; i < values.length; i++)
-						values[i] = backgroundValues[i];
-					return ConstantDescriptor.create(
+				Number[] values = ImageMosaicUtils.getBackgroundValues(rasterManager.defaultSM, backgroundValues);
+			        
+				return ConstantDescriptor.create(
 									Float.valueOf(rasterBounds.width), 
 									Float.valueOf(rasterBounds.height),
 									values, 
-									this.rasterManager.getHints());
-				}
+									rasterManager.defaultImageLayout!=null?new RenderingHints(JAI.KEY_IMAGE_LAYOUT,rasterManager.defaultImageLayout):null);
 			}
 
 		} catch (IOException e) {
@@ -720,7 +758,7 @@ class RasterLayerResponse{
 		//
 		// ROI
 		//
-		if (alphaIn || doTransparentColor) {
+		if ((alphaIn || doTransparentColor) && !footprintManagement) {
 			ImageWorker w = new ImageWorker(granule);
 			if (granule.getSampleModel() instanceof MultiPixelPackedSampleModel)
 				w.forceComponentColorModel();
@@ -841,7 +879,6 @@ class RasterLayerResponse{
 		else
 			policy = overviewPolicy;
 
-
 		// requested to ignore overviews
 		if (policy.equals(OverviewPolicy.IGNORE))
 			return imageChoice;
@@ -849,11 +886,9 @@ class RasterLayerResponse{
 		// overviews and decimation
 		imageChoice = rasterManager.overviewsController.pickOverviewLevel(overviewPolicy, request);
 
-
 		// DECIMATION ON READING
 		rasterManager.decimationController.performDecimation(imageChoice, readParams, request);
 		return imageChoice;
-
 	}
 
 

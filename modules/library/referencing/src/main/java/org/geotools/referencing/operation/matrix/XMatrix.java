@@ -29,7 +29,7 @@ import org.opengis.referencing.operation.Matrix;
  * {@link javax.vecmath.Matrix4d}, {@link javax.vecmath.GMatrix}).
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/XMatrix.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/XMatrix.java $
  * @version $Id: XMatrix.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini

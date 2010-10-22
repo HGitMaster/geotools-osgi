@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * Provides a basic implementation of the TrackSegment interface.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/gpx2/org/geotools/gpx2/gpxentities/BasicTrackSegment.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/gpx2/org/geotools/gpx2/gpxentities/BasicTrackSegment.java $
  */
 public class BasicTrackSegment implements TrackSegment 
 {

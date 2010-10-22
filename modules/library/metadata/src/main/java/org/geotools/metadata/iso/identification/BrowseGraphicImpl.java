@@ -28,7 +28,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Graphic that provides an illustration of the dataset (should include a legend for the graphic).
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/identification/BrowseGraphicImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/identification/BrowseGraphicImpl.java $
  * @version $Id: BrowseGraphicImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

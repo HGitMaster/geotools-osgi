@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the wrapper for JAI's parameters.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/parameter/ImagingParametersTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/parameter/ImagingParametersTest.java $
  * @version $Id: ImagingParametersTest.java 31132 2008-08-05 12:49:11Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini

@@ -26,7 +26,7 @@ import org.geotools.validation.DefaultIntegrityValidationBeanInfo;
  * RelateIntegrityBeanInfo<br>
  * @author bowens<br>
  * Created Apr 27, 2004<br>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelateIntegrityBeanInfo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelateIntegrityBeanInfo.java $
  * @version <br>
  * 
  * <b>Puropse:</b><br>

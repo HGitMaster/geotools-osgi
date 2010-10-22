@@ -38,7 +38,7 @@ import org.xml.sax.Attributes;
  * @author Gabriel Roldan
  * @author Justin Deoliveira
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributePropertyHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributePropertyHandler.java $
  */
 public class AttributePropertyHandler implements DynamicPropertyHandler {
 

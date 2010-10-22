@@ -62,7 +62,7 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
  * @author Mauricio Pazos (Axios Engineering)
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQLCompiler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQLCompiler.java $
  * @version $Id: CQLCompiler.java 34180 2009-10-21 09:05:04Z mpazos $
  * @since 2.5
  */

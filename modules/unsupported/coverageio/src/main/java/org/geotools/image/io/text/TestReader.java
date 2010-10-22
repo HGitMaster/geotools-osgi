@@ -30,7 +30,7 @@ import org.geotools.resources.XArray;
  * of {@link TextImageReader.Spi#canDecodeInput}. This class is more lightweight than
  * loading the real image reader implementation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TestReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TestReader.java $
  * @version $Id: TestReader.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

@@ -32,7 +32,7 @@ import org.geotools.geometry.iso.topograph2D.PlanarGraph;
  * operations.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/overlay/OverlayNodeFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/overlay/OverlayNodeFactory.java $
  * @version 1.7.2
  */
 public class OverlayNodeFactory extends NodeFactory {

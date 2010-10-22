@@ -44,7 +44,7 @@ import junit.framework.TestCase;
  * @author Jody Garnett
  * @author Joel Skelton
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/test/java/org/geotools/geometry/jts/spatialschema/geometry/AbstractGeometryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/test/java/org/geotools/geometry/jts/spatialschema/geometry/AbstractGeometryTest.java $
  */
 public abstract class AbstractGeometryTest extends TestCase {
 

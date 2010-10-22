@@ -29,7 +29,7 @@ import org.opengis.filter.Id;
  * <p>
  * Example:<code>Set<String> fids = (Set<String>) filter.accept( IdCollectorFilterVisitor.ID_COLLECTOR, new HashSet() );</code>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/IdCollectorFilterVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/visitor/IdCollectorFilterVisitor.java $
  */
 public class IdCollectorFilterVisitor extends DefaultFilterVisitor {
     public static final IdCollectorFilterVisitor ID_COLLECTOR = new IdCollectorFilterVisitor(true);

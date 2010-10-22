@@ -76,7 +76,7 @@ import java.util.Set;
  *
  * @since 2.5
  * @version $Id: ObjectCache.java 31618 2008-10-03 20:30:40Z egouge $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/ObjectCache.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/ObjectCache.java $
  * @author Cory Horner (Refractions Research)
  *
  * @see https://jsr-107-interest.dev.java.net/javadoc/javax/cache/package-summary.html

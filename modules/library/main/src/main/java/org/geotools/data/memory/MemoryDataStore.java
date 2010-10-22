@@ -66,7 +66,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/memory/MemoryDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/memory/MemoryDataStore.java $
  */
 public class MemoryDataStore extends AbstractDataStore {
     /** Memory holds Map of Feature by fid by typeName. */

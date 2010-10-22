@@ -70,7 +70,7 @@ import org.geotools.factory.Factory;
  * </p>
 
  * @author Andrea Aime - TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/DataSourceFactorySpi.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/DataSourceFactorySpi.java $
  */
 public interface DataSourceFactorySpi extends Factory {
     /**

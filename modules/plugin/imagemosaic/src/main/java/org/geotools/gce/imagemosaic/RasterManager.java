@@ -17,6 +17,9 @@
 package org.geotools.gce.imagemosaic;
 
 import java.awt.Rectangle;
+import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -28,12 +31,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageReadParam;
+import javax.media.jai.ImageLayout;
 
+import org.apache.commons.io.FilenameUtils;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GridEnvelope2D;
@@ -74,43 +81,41 @@ class RasterManager {
 	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(RasterManager.class);
 	
 	final SoftValueHashMap<String, Granule> granulesCache= new SoftValueHashMap<String, Granule>();
-	
+		
 	/**
-	 * This class simply builds an SRTREE spatial index in memory for fast indexed
+	 * This class simply builds an SRTREE spatial granulesIndex in memory for fast indexed
 	 * geometric queries.
 	 * 
 	 * <p>
 	 * Since the {@link ImageMosaicReader} heavily uses spatial queries to find out
 	 * which are the involved tiles during mosaic creation, it is better to do some
-	 * caching and keep the index in memory as much as possible, hence we came up
-	 * with this index.
+	 * caching and keep the granulesIndex in memory as much as possible, hence we came up
+	 * with this granulesIndex.
 	 * 
 	 * @author Simone Giannecchini, S.A.S.
-     * @author Stefan Alfons Krueger (alfonx), Wikisquare.de : Support for jar:file:foo.jar/bar.properties URLs
+         * @author Stefan Alfons Krueger (alfonx), Wikisquare.de : Support for jar:file:foo.jar/bar.properties URLs
 	 * @since 2.5
- *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic/src/main/java/org/geotools/gce/imagemosaic/RasterManager.java $
+         *
+         * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic/src/main/java/org/geotools/gce/imagemosaic/RasterManager.java $
 	 */
-	public class GranuleIndex {
+	class GranuleCatalog {
 		
-		private long lastModified=-1;
+		private long lastModifiedGranuleIndex=-1;
 		
-		/** The {@link STRtree} index. */
-		private SoftReference<STRtree> index= new SoftReference<STRtree>(null);
+		private long lastModifiedFootprintIndex=-1;
+		
+		/** The {@link STRtree} granulesIndex. */
+		private SoftReference<STRtree> granulesIndex= new SoftReference<STRtree>(null);
+
+		private SoftReference<Map<String, Geometry>> footprintsIndex  = new SoftReference<Map<String, Geometry>>(null);
 
 		/**
-		 * Constructs a {@link GranuleIndex} out of a {@link FeatureCollection}.
+		 * Constructs a {@link GranuleCatalog} out of a {@link FeatureCollection}.
 		 * 
 		 * @param features
 		 * @throws IOException
 		 */
 		private synchronized SpatialIndex getIndex() throws IOException {
-
-			/**
-			 * Comment by Stefan Krueger while patching the stuff to deal with
-			 * URLs instead of Files: If it is not a URL to a file, we don't
-			 * need locks, because no one can change to the index.
-			 */
 
 			STRtree tree = null;
 
@@ -130,22 +135,22 @@ class RasterManager {
 						lock = channel.lock(0, Long.MAX_VALUE, true);
 					}
 
-					// now check the modified time and rebuild the index as
+					// now check the modified time and rebuild the granulesIndex as
 					// needed
 					final long lastMod = file.lastModified();
-					if (lastMod > this.lastModified) {
+					if (lastMod > this.lastModifiedGranuleIndex) {
 						// the underlying files has been modified, let's clean
-						// up the index
-						index.clear();
+						// up the granulesIndex
+						granulesIndex.clear();
 						tree = null;
 					} else
-						tree = index.get();
+						tree = granulesIndex.get();
 					if (tree == null) {
 
 						if (LOGGER.isLoggable(Level.FINE))
 							LOGGER.fine("Index needs to be recreated...");
 						createIndex();
-						tree = index.get();
+						tree = granulesIndex.get();
 						assert tree != null;
 					} else if (LOGGER.isLoggable(Level.FINE))
 						LOGGER.fine("Index does not need to be created...");
@@ -176,15 +181,15 @@ class RasterManager {
 				}
 
 			} else {
-				// The URL is not a file. So no locks are needed, and no index
-				// can be created. Use an index if it is there.
+				// The URL is not a file. So no locks are needed, and no granulesIndex
+				// can be created. Use an granulesIndex if it is there.
 
-				tree = index.get();
+				tree = granulesIndex.get();
 				if (tree == null) {
 					if (LOGGER.isLoggable(Level.FINE))
-						LOGGER.fine("No index exits and we create a new one.");
+						LOGGER.fine("No granulesIndex exits and we create a new one.");
 					createIndex();
-					tree = index.get();
+					tree = granulesIndex.get();
 				} else if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("Index does not need to be created...");
 				
@@ -219,30 +224,29 @@ class RasterManager {
 				final String[] typeNames = tileIndexStore.getTypeNames();
 				if (typeNames.length <= 0)
 					throw new IllegalArgumentException(
-							"Problems when opening the index, no typenames for the schema are defined");
+							"Problems when opening the granulesIndex, no typenames for the schema are defined");
 		
-				// loading all the features into memory to build an in-memory index.
+				// loading all the features into memory to build an in-memory granulesIndex.
 				String typeName = typeNames[0];
 				final FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = tileIndexStore.getFeatureSource(typeName);
 				if (featureSource == null) 
 					throw new NullPointerException(
-							"The provided FeatureSource<SimpleFeatureType, SimpleFeature> is null, it's impossible to create an index!");
+							"The provided FeatureSource<SimpleFeatureType, SimpleFeature> is null, it's impossible to create an granulesIndex!");
 				features = featureSource.getFeatures();
 				if (features == null) 
 					throw new NullPointerException(
-							"The provided FeatureCollection<SimpleFeatureType, SimpleFeature> is null, it's impossible to create an index!");
+							"The provided FeatureCollection<SimpleFeatureType, SimpleFeature> is null, it's impossible to create an granulesIndex!");
 		
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("Index Loaded");
 				
-				//load the feature from the shapefile and create JTS index
+				//load the feature from the shapefile and create JTS granulesIndex
 				it = features.features();
 				if (!it.hasNext()) 
 					throw new IllegalArgumentException(
-							"The provided FeatureCollection<SimpleFeatureType, SimpleFeature>  or empty, it's impossible to create an index!");
+							"The provided FeatureCollection<SimpleFeatureType, SimpleFeature>  or empty, it's impossible to create an granulesIndex!");
 				
-				// now build the index
-				// TODO make it configurable as far the index is involved
+				// now build the granulesIndex
 				STRtree tree = new STRtree();
 				while (it.hasNext()) {
 					final SimpleFeature feature = it.next();
@@ -250,20 +254,20 @@ class RasterManager {
 					tree.insert(g.getEnvelopeInternal(), feature);
 				}
 				
-				// force index construction --> STRTrees are build on first call to
+				// force granulesIndex construction --> STRTrees are build on first call to
 				// query
 				tree.build();
 				
 				// save the soft reference
-				index= new SoftReference<STRtree>(tree);
+				granulesIndex= new SoftReference<STRtree>(tree);
 
 				// IF this the sourceURL points to a File, THEN we are using the
 				// last modified time to determine whether we have to recreate the
-				// index. Otherwise now used.
+				// granulesIndex. Otherwise now used.
 				if(parent.sourceURL.getProtocol().equals("file")) {
-					this.lastModified = DataUtilities.urlToFile(parent.sourceURL).lastModified();
+					this.lastModifiedGranuleIndex = DataUtilities.urlToFile(parent.sourceURL).lastModified();
 				} else {
-					this.lastModified = new Date().getTime();
+					this.lastModifiedGranuleIndex = new Date().getTime();
 				}
 
 			}
@@ -282,10 +286,12 @@ class RasterManager {
 					tileIndexStore=null;
 				}
 				
-				if(it!=null)
+				if(it!=null){
 					// closing he iterator to free some resources.
 					if(features!=null)
 						features.close(it);
+					it.close();
+				}
 
 			}
 			
@@ -302,7 +308,7 @@ class RasterManager {
 		 */
 		@SuppressWarnings("unchecked")
 		public List<SimpleFeature> findFeatures(final Envelope envelope) throws IOException {
-			ImageMosaicUtils.ensureNonNull("envelope",envelope);
+			Utilities.ensureNonNull("envelope",envelope);
 			return getIndex().query(envelope);
 
 		}
@@ -317,15 +323,137 @@ class RasterManager {
 		 * @throws IOException 
 		 */
 		public void findFeatures(final Envelope envelope, final ItemVisitor visitor) throws IOException {
-			ImageMosaicUtils.ensureNonNull("envelope",envelope);
-			ImageMosaicUtils.ensureNonNull("visitor",visitor);
+			Utilities.ensureNonNull("envelope",envelope);
+			Utilities.ensureNonNull("visitor",visitor);
 			getIndex().query(envelope, visitor);
 
 		}
 		
 		
 		public synchronized void dispose()throws IOException{
-			index.clear();
+			granulesIndex.clear();
+		}
+
+		public Geometry getFootprint(String id) {
+			Utilities.ensureNonNull("id",id);
+			Map<String, Geometry> cache;
+			try {
+				cache = getFootprintsIndex();
+				if(cache!=null&&cache.containsKey(id))
+					return cache.get(id);				
+			} catch (IOException e) {
+				if(LOGGER.isLoggable(Level.WARNING))
+					LOGGER.log(Level.WARNING,e.getLocalizedMessage(),e);
+			}
+			return null;
+		}
+
+		private synchronized Map<String, Geometry> getFootprintsIndex() throws IOException{
+                    
+			Map<String, Geometry> retValue=null;
+			if (parent.sourceURL.getProtocol().equals("file")) {
+
+				final String fileName = DataUtilities.urlToFile(inputURL).getAbsolutePath();
+	        	final File footprintSummaryFile = new File(FilenameUtils.getFullPathNoEndSeparator(fileName),FilenameUtils.getBaseName(fileName)+FootprintUtils.FOOTPRINT_EXT);
+	            if (!(footprintSummaryFile != null && footprintSummaryFile.exists() && footprintSummaryFile.canRead())) 
+	            	return null;
+	            
+				FileLock lock = null;
+				FileChannel channel = null;
+				try {
+
+					//  Get a file channel for the file
+					if(footprintSummaryFile.canWrite()){
+						channel = new RandomAccessFile(footprintSummaryFile, "rw").getChannel();
+	
+						// Create a shared lock on the file.
+						// This method blocks until it can retrieve the lock.
+						lock = channel.lock(0, Long.MAX_VALUE, true);
+					}
+
+					// now check the modified time and rebuild the granulesIndex as
+					// needed
+					final long lastMod = footprintSummaryFile.lastModified();
+					if (lastMod > this.lastModifiedFootprintIndex) {
+						// the underlying files has been modified, let's clean
+						// up the granulesIndex
+						footprintsIndex.clear();
+					} else
+						retValue = footprintsIndex.get();
+					if (retValue == null) {
+
+						if (LOGGER.isLoggable(Level.FINE))
+							LOGGER.fine("footprintsIndex needs to be recreated...");
+						createFootprintIndex();
+						retValue = footprintsIndex.get();
+						assert retValue != null;
+					} else if (LOGGER.isLoggable(Level.FINE))
+						LOGGER.fine("footprintsIndex does not need to be created...");
+					return retValue;
+				} finally {
+
+					try {
+						if (lock != null)
+							// Release the lock
+							lock.release();
+					} catch (Throwable e) {
+						if (LOGGER.isLoggable(Level.FINE))
+							LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
+					} finally {
+						lock = null;
+					}
+
+					try {
+						if (channel != null)
+							// Close the file
+							channel.close();
+					} catch (Throwable e) {
+						if (LOGGER.isLoggable(Level.FINE))
+							LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
+					} finally {
+						channel = null;
+					}
+				}
+
+			} else {
+				// The URL is not a file. So no locks are needed, and no granulesIndex
+				// can be created. Use an granulesIndex if it is there.
+
+				retValue = footprintsIndex.get();
+				if (retValue == null) {
+					if (LOGGER.isLoggable(Level.FINE))
+						LOGGER.fine("No footprintsIndex exists and we create a new one.");
+					createFootprintIndex();
+					retValue = footprintsIndex.get();
+				} else if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine("footprintsIndex does not need to be created...");
+				
+				return retValue;
+			}
+		}
+
+		private void createFootprintIndex() {
+
+			// check that we holds a lock 
+			assert Thread.holdsLock(this);
+			
+			final Map<String, Geometry> footprintsMap=new HashMap<String, Geometry>();
+
+        	final String fileName = DataUtilities.urlToFile(inputURL).getAbsolutePath();
+        	final File footprintSummaryFile = new File(FilenameUtils.getFullPathNoEndSeparator(fileName),FilenameUtils.getBaseName(fileName)+FootprintUtils.FOOTPRINT_EXT);
+                    if (footprintSummaryFile != null && footprintSummaryFile.exists() && footprintSummaryFile.canRead()) {
+                        FootprintUtils.initFootprintsGranuleIDGeometryMap(footprintSummaryFile, footprintsMap);
+                    }
+            // save the soft reference
+			footprintsIndex= new SoftReference<Map<String, Geometry>>(footprintsMap);
+
+			// IF this the sourceURL points to a File, THEN we are using the
+			// last modified time to determine whether we have to recreate the
+			// granulesIndex. Otherwise now used.
+			this.lastModifiedFootprintIndex = footprintSummaryFile.lastModified();       
+
+			
+						
 		}
 
 	}
@@ -520,8 +648,8 @@ class RasterManager {
 			{
 		
 				// the read parameters cannot be null
-				ImageMosaicUtils.ensureNonNull("readParameters", readParameters);
-				ImageMosaicUtils.ensureNonNull("request", request);
+				Utilities.ensureNonNull("readParameters", readParameters);
+				Utilities.ensureNonNull("request", request);
 				
 				//get the requested resolution
 				final double[] requestedRes=request.getRequestedResolution();
@@ -661,10 +789,16 @@ class RasterManager {
 		    coverageFullResolution[0] = highestLevel.resolutionX;
 		    coverageFullResolution[1] = highestLevel.resolutionY;
 		}
-		
-		
-		
 	}
+	
+	       /** Default {@link ColorModel}.*/
+        ColorModel defaultCM;
+        
+        /** Default {@link SampleModel}.*/
+        SampleModel defaultSM;
+        
+        ImageLayout defaultImageLayout;
+	
 	/** The CRS of the input coverage */
 	private CoordinateReferenceSystem coverageCRS;
 	/** The base envelope related to the input coverage */
@@ -702,12 +836,12 @@ class RasterManager {
 	boolean expandMe;
 	SpatialDomainManager spatialDomainManager;
 
-	/** {@link SoftReference} to the index holding the tiles' envelopes. */
-	private final GranuleIndex index=  new GranuleIndex();
+	/** {@link SoftReference} to the granulesIndex holding the tiles' envelopes. */
+	private final GranuleCatalog index=  new GranuleCatalog();
 
 	public RasterManager(final ImageMosaicReader reader) throws DataSourceException {
 		
-		ImageMosaicUtils.ensureNonNull("ImageMosaicReader", reader);
+		Utilities.ensureNonNull("ImageMosaicReader", reader);
 		this.parent=reader;
 		this.expandMe=parent.expandMe;
         inputURL = reader.sourceURL;
@@ -715,10 +849,9 @@ class RasterManager {
         coverageIdentifier=reader.getName();
         hints = reader.getHints();
         coverageEnvelope = reader.getOriginalEnvelope();
-        coverageGridrange=reader.getOriginalGridRange();
+        coverageGridrange = reader.getOriginalGridRange();
         coverageCRS = reader.getCrs();	 
         raster2Model = reader.getOriginalGridToWorld(PixelInCell.CELL_CENTER);
-        this.coverageIdentifier =reader.getName();
         this.coverageFactory = reader.getGridCoverageFactory();
         this.pathType=parent.pathType;
         
@@ -739,8 +872,38 @@ class RasterManager {
 		}
         extractOverviewPolicy();
         
+        loadSampleImage();    
 		
 	}
+	
+	/**
+     * This code tries to load the sample image from which we can extract SM and CM to use 
+     * when answering to requests that falls within a hole in the mosaic.
+     */
+    private void loadSampleImage() {
+		final URL baseURL=this.parent.sourceURL;
+		final File baseFile= DataUtilities.urlToFile(baseURL);
+		// in case we do not manage to convert the source URL we leave right awaycd sr
+		if(baseFile==null){
+		        if(LOGGER.isLoggable(Level.FINE))
+		                LOGGER.fine("Unable to find sample image for path "+baseURL);
+		        return;
+		}
+		final File sampleImageFile= new File(baseFile.getParent() + "/sample_image");                   
+		final RenderedImage sampleImage = ImageMosaicUtils.loadSampleImage(sampleImageFile);
+		if(sampleImage!=null){
+		        
+		        // load SM and CM
+		        defaultCM= sampleImage.getColorModel();
+		        defaultSM= sampleImage.getSampleModel();
+		        
+		        // default ImageLayout
+		        defaultImageLayout= new ImageLayout().setColorModel(defaultCM).setSampleModel(defaultSM);
+		}
+		else
+		        if(LOGGER.isLoggable(Level.FINE))
+		                LOGGER.warning("Unable to find sample image for path "+baseURL);
+    }
 
 	/**
 	 * This method is responsible for checking the overview policy as defined by
@@ -799,7 +962,7 @@ class RasterManager {
 
 	/**
 	 * Retrieves the list of features that intersect the provided envelope
-	 * loading them inside an index in memory where needed.
+	 * loading them inside an granulesIndex in memory where needed.
 	 * 
 	 * @param envelope
 	 *            Envelope for selecting features that intersect.
@@ -817,7 +980,7 @@ class RasterManager {
 
 	/**
 	 * Retrieves the list of features that intersect the provided envelope
-	 * loading them inside an index in memory where needed.
+	 * loading them inside an granulesIndex in memory where needed.
 	 * 
 	 * @param envelope
 	 *            Envelope for selecting features that intersect.
@@ -871,6 +1034,16 @@ class RasterManager {
 	
 	public GridEnvelope getCoverageGridrange() {
 		return coverageGridrange;
+	}
+
+	/**
+	 * Retrieves the footprint for a certain feature ID
+	 * @param id the feature id to get the footprint for
+	 * @return 
+	 * 			the footprint ((polygon or multipolygon) for this granule, or null in case no one is found.
+	 */
+	Geometry getGranuleFootprint(final String id) {
+		return index.getFootprint(id);
 	}
 
 }

@@ -57,7 +57,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-sld/src/main/java/org/geotools/sld/bindings/SLDContrastEnhancementBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-sld/src/main/java/org/geotools/sld/bindings/SLDContrastEnhancementBinding.java $
  */
 public class SLDContrastEnhancementBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;

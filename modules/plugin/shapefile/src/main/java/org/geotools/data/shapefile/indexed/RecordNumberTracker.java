@@ -25,7 +25,7 @@ import java.io.IOException;
  * @author Jesse
  * @since 1.1.0
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/RecordNumberTracker.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/RecordNumberTracker.java $
  */
 public interface RecordNumberTracker {
     public int getRecordNumber();

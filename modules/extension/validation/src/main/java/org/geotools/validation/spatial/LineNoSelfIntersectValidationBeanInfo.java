@@ -30,7 +30,7 @@ import org.geotools.validation.DefaultFeatureValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/spatial/LineNoSelfIntersectValidationBeanInfo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/spatial/LineNoSelfIntersectValidationBeanInfo.java $
  * @version $Id: LineNoSelfIntersectValidationBeanInfo.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class LineNoSelfIntersectValidationBeanInfo extends DefaultFeatureValidationBeanInfo {

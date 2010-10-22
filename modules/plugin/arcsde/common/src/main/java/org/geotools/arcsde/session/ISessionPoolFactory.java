@@ -30,7 +30,7 @@ import org.geotools.arcsde.jndi.ArcSDEConnectionFactory;
  * 
  * @author Gabriel Roldan (OpenGeo)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcsde/common/src/main/java/org/geotools/arcsde/session/ISessionPoolFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcsde/common/src/main/java/org/geotools/arcsde/session/ISessionPoolFactory.java $
  * @version $Id: ISessionPoolFactory.java 34131 2009-10-12 07:39:40Z mbedward $
  * @since 2.5.7
  */

@@ -26,7 +26,7 @@ import org.xml.sax.SAXException;
 /**
  * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/response/GetLegendGraphicResponse.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/response/GetLegendGraphicResponse.java $
  */
 public class GetLegendGraphicResponse extends Response {
 

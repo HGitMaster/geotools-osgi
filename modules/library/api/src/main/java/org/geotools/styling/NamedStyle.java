@@ -43,7 +43,7 @@ package org.geotools.styling;
  * </code></pre>
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/NamedStyle.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/NamedStyle.java $
  */
 public interface NamedStyle extends Style {
     

@@ -50,7 +50,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * ${false_northing}   = (${lat0} >= 0.0) ? 0.0 : 10000000.0
  * </pre>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Auto42002.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/Auto42002.java $
  * @version $Id: Auto42002.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Jody Garnett
  * @author Rueben Schulz

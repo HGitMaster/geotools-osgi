@@ -47,7 +47,7 @@ import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
  * Tests the usage of {@link OrderedAxisAuthorityFactory} with the help of the
  * EPSG database. 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/OrderedAxisAuthorityFactoryOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/OrderedAxisAuthorityFactoryOnlineTest.java $
  * @version $Id: OrderedAxisAuthorityFactoryOnlineTest.java 30691 2008-06-13 13:20:02Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Jody Garnett

@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the "filtered subsample" operation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/processing/FilteredSubsampleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/coverage/processing/FilteredSubsampleTest.java $
  * @version $Id: FilteredSubsampleTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Simone Giannecchini (GeoSolutions)
  * @author Martin Desruisseaux (Geomatys)

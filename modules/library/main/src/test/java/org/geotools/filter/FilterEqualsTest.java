@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @author Chris Holmes, TOPP
  * @author James MacGill, CCG
  * @author Rob Hranac, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/FilterEqualsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/FilterEqualsTest.java $
  */            
 public class FilterEqualsTest extends TestCase {
     

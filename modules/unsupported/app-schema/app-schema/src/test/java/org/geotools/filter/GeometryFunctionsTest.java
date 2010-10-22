@@ -59,7 +59,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author Rini Angreani, Curtin University of Technology
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/filter/GeometryFunctionsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/filter/GeometryFunctionsTest.java $
  */
 public class GeometryFunctionsTest {
 

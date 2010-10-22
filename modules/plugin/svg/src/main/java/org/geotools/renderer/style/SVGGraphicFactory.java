@@ -24,6 +24,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -64,7 +65,7 @@ import org.w3c.dom.NodeList;
 public class SVGGraphicFactory implements ExternalGraphicFactory {
 
     /** Parsed SVG glyphs cache */
-    Map<URL, RenderableSVG> glyphCache = new SoftValueHashMap<URL, RenderableSVG>();
+    static Map<URL, RenderableSVG> glyphCache = Collections.synchronizedMap(new SoftValueHashMap<URL, RenderableSVG>());
 
     /** The possible mime types for SVG */
     static final Set<String> formats = new HashSet<String>() {
@@ -88,17 +89,13 @@ public class SVGGraphicFactory implements ExternalGraphicFactory {
                     "The specified expression could not be turned into an URL");
 
         // turn the svg into a document and cache results
-        RenderableSVG svg = null;
-        if (glyphCache.containsKey(svgfile)) {
-            svg = glyphCache.get(svgfile);
-        } else {
+        RenderableSVG svg = glyphCache.get(svgfile);
+        if(svg == null) {
             String parser = XMLResourceDescriptor.getXMLParserClassName();
             SAXSVGDocumentFactory f = new SAXSVGDocumentFactory(parser);
             Document doc = f.createDocument(url.toString());
             svg = new RenderableSVG(doc);
-            synchronized (glyphCache) {
-                glyphCache.put(svgfile, svg);
-            }
+            glyphCache.put(svgfile, svg);
         }
 
         return new SVGIcon(svg, size);
@@ -177,12 +174,22 @@ public class SVGGraphicFactory implements ExternalGraphicFactory {
             Node heightNode = attrbiutes.getNamedItem("height");
 
             if (widthNode != null && heightNode != null) {
-                double width = Double.parseDouble(widthNode.getNodeValue());
-                double height = Double.parseDouble(heightNode.getNodeValue());
+                double width = parseDouble(widthNode.getNodeValue());
+                double height = parseDouble(heightNode.getNodeValue());
                 return new Rectangle2D.Double(0.0, 0.0, width, height);
             }
 
             return null;
+        }
+        
+        private double parseDouble(String value) {
+            try {
+                return Double.parseDouble(value);
+            }
+            catch(NumberFormatException e) {
+                //strip off any units
+                return Double.parseDouble(value.replaceAll("\\D*$", ""));
+            }
         }
 
         /**
@@ -225,6 +232,13 @@ public class SVGGraphicFactory implements ExternalGraphicFactory {
             }
 
         }
+    }
+    
+    /**
+     * Forcefully drops the SVG cache 
+     */
+    public static void resetCache() {
+        glyphCache.clear();
     }
 
 }

@@ -26,7 +26,7 @@ import org.opengis.metadata.extent.GeographicDescription;
 /**
  * Description of the geographic area using identifiers.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/extent/GeographicDescriptionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/extent/GeographicDescriptionImpl.java $
  * @version $Id: GeographicDescriptionImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

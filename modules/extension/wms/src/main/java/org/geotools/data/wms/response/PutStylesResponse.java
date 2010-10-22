@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
  * Success can be checked using the success() method.
  * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/response/PutStylesResponse.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/response/PutStylesResponse.java $
  */
 public class PutStylesResponse extends Response {
 

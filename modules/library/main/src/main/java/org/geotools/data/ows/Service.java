@@ -27,7 +27,7 @@ import org.opengis.metadata.citation.ResponsibleParty;
  * extended while implementing other OWSs. Name, Title and OnlineResource are 
  * required. Everything else is optional.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ows/Service.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/ows/Service.java $
  */
 public class Service {
     /**

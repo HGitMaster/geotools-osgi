@@ -16,6 +16,8 @@
  */
 package org.geotools.renderer.label;
 
+import static org.geotools.styling.TextSymbolizer.*;
+
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -74,37 +76,6 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
  * <p>{@link TextSymbolizer#getPriority()} OGC Expression controls a label priority.</p>
  * <p>A label with high priority will be drawn before others, increasing its likeliness
  * to appear on the screen</p>
- * 
- * <h2>Vendor options</h2>
- * <p>{@link TextSymbolizer#getOptions()} contains a map of vendor specific options
- * other than priority which are not part of the SLD specification. Here is a list
- * of their names, default values, and meaning:
- * <ul>
- * <li><code>spaceAround</code> (0): the minimum distance between two labels, in pixels</li>
- * <li><code>group</code> (false): if true, geometries with the same labels are grouped and
- * considered a single entity to be labeled. This allows to avoid or control repeated labels</li>
- * <li><code>labelAllGroup</code> (false): when false, in a group only the biggest geometry is labelled
- * (the biggest is obtained by merging, when possible, the original geometries). When true, also the
- * smaller items in the group are labelled. Works only on lines at the moment</li>
- * <li><code>maxDisplacement</code> (50): the distance, in pixel, a label can be displaced
- * from its natural position in an attempt to find a position that does not conflict with
- * already drawn labels. At the moment this works only on lines</li>.
- * <li><code>repeat</code> (0): when positive it's the desired distance between two subsequent labels
- * on a "big" geometry. Works only on lines atm, if zero only one label is drawn no matter how big
- * the geometry is</li>
- * <li><code>minGroupDistance</code> (0): minimum distance between two labels in the same label group.
- * To be used when both displacement and repeat are used to avoid having two labels too close to
- * each other</li>
- * <li><code>allowOvveruns</code> (true): when false does not allow labels on lines to get beyond the
- * beginning/end of the line. By default a partial overrun is tolerated, set to false to disallow it.</li>
- * <li><code>followLine</code> (false): when true activates curved labels on linear geometries. The label
- * will follow the shape of the current line, as opposed to being drawn a tangent straight line</li>
- * <li><code>maxAngleDelta</code> (22.5): when drawing curved labels, max allowed angle between
- * two subsequent characters. Higher angles may cause disconnected words or overlapping characters</li> 
- * <li><code>autoWrap</code> (false): number of pixels are which a long label should be split into
- * multiple lines. Works on all geometries, on lines it is mutually exclusive with the 
- * <code>followLine<code> option.</li>
- * </ul>
  *
  * @author jeichar
  * @author dblasby
@@ -115,6 +86,11 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
 public final class LabelCacheImpl implements LabelCache {
 
     public double DEFAULT_PRIORITY = 1000.0;
+    
+    /**
+     * The angle delta at which we switch from curved rendering to straight rendering
+     */
+    public static double MIN_CURVED_DELTA = Math.PI / 60;
 
     /** Map<label, LabelCacheItem> the label cache */
     protected Map<String, LabelCacheItem> labelCache = new HashMap<String, LabelCacheItem>();
@@ -125,61 +101,6 @@ public final class LabelCacheImpl implements LabelCache {
     /** List of reserved areas of the screen for which labels should fear to tread */
     private List<Rectangle2D> reserved = new ArrayList<Rectangle2D>();
 
-    // what to do if there's no grouping option
-    public boolean DEFAULT_GROUP = false;
-
-    // by default, don't add space around labels
-    public int DEFAULT_SPACE_AROUND = 0;
-
-    // default max displacement
-    public int DEFAULT_MAX_DISPLACEMENT = 0;
-    
-    // default max displacement when labeling points
-    public int DEFAULT_MAX_DISPLACEMENT_POINT = 0;
-
-    // default min distance between labels in the same group (-1 means no min
-    // distance)
-    public int DEFAULT_MIN_GROUP_DISTANCE = -1;
-
-    // default repetition distance for labels (<= 0 -> no repetition)
-    public int DEFAULT_LABEL_REPEAT = 0;
-
-    // if in case of grouping all resulting lines have to be labelled
-    public boolean DEFAULT_LABEL_ALL_GROUP = false;
-
-    // we allow labels that are longer than the line to appear by default
-    public boolean DEFAULT_ALLOW_OVERRUNS = true;
-
-    // if, in case of grouping, self overlaps have to be taken into account and
-    // removed (expensive!)
-    public boolean DEFAULT_REMOVE_OVERLAPS = false;
-
-    // if labels with a line placement should follow the line shape or be just
-    // tangent
-    public boolean DEFAULT_FOLLOW_LINE = false;
-
-    // when label follows line, the max angle change between two subsequent
-    // characters, keeping
-    // it low avoids chars overlaps. When the angle is exceeded the label
-    // placement will fail.
-    public double DEFAULT_MAX_ANGLE_DELTA = 22.5;
-
-    // The angle delta at which we switch from curved rendering to straight
-    // rendering
-    static final double MIN_CURVED_DELTA = Math.PI / 60;
-
-    // Auto wrapping long labels default
-    static final int DEFAULT_AUTO_WRAP = 0;
-    
-    // Force labels to a readable orientation (so that they don't look "upside down")
-    static final boolean DEFAULT_FORCE_LEFT_TO_RIGHT = true;
-    
-    // By default, put each label in the conflict resolution map
-    static final boolean DEFAULT_CONFLICT_RESOLUTION = true;
-    
-    // Default value for the goodness of fit threshold
-    static final double DEFAULT_GOODNESS_OF_FIT = 0.5;
-    
     // Anchor candidate values used when looping to find a point label that can be drawn
     static final double[] RIGHT_ANCHOR_CANDIDATES = new double[] {0,0.5, 0,0, 0,1};
     static final double[] MID_ANCHOR_CANDIDATES = new double[] {0.5,0.5, 0,0.5, 1,0.5};
@@ -327,7 +248,7 @@ public final class LabelCacheImpl implements LabelCache {
                 return; // dont label something with nothing!
             }
             double priorityValue = getPriority(symbolizer, feature);
-            boolean group = getBooleanOption(symbolizer, "group", false);
+            boolean group = getBooleanOption(symbolizer, TextSymbolizer.GROUP_KEY, false);
             if (!(group)) {
                 LabelCacheItem item = buildLabelCacheItem(layerId, symbolizer, feature, shape,
                         scaleRange, label, priorityValue);
@@ -385,25 +306,25 @@ public final class LabelCacheImpl implements LabelCache {
 
         LabelCacheItem item = new LabelCacheItem(layerId, textStyle, shape, label);
         item.setPriority(priorityValue);
-        item.setSpaceAround(getIntOption(symbolizer, "spaceAround", DEFAULT_SPACE_AROUND));
-        item.setMaxDisplacement(getIntOption(symbolizer, "maxDisplacement",
+        item.setSpaceAround(getIntOption(symbolizer, SPACE_AROUND_KEY, DEFAULT_SPACE_AROUND));
+        item.setMaxDisplacement(getIntOption(symbolizer, MAX_DISPLACEMENT_KEY,
                 DEFAULT_MAX_DISPLACEMENT));
-        item.setMinGroupDistance(getIntOption(symbolizer, "minGroupDistance",
+        item.setMinGroupDistance(getIntOption(symbolizer, MIN_GROUP_DISTANCE_KEY,
                 DEFAULT_MIN_GROUP_DISTANCE));
-        item.setRepeat(getIntOption(symbolizer, "repeat", DEFAULT_LABEL_REPEAT));
-        item.setLabelAllGroup(getBooleanOption(symbolizer, "labelAllGroup",
+        item.setRepeat(getIntOption(symbolizer, LABEL_REPEAT_KEY, DEFAULT_LABEL_REPEAT));
+        item.setLabelAllGroup(getBooleanOption(symbolizer, LABEL_ALL_GROUP_KEY,
                         DEFAULT_LABEL_ALL_GROUP));
         item.setRemoveGroupOverlaps(getBooleanOption(symbolizer, "removeOverlaps",
                 DEFAULT_REMOVE_OVERLAPS));
-        item.setAllowOverruns(getBooleanOption(symbolizer, "allowOverruns",
+        item.setAllowOverruns(getBooleanOption(symbolizer, ALLOW_OVERRUNS_KEY,
                         DEFAULT_ALLOW_OVERRUNS));
-        item.setFollowLineEnabled(getBooleanOption(symbolizer, "followLine", DEFAULT_FOLLOW_LINE));
-        double maxAngleDelta = getDoubleOption(symbolizer, "maxAngleDelta", DEFAULT_MAX_ANGLE_DELTA);
+        item.setFollowLineEnabled(getBooleanOption(symbolizer, FOLLOW_LINE_KEY, DEFAULT_FOLLOW_LINE));
+        double maxAngleDelta = getDoubleOption(symbolizer, MAX_ANGLE_DELTA_KEY, DEFAULT_MAX_ANGLE_DELTA);
         item.setMaxAngleDelta(Math.toRadians(maxAngleDelta));
-        item.setAutoWrap(getIntOption(symbolizer, "autoWrap", DEFAULT_AUTO_WRAP));
-        item.setForceLeftToRightEnabled(getBooleanOption(symbolizer, "forceLeftToRight", DEFAULT_FORCE_LEFT_TO_RIGHT));
-        item.setConflictResolutionEnabled(getBooleanOption(symbolizer, "conflictResolution", DEFAULT_CONFLICT_RESOLUTION));
-        item.setGoodnessOfFit(getDoubleOption(symbolizer, "goodnessOfFit", DEFAULT_GOODNESS_OF_FIT));
+        item.setAutoWrap(getIntOption(symbolizer, AUTO_WRAP_KEY, DEFAULT_AUTO_WRAP));
+        item.setForceLeftToRightEnabled(getBooleanOption(symbolizer, FORCE_LEFT_TO_RIGHT_KEY, DEFAULT_FORCE_LEFT_TO_RIGHT));
+        item.setConflictResolutionEnabled(getBooleanOption(symbolizer, CONFLICT_RESOLUTION_KEY, DEFAULT_CONFLICT_RESOLUTION));
+        item.setGoodnessOfFit(getDoubleOption(symbolizer, GOODNESS_OF_FIT_KEY, DEFAULT_GOODNESS_OF_FIT));
         return item;
     }
     
@@ -766,7 +687,7 @@ public final class LabelCacheImpl implements LabelCache {
                         if (maxAngleChange < MIN_CURVED_DELTA) {
                             // if label will be painted as straight, use the
                             // straight bounds
-                            setupLineTransform(painter, cursor, centroid, tx);
+                            setupLineTransform(painter, cursor, centroid, tx, true);
                             labelEnvelope = tx.createTransformedShape(textBounds).getBounds2D();
                         } else {
                             // otherwise use curved bounds, more expensive to
@@ -775,7 +696,7 @@ public final class LabelCacheImpl implements LabelCache {
                                     endOrdinate, textBounds.getHeight() / 2);
                         }
                     } else {
-                        setupLineTransform(painter, cursor, centroid, tx);
+                        setupLineTransform(painter, cursor, centroid, tx, false);
                         labelEnvelope = tx.createTransformedShape(textBounds).getBounds2D();
                     }
 
@@ -915,7 +836,7 @@ public final class LabelCacheImpl implements LabelCache {
      * @param textBounds
      */
     private void setupLineTransform(LabelPainter painter, LineStringCursor cursor,
-            Coordinate centroid, AffineTransform tempTransform) {
+            Coordinate centroid, AffineTransform tempTransform, boolean followLine) {
         tempTransform.translate(centroid.x, centroid.y);
 
         TextStyle2D textStyle = painter.getLabel().getTextStyle();
@@ -926,7 +847,7 @@ public final class LabelCacheImpl implements LabelCache {
         double rotation;
         double displacementX = 0;
         double displacementY = 0;
-        if (textStyle.isPointPlacement()) {
+        if (textStyle.isPointPlacement() && !followLine) {
             // use the one the user supplied!
             rotation = textStyle.getRotation();
         } else { // lineplacement

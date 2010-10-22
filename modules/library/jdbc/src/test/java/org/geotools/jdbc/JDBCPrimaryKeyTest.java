@@ -36,8 +36,8 @@ public abstract class JDBCPrimaryKeyTest extends JDBCTestSupport {
     protected abstract JDBCPrimaryKeyTestSetup createTestSetup();
     
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
         
         dataStore.setDatabaseSchema(null);
     }

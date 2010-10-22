@@ -81,8 +81,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <code>{@linkplain ReferencingFactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/ThreadedEpsgFactory.java $
- * @version $Id: ThreadedEpsgFactory.java 34799 2010-01-15 14:10:52Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/ThreadedEpsgFactory.java $
+ * @version $Id: ThreadedEpsgFactory.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class ThreadedEpsgFactory extends DeferredAuthorityFactory
@@ -135,11 +135,6 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      * The data source, or {@code null} if the connection has not yet been etablished.
      */
     private DataSource datasource;
-
-    /**
-     * The shutdown hook, or {@code null} if none.
-     */
-    private Thread shutdown;
 
     /**
      * Constructs an authority factory using the default set of factories.
@@ -457,57 +452,4 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
         return super.canDisposeBackingStore(backingStore);
     }
 
-    /**
-     * Ensures that the database connection will be closed on JVM exit. This code will be executed
-     * even if the JVM is terminated because of an exception or with [Ctrl-C]. Note: we create this
-     * shutdown hook only if this factory is registered as a service because it will prevent this
-     * instance to be garbage collected until it is deregistered.
-     */
-    private final class ShutdownHook extends Thread {
-        public ShutdownHook() {
-            super(DirectEpsgFactory.SHUTDOWN_THREAD);
-        }
-
-        @Override
-        public void run() {
-            synchronized (ThreadedEpsgFactory.this) {
-                try {
-                    dispose();
-                } catch (Throwable exception) {
-                    // Too late for logging, since the JVM is
-                    // in process of shutting down. Ignore...
-                }
-            }
-        }
-    }
-
-    /**
-     * Called when this factory is added to the given {@code category} of the given
-     * {@code registry}. The object may already be registered under another category.
-     */
-    @Override
-    public synchronized void onRegistration(final ServiceRegistry registry, final Class category) {
-        super.onRegistration(registry, category);
-        if (shutdown == null) {
-            shutdown = new ShutdownHook();
-            Runtime.getRuntime().addShutdownHook(shutdown);
-        }
-    }
-
-    /**
-     * Called when this factory is removed from the given {@code category} of the given
-     * {@code registry}.  The object may still be registered under another category.
-     */
-    @Override
-    public synchronized void onDeregistration(final ServiceRegistry registry, final Class category) {
-        if (shutdown != null) {
-            if (registry.getServiceProviderByClass(getClass()) == null) {
-                // Remove the shutdown hook only if this instance is not
-                // anymore registered as a service under any category.
-                Runtime.getRuntime().removeShutdownHook(shutdown);
-                shutdown = null;
-            }
-        }
-        super.onDeregistration(registry, category);
-    }
 }

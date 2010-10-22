@@ -35,7 +35,7 @@ import org.geotools.resources.Classes;
  * Base class for test on widgets. Widgets will be displayed only if the test is run
  * from the main method. Otherwise (i.e. if run from Maven), widgets are invisibles.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/TestBase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/TestBase.java $
  * @version $Id: TestBase.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux
  */

@@ -16,9 +16,13 @@
  */
 package org.geotools.coverageio.jp2k;
 
+import it.geosolutions.imageio.stream.input.FileImageInputStreamExt;
+
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +36,7 @@ import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
@@ -204,15 +209,41 @@ public final class JP2KFormat extends AbstractGridFormat implements Format {
      */
     @Override
     public boolean accepts(Object input) {
+    	boolean closeMe=false;
+    	ImageInputStream stream=null;
         try {
+        	// null check
+        	if(input==null)
+        		throw new NullPointerException("Null input provided");
         	
-        	//Directories aren't accepted
-        	if (input != null && input instanceof File){
-        		final File directory = (File) input;
-        		if (!directory.exists() || directory.isDirectory())
-        			return false;
+
+        	// URL turn into a file
+        	if ( input instanceof URL){
+        		input = DataUtilities.urlToFile((URL) input);
+        		closeMe=true;
         	}
-        	final ImageInputStream stream = ImageIO.createImageInputStream(input);
+        	
+        	// URI turn into a file
+        	if ( input instanceof URI){
+        		input = DataUtilities.urlToFile(((URI) input).toURL());
+        		closeMe=true;
+        	}
+        	
+        	//file
+        	if ( input instanceof File){
+        		final File source = (File) input;
+        		if (!source.exists() || !source.canRead() ||source.isDirectory()){
+        			if(LOGGER.isLoggable(Level.FINE))
+        				LOGGER.log(Level.FINE,"Provided file cannot be read or is it not a file.");
+        			return false;
+        		}
+        		closeMe=true;
+        	}
+        	
+        	// this catches null values as well
+        	if(!(input instanceof File)&&!(input instanceof FileImageInputStreamExt))
+        		return false;
+        	stream = (input instanceof File)?ImageIO.createImageInputStream(input):(FileImageInputStreamExt)input;
         	if (spi == null){
 				ImageReader reader = Utils.getReader(stream);
 				if (reader != null)
@@ -226,6 +257,13 @@ public final class JP2KFormat extends AbstractGridFormat implements Format {
                 LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
             }
             return false;
+        } finally{
+        	if(closeMe&&stream!=null)
+        		try{
+        			stream.close();
+        		}catch (Throwable t){
+					// TODO: handle exception
+				}
         }
     }
 }

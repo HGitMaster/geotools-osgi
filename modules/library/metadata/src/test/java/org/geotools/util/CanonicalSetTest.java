@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link CanonicalSet}. A standard {@link HashSet} object is used for comparaison purpose.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/CanonicalSetTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/CanonicalSetTest.java $
  * @version $Id: CanonicalSetTest.java 34661 2009-12-13 11:01:50Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

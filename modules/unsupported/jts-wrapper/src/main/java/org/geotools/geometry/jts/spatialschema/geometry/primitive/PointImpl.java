@@ -52,7 +52,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @author crossley
  * @author cdillard
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/PointImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/primitive/PointImpl.java $
  * @version $Revision $
  */
 public class PointImpl extends GeometryImpl implements Point {

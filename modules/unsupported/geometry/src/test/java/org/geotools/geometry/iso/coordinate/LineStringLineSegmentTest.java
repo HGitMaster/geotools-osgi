@@ -42,7 +42,7 @@ import org.opengis.geometry.primitive.CurveSegment;
  * @author Sanjay Jena
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/iso/coordinate/LineStringLineSegmentTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/test/java/org/geotools/geometry/iso/coordinate/LineStringLineSegmentTest.java $
  */
 public class LineStringLineSegmentTest extends TestCase {
 	

@@ -57,7 +57,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </p>
  *
  * @author aaime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemFeatureResults.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemFeatureResults.java $
  * @version $Id: ForceCoordinateSystemFeatureResults.java 32769 2009-04-10 17:06:07Z aaime $
  */
 public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollection {

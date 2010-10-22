@@ -27,7 +27,7 @@ import org.opengis.filter.expression.Expression;
  * 
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/BinaryComparisonAbstract.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/BinaryComparisonAbstract.java $
  */
 public abstract class BinaryComparisonAbstract extends AbstractFilter 
 	implements BinaryComparisonOperator {

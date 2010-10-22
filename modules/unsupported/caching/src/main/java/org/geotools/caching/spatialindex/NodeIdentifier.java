@@ -37,7 +37,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author crousson
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/NodeIdentifier.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/NodeIdentifier.java $
  */
 public abstract class NodeIdentifier implements Serializable {
 	private static final long serialVersionUID = 1L;

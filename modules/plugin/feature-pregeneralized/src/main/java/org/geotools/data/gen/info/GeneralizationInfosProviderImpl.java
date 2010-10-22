@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
  * 
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/info/GeneralizationInfosProviderImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/info/GeneralizationInfosProviderImpl.java $
  */
 public class GeneralizationInfosProviderImpl implements GeneralizationInfosProvider {
 

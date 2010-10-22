@@ -16,8 +16,11 @@
  */
 package org.geotools.gce.imagemosaic.jdbc;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.geotools.gce.imagemosaic.jdbc.custom.JDBCAccessOracleGeoRaster;
 
 /**
  * Factory for JDBCAccess Objects.
@@ -40,7 +43,8 @@ class JDBCAccessFactory {
 	 * @return the corresponding JDBCAccess object
 	 * @throws Exception
 	 */
-	static synchronized JDBCAccess getJDBCAcess(Config config) throws Exception {
+	@SuppressWarnings("unchecked")
+    static synchronized JDBCAccess getJDBCAcess(Config config) throws Exception {
 		JDBCAccess jdbcAccess = JDBCAccessMap.get(config.getXmlUrl());
 
 		if (jdbcAccess != null) {
@@ -63,6 +67,20 @@ class JDBCAccessFactory {
 			jdbcAccess = new JDBCAccessUniversal(config);
 		} else if (type == SpatialExtension.ORACLE) {
 			jdbcAccess = new JDBCAccessOracle(config);
+                } else if (type == SpatialExtension.GEORASTER) {
+                    jdbcAccess = new JDBCAccessOracleGeoRaster(config);
+                } else if (type == SpatialExtension.CUSTOM) {
+                    String jdbcAccessClassName = config.getJdbcAccessClassName();
+                    Class jdbcAccessClass = Class.forName(jdbcAccessClassName);
+                    try {
+                        Constructor cons = jdbcAccessClass.getConstructor(new Class[] { Config.class });
+                        jdbcAccess = (JDBCAccess) cons.newInstance(new Object[] {config });
+                    } catch (Exception ex) {
+                        String msg = "No public Constructor with an "+config.getClass().getName()+ 
+                               " argument for class "+jdbcAccessClassName ;
+                        throw new RuntimeException(msg, ex);
+                    }
+                                        
 		} else {
 			throw new Exception("spatialExtension: " + type + " not supported");
 		}

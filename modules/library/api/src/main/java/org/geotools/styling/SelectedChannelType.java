@@ -33,7 +33,7 @@ import org.opengis.filter.expression.Expression;
  *  </pre>
  *
  * @author iant
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/SelectedChannelType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/SelectedChannelType.java $
  */
 public interface SelectedChannelType extends org.opengis.style.SelectedChannelType {
     

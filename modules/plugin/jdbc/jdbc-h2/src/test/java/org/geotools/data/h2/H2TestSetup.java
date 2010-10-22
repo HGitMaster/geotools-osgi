@@ -31,7 +31,7 @@ import org.geotools.jdbc.SQLDialect;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-h2/src/test/java/org/geotools/data/h2/H2TestSetup.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-h2/src/test/java/org/geotools/data/h2/H2TestSetup.java $
  */
 public class H2TestSetup extends JDBCTestSetup {
     protected void setUpData() throws Exception {

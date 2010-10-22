@@ -44,7 +44,7 @@ import org.opengis.geometry.coordinate.TriangulatedSurface;
  * @author sanjay
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/TriangleImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/TriangleImpl.java $
  */
 public class TriangleImpl extends PolygonImpl implements Triangle {
 

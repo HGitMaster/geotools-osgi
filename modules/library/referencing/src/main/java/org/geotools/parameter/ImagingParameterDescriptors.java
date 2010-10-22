@@ -70,7 +70,7 @@ import org.geotools.resources.XArray;
  * parameters framework.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/ImagingParameterDescriptors.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/parameter/ImagingParameterDescriptors.java $
  * @version $Id: ImagingParameterDescriptors.java 34804 2010-01-15 18:13:52Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -36,6 +37,7 @@ import java.util.logging.Logger;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
+import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -77,7 +79,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * @author Justin Deoliveira, The Open Plannign Project.
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCFeatureReader.java $
  */
 public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     protected static final Logger LOGGER = Logging.getLogger(JDBCFeatureReader.class);
@@ -249,7 +251,10 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
             NoSuchElementException {
         try {
             ensureOpen();
-            ensureNext();
+            if(!hasNext()) {
+                throw new NoSuchElementException("No more features in this reader, you should call " +
+                		"hasNext() to check for feature availability");
+            }
             
             //grab the connection
             Connection cx;
@@ -284,9 +289,8 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                 (PropertyName) hints.get(Hints.ASSOCIATION_PROPERTY);
     
             // round up attributes
-            // List attributes = new ArrayList();
-            final int pkeyCols = pkey.getColumns().size();
             final int attributeCount = featureType.getAttributeCount();
+            int[] attributeRsIndex = buildAttributeRsIndex();
             for(int i = 0; i < attributeCount; i++) {
                 AttributeDescriptor type = featureType.getDescriptor(i);
                 
@@ -310,7 +314,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                         //read the geometry
                         try {
                             value = dataStore.getSQLDialect()
-                                             .decodeGeometryValue(gatt, rs, i + pkeyCols + 1,
+                                             .decodeGeometryValue(gatt, rs, attributeRsIndex[i],
                                     geometryFactory, cx);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -516,7 +520,7 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
                             }
                         }
                     } else {
-                        value = rs.getObject(i + pkeyCols + 1);
+                        value = rs.getObject(attributeRsIndex[i]);
                     }
     
                     // is this an association?
@@ -663,6 +667,29 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
         }
     }
 
+    /**
+     * Builds an array containing the position in the result set for each attribute.
+     * It takes into account that rs positions start by one, about the exposed primary keys,
+     * and the fact that exposed pk can be only partially selected in the output
+     * @return
+     */
+    private int[] buildAttributeRsIndex() {
+        LinkedHashSet<String> pkColumns = dataStore.getColumnNames(pkey);
+        List<String> pkColumnsList = new ArrayList<String>(pkColumns);
+        int[] indexes = new int[featureType.getAttributeCount()];
+        int exposedPks = 0;
+        for(int i = 0; i < indexes.length; i++) {
+            String attName = featureType.getDescriptor(i).getLocalName();
+            if(pkColumns.contains(attName)) {
+                indexes[i] = pkColumnsList.indexOf(attName) + 1;
+                exposedPks++;
+            } else {
+                indexes[i] = i + pkColumns.size() - exposedPks + 1;
+            }
+        }
+        return indexes;
+    }
+
     public void close() throws IOException {
         if ( dataStore != null ) {
             //clean up
@@ -753,6 +780,11 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
          * user data
          */
         HashMap<Object, Object> userData = new HashMap<Object, Object>();
+        
+        /**
+         * true if primary keys are not returned (the default is false)
+         */
+        boolean exposePrimaryKeys;
 
         ResultSetFeature(ResultSet rs, Connection cx) throws SQLException, IOException {
             this.rs = rs;
@@ -766,15 +798,18 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
             int count = md.getColumnCount();
             columnNames=new String[count];
 
+            exposePrimaryKeys = featureSource.getState().isExposePrimaryKeyColumns();
             for (int i = 0; i < md.getColumnCount(); i++) {
             	String columnName =md.getColumnName(i + 1); 
             	columnNames[i]=columnName;
-                for ( PrimaryKeyColumn col : key.getColumns() ) {
-                    if (col.getName().equals(columnName)) {
-                        count--;
-                        break;
-                    }    
-                }
+            	if(!exposePrimaryKeys) {
+                    for ( PrimaryKeyColumn col : key.getColumns() ) {
+                        if (col.getName().equals(columnName)) {
+                            count--;
+                            break;
+                        }    
+                    }
+            	}
                 
             }
 
@@ -788,10 +823,12 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
             int offset = 0;
 
          O: for (int i = 0; i < md.getColumnCount(); i++) {
-                for( PrimaryKeyColumn col : key.getColumns() ) {
-                    if ( col.getName().equals( md.getColumnName(i+1))) {
-                        offset++;
-                        continue O;
+                if(!exposePrimaryKeys) {
+                    for( PrimaryKeyColumn col : key.getColumns() ) {
+                        if ( col.getName().equals( md.getColumnName(i+1))) {
+                            offset++;
+                            continue O;
+                        }
                     }
                 }
                 
@@ -856,10 +893,12 @@ public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, Simp
             int rsindex = index;
             
             for ( int i = 0; i <= index; i++ ) {
-                for( PrimaryKeyColumn col : key.getColumns() ) {
-                    if ( col.getName().equals( columnNames[i])) {
-                        rsindex++;
-                        break;
+                if(!exposePrimaryKeys) {
+                    for( PrimaryKeyColumn col : key.getColumns() ) {
+                        if ( col.getName().equals( columnNames[i])) {
+                            rsindex++;
+                            break;
+                        }
                     }
                 }
             }

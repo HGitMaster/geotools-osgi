@@ -16,14 +16,14 @@
  */
 package org.geotools.jdbc;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Map;
 
 import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
@@ -40,18 +40,19 @@ public class JDBCJNDITestSetup extends JDBCDelegatingTestSetup {
         File jndi = new File( "target/jndi");
         jndi.mkdirs();
         
-        BufferedReader in = new BufferedReader( 
-            new InputStreamReader( delegate.getClass().getResourceAsStream( "ds.properties")));
-        OutputStreamWriter out = new OutputStreamWriter( new FileOutputStream( new File( jndi, "ds.properties")));
+        OutputStreamWriter out = new OutputStreamWriter( new FileOutputStream( new File( jndi, "ds.properties")) );
         
-        String l = null;
-        while( ( l = in.readLine()) != null ) {
-            out.write( l ); out.write( "\n");
+        //can't use Properties.store because it escapes colons, which throws
+        // of the jdbc urls
+        for ( Map.Entry e : fixture.entrySet() ) {
+            out.write(e.getKey().toString()+"="+e.getValue().toString()+"\n");
         }
-        
+        if (!fixture.containsKey("password") && fixture.containsKey("passwd")) {
+            out.write("password=" + fixture.get("passwd")+"\n");
+        }
+        out.write( "type=javax.sql.DataSource\n");
         out.flush();
         out.close();
-        in.close();
         
         String IC_FACTORY_PROPERTY = "java.naming.factory.initial";
         String JNDI_ROOT = "org.osjava.sj.root";
@@ -79,6 +80,11 @@ public class JDBCJNDITestSetup extends JDBCDelegatingTestSetup {
         
         DataSource ds = null;
         try {
+            //JD: we need to "reset" the naming context because if there is a 
+            // context that already exists (this mostly happens due to the epsg
+            // hsql database), then it will not have been affected by our special
+            // jndi environment variables
+            GeoTools.init( new InitialContext() );
             Context ctx = GeoTools.getInitialContext(GeoTools.getDefaultHints());
             ds = (DataSource) ctx.lookup("ds");
         } 

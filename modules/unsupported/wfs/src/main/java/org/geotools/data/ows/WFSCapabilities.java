@@ -29,7 +29,7 @@ import org.geotools.filter.FilterCapabilities;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/main/java/org/geotools/data/ows/WFSCapabilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/main/java/org/geotools/data/ows/WFSCapabilities.java $
  */
 public class WFSCapabilities extends Capabilities {
     private List<FeatureSetDescription> featureTypes; // FeatureSetDescriptions

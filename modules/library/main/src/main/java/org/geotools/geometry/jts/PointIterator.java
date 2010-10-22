@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Point;
  * A path iterator for the LiteShape class, specialized to iterate over Point objects.
  *
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/PointIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/PointIterator.java $
  */
 public final class PointIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */

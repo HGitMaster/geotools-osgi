@@ -25,7 +25,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * defined manner.
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/Expression.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/Expression.java $
  * @version $Id: Expression.java 30642 2008-06-12 17:52:06Z acuster $
  *
  * @deprecated use {@link org.opengis.filter.expression.Expression}

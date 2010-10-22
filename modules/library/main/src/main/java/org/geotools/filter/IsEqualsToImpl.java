@@ -26,7 +26,7 @@ import org.opengis.filter.expression.Literal;
  * 
  * @author jdeolive TODO: rename this class to IsEqualToImpl
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/IsEqualsToImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/IsEqualsToImpl.java $
  */
 public class IsEqualsToImpl extends CompareFilterImpl implements PropertyIsEqualTo {
 

@@ -51,7 +51,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * This transform is the inverse of {@link ExponentialTransform1D}.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/LogarithmicTransform1D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/LogarithmicTransform1D.java $
  * @version $Id: LogarithmicTransform1D.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *

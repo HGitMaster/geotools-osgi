@@ -10,11 +10,11 @@ public class DB2ViewTest extends JDBCViewTest {
         return new DB2ViewTestSetup();
     }
     
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		dataStore.setDatabaseSchema("geotools");
-	}
+    @Override
+    protected void connect() throws Exception {
+        super.connect();
+        dataStore.setDatabaseSchema("geotools");
+    }
 
     /**
      * Whether the pk field in a view is nillable or not (it is for most databases, but not

@@ -30,7 +30,7 @@ import org.geotools.feature.IllegalAttributeException;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/jxpath/FeaturePropertyHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/jxpath/FeaturePropertyHandler.java $
  */
 public class FeaturePropertyHandler implements DynamicPropertyHandler {
     public String[] getPropertyNames(Object object) {

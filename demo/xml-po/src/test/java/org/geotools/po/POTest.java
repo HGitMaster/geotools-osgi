@@ -23,7 +23,7 @@ import org.geotools.xml.Parser;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/xml-po/src/test/java/org/geotools/po/POTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/xml-po/src/test/java/org/geotools/po/POTest.java $
  */
 public class POTest extends TestCase {
 

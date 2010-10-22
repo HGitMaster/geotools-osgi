@@ -68,7 +68,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *this off to the lite renderer as normal.
  *
  * @author  jamesm
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/UserLayerImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/UserLayerImpl.java $
  */
 public class UserLayerImpl extends StyledLayerImpl implements UserLayer {
 

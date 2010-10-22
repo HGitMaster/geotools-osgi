@@ -83,7 +83,7 @@ import org.opengis.referencing.operation.MathTransform;
  * on the result.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/AbstractGridCoverageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/AbstractGridCoverageReader.java $
  * @version $Id: AbstractGridCoverageReader.java 34079 2009-10-05 20:41:26Z jive $
  * @author Martin Desruisseaux (IRD)
  */

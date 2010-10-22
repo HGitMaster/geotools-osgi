@@ -32,7 +32,7 @@ import org.opengis.util.Cloneable;
  *
  * @author Ian Turton, CCG
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/MarkImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/MarkImpl.java $
  * @version $Id: MarkImpl.java 33898 2009-09-13 15:39:05Z jive $
  */
 public class MarkImpl implements Mark, Cloneable {

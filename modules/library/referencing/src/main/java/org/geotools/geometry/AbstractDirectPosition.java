@@ -35,7 +35,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * or {@link org.geotools.util.Cloneable} interfaces is left to implementors.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/geometry/AbstractDirectPosition.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/geometry/AbstractDirectPosition.java $
  * @version $Id: AbstractDirectPosition.java 30939 2008-07-07 21:02:31Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

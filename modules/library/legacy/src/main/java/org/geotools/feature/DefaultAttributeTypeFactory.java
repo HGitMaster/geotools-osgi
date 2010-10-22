@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Factory for creating DefaultAttributeTypes.
  *
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/DefaultAttributeTypeFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/DefaultAttributeTypeFactory.java $
  * @version $Id: DefaultAttributeTypeFactory.java 30647 2008-06-12 18:58:42Z acuster $
  */
 public class DefaultAttributeTypeFactory extends AttributeTypeFactory {

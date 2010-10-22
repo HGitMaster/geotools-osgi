@@ -202,11 +202,14 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                     String name = columns.getString("COLUMN_NAME");
 
                     //do not include primary key in the type if not exposing primary key columns
-                    if ( !state.isExposePrimaryKeyColumns() ) {
-                        for ( PrimaryKeyColumn pkeycol : pkey.getColumns() ) {
-                            if ( name.equals( pkeycol.getName() ) ) {
+                    boolean pkColumn = false;
+                    for ( PrimaryKeyColumn pkeycol : pkey.getColumns() ) {
+                        if ( name.equals( pkeycol.getName() ) ) {
+                            if ( !state.isExposePrimaryKeyColumns() ) {
                                 name = null;
                                 break;
+                            } else {
+                                pkColumn = true;
                             }
                         }
                     }
@@ -277,7 +280,7 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                     ab.addUserData(JDBCDataStore.JDBC_NATIVE_TYPENAME, nativeTypeName);
 
                     //nullability
-                    if ( "NO".equalsIgnoreCase( columns.getString( "IS_NULLABLE" ) ) ) {
+                    if ( !pkColumn && "NO".equalsIgnoreCase( columns.getString( "IS_NULLABLE" ) ) ) {
                         ab.nillable(false);
                         ab.minOccurs(1);
                     }

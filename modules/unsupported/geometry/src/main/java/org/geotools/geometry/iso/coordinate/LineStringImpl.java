@@ -39,7 +39,7 @@ import org.opengis.geometry.primitive.CurveInterpolation;
  * 
  * @author Jackson Roehrig & Sanjay Jena
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/LineStringImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/LineStringImpl.java $
  */
 public class LineStringImpl extends CurveSegmentImpl implements LineString {
     private static final long serialVersionUID = -4463400288452707656L;

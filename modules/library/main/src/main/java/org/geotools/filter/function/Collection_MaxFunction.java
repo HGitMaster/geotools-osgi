@@ -43,7 +43,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @author Cory Horner
  * @since 2.2M2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/Collection_MaxFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/function/Collection_MaxFunction.java $
  */
 public class Collection_MaxFunction extends FunctionExpressionImpl
     implements FunctionExpression {

@@ -165,7 +165,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </table>
  *
  * @author Simon Raess
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/producer/FeatureTypeTransformer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/gml/producer/FeatureTypeTransformer.java $
  * @version $Id: FeatureTypeTransformer.java 30921 2008-07-05 07:51:23Z jgarnett $
  *
  * @task TODO: Support GeometryCollection.

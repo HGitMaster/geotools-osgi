@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author jeichar
  *
  * @since 2.1.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/shapehandler/simple/MultiLineHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/shapehandler/simple/MultiLineHandler.java $
  */
 public class MultiLineHandler implements ShapeHandler {
     static final int TOP = 0x8;

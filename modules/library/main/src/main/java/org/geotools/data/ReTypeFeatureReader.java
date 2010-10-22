@@ -55,7 +55,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * on descriptor name.
  * 
  * @author Jody Garnett (Refractions Research)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ReTypeFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/ReTypeFeatureReader.java $
  */
 public class ReTypeFeatureReader implements DelegatingFeatureReader<SimpleFeatureType,SimpleFeature> {
     

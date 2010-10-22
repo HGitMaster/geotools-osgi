@@ -24,7 +24,7 @@ import junit.framework.TestCase;
  * 
  * @see org.geotools.data
  * @author jgarnett, Refractions Reasearch Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/FeatureLockTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/data/FeatureLockTest.java $
  * @version CVS Version
  */
 public class FeatureLockTest extends TestCase {

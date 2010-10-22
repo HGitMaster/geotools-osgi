@@ -54,7 +54,7 @@ import org.geotools.resources.i18n.Errors;
  * coordinate points. Input points must be longitudes, latitudes and heights above the ellipsoid.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/GeocentricTransform.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/GeocentricTransform.java $
  * @version $Id: GeocentricTransform.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Frank Warmerdam
  * @author Martin Desruisseaux (IRD)

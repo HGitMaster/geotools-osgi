@@ -24,7 +24,7 @@ import java.io.Reader;
  * Reads a multiline SQL file extracting each command separately. Skips empty lines, assumes
  * comments start with "--" and are on their own line 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/SqlScriptReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/SqlScriptReader.java $
  */
 public class SqlScriptReader {
     boolean fetched = true;

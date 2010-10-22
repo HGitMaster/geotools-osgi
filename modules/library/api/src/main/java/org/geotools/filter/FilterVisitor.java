@@ -28,7 +28,7 @@ package org.geotools.filter;
  * infomration from the Filter strucure, for example a list of all bboxes.
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/FilterVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/FilterVisitor.java $
  * @version $Id: FilterVisitor.java 30642 2008-06-12 17:52:06Z acuster $
  *
  * @task REVISIT: These need to throw some sort of checked exception as the

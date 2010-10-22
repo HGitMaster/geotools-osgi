@@ -64,8 +64,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * {@linkplain org.opengis.metadata.citation.Citation#getTitle authority titles}.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Formatter.java $
- * @version $Id: Formatter.java 31531 2008-09-16 19:37:27Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Formatter.java $
+ * @version $Id: Formatter.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Martin Desruisseaux (IRD)
  *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
@@ -884,6 +884,7 @@ public class Formatter {
         lineChanged   = false;
         margin        = 0;
     }
+    
 
     /**
      * Set the preferred indentation from the command line. This indentation is used by

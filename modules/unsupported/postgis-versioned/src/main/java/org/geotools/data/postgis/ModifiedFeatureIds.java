@@ -27,7 +27,7 @@ import java.util.Set;
  * @since 2.4
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/ModifiedFeatureIds.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/ModifiedFeatureIds.java $
  */
 public class ModifiedFeatureIds {
     RevisionInfo fromRevision;

@@ -37,7 +37,7 @@ import org.opengis.util.InternationalString;
  * @author Justin
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/simple/SimpleFeatureTypeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/simple/SimpleFeatureTypeImpl.java $
  */
 public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
         SimpleFeatureType {

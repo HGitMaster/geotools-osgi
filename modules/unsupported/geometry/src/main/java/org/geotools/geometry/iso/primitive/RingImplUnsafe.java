@@ -56,7 +56,7 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @author Graham Davis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/RingImplUnsafe.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/RingImplUnsafe.java $
  */
 public class RingImplUnsafe extends CompositeCurveImpl implements Ring {
 

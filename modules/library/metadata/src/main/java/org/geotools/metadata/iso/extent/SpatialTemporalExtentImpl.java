@@ -30,7 +30,7 @@ import org.opengis.metadata.extent.SpatialTemporalExtent;
  * (<var>x</var>,<var>y</var>) coordinates of the polygon. The last
  * point replicates first point.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/extent/SpatialTemporalExtentImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/extent/SpatialTemporalExtentImpl.java $
  * @version $Id: SpatialTemporalExtentImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

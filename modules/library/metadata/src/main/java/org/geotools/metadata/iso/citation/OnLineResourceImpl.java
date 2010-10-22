@@ -32,7 +32,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  * community profile name and extended metadata elements can be obtained.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/OnLineResourceImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/OnLineResourceImpl.java $
  * @version $Id: OnLineResourceImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

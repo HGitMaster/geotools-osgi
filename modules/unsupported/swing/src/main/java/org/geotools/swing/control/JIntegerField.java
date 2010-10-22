@@ -39,7 +39,7 @@ import javax.swing.event.DocumentListener;
  *
  * @author Michael Bedward
  * @since 2.6.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/control/JIntegerField.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/control/JIntegerField.java $
  * @version $Id: JIntegerField.java 34290 2009-10-30 12:36:40Z mbedward $
  */
 public class JIntegerField extends JValueField {

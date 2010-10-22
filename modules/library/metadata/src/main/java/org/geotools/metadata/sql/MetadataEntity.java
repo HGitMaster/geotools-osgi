@@ -34,7 +34,7 @@ import java.sql.SQLException;
  * Then the information is fetch in the underlying metadata database.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/sql/MetadataEntity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/sql/MetadataEntity.java $
  * @version $Id: MetadataEntity.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Touraïvane
  * @author Martin Desruisseaux (IRD)

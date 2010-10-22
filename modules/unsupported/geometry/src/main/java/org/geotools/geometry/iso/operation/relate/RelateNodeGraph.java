@@ -48,7 +48,7 @@ import org.geotools.geometry.iso.topograph2D.NodeMap;
  * creating a Node object to represent them.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/relate/RelateNodeGraph.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/relate/RelateNodeGraph.java $
  * @version 1.7.2
  */
 public class RelateNodeGraph {

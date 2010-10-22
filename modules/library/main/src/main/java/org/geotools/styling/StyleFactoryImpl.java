@@ -58,7 +58,7 @@ import org.opengis.util.InternationalString;
  * </ul>
  * 
  * @author iant
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/StyleFactoryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/StyleFactoryImpl.java $
  * @version $Id: StyleFactoryImpl.java 33898 2009-09-13 15:39:05Z jive $
  */
 public class StyleFactoryImpl extends AbstractStyleFactory

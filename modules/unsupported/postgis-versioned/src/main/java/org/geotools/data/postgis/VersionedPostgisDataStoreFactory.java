@@ -35,7 +35,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  * @since 2.4
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/VersionedPostgisDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/VersionedPostgisDataStoreFactory.java $
  */
 public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
     
@@ -62,10 +62,13 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
     public static final Param USER = new Param("user", String.class, "user name to login as");
 
     public static final Param PASSWD = new Param("passwd", String.class, "password used to login",
-            false);
+            false, null, Param.IS_PASSWORD, true);
 
     public static final Param NAMESPACE = new Param("namespace", String.class,
             "namespace prefix used", false);
+    
+    /** parameter for data source */
+    public static final Param DATASOURCE = new Param( "Data Source", DataSource.class, "Data Source", false );
 
     public static final Param WKBENABLED = new Param("wkb enabled", Boolean.class,
             "set to true if Well Known Binary should be used to read PostGIS "
@@ -80,7 +83,7 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
 
     /** Array with all of the params */
     static final Param[] arrayParameters = { DBTYPE, HOST, PORT, DATABASE, USER, PASSWD,
-            WKBENABLED, LOOSEBBOX, NAMESPACE, VERSIONALL };
+            WKBENABLED, LOOSEBBOX, NAMESPACE, VERSIONALL, DATASOURCE };
 
     /**
      * Creates a new instance of PostgisDataStoreFactory
@@ -136,8 +139,11 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
             throw new IOException("The parameters map isn't correct!!");
         }
         
-        String url = "jdbc:postgresql" + "://" + host + ":" + port + "/" + database;
-        DataSource source = DataSourceUtil.buildDefaultDataSource(url, "org.postgresql.Driver", user, passwd, "select now()");
+        DataSource source = (DataSource)DATASOURCE.lookUp(params);
+        if(source == null) {
+        	String url = "jdbc:postgresql" + "://" + host + ":" + port + "/" + database;
+        	source = DataSourceUtil.buildDefaultDataSource(url, "org.postgresql.Driver", user, passwd, "select now()");
+        }
         VersionedPostgisDataStore dataStore = createDataStoreInternal(source, namespace, schema);
 
         if (wkb_enabled != null) {

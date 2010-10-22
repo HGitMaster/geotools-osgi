@@ -32,7 +32,7 @@ import org.opengis.filter.expression.PropertyName;
  * Do aggregate functions actually work?
  * 
  * @author Cory Horner, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/function/Collection_FunctionsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/function/Collection_FunctionsTest.java $
  */
 public class Collection_FunctionsTest extends FunctionTestSupport{
     

@@ -21,7 +21,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Tests the optimized data loading does merge the filters properly (was never released,
  * but a certain point in time only the first one was passed down to the datastore) 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/QueryOptimizeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/renderer/lite/QueryOptimizeTest.java $
  */
 public class QueryOptimizeTest extends TestCase {
     

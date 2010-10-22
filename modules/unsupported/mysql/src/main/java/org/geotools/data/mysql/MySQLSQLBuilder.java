@@ -30,7 +30,7 @@ import org.geotools.data.jdbc.FilterToSQL;
  * datatypes.
  * @author Gary Sheppard garysheppard@psu.edu
  * @author Andrea Aime aaime@users.sourceforge.net
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLSQLBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLSQLBuilder.java $
  */
 public class MySQLSQLBuilder extends GeoAPISQLBuilder {
     private boolean wkbEnabled;

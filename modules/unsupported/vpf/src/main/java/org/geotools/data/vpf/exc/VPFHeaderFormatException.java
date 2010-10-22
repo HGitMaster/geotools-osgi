@@ -24,7 +24,7 @@ package org.geotools.data.vpf.exc;
  * </p>
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/exc/VPFHeaderFormatException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/exc/VPFHeaderFormatException.java $
  * @version 1.0.0
  */
 public class VPFHeaderFormatException extends VPFDataException {

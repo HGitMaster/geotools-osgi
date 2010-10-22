@@ -37,8 +37,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * other, simpler iterator to carry on its duties.
  *
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/GeomCollectionIterator.java $
- * @version $Id: GeomCollectionIterator.java 30648 2008-06-12 19:22:35Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/GeomCollectionIterator.java $
+ * @version $Id: GeomCollectionIterator.java 35196 2010-04-09 10:53:12Z aaime $
  */
 public final class GeomCollectionIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */
@@ -62,10 +62,6 @@ public final class GeomCollectionIterator extends AbstractLiteIterator {
     /** Maximum distance for point elision when generalizing */
     private double maxDistance = 1.0;
     
-    private LineIterator lineIterator = new LineIterator();
-    
-    private EmptyIterator emptyIterator = new EmptyIterator();
-
     public GeomCollectionIterator()
     {
     	
@@ -82,7 +78,7 @@ public final class GeomCollectionIterator extends AbstractLiteIterator {
         this.maxDistance = maxDistance;
         currentGeom = 0;
         done = false;
-        currentIterator = gc.isEmpty() ? emptyIterator : getIterator(gc.getGeometryN(0));
+        currentIterator = gc.isEmpty() ? EmptyIterator.INSTANCE : getIterator(gc.getGeometryN(0));
 	}
 
     /**
@@ -131,21 +127,16 @@ public final class GeomCollectionIterator extends AbstractLiteIterator {
         AbstractLiteIterator pi = null;
 
         if (g.isEmpty())
-            return emptyIterator;
+            return EmptyIterator.INSTANCE;
         if (g instanceof Polygon) {
             Polygon p = (Polygon) g;
             pi = new PolygonIterator(p, at, generalize, maxDistance);
         } else if (g instanceof GeometryCollection) {
             GeometryCollection gc = (GeometryCollection) g;
             pi = new GeomCollectionIterator(gc, at, generalize, maxDistance);
-        } else if (g instanceof LineString) {
+        } else if (g instanceof LineString || g instanceof LinearRing) {
             LineString ls = (LineString) g;
-            lineIterator.init(ls, at, generalize, (float) maxDistance);
-            pi = lineIterator;
-        } else if (g instanceof LinearRing) {
-            LinearRing lr = (LinearRing) g;
-            lineIterator.init(lr, at, generalize, (float) maxDistance);
-            pi = lineIterator;
+            pi = new LineIterator(ls, at, generalize, (float) maxDistance);
         } else if (g instanceof Point) {
             Point p = (Point) g;
             pi = new PointIterator(p, at);
@@ -230,16 +221,20 @@ public final class GeomCollectionIterator extends AbstractLiteIterator {
      * direction.
      */
     public void next() {
-        if (currentIterator.isDone()) {
+        // try to move the current iterator forward
+        if(!currentIterator.isDone()) {
+            currentIterator.next();
+        }
+        // if the iterator is finished, let's move to the next one (and if
+        // the next one, should the next one be empty)
+        while(currentIterator.isDone() && !done) {
             if (currentGeom < (gc.getNumGeometries() - 1)) {
                 currentGeom++;
                 currentIterator = getIterator(gc.getGeometryN(currentGeom));
             } else {
                 done = true;
             }
-        } else {
-            currentIterator.next();
-        }
+        } 
     }
 
 }

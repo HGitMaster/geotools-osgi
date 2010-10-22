@@ -32,7 +32,7 @@ import java.sql.Statement;
  * @author Justin Deoliveira, OpenGEO
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/NonIncrementingPrimaryKeyColumn.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/NonIncrementingPrimaryKeyColumn.java $
  */
 public class NonIncrementingPrimaryKeyColumn extends PrimaryKeyColumn {
 

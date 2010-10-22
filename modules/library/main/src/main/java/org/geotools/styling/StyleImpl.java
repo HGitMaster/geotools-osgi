@@ -31,7 +31,7 @@ import org.opengis.util.Cloneable;
  * Implementation of style.
  *
  * @author James Macgill, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/StyleImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/StyleImpl.java $
  * @version $Id: StyleImpl.java 33833 2009-09-04 12:26:28Z jive $
  */
 public class StyleImpl implements org.geotools.styling.Style, Cloneable {

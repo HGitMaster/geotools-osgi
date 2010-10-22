@@ -32,7 +32,7 @@ import org.geotools.feature.type.DefaultFeatureTypeBuilder;
  *
  * @deprecated Please use FeatureTypeBuilder
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/FeatureTypeFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/FeatureTypeFactory.java $
  * @version $Id: FeatureTypeFactory.java 30921 2008-07-05 07:51:23Z jgarnett $
  */
 public abstract class FeatureTypeFactory extends FeatureTypeBuilder {

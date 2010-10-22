@@ -25,7 +25,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/TestReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/data/TestReader.java $
  */
 class TestReader implements FeatureReader<SimpleFeatureType, SimpleFeature>{
 

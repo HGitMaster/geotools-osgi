@@ -121,7 +121,7 @@ import org.geotools.resources.coverage.CoverageUtilities;
  * </table>
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Resample.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Resample.java $
  * @version $Id: Resample.java 32440 2009-02-09 11:14:54Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

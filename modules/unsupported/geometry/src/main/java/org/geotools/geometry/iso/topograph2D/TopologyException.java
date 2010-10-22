@@ -22,7 +22,7 @@ package org.geotools.geometry.iso.topograph2D;
  * Indicates an invalid or inconsistent topological situation encountered during
  * processing
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/TopologyException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/TopologyException.java $
  */
 public class TopologyException extends RuntimeException {
 

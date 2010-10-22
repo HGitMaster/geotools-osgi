@@ -54,7 +54,7 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
  * </p>
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: CubeWerxStrategy.java 31917 2008-11-24 21:09:38Z groldan $
+ * @version $Id: CubeWerxStrategy.java 35134 2010-03-29 14:25:33Z groldan $
  * @since 2.6
  * @source $URL:
  *         http://gtsvn.refractions.net/trunk/modules/plugin/wfs/src/main/java/org/geotools/data
@@ -82,6 +82,9 @@ public class CubeWerxStrategy extends DefaultWFSStrategy {
         RequestComponents parts = super.createGetFeatureRequest(wfs, query);
 
         GetFeatureType serverRequest = parts.getServerRequest();
+        serverRequest.setResultType(null);
+        parts.setServerRequest(serverRequest);
+
         GetFeatureType nonResultTypeRequest = new CubeWerxGetFeatureType();
         EMFUtils.copy(serverRequest, nonResultTypeRequest);
         // CubeWerx fails if the _mandatory_ resultType attribute is sent

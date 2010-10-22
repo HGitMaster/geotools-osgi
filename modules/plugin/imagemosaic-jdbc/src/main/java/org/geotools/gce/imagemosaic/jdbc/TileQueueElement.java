@@ -28,9 +28,9 @@ import org.geotools.geometry.GeneralEnvelope;
  * @author mcr
  * 
  */
-class TileQueueElement {
+public class TileQueueElement {
 
-	static TileQueueElement ENDELEMENT = new TileQueueElement(null, null, null);
+	public static TileQueueElement ENDELEMENT = new TileQueueElement(null, null, null);
 
 	/**
 	 * name of the tile
@@ -47,26 +47,26 @@ class TileQueueElement {
 	 */
 	private GeneralEnvelope envelope;
 
-	GeneralEnvelope getEnvelope() {
+	public GeneralEnvelope getEnvelope() {
 		return envelope;
 	}
 
-	TileQueueElement(String name, BufferedImage tileImage,
+	public TileQueueElement(String name, BufferedImage tileImage,
 			GeneralEnvelope envelope) {
 		this.name = name;
 		this.tileImage = tileImage;
 		this.envelope = envelope;
 	}
 
-	String getName() {
+	public String getName() {
 		return name;
 	}
 
-	BufferedImage getTileImage() {
+	public BufferedImage getTileImage() {
 		return tileImage;
 	}
 
-	boolean isEndElement() {
+	public boolean isEndElement() {
 		return getName() == null && getTileImage() == null
 				&& getEnvelope() == null;
 	}

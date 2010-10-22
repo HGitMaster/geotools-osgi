@@ -75,6 +75,7 @@ public class DB2SQLDialect extends SQLDialect  {
 	
 	private static String DEFAULT_SRS_NAME = "DEFAULT_SRS";
 	private static Integer DEFAULT_SRS_ID=0;
+	 
 	
     private static String SELECT_SRSID_WITH_SCHEMA = 
     	"select SRS_ID from DB2GSE.ST_GEOMETRY_COLUMNS where TABLE_SCHEMA = ? and "+
@@ -104,10 +105,19 @@ public class DB2SQLDialect extends SQLDialect  {
     	"dbstop\n"+
     	"db2set DB2_COMPATIBILITY_VECTOR=01\n"+
     	"db2start\n";
+
+    private DB2DialectInfo db2DialectInfo;
     
-    public DB2SQLDialect(JDBCDataStore dataStore) {
+
+    public DB2SQLDialect(JDBCDataStore dataStore,DB2DialectInfo info) {
         super(dataStore);
+        db2DialectInfo=info;
     }
+    
+    public DB2DialectInfo getDb2DialectInfo() {
+        return db2DialectInfo;
+    }
+
     
     /* (non-Javadoc)
      * @see org.geotools.jdbc.SQLDialect#createCRS(int, java.sql.Connection)
@@ -543,26 +553,27 @@ public class DB2SQLDialect extends SQLDialect  {
     }
 
     private boolean isGeomGeneralizationSupported() {
+        DB2DialectInfo info = getDb2DialectInfo();
         
-        if (DB2NGDataStoreFactory.ProductVersion.startsWith("DSN"))
+        if (info.getProductVersion().startsWith("DSN"))
             return false; // I have no idea about the version on z/OS            
-        if (DB2NGDataStoreFactory.ProductName.startsWith("Informix"))
+        if (info.getProductName().startsWith("Informix"))
             return false; 
         
-        if (DB2NGDataStoreFactory.ProductVersion.startsWith("SQL")==false) 
+        if (info.getProductVersion().startsWith("SQL")==false) 
             return false; // insist on DB2 on windows and linux
 
         
         
-        if (DB2NGDataStoreFactory.MajorVersion > 9 ) return true;
-        if (DB2NGDataStoreFactory.MajorVersion < 9 ) return false;
+        if (info.getMajorVersion() > 9 ) return true;
+        if (info.getMajorVersion() < 9 ) return false;
         // major version 9
-        if (DB2NGDataStoreFactory.MinorVersion > 7 ) return true;
-        if (DB2NGDataStoreFactory.MinorVersion < 5 ) return false;
+        if (info.getMinorVersion() > 7 ) return true;
+        if (info.getMinorVersion() < 5 ) return false;
         
         // left 9.5 and 9.7, get FP number
-        if (DB2NGDataStoreFactory.ProductVersion.length() <8) return false;
-        String fp = DB2NGDataStoreFactory.ProductVersion.substring(7);
+        if (info.getProductVersion().length() <8) return false;
+        String fp = info.getProductVersion().substring(7);
         StringBuffer buff =new StringBuffer();
         
         for (int i = 0; i < fp.length();i++) {
@@ -574,8 +585,8 @@ public class DB2SQLDialect extends SQLDialect  {
         if (buff.length()==0) return false;
         
         int fpNumber = Integer.parseInt(buff.toString());
-        if (DB2NGDataStoreFactory.MinorVersion==5 && fpNumber>=5) return true;
-        if (DB2NGDataStoreFactory.MinorVersion==7 && fpNumber>=1) return true;
+        if (info.getMinorVersion()==5 && fpNumber>=5) return true;
+        if (info.getMinorVersion()==7 && fpNumber>=1) return true;
         return false;
     }
     

@@ -41,7 +41,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  * @author Chris Holmes, Fulbright.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/VPFFeatureReader.java $
  */
 public class VPFFeatureReader
     implements FeatureReader<SimpleFeatureType, SimpleFeature>, FCode {

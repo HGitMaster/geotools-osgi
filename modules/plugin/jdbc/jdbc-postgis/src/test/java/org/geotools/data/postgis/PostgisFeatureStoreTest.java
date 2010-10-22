@@ -16,8 +16,6 @@
  */
 package org.geotools.data.postgis;
 
-import java.io.IOException;
-
 import org.geotools.jdbc.JDBCFeatureStoreTest;
 import org.geotools.jdbc.JDBCTestSetup;
 

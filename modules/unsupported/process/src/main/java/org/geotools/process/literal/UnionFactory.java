@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/literal/UnionFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/literal/UnionFactory.java $
  */
 public class UnionFactory extends SingleProcessFactory {
     // making parameters available as static constants to help java programmers
@@ -74,7 +74,7 @@ public class UnionFactory extends SingleProcessFactory {
     }
     
     public UnionFactory() {
-        super(new NameImpl(GT_NAMESPACE, "Union"));
+        super(new NameImpl("gt", "Union"));
     }
     
 	public Process create(){

@@ -63,7 +63,7 @@ import org.opengis.filter.expression.Expression;
  * </p>
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Mark.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Mark.java $
  * @version $Id: Mark.java 33898 2009-09-13 15:39:05Z jive $
  */
 public interface Mark extends org.opengis.style.Mark, Symbol {

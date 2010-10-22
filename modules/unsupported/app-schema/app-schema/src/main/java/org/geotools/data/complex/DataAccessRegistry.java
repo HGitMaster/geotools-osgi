@@ -35,7 +35,7 @@ import org.opengis.feature.type.Name;
  * 
  * @author Rini Angreani, Curtin University of Technology
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/DataAccessRegistry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/DataAccessRegistry.java $
  */
 public class DataAccessRegistry extends ArrayList<DataAccess<FeatureType, Feature>> {
     /**
@@ -130,7 +130,12 @@ public class DataAccessRegistry extends ArrayList<DataAccess<FeatureType, Featur
         }
         for (DataAccess<FeatureType, Feature> dataAccess : registry) {
             if (dataAccess.getNames().contains(featureTypeName)) {
-                return dataAccess.getFeatureSource(featureTypeName);
+                if (dataAccess instanceof AppSchemaDataAccess) {
+                    return ((AppSchemaDataAccess) dataAccess)
+                            .getFeatureSourceByName(featureTypeName);
+                } else {
+                    return dataAccess.getFeatureSource(featureTypeName);
+                }
             }
         }
         throwDataSourceException(featureTypeName);
@@ -151,24 +156,14 @@ public class DataAccessRegistry extends ArrayList<DataAccess<FeatureType, Featur
      * @throws IOException
      */
     protected static void throwDataSourceException(Name featureTypeName) throws IOException {
-        StringBuffer availables = new StringBuffer("[");
+        List<Name> typeNames = new ArrayList<Name>();
         for (Iterator<DataAccess<FeatureType, Feature>> dataAccessIterator = registry.iterator(); dataAccessIterator
                 .hasNext();) {
-            DataAccess<FeatureType, Feature> dataAccess = dataAccessIterator.next();
-            List<Name> typeNames = dataAccess.getNames();
-            for (Iterator<Name> it = typeNames.iterator(); it.hasNext();) {
-                availables.append(it.next());
-                availables.append(it.hasNext() ? ", " : "");
-            }
-            if (dataAccessIterator.hasNext()) {
-                // we assume that every data access has at least one feature type
-                availables.append(", ");
-            }
+            typeNames.addAll(dataAccessIterator.next().getNames());
         }
-        availables.append("]");
         throw new DataSourceException("Feature type " + featureTypeName + " not found."
                 + " Has the data access been registered in DataAccessRegistry?" + " Available: "
-                + availables);
+                + typeNames.toString());
     }
 
 }

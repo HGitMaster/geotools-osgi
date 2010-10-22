@@ -28,7 +28,7 @@ import org.geotools.geometry.iso.util.algorithm2D.RobustLineIntersector;
 /**
  * The base class for operations that require {@link org.geotools.geometry.iso.topograph2D.GeometryGraph)s.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/GeometryGraphOperation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/operation/GeometryGraphOperation.java $
  */
 public abstract class GeometryGraphOperation {
 

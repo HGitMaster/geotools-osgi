@@ -21,7 +21,7 @@ package org.geotools.resources.i18n;
  * Greek language resource.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/i18n/Errors_el.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/i18n/Errors_el.java $
  * @version $Id: Errors_el.java 31007 2008-07-11 17:33:53Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

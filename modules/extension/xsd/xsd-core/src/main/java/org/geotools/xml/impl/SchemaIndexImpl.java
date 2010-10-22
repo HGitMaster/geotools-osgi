@@ -43,6 +43,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
+
+import org.geotools.util.SoftValueHashMap;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 
@@ -65,7 +67,7 @@ public class SchemaIndexImpl implements SchemaIndex {
     /**
      * Cache of elements to children
      */
-    HashMap /*<XSDElementDeclaration,OrderedMap>*/ element2children = new HashMap();
+    SoftValueHashMap /*<XSDElementDeclaration,OrderedMap>*/ element2children = new SoftValueHashMap(1000);
 
     /**
      * Cache of elemnets to attributes

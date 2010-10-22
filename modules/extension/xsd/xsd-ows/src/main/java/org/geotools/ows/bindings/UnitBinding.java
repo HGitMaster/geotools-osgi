@@ -57,26 +57,30 @@ public class UnitBinding extends AbstractSimpleBinding {
     }
     
     private Unit lookup(String name) {
-    	Unit unit = lookup( SI.class, name );
-    	if( unit != null ) return unit;
-    	
-    	unit = lookup( NonSI.class, name );
-    	if( unit != null ) return unit;
-    	
-    	if( name.endsWith("s") || name.endsWith("S") ){
-    		return lookup( name.substring(0,name.length()-1) );
-    	}
-    	// if we get here, try some aliases
-    	if (name.equalsIgnoreCase("feet")) {
-    		return lookup( NonSI.class, "foot" );
-    	}
-    	// if we get here, try some aliases
-    	if (name.equalsIgnoreCase("meters") || name.equalsIgnoreCase("meter")) {
-    		return lookup( SI.class, "m" );
-    	}    	
-    		
-		return null;
-	}
+        Unit unit = lookup(SI.class, name);
+        if (unit != null)
+            return unit;
+
+        unit = lookup(NonSI.class, name);
+        if (unit != null)
+            return unit;
+
+        if (name.endsWith("s") || name.endsWith("S")) {
+            return lookup(name.substring(0, name.length() - 1));
+        }
+        // if we get here, try some aliases
+        if (name.equalsIgnoreCase("feet")) {
+            return lookup(NonSI.class, "foot");
+        }
+        // if we get here, try some aliases
+        if (name.equalsIgnoreCase("meters") || name.equalsIgnoreCase("meter")) {
+            return lookup(SI.class, "m");
+        }
+        if (name.equalsIgnoreCase("unity")) {
+            return Unit.ONE;
+        }
+        return null;
+    }
 
 	private Unit lookup(Class class1, String name) {
 		Unit unit = null;

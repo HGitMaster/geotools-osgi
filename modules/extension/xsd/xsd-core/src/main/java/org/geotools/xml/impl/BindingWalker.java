@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 import javax.xml.namespace.QName;
+
+import org.geotools.util.SoftValueHashMap;
 import org.geotools.xml.Binding;
 import org.geotools.xml.Schemas;
 import org.geotools.xs.XS;
@@ -37,7 +39,8 @@ import org.geotools.xs.XS;
 
 public class BindingWalker implements TypeWalker.Visitor {
     BindingLoader loader;
-    HashMap /*<XSDFeature,BindingExecutionChain>*/ chains;
+    
+    SoftValueHashMap /*<XSDFeature,BindingExecutionChain>*/ chains;
     TypeWalker typeWalker;
     MutablePicoContainer context;
     ArrayList bindings;
@@ -47,7 +50,7 @@ public class BindingWalker implements TypeWalker.Visitor {
     public BindingWalker(BindingLoader factory) {
         this.loader = factory;
 
-        chains = new HashMap();
+        chains = new SoftValueHashMap(100);
         typeWalker = new TypeWalker();
     }
     

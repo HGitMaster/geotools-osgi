@@ -26,7 +26,7 @@ import org.opengis.filter.expression.Literal;
  * This class is actualy a place holder.  It resolves to 1.0 but should actualy be substituted for 
  * a literal that actualy contains the current map scale before use.
  * @author James
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/MapScaleDenominatorImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/MapScaleDenominatorImpl.java $
  * 
  */
 public class MapScaleDenominatorImpl extends DefaultExpression implements MapScaleDenominator, Literal {

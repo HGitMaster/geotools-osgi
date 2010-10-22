@@ -17,6 +17,9 @@
 package org.geotools.jdbc;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,6 +32,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.FeatureEvent.Type;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
@@ -51,8 +55,8 @@ import com.vividsolutions.jts.geom.Point;
 public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
     JDBCFeatureStore featureStore;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
 
         featureStore = (JDBCFeatureStore) dataStore.getFeatureSource(tname("ft1"));
     }
@@ -99,6 +103,43 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
         }
     }
     
+    public void testAddFeaturesUseProvidedFid() throws IOException {
+        // check we advertise the ability to reuse feature ids
+        assertTrue(featureStore.getQueryCapabilities().isUseProvidedFIDSupported());
+        
+        SimpleFeatureBuilder b = new SimpleFeatureBuilder(featureStore.getSchema());
+        DefaultFeatureCollection collection = new DefaultFeatureCollection(null,
+                featureStore.getSchema());
+        
+        String typeName = b.getFeatureType().getTypeName();
+        for (int i = 3; i < 6; i++) {
+            b.set(aname("intProperty"), new Integer(i));
+            b.set(aname("geometry"), new GeometryFactory().createPoint(new Coordinate(i, i)));
+            b.featureUserData(Hints.USE_PROVIDED_FID, Boolean.TRUE);
+            collection.add(b.buildFeature(typeName + "." + (i * 10)));
+        }
+        List<FeatureId> fids = featureStore.addFeatures(collection);
+        
+        assertEquals(3, fids.size());
+        assertTrue(fids.contains(SimpleFeatureBuilder.createDefaultFeatureIdentifier(typeName + ".30")));
+        assertTrue(fids.contains(SimpleFeatureBuilder.createDefaultFeatureIdentifier(typeName + ".40")));
+        assertTrue(fids.contains(SimpleFeatureBuilder.createDefaultFeatureIdentifier(typeName + ".50")));
+
+        FeatureCollection features = featureStore.getFeatures();
+        assertEquals(6, features.size());
+
+        FilterFactory ff = dataStore.getFilterFactory();
+
+        for (Iterator f = fids.iterator(); f.hasNext();) {
+            FeatureId identifier = (FeatureId) f.next();
+            String fid = identifier.getID();
+            Id filter = ff.id(Collections.singleton(identifier));
+
+            features = featureStore.getFeatures(filter);
+            assertEquals(1, features.size());
+        }
+    }
+    
     public void testAddInTransaction() throws IOException {
         SimpleFeatureBuilder b = new SimpleFeatureBuilder(featureStore.getSchema());
         DefaultFeatureCollection collection = new DefaultFeatureCollection(null,
@@ -129,6 +170,48 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
         t.close();
     }
     
+    public void testExternalConnection() throws IOException, SQLException {
+        SimpleFeatureBuilder b = new SimpleFeatureBuilder(featureStore.getSchema());
+        DefaultFeatureCollection collection = new DefaultFeatureCollection(null,
+                featureStore.getSchema());
+        
+        b.set(aname("intProperty"), new Integer(3));
+        b.set(aname("geometry"), new GeometryFactory().createPoint(new Coordinate(3, 3)));
+        collection.add(b.buildFeature(null));
+
+        FeatureEventWatcher watcher = new FeatureEventWatcher();
+        
+        Connection conn = setup.getDataSource().getConnection();
+        conn.setAutoCommit(false);
+        Transaction t = dataStore.buildTransaction(conn);
+        featureStore.setTransaction(t);
+        featureStore.addFeatureListener(watcher);
+        JDBCFeatureStore featureStore2 = (JDBCFeatureStore) dataStore.getFeatureSource(featureStore.getName().getLocalPart()); 
+        List<FeatureId> fids = featureStore.addFeatures(collection);
+        
+        assertEquals(1, fids.size());
+
+        // check the store with the transaction sees the new features, but the other store does not
+        assertEquals(4, featureStore.getFeatures().size());
+        assertEquals(3, featureStore2.getFeatures().size());
+        
+        // check that after the commit on the transaction things have not changed, 
+        // the connection is externally managed
+        t.commit();
+        assertEquals(4, featureStore.getFeatures().size());
+        assertEquals(3, featureStore2.getFeatures().size());
+
+        // commit directly
+        conn.commit();
+        assertEquals(4, featureStore.getFeatures().size());
+        assertEquals(4, featureStore2.getFeatures().size());
+        
+        // check that closing the transaction does not affect the connection
+        t.close();
+        assertFalse(conn.isClosed());
+        conn.close();
+    }
+    
     /**
      * Check null encoding is working properly
      * @throws IOException
@@ -137,6 +220,19 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
         SimpleFeatureBuilder b = new SimpleFeatureBuilder(featureStore.getSchema());
         SimpleFeature nullFeature = b.buildFeature("testId");
         featureStore.addFeatures(Arrays.asList(nullFeature));
+    }
+    
+    /**
+     * Check null encoding is working properly
+     * @throws IOException
+     */
+    public void testModifyNullAttributes() throws IOException {
+        AttributeDescriptor[] attributes = new AttributeDescriptor[featureStore.getSchema().getAttributeCount()];
+        for(int i = 0; i < attributes.length; i++) {
+            attributes[i] = featureStore.getSchema().getDescriptor(i);
+        }
+        Object[] nulls = new Object[attributes.length];
+        featureStore.modifyFeatures(attributes, nulls, Filter.INCLUDE);
     }
 
     public void testSetFeatures() throws IOException {

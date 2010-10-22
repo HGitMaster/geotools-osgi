@@ -42,7 +42,7 @@ import org.opengis.util.ProgressListener;
  * 
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/feature/FeatureToFeatureProcess.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/feature/FeatureToFeatureProcess.java $
  */
 public abstract class FeatureToFeatureProcess extends AbstractFeatureCollectionProcess {
 

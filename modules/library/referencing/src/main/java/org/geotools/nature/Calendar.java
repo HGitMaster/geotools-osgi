@@ -43,7 +43,7 @@ import java.util.TimeZone;
  * <a href="http://webexhibits.org/calendars/year-astronomy.html">http://webexhibits.org/calendars/year-astronomy.html</a> ainsi que
  * <a href="http://www.treasure-troves.com/astro/TropicalYear.html">http://www.treasure-troves.com/astro/TropicalYear.html</a>.</p>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/nature/Calendar.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/nature/Calendar.java $
  * @version $Id: Calendar.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

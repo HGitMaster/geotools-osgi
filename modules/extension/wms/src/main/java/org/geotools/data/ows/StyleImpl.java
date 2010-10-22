@@ -26,7 +26,7 @@ import org.opengis.util.InternationalString;
  * @author Richard Gould
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/ows/StyleImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/ows/StyleImpl.java $
  */
 public class StyleImpl {
 

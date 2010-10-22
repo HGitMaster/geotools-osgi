@@ -19,11 +19,9 @@ package org.geotools.data.complex;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,7 +40,6 @@ import org.geotools.data.DataAccessFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
 import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
-import org.geotools.data.complex.config.CatalogUtilities;
 import org.geotools.data.complex.config.EmfAppSchemaReader;
 import org.geotools.data.complex.config.FeatureTypeRegistry;
 import org.geotools.data.complex.config.XMLConfigDigester;
@@ -70,8 +67,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: TimeSeriesTest.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
+ * @version $Id: TimeSeriesTest.java 35576 2010-05-25 05:47:07Z bencaradocdavies $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/TimeSeriesTest.java $
  * @since 2.4
  */
 public class TimeSeriesTest extends TestCase {
@@ -134,7 +131,7 @@ public class TimeSeriesTest extends TestCase {
      */
     private SchemaIndex loadSchema(URL location) throws IOException {
         URL catalogLocation = getClass().getResource(schemaBase + "observations.oasis.xml");
-        reader.setCatalog(CatalogUtilities.buildPrivateCatalog(catalogLocation));
+        reader.setResolver(catalogLocation);
         return reader.parse(location, null);
     }
 

@@ -63,7 +63,7 @@ import com.sun.media.imageioimpl.common.PackageUtil;
 /**
  * Tests the {@link ImageWorker} implementation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/image/ImageWorkerTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/image/ImageWorkerTest.java $
  * @version $Id: ImageWorkerTest.java 34783 2010-01-13 13:24:24Z simonegiannecchini $
  * @author Simone Giannecchini (GeoSolutions)
  * @author Martin Desruisseaux (Geomatys)

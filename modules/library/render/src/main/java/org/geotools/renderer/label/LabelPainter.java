@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author Andrea Aime
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/label/LabelPainter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/label/LabelPainter.java $
  */
 public class LabelPainter {
 
@@ -425,10 +425,8 @@ public class LabelPainter {
     private void configureHalo() {
         graphics.setPaint(labelItem.getTextStyle().getHaloFill());
         graphics.setComposite(labelItem.getTextStyle().getHaloComposite());
-        int haloRadius = Math.round(labelItem.getTextStyle().getHaloFill() != null ? labelItem
-                .getTextStyle().getHaloRadius() : 0);
-        graphics.setStroke(new BasicStroke(2f * haloRadius, BasicStroke.CAP_ROUND,
-                BasicStroke.JOIN_ROUND));
+        float haloRadius = labelItem.getTextStyle().getHaloFill() != null ? labelItem.getTextStyle().getHaloRadius() : 0;
+        graphics.setStroke(new BasicStroke(2 * haloRadius, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
     }
 
     /**

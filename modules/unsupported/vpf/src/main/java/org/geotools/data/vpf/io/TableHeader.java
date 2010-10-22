@@ -29,7 +29,7 @@ import org.geotools.data.vpf.ifc.VPFHeader;
  * Objects of this type are immutable.  Created: Thu Jan 02 22:50:59 2003
  *
  * @author <a href="mailto:kobit@users.fs.net">Artur Hefczyc</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/TableHeader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/TableHeader.java $
  * @version 1.0
  */
 public class TableHeader implements VPFHeader, DataTypesDefinition {

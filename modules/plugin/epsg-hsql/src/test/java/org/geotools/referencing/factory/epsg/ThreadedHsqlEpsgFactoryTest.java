@@ -39,7 +39,7 @@ import org.opengis.referencing.operation.MathTransform;
  * 
  * @author Jody
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/ThreadedHsqlEpsgFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/ThreadedHsqlEpsgFactoryTest.java $
  */
 public class ThreadedHsqlEpsgFactoryTest extends TestCase {
     

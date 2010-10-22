@@ -44,7 +44,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author wolf
  * @since 2.2.1
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/BatikXMLReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/BatikXMLReader.java $
  */
 public class BatikXMLReader implements XMLReader {
     XMLReader reader;

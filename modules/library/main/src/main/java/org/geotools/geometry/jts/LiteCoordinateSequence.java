@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/LiteCoordinateSequence.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/LiteCoordinateSequence.java $
  */
 public class LiteCoordinateSequence extends PackedCoordinateSequence {
     
@@ -348,10 +348,24 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence {
 
         ArrayList gs = new ArrayList(geom.getNumGeometries());
         int n = geom.getNumGeometries();
+        Class geomType = geom.getGeometryN(0).getClass();
         for (int t = 0; t < n; t++) {
-            gs.add(t, cloneGeometry(geom.getGeometryN(t)));
+            Geometry clone = cloneGeometry(geom.getGeometryN(t));
+            if(clone.getClass() != geomType) {
+                geomType = null;
+            }
+            gs.add(t, clone);
         }
-        return geomFac.buildGeometry(gs);
+        
+        if(geomType == Point.class) {
+            return geomFac.createMultiPoint((Point[]) gs.toArray(new Point[gs.size()]));
+        } else if(geomType == LineString.class) {
+            return geomFac.createMultiLineString((LineString[]) gs.toArray(new LineString[gs.size()]));
+        } else if(geomType == Polygon.class) {
+            return geomFac.createMultiPolygon((Polygon[]) gs.toArray(new Polygon[gs.size()]));
+        } else {
+            return geomFac.buildGeometry(gs);
+        }
     }
 
     /**

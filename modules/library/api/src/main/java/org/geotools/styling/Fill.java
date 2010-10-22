@@ -74,8 +74,8 @@ import org.opengis.style.StyleVisitor;
  * </p>
  *
  * @author James Macgill, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Fill.java $
- * @version $Id: Fill.java 33833 2009-09-04 12:26:28Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Fill.java $
+ * @version $Id: Fill.java 35470 2010-05-12 22:54:57Z jive $
  */
 public interface Fill extends org.opengis.style.Fill{
     static final Fill DEFAULT = new ConstantFill() {
@@ -83,8 +83,8 @@ public interface Fill extends org.opengis.style.Fill{
                 throw new UnsupportedOperationException("Constant Stroke may not be modified");
             }
 
-            final Expression COLOR = ConstantExpression.constant(new Color(128, 128, 128));
-            final Expression BGCOLOR = ConstantExpression.constant(new Color(255, 255, 255, 0));
+            final Expression COLOR = ConstantExpression.color(new Color(128, 128, 128));
+            final Expression BGCOLOR = ConstantExpression.color(new Color(255, 255, 255, 0));
             final Expression OPACITY = ConstantExpression.ONE;
 
             public Expression getColor() {

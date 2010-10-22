@@ -24,7 +24,7 @@ import org.geotools.data.Query;
  * @author Frank Gasdorf, fgdrf@users.sourceforge.net
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/data/memory/MemoryDataStoreBoundsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/data/memory/MemoryDataStoreBoundsTest.java $
  */
 public class MemoryDataStoreBoundsTest extends DataTestCase {
     MemoryDataStore data;

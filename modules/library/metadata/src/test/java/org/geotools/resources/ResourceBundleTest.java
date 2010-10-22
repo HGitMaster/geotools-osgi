@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link ResourceBundle} class, especially {@link Vocabulary}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/resources/ResourceBundleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/resources/ResourceBundleTest.java $
  * @version $Id: ResourceBundleTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

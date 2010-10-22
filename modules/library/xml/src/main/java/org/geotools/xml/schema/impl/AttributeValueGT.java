@@ -25,7 +25,7 @@ import org.geotools.xml.schema.AttributeValue;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/AttributeValueGT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/AttributeValueGT.java $
  */
 public class AttributeValueGT implements AttributeValue {
     private String value;

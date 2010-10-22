@@ -45,7 +45,7 @@ import org.opengis.filter.expression.PropertyName;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/cql2/CQLExtensionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/cql2/CQLExtensionTest.java $
  * @version Revision: 1.9
  */
 public class CQLExtensionTest{
@@ -440,8 +440,8 @@ public class CQLExtensionTest{
 
         expected = FilterCQLSample.getSample(cqlUnaryExp);
 
-        // TODO BUG in Function equals strConcat
-        //assertEquals( "Functions", expected, result);
+        // TODO BUG There is a bug in function "equals"' strConcat
+        // assertEquals( "Functions", expected, result);
 
         // test for improvement Key: GEOT-1168
         cqlUnaryExp = "A = strConcat(B, 'testParam')";

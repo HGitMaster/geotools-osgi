@@ -30,7 +30,7 @@ import org.geotools.ows.ServiceException;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/test/java/org/geotools/data/wms/test/GetCapabilitiesRequestTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/test/java/org/geotools/data/wms/test/GetCapabilitiesRequestTest.java $
  */
 public class GetCapabilitiesRequestTest extends ServerTestCase {
     public void testGetCapabilitiesRequest() throws Exception {

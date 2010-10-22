@@ -49,7 +49,7 @@ import org.opengis.filter.expression.Expression;
  * can get away without a full parser here.
  *
  * @author iant
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/ExpressionDOMParser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/ExpressionDOMParser.java $
  */
 public final class ExpressionDOMParser {
     /** The logger for the filter module. */

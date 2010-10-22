@@ -32,7 +32,7 @@ import org.geotools.graph.structure.line.XYNode;
  *
  * @author jfc173
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/util/delaunay/GraphViewer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/util/delaunay/GraphViewer.java $
  */
 public class GraphViewer extends JPanel{
     

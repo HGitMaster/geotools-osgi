@@ -31,7 +31,7 @@ import org.geotools.xml.XSD;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/v3_2/gmd/GMD.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/v3_2/gmd/GMD.java $
  */
 public final class GMD extends XSD {
 

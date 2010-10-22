@@ -38,7 +38,7 @@ import org.opengis.filter.expression.Literal;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/cql2/CQLTemporalPredicateTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/cql2/CQLTemporalPredicateTest.java $
  */
 public class CQLTemporalPredicateTest {
     

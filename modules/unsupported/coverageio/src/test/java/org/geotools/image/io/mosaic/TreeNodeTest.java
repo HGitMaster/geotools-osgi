@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  * {@link TreeNode} except for the {@link RTree#searchTiles} method, which is not
  * tested here (see {@link TileManagerTest} for that).
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/TreeNodeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/TreeNodeTest.java $
  * @version $Id: TreeNodeTest.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux
  */

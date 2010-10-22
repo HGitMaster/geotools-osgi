@@ -162,27 +162,30 @@ public class JTSUtilities {
 
     /**
      * Does what it says, reverses the order of the Coordinates in the ring.
-     * 
+     * <p>
+     * This is different then lr.reverses() in that a copy is produced using a
+     * new coordinate sequence.
+     * </p>
      * @param lr
      *                The ring to reverse.
      * @return A new ring with the reversed Coordinates.
      */
     public static final LinearRing reverseRing(LinearRing lr) {
-        GeometryFactory gf = lr.getFactory();
-        CoordinateSequenceFactory csf = gf.getCoordinateSequenceFactory();
-        
-        CoordinateSequence csOrig = lr.getCoordinateSequence();
+		GeometryFactory gf = lr.getFactory();
+		CoordinateSequenceFactory csf = gf.getCoordinateSequenceFactory();
+
+		CoordinateSequence csOrig = lr.getCoordinateSequence();
 		int numPoints = csOrig.size();
 		int dimensions = csOrig.getDimension();
 		CoordinateSequence csNew = csf.create(numPoints, dimensions);
 
 		for (int i = 0; i < numPoints; i++) {
 			for (int j = 0; j < dimensions; j++) {
-				csOrig.getOrdinate(i, j);
+				csNew.setOrdinate(numPoints-1-i, j, csOrig.getOrdinate(i, j));
 			}
 		}
-
-        return gf.createLinearRing(csNew);
+		
+		return gf.createLinearRing(csNew);
     }
 
     /**

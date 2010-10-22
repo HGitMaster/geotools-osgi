@@ -220,6 +220,7 @@ public class WFSFeatureSource extends AbstractFeatureSource implements FeatureSo
             // "any" use a default
             DefaultQuery defaultQuery = new DefaultQuery(query);
             defaultQuery.setTypeName(typeName);
+            query = defaultQuery;
         }
 
         if (!typeName.equals(query.getTypeName())) {

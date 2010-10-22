@@ -71,7 +71,7 @@ import java.util.Map;
  * </p>
  *
  * @author James Macgill, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/ExternalGraphic.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/ExternalGraphic.java $
  * @version $Id: ExternalGraphic.java 32919 2009-05-03 14:18:31Z jive $
  */
 public interface ExternalGraphic extends org.opengis.style.ExternalGraphic,Symbol {

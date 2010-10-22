@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
-import org.opengis.coverage.grid.Format;
 
 /**
  * Implementation of the GridCoverageFormat service provider interface for
@@ -30,7 +29,7 @@ import org.opengis.coverage.grid.Format;
  * @author mcr
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/ImageMosaicJDBCFormatFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/ImageMosaicJDBCFormatFactory.java $
  */
 public class ImageMosaicJDBCFormatFactory implements GridFormatFactorySpi {
 	/**

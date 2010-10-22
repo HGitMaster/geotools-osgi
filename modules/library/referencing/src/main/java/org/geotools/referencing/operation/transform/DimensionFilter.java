@@ -53,7 +53,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * a call to {@link #getTargetDimensions}.</P>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/DimensionFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/DimensionFilter.java $
  * @version $Id: DimensionFilter.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini

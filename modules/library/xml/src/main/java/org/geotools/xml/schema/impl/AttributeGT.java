@@ -28,7 +28,7 @@ import org.geotools.xml.schema.SimpleType;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/AttributeGT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/AttributeGT.java $
  */
 public class AttributeGT implements Attribute {
     private String defualT;

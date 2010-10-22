@@ -16,47 +16,30 @@
  */
 package org.geotools.styling.visitor;
 
-import java.util.Collections;
+import java.awt.Color;
 
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.styling.AnchorPoint;
-import org.geotools.styling.Displacement;
-import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Fill;
 import org.geotools.styling.Font;
-import org.geotools.styling.Graphic;
-import org.geotools.styling.Halo;
-import org.geotools.styling.LabelPlacement;
-import org.geotools.styling.LinePlacement;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.Mark;
-import org.geotools.styling.PointPlacement;
-import org.geotools.styling.PointSymbolizer;
-import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
-import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Expression;
-import org.opengis.util.Cloneable;
 
 
 /**
  * Unit test for RescaleStyleVisitor.
  *
  * @author Jody Garnett (Refractions Research Inc)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/visitor/RescaleStyleVisitorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/styling/visitor/RescaleStyleVisitorTest.java $
  */
 public class RescaleStyleVisitorTest extends TestCase {
     StyleBuilder sb;
@@ -134,6 +117,25 @@ public class RescaleStyleVisitorTest extends TestCase {
         Rule clone = (Rule) visitor.getCopy();
 
         assertNotNull( clone );
+    }
+    
+    public void testStroke() throws Exception {
+        Stroke original = sb.createStroke(Color.RED, 2, new float[] {5, 10});
+        original.accept(visitor);
+        Stroke clone = (Stroke) visitor.getCopy();
+        
+        assertEquals(4.0d, clone.getWidth().evaluate(null));
+        assertEquals(10.0f, clone.getDashArray()[0]);
+        assertEquals(20.0f, clone.getDashArray()[1]);
+    }
+    
+    public void testTextSymbolizer() throws Exception {
+        TextSymbolizer ts = sb.createTextSymbolizer(Color.BLACK, (Font) null, "label");
+        ts.getOptions().put(TextSymbolizer.MAX_DISPLACEMENT_KEY, "10");
+        
+        ts.accept(visitor);
+        TextSymbolizer clone = (TextSymbolizer) visitor.getCopy();
+        assertEquals("20", clone.getOptions().get(TextSymbolizer.MAX_DISPLACEMENT_KEY));
     }
     
 }

@@ -33,7 +33,7 @@ import static java.lang.Math.*;
  * form is given here.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueOrthographic.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueOrthographic.java $
  * @version $Id: ObliqueOrthographic.java 34859 2010-02-03 19:30:23Z aaime $
  * @author Rueben Schulz
  */

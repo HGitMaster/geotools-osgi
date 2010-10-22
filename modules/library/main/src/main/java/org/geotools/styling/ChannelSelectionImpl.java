@@ -24,7 +24,7 @@ import org.opengis.style.StyleVisitor;
  * ChannelSelectionImpl
  *
  * @author iant
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/ChannelSelectionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/ChannelSelectionImpl.java $
  */
 public class ChannelSelectionImpl 
     implements ChannelSelection {

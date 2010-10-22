@@ -45,7 +45,7 @@ import com.vividsolutions.jts.io.WKBWriter;
  * An attribute IO implementation that can manage the WKB
  *
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/PgWKBAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/PgWKBAttributeIO.java $
  */
 public class PgWKBAttributeIO implements AttributeIO {
     private boolean useByteArray;

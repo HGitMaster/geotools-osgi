@@ -38,7 +38,7 @@ import org.geotools.util.Utilities;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp.html">lambert_conic_conformal_2sp</A>
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertConformal2SP.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/LambertConformal2SP.java $
  * @version $Id: LambertConformal2SP.java 34051 2009-10-02 15:31:02Z aaime $
  * @author Martin Desruisseaux
  * @author Rueben Schulz

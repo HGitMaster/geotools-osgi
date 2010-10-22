@@ -23,7 +23,7 @@ import java.util.List;
  * Defines constants related to FACC Code processing.  
  *
  * @author John Meagher
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/FCode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/FCode.java $
  * @version $Id: FCode.java 30687 2008-06-13 11:03:06Z acuster $
  */
 public interface FCode {

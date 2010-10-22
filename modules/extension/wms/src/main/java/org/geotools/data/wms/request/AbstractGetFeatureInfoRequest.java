@@ -29,7 +29,7 @@ import org.geotools.data.ows.Layer;
 /**
  * A base class for GetFeatureInfoRequests that provides some
  * functionality.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractGetFeatureInfoRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractGetFeatureInfoRequest.java $
  */
 public abstract class AbstractGetFeatureInfoRequest extends AbstractWMSRequest implements GetFeatureInfoRequest {
     /** A set of type Layer, each of which is to be queried in the request */

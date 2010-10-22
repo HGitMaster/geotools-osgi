@@ -142,7 +142,7 @@ import org.geotools.xml.AbstractComplexEMFBinding;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/GetFeatureTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/GetFeatureTypeBinding.java $
  */
 public class GetFeatureTypeBinding extends AbstractComplexEMFBinding {
     public GetFeatureTypeBinding(WfsFactory factory) {

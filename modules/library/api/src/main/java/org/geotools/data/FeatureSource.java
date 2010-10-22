@@ -64,7 +64,7 @@ import org.opengis.filter.Filter;
  * @author Ray Gallagher
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/FeatureSource.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/FeatureSource.java $
  * @version $Id: FeatureSource.java 30642 2008-06-12 17:52:06Z acuster $
  */
 public interface FeatureSource<T extends FeatureType, F extends Feature>{

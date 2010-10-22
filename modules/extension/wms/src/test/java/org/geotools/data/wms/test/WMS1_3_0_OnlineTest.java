@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 /**
  * @author rgould
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/test/java/org/geotools/data/wms/test/WMS1_3_0_OnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/test/java/org/geotools/data/wms/test/WMS1_3_0_OnlineTest.java $
  */
 public class WMS1_3_0_OnlineTest extends WMS1_1_1_OnlineTest{
     

@@ -46,7 +46,7 @@ import static java.lang.Math.*;
  * 
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/WKTReader2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/WKTReader2.java $
  * @version 1.7
  * @see WKTWriter
  */

@@ -31,7 +31,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * 
  * @author Jody Garnett (Refractions Research)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/FeatureTypeExample.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/FeatureTypeExample.java $
  */
 public class FeatureTypeExample {
 

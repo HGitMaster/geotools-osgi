@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.LineString;
  * @author Andrea Aime
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/label/LineStringCursor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/label/LineStringCursor.java $
  */
 public class LineStringCursor {
 

@@ -116,7 +116,7 @@ import java.util.logging.Logger;
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/LogicSAXParser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/LogicSAXParser.java $
  * @version $Id: LogicSAXParser.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public class LogicSAXParser {

@@ -59,7 +59,7 @@ import org.geotools.util.Utilities;
  * Conversely, these names shall not be used in any other context.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultCoordinateSystemAxis.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/cs/DefaultCoordinateSystemAxis.java $
  * @version $Id: DefaultCoordinateSystemAxis.java 34025 2009-10-01 07:54:00Z aaime $
  * @author Martin Desruisseaux (IRD)
  *

@@ -16,11 +16,14 @@
  */
 package org.geotools.referencing;
 
+import java.io.IOException;
 import java.io.LineNumberReader;
-import org.geotools.test.TestData;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.geotools.test.TestData;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -31,8 +34,8 @@ import static org.junit.Assert.*;
  * <p>
  * This is probably the most important test case for the whole CRS module.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/ScriptTest.java $
- * @version $Id: ScriptTest.java 34723 2009-12-22 10:55:34Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/ScriptTest.java $
+ * @version $Id: ScriptTest.java 35171 2010-04-05 10:10:58Z aaime $
  * @author Yann Cézard
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)
@@ -157,8 +160,7 @@ public final class ScriptTest {
      *
      * @throws Exception If a test failed.
      */
-    // hwellmann: fails on Java 1.6.0
-    //@Test
+    @Test
     public void testStereographic() throws Exception {
         runScript("scripts/Stereographic.txt");
     }
@@ -168,8 +170,7 @@ public final class ScriptTest {
      *
      * @throws Exception If a test failed.
      */
-    // hwellmann: fails on Java 1.6.0
-    //@Test
+    @Test
     public void testOrthographic() throws Exception {
         runScript("scripts/Orthographic.txt");
     }
@@ -210,6 +211,15 @@ public final class ScriptTest {
     @Test
     public void testPolyconic() throws Exception {
         runScript("scripts/Polyconic.txt");
+    }
+    
+    /**
+     * Run "Robinson.txt"
+     * @throws Exception
+     */
+    @Test
+    public void testRobinson() throws Exception {
+        runScript("scripts/Robinson.txt");
     }
 
     /**

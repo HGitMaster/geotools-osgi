@@ -52,7 +52,7 @@ import org.geotools.referencing.factory.DirectAuthorityFactory;
  * in the {@code CRS} space.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/WebCRSFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/WebCRSFactory.java $
  * @version $Id: WebCRSFactory.java 31593 2008-09-25 12:30:10Z desruisseaux $
  * @author Martin Desruisseaux
  *

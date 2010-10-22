@@ -24,7 +24,7 @@ package org.geotools.data;
  * The single instance of this class is available as
  * <code>FeatureLock.TRANSACTION</code>.
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/CurrentTransactionLock.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/CurrentTransactionLock.java $
  */
 class CurrentTransactionLock implements FeatureLock {
     /**

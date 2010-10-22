@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +37,6 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.media.jai.JAI;
 
 import org.geotools.coverage.CoverageFactoryFinder;
-import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
@@ -400,53 +400,6 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
     }
 
     /**
-     * Gets the coordinate reference system that will be associated to the
-     * {@link GridCoverage} by looking for a related PRJ.
-     */
-    protected void parsePRJFile() {
-        String prjPath = null;
-
-        setCoverageCRS(null);
-        prjPath = new StringBuilder(this.parentPath).append(File.separatorChar) .append(coverageName).append(".prj").toString();
-
-        // read the prj serviceInfo from the file
-        PrjFileReader projReader = null;
-
-        try {
-            final File prj = new File(prjPath);
-
-            if (prj.exists()) {
-                projReader = new PrjFileReader(new FileInputStream(prj).getChannel());
-                setCoverageCRS(projReader.getCoordinateReferenceSystem());
-            }
-            // If some exception occurs, warn about the error but proceed
-            // using a default CRS
-        } catch (FileNotFoundException e) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            }
-        } catch (IOException e) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            }
-        } catch (FactoryException e) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            }
-        } finally {
-            if (projReader != null) {
-                try {
-                    projReader.close();
-                } catch (IOException e) {
-                    if (LOGGER.isLoggable(Level.WARNING)) {
-                        LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Checks whether a world file is associated with the data source. If found,
      * set a proper envelope.
      * 
@@ -665,5 +618,76 @@ public abstract class BaseGridCoverage2DReader extends AbstractGridCoverage2DRea
     public boolean hasMoreGridCoverages() {
         return false;
     }
+
+	/**
+	 * Gets the coordinate reference system that will be associated to the
+	 * {@link GridCoverage} by looking for a related PRJ.
+	 */
+	protected void parsePRJFile() {
+	    String prjPath = null;
+	
+	    setCoverageCRS(null);
+	    prjPath = new StringBuilder(this.parentPath).append(File.separatorChar) .append(coverageName).append(".prj").toString();
+	
+	    // read the prj serviceInfo from the file
+	    PrjFileReader projReader = null;
+	
+	    FileInputStream inStream=null;
+	    FileChannel channel=null;
+	    try {
+	        final File prj = new File(prjPath);
+	        if (prj.exists()&&prj.canRead()) {
+	
+	            inStream=new FileInputStream(prj);
+	            channel=inStream.getChannel();
+	            projReader = new PrjFileReader(channel);
+	            setCoverageCRS(projReader.getCoordinateReferenceSystem());
+	        }
+	        // If some exception occurs, warn about the error but proceed
+	        // using a default CRS
+	    } catch (FileNotFoundException e) {
+	        if (LOGGER.isLoggable(Level.WARNING)) {
+	            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+	        }
+	    } catch (IOException e) {
+	        if (LOGGER.isLoggable(Level.WARNING)) {
+	            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+	        }
+	    } catch (FactoryException e) {
+	        if (LOGGER.isLoggable(Level.WARNING)) {
+	            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+	        }
+	    } finally {
+	        if (projReader != null) {
+	            try {
+	                projReader.close();
+	            } catch (IOException e) {
+	                if (LOGGER.isLoggable(Level.WARNING)) {
+	                    LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+	                }
+	            }
+	        }
+	        
+	        if (inStream != null) {
+	            try {
+	                inStream.close();
+	            } catch (Throwable e) {
+	                if (LOGGER.isLoggable(Level.WARNING)) {
+	                    LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+	                }
+	            }
+	        }
+	        
+	        if (channel != null) {
+	            try {
+	                channel.close();
+	            } catch (Throwable e) {
+	                if (LOGGER.isLoggable(Level.WARNING)) {
+	                    LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+	                }
+	            }
+	        }            
+	    }
+	}
 
 }

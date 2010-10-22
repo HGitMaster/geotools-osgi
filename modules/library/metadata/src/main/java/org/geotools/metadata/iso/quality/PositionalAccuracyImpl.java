@@ -30,7 +30,7 @@ import org.geotools.util.SimpleInternationalString;
 /**
  * Accuracy of the position of features.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/PositionalAccuracyImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/PositionalAccuracyImpl.java $
  * @version $Id: PositionalAccuracyImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

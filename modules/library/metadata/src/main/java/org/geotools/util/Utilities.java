@@ -27,6 +27,8 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.geotools.factory.Hints;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -61,8 +63,8 @@ import org.geotools.factory.Hints;
  * {@linkplain java.io.Serializable} classes can use {@code (int) serialVersionUID} for example.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/Utilities.java $
- * @version $Id: Utilities.java 34082 2009-10-06 11:00:21Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/Utilities.java $
+ * @version $Id: Utilities.java 35332 2010-05-03 07:34:09Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  */
 public final class Utilities {
@@ -652,4 +654,19 @@ public final class Utilities {
         }
         return s;
     }
+    
+    /**
+     * Makes sure that an argument is non-null.
+     * 
+     * @param name Argument name.
+     * @param object User argument.
+     * @throws NullPointerException if {@code object} is null.
+     */
+    public static void ensureNonNull(final String name, final Object object)
+            throws NullPointerException {
+        if (object == null) {
+            throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
+        }
+    }
+
 }

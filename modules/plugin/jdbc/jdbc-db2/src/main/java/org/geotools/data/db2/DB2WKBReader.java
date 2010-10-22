@@ -41,7 +41,7 @@ import com.vividsolutions.jts.io.WKBConstants;
  * @see WKBReader for JTS Java Doc
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-db2/src/main/java/org/geotools/data/db2/DB2WKBReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-db2/src/main/java/org/geotools/data/db2/DB2WKBReader.java $
  */
 
 
@@ -148,12 +148,25 @@ public class DB2WKBReader {
       if (DB2WKBConstants.zTypes.contains(geometryType)) {
           inputDimension=3;
           if (geometryType==DB2WKBConstants.wkbPointZ) geometryType=DB2WKBConstants.wkbPoint2D;
+          if (geometryType==DB2WKBConstants.wkbOGCPointZ) geometryType=DB2WKBConstants.wkbPoint2D;
+          
           if (geometryType==DB2WKBConstants.wkbLineStringZ) geometryType=DB2WKBConstants.wkbLineString2D;
+          if (geometryType==DB2WKBConstants.wkbOGCLineStringZ) geometryType=DB2WKBConstants.wkbLineString2D;
+          
           if (geometryType==DB2WKBConstants.wkbPolygonZ) geometryType=DB2WKBConstants.wkbPolygon2D;
+          if (geometryType==DB2WKBConstants.wkbOGCPolygonZ) geometryType=DB2WKBConstants.wkbPolygon2D;
+          
           if (geometryType==DB2WKBConstants.wkbMultiPointZ) geometryType=DB2WKBConstants.wkbMultiPoint2D;
+          if (geometryType==DB2WKBConstants.wkbOGCMultiPointZ) geometryType=DB2WKBConstants.wkbMultiPoint2D;
+          
           if (geometryType==DB2WKBConstants.wkbMultiLineStringZ) geometryType=DB2WKBConstants.wkbMultiLineString2D;
+          if (geometryType==DB2WKBConstants.wkbOGCMultiLineStringZ) geometryType=DB2WKBConstants.wkbMultiLineString2D;
+          
           if (geometryType==DB2WKBConstants.wkbMultiPolygonZ) geometryType=DB2WKBConstants.wkbMultiPolygon2D;
+          if (geometryType==DB2WKBConstants.wkbOGCMultiPolygonZ) geometryType=DB2WKBConstants.wkbMultiPolygon2D;
+          
           if (geometryType==DB2WKBConstants.wkbGeomCollectionZ) geometryType=DB2WKBConstants.wkbGeomCollection2D;
+          if (geometryType==DB2WKBConstants.wkbOGCGeomCollectionZ) geometryType=DB2WKBConstants.wkbGeomCollection2D;
       }  
       
             

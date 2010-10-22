@@ -28,7 +28,7 @@ import org.opengis.geometry.coordinate.GeometryFactory;
  * @author Sanjay Jena
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/iso/coordinate/DirectPositionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/test/java/org/geotools/geometry/iso/coordinate/DirectPositionTest.java $
  */
 public class DirectPositionTest extends TestCase {
 	GeometryFactory gf2D;

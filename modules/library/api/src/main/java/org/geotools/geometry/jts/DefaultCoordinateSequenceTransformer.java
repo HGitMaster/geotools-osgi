@@ -38,7 +38,7 @@ import org.opengis.referencing.operation.TransformException;
  * or target dimensions. This transformer is not thread-safe.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/geometry/jts/DefaultCoordinateSequenceTransformer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/geometry/jts/DefaultCoordinateSequenceTransformer.java $
  * @version $Id: DefaultCoordinateSequenceTransformer.java 33341 2009-06-22 17:18:58Z aaime $
  * @author Andrea Aime
  * @author Martin Desruisseaux

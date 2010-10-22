@@ -31,7 +31,7 @@ import org.opengis.filter.expression.Literal;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FallbackFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FallbackFunction.java $
  */
 public class FallbackFunction extends FunctionExpressionImpl {
 

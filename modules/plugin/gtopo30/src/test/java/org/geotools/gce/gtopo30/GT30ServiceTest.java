@@ -29,7 +29,7 @@ import org.geotools.coverage.grid.io.GridFormatFinder;
  *
  * @author Simone Giannecchini
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/gtopo30/src/test/java/org/geotools/gce/gtopo30/GT30ServiceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/gtopo30/src/test/java/org/geotools/gce/gtopo30/GT30ServiceTest.java $
  */
 public class GT30ServiceTest extends TestCase {
     public GT30ServiceTest() {

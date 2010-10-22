@@ -27,7 +27,7 @@ import org.geotools.util.DerivedMap;
  * key: if it doesn't exists, then the plain {@code name} key is used. In other words,
  * this map inherits the {@code "name"} property from the {@linkplain #base} map.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/crs/UnprefixedMap.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/crs/UnprefixedMap.java $
  * @version $Id: UnprefixedMap.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

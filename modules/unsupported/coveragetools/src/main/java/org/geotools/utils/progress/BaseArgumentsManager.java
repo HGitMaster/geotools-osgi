@@ -39,7 +39,7 @@ import org.apache.commons.cli2.util.HelpFormatter;
  * @author Simone Giannecchini, GeoSolutions.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/progress/BaseArgumentsManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/progress/BaseArgumentsManager.java $
  */
 public abstract class BaseArgumentsManager extends ProgressManager {
 	/**

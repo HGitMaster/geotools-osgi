@@ -28,7 +28,7 @@ import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
  * @since 2.3.x
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcgrid/src/main/java/org/geotools/gce/arcgrid/ArcGridWriteParams.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcgrid/src/main/java/org/geotools/gce/arcgrid/ArcGridWriteParams.java $
  */
 public class ArcGridWriteParams extends GeoToolsWriteParams {
 

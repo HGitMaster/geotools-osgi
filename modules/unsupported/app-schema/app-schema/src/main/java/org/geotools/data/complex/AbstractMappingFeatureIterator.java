@@ -57,8 +57,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * Base class for several MappingFeatureImplementation's. 
  * 
  * @author Russell Petty, GSV
- * @version $Id: AbstractMappingFeatureIterator.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AbstractMappingFeatureIterator.java $
+ * @version $Id: AbstractMappingFeatureIterator.java 35836 2010-07-05 07:49:35Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AbstractMappingFeatureIterator.java $
  */
 public abstract class AbstractMappingFeatureIterator implements IMappingFeatureIterator {
     /** The logger for the filter module. */
@@ -108,6 +108,11 @@ public abstract class AbstractMappingFeatureIterator implements IMappingFeatureI
 
     public AbstractMappingFeatureIterator(AppSchemaDataAccess store, FeatureTypeMapping mapping,
             Query query) throws IOException {
+        this(store, mapping, query, false);
+    }
+    
+    public AbstractMappingFeatureIterator(AppSchemaDataAccess store, FeatureTypeMapping mapping,
+            Query query, boolean isQueryUnrolled) throws IOException {
         this.store = store;
         this.attf = new AppSchemaFeatureFactoryImpl();
 
@@ -133,17 +138,18 @@ public abstract class AbstractMappingFeatureIterator implements IMappingFeatureI
         if (featureFidMapping == null || Expression.NIL.equals(featureFidMapping)) {
             FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
             featureFidMapping = ff.property("@id");
-        }
-
-        Query unrolledQuery = getUnrolledQuery(query);
-        initialiseSourceFeatures(mapping, unrolledQuery);
-
+        }        
+        this.maxFeatures = query.getMaxFeatures();
+                
+        if (!isQueryUnrolled) {
+            query = getUnrolledQuery(query);
+        }                
+        initialiseSourceFeatures(mapping, query);
         xpathAttributeBuilder = new XPath();
         xpathAttributeBuilder.setFeatureFactory(attf);
         namespaces = mapping.getNamespaces();
         namespaceAwareFilterFactory = new FilterFactoryImplNamespaceAware(namespaces);
         xpathAttributeBuilder.setFilterFactory(namespaceAwareFilterFactory);
-        this.maxFeatures = query.getMaxFeatures();
     }
 
     /**
@@ -182,11 +188,13 @@ public abstract class AbstractMappingFeatureIterator implements IMappingFeatureI
      * 
      * @see java.util.Iterator#next()
      */
-    public Feature next() {        
-        if (!hasNext()) {
-            throw new IllegalStateException("there are no more features in this iterator");
+    public Feature next() {      
+        if (!isHasNextCalled()) {
+            LOGGER.warning("hasNext not called before calling next() in the iterator!");
+            if (!hasNext()) {
+                return null;
+            }
         }
-        hasNextCalled = false;
         Feature next;
         try {
             next = computeNext();
@@ -222,8 +230,10 @@ public abstract class AbstractMappingFeatureIterator implements IMappingFeatureI
         if (!exists) {        
             LOGGER.finest("no more features, produced " + featureCounter);
             close();
-            hasNextCalled = true;
-        }  
+        }
+        
+        setHasNextCalled(true);
+        
         return exists;
     }
 
@@ -304,7 +314,7 @@ public abstract class AbstractMappingFeatureIterator implements IMappingFeatureI
 
     protected abstract void closeSourceFeatures();
 
-    protected abstract Iterator<?> getSourceFeatureIterator();
+    protected abstract Iterator<Feature> getSourceFeatureIterator();
 
     protected abstract void initialiseSourceFeatures(FeatureTypeMapping mapping, Query query)
             throws IOException;

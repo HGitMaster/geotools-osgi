@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
  *   <li>{@link MathTransformFactory#createFilterTransform}</li>
  * </ul>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/PassthroughTransformTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/PassthroughTransformTest.java $
  * @version $Id: PassthroughTransformTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

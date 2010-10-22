@@ -14,6 +14,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -26,6 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
+
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -48,6 +50,7 @@ import org.geotools.swing.JMapFrame;
 import org.geotools.swing.data.JFileDataStoreChooser;
 import org.geotools.swing.event.MapMouseEvent;
 import org.geotools.swing.tool.CursorTool;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -59,7 +62,7 @@ import org.opengis.filter.identity.FeatureId;
  * In this example we create a map tool to select a feature clicked
  * with the mouse. The selected feature will be painted yellow.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/SelectionLab.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/SelectionLab.java $
  */
 public class SelectionLab {
 
@@ -184,7 +187,7 @@ public class SelectionLab {
          */
         Point screenPos = ev.getPoint();
         Rectangle screenRect = new Rectangle(screenPos.x-2, screenPos.y-2, 5, 5);
-        
+
         /*
          * Transform the screen rectangle into bounding box in the coordinate
          * reference system of our map context. Note: we are using a naive method
@@ -200,7 +203,7 @@ public class SelectionLab {
          * Create a Filter to select features that intersect with
          * the bounding box
          */
-        Filter filter = ff.bbox(ff.property(geometryAttributeName), bbox);
+        Filter filter = ff.intersects(ff.property(geometryAttributeName), ff.literal(bbox));
 
         /*
          * Use the filter to identify the selected features

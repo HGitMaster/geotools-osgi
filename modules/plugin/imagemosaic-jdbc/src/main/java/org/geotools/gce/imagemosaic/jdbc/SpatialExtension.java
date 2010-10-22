@@ -24,7 +24,7 @@ package org.geotools.gce.imagemosaic.jdbc;
  */
 public enum SpatialExtension {
 	DB2("DB2"), ORACLE("ORACLE"), POSTGIS("POSTGIS"), MYSQL("MYSQL"), UNIVERSAL(
-			"UNIVERSAL");
+			"UNIVERSAL"), GEORASTER("GEORASTER"), CUSTOM("CUSTOM");
 	private SpatialExtension(String name) {
 		this.name = name;
 	}
@@ -63,6 +63,12 @@ public enum SpatialExtension {
 		if ("UNIVERSAL".equalsIgnoreCase(spatName)) {
 			return UNIVERSAL;
 		}
+                if ("GEORASTER".equalsIgnoreCase(spatName)) {
+                        return GEORASTER;
+                }
+                if ("CUSTOM".equalsIgnoreCase(spatName)) {
+                    return CUSTOM;
+                }
 
 		return null;
 	}

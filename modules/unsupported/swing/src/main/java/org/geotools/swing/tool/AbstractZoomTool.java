@@ -24,7 +24,7 @@ package org.geotools.swing.tool;
  * 
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/AbstractZoomTool.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/AbstractZoomTool.java $
  * @version $Id: AbstractZoomTool.java 34138 2009-10-13 06:35:19Z mbedward $
  */
 

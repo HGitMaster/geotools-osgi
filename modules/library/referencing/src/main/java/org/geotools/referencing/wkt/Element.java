@@ -43,7 +43,7 @@ import org.geotools.util.logging.LoggedFormat;
  * Elements can be pull in a <cite>first in, first out</cite> order.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Element.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Element.java $
  * @version $Id: Element.java 33399 2009-06-30 11:25:55Z aaime $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)

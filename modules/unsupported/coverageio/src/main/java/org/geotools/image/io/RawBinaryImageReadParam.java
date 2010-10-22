@@ -44,7 +44,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * to specify those missing informations.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/RawBinaryImageReadParam.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/RawBinaryImageReadParam.java $
  * @version $Id: RawBinaryImageReadParam.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

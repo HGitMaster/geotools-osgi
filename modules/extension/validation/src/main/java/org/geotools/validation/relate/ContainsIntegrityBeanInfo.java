@@ -23,7 +23,7 @@ import java.beans.PropertyDescriptor;
  *
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/ContainsIntegrityBeanInfo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/relate/ContainsIntegrityBeanInfo.java $
  */
 public class ContainsIntegrityBeanInfo extends RelationIntegrityBeanInfo {
 	/**

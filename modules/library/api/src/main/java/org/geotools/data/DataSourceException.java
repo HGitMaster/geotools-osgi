@@ -25,7 +25,7 @@ package org.geotools.data;
  * problems from external services, providing the root cause is
  * important.
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/DataSourceException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/DataSourceException.java $
  */
 public class DataSourceException extends java.io.IOException {
     private static final long serialVersionUID = -602847953059978370L;

@@ -24,7 +24,7 @@ import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
  * @author Christian Mueller
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-mysql/src/main/java/org/geotools/data/mysql/MySQLJNDIDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-mysql/src/main/java/org/geotools/data/mysql/MySQLJNDIDataStoreFactory.java $
  */
 public class MySQLJNDIDataStoreFactory extends JDBCJNDIDataStoreFactory {
 

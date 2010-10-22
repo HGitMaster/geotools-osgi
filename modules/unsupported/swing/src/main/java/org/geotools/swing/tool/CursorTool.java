@@ -28,7 +28,7 @@ import org.geotools.swing.event.MapMouseAdapter;
  * 
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/CursorTool.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/CursorTool.java $
  * @version $Id: CursorTool.java 34138 2009-10-13 06:35:19Z mbedward $
  */
 public abstract class CursorTool extends MapMouseAdapter {

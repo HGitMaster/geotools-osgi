@@ -34,7 +34,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Jackson Roehrig & Sanjay Jena
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/SurfaceBoundaryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/primitive/SurfaceBoundaryImpl.java $
  */
 public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 		SurfaceBoundary {

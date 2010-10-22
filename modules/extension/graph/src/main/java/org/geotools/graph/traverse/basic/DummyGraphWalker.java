@@ -28,7 +28,7 @@ import org.geotools.graph.traverse.GraphWalker;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/traverse/basic/DummyGraphWalker.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/traverse/basic/DummyGraphWalker.java $
  */
 public class DummyGraphWalker implements GraphWalker {
 

@@ -68,7 +68,7 @@ import static java.lang.Math.*;
  * @see <A HREF="http://srmwww.gov.bc.ca/gis/bceprojection.html">British Columbia Albers Standard Projection</A>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/AlbersEqualArea.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/AlbersEqualArea.java $
  * @version $Id: AlbersEqualArea.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Gerald I. Evenden (for original code in Proj4)
  * @author Rueben Schulz

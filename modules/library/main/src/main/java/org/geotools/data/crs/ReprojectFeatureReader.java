@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author jgarnett, Refractions Research, Inc.
  * @author aaime
  * @author $Author: jive $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/crs/ReprojectFeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/crs/ReprojectFeatureReader.java $
  * @version $Id: ReprojectFeatureReader.java 31406 2008-09-05 02:11:38Z jdeolive $
  */
 public class ReprojectFeatureReader implements DelegatingFeatureReader<SimpleFeatureType, SimpleFeature>{

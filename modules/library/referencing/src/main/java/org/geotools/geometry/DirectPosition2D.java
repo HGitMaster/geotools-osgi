@@ -62,7 +62,7 @@ import org.geotools.util.Utilities;
  * </blockquote>
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/geometry/DirectPosition2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/geometry/DirectPosition2D.java $
  * @version $Id: DirectPosition2D.java 30892 2008-07-04 15:17:36Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

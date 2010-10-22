@@ -21,7 +21,7 @@ import org.picocontainer.MutablePicoContainer;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/xml-po/src/main/java/org/geotools/po/bindings/POConfiguration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/xml-po/src/main/java/org/geotools/po/bindings/POConfiguration.java $
  */
 public class POConfiguration extends Configuration {
 

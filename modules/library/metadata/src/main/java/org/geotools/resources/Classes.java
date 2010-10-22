@@ -35,7 +35,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * A set of miscellaneous methods working on {@link Class} objects.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/Classes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/Classes.java $
  * @version $Id: Classes.java 30892 2008-07-04 15:17:36Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

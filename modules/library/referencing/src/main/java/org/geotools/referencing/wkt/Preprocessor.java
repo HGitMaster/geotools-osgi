@@ -57,7 +57,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * </blockquote>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Preprocessor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Preprocessor.java $
  * @version $Id: Preprocessor.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

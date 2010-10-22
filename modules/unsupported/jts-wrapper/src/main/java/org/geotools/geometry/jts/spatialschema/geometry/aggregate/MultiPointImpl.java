@@ -14,7 +14,7 @@ import org.opengis.geometry.aggregate.MultiPoint;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/aggregate/MultiPointImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/aggregate/MultiPointImpl.java $
  */
 public class MultiPointImpl extends AggregateImpl 
 	implements MultiPoint {

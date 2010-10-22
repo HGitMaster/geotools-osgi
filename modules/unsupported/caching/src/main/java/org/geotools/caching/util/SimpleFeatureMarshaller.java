@@ -54,7 +54,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/util/SimpleFeatureMarshaller.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/util/SimpleFeatureMarshaller.java $
  */
 public class SimpleFeatureMarshaller {
     /**

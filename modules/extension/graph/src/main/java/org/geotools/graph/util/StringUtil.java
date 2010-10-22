@@ -34,7 +34,7 @@ package org.geotools.graph.util;
 
 /**
  *  Various string utilities. 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/util/StringUtil.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/util/StringUtil.java $
  */
 public class StringUtil {
 	

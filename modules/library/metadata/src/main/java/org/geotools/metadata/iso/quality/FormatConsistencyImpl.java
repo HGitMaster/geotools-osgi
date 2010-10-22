@@ -27,7 +27,7 @@ import org.opengis.metadata.quality.FormatConsistency;
  * the dataset, as described by the scope.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/FormatConsistencyImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/FormatConsistencyImpl.java $
  * @version $Id: FormatConsistencyImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

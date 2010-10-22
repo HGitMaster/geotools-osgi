@@ -49,8 +49,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FIDFeatureReader.java $
- * @version $Id: FIDFeatureReader.java 30889 2008-07-04 15:16:12Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/FIDFeatureReader.java $
+ * @version $Id: FIDFeatureReader.java 35165 2010-04-05 10:01:06Z aaime $
  */
 public class FIDFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     /** The logger for the data module. */
@@ -60,6 +60,7 @@ public class FIDFeatureReader implements  FeatureReader<SimpleFeatureType, Simpl
     private final FIDReader fidReader;
     protected final Object[] attributes;
     private SimpleFeatureBuilder builder;
+    private Boolean hasNextFlag;
 
     /**
      * Creates a new instance of AbstractFeatureReader
@@ -92,7 +93,8 @@ public class FIDFeatureReader implements  FeatureReader<SimpleFeatureType, Simpl
 
     public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
-        if (attributeReader.hasNext()) {
+        if (hasNext()) {
+            hasNextFlag = null;
             attributeReader.next();
 
             return readFeature(attributeReader);
@@ -140,6 +142,9 @@ public class FIDFeatureReader implements  FeatureReader<SimpleFeatureType, Simpl
     }
 
     public boolean hasNext() throws IOException {
-        return attributeReader.hasNext();
+        if(hasNextFlag == null) {
+            hasNextFlag = Boolean.valueOf(attributeReader.hasNext());
+        }
+        return hasNextFlag;
     }
 }

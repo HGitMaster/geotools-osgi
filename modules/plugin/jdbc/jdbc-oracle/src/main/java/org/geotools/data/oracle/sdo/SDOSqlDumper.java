@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Converts a JTS geometry into the equivalent MDSYS.SDO_GEOMETRY SQL syntax. 
  * Useful for non prepared statement based dialects and for debugging purposes 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/SDOSqlDumper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/SDOSqlDumper.java $
  */
 public class SDOSqlDumper {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.oracle.sdo");

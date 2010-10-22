@@ -46,7 +46,7 @@ import org.geotools.geometry.jts.GeometryUtils;
  * {@linkplain AxisDirection#NORTH_EAST North-East} direction?).
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/DirectPosition2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/DirectPosition2D.java $
  * @version $Id: DirectPosition2D.java 34133 2009-10-12 08:14:05Z mbedward $
  * @author Martin Desruisseaux
  */

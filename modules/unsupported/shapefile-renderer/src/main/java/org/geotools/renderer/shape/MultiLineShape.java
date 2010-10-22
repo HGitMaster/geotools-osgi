@@ -27,7 +27,7 @@ import java.awt.geom.PathIterator;
  * @author jeichar
  *
  * @since 2.1.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/MultiLineShape.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/MultiLineShape.java $
  */
 public class MultiLineShape extends AbstractShape implements Shape {
     public MultiLineShape(SimpleGeometry geom) {

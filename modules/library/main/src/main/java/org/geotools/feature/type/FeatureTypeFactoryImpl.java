@@ -49,7 +49,7 @@ import org.opengis.util.InternationalString;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/FeatureTypeFactoryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/type/FeatureTypeFactoryImpl.java $
  */
 public class FeatureTypeFactoryImpl implements FeatureTypeFactory {
 	/** Used for spatial content */

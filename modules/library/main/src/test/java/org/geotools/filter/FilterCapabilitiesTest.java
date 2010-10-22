@@ -27,7 +27,7 @@ import junit.framework.TestSuite;
  * Unit test for FilterCapabilities.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/FilterCapabilitiesTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/FilterCapabilitiesTest.java $
  */
 public class FilterCapabilitiesTest extends TestCase {
     /** Standard logging instance */

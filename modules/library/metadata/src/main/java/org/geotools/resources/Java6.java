@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
  * The Java 6 methods that we would like to use are commented-out at the begining
  * of each method.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/Java6.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/Java6.java $
  * @version $Id: Java6.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

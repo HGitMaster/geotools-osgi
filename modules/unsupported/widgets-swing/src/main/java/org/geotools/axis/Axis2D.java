@@ -70,7 +70,7 @@ import org.geotools.referencing.operation.matrix.XAffineTransform;
  * pair of {@code Axis2D} objects, which doesn't need to be perpendicular.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/Axis2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/Axis2D.java $
  * @version $Id: Axis2D.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (PMO, IRD)
  *

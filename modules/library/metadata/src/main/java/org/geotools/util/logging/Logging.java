@@ -46,7 +46,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </code></blockquote>
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/logging/Logging.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/logging/Logging.java $
  * @version $Id: Logging.java 34824 2010-01-21 16:02:21Z aaime $
  * @author Martin Desruisseaux
  */

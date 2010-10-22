@@ -58,7 +58,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author jgarnett, Refractions Research, Inc.
  * @author aaime
  * @author $Author: jive $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/crs/ForceCoordinateSystemIterator.java $
  * @version $Id: ForceCoordinateSystemIterator.java 32123 2008-12-30 16:53:44Z aaime $
  */
 public class ForceCoordinateSystemIterator implements Iterator<SimpleFeature> {

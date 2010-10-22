@@ -26,7 +26,7 @@ import org.geotools.ows.OWS;
  * 
  * @author Justin Deoliveira, OpenGEO
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/v1_1/WFS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/v1_1/WFS.java $
  */
 public final class WFS extends org.geotools.wfs.WFS {
 

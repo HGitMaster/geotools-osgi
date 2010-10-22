@@ -41,7 +41,7 @@ import org.geotools.ows.ServiceException;
 /**
  * @author Richard Gould
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/WMS1_1_0.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/WMS1_1_0.java $
  */
 public class WMS1_1_0 extends WMS1_0_0 {
 

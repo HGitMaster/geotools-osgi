@@ -44,7 +44,7 @@ import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
 /**
  * Tests if the CRS utility class is functioning correctly when using HSQL datastore.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/CRSTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/CRSTest.java $
  * @version $Id: CRSTest.java 34717 2009-12-21 17:58:58Z aaime $
  * @author Jody Garnett
  * @author Martin Desruisseaux

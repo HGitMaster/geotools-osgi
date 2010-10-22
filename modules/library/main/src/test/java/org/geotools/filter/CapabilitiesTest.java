@@ -30,7 +30,7 @@ import org.opengis.filter.spatial.Beyond;
  * Unit test for FilterCapabilities.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/CapabilitiesTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/CapabilitiesTest.java $
  */
 public class CapabilitiesTest extends TestCase {
     public void testCapablities(){

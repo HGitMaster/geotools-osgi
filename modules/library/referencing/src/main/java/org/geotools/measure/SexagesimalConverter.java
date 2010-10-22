@@ -31,7 +31,7 @@ import javax.measure.converter.ConversionException;
  * Unfortunatly, this pseudo-unit is extensively used in the EPSG database.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/measure/SexagesimalConverter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/measure/SexagesimalConverter.java $
  * @version $Id: SexagesimalConverter.java 30776 2008-06-20 17:00:11Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

@@ -48,7 +48,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see JSpinner
  * @see SpinnerNumberModel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/referencing/SpinnerAngleModel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/referencing/SpinnerAngleModel.java $
  * @version $Id: SpinnerAngleModel.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Adapted from Hans Muller
  * @author Martin Desruisseaux (IRD)

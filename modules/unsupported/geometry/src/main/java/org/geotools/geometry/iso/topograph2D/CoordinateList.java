@@ -26,7 +26,7 @@ import java.util.Iterator;
  * A list of {@link Coordinate}s, which may be set to prevent repeated
  * coordinates from occuring in the list.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/CoordinateList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/CoordinateList.java $
  */
 public class CoordinateList extends ArrayList {
 	

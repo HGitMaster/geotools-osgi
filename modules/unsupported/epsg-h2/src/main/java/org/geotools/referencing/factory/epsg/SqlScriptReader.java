@@ -25,7 +25,7 @@ import java.io.Reader;
  * statements (works with EPSG distributed scripts)
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-h2/src/main/java/org/geotools/referencing/factory/epsg/SqlScriptReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-h2/src/main/java/org/geotools/referencing/factory/epsg/SqlScriptReader.java $
  */
 public class SqlScriptReader {
     boolean fetched = true;

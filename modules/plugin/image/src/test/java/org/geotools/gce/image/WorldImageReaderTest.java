@@ -48,7 +48,7 @@ import org.opengis.parameter.ParameterValue;
  * @author Simone Giannecchini
  * @author Alessio Fabiani
  * @author rgould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/image/src/test/java/org/geotools/gce/image/WorldImageReaderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/image/src/test/java/org/geotools/gce/image/WorldImageReaderTest.java $
  */
 public class WorldImageReaderTest extends WorldImageBaseTestCase {
 

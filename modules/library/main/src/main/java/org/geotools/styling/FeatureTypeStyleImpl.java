@@ -42,8 +42,8 @@ import org.opengis.util.Cloneable;
  *
  * @author James Macgill
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/FeatureTypeStyleImpl.java $
- * @version $Id: FeatureTypeStyleImpl.java 33833 2009-09-04 12:26:28Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/FeatureTypeStyleImpl.java $
+ * @version $Id: FeatureTypeStyleImpl.java 35198 2010-04-09 12:56:20Z aaime $
  */
 public class FeatureTypeStyleImpl implements org.geotools.styling.FeatureTypeStyle, Cloneable {
     
@@ -65,7 +65,6 @@ public class FeatureTypeStyleImpl implements org.geotools.styling.FeatureTypeSty
      */
     protected FeatureTypeStyleImpl(Rule[] rules) {
         this(Arrays.asList(rules));
-        featureTypeNames.add(new NameImpl("Feature"));
     }
 
     protected FeatureTypeStyleImpl(List<Rule> arules) {

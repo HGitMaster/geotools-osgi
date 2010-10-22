@@ -74,8 +74,8 @@ import org.geotools.resources.image.ImageUtilities;
  * is left in an undetermined state and should not be used anymore.
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
- * @version $Id: ImageWorker.java 34937 2010-02-22 12:30:31Z danieleromagnoli $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/image/ImageWorker.java $
+ * @version $Id: ImageWorker.java 35406 2010-05-07 12:35:13Z simonegiannecchini $
  * @author Simone Giannecchini
  * @author Bryce Nordgren
  * @author Martin Desruisseaux
@@ -884,8 +884,8 @@ public class ImageWorker {
      * {@linkplain #image} already uses a suitable color model, then this method
      * do nothing.
      *
-     * @param transparent
-     *            A pixel value to define as the transparent pixel. *
+     * @param suggestedTransparent
+     *            A suggested pixel index to define as the transparent pixel. *
      * @param errorDiffusion
      *            Tells if I should use {@link ErrorDiffusionDescriptor} or
      *            {@link OrderedDitherDescriptor} JAi operations. errorDiffusion
@@ -896,7 +896,7 @@ public class ImageWorker {
      * @see #forceIndexColorModel
      * @see #forceIndexColorModelForGIF
      */
-    public final ImageWorker forceBitmaskIndexColorModel(int transparent, final boolean errorDiffusion) {
+    public final ImageWorker forceBitmaskIndexColorModel(int suggestedTransparent, final boolean errorDiffusion) {
         final ColorModel cm = image.getColorModel();
         if (cm instanceof IndexColorModel) {
             final IndexColorModel oldCM = (IndexColorModel) cm;
@@ -906,7 +906,7 @@ public class ImageWorker {
                     return this;
                 }
                 case Transparency.BITMASK: {
-                    if (oldCM.getTransparentPixel() == transparent) {
+                    if (oldCM.getTransparentPixel() == suggestedTransparent) {
                         // Suitable color model. There is nothing to do.
                         return this;
                     }
@@ -916,6 +916,9 @@ public class ImageWorker {
                     break;
                 }
             }
+            
+            // check if we already have a pixel fully transparent
+            final int transparentPixel = ColorUtilities.getTransparentPixel(oldCM);
             /*
              * The index color model need to be replaced. Creates a lookup table
              * mapping from the old pixel values to new pixels values, with
@@ -923,25 +926,28 @@ public class ImageWorker {
              * lookup table uses TYPE_BYTE or TYPE_USHORT, which are the two
              * only types supported by IndexColorModel.
              */
-            final int pixelSize = oldCM.getPixelSize();
-            transparent &= (1 << pixelSize) - 1;
             final int mapSize = oldCM.getMapSize();
-            final int newSize = Math.max(mapSize, transparent + 1);
+            if(transparentPixel<0)
+            	suggestedTransparent=suggestedTransparent<=mapSize?mapSize+1:suggestedTransparent;
+            else
+            	suggestedTransparent=transparentPixel;
+            final int newSize = Math.max(mapSize, suggestedTransparent);
+            final int newPixelSize=ColorUtilities.getBitCount(newSize);
+            if(newPixelSize>16)
+            	throw new IllegalArgumentException("Unable to create index color model with more than 65536 elements");
             final LookupTableJAI lookupTable;
-            if (newSize <= 0xFF) {
+            if (newPixelSize <= 8) {
                 final byte[] table = new byte[mapSize];
                 for (int i=0; i<mapSize; i++) {
-                    table[i] = (byte) ((oldCM.getAlpha(i) == 0) ? transparent : i);
+                    table[i] = (byte) ((oldCM.getAlpha(i) == 0) ? suggestedTransparent : i);
                 }
                 lookupTable = new LookupTableJAI(table);
-            } else if (newSize <= 0xFFFF) {
+            } else {
                 final short[] table = new short[mapSize];
                 for (int i=0; i<mapSize; i++) {
-                    table[i] = (short) ((oldCM.getAlpha(i) == 0) ? transparent : i);
+                    table[i] = (short) ((oldCM.getAlpha(i) == 0) ? suggestedTransparent : i);
                 }
                 lookupTable = new LookupTableJAI(table, true);
-            } else {
-                throw new AssertionError(mapSize); // Should never happen.
             }
             /*
              * Now we need to perform the look up transformation. First of all
@@ -953,16 +959,16 @@ public class ImageWorker {
             oldCM.getReds  (rgb[0]);
             oldCM.getGreens(rgb[1]);
             oldCM.getBlues (rgb[2]);
-            final IndexColorModel newCM = new IndexColorModel(pixelSize,
-                    newSize, rgb[0], rgb[1], rgb[2], transparent);
+            final IndexColorModel newCM = new IndexColorModel(newPixelSize,newSize, rgb[0], rgb[1], rgb[2], suggestedTransparent);
             final RenderingHints hints = getRenderingHints();
             final ImageLayout layout = getImageLayout(hints);
             layout.setColorModel(newCM);
             hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
-            hints.put(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
             image = LookupDescriptor.create(image, lookupTable, hints);
+            
+            //workaround bug in Lookup since it looks like it is switching 255 and 254
+            image=FormatDescriptor.create(image, image.getSampleModel().getDataType(), hints);
         } else {
-        	
         	// force component color model first
         	forceComponentColorModel(true);
 			/*
@@ -986,7 +992,7 @@ public class ImageWorker {
                  * channel to build a new color model. The method call below implies
                  * 'forceColorSpaceRGB()' and 'forceIndexColorModel()' method calls.
                  */
-                addTransparencyToIndexColorModel(alphaChannel, false, transparent, errorDiffusion);
+                addTransparencyToIndexColorModel(alphaChannel, false, suggestedTransparent, errorDiffusion);
             }
             else
                 forceIndexColorModel(errorDiffusion);
@@ -1030,12 +1036,10 @@ public class ImageWorker {
          * color model. We might also need to reformat the image in order to get
          * it to 8 bits samples.
          */
-        tileCacheEnabled(false);
         if (image.getColorModel() instanceof PackedColorModel) {
             forceComponentColorModel();
         }
         rescaleToBytes();
-        tileCacheEnabled(true);
         /*
          * Getting the alpha channel and separating from the others bands. If
          * the initial image had no alpha channel (more specifically, if it is
@@ -2224,16 +2228,15 @@ public class ImageWorker {
             throws IOException
     {
         // Reformatting this image for PNG.
-        tileCacheEnabled(false);
         if (!paletted) {
             forceComponentColorModel();
-        } else {
-            forceIndexColorModelForGIF(true);
         }
-        LOGGER.finer("Encoded input image for png writer");
+        if(LOGGER.isLoggable(Level.FINER))
+			LOGGER.finer("Encoded input image for png writer");
 
         // Getting a writer.
-        LOGGER.finer("Getting a writer");
+        if(LOGGER.isLoggable(Level.FINER))
+			LOGGER.finer("Getting a writer");
         final Iterator<ImageWriter> it = ImageIO.getImageWritersByFormatName("PNG");
         if (!it.hasNext()) {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_WRITER));
@@ -2241,7 +2244,8 @@ public class ImageWorker {
         ImageWriter writer = it.next();
 
         // Getting a stream.
-        LOGGER.finer("Setting write parameters for this writer");
+        if(LOGGER.isLoggable(Level.FINER))
+			LOGGER.finer("Setting write parameters for this writer");
         ImageWriteParam iwp = null;
         final ImageOutputStream memOutStream = ImageIO.createImageOutputStream(destination);
         if(memOutStream==null)
@@ -2250,7 +2254,8 @@ public class ImageWorker {
                 "com.sun.media.imageioimpl.plugins.png.CLibPNGImageWriter"))
         {
             // Compressing with native.
-            LOGGER.finer("Writer is native");
+        	if(LOGGER.isLoggable(Level.FINER))
+    			LOGGER.finer("Writer is native");
             iwp = writer.getDefaultWriteParam();
             // Define compression mode
             iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
@@ -2268,17 +2273,18 @@ public class ImageWorker {
             {
                 writer = it.next();
             }
-            LOGGER.finer("Writer is NOT native");
+            if(LOGGER.isLoggable(Level.FINER))
+    			LOGGER.finer("Writer is NOT native");
             // Instantiating PNGImageWriteParam
             iwp = new PNGImageWriteParam();
             // Define compression mode
             iwp.setCompressionMode(ImageWriteParam.MODE_DEFAULT);
         }
-        LOGGER.finer("About to write png image");
+        if(LOGGER.isLoggable(Level.FINER))
+			LOGGER.finer("About to write png image");
         try{
 	        writer.setOutput(memOutStream);
 	        writer.write(null, new IIOImage(image, null, null), iwp);
-	        tileCacheEnabled(true);
         }
         finally{
         	try{
@@ -2327,9 +2333,7 @@ public class ImageWorker {
                                       final float  compressionRate)
             throws IOException
     {
-        tileCacheEnabled(false);
         forceIndexColorModelForGIF(true);
-        tileCacheEnabled(true);
         final IIORegistry registry = IIORegistry.getDefaultInstance();
         Iterator<ImageWriterSpi> it = registry.getServiceProviders(ImageWriterSpi.class, true);
         ImageWriterSpi spi = null;
@@ -2444,8 +2448,7 @@ public class ImageWorker {
         // Compression is available on both lib
         final ImageWriteParam iwp = writer.getDefaultWriteParam();
         final ImageOutputStream outStream = ImageIO.createImageOutputStream(destination);
-        final ImageOutputStream stream = ImageIO.createImageOutputStream(destination);
-        if(stream==null)
+        if(outStream==null)
         	throw new IIOException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1,"stream"));
          
         iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
@@ -2509,7 +2512,6 @@ public class ImageWorker {
        
 
     }
-
 
     /**
      * Writes the {@linkplain #image} to the specified output, trying all

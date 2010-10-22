@@ -31,7 +31,7 @@ import org.geotools.geometry.iso.topograph2D.Coordinate;
  *  envelope computation, and many other functions.
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/util/CoordinateFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/util/CoordinateFilter.java $
  *@version 1.7.2
  */
 public interface CoordinateFilter {

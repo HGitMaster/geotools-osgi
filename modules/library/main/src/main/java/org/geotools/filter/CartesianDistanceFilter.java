@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * <p></p>
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/CartesianDistanceFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/CartesianDistanceFilter.java $
  * @version $Id: CartesianDistanceFilter.java 31681 2008-10-18 19:02:26Z aaime $
  *
  * @task REVISIT: add units for distance.

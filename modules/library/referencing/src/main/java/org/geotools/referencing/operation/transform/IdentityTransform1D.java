@@ -22,7 +22,7 @@ package org.geotools.referencing.operation.transform;
  * This class is really a special case of {@link LinearTransform1D} optimized for speed.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/IdentityTransform1D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/IdentityTransform1D.java $
  * @version $Id: IdentityTransform1D.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

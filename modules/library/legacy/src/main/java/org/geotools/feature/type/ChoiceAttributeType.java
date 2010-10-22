@@ -49,7 +49,7 @@ import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
  *
  * @author dzwiers
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/type/ChoiceAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/type/ChoiceAttributeType.java $
  * 
  * @deprecated Will be removed in geotools 2.6.
  */

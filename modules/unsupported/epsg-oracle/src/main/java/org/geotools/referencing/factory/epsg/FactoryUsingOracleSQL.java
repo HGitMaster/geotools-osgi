@@ -30,7 +30,7 @@ import org.geotools.factory.Hints;
  * An EPSG factory suitable for Oracle SQL syntax.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingOracleSQL.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-oracle/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingOracleSQL.java $
  * @version $Id: FactoryUsingOracleSQL.java 30691 2008-06-13 13:20:02Z acuster $
  * @author John Grange
  *

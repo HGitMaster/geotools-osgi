@@ -124,6 +124,7 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 		}
 		ImageReader reader = null;
 		ImageInputStream inputStream = null;
+		boolean closeMe=false;
 		try {
 			if (o instanceof URL) {
 				// /////////////////////////////////////////////////////////////
@@ -136,21 +137,15 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 				//
 				// /////////////////////////////////////////////////////////////
 				final URL url = (URL) o;
-				if (url.getProtocol().equalsIgnoreCase("file"))
-					o = DataUtilities.urlToFile(url);
-				else {
-					if (url.getProtocol().equalsIgnoreCase("http")
-							|| url.getProtocol().equalsIgnoreCase("ftp")) {
-						o = ((URL) o).openStream();
-
-					} else
-						return false;
-				}
+				o = DataUtilities.urlToFile(url);
+				
 
 			}
+			else
+				if(o instanceof ImageInputStream)
+					closeMe=false;
 			// get a stream
-			inputStream = (ImageInputStream) ((o instanceof ImageInputStream) ? o
-					: ImageIO.createImageInputStream(o));
+			inputStream = (ImageInputStream) ((o instanceof ImageInputStream) ? o: ImageIO.createImageInputStream(o));
 			if (inputStream == null) {
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("Unable to get an ImageInputStream");
@@ -158,10 +153,12 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 			}
 
 			// get a reader
-			inputStream.mark();
 			if (!spi.canDecodeInput(inputStream))
 				return false;
 			reader = spi.createReaderInstance();
+			
+
+			inputStream.mark();
 			reader.setInput(inputStream);
 			final IIOMetadata metadata = reader.getImageMetadata(0);
 			if(metadata==null)
@@ -195,10 +192,10 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 					
 				}
 			}
-			if (inputStream != null) {
+			if (closeMe && inputStream != null) {
 				try{
 					inputStream.close();
-				}catch (Exception e) {
+				}catch (Throwable t) {
 					
 				}
 			}

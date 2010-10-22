@@ -47,7 +47,7 @@ import org.geotools.geometry.iso.topograph2D.Envelope;
  * usage of Samet and others.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/Quadtree.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/Quadtree.java $
  */
 public class Quadtree implements SpatialIndex {
 	/**

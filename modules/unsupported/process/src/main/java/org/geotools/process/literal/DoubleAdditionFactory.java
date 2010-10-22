@@ -54,7 +54,7 @@ public class DoubleAdditionFactory extends SingleProcessFactory
     }
 	
 	public DoubleAdditionFactory() {
-	    super(new NameImpl(GT_NAMESPACE, "DoubleAddition"));
+	    super(new NameImpl("gt", "DoubleAddition"));
 	}
 
 	public Process create(Map<String, Object> parameters) throws IllegalArgumentException

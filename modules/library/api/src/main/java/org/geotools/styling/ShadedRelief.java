@@ -46,7 +46,7 @@ import org.opengis.filter.expression.Expression;
  * results for Earth-based DEMs. The default value is system-dependent.
  *
  * @author iant
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/ShadedRelief.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/ShadedRelief.java $
  */
 public interface ShadedRelief extends org.opengis.style.ShadedRelief{
     

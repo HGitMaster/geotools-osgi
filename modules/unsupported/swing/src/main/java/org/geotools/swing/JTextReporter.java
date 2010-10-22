@@ -51,7 +51,7 @@ import net.miginfocom.swing.MigLayout;
  * @author Michael Bedward
  * @since 2.6
  * @source $Id: JTextReporter.java 34263 2009-10-27 10:45:47Z mbedward $
- * @version $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/JTextReporter.java $
+ * @version $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/JTextReporter.java $
  */
 public class JTextReporter extends JDialog {
 

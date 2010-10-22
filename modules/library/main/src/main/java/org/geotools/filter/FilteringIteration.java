@@ -29,7 +29,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * DOCUMENT ME!
  *
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilteringIteration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FilteringIteration.java $
  */
 public class FilteringIteration extends FeatureCollectionIteration {
     /**

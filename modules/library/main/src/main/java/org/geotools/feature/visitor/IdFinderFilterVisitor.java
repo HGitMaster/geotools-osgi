@@ -27,7 +27,7 @@ import org.opengis.filter.Id;
  * <p>
  * Example:<code>found = (Boolean) filter.accept( new IdFinderFilter(), null )</code>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/IdFinderFilterVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/visitor/IdFinderFilterVisitor.java $
  */
 public class IdFinderFilterVisitor extends AbstractFinderFilterVisitor {
 

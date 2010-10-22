@@ -14,9 +14,10 @@ package org.geotools.demo;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.Map;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -28,10 +29,11 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.postgis.PostgisDataStoreFactory;
+import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -58,23 +60,21 @@ import com.vividsolutions.jts.geom.Point;
  */
 @SuppressWarnings("serial")
 public class QueryLab extends JFrame {
-    DataStore datastore;
-    JComboBox types;
-    JTable table;
-    JTextField text;
+    private DataStore dataStore;
+    private JComboBox featureTypeCBox;
+    private JTable table;
+    private JTextField text;
 
-    public QueryLab(DataStore data) {
-        this.datastore = data;
-        // USER INTERFACE
+    public static void main(String[] args) throws Exception {
+        JFrame frame = new QueryLab();
+        frame.setVisible(true);
+    }
+    // docs end main
+
+    // docs start constructor
+    public QueryLab() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
-
-        try {
-            types = new JComboBox(datastore.getTypeNames());
-        } catch (IOException e1) {
-            JOptionPane.showMessageDialog(null, "Unable to find any published content");
-            System.exit(0);
-        }
 
         text = new JTextField(80);
         text.setText("include"); // include selects everything!
@@ -91,89 +91,112 @@ public class QueryLab extends JFrame {
         JMenuBar menubar = new JMenuBar();
         setJMenuBar(menubar);
 
-        menubar.add(types);
-        JMenu menu = new JMenu("Data");
-        menubar.add(menu);
+        JMenu fileMenu = new JMenu("File");
+        menubar.add(fileMenu);
+
+        featureTypeCBox = new JComboBox();
+        menubar.add(featureTypeCBox);
+
+        JMenu dataMenu = new JMenu("Data");
+        menubar.add(dataMenu);
         pack();
-        // ACTIONS
-        // begin filter
-        // ACTIONS
-        menu.add(new SafeAction("Get features") {
+
+        // docs start file menu
+        fileMenu.add(new SafeAction("Open shapefile...") {
+            public void action(ActionEvent e) throws Throwable {
+                connect(new ShapefileDataStoreFactory());
+            }
+        });
+
+        fileMenu.add(new SafeAction("Connect to PostGIS database...") {
+            public void action(ActionEvent e) throws Throwable {
+                connect(new PostgisNGDataStoreFactory());
+            }
+        });
+        
+        fileMenu.add(new SafeAction("Connect to DataStore...") {
+            public void action(ActionEvent e) throws Throwable {
+                connect(null);
+            }
+        });
+
+        fileMenu.addSeparator();
+
+        fileMenu.add(new SafeAction("Exit") {
+            public void action(ActionEvent e) throws Throwable {
+                System.exit(0);
+            }
+        });
+        // docs end file menu
+
+        // docs start data menu
+        dataMenu.add(new SafeAction("Get features") {
             public void action(ActionEvent e) throws Throwable {
                 filterFeatures();
             }
         });
-        // end filter
-        // begin count
-        menu.add(new SafeAction("Count") {
+
+        dataMenu.add(new SafeAction("Count") {
             public void action(ActionEvent e) throws Throwable {
                 countFeatures();
             }
         });
-        // end count
-        // begin center
-        menu.add(new SafeAction("Center") {
+
+        dataMenu.add(new SafeAction("Center") {
             public void action(ActionEvent e) throws Throwable {
                 centerFeatures();
             }
 
         });
-        // end center
-        // begin query
-        menu.add(new SafeAction("Geometry") {
+
+        dataMenu.add(new SafeAction("Geometry") {
             public void action(ActionEvent e) throws Throwable {
                 queryFeatures();
             }
         });
-        // end query
-
     }
+    // docs end constructor
 
-    // docs start main
-    public static void main(String[] args) throws Exception {
-        /*
-         * We use a GeoTools wizard to prompt the user for an input shapefile.
-         * 
-         * To modify this example to work with a PostGIS database instead just replace 'new
-         * ShapefileDataStoreFactory()' in the line below with 'new PostgisDataStoreFactory()'
-         */
-        JDataStoreWizard wizard = new JDataStoreWizard(new ShapefileDataStoreFactory());
-        //JDataStoreWizard wizard = new JDataStoreWizard(new PostgisDataStoreFactory());
+    // docs start connect
+    private void connect(DataStoreFactorySpi format) throws Exception {
+        JDataStoreWizard wizard = new JDataStoreWizard(format);
         int result = wizard.showModalDialog();
-        if (result != JWizard.FINISH) {
-            System.exit(0);
+        if (result == JWizard.FINISH) {
+            Map<String, Object> connectionParameters = wizard.getConnectionParameters();
+            dataStore = DataStoreFinder.getDataStore(connectionParameters);
+            if (dataStore == null) {
+                JOptionPane.showMessageDialog(null, "Could not connect - check parameters");
+            }
+            updateUI();            
         }
-
-        Map<String, Object> connectionParameters = wizard.getConnectionParameters();
-        DataStore dataStore = DataStoreFinder.getDataStore(connectionParameters);
-        if (dataStore == null) {
-            JOptionPane.showMessageDialog(null, "Could not connect - check parameters");
-            System.exit(0);
-        }
-
-        JFrame frame = new QueryLab(dataStore);
-        frame.setVisible(true);
     }
-    // docs end main
-    
+
+    private void updateUI() throws Exception {
+        ComboBoxModel cbm = new DefaultComboBoxModel(dataStore.getTypeNames());
+        featureTypeCBox.setModel(cbm);
+
+        table.setModel(new DefaultTableModel(5, 5));
+    }
+    // docs end connect
+
     @SuppressWarnings("unchecked")
-    // begin filterFeatures
-    public void filterFeatures() throws Exception {
-        String typeName = (String) types.getSelectedItem();
-        FeatureSource source = datastore.getFeatureSource(typeName);
+    // docs start filterFeatures
+    private void filterFeatures() throws Exception {
+        String typeName = (String) featureTypeCBox.getSelectedItem();
+        FeatureSource source = dataStore.getFeatureSource(typeName);
 
         Filter filter = CQL.toFilter(text.getText());
         FeatureCollection features = source.getFeatures(filter);
         FeatureCollectionTableModel model = new FeatureCollectionTableModel(features);
         table.setModel(model);
     }
-    // end filterFeatures
+    // docs end filterFeatures
 
     @SuppressWarnings("unchecked")
-    // begin countFeatures
-    public void countFeatures() throws Exception {
-        String typeName = (String) types.getSelectedItem();
-        FeatureSource source = datastore.getFeatureSource(typeName);
+    // docs start countFeatures
+    private void countFeatures() throws Exception {
+        String typeName = (String) featureTypeCBox.getSelectedItem();
+        FeatureSource source = dataStore.getFeatureSource(typeName);
 
         Filter filter = CQL.toFilter(text.getText());
         FeatureCollection features = source.getFeatures(filter);
@@ -181,14 +204,13 @@ public class QueryLab extends JFrame {
         int count = features.size();
         JOptionPane.showMessageDialog(text, "Number of selected features:" + count);
     }
-
-    // end countFeatures
+    // docs end countFeatures
 
     @SuppressWarnings("unchecked")
-    // begin centerFeatures
+    // docs start centerFeatures
     private void centerFeatures() throws Exception {
-        String typeName = (String) types.getSelectedItem();
-        FeatureSource source = datastore.getFeatureSource(typeName);
+        String typeName = (String) featureTypeCBox.getSelectedItem();
+        FeatureSource source = dataStore.getFeatureSource(typeName);
 
         Filter filter = CQL.toFilter(text.getText());
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = source.getFeatures(filter);
@@ -215,14 +237,13 @@ public class QueryLab extends JFrame {
 
         JOptionPane.showMessageDialog(text, "Center of selected features:" + center);
     }
-
-    // end centerFeatures
+    // docs end centerFeatures
 
     @SuppressWarnings("unchecked")
-    // begin queryFeatures
-    public void queryFeatures() throws Exception {
-        String typeName = (String) types.getSelectedItem();
-        FeatureSource source = datastore.getFeatureSource(typeName);
+    // docs start queryFeatures
+    private void queryFeatures() throws Exception {
+        String typeName = (String) featureTypeCBox.getSelectedItem();
+        FeatureSource source = dataStore.getFeatureSource(typeName);
 
         FeatureType schema = source.getSchema();
         String name = schema.getGeometryDescriptor().getLocalName();
@@ -237,6 +258,7 @@ public class QueryLab extends JFrame {
         FeatureCollectionTableModel model = new FeatureCollectionTableModel(features);
         table.setModel(model);
     }
-    // end queryFeatures
+
+    // docs end queryFeatures
 }
 // docs end source

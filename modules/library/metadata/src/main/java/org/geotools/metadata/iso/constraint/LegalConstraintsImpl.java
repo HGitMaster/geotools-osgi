@@ -28,7 +28,7 @@ import org.opengis.util.InternationalString;
 /**
  * Restrictions and legal prerequisites for accessing and using the resource.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/constraint/LegalConstraintsImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/constraint/LegalConstraintsImpl.java $
  * @version $Id: LegalConstraintsImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

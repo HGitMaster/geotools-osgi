@@ -21,7 +21,7 @@ package org.geotools.data.vpf.ifc;
  * Created on 20. april 2004, 15:04
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/VPFCoverageIfc.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/VPFCoverageIfc.java $
  */
 public interface VPFCoverageIfc {
     /**

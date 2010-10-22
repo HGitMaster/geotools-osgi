@@ -34,7 +34,7 @@ import org.opengis.filter.expression.Expression;
  * caching them
  *
  * @author jamesm
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/DynamicLineStyle2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/DynamicLineStyle2D.java $
  */
 public class DynamicLineStyle2D extends org.geotools.renderer.style.LineStyle2D {
     /** The feature that will be styled as a polygon */

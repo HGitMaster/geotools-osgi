@@ -26,7 +26,7 @@ import org.opengis.feature.type.FeatureTypeFactory;
 /**
  * This specifies the interface to create filters.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryFinder.java $
  * @version $Id: FilterFactoryFinder.java 31682 2008-10-19 13:23:25Z aaime $
  *
  * @task TODO: This needs to be massively overhauled.  This should be the

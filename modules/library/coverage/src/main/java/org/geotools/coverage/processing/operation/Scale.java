@@ -35,7 +35,7 @@ import org.geotools.image.jai.Registry;
  * This operation is simply a wrapper for the JAI scale operation which allows
  * me to arbitrarly scale and translate a rendered image.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Scale.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Scale.java $
  * @version $Id: Scale.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Simone Giannecchini
  * @since 2.3

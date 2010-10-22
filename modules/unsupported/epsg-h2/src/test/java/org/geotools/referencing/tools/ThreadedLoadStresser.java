@@ -11,7 +11,7 @@ import org.geotools.referencing.CRS;
  * Starts a certain number of parallel testers, each one randomly asking
  * for 1000 codes
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-h2/src/test/java/org/geotools/referencing/tools/ThreadedLoadStresser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-h2/src/test/java/org/geotools/referencing/tools/ThreadedLoadStresser.java $
  */
 public class ThreadedLoadStresser {
     private static final int THREADS = 100;

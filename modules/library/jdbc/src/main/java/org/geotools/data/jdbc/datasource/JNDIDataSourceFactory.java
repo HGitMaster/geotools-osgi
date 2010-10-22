@@ -30,7 +30,7 @@ import org.geotools.factory.GeoTools;
  * @author Administrator
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/JNDIDataSourceFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/JNDIDataSourceFactory.java $
  */
 public class JNDIDataSourceFactory extends AbstractDataSourceFactorySpi {
     

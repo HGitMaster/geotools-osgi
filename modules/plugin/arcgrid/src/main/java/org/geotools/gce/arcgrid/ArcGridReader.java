@@ -620,12 +620,9 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 		final int hrWidth = Integer.parseInt(attributes.getNamedItem("nColumns").getNodeValue());
 		final int hrHeight = Integer.parseInt(attributes.getNamedItem("nRows").getNodeValue());
 		originalGridRange = new GridEnvelope2D(new Rectangle(0, 0, hrWidth,hrHeight));
-		final boolean pixelIsArea = attributes.getNamedItem("rasterSpaceType")
-				.getNodeValue().equalsIgnoreCase(
-						AsciiGridsImageMetadata.rasterSpaceTypes[1]);
+		final boolean pixelIsArea = AsciiGridsImageMetadata.RasterSpaceType.valueOf(attributes.getNamedItem("rasterSpaceType").getNodeValue()).equals(AsciiGridsImageMetadata.RasterSpaceType.PixelIsArea);
 		if (!grass)
-			inNoData = Double.parseDouble(attributes
-					.getNamedItem("noDataValue").getNodeValue());
+			inNoData = Double.parseDouble(attributes.getNamedItem("noDataValue").getNodeValue());
 
 		// getting Envelope Properties
 		child = child.getNextSibling();

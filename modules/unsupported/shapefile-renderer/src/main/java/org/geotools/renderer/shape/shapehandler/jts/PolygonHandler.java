@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/shapehandler/jts/PolygonHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/shapehandler/jts/PolygonHandler.java $
  */
 public class PolygonHandler extends org.geotools.renderer.shape.shapehandler.simple.PolygonHandler{
     private static final LinearRing[] HOLES=new LinearRing[0];

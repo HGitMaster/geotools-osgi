@@ -43,14 +43,14 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
  * 
  * @author Andrea Aime - OpenGeo
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCSpatialFiltersTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCSpatialFiltersTest.java $
  */
 public abstract class JDBCSpatialFiltersTest extends JDBCTestSupport {
     
     TestData td;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
 
         if (td == null) {
             td = new TestData(((JDBCDataStoreAPITestSetup) setup).getInitialPrimaryKeyValue());

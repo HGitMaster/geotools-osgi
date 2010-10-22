@@ -76,7 +76,7 @@ import org.opengis.util.InternationalString;
  * @since 2.4
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Extrema.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Extrema.java $
  */
 public class Extrema extends AbstractStatisticsOperationJAI {
 

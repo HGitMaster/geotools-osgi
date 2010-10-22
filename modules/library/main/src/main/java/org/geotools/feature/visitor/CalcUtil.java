@@ -19,7 +19,7 @@ package org.geotools.feature.visitor;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/CalcUtil.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/visitor/CalcUtil.java $
  */
 public class CalcUtil {
 

@@ -61,7 +61,7 @@ import org.geotools.utils.progress.ProcessingEventListener;
  * @since 2.3.x
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/imagepyramid/PyramidBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/imagepyramid/PyramidBuilder.java $
  */
 public class PyramidBuilder extends BaseArgumentsManager implements Runnable,
 		ProcessingEventListener {

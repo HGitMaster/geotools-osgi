@@ -43,7 +43,7 @@ public class DatabaseCreationScript {
          * - update ThreadedH2EpsgFactory.VERSION 
          * - modify the "directory" variable below to point to the folder containing the SQL scripts
          */
-        String inputDirectory = "/home/aaime/devel/gt2.6.x/modules/unsupported/epsg-h2/src/main/resources/org/geotools/referencing/factory/epsg/";
+        String inputDirectory = "./src/main/resources/org/geotools/referencing/factory/epsg/";
 
         /**
          * The files we're interested into

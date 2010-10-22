@@ -30,7 +30,7 @@ import org.geotools.resources.Utilities;
  * is, an image painted along the contour)
  *
  * @author aaime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/LineStyle2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/LineStyle2D.java $
  */
 public class LineStyle2D extends Style2D {
     protected Paint contour;

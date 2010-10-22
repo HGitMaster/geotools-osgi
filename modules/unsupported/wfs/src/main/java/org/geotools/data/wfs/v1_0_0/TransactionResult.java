@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
  * DOCUMENT ME!
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/v1_0_0/TransactionResult.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/v1_0_0/TransactionResult.java $
  */
 public class TransactionResult {
     /**

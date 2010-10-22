@@ -50,7 +50,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin
  * @author Andrea Aime
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/simple/SimpleFeatureImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/simple/SimpleFeatureImpl.java $
  */
 public class SimpleFeatureImpl implements SimpleFeature {
     

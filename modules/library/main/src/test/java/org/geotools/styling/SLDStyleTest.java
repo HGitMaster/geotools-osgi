@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import junit.framework.Test;
@@ -30,9 +31,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-import org.geotools.filter.IsEqualsToImpl;
 import org.geotools.filter.function.FilterFunction_buffer;
-import org.geotools.filter.function.math.FilterFunction_abs;
 import org.geotools.test.TestData;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -56,7 +55,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Try out our SLD parser and see how well it does.
  *
  * @author jamesm
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/SLDStyleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/styling/SLDStyleTest.java $
  */
 public class SLDStyleTest extends TestCase {
     StyleFactory sf = CommonFactoryFinder.getStyleFactory( GeoTools.getDefaultHints() );
@@ -136,6 +135,51 @@ public class SLDStyleTest extends TestCase {
         assertNotNull(xml);
         //we're content for the moment if this didn't throw an exception...
         //TODO: convert the buffer/resource to a string and compare
+    }
+    
+    public void testEmptyElements() throws Exception {
+        // before GEOT-3042 this would simply fail with an NPE
+        java.net.URL surl = TestData.getResource(this, "test-empty-elements.sld");
+        SLDParser stylereader = new SLDParser(sf, surl);
+        StyledLayerDescriptor sld = stylereader.parseSLD();
+        
+        assertEquals(1, ((UserLayer) sld.getStyledLayers()[0]).getUserStyles().length);
+        Style style = ((UserLayer) sld.getStyledLayers()[0]).getUserStyles()[0];
+        assertEquals(1, style.featureTypeStyles().size());
+        assertEquals(1, style.featureTypeStyles().get(0).rules().size());
+        assertEquals(1, style.featureTypeStyles().get(0).rules().get(0).symbolizers().size());
+    }
+    
+    public void testDashArray1() throws Exception {
+        // plain text in dasharray
+        java.net.URL surl = TestData.getResource(this, "dasharray1.sld");
+        SLDParser stylereader = new SLDParser(sf, surl);
+        StyledLayerDescriptor sld = stylereader.parseSLD();
+        
+        validateDashArrayStyle(sld);
+    }
+    
+    public void testDashArray2() throws Exception {
+        // using ogc:Literal in dasharray
+        java.net.URL surl = TestData.getResource(this, "dasharray2.sld");
+        SLDParser stylereader = new SLDParser(sf, surl);
+        StyledLayerDescriptor sld = stylereader.parseSLD();
+        
+        validateDashArrayStyle(sld);
+    }
+
+    private void validateDashArrayStyle(StyledLayerDescriptor sld) {
+        assertEquals(1, ((UserLayer) sld.getStyledLayers()[0]).getUserStyles().length);
+        Style style = ((UserLayer) sld.getStyledLayers()[0]).getUserStyles()[0];
+        List<FeatureTypeStyle> fts = style.featureTypeStyles();
+        assertEquals(1, fts.size());
+        List<Rule> rules = fts.get(0).rules();
+        assertEquals(1, rules.size());
+        List<Symbolizer> symbolizers = rules.get(0).symbolizers();
+        assertEquals(1, symbolizers.size());
+        
+        LineSymbolizer ls = (LineSymbolizer) symbolizers.get(0);
+        assertTrue(Arrays.equals(new float[] {2.0f, 1.0f, 4.0f, 1.0f}, ls.getStroke().getDashArray()));
     }
 
     public void testSLDParserWithWhitespaceIsTrimmed() throws Exception {

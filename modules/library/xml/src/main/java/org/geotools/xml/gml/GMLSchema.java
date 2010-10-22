@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/gml/GMLSchema.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/gml/GMLSchema.java $
  */
 public class GMLSchema implements Schema {
     /** GML target namespace */

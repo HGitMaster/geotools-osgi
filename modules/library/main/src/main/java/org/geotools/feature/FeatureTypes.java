@@ -38,8 +38,12 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.feature.type.PropertyType;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.opengis.filter.expression.Literal;
@@ -64,7 +68,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Jody Garnett, Refractions Research
  * @since 2.1.M3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/FeatureTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/FeatureTypes.java $
  */
 public class FeatureTypes {
 
@@ -119,41 +123,54 @@ public class FeatureTypes {
      *
      * @return an int indicating the max length of field in characters, or ANY_LENGTH
      */
-    public static int getFieldLength( AttributeDescriptor descriptor ) {
-
-        AttributeType type = descriptor.getType();
-        Class colType = type.getBinding();
-        String colName = descriptor.getLocalName();
-
-        int fieldLen = -1;
+    public static int getFieldLength( PropertyDescriptor descriptor ) {
+        PropertyType type = descriptor.getType();
+        Integer length = null;
         while( type != null ){
             // TODO: We should really go through all the restrictions and find
             // the minimum of all the length restrictions; for now we assume an
-            // override behaviour.
+            // override behavior.
             for ( Filter f : type.getRestrictions()) {
-                if (f != null
-                    && f != Filter.EXCLUDE
-                    && f != Filter.INCLUDE
-                    && (f instanceof PropertyIsLessThan || f instanceof PropertyIsLessThanOrEqualTo)) {
-                    try {
+                Integer filterLength = null;
+                try {
+                    if(f == null) {
+                        continue;
+                    }
+                    if (f instanceof PropertyIsLessThan) {
                         BinaryComparisonOperator cf =  (BinaryComparisonOperator) f;
                         if (cf.getExpression1() instanceof LengthFunction) {
-                            return Integer.parseInt(((Literal) cf.getExpression2()).getValue()
-                                    .toString());
-                        } else if (cf.getExpression2() instanceof LengthFunction) {
-                            return Integer.parseInt(((Literal) cf.getExpression1()).getValue()
-                                    .toString());
-                        } else {
-                            return ANY_LENGTH;
+                            filterLength = cf.getExpression2().evaluate(null, Integer.class) - 1;
                         }
-                    } catch (NumberFormatException e) {
-                        return ANY_LENGTH;
+                    } else if (f instanceof PropertyIsLessThanOrEqualTo) {
+                        BinaryComparisonOperator cf =  (BinaryComparisonOperator) f;
+                        if (cf.getExpression1() instanceof LengthFunction) {
+                            filterLength = cf.getExpression2().evaluate(null, Integer.class);
+                        } 
+                    } else if(f instanceof PropertyIsGreaterThan) {
+                        BinaryComparisonOperator cf =  (BinaryComparisonOperator) f;
+                        if (cf.getExpression2() instanceof LengthFunction) {
+                            filterLength = cf.getExpression1().evaluate(null, Integer.class) - 1;
+                        }
+                    } else if (f instanceof PropertyIsGreaterThanOrEqualTo) {
+                        BinaryComparisonOperator cf =  (BinaryComparisonOperator) f;
+                        if (cf.getExpression2() instanceof LengthFunction) {
+                            filterLength = cf.getExpression1().evaluate(null, Integer.class);
+                        } 
+                    }
+                } catch (NullPointerException e) {
+                    // was not an integer eh? Continue, worst case we'll return ANY_LENGTH
+                }
+                
+                if(filterLength != null) {
+                    if(length == null || filterLength < length) {
+                        length = filterLength;
                     }
                 }
             }
             type = type.getSuper();
         }
-        return ANY_LENGTH;
+        
+        return length != null ? length : ANY_LENGTH;
     }
 
     /**
@@ -374,17 +391,16 @@ public class FeatureTypes {
     }
 
     /**
-     * Walks up the type hierachy of the feature returning all super types of the specified feature
-     * type.
+     * Walks up the type hierarchy of the feature returning all super types of the specified feature
+     * type. The search terminates when a non-FeatureType or null is found. The original featureType
+     * is not included as an ancestor, only its strict ancestors.
      */
     public static List<FeatureType> getAncestors(FeatureType featureType) {
         List<FeatureType> ancestors = new ArrayList<FeatureType>();
-        while (featureType.getSuper() != null) {
-            if (featureType.getSuper() instanceof FeatureType) {
-                FeatureType superType = (FeatureType) featureType.getSuper();
-                ancestors.add(superType);
-                featureType = superType;
-            }
+        while (featureType.getSuper() instanceof FeatureType) {
+            FeatureType superType = (FeatureType) featureType.getSuper();
+            ancestors.add(superType);
+            featureType = superType;
         }
         return ancestors;
     }

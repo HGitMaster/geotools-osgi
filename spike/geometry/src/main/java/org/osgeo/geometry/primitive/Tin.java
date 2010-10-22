@@ -36,7 +36,7 @@ import org.osgeo.geometry.primitive.segments.LineStringSegment;
  * @author <a href="mailto:ionita@lat-lon.de">Andrei Ionita</a>
  * @author last edited by: $Author: markusschneider $
  * 
- * @version $Revision: 34053 $, $Date: 2009-10-03 01:39:21 +1000 (Sat, 03 Oct 2009) $
+ * @version $Revision: 34053 $, $Date: 2009-10-02 18:39:21 +0300 (Fri, 02 Oct 2009) $
  */
 public interface Tin extends TriangulatedSurface {
 

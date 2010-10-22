@@ -25,7 +25,7 @@ import org.osgeo.geometry.primitive.Solid;
  * @author <a href="mailto:poth@lat-lon.de">Andreas Poth</a>
  * @author last edited by: $Author: markusschneider $
  * 
- * @version. $Revision: 34053 $, $Date: 2009-10-03 01:39:21 +1000 (Sat, 03 Oct 2009) $
+ * @version. $Revision: 34053 $, $Date: 2009-10-02 18:39:21 +0300 (Fri, 02 Oct 2009) $
  */
 public interface MultiSolid extends MultiGeometry<Solid> {
     // marker interface

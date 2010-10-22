@@ -67,7 +67,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/xml/WMSComplexTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/xml/WMSComplexTypes.java $
  */
 public class WMSComplexTypes {
 	static class OperationType extends WMSComplexType {
@@ -2595,6 +2595,8 @@ public class WMSComplexTypes {
 
 			Set crs = new TreeSet();
 			HashMap boundingBoxes = new HashMap();
+			HashMap dimensions = new HashMap();
+			HashMap extents = new HashMap();
 			List styles = new ArrayList();
 
 			for (int i = 0; i < value.length; i++) {
@@ -2633,12 +2635,18 @@ public class WMSComplexTypes {
 					boundingBoxes.put(bbox.getEPSGCode(), bbox);
 				}
 
-				// if (sameName(elems[7], value[i])) {
-				// //TODO Dimension ignored
-				// }
-				// if (sameName(elems[8], value[i])) {
-				// //TODO Extent ignored
-				// }
+				 if (sameName(elems[7], value[i])) {
+					 Dimension dim = (Dimension) value[i].getValue();
+					 dimensions.put(dim.getName(), dim);
+				 }
+				 if (sameName(elems[8], value[i])) {
+					 Extent ext = (Extent) value[i].getValue();
+					 extents.put(ext.getName(), ext);
+					 // NOTE: dim might be null here, because at this point a sublayer without 
+					 // dimension tags may not yet have inherited parent dimensions.
+					 //Dimension dim = layer.getDimension(ext.getName());
+					 //dim.setExtent(ext);
+				 }
 				// if (sameName(elems[9], value[i])) {
 				// //TODO attribution ignored
 				// }
@@ -2685,6 +2693,8 @@ public class WMSComplexTypes {
 
 			layer.setSrs(crs);
 			layer.setBoundingBoxes(boundingBoxes);
+			layer.setDimensions(dimensions);
+			layer.setExtents(extents);
 			layer.setStyles(styles);
             
             layer.setChildren((Layer[]) childLayers.toArray(new Layer[childLayers.size()]));
@@ -3103,15 +3113,16 @@ public class WMSComplexTypes {
 				new WMSAttribute(null, "units", WMSSchema.NAMESPACE,
 						XSISimpleTypes.String.getInstance(),
 						Attribute.REQUIRED, null, null, false),
-				new WMSAttribute("unitSymbol", XSISimpleTypes.String
-						.getInstance()),
+				new WMSAttribute("unitSymbol", XSISimpleTypes.String.getInstance()),
 				new WMSAttribute("default", XSISimpleTypes.String.getInstance()),
-				new WMSAttribute("multipleValues", XSISimpleTypes.Boolean
-						.getInstance()),
-				new WMSAttribute("nearestValue", XSISimpleTypes.Boolean
-						.getInstance()),
-				new WMSAttribute("current", XSISimpleTypes.Boolean
-						.getInstance()) };
+				new WMSAttribute("current", XSISimpleTypes.Boolean.getInstance()),
+				new WMSAttribute(null, "multipleValues", WMSSchema.NAMESPACE,
+						XSISimpleTypes.Boolean.getInstance(),
+						Attribute.OPTIONAL, "0", null, false),
+				new WMSAttribute(null, "nearestValue", WMSSchema.NAMESPACE,
+						XSISimpleTypes.Boolean.getInstance(),
+						Attribute.OPTIONAL, "0", null, false)
+		};
 
 		public static WMSComplexType getInstance() {
 			return instance;
@@ -3160,7 +3171,37 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return null;
+			String name = attrs.getValue("name");
+			if (name == null || name.length() == 0) {
+				throw new SAXException(
+						"Dimension element contains no 'name' attribute");
+			}
+
+			String units = attrs.getValue("units");
+			if (units == null || units.length() == 0) {
+				throw new SAXException(
+						"Dimension element contains no 'units' attribute");
+			}
+
+			Dimension dim = new Dimension(name, units);
+			Boolean current = Boolean.parseBoolean(attrs.getValue("current"));
+			if (current != null) {
+				dim.setCurrent(current);
+			}
+			
+			String unitSymbol = attrs.getValue("unitSymbol");
+			if (unitSymbol != null && unitSymbol.length() > 0) {
+				dim.setUnitSymbol(unitSymbol);
+			}
+
+			// We delegate to _ExtentType to fetch properties and value since document structure
+			// differs between WMS Spec. 1.1.1 and 1.3.0
+			Extent ext = (Extent) _ExtentType.instance.getValue(element, value, attrs, hints);
+			if( !ext.isEmpty() ){
+			    // only use extent if it actually aquired a value
+			    dim.setExtent(ext);
+			}
+			return dim;
 			// throw new OperationNotSupportedException();
 		}
 
@@ -3179,7 +3220,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return null;
+			return Dimension.class;
 		}
 
 		/*
@@ -3259,7 +3300,21 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return null;
+			String name = attrs.getValue("name");
+			if (name == null || name.length() == 0) {
+				throw new SAXException(
+						"Dimension element contains no 'name' attribute");
+			}
+			String defaultValue = attrs.getValue("default");
+			boolean multipleValues = "1".equals(attrs.getValue("multipleValues"));
+			boolean nearestValue = "1".equals(attrs.getValue("nearestValue"));
+			
+			String extractedValue = "";
+			for (ElementValue elementValue : value) {
+				extractedValue += elementValue.getValue();
+			}
+			
+			return new Extent(name, defaultValue, multipleValues, nearestValue, extractedValue);
 		}
 
 		/*
@@ -3277,7 +3332,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return null;
+			return Extent.class;
 		}
 
 		/*

@@ -23,7 +23,7 @@ import java.util.EventListener;
  * DOCUMENT ME!
  *
  * @author wolf
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/event/MapLayerListListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/map/event/MapLayerListListener.java $
  */
 public interface MapLayerListListener extends EventListener {
     /**

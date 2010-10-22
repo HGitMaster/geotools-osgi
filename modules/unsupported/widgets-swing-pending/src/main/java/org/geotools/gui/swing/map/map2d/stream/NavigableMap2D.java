@@ -24,7 +24,7 @@ import org.geotools.gui.swing.map.map2d.stream.listener.NavigationListener;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/NavigableMap2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/NavigableMap2D.java $
  */
 public interface NavigableMap2D extends StreamingMap2D{
         

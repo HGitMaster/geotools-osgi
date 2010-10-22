@@ -30,7 +30,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Information about the contents of a shapefile on disk.
  * @author Jody Garnett (Refractions Reserach Inc)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileFileResourceInfo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileFileResourceInfo.java $
  */
 public class ShapefileFileResourceInfo implements ResourceInfo {
 

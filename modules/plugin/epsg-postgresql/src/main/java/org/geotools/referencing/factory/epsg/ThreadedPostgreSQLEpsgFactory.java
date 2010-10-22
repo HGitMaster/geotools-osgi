@@ -107,7 +107,7 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  * database.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-postgresql/src/main/java/org/geotools/referencing/factory/epsg/ThreadedPostgreSQLEpsgFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-postgresql/src/main/java/org/geotools/referencing/factory/epsg/ThreadedPostgreSQLEpsgFactory.java $
  * @version $Id: ThreadedPostgreSQLEpsgFactory.java 32612 2009-03-09 16:32:57Z aaime $
  * @author Didier Richard
  * @author Martin Desruisseaux

@@ -41,7 +41,7 @@ import org.geotools.xml.Binding;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/test/java/org/geotools/filter/v1_1/capabilities/ComparisonOperatorsTypeBindingTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-filter/src/test/java/org/geotools/filter/v1_1/capabilities/ComparisonOperatorsTypeBindingTest.java $
  */
 public class ComparisonOperatorsTypeBindingTest extends OGCTestSupport {
     public void testType() {

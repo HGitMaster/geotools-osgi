@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLBoundingShapeTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GMLBoundingShapeTypeBinding.java $
  */
 public class GMLBoundingShapeTypeBinding extends AbstractComplexBinding {
     /**

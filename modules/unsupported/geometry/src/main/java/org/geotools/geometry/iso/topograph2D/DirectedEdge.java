@@ -28,7 +28,7 @@ import java.io.PrintStream;
  * a client using a <code>PlanarGraph</code> will subclass <code>DirectedEdge</code>
  * to add its own application-specific data and methods.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/DirectedEdge.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/DirectedEdge.java $
  */
 public class DirectedEdge extends EdgeEnd {
 

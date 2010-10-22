@@ -25,7 +25,7 @@ import org.geotools.factory.Factory;
  * Interface for a function expression implementation
  *
  * @author James Macgill, PSU
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/FunctionExpression.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/FunctionExpression.java $
  *
  * @deprecated use {@link org.opengis.filter.expression.Function}
  */

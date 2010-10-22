@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * <BR/>The dbf file may not be necessary, if not, just pass null as the
  * DbaseFileReader
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileAttributeReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileAttributeReader.java $
  */
 public class ShapefileAttributeReader extends AbstractAttributeIO implements
         AttributeReader {

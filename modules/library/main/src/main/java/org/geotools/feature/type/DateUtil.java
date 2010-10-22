@@ -55,7 +55,7 @@ import java.util.*;
  * the Java date handling, which uses a discontinuous Gregorian calendar.
  *
  * @author Dennis M. Sosnoski
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/DateUtil.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/type/DateUtil.java $
  * @version 1.0
  */
 public abstract class DateUtil {

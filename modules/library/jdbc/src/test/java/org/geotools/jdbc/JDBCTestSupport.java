@@ -19,6 +19,7 @@ package org.geotools.jdbc;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -27,6 +28,7 @@ import junit.framework.TestResult;
 
 import org.geotools.feature.NameImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.test.OnlineTestCase;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -46,15 +48,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCTestSupport.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCTestSupport.java $
  */
-public abstract class JDBCTestSupport extends TestCase {
-    /**
-     * map of test setup class to boolean which tracks which 
-     * setups can obtain a connection and which cannot
-     */
-    static Map dataSourceAvailable = new HashMap();
-    
+public abstract class JDBCTestSupport extends OnlineTestCase {
     static {
         // uncomment to turn up logging
                 
@@ -72,54 +68,53 @@ public abstract class JDBCTestSupport extends TestCase {
     protected JDBCDataStore dataStore;
     protected SQLDialect dialect;
     
-    /**
-     * Override to check if a database connection can be obtained, if not
-     * tests are ignored.
-     */
-    public void run(TestResult result) {
+    @Override
+    protected Properties createOfflineFixture() {
+        return createTestSetup().createOfflineFixture();
+    }
+    
+    @Override
+    protected Properties createExampleFixture() {
+        return createTestSetup().createExampleFixture();
+    }
+
+    @Override
+    protected String getFixtureId() {
+        return createTestSetup().createDataStoreFactory().getDatabaseID();
+    }
+
+    @Override
+    protected boolean isOnline() throws Exception {
         JDBCTestSetup setup = createTestSetup();
+        setup.setFixture(fixture);
         
-        //check if the data source is available for this setup
-        Boolean available = 
-            (Boolean) dataSourceAvailable.get( setup.getClass() );
-        if ( available == null || available.booleanValue() ) {
-            //test the connection
+        try {
+            DataSource dataSource = setup.getDataSource();
+            Connection cx = dataSource.getConnection();
+            cx.close();
+            return true;
+        } 
+        catch (Throwable t) {
+            throw new RuntimeException(t);
+        } 
+        finally {
             try {
-                DataSource dataSource = setup.getDataSource();
-                Connection cx = dataSource.getConnection();
-                
-                //connection ok, ask the test setup if to proceed
-                available = setup.shouldRunTests(cx);
-                cx.close();
-                dataSourceAvailable.put( setup.getClass(), available );
-                if (!available) {
-                    System.out.println("Skipping tests " + getClass().getName());
-                    return;
-                }
-            } catch (Throwable t) {
-                System.out.println("Skipping tests " + getClass().getName() + " since data souce is not available: " + t.getMessage());
-                dataSourceAvailable.put( setup.getClass(), Boolean.FALSE );
-                return;
-            } finally {
-                try {
-                    setup.tearDown();
-                } catch(Exception e) {
-                    System.out.println("Error occurred tearing down the test setup");
-                }
+                setup.tearDown();    
+            } 
+            catch(Exception e) {
+                System.out.println("Error occurred tearing down the test setup");
             }
-            
-            super.run(result);
         }
     }
     
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Override
+    protected void connect() throws Exception {
         //create the test harness
         if (setup == null) {
             setup = createTestSetup();
         }
 
+        setup.setFixture(fixture);
         setup.setUp();
 
         //initialize the database
@@ -144,10 +139,9 @@ public abstract class JDBCTestSupport extends TestCase {
 
     protected abstract JDBCTestSetup createTestSetup();
 
-    protected void tearDown() throws Exception {
+    protected void disconnect() throws Exception {
         setup.tearDown();
         dataStore.dispose();
-        super.tearDown();
     }
     
     /**

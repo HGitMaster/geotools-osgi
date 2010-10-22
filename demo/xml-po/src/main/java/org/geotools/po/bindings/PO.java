@@ -20,7 +20,7 @@ import org.geotools.xml.XSD;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/xml-po/src/main/java/org/geotools/po/bindings/PO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/xml-po/src/main/java/org/geotools/po/bindings/PO.java $
  */
 public class PO extends XSD {
 

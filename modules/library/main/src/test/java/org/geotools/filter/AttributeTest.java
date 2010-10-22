@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * Tests for Attribute Expressions
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/AttributeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/AttributeTest.java $
  */
 public class AttributeTest extends TestCase {
     SimpleFeatureType schema = null;

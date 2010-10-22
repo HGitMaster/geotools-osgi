@@ -22,7 +22,7 @@ package org.geotools.metadata;
  * is in a invalid state, usually because a mandatory attribute is missing.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/InvalidMetadataException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/InvalidMetadataException.java $
  * @version $Id: InvalidMetadataException.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (Geomatys)
  */

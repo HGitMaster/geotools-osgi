@@ -149,7 +149,7 @@ import static java.lang.Math.*;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/oblique_mercator.html">"oblique_mercator" on RemoteSensing.org</A>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueMercator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/ObliqueMercator.java $
  * @version $Id: ObliqueMercator.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Gerald I. Evenden (for original code in Proj4)
  * @author  Rueben Schulz

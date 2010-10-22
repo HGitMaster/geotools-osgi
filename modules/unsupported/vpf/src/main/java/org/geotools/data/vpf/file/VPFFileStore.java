@@ -39,7 +39,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Hopefully some one will take advantage of this class to provide 
  * the full functionality.
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/file/VPFFileStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/file/VPFFileStore.java $
  */
 public class VPFFileStore extends AbstractDataStore {
     /**

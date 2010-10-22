@@ -30,7 +30,7 @@ import org.geotools.data.jdbc.JDBCUtils;
  * @author aaime
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/test/java/org/geotools/data/postgis/SqlTestUtils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/postgis-versioned/src/test/java/org/geotools/data/postgis/SqlTestUtils.java $
  */
 public class SqlTestUtils {
 

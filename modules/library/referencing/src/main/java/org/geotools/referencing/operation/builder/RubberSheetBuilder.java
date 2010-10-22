@@ -46,7 +46,7 @@ import org.opengis.referencing.operation.MathTransform;
  * <a href ="http://planner.t.u-tokyo.ac.jp/member/fuse/rubber_sheeting.pdf">here</a>.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/RubberSheetBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/RubberSheetBuilder.java $
  * @version $Id: RubberSheetBuilder.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Jan Jezek
  * @author Adrian Custer

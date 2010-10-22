@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
  * This allows us to determine the dimensions of a Geometry.
  * </p>
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/CoordinateAccessFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/CoordinateAccessFactory.java $
  */
 public interface CoordinateAccessFactory extends CoordinateSequenceFactory {
     /**

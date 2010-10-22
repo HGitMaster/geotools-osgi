@@ -24,24 +24,19 @@ import java.util.HashSet;
  * @author Rini Angreani, Curtin University of Technology (with Gabriel Roldan and Justin
  *         Deoliveira's help)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/XSDIdRegistry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/XSDIdRegistry.java $
  */
 public class XSDIdRegistry {
     HashSet<String> ids = new HashSet<String>();
 
     public boolean idExists(String id) {
-        synchronized (this) {
-            return ids.contains(id);
-        }
+        return ids.contains(id);
     }
 
     public void add(String id) {
-        synchronized (this) {
-            if (!ids.add(id)) {
-                String msg = "Duplicate id '" + id
-                        + "' detected! XSD Ids must be unique per document.";
-                throw new IllegalArgumentException(msg);
-            }
+        if (!ids.add(id)) {
+            String msg = "Duplicate id '" + id + "' detected! XSD Ids must be unique per document.";
+            throw new IllegalArgumentException(msg);
         }
     }
 }

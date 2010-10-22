@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 /**
  * Tests formatting done by the {@link CoordinateFormat} class.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/measure/FormatTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/measure/FormatTest.java $
  * @version $Id: FormatTest.java 34521 2009-11-27 10:02:26Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

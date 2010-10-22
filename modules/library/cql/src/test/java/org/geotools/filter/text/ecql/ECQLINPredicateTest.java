@@ -42,7 +42,7 @@ import org.opengis.filter.expression.PropertyName;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLINPredicateTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLINPredicateTest.java $
  */
 public class ECQLINPredicateTest {
  

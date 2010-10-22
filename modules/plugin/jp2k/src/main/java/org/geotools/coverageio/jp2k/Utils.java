@@ -96,7 +96,7 @@ class Utils {
 		//
 		// /////////////////////////////////////////////////////////////////////
 		// if it is a URL or a String let's try to see if we can get a file to
-		// check if we have to build the index
+
 		if (source instanceof URL) {
 			sourceURL = ((URL) source);
 			source = DataUtilities.urlToFile(sourceURL);
@@ -114,7 +114,7 @@ class Utils {
 					source = null;
 				}
 			} else {
-				sourceURL = tempFile.toURI().toURL();
+			    	sourceURL =  DataUtilities.fileToURL(tempFile); 
 				source = tempFile;
 			}
 		} else if (source instanceof FileImageInputStreamExt) {
@@ -166,7 +166,7 @@ class Utils {
 		return w.makeColorTransparent(transparentColor).getRenderedImage();
 	}
 
-	static ImageReadParam cloneImageReadParam(ImageReadParam param) {
+	static ImageReadParam cloneImageReadParam (ImageReadParam param) {
 
 		// The ImageReadParam passed in is non-null. As the
 		// ImageReadParam class is not Cloneable, if the param
@@ -200,16 +200,17 @@ class Utils {
 		newParam.setSourceBands(param.getSourceBands());
 		newParam.setSourceRegion(param.getSourceRegion());
 		if (param.getSourceMaxProgressivePass() != Integer.MAX_VALUE) {
-			newParam.setSourceProgressivePasses(param
-					.getSourceMinProgressivePass(), param
-					.getSourceNumProgressivePasses());
+	        newParam.setSourceProgressivePasses(
+	            param.getSourceMinProgressivePass(),
+	            param.getSourceNumProgressivePasses());
 		}
 		if (param.canSetSourceRenderSize()) {
 			newParam.setSourceRenderSize(param.getSourceRenderSize());
 		}
-		newParam.setSourceSubsampling(param.getSourceXSubsampling(), param
-				.getSourceYSubsampling(), param.getSubsamplingXOffset(), param
-				.getSubsamplingYOffset());
+	    newParam.setSourceSubsampling(param.getSourceXSubsampling(),
+	                                  param.getSourceYSubsampling(),
+	                                  param.getSubsamplingXOffset(),
+	                                  param.getSubsamplingYOffset());
 
 		// Replace the local variable with the new ImageReadParam.
 		return newParam;
@@ -247,7 +248,7 @@ class Utils {
 	 * @return a suitable instance of {@link ImageReader} or <code>null</code>
 	 *         if one cannot be found.
 	 */
-	static ImageReader getReader(final ImageInputStream inStream) {
+	static ImageReader getReader (final ImageInputStream inStream) {
 		ensureNonNull("inStream", inStream);
 		// get a reader
 //		inStream.mark();
@@ -289,18 +290,17 @@ class Utils {
 	 *             in case the {@link ImageReader} or the
 	 *             {@link ImageInputStream} fail.
 	 */
-	static Rectangle getDimension(final int imageIndex,
-			final ImageInputStream inStream, final ImageReader reader)
-			throws IOException {
+	static Rectangle  getDimension(
+			final int imageIndex,
+			final ImageInputStream inStream, 
+			final ImageReader reader) throws IOException {
 		ensureNonNull("inStream", inStream);
 		ensureNonNull("reader", reader);
 		if (imageIndex < 0)
-			throw new IllegalArgumentException(Errors.format(
-					ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, imageIndex));
+			throw new IllegalArgumentException(Errors.format(ErrorKeys.INDEX_OUT_OF_BOUNDS_$1,imageIndex));
 		inStream.reset();
 		reader.setInput(inStream);
-		return new Rectangle(0, 0, reader.getWidth(imageIndex), reader
-				.getHeight(imageIndex));
+		return new Rectangle(0,0,reader.getWidth(imageIndex), reader.getHeight(imageIndex));
 	}
 
 	/**
@@ -334,8 +334,7 @@ class Utils {
 	 * @return <code>true</code> if the intersection is not empty,
 	 *         <code>false</code> otherwise.
 	 */
-	static boolean checkEmptySourceRegion(final ImageReadParam readParameters,
-			final Rectangle dimensions) {
+	static boolean checkEmptySourceRegion(final ImageReadParam readParameters, final Rectangle dimensions) {
 		ensureNonNull("readDimension", dimensions);
 		ensureNonNull("readP", readParameters);
 		final Rectangle sourceRegion = readParameters.getSourceRegion();
@@ -399,33 +398,33 @@ class Utils {
 		return accum;
 	}
 	
-	private static IOFileFilter createFilter() {
-		IOFileFilter fileFilter = Utils.includeFilters(
-				FileFilterUtils.suffixFileFilter("jp2"),
-				FileFilterUtils.suffixFileFilter("j2c"),
-				FileFilterUtils.suffixFileFilter("jpx"), 
-				FileFilterUtils.suffixFileFilter("jp2k"), 
-				FileFilterUtils.nameFileFilter("jpeg2000"));
-		return fileFilter;
-	}
-	
-	static IOFileFilter excludeFilters(final IOFileFilter inputFilter,
-			IOFileFilter ...filters) {
-		IOFileFilter retFilter=inputFilter;
-		for(IOFileFilter filter:filters){
-			retFilter=FileFilterUtils.andFileFilter(
-					retFilter, 
-					FileFilterUtils.notFileFilter(filter));
-		}
-		return retFilter;
-	}
-	
-	static IOFileFilter includeFilters(final IOFileFilter inputFilter,
-			IOFileFilter ...filters) {
-		IOFileFilter retFilter=inputFilter;
-		for(IOFileFilter filter:filters){
-			retFilter=FileFilterUtils.orFileFilter(retFilter, filter);
-		}
-		return retFilter;
-	}
+    private static IOFileFilter createFilter() {
+        IOFileFilter fileFilter = Utils.includeFilters(
+                FileFilterUtils.suffixFileFilter("jp2"), 
+                FileFilterUtils.suffixFileFilter("JP2"), 
+                FileFilterUtils.suffixFileFilter("j2c"),
+                FileFilterUtils.suffixFileFilter("J2C"), 
+                FileFilterUtils.suffixFileFilter("jpx"), 
+                FileFilterUtils.suffixFileFilter("JPX"), 
+                FileFilterUtils.suffixFileFilter("jp2k"), 
+                FileFilterUtils.suffixFileFilter("JP2K"), 
+                FileFilterUtils.nameFileFilter("jpeg2000"));
+        return fileFilter;
+    }
+
+    static IOFileFilter excludeFilters(final IOFileFilter inputFilter, IOFileFilter... filters) {
+        IOFileFilter retFilter = inputFilter;
+        for (IOFileFilter filter : filters) {
+            retFilter = FileFilterUtils.andFileFilter(retFilter, FileFilterUtils.notFileFilter(filter));
+        }
+        return retFilter;
+    }
+
+    static IOFileFilter includeFilters(final IOFileFilter inputFilter, IOFileFilter... filters) {
+        IOFileFilter retFilter = inputFilter;
+        for (IOFileFilter filter : filters) {
+            retFilter = FileFilterUtils.orFileFilter(retFilter, filter);
+        }
+        return retFilter;
+    }
 }

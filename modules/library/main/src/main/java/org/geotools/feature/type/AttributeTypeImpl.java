@@ -30,7 +30,7 @@ import org.opengis.util.InternationalString;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/AttributeTypeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/type/AttributeTypeImpl.java $
  */
 public class AttributeTypeImpl extends PropertyTypeImpl implements AttributeType {
 	

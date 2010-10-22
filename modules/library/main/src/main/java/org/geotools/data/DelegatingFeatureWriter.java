@@ -26,7 +26,7 @@ import org.opengis.feature.type.FeatureType;
  * @since 2.5
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/DelegatingFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/DelegatingFeatureWriter.java $
  */
 public interface DelegatingFeatureWriter<T extends FeatureType,F extends Feature> extends FeatureWriter<T, F> {
 

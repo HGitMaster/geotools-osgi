@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  * @version $Id: DescribeFeatureTypeTypeBindingTest.java 27759 2007-11-05
  *          19:46:45Z groldan $
  * @since 2.5.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/test/java/org/geotools/wfs/bindings/DescribeFeatureTypeTypeBindingTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/test/java/org/geotools/wfs/bindings/DescribeFeatureTypeTypeBindingTest.java $
  */
 public class DescribeFeatureTypeTypeBindingTest extends WFSTestSupport {
     public DescribeFeatureTypeTypeBindingTest() {

@@ -78,7 +78,7 @@ import java.awt.RenderingHints;
  * @author Ian Schneider
  * @author Martin Desruisseaux
  * @author Jody Garnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/Factory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/Factory.java $
  * @version $Id: Factory.java 30640 2008-06-12 17:34:32Z acuster $
  *
  * @see Hints

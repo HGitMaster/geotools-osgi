@@ -47,7 +47,7 @@ import java.util.logging.Logger;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/SchemaLocator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/SchemaLocator.java $
  */
 public final class SchemaLocator implements XSDSchemaLocator {
     /**

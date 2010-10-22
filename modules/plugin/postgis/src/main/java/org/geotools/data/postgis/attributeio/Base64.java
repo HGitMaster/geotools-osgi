@@ -73,7 +73,7 @@ package org.geotools.data.postgis.attributeio;
  * @author Robert Harder
  * @author rob@iharder.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/Base64.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/attributeio/Base64.java $
  * @version 2.1
  */
 public class Base64

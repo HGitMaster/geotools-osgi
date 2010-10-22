@@ -31,7 +31,7 @@ import org.opengis.util.Cloneable;
  * Tests style cloning
  *
  * @author Sean Geoghegan
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/StyleObjectTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/styling/StyleObjectTest.java $
  */
 public class StyleObjectTest extends TestCase {
     private StyleFactory styleFactory;

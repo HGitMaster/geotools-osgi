@@ -89,7 +89,7 @@ import org.opengis.util.InternationalString;
  * </p>
  * 
  * @author Jody Garnett (Refractions Research)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/DataAccessFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/DataAccessFactory.java $
  */
 public interface DataAccessFactory extends Factory {
     /**
@@ -479,7 +479,6 @@ public interface DataAccessFactory extends Factory {
          * @return Value as processed by text
          *
          * @throws IOException If text could not be parsed
-         * @throws DataSourceException DOCUMENT ME!
          */
         public Object handle(String text) throws IOException {
             if (text == null) {

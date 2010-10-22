@@ -55,7 +55,7 @@ import org.geotools.util.CanonicalSet;
  * in the {@link ObjectFactory} interface.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/ReferencingObjectFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/ReferencingObjectFactory.java $
  * @version $Id: ReferencingObjectFactory.java 31007 2008-07-11 17:33:53Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

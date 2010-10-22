@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link PropertyAccessor} class.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/metadata/PropertyAccessorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/metadata/PropertyAccessorTest.java $
  * @version $Id: PropertyAccessorTest.java 30852 2008-07-03 15:59:42Z desruisseaux $
  * @author Martin Desruisseaux
  */

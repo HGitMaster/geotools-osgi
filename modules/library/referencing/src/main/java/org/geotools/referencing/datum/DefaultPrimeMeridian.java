@@ -37,7 +37,7 @@ import org.geotools.util.Utilities;
  * used when the {@linkplain #getGreenwichLongitude greenwich longitude} value is
  * zero.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultPrimeMeridian.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultPrimeMeridian.java $
  * @version $Id: DefaultPrimeMeridian.java 34044 2009-10-02 08:41:31Z aaime $
  * @author Martin Desruisseaux (IRD)
  *

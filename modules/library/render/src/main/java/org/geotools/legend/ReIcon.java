@@ -27,7 +27,7 @@ import javax.swing.Icon;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/legend/ReIcon.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/legend/ReIcon.java $
  */
 public class ReIcon {
     final Icon icon;

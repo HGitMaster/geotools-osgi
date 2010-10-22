@@ -31,7 +31,7 @@ import org.geotools.filter.text.cql2.CQLBooleanValueExpressionTest;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLBooleanValueExpressionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLBooleanValueExpressionTest.java $
  */
 public class ECQLBooleanValueExpressionTest extends CQLBooleanValueExpressionTest {
 

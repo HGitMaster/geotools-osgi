@@ -40,7 +40,7 @@ import org.opengis.filter.identity.FeatureId;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/CompositeFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/CompositeFeatureCollection.java $
  */
 public class CompositeFeatureCollection extends DataFeatureCollection {
     /**

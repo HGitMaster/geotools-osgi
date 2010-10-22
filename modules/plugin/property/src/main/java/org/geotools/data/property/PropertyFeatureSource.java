@@ -26,6 +26,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.Query;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.data.Transaction;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -58,8 +59,15 @@ public class PropertyFeatureSource extends AbstractFeatureLocking {
                 }
                 cacheCount = -1;
             }
-        });        
+        }); 
+        this.queryCapabilities = new QueryCapabilities() {
+            @Override
+            public boolean isUseProvidedFIDSupported() {
+                return true;
+            }
+        };
     }
+    
     public DataStore getDataStore() {
         return store;
     }

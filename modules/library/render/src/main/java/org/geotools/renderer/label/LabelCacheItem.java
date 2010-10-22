@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author simone giannecchini
  * @author Andrea Aime - OpenGeo
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/label/LabelCacheItem.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/label/LabelCacheItem.java $
  */
 public class LabelCacheItem implements Comparable<LabelCacheItem> {
 

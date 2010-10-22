@@ -21,7 +21,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 /**
  * Provides support for creating AttributeReaders.
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/AbstractAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/AbstractAttributeIO.java $
  * @version $Id: AbstractAttributeIO.java 30648 2008-06-12 19:22:35Z acuster $
  * @author  Ian Schneider
  */

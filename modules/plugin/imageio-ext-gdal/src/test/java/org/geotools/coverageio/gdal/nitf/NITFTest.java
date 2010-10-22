@@ -51,7 +51,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * 
  * Testing {@link NITFReader}
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/nitf/NITFTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/nitf/NITFTest.java $
  */
 public final class NITFTest extends GDALTestCase {
 	/**

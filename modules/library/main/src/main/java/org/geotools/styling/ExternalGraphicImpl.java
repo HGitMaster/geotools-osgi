@@ -38,7 +38,7 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/ExternalGraphicImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/ExternalGraphicImpl.java $
  * @version $Id: ExternalGraphicImpl.java 33813 2009-08-28 14:45:11Z jive $
  */
 public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {

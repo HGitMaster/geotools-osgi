@@ -23,7 +23,7 @@ package org.geotools.data.store;
  * is reduced to an XPath expression in the future.
  * </p>
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/TypeRef.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/store/TypeRef.java $
  */
 public class TypeRef {
 	private final String dataStoreId;

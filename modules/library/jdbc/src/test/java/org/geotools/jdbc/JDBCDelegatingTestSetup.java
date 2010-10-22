@@ -30,6 +30,22 @@ public class JDBCDelegatingTestSetup extends JDBCTestSetup {
         this.delegate = delegate;
     }
 
+    @Override
+    public void setFixture(Properties fixture) {
+        super.setFixture(fixture);
+        delegate.setFixture(fixture);
+    }
+    
+    @Override
+    protected Properties createOfflineFixture() {
+        return delegate.createOfflineFixture();
+    }
+    
+    @Override
+    protected Properties createExampleFixture() {
+        return delegate.createExampleFixture();
+    }
+    
     public void setUp() throws Exception {
         // make sure we don't forget to run eventual extra stuff
         delegate.setUp();

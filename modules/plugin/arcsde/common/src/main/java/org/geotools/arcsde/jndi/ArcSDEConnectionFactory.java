@@ -76,7 +76,7 @@ import org.geotools.arcsde.session.SessionPoolFactory;
  * 
  * @author Gabriel Roldan (OpenGeo)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcsde/common/src/main/java/org/geotools/arcsde/jndi/ArcSDEConnectionFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcsde/common/src/main/java/org/geotools/arcsde/jndi/ArcSDEConnectionFactory.java $
  * @version $Id: ArcSDEConnectionFactory.java 34131 2009-10-12 07:39:40Z mbedward $
  * @since 2.5.7
  */

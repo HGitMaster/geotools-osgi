@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Purpose: these tests ensure the proper operation of feature visitation, with CalcResult merging too!
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/feature/visitor/VisitorCalculationTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/feature/visitor/VisitorCalculationTest.java $
  */
 public class VisitorCalculationTest extends DataTestCase {
     FeatureCollection<SimpleFeatureType, SimpleFeature> fc;

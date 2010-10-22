@@ -28,7 +28,7 @@ import org.geotools.swing.wizard.JWizard;
  * 
  * @author Jody
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/swing/JExampleWizard.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/swing/JExampleWizard.java $
  */
 public class JExampleWizard extends JWizard {    
     private static final long serialVersionUID = 2103905729508952829L;

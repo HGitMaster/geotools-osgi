@@ -57,7 +57,7 @@ import static org.junit.Assert.*;
  * MS-Access database. Otherwise, the default will probably be the one backed by the HSQL
  * database, since this test live in the {@code epsg-hsql} module.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/DefaultFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/DefaultFactoryTest.java $
  * @version $Id: DefaultFactoryTest.java 33776 2009-08-20 13:42:09Z aaime $
  * @author Martin Desruisseaux
  * @author Vadim Semenov
@@ -782,8 +782,7 @@ public class DefaultFactoryTest {
      *
      * @throws FactoryException if an error occured while querying the factory.
      */
-    // hwellmann: Fails on Java 1.6.0
-    // @Test
+    @Test
     public void testFind() throws FactoryException {
         final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(
                 CoordinateReferenceSystem.class);

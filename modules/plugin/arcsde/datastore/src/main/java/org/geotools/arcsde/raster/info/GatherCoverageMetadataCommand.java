@@ -16,6 +16,7 @@
  */
 package org.geotools.arcsde.raster.info;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -515,7 +516,7 @@ public class GatherCoverageMetadataCommand extends Command<RasterDatasetInfo> {
         } catch (SeException e) {
             throw new ArcSdeException(e);
         }
-        bandInfo.tileOrigin = new Point2D.Double(tOrigin.getX(), tOrigin.getY());
+        bandInfo.tileOrigin = new Point((int)tOrigin.getX(), (int)tOrigin.getY());
     }
 
 }

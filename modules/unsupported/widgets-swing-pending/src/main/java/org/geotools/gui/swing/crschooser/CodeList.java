@@ -33,7 +33,7 @@ import org.opengis.referencing.FactoryException;
  * database backed (not a usual implementation from {@code java.util} package), so it
  * is worth to do lazy loading here.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/crschooser/CodeList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/crschooser/CodeList.java $
  * @version $Id: CodeList.java 30681 2008-06-13 10:25:54Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

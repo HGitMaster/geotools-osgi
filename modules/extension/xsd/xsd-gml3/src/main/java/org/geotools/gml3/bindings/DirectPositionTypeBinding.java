@@ -58,7 +58,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/DirectPositionTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/DirectPositionTypeBinding.java $
  */
 public class DirectPositionTypeBinding extends AbstractComplexBinding {
     GeometryFactory factory;

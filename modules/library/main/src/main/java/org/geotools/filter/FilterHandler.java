@@ -25,7 +25,7 @@ import org.xml.sax.ContentHandler;
  * filter information.
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FilterHandler.java $
  * @version $Id: FilterHandler.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public interface FilterHandler extends ContentHandler {

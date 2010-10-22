@@ -43,7 +43,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @author jeichar
  *
  * @since 0.9.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/LabelingTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/LabelingTest.java $
  */
 public class LabelingTest extends TestCase {
     private static final int CENTERX = 160;

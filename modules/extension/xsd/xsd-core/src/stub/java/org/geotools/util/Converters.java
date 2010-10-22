@@ -22,7 +22,7 @@ package org.geotools.util;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/stub/java/org/geotools/util/Converters.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/stub/java/org/geotools/util/Converters.java $
  */
 public class Converters {
 

@@ -51,7 +51,7 @@ import org.opengis.filter.PropertyIsNull;
  * @see FeatureType
  * @author Jody Garnett
  * @since 2.1.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/Schema.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/Schema.java $
  */
 public class Schema {
     private static Schema DEFAULT = new Schema();

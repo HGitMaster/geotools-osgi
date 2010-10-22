@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Jesse
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/test/java/org/geotools/data/wfs/v1_0_0/CreateFeatureTypeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/test/java/org/geotools/data/wfs/v1_0_0/CreateFeatureTypeTest.java $
  */
 public class CreateFeatureTypeTest extends TestCase {
 

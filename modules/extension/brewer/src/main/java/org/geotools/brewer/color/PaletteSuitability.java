@@ -23,7 +23,7 @@ import java.io.IOException;
  * Contains the suitability information for a single palette with several colour schemes.
  *
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/brewer/color/PaletteSuitability.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/brewer/color/PaletteSuitability.java $
  */
 public class PaletteSuitability {
     /** Suitability = GOOD */

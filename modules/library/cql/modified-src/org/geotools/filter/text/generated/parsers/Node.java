@@ -24,7 +24,7 @@ package org.geotools.filter.text.generated.parsers;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/modified-src/org/geotools/filter/text/generated/parsers/Node.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/modified-src/org/geotools/filter/text/generated/parsers/Node.java $
  */
 public interface Node {
 

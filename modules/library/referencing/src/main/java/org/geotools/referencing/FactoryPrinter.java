@@ -41,7 +41,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Prints a list of factory. This is used for {@link ReferencingFactoryFinder#listProviders}
  * implementation only.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/FactoryPrinter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/FactoryPrinter.java $
  * @version $Id: FactoryPrinter.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Desruisseaux
  */

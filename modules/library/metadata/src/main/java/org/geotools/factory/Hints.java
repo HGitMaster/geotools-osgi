@@ -59,8 +59,8 @@ import org.opengis.util.InternationalString;
  * retarget the geotools library for their needs.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
- * @version $Id: Hints.java 34082 2009-10-06 11:00:21Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+ * @version $Id: Hints.java 35735 2010-06-19 15:17:07Z aaime $
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
@@ -367,7 +367,18 @@ public class Hints extends RenderingHints {
      * @since 2.4
      */
     public static final Key VERSION = new Key("org.geotools.util.Version");
+    
+    
 
+    /**
+     * When this key is used in the user data section of a feature and the feature store
+     * query capabilities reports being able to use provided feature ids the store will
+     * try to use the user provided feature id during insertion, and will fail if the FID
+     * cannot be parsed into a valid storage identifier
+     *
+     * @since 2.7
+     */
+    public static final Key USE_PROVIDED_FID = new Key("org.geotools.fidPolicy.UseExisting");
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -1283,8 +1294,8 @@ public class Hints extends RenderingHints {
      * non-sense), but may impact other aspects of an application as well.
      *
      * @since 2.1
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 34082 2009-10-06 11:00:21Z aaime $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 35735 2010-06-19 15:17:07Z aaime $
      * @author Martin Desruisseaux
      */
     public static class Key extends RenderingHints.Key {
@@ -1405,8 +1416,8 @@ public class Hints extends RenderingHints {
      * {@code Class<T>}.
      *
      * @since 2.4
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 34082 2009-10-06 11:00:21Z aaime $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 35735 2010-06-19 15:17:07Z aaime $
      * @author Martin Desruisseaux
      */
     public static final class ClassKey extends Key {
@@ -1491,8 +1502,8 @@ public class Hints extends RenderingHints {
      * The file may also be specified as a {@link String} object.
      *
      * @since 2.4
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 34082 2009-10-06 11:00:21Z aaime $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 35735 2010-06-19 15:17:07Z aaime $
      * @author Jody Garnett
      * @author Martin Desruisseaux
      */
@@ -1538,8 +1549,8 @@ public class Hints extends RenderingHints {
      * A default value is provided and may be checked with {@link #getDefault()}.
      *
      * @since 2.4
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 34082 2009-10-06 11:00:21Z aaime $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 35735 2010-06-19 15:17:07Z aaime $
      * @author Jody Garnett
      */
     public static final class IntegerKey extends Key {
@@ -1611,8 +1622,8 @@ public class Hints extends RenderingHints {
      * A default value is provided and may be checked with {@link #getDefault()}.
      *
      * @since 2.6
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 34082 2009-10-06 11:00:21Z aaime $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 35735 2010-06-19 15:17:07Z aaime $
      * @author Jody Garnett
      */
     public static final class DoubleKey extends Key {
@@ -1685,8 +1696,8 @@ public class Hints extends RenderingHints {
      * may be supported (but there is no assurances - {@link Hints#DATUM_SHIFT_METHOD}).
      *
      * @since 2.4
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 34082 2009-10-06 11:00:21Z aaime $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 35735 2010-06-19 15:17:07Z aaime $
      * @author Jody Garnett
      */
     public static final class OptionKey extends Key {
@@ -1742,8 +1753,8 @@ public class Hints extends RenderingHints {
      * your nam
      *
      * @since 2.4
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
-     * @version $Id: Hints.java 34082 2009-10-06 11:00:21Z aaime $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/Hints.java $
+     * @version $Id: Hints.java 35735 2010-06-19 15:17:07Z aaime $
      * @author Martin Desruisseaux
      */
     static final class DataSourceKey extends Key {

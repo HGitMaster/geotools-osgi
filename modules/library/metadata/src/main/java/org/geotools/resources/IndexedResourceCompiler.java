@@ -36,7 +36,7 @@ import java.lang.reflect.Field;
  * them.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/IndexedResourceCompiler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/IndexedResourceCompiler.java $
  * @version $Id: IndexedResourceCompiler.java 34724 2009-12-22 11:17:18Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

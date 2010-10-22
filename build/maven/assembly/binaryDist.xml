@@ -10,7 +10,7 @@
        contains every JAR copied by our custom "jar-collector" plugin.
 
        $Id: binaryDist.xml 31202 2008-08-21 09:06:17Z jgarnett $
-       $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/assembly/binaryDist.xml $
+       $URL: http://svn.osgeo.org/geotools/tags/2.6.5/build/maven/assembly/binaryDist.xml $
      ====================================================================== -->
 <assembly>
   <id>bin</id>

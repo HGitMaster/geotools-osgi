@@ -27,7 +27,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  *    validation??
  *  
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/AttributeWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/AttributeWriter.java $
  * @version $Id: AttributeWriter.java 30648 2008-06-12 19:22:35Z acuster $
  * @author  Ian Schneider
  * @author Sean Geoghegan, Defence Science and Technology Organisation.

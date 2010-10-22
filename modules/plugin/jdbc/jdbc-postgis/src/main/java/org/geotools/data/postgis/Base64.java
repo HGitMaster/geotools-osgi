@@ -73,7 +73,7 @@ package org.geotools.data.postgis;
  * @author Robert Harder
  * @author rob@iharder.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-postgis/src/main/java/org/geotools/data/postgis/Base64.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-postgis/src/main/java/org/geotools/data/postgis/Base64.java $
  * @version 2.1
  */
 public class Base64

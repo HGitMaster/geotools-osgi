@@ -41,7 +41,7 @@ import org.geotools.util.NumberRange;
  * name in the {@code coverage} module. We made this copy because we currently
  * can't leverage test classes defined in an other module.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/coverage/io/GridCoverageExamples.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/coverage/io/GridCoverageExamples.java $
  * @version $Id: GridCoverageExamples.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

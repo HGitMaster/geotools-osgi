@@ -28,7 +28,7 @@ import org.geotools.xml.schema.ElementGrouping;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/ChoiceGT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/ChoiceGT.java $
  */
 public class ChoiceGT implements Choice {
     private String id;

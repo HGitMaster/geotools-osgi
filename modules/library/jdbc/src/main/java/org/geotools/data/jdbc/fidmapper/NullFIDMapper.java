@@ -34,7 +34,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * each time it is loaded from the datastore.
  *
  * @author wolf
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/NullFIDMapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/NullFIDMapper.java $
  * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class NullFIDMapper extends AbstractFIDMapper {

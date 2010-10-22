@@ -44,7 +44,7 @@ import org.geotools.xs.XS;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/bindings/XSNonNegativeIntegerBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/bindings/XSNonNegativeIntegerBinding.java $
  */
 public class XSNonNegativeIntegerBinding implements SimpleBinding {
     final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);

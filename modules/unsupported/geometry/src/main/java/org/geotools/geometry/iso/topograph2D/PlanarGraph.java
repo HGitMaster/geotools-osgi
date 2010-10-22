@@ -44,7 +44,7 @@ import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
  * graphs
  * </UL>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/PlanarGraph.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/PlanarGraph.java $
  */
 public class PlanarGraph {
 

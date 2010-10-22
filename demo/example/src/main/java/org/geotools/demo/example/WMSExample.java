@@ -24,7 +24,7 @@ import org.geotools.data.wms.response.GetMapResponse;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/example/WMSExample.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/example/WMSExample.java $
  */
 public class WMSExample {
 

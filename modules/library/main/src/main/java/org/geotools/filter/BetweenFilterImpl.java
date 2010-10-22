@@ -31,7 +31,7 @@ import org.opengis.filter.FilterVisitor;
  * filter.
  *
  * @author Rob Hranac, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/BetweenFilterImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/BetweenFilterImpl.java $
  * @version $Id: BetweenFilterImpl.java 31681 2008-10-18 19:02:26Z aaime $
  *
  * @task REVISIT: I think AbstractFilter right now does not consider between a

@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Interface for a feature cache. 
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/featurecache/FeatureCache.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/featurecache/FeatureCache.java $
  */
 public interface FeatureCache extends FeatureSource {
     /**

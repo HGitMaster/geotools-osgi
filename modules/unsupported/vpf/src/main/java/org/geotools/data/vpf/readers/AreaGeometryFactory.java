@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Creates Geometries for area objects
  *
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/readers/AreaGeometryFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/readers/AreaGeometryFactory.java $
  */
 public class AreaGeometryFactory extends VPFGeometryFactory
     implements FileConstants {

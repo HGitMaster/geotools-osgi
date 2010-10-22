@@ -26,7 +26,7 @@ import org.geotools.jdbc.JDBCTestSetup;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-h2/src/test/java/org/geotools/data/h2/H2FeatureSourceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-h2/src/test/java/org/geotools/data/h2/H2FeatureSourceTest.java $
  */
 public class H2FeatureSourceTest extends JDBCFeatureSourceTest {
     protected JDBCTestSetup createTestSetup() {

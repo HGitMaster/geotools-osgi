@@ -41,7 +41,7 @@ import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
 /**
  * Tests if the CRS utility class is functioning correctly when using EPSG-Oracle datastore.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/CRSOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/CRSOnlineTest.java $
  * @version $Id: CRSOnlineTest.java 30691 2008-06-13 13:20:02Z acuster $
  * @author Jody Garnett
  * @author Martin Desruisseaux

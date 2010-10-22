@@ -134,6 +134,10 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
     public static final ParameterDescriptor<Boolean> ALLOW_MULTITHREADING = new DefaultParameterDescriptor<Boolean>(
             "AllowMultithreading", Boolean.class, new Boolean[]{Boolean.TRUE,Boolean.FALSE}, Boolean.FALSE);
     
+    /** Control the footprint management.*/
+    public static final ParameterDescriptor<Boolean> HANDLE_FOOTPRINT = new DefaultParameterDescriptor<Boolean>(
+            "HandleFootprint", Boolean.class, new Boolean[]{Boolean.TRUE,Boolean.FALSE}, Boolean.TRUE);
+    
     /** Control the background values for the output coverage */
     public static final ParameterDescriptor<double[]> BACKGROUND_VALUES = new DefaultParameterDescriptor<double[]>(
             "BackgroundValues", double[].class, null, null);
@@ -165,6 +169,7 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
                 INPUT_IMAGE_THRESHOLD_VALUE, 
                 OUTPUT_TRANSPARENT_COLOR,
                 USE_JAI_IMAGEREAD,
+                HANDLE_FOOTPRINT,
                 BACKGROUND_VALUES,
                 SUGGESTED_TILE_SIZE,
                 ALLOW_MULTITHREADING,
@@ -227,7 +232,7 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
 				}
 	            
 	            //get the properties file
-	            final MosaicConfigurationBean props = ImageMosaicUtils.loadPropertiesFile(sourceURL, crs,"location");
+	            final MosaicConfigurationBean props = ImageMosaicUtils.loadPropertiesFile(sourceURL, crs,ImageMosaicUtils.DEFAULT_LOCATION_ATTRIBUTE);
 	            if(props==null)
 	            	return false;
 	            

@@ -65,7 +65,7 @@ import net.sf.jsqlparser.statement.select.Union;
  * 
  * @author Gabriel Roldan, Axios Engineering
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/sql-datastore/src/org/geotools/data/sql/ViewRegisteringFactoryHelper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/sql-datastore/src/org/geotools/data/sql/ViewRegisteringFactoryHelper.java $
  */
 public class ViewRegisteringFactoryHelper {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ViewRegisteringFactoryHelper.class.getPackage()

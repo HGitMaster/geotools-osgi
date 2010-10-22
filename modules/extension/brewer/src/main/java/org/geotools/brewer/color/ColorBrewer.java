@@ -42,7 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author James Macgill
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/brewer/color/ColorBrewer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/brewer/color/ColorBrewer.java $
  */
 public class ColorBrewer {
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.brewer.color");

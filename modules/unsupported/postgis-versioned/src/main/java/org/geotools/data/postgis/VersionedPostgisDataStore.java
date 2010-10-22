@@ -60,6 +60,7 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.data.postgis.fidmapper.PostGISAutoIncrementFIDMapper;
+import org.geotools.data.postgis.fidmapper.UUIDFIDMapper;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapperFactory;
 import org.geotools.factory.CommonFactoryFinder;
@@ -100,7 +101,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 2.4
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/VersionedPostgisDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/VersionedPostgisDataStore.java $
  */
 public class VersionedPostgisDataStore implements VersioningDataStore {
 
@@ -118,18 +119,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
     static final String VERSION = "version";
 
     static final Class[] SUPPORTED_FID_MAPPERS = new Class[] { BasicFIDMapper.class,
-            MultiColumnFIDMapper.class, PostGISAutoIncrementFIDMapper.class };
-
-    /**
-     * Key used in transaction properties to hold the commit author
-     */
-    public static final String AUTHOR = "PgVersionedCommitAuthor";
-
-    /**
-     * Key used in transaction properties to hold the commit message
-     */
-    public static final String MESSAGE = "PgVersionedCommitMessage";
-
+            MultiColumnFIDMapper.class, PostGISAutoIncrementFIDMapper.class, UUIDFIDMapper.class};
     /**
      * Key used to store the feature types touched by the current transaction
      */
@@ -444,6 +434,13 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         }
         return versioned.booleanValue();
     }
+    
+    /**
+     * Gets a connection for the provided transaction.
+     */
+    public Connection getConnection(Transaction t) throws IOException {
+        return wrapped.getConnection(t);
+    }
 
     public boolean isVersionedFeatureCollection(String typeName) throws IOException {
         if(!typeName.endsWith("_vfc_view"))
@@ -648,7 +645,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         // select rowId, revisionCreated, [columnsForSecondaryFilter]
         // from data
         // where (
-        // (revision < r1 and expired >= r1 and expired <= r2)
+        // (revision < r1 and expired > r1 and expired <= r2)
         // or
         // (revision > r1 and revision <= r2)
         // )
@@ -686,16 +683,16 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
 
         // build a filter to extract stuff modified between r1 and r2 and matching the prefilter
         Filter revLeR1 = ff.lessOrEqual(ff.property("revision"), ff.literal(r1.revision));
-        Filter expGeR1 = ff.greaterOrEqual(ff.property("expired"), ff.literal(r1.revision));
+        Filter expGtR1 = ff.greater(ff.property("expired"), ff.literal(r1.revision));
         Filter expLeR2 = ff.lessOrEqual(ff.property("expired"), ff.literal(r2.revision));
         Filter expLtR2 = ff.less(ff.property("expired"), ff.literal(r2.revision));
         Filter revGtR1 = ff.greater(ff.property("revision"), ff.literal(r1.revision));
         Filter revLeR2 = ff.lessOrEqual(ff.property("revision"), ff.literal(r2.revision));
         Filter versionFilter;
         if(r2.isLast())
-            versionFilter = ff.or(ff.and(revLeR1, ff.and(expGeR1, expLtR2)), revGtR1);
+            versionFilter = ff.or(ff.and(revLeR1, ff.and(expGtR1, expLtR2)), revGtR1);
         else
-            versionFilter = ff.or(ff.and(revLeR1, ff.and(expGeR1, expLeR2)), ff.and(revGtR1,
+            versionFilter = ff.or(ff.and(revLeR1, ff.and(expGtR1, expLeR2)), ff.and(revGtR1,
                 revLeR2));
         // ... merge in the prefilter
         Filter newFilter = null;
@@ -851,17 +848,40 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      * The base revision is the revision at which the feature type has been version enabled.
      * returned) 
      * @param typeName
-     * @return
+     * @return 
      */
     long getBaseRevision(String typeName, Transaction transaction) throws IOException {
-        DefaultQuery q = new DefaultQuery(typeName);
-        q.setPropertyNames(new String[] {REVISION});
-        q.setSortBy(new org.opengis.filter.sort.SortBy[] { ff.sort(REVISION, SortOrder.ASCENDING) });
-        q.setMaxFeatures(1);
+        // first grab the table code
+        DefaultQuery q = new DefaultQuery(TBL_VERSIONEDTABLES);
+        q.setFilter(ff.equal(ff.property("name"), ff.literal(typeName), true));
         FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
+        Long tableId;
         try {
             fr = wrapped.getFeatureReader(q, transaction);
-            return (Long) fr.next().getAttribute(REVISION);
+            SimpleFeature feature = fr.next();
+            tableId = Long.parseLong(feature.getID().substring(TBL_VERSIONEDTABLES.length() + 1));
+        } finally {
+            if(fr != null) fr.close();
+        }
+        
+        if(tableId == null) {
+            throw new RuntimeException("Table " + typeName + " does not appear " +
+            		"to be versioned, there is no record of it in " + TBL_VERSIONEDTABLES);
+        }
+        
+        // next find the revision at which it was version enabled (it's the oldest)
+        q = new DefaultQuery(TBL_TABLESCHANGED);
+        q.setFilter(ff.equal(ff.property("versionedtable"), ff.literal(tableId), false));
+        q.setSortBy(new org.opengis.filter.sort.SortBy[] { ff.sort(REVISION, SortOrder.ASCENDING) });
+        q.setMaxFeatures(1);
+        try {
+            fr = wrapped.getFeatureReader(q, transaction);
+            if(!fr.hasNext()) {
+                return -1; // this is equivalent to "FIRST"
+            } else {
+                SimpleFeature feature = fr.next();
+                return (Long) feature.getAttribute(REVISION);
+            }
         } finally {
             if(fr != null) fr.close();
         }
@@ -1069,8 +1089,8 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         ResultSet rs = null;
         PostgisSQLBuilder sqlb = wrapped.createSQLBuilder();
         Transaction t = new DefaultTransaction();
-        t.putProperty(AUTHOR, author);
-        t.putProperty(MESSAGE, message);
+        t.putProperty(VersioningDataStore.AUTHOR, author);
+        t.putProperty(VersioningDataStore.MESSAGE, message);
         try {
             // gather the transaction state and pick the version number, also
             // update the dirty feature types
@@ -1280,8 +1300,8 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         Statement st = null;
         PostgisSQLBuilder sqlb = wrapped.createSQLBuilder();
         Transaction t = new DefaultTransaction();
-        t.putProperty(AUTHOR, author);
-        t.putProperty(MESSAGE, message);
+        t.putProperty(VersioningDataStore.AUTHOR, author);
+        t.putProperty(VersioningDataStore.MESSAGE, message);
         try {
             // gather the transaction state and pick the version number, also
             // update the dirty feature types
@@ -1296,7 +1316,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
 
             // gather bbox, we need it for the first commit msg
             Envelope envelope = wrapped.getFeatureSource(typeName).getBounds();
-            if (envelope != null) {
+            if (envelope != null && wrapped.getSchema(typeName).getGeometryDescriptor() != null) {
                 CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getGeometryDescriptor()
                         .getCoordinateReferenceSystem();
                 if (crs != null)
@@ -1315,9 +1335,11 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             st.execute("DELETE FROM geometry_columns WHERE f_table_schema = current_schema() " +
             		"   AND f_table_name = '" + typeName + "_vfc_view'");
             
+            // remove all non active rows
+            st.execute("DELETE FROM " + sqlb.encodeTableName(typeName) + " WHERE expired <> " + Long.MAX_VALUE);
+            
             // build a comma separated list of old pk columns, just skip the
-            // first
-            // which we know is "revision"
+            // first which we know is "revision"
             PkDescriptor pk = getPrimaryKeyConstraintName(conn, typeName);
             if (pk == null)
                 throw new DataSourceException("Cannot version tables without primary keys");
@@ -1357,8 +1379,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             // alters still in progress and the whole thing will lock up
             resetTypeInfo();
         } catch (SQLException sql) {
-            throw new DataSourceException("Error occurred during version enabling. "
-                    + "Does your table have columns with reserved names?", sql);
+            throw new DataSourceException("Error occurred during version disabling", sql);
         } catch (TransformException e) {
             throw new DataSourceException(
                     "Error occurred while trying to compute the lat/lon bounding box "

@@ -19,12 +19,15 @@ package org.geotools.filter.text.ecql;
 
 import org.geotools.filter.text.commons.CompilerUtil;
 import org.geotools.filter.text.commons.Language;
+import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.filter.text.cql2.CQLLikePredicateTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Not;
 import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
 
 /**
  * Test for like predicate
@@ -40,7 +43,7 @@ import org.opengis.filter.PropertyIsLike;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLLikePredicateTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLLikePredicateTest.java $
  */
 public class ECQLLikePredicateTest extends CQLLikePredicateTest {
     
@@ -67,6 +70,44 @@ public class ECQLLikePredicateTest extends CQLLikePredicateTest {
         PropertyIsLike expected = (PropertyIsLike) FilterECQLSample.getSample(FilterECQLSample.FUNCTION_LIKE_ECQL_PATTERN);
 
         Assert.assertEquals("like filter was expected", expected, resultFilter);
+        
+        // test for strToUpperCase function
+        resultFilter = ECQL.toFilter( "strToUpperCase(anAttribute) like '%BB%'"); 
+
+        Assert.assertTrue(resultFilter instanceof PropertyIsLike);
+
+        PropertyIsLike resultLike = (PropertyIsLike) resultFilter;
+        
+        Expression resultExpression = resultLike.getExpression();
+        Assert.assertTrue(  resultExpression instanceof Function);
+        
+        Function resultFunction = (Function)resultExpression;
+        Assert.assertEquals("strToUpperCase", resultFunction.getName());
+        
+        Assert.assertEquals( resultLike.getLiteral(),  "%BB%" );
+        
+    }
+    
+    /**
+     * Test like using a pattern with spanish caracters 
+     */
+    @Test
+    public void functionAndPatternWithSpanishCharacter() throws CQLException{
+
+    	Filter resultFilter = ECQL.toFilter( "strToUpperCase(anAttribute) like '%año%'"); 
+
+        Assert.assertTrue(resultFilter instanceof PropertyIsLike);
+
+        PropertyIsLike resultLike = (PropertyIsLike) resultFilter;
+        
+        Expression resultExpression = resultLike.getExpression();
+        Assert.assertTrue(  resultExpression instanceof Function);
+        
+        Function resultFunction = (Function)resultExpression;
+        Assert.assertEquals("strToUpperCase", resultFunction.getName());
+        
+        Assert.assertEquals( resultLike.getLiteral(),  "%año%" );
+        
     }
     
     /**

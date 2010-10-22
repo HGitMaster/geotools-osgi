@@ -25,7 +25,7 @@ import java.util.List;
  * better ways to do this, but this seems to work.
  *
  * @author Chris Holmes
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/MultiAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/MultiAttributeType.java $
  * @version $Id: MultiAttributeType.java 30647 2008-06-12 18:58:42Z acuster $
  * 
  * @deprecated Will be removed in geotools 2.6

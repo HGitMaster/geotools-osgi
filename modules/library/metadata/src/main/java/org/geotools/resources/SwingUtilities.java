@@ -55,7 +55,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * </ul>
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/SwingUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/SwingUtilities.java $
  * @version $Id: SwingUtilities.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

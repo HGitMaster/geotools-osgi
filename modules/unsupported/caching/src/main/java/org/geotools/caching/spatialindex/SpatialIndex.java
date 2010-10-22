@@ -41,7 +41,7 @@ import java.util.Properties;
  * Modified by Christophe Rousson
  * Modified by Emily Gouge
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/SpatialIndex.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/spatialindex/SpatialIndex.java $
  */
 public interface SpatialIndex {
     public static final String INDEX_TYPE_PROPERTY = "SpatialIndex.Type";

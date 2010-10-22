@@ -67,13 +67,19 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/GMLConfiguration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/GMLConfiguration.java $
  */
 public class GMLConfiguration extends Configuration {
     /**
      * Property which controls whether encoded features should include bounds.
      */
     public static final QName NO_FEATURE_BOUNDS = new QName( "org.geotools.gml", "noFeatureBounds" );
+   
+    /**
+     * Boolean property which controls whether the FeatureCollection should be encoded with multiple featureMember
+     * as opposed to a single featureMembers
+     */
+    public static final QName ENCODE_FEATURE_MEMBER = new QName( "org.geotools.gml", "encodeFeatureMember" );
 
     /**
      * Creates the new gml configuration, with a depenendency

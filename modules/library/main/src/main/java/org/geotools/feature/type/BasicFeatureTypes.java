@@ -48,7 +48,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * </p>
  *
  * @author John Meagher
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/BasicFeatureTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/type/BasicFeatureTypes.java $
  */
 public class BasicFeatureTypes
 {

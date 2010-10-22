@@ -23,7 +23,7 @@ import org.opengis.referencing.operation.MathTransform2D;
 /**
  * Seems to be a cache of fun information associated with the Symbolizer.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/SymbolizerAssociation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/SymbolizerAssociation.java $
  */
 class SymbolizerAssociation
 {

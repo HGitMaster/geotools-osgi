@@ -26,7 +26,7 @@ import org.geotools.xml.XSD;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xlink/XLINK.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xlink/XLINK.java $
  */
 public final class XLINK extends XSD {
     /**

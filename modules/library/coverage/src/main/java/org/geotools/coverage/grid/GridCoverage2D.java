@@ -93,7 +93,7 @@ import org.opengis.referencing.datum.PixelInCell;
  * deserialization (usually on client side) of {@code GridCoverage2D} instances requires J2SE 1.5.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoverage2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridCoverage2D.java $
  * @version $Id: GridCoverage2D.java 34912 2010-02-17 16:11:33Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  */

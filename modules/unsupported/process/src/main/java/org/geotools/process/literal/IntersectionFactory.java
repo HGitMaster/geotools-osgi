@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/literal/IntersectionFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/literal/IntersectionFactory.java $
  */
 public class IntersectionFactory extends SingleProcessFactory {
     // making parameters available as static constants to help java programmers
@@ -75,7 +75,7 @@ public class IntersectionFactory extends SingleProcessFactory {
     }
     
     public IntersectionFactory() {
-        super(new NameImpl(GT_NAMESPACE, "Intersect"));
+        super(new NameImpl("gt", "Intersect"));
     }
     
 	public Process create()

@@ -62,8 +62,8 @@ import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
  * process from the super-class is used as a fallback.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/AuthorityBackedFactory.java $
- * @version $Id: AuthorityBackedFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/AuthorityBackedFactory.java $
+ * @version $Id: AuthorityBackedFactory.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
@@ -304,7 +304,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                         prepend = createOperation(sourceCRS, source).getMathTransform();
                         source  = sourceCRS;
                     } finally {
-                        processing.set(Boolean.FALSE);
+                        processing.remove();
                     } else {
                         prepend = null;
                     }
@@ -313,7 +313,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                         append = createOperation(target, targetCRS).getMathTransform();
                         target = targetCRS;
                     } finally {
-                        processing.set(Boolean.FALSE);
+                        processing.remove();
                     } else {
                         append = null;
                     }

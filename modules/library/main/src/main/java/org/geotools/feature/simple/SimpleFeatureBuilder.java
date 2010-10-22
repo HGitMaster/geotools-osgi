@@ -126,7 +126,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin Deoliveira
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/simple/SimpleFeatureBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/simple/SimpleFeatureBuilder.java $
  */
 public class SimpleFeatureBuilder {
     /**
@@ -152,6 +152,8 @@ public class SimpleFeatureBuilder {
     
     Map<Object, Object>[] userData;
     
+    Map<Object, Object> featureUserData;
+    
     boolean validating;
     
     public SimpleFeatureBuilder(SimpleFeatureType featureType) {
@@ -174,6 +176,7 @@ public class SimpleFeatureBuilder {
         values = new Object[featureType.getAttributeCount()];
         next = 0;
         userData = null;
+        featureUserData = null;
     }
     
     /**
@@ -341,16 +344,22 @@ public class SimpleFeatureBuilder {
 
         Object[] values = this.values;
         Map<Object,Object>[] userData = this.userData;
+        Map<Object,Object> featureUserData = this.featureUserData;
         reset();
         SimpleFeature sf = factory.createSimpleFeature(values, featureType, id);
         
-        // handle the user data
+        // handle the per attribute user data
         if(userData != null) {
             for (int i = 0; i < userData.length; i++) {
                 if(userData[i] != null) {
                     sf.getProperty(featureType.getDescriptor(i).getName()).getUserData().putAll(userData[i]);
                 }
             }
+        }
+        
+        // handle the feature wide user data
+        if(featureUserData != null) {
+            sf.getUserData().putAll(featureUserData);
         }
         
         return sf;
@@ -554,6 +563,21 @@ public class SimpleFeatureBuilder {
         if(userData[index] == null)
             userData[index] = new HashMap<Object, Object>();
         userData[index].put( key, value );
+        return this;
+    }
+    
+    /**
+     * Sets a feature wide use data key/value pair. The user data map is reset
+     * when the feature is built
+     * @param key
+     * @param value
+     * @return
+     */
+    public SimpleFeatureBuilder featureUserData(Object key, Object value) {
+        if(featureUserData == null) {
+            featureUserData = new HashMap<Object, Object>();
+        }
+        featureUserData.put(key, value);
         return this;
     }
     

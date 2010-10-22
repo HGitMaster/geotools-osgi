@@ -23,7 +23,7 @@ import junit.framework.TestCase;
  * DOCUMENT ME!
  *
  * @author rgoulds
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/image/src/test/java/org/geotools/gce/image/WorldImageFormatTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/image/src/test/java/org/geotools/gce/image/WorldImageFormatTest.java $
  */
 public class WorldImageFormatTest extends TestCase {
     private WorldImageFormatTest format;

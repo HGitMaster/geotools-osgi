@@ -28,7 +28,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Allows developer to skip refering to the typeName when a file contains
  * only a single set of content.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/FileDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/FileDataStore.java $
  */
 public interface FileDataStore extends DataStore {
     

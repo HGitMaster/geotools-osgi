@@ -22,7 +22,7 @@ import org.opengis.filter.Not;
 /**
  * @author jdeolive
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/NotImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/NotImpl.java $
  */
 public class NotImpl extends LogicFilterImpl implements Not {
 	

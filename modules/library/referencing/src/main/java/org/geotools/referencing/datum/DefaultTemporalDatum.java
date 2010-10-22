@@ -32,7 +32,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
 /**
  * A temporal datum defines the origin of a temporal coordinate reference system.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultTemporalDatum.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/datum/DefaultTemporalDatum.java $
  * @version $Id: DefaultTemporalDatum.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

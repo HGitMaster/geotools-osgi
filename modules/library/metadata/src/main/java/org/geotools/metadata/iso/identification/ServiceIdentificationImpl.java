@@ -26,7 +26,7 @@ import org.opengis.metadata.identification.ServiceIdentification;
  * Identification of capabilities which a service provider makes available to a service user
  * through a set of interfaces that define a behaviour.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/identification/ServiceIdentificationImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/identification/ServiceIdentificationImpl.java $
  * @version $Id: ServiceIdentificationImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

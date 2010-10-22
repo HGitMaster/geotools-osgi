@@ -34,7 +34,7 @@ import org.opengis.filter.expression.Expression;
  * 
  * @author James
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/WellKnownMarkFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/WellKnownMarkFactory.java $
  */
 public class WellKnownMarkFactory implements MarkFactory {
 

@@ -32,7 +32,7 @@ import org.opengis.filter.identity.GmlObjectId;
  *
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/GmlObjectStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/GmlObjectStore.java $
  */
 public interface GmlObjectStore {
 

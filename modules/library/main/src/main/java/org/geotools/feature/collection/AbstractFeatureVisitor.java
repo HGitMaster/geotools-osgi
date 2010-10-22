@@ -36,7 +36,7 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/collection/AbstractFeatureVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/collection/AbstractFeatureVisitor.java $
  */
 public abstract class AbstractFeatureVisitor implements FeatureVisitor {
     //public void init( FeatureCollection<? extends FeatureType, ? extends Feature> collection ) {

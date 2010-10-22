@@ -41,7 +41,7 @@ import org.geotools.swing.wizard.JWizard.Controller;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JURLField.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JURLField.java $
  */
 public class JURLField extends ParamField {
 

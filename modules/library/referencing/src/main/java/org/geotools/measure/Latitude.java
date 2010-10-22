@@ -22,7 +22,7 @@ package org.geotools.measure;
  * latitudes are South. This class has no direct OpenGIS equivalent.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/measure/Latitude.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/measure/Latitude.java $
  * @version $Id: Latitude.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (PMO, IRD)
  *

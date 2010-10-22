@@ -22,7 +22,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * A utility class for creating simple Comparators for Features.
  *
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/FeatureComparators.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/FeatureComparators.java $
  */
 public final class FeatureComparators {
     /** A utility comparator for comparison by id. */
@@ -161,6 +161,14 @@ public final class FeatureComparators {
             if ((att1 == null) && (att2 == null)) {
                 return 0;
             }
+            
+            if (att1 == null) {
+                return -1;
+            }
+            
+            if (att2 == null) {
+                return 1;
+            }                        
 
             return ((Comparable) att1).compareTo((Comparable) att2);
         }

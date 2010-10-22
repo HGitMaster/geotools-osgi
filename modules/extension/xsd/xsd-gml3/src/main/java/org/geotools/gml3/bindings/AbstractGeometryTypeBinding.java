@@ -61,7 +61,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/AbstractGeometryTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/AbstractGeometryTypeBinding.java $
  */
 public class AbstractGeometryTypeBinding extends AbstractComplexBinding {
     /**
@@ -105,11 +105,18 @@ public class AbstractGeometryTypeBinding extends AbstractComplexBinding {
     public Object getProperty(Object object, QName name)
         throws Exception {
         Geometry geometry = (Geometry) object;
-        if ("srsName".equals( name.getLocalPart() ) ) {
+        
+        if ("srsName".equals(name.getLocalPart())) {
             CoordinateReferenceSystem crs = GML3EncodingUtils.getCRS(geometry);
-
             if (crs != null) {
-                return GML3EncodingUtils.crs(crs);
+                return GML3EncodingUtils.toURI(crs);
+            }
+        }
+
+        if ("srsDimension".equals(name.getLocalPart())) {
+            CoordinateReferenceSystem crs = GML3EncodingUtils.getCRS(geometry);
+            if (crs != null) {
+                return crs.getCoordinateSystem().getDimension();
             }
         }
 

@@ -30,8 +30,8 @@ public class DB2DataStoreAPITest extends JDBCDataStoreAPITest {
     }
     
 	@Override
-	public void setUp() throws Exception {
-		super.setUp();
+	public void connect() throws Exception {
+		super.connect();
 		dataStore.setDatabaseSchema("geotools");
 	}
     

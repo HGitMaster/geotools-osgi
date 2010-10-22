@@ -102,7 +102,7 @@ import org.opengis.feature.type.Name;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/ValidationProcessor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/ValidationProcessor.java $
  * @version $Id: ValidationProcessor.java 33031 2009-05-16 23:51:49Z jive $
  */
 public class ValidationProcessor {

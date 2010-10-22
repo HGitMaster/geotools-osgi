@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  * Tests {@link GeoTools}.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/factory/GeoToolsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/factory/GeoToolsTest.java $
  * @version $Id: GeoToolsTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Jody Garnett
  * @author Martin Desruisseaux

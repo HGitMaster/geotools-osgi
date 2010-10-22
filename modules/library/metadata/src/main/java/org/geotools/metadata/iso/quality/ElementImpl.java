@@ -40,7 +40,7 @@ import org.geotools.resources.i18n.Errors;
 /**
  * Type of test applied to the data specified by a data quality scope.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/ElementImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/ElementImpl.java $
  * @version $Id: ElementImpl.java 30967 2008-07-09 13:46:57Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

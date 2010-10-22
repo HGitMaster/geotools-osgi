@@ -21,7 +21,7 @@ package org.geotools.data.jdbc;
  * the SQLEncoder being used, or that there were io problems.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/FilterToSQLException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/FilterToSQLException.java $
  */
 public class FilterToSQLException extends Exception {
     private static final long serialVersionUID = -2394509611777950167L;

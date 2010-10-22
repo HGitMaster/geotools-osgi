@@ -21,7 +21,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
@@ -32,9 +34,11 @@ import org.geotools.util.logging.Logging;
  * and a good implementation for the URL factory helper method {@link #createUrl(URL, Map)}
  * 
  * @author Gabriel Roldan (OpenGeo)
- * @version $Id: AbstractHttpProtocol.java 34133 2009-10-12 08:14:05Z mbedward $
+ * @version $Id: AbstractHttpProtocol.java 35134 2010-03-29 14:25:33Z groldan $
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/main/java/org/geotools/data/wfs/protocol/http/AbstractHttpProtocol.java $
+ * @source $URL:
+ *         http://svn.osgeo.org/geotools/trunk/modules/unsupported/wfs/src/main/java/org/geotools
+ *         /data/wfs/protocol/http/AbstractHttpProtocol.java $
  * 
  */
 public abstract class AbstractHttpProtocol implements HTTPProtocol {
@@ -102,7 +106,7 @@ public abstract class AbstractHttpProtocol implements HTTPProtocol {
     protected String createUri(final URL baseUrl, final Map<String, String> queryStringKvp) {
         final String query = baseUrl.getQuery();
         Map<String, String> finalKvpMap = new HashMap<String, String>(queryStringKvp);
-        if (query != null) {
+        if (query != null && query.length() > 0) {
             Map<String, String> userParams = new CaseInsensitiveMap(queryStringKvp);
             String[] rawUrlKvpSet = query.split("&");
             for (String rawUrlKvp : rawUrlKvpSet) {
@@ -142,7 +146,10 @@ public abstract class AbstractHttpProtocol implements HTTPProtocol {
 
         String key, value;
         try {
-            for (Map.Entry<String, String> kvp : finalKvpMap.entrySet()) {
+            Entry<String, String> kvp;
+            for (Iterator<Map.Entry<String, String>> it = finalKvpMap.entrySet().iterator(); it
+                    .hasNext();) {
+                kvp = it.next();
                 key = kvp.getKey();
                 value = kvp.getValue();
                 if (value == null) {
@@ -153,7 +160,9 @@ public abstract class AbstractHttpProtocol implements HTTPProtocol {
                 sb.append(key);
                 sb.append('=');
                 sb.append(value);
-                sb.append('&');
+                if (it.hasNext()) {
+                    sb.append('&');
+                }
             }
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);

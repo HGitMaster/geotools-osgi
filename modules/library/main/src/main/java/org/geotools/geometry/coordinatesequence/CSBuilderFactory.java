@@ -25,7 +25,7 @@ package org.geotools.geometry.coordinatesequence;
  *
  * @deprecated Moved to {@link org.geotools.geometry.jts.coordinatesequence.CSBuilderFactory}.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/coordinatesequence/CSBuilderFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/coordinatesequence/CSBuilderFactory.java $
  */
 public class CSBuilderFactory extends org.geotools.geometry.jts.coordinatesequence.CSBuilderFactory {
 }

@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 
  * @since 2.5
  * @version $Id: DefaultObjectCache.java 31618 2008-10-03 20:30:40Z egouge $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/DefaultObjectCache.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/DefaultObjectCache.java $
  * @author Cory Horner (Refractions Research)
  */
 final class DefaultObjectCache implements ObjectCache {

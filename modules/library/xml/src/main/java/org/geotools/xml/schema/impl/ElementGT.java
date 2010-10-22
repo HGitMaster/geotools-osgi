@@ -41,7 +41,7 @@ import org.geotools.xml.schema.Type;
  * </p>
  * @author dzwiers
  * @since 0.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/ElementGT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/ElementGT.java $
  */
 public class ElementGT implements Element {
 

@@ -32,7 +32,7 @@ import org.geotools.filter.expression.PropertyAccessorFactory;
  * @author Gabriel Roldan
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/MapPropertyAccessorFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/filter/MapPropertyAccessorFactory.java $
  */
 public class MapPropertyAccessorFactory implements PropertyAccessorFactory {
 

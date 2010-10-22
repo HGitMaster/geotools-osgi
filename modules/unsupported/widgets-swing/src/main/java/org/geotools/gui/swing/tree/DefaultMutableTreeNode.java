@@ -24,7 +24,7 @@ package org.geotools.gui.swing.tree;
  * implementation but seems to have been forgotten in all Swing interfaces.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/tree/DefaultMutableTreeNode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/tree/DefaultMutableTreeNode.java $
  * @version $Id: DefaultMutableTreeNode.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

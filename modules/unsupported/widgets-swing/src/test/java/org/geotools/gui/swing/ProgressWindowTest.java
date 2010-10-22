@@ -32,7 +32,7 @@ import org.geotools.resources.Arguments;
  * Tests {@link ProgressWindow}. The window will be displayed only if this test
  * is executed through its {@link #main main} method.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/ProgressWindowTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/ProgressWindowTest.java $
  * @version $Id: ProgressWindowTest.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

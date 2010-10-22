@@ -76,7 +76,7 @@ import org.geotools.util.Utilities;
  * <p>&nbsp;</p>
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/image/ColorRamp.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/image/ColorRamp.java $
  * @version $Id: ColorRamp.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (PMO, IRD)
  */

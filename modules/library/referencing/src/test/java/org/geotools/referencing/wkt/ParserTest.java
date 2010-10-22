@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the WKT {@link Parser} implementation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/wkt/ParserTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/wkt/ParserTest.java $
  * @version $Id: ParserTest.java 33399 2009-06-30 11:25:55Z aaime $
  * @author Yann Cézard
  * @author Remi Eve

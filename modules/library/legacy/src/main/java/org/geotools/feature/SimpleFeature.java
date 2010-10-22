@@ -70,7 +70,7 @@ package org.geotools.feature;
  *
  * @author David Zwiers, Refractions
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/SimpleFeature.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/SimpleFeature.java $
  * @version $Id: SimpleFeature.java 30647 2008-06-12 18:58:42Z acuster $
  *
  * @task REVISIT: I am not sure that I like getAttribute returning the  object

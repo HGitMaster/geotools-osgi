@@ -31,7 +31,7 @@ import org.geotools.util.logging.Logging;
  * @author rpetty
  * @version $Id: WSResponse.java 34133 2009-10-12 08:14:05Z mbedward $
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/protocol/ws/WSResponse.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/protocol/ws/WSResponse.java $
  */
 @SuppressWarnings("nls")
 public class WSResponse {

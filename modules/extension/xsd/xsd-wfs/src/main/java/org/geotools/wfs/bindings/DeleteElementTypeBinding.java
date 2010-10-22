@@ -84,7 +84,7 @@ import org.geotools.xml.AbstractComplexEMFBinding;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/DeleteElementTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/DeleteElementTypeBinding.java $
  */
 public class DeleteElementTypeBinding extends AbstractComplexEMFBinding {
     public DeleteElementTypeBinding(WfsFactory factory) {

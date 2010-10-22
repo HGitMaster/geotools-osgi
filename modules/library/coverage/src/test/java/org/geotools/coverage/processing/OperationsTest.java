@@ -47,7 +47,7 @@ import static org.junit.Assert.*;
  * failure suggests that it is not always the case. The <cite>mediaLib</cite> native code seems
  * right in this case (the bug would be in the pure Java code).
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/processing/OperationsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/coverage/processing/OperationsTest.java $
  * @version $Id: OperationsTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

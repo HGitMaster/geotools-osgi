@@ -29,7 +29,7 @@ import org.geotools.resources.i18n.LoggingKeys;
 /**
  * A set of utilities methods related to JDBC (<cite>Java Database Connectivity</cite>).
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/JDBC.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/JDBC.java $
  * @version $Id: JDBC.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

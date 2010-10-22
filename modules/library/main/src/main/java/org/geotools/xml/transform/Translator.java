@@ -23,7 +23,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * A Translator is used in an XMLEncoding process by the FeatureTransformer 
  * class.
  * @author  Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/xml/transform/Translator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/xml/transform/Translator.java $
  */
 public interface Translator {
     

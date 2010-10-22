@@ -24,7 +24,7 @@ import org.geotools.data.ows.AbstractRequest;
  * Provides functionality for a basic GetLegendGraphic request
  * 
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractGetLegendGraphicRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractGetLegendGraphicRequest.java $
  */
 public abstract class AbstractGetLegendGraphicRequest extends AbstractWMSRequest implements GetLegendGraphicRequest {
 

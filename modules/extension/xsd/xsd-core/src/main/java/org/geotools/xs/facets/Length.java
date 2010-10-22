@@ -56,7 +56,7 @@ import java.util.Collection;
  * </code></pre>
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/facets/Length.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xs/facets/Length.java $
  */
 public abstract class Length {
     /**

@@ -30,7 +30,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Brief description of ways in which the resource(s) is/are currently used.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/identification/UsageImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/identification/UsageImpl.java $
  * @version $Id: UsageImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

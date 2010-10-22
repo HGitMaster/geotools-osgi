@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * a starting point for test cases involving Data constructs.
  * </p>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/DataTestCase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/DataTestCase.java $
  * @version $Id: DataTestCase.java 31750 2008-11-01 10:02:11Z aaime $
  * @author Jody Garnett, Refractions Research
  *

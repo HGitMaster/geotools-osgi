@@ -30,7 +30,7 @@ import java.awt.geom.Point2D;
  * have if no deformations existed.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/DeformableViewer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/DeformableViewer.java $
  * @version $Id: DeformableViewer.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (PMO, IRD)
  */

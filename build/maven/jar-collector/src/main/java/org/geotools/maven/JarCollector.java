@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.FileUtils;
  *
  * @goal collect
  * @phase package
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/jar-collector/src/main/java/org/geotools/maven/JarCollector.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/build/maven/jar-collector/src/main/java/org/geotools/maven/JarCollector.java $
  * @version $Id: JarCollector.java 33719 2009-08-07 15:52:38Z aaime $
  * @author Martin Desruisseaux
  */

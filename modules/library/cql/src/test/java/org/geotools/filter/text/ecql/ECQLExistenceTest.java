@@ -30,7 +30,7 @@ import org.geotools.filter.text.cql2.CQLExistenceTest;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLExistenceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLExistenceTest.java $
  */
 public class ECQLExistenceTest extends CQLExistenceTest {
     

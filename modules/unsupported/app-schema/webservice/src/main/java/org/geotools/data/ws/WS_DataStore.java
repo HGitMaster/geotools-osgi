@@ -58,7 +58,7 @@ import org.jdom.Document;
  * 
  * @author Russell Petty
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/WS_DataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/WS_DataStore.java $
  * @version $Id: WS_DataStore.java 34133 2009-10-12 08:14:05Z mbedward $ 
  */
 public final class WS_DataStore implements XmlDataStore {

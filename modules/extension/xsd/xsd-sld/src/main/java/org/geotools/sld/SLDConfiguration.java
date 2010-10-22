@@ -76,7 +76,7 @@ import org.geotools.xml.Configuration;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-sld/src/main/java/org/geotools/sld/SLDConfiguration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-sld/src/main/java/org/geotools/sld/SLDConfiguration.java $
  */
 public class SLDConfiguration extends Configuration {
     /**

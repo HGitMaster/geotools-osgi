@@ -27,7 +27,7 @@ import org.geotools.util.Utilities;
  * A writer that put some spaces in front of every lines. The indentation is initially set
  * to 0 spaces. Users must invoke {@link #setIndentation} in order to set a different value.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/io/IndentedLineWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/io/IndentedLineWriter.java $
  * @version $Id: IndentedLineWriter.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  *

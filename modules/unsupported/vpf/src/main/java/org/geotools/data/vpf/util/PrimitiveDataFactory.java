@@ -27,7 +27,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Created on July 8, 2004, 12:10 PM
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/util/PrimitiveDataFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/util/PrimitiveDataFactory.java $
  */
 public class PrimitiveDataFactory {
     protected EdgeData readEdge(TableRow edge) {

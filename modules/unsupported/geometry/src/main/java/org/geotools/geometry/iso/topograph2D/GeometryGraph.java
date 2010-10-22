@@ -53,7 +53,7 @@ import org.opengis.geometry.primitive.Surface;
 /**
  * A GeometryGraph is a graph that models a given Geometry
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/GeometryGraph.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/GeometryGraph.java $
  */
 public class GeometryGraph extends PlanarGraph {
 

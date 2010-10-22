@@ -53,7 +53,7 @@ import org.geotools.referencing.wkt.Formatter;
  * identify the exact type.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/crs/AbstractSingleCRS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/crs/AbstractSingleCRS.java $
  * @version $Id: AbstractSingleCRS.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

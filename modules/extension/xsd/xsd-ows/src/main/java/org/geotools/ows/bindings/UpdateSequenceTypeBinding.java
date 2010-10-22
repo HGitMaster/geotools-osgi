@@ -41,7 +41,7 @@ import org.geotools.xml.*;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/UpdateSequenceTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/UpdateSequenceTypeBinding.java $
  */
 public class UpdateSequenceTypeBinding extends AbstractSimpleBinding {
     public UpdateSequenceTypeBinding(Ows10Factory factory) {

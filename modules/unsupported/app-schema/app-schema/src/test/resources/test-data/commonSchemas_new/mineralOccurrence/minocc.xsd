@@ -3,7 +3,7 @@
         <documentation>[WARN-A001] - No package description in UML model</documentation>
     </annotation>
     <import namespace="http://www.opengis.net/gml" schemaLocation="http://schemas.opengis.net/gml/3.1.1/base/gml.xsd"/>
-    <import namespace="urn:cgi:xmlns:CGI:Utilities:1.0" schemaLocation="http://www.geosciml.org/schemas/cgiutilities/1.0/primitiveTypes.xsd"/>
+    <import namespace="urn:cgi:xmlns:CGI:Utilities:1.0" schemaLocation="http://www.geosciml.org/cgiutilities/1.0/xsd/primitiveTypes.xsd"/>
     <import namespace="http://www.cgi-iugs.org/xml/GeoSciML/2" schemaLocation="http://schemas.opengis.net/GeoSciML/geosciml.xsd"/>
     <element name="MiningActivity" substitutionGroup="mo:MiningFeature" type="mo:MiningActivityType">
         <annotation>

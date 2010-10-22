@@ -22,10 +22,17 @@ import it.geosolutions.imageio.plugins.jp2mrsid.JP2GDALMrSidImageReaderSpi;
 import it.geosolutions.imageio.utilities.ImageIOUtilities;
 
 import java.awt.RenderingHints;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +42,7 @@ import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 import org.geotools.coverageio.gdal.jp2ecw.JP2ECWFormatFactory;
 import org.geotools.coverageio.gdal.jp2kak.JP2KFormatFactory;
 import org.geotools.coverageio.gdal.jp2mrsid.JP2MrSIDFormatFactory;
+import org.geotools.data.DataUtilities;
 
 import com.sun.media.imageioimpl.common.PackageUtil;
 import com.sun.media.imageioimpl.plugins.jpeg2000.J2KImageReaderCodecLibSpi;
@@ -50,11 +58,23 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
  */
 
 public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
+        
+    @Override
+	protected void finalize() throws Throwable {
+    	DefaultMultiThreadedLoader.shutdown();
+		DefaultMultiThreadedLoader.shutdownNow();
+	}
+
+	static ExecutorService DefaultMultiThreadedLoader;
+    
 	/** Logger. */
 	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ImageMosaicFormatFactory.class);
+	
 	private static final String KAKADU_SPI = "it.geosolutions.imageio.plugins.jp2k.JP2KKakaduImageReaderSpi";
 
 	static{
+		initDefaultMultiThreadedLoader();
+		
 		replaceTIFF();
 		
 		if(JP2KAK()){
@@ -72,7 +92,94 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
 				replaceGDALKAK();
 			}
 		}
+		
 	}
+
+	/**
+	 * Initialize the multithreaded loader for loading granules in 
+	 * parallel inside {@link ImageMosaicReader}s instances.
+	 */
+	private static void initDefaultMultiThreadedLoader() {
+	    // defaults   
+	    int corePoolSize = ImageMosaicUtils.DEFAULT_CORE_POOLSIZE;
+            int maxPoolSize = ImageMosaicUtils.DEFAULT_MAX_POOLSIZE;;
+            int keepAliveSeconds = ImageMosaicUtils.DEFAULT_KEEP_ALIVE;
+            ImageMosaicUtils.QueueType queueType=ImageMosaicUtils.DEFAULT_QUEUE_TYPE;
+            
+
+            String configFile = null;
+            Properties props = null;
+            //
+            // STEP 0 Java property
+            //
+            final String filePath = System.getProperty("mosaic.threadpoolconfig.path");
+            if (filePath != null && filePath.trim().length() > 0) {
+                configFile = filePath;
+                if (configFile != null){
+                    final File file = new File(configFile);
+                    if (file != null && file.exists() && file.canRead()){
+                        props = ImageMosaicUtils.loadPropertiesFromURL(DataUtilities.fileToURL(file));
+                    }
+                }
+            }            
+
+            //
+            // STEP 1 User home config file
+            //
+            // Looking for file referred by "mosaic.threadpoolconfig.path" property
+            if (props == null) {
+                //Looking for file on user home
+                final String userHome = System.getProperty("user.home");
+                if (userHome != null && userHome.length()>0) {
+                    configFile = userHome+File.separatorChar+ImageMosaicUtils.THREADPOOL_CONFIG_FILE;
+                    final File file = new File(configFile);
+                    if (file != null && file.exists() && file.canRead()){
+                        props = ImageMosaicUtils.loadPropertiesFromURL(DataUtilities.fileToURL(file));
+                    }
+                }
+            }
+            
+            //Init properties
+            if (props != null){
+                final String corePool = props.getProperty("corePoolSize");
+                if (corePool != null){
+                    corePoolSize = Integer.parseInt(corePool);
+                }
+                final String maxPool = props.getProperty("maxPoolSize");
+                if (maxPool != null){
+                    maxPoolSize = Integer.parseInt(maxPool);
+                }
+                final String keepAlive = props.getProperty("keepAliveSeconds");
+                if (keepAlive != null){
+                    keepAliveSeconds = Integer.parseInt(keepAlive);
+                }
+                final String queueT = props.getProperty("queueType");
+                if (queueT != null){
+                	try{
+                		queueType=ImageMosaicUtils.QueueType.valueOf(queueT);
+                	}finally{
+                		queueType=ImageMosaicUtils.QueueType.getDefault();
+                	}
+                }                
+            }
+            
+            switch (queueType) {
+			case UNBOUNDED:
+				DefaultMultiThreadedLoader = new ThreadPoolExecutor(corePoolSize,maxPoolSize,keepAliveSeconds,
+	                    TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
+				break;
+			case DIRECT:
+				DefaultMultiThreadedLoader = new ThreadPoolExecutor(corePoolSize,maxPoolSize,keepAliveSeconds,
+	                    TimeUnit.SECONDS,new SynchronousQueue<Runnable>());
+				break;
+			default:// UNBOUNDED
+				DefaultMultiThreadedLoader = new ThreadPoolExecutor(corePoolSize,maxPoolSize,keepAliveSeconds,
+	                    TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());				
+				break;
+			}
+            
+        
+    }            
 	/**
 	 * Tells me if this plugin will work on not given the actual installation.
 	 * 
@@ -148,7 +255,7 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
 			
 			final boolean succeeded=ImageIOUtilities.replaceProvider(ImageReaderSpi.class, KAKADU_SPI, imageioJ2KImageReaderName, "JPEG 2000");
         	if(!succeeded)
-        		if (LOGGER.isLoggable(Level.WARNING))
+        		if (LOGGER.isLoggable(Level.FINE))
         			LOGGER.warning("Unable to set ordering between jp2 readers spi-"+KAKADU_SPI+":"+imageioJ2KImageReaderName);	
 	        
 		} catch (ClassNotFoundException e) {
@@ -168,7 +275,7 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
 			
 			final boolean succeeded=ImageIOUtilities.replaceProvider(ImageReaderSpi.class, customTiffName, imageioTiffName, "tiff");
         	if(!succeeded)
-        		if (LOGGER.isLoggable(Level.WARNING))
+        		if (LOGGER.isLoggable(Level.FINE))
         			LOGGER.warning("Unable to set ordering between tiff readers spi");	
 	        
 		} catch (ClassNotFoundException e) {
@@ -194,7 +301,7 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
 			if(PackageUtil.isCodecLibAvailable()){
 				boolean succeeded=ImageIOUtilities.replaceProvider(ImageReaderSpi.class, kakJP2, imageioJ2KImageReaderCodecName, "JPEG 2000");
 	        	if(!succeeded)
-	        		if (LOGGER.isLoggable(Level.WARNING))
+	        		if (LOGGER.isLoggable(Level.FINE))
 	        			LOGGER.warning("Unable to set ordering between jp2 readers spi-"+kakJP2+":"+imageioJ2KImageReaderCodecName);	
 			}
         	
@@ -204,7 +311,7 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
 			
 			final boolean succeeded=ImageIOUtilities.replaceProvider(ImageReaderSpi.class, kakJP2, imageioJ2KImageReaderName, "JPEG 2000");
         	if(!succeeded)
-        		if (LOGGER.isLoggable(Level.WARNING))
+        		if (LOGGER.isLoggable(Level.FINE))
         			LOGGER.warning("Unable to set ordering between jp2 readers spi-"+kakJP2+":"+imageioJ2KImageReaderName);	
 	        
 		} catch (ClassNotFoundException e) {
@@ -226,7 +333,7 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
 			if(PackageUtil.isCodecLibAvailable()){
 				boolean succeeded=ImageIOUtilities.replaceProvider(ImageReaderSpi.class, mrsidJP2, imageioJ2KImageReaderCodecName, "JPEG 2000");
 	        	if(!succeeded)
-	        		if (LOGGER.isLoggable(Level.WARNING))
+	        		if (LOGGER.isLoggable(Level.FINE))
 	        			LOGGER.warning("Unable to set ordering between jp2 readers spi-"+mrsidJP2+":"+imageioJ2KImageReaderCodecName);	
 			}
         	
@@ -236,7 +343,7 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
 			
 			final boolean succeeded=ImageIOUtilities.replaceProvider(ImageReaderSpi.class, mrsidJP2, imageioJ2KImageReaderName, "JPEG 2000");
         	if(!succeeded)
-        		if (LOGGER.isLoggable(Level.WARNING))
+        		if (LOGGER.isLoggable(Level.FINE))
         			LOGGER.warning("Unable to set ordering between jp2 readers spi-"+mrsidJP2+":"+imageioJ2KImageReaderName);	
 	        
 		} catch (ClassNotFoundException e) {
@@ -262,7 +369,7 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
 			if(PackageUtil.isCodecLibAvailable()){
 				boolean succeeded=ImageIOUtilities.replaceProvider(ImageReaderSpi.class, ecwJP2, imageioJ2KImageReaderCodecName, "JPEG 2000");
 	        	if(!succeeded)
-	        		if (LOGGER.isLoggable(Level.WARNING))
+	        		if (LOGGER.isLoggable(Level.FINE))
 	        			LOGGER.warning("Unable to set ordering between jp2 readers spi-"+ecwJP2+":"+imageioJ2KImageReaderCodecName);	
 			}
         	
@@ -271,7 +378,7 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
 			
 			final boolean succeeded=ImageIOUtilities.replaceProvider(ImageReaderSpi.class, ecwJP2, imageioJ2KImageReaderName, "JPEG 2000");
         	if(!succeeded)
-        		if (LOGGER.isLoggable(Level.WARNING))
+        		if (LOGGER.isLoggable(Level.FINE))
         			LOGGER.warning("Unable to set ordering between jp2 readers spi-"+ecwJP2+":"+imageioJ2KImageReaderName);	
 	        
 		} catch (ClassNotFoundException e) {

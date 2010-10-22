@@ -31,38 +31,18 @@ import java.util.logging.Logger;
  * DataStore factory that creates {@linkplain org.geotools.data.property.PropertyDataStore}s
  *
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyDataStoreFactory.java $
- * @version $Id: PropertyDataStoreFactory.java 32332 2009-01-26 18:54:59Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyDataStoreFactory.java $
+ * @version $Id: PropertyDataStoreFactory.java 35216 2010-04-12 11:00:06Z jive $
  */
 public class PropertyDataStoreFactory implements DataStoreFactorySpi {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(PropertyDataStoreFactory.class.getPackage().getName());
 	
-	
-	//    public DataSourceMetadataEnity createMetadata( Map params )
-    //            throws IOException {
-    //        if( !canProcess( params )){
-    //            throw new IOException( "Provided params cannot be used to connect");
-    //        }
-    //        File dir = (File) DIRECTORY.lookUp( params );
-    //        return new DataSourceMetadataEnity( dir, "Property file access for " + dir );        
-    //    }    
-
-    /** DOCUMENT ME!  */
     public static final Param DIRECTORY = new Param("directory", File.class,
             "Directory containting property files", true);
 
-    public static final Param NAMESPACE = new Param("namespace", String.class, 
-    		"namespace of datastore", false );
+    public static final Param NAMESPACE = new Param("namespace", String.class,
+            "namespace of datastore", false);
     
-    /**
-     * DOCUMENT ME!
-     *
-     * @param params DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     */
     public DataStore createDataStore(Map params) throws IOException {
     	File dir = directoryLookup(params);
         String namespaceURI = (String) NAMESPACE.lookUp( params );
@@ -73,15 +53,6 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param params DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     */
     public DataStore createNewDataStore(Map params) throws IOException {
     	File dir = directoryLookup(params);
 
@@ -101,28 +72,17 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
         return new PropertyDataStore(dir,namespaceURI);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public String getDisplayName() {
         return "Properties";
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public String getDescription() {
         return "Allows access to Java Property files containing Feature information";
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @see #DIRECTORY
+     * @see PropertyDataStoreFactory#NAMESPACE
      */
     public Param[] getParametersInfo() {
         return new Param[] { DIRECTORY, NAMESPACE };
@@ -137,20 +97,18 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
      * @return <tt>true</tt> if and only if this factory is available to create
      *         DataStores.
      *
-     * @task REVISIT: I'm just adding this method to compile, maintainer should
-     *       revisit to check for any libraries that may be necessary for
-     *       datastore creations. ch.
+     * @task <code>true</code> property datastore is always available
      */
     public boolean isAvailable() {
         return true;
     }
 
     /**
-     * DOCUMENT ME!
+     * Works for a file directory or property file
      *
-     * @param params DOCUMENT ME!
+     * @param params Connection parameters
      *
-     * @return DOCUMENT ME!
+     * @return true for connection parameters indicating a directory or property file
      */
     public boolean canProcess(Map params) {
         try {
@@ -163,6 +121,7 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
     }
     
     /**
+     * No implementation hints are provided at this time.
      */
     public Map getImplementationHints(){
         return java.util.Collections.EMPTY_MAP;
@@ -182,20 +141,28 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
      * @throws IOException if {@linkplain #DIRECTORY} doesn't find parameter in <code>params</code>
      * file does not exists.
      */
-    private File directoryLookup(Map params)throws IOException, FileNotFoundException,IllegalArgumentException{
-    	File directory = (File)DIRECTORY.lookUp(params);
-    	if(!directory.exists()){
-    		File currentDir = new File(System.getProperty("user.dir"));
-    		directory = new File(currentDir, (String)params.get(DIRECTORY.key));
-    		if(!directory.exists()){
-    			throw new FileNotFoundException(directory.getAbsolutePath());
-    		}
-    		if(!directory.isDirectory()){
-    			throw new IllegalArgumentException(directory.getAbsolutePath() + " is not a directory");
-    		}
-    	} else if(!directory.isDirectory()) {
-    	        throw new IllegalArgumentException(directory.getAbsolutePath() + " is not a directory");
-    	}
-    	return directory;
+    private File directoryLookup(Map params) throws IOException, FileNotFoundException,
+            IllegalArgumentException {
+        File directory = (File) DIRECTORY.lookUp(params);
+        if (!directory.exists()) {
+            File currentDir = new File(System.getProperty("user.dir"));
+            directory = new File(currentDir, (String) params.get(DIRECTORY.key));
+            if (!directory.exists()) {
+                throw new FileNotFoundException(directory.getAbsolutePath());
+            }
+            if (!directory.isDirectory()) {
+                throw new IllegalArgumentException(directory.getAbsolutePath()
+                        + " is not a directory");
+            }
+        } else if (!directory.isDirectory()) {
+            // check if they pointed to a properties file; and use the parent directory
+            if( directory.getPath().endsWith(".properties")){
+                return directory.getParentFile();
+            }
+            else {
+                throw new IllegalArgumentException(directory.getAbsolutePath() + " is not a directory");
+            }
+        }
+        return directory;
     }
 }

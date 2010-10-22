@@ -27,7 +27,7 @@ import org.opengis.feature.type.PropertyDescriptor;
  *
  * @author Michael Bedward
  * @since 2.7
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/utils/MapLayerUtils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/utils/MapLayerUtils.java $
  * @version $Id: MapLayerUtils.java 34442 2009-11-23 00:52:37Z mbedward $
  */
 public class MapLayerUtils {

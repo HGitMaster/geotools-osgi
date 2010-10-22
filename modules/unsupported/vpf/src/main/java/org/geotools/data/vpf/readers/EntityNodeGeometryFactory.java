@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DOCUMENT ME!
  *
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/readers/EntityNodeGeometryFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/readers/EntityNodeGeometryFactory.java $
  */
 public class EntityNodeGeometryFactory extends VPFGeometryFactory implements FileConstants {
     /* (non-Javadoc)

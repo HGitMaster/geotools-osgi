@@ -25,7 +25,7 @@ package org.geotools.swing.control;
  * 
  * @author Michael Bedward
  * @since 2.6.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/control/ValueChangedListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/control/ValueChangedListener.java $
  * @version $Id: ValueChangedListener.java 34290 2009-10-30 12:36:40Z mbedward $
  */
 public interface ValueChangedListener {

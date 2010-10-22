@@ -5,7 +5,7 @@
 -- Authors: Andrea Aimes
 --          Martin Desruisseaux
 --
--- Version: $Id: EPSG_Indexes.sql 34665 2009-12-13 12:40:59Z aaime $
+-- Version: $Id: EPSG_Indexes.sql 35746 2010-06-21 17:25:23Z aaime $
 --
 
 --------------------------------------------------------------------------------

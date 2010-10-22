@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/Decimator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/Decimator.java $
  */
 public final class Decimator {
     
@@ -112,18 +112,50 @@ public final class Decimator {
 	 */
     public static double[] computeGeneralizationDistances(MathTransform screenToWorld, Rectangle paintArea, double pixelDistance)
             throws TransformException {
+        try {
+            // init the spans with the upper left corner
+            double[] spans = getGeneralizationSpans(paintArea.x, paintArea.y, screenToWorld);
+            // search over a simple 3x3 grid for higher spans so that we perform a basic sampling of the whole area
+            // and we pick the shortest generalization distances
+            for(int i = 0; i < 2; i++) {
+                for(int j = 0; j < 2; j++) {
+                    double[] ns = getGeneralizationSpans(paintArea.x + paintArea.width * i / 2.0, 
+                            paintArea.y + paintArea.height / 2.0, screenToWorld);
+                    if(ns[0] < spans[0])
+                        spans[0] = ns[0];
+                    if(ns[1] < spans[1])
+                        spans[1] = ns[1];
+                }
+            }
+            spans[0] *= pixelDistance;
+            spans[1] *= pixelDistance ;
+            return spans;
+        } catch(TransformException e) {
+            // if we can't transform we went way out of the area of definition for the transform -> don't generalize
+            return new double[] {0, 0};
+        }
+    }
+    
+    /**
+     * Computes the real world distance of a one pixel segment centered in the specified point
+     * @param x
+     * @param y
+     * @param transform
+     * @return
+     * @throws TransformException
+     */
+    static double[] getGeneralizationSpans(double x, double y, MathTransform transform) throws TransformException {
         double[] original = new double[] {
-        		paintArea.x + paintArea.width / 2.0,
-        		paintArea.y + paintArea.height / 2.0,
-        		paintArea.x + paintArea.width / 2.0 + 1,
-        		paintArea.y + paintArea.height / 2.0 + 1, };
-        double[] coords = new double[4];
-        	screenToWorld.transform(original, 0, coords, 0, 2);
+                x - 0.5, y - 0.5,
+                x + 0.5, y + 0.5};
+        double[] transformed = new double[4];
+        transform.transform(original, 0, transformed, 0, 2);
         double[] spans = new double[2]; 
-        spans[0] = Math.abs(coords[0] - coords[2]) * pixelDistance;
-        spans[1] = Math.abs(coords[1] - coords[3]) * pixelDistance;
+        spans[0] = Math.abs(transformed[0] - transformed[2]);
+        spans[1] = Math.abs(transformed[1] - transformed[3]);
         return spans;
     }
+    
 
 	/**
 	 * @throws TransformException

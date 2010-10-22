@@ -46,6 +46,8 @@ import org.geotools.styling.LinePlacement;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
 import org.geotools.styling.NamedLayer;
+import org.geotools.styling.OtherText;
+import org.geotools.styling.OtherTextImpl;
 import org.geotools.styling.OverlapBehavior;
 import org.geotools.styling.PointPlacement;
 import org.geotools.styling.PointSymbolizer;
@@ -64,6 +66,7 @@ import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbol;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.TextSymbolizer2;
 import org.geotools.styling.UserLayer;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
@@ -86,7 +89,7 @@ import org.opengis.style.Description;
  * </p>
  * @author Jesse Eichar
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/visitor/DuplicatingStyleVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/visitor/DuplicatingStyleVisitor.java $
  */
 public class DuplicatingStyleVisitor implements StyleVisitor {
 	
@@ -714,7 +717,9 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
 
     public void visit(PointSymbolizer ps) {
         PointSymbolizer copy = sf.getDefaultPointSymbolizer();
-        copy.setGeometryPropertyName( ps.getGeometryPropertyName());
+        
+        copy.setGeometry(copy(ps.getGeometry()));
+        
         copy.setUnitOfMeasure(ps.getUnitOfMeasure());
         copy.setGraphic( copy( ps.getGraphic() ));
         if( STRICT ){
@@ -727,7 +732,9 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
 
     public void visit(LineSymbolizer line) {
         LineSymbolizer copy = sf.getDefaultLineSymbolizer();
-        copy.setGeometryPropertyName( line.getGeometryPropertyName());
+        
+        copy.setGeometry(copy(line.getGeometry()));
+        
         copy.setUnitOfMeasure(line.getUnitOfMeasure());
         copy.setStroke( copy( line.getStroke()));
         
@@ -740,7 +747,9 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     public void visit(PolygonSymbolizer poly) {
         PolygonSymbolizer copy = sf.createPolygonSymbolizer();
         copy.setFill( copy( poly.getFill()));
-        copy.setGeometryPropertyName( poly.getGeometryPropertyName());
+        
+        copy.setGeometry(copy(poly.getGeometry()));
+        
         copy.setUnitOfMeasure(poly.getUnitOfMeasure());
         copy.setStroke(copy(poly.getStroke()));
         
@@ -752,9 +761,12 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
 
     public void visit(TextSymbolizer text) {
         TextSymbolizer copy = sf.createTextSymbolizer();
+        
         copy.setFill( copy( text.getFill()));
         copy.setFont( copy( text.getFont()));
-        copy.setGeometryPropertyName( text.getGeometryPropertyName() );
+        
+        copy.setGeometry(copy(text.getGeometry()));
+        
         copy.setUnitOfMeasure(text.getUnitOfMeasure());
         copy.setHalo( copy( text.getHalo() ));
         copy.setLabel( copy( text.getLabel()));
@@ -762,18 +774,30 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         copy.setPriority( copy( text.getPriority()));
         copy.getOptions().putAll(text.getOptions());
         
+        if (text instanceof TextSymbolizer2){
+        	TextSymbolizer2 text2 = (TextSymbolizer2) text;
+        	TextSymbolizer2 copy2 = (TextSymbolizer2) copy;
+        	
+        	copy2.setGraphic( copy(text2.getGraphic()));
+        	copy2.setSnippet(copy(text2.getSnippet()));
+        	copy2.setFeatureDescription(copy(text2.getFeatureDescription()));
+        	copy2.setOtherText(copy(text2.getOtherText()));
+        }
+        
         if( STRICT && !copy.equals( text )){
             throw new IllegalStateException("Was unable to duplicate provided TextSymbolizer:"+text );
         }
         pages.push(copy);
     }
-    
-    public void visit(RasterSymbolizer raster) {
+
+	public void visit(RasterSymbolizer raster) {
         RasterSymbolizer copy = sf.createRasterSymbolizer();
         copy.setChannelSelection( copy( raster.getChannelSelection() ));
         copy.setColorMap( copy( raster.getColorMap() ));
         copy.setContrastEnhancement( copy( raster.getContrastEnhancement()));
-        copy.setGeometryPropertyName( raster.getGeometryPropertyName());
+        
+        copy.setGeometry(copy(raster.getGeometry()));
+        
         copy.setUnitOfMeasure(raster.getUnitOfMeasure());
         copy.setImageOutline( copy( raster.getImageOutline()));
         copy.setOpacity( copy( raster.getOpacity() ));
@@ -800,7 +824,10 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         // Symbol[] symbolCopys = copy( gr.getSymbols() );
 
         copy = sf.createDefaultGraphic();
+        
+        // Odd.. graphics should not have a geometry property name 
         copy.setGeometryPropertyName(gr.getGeometryPropertyName());
+        
         copy.setDisplacement(displacementCopy);
         copy.setExternalGraphics(externalGraphicsCopy);
         copy.setMarks(marksCopy);
@@ -915,6 +942,11 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     public void visit(LinePlacement lp) {
         Expression offset = copy( lp.getPerpendicularOffset());
         LinePlacement copy = sf.createLinePlacement(offset);
+        copy.setAligned( lp.isAligned() );
+        copy.setGap( copy(lp.getGap()) );
+        copy.setGeneralized( lp.isGeneralizeLine() );
+        copy.setInitialGap( copy(lp.getInitialGap()) );
+        copy.setRepeated( lp.isRepeated() );
 
         if( STRICT && !copy.equals( lp )){
             throw new IllegalStateException("Was unable to duplicate provided LinePlacement:"+lp );
@@ -962,6 +994,19 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         Extent copy = sf.createExtent(name, value);
         return copy;
     }
+    
+    
+    private OtherText copy(OtherText otherText) {
+    	if (otherText == null) return null;
+    	
+        // TODO: add methods to the factory to create OtherText instances
+    	// sf.createOtherText();
+    	OtherTextImpl copy = new OtherTextImpl();
+    	copy.setTarget( otherText.getTarget() );
+    	copy.setText( copy(otherText.getText()) );
+		return copy;
+	}
+
     
     public void visit(ColorMap colorMap) {
         ColorMap copy = sf.createColorMap();

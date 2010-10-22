@@ -28,7 +28,7 @@ import org.geotools.test.OnlineTestCase;
  * @since 2.4
  * @author Cory Horner, Refractions Research
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisOnlineTestCase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisOnlineTestCase.java $
  */
 public abstract class PostgisOnlineTestCase extends OnlineTestCase {
 

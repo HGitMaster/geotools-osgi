@@ -30,7 +30,7 @@ import org.opengis.util.Cloneable;
  * Direct implementation of AnchorPoint.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/AnchorPointImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/AnchorPointImpl.java $
  * @version $Id: AnchorPointImpl.java 33813 2009-08-28 14:45:11Z jive $
  */
 public class AnchorPointImpl implements AnchorPoint,Cloneable {

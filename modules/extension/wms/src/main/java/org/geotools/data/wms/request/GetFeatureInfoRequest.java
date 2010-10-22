@@ -33,7 +33,7 @@ import org.geotools.data.ows.Request;
  * </p>
  *
  * @author Richard Gould, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/GetFeatureInfoRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/GetFeatureInfoRequest.java $
  */
 public interface GetFeatureInfoRequest extends Request{
     /** Represents the INFO_FORMAT parameter */

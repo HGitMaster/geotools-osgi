@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link DefaultTemporalDatum} class.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/datum/DefaultTemporalDatumTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/datum/DefaultTemporalDatumTest.java $
  * @version $Id: DefaultTemporalDatumTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux
  */

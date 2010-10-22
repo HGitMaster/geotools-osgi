@@ -45,7 +45,7 @@ import org.geotools.xml.InstanceComponent;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/test/java/org/geotools/ml/bindings/MLMimeTopLevelTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/test/java/org/geotools/ml/bindings/MLMimeTopLevelTypeBinding.java $
  */
 public class MLMimeTopLevelTypeBinding extends AbstractSimpleBinding {
     /**

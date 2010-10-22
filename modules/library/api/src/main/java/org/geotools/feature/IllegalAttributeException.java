@@ -25,7 +25,7 @@ import org.opengis.feature.type.Name;
 
 /**
  * Indicates client class has attempted to create an invalid feature.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/feature/IllegalAttributeException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/feature/IllegalAttributeException.java $
  * @deprecated Please use org.opengis.feature.IllegalAttributeException
  */
 public class IllegalAttributeException extends org.opengis.feature.IllegalAttributeException {

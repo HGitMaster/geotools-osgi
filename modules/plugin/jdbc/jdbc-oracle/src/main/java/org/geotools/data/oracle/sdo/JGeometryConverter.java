@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author Andrea Aime - OpenGeo
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/JGeometryConverter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/JGeometryConverter.java $
  */
 public class JGeometryConverter {
 //    /**

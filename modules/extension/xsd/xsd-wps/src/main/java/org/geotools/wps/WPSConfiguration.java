@@ -40,7 +40,7 @@ import org.picocontainer.MutablePicoContainer;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wps/src/main/java/org/geotools/wps/WPSConfiguration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wps/src/main/java/org/geotools/wps/WPSConfiguration.java $
  */
 public class WPSConfiguration extends Configuration {
 
@@ -55,6 +55,7 @@ public class WPSConfiguration extends Configuration {
        addDependency( new OWSConfiguration());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void registerBindings(Map bindings) {
         bindings.put(WPS.InputReferenceType, InputReferenceTypeBinding.class);

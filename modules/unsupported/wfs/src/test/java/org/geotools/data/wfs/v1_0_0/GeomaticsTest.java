@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
  * </p>
  * @author dzwiers
  * @since 0.6.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/test/java/org/geotools/data/wfs/v1_0_0/GeomaticsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/test/java/org/geotools/data/wfs/v1_0_0/GeomaticsTest.java $
  */
 public class GeomaticsTest extends TestCase {
 

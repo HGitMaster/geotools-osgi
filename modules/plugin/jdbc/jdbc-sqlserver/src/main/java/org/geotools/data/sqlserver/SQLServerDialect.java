@@ -50,7 +50,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Justin Deoliveira, OpenGEO
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-sqlserver/src/main/java/org/geotools/data/sqlserver/SQLServerDialect.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-sqlserver/src/main/java/org/geotools/data/sqlserver/SQLServerDialect.java $
  */
 public class SQLServerDialect extends BasicSQLDialect {
 

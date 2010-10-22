@@ -20,7 +20,7 @@ package org.geotools.data.vpf.ifc;
  * FileConstants.java Created: Fri Dec 27 23:16:01 2002
  *
  * @author <a href="mailto:kobit@users.sf.net">Artur Hefczyc</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/FileConstants.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/ifc/FileConstants.java $
  * @version $Id: FileConstants.java 30687 2008-06-13 11:03:06Z acuster $
  */
 public interface FileConstants {

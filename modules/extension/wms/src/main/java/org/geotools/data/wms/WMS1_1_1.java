@@ -29,7 +29,7 @@ import org.geotools.data.ows.GetCapabilitiesRequest;
  * 
  * @author Jody Garnett, Refractions Research
  * @author rgould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/WMS1_1_1.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/WMS1_1_1.java $
  */
 public class WMS1_1_1 extends WMS1_1_0 {
     public WMS1_1_1() {

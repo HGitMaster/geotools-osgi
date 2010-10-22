@@ -52,7 +52,7 @@ import static org.junit.Assert.*;
  * Visual test of the "Resample" operation. A remote sensing image is projected from a fitted
  * coordinate system to a geographic one.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/processing/ResampleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/coverage/processing/ResampleTest.java $
  * @version $Id: ResampleTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Rémi Eve (IRD)
  * @author Martin Desruisseaux (IRD)

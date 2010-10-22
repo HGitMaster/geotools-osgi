@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  * Tests the {@link DefaultCoordinateSystemAxis} class.
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/cs/DefaultCoordinateSystemAxisTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/cs/DefaultCoordinateSystemAxisTest.java $
  * @version $Id: DefaultCoordinateSystemAxisTest.java 34126 2009-10-12 06:35:18Z mbedward $
  * @author Martin Desruisseaux
  */

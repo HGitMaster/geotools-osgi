@@ -115,7 +115,7 @@ import java.util.Set;
  * </ol>
  * @author Jody Garnett
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/Transaction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/Transaction.java $
  * @version $Id: Transaction.java 30642 2008-06-12 17:52:06Z acuster $
  */
 public interface Transaction {

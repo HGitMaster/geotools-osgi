@@ -31,7 +31,7 @@ import org.opengis.util.Cloneable;
  * Direct implementation of Halo.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/HaloImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/HaloImpl.java $
  * @version $Id: HaloImpl.java 33833 2009-09-04 12:26:28Z jive $
  */
 public class HaloImpl implements Halo, Cloneable {

@@ -77,7 +77,7 @@ import org.opengis.filter.expression.Expression;
  * </p>
  *
  * @author James Macgill, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/LineSymbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/LineSymbolizer.java $
  * @version $Id: LineSymbolizer.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public interface LineSymbolizer extends org.opengis.style.LineSymbolizer, Symbolizer {

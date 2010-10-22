@@ -31,7 +31,7 @@ import org.opengis.filter.expression.Expression;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/visitor/AverageVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/visitor/AverageVisitor.java $
  */
 public class AverageVisitor implements FeatureCalc {
     private Expression expr;

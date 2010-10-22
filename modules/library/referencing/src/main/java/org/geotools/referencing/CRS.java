@@ -64,8 +64,10 @@ import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.referencing.operation.transform.IdentityTransform;
+import org.geotools.referencing.wkt.Formattable;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -103,8 +105,8 @@ import org.geotools.util.UnsupportedImplementationException;
  * 
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/CRS.java $
- * @version $Id: CRS.java 34842 2010-01-27 16:44:20Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/CRS.java $
+ * @version $Id: CRS.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
  * @author Andrea Aime
@@ -1679,6 +1681,16 @@ search:             if (DefaultCoordinateSystemAxis.isCompassDirection(axis.getD
         strictFactory = null;
         lenientFactory = null;
     }
+    
+    /**
+     * Cleans up the thread local set in this thread. They can prevent web applications from
+     * proper shutdown
+     */
+    public static void cleanupThreadLocals() {
+        DefaultMathTransformFactory.cleanupThreadLocals();
+        Formattable.cleanupThreadLocals();
+    }
+
 
     /**
      * Prints to the {@linkplain System#out standard output stream} some information about

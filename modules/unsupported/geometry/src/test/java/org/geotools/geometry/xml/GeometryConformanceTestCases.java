@@ -60,7 +60,7 @@ import org.xml.sax.InputSource;
  * - spaces must be replaced by "_" in description
  * - "No_description" is the default
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/test/java/org/geotools/geometry/xml/GeometryConformanceTestCases.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/test/java/org/geotools/geometry/xml/GeometryConformanceTestCases.java $
  */
 public class GeometryConformanceTestCases extends TestCase {
 

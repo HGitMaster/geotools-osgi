@@ -25,7 +25,7 @@ import org.opengis.metadata.quality.NonQuantitativeAttributeAccuracy;
 /**
  * Accuracy of non-quantitative attributes.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/NonQuantitativeAttributeAccuracyImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/NonQuantitativeAttributeAccuracyImpl.java $
  * @version $Id: NonQuantitativeAttributeAccuracyImpl.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Cory Horner (Refractions Research)
  *

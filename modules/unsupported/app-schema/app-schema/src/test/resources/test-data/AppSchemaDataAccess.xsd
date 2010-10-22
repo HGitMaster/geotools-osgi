@@ -212,6 +212,7 @@
       <element name="FeatureTypeMapping" minOccurs="0" maxOccurs="unbounded">
         <complexType>
           <sequence>
+            <element name="mappingName" type="string" minOccurs="0"/>
             <element name="sourceDataStore" type="string">
               <annotation>
                 <documentation>one of the datastore ids defined in the sourceDataStores section</documentation>
@@ -336,7 +337,7 @@
       </documentation>
     </annotation>
     <sequence>
-      <choice>
+      <choice minOccurs="0">
         <element name="OCQL" type="string" />
         <element name="Expression">
           <complexType>

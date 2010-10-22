@@ -80,8 +80,8 @@ import org.geotools.resources.LazySet;
  * wrapper around a {@code FactoryRegistry} instance.</P>
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/ReferencingFactoryFinder.java $
- * @version $Id: ReferencingFactoryFinder.java 34644 2009-12-10 19:41:46Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/ReferencingFactoryFinder.java $
+ * @version $Id: ReferencingFactoryFinder.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public final class ReferencingFactoryFinder extends FactoryFinder {
@@ -709,7 +709,11 @@ loop:       for (int i=0; ; i++) {
      * Resets the factory finder and prepares for a new full scan of the SPI subsystems
      */
     public static void reset() {
+        FactoryRegistry copy = registry;
         registry = null;
+        if(copy != null) {
+            copy.deregisterAll();
+        }
     }
 
     /**

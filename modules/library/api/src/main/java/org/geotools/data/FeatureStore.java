@@ -45,7 +45,7 @@ import org.geotools.feature.FeatureCollection;
  * @author Ray Gallagher
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/FeatureStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/FeatureStore.java $
  * @version $Id: FeatureStore.java 31060 2008-07-23 20:45:42Z jgarnett $
  */
 public interface FeatureStore<T extends FeatureType, F extends Feature> extends FeatureSource<T, F> {

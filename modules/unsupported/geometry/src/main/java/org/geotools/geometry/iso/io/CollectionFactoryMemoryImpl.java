@@ -33,7 +33,7 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
  * @author Sanjay Jena and Prof. Dr. Jackson Roehrig
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/io/CollectionFactoryMemoryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/io/CollectionFactoryMemoryImpl.java $
  */
 public class CollectionFactoryMemoryImpl implements CollectionFactory {
 

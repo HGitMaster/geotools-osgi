@@ -55,7 +55,7 @@ import org.opengis.filter.spatial.Within;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterVisitorFilterWrapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FilterVisitorFilterWrapper.java $
  */
 public class FilterVisitorFilterWrapper implements FilterVisitor {
 

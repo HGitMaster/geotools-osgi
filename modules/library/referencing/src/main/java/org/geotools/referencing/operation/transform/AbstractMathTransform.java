@@ -70,7 +70,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * themself if they know to maps two-dimensional coordinate systems.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/AbstractMathTransform.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/AbstractMathTransform.java $
  * @version $Id: AbstractMathTransform.java 31593 2008-09-25 12:30:10Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

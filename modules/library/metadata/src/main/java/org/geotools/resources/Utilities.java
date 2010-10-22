@@ -28,7 +28,7 @@ import org.geotools.util.logging.Logging;
  * A set of miscellaneous methods.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/Utilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/Utilities.java $
  * @version $Id: Utilities.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

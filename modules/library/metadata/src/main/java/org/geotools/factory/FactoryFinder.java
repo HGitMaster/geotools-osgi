@@ -22,7 +22,7 @@ package org.geotools.factory;
  * adding type safety, default hints and synchronization for multi-thread environments.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/FactoryFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/FactoryFinder.java $
  * @version $Id: FactoryFinder.java 31531 2008-09-16 19:37:27Z desruisseaux $
  * @author Martin Desruisseaux
  */

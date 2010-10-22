@@ -28,7 +28,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * Implementation of {@link FeatureIterator} for {@link PreGeneralizedSimpleFeature}
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/PreGeneralizedFeatureIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/PreGeneralizedFeatureIterator.java $
  */
 public class PreGeneralizedFeatureIterator implements FeatureIterator<SimpleFeature> {
 

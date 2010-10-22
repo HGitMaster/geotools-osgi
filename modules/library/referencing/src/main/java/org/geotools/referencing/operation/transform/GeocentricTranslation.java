@@ -67,7 +67,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </ul>
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/GeocentricTranslation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/GeocentricTranslation.java $
  * @version $Id: GeocentricTranslation.java 34665 2009-12-13 12:40:59Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

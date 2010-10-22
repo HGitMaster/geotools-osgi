@@ -80,8 +80,8 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
         return origional;
     }
     
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
         if( fixture == null ) return; // we are not online - skip test
         
         wrappedDS = (BasicDataSource) datasource;
@@ -91,12 +91,12 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
         mediator = new OracleDialectEpsgMediator(80, hints, datasource);
         codes = getCodes();
     }
-    protected void tearDown() throws Exception {
+    protected void disconnect() throws Exception {
         if( mediator != null){
             mediator.dispose();
         }
         
-        super.tearDown();
+        super.disconnect();
     }
     
     public void testRunners() throws Throwable {

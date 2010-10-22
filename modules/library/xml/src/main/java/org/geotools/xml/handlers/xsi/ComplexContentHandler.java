@@ -28,7 +28,7 @@ import org.xml.sax.SAXNotRecognizedException;
  * </p>
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/ComplexContentHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/handlers/xsi/ComplexContentHandler.java $
  */
 public class ComplexContentHandler extends XSIElementHandler {
     /** 'complexContent' */

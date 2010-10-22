@@ -22,7 +22,7 @@ import org.geotools.data.shapefile.shp.ShapeType;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/SimpleGeometry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/SimpleGeometry.java $
  */
 public class SimpleGeometry {
     public final ShapeType type;

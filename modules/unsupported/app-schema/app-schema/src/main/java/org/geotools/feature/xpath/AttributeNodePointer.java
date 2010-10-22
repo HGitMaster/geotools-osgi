@@ -36,7 +36,7 @@ import org.opengis.feature.ComplexAttribute;
  * @author Gabriel Roldan, Axios Engineering
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributeNodePointer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributeNodePointer.java $
  */
 public class AttributeNodePointer extends NodePointer {
 

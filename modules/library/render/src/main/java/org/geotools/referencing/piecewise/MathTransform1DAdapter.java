@@ -45,7 +45,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author Simone Giannecchini, GeoSolutions.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/referencing/piecewise/MathTransform1DAdapter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/referencing/piecewise/MathTransform1DAdapter.java $
  */
 public class MathTransform1DAdapter implements MathTransform1D {
 

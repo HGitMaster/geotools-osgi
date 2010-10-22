@@ -29,7 +29,7 @@ import org.opengis.style.StyleVisitor;
  *
  * @author iant
  * @author aaime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/ColorMapImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/ColorMapImpl.java $
  */
 public class ColorMapImpl implements ColorMap {
     private final Function function;

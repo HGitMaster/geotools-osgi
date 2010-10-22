@@ -16,6 +16,7 @@
  */
 package org.geotools.jdbc;
 
+import org.geotools.data.FeatureStore;
 import org.geotools.data.QueryCapabilities;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.expression.PropertyName;
@@ -29,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Gabriel Roldan (TOPP)
  * @author Andrea Aime (OpenGeo)
- * @version $Id: JDBCQueryCapabilities.java 33439 2009-07-02 12:40:03Z jdeolive $
+ * @version $Id: JDBCQueryCapabilities.java 35735 2010-06-19 15:17:07Z aaime $
  * @since 2.5.4
  */
 class JDBCQueryCapabilities extends QueryCapabilities {
@@ -97,5 +98,10 @@ class JDBCQueryCapabilities extends QueryCapabilities {
     @Override
     public boolean isOffsetSupported() {
         return source.getDataStore().getSQLDialect().isLimitOffsetSupported();
+    }
+    
+    @Override
+    public boolean isUseProvidedFIDSupported() {
+        return true;
     }
 }

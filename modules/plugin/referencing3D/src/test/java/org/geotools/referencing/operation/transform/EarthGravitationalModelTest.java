@@ -36,7 +36,7 @@ import org.geotools.geometry.GeneralDirectPosition;
  * Tests the {@link EarthGravitationalModel} class.
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/referencing3D/src/test/java/org/geotools/referencing/operation/transform/EarthGravitationalModelTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/referencing3D/src/test/java/org/geotools/referencing/operation/transform/EarthGravitationalModelTest.java $
  * @version $Id: EarthGravitationalModelTest.java 30658 2008-06-12 21:00:20Z acuster $
  * @author Martin Desruisseaux
  */

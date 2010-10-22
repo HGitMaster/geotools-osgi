@@ -42,7 +42,7 @@ import org.geotools.resources.OptionalDependencies;
  * Note: this method is called {@code PropertyTree} because it may implements
  * {@link javax.swing.tree.TreeModel} in some future Geotools implementation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/PropertyTree.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/PropertyTree.java $
  * @version $Id: PropertyTree.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (Geomatys)
  */

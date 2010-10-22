@@ -76,7 +76,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * @author Jody Garnett
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/geometry/GeometryBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/geometry/GeometryBuilder.java $
  */
 public class GeometryBuilder {
     /**

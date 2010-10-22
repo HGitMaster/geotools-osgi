@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import javax.swing.JComponent;
@@ -44,7 +45,7 @@ import org.geotools.swing.wizard.ParamField;
  * - but will only show parameters that match the indicated "level". If level is null it
  * assumed to be "user".
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JDataStorePage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JDataStorePage.java $
  */
 public class JDataStorePage extends JPage {
     /**
@@ -61,6 +62,9 @@ public class JDataStorePage extends JPage {
     /** level of parameters to display */
     private String level = null;
 
+    /** max line length of parameter description labels (chars) */
+    private final int MAX_DESCRIPTION_WIDTH = 60;
+
     public JDataStorePage(DataStoreFactorySpi format) {
         this(format, null);
     }
@@ -69,8 +73,10 @@ public class JDataStorePage extends JPage {
         this.format = format;
         if (params == null) {
             params = new HashMap<String, Object>();
-            for (Param param : format.getParametersInfo()) {
-                params.put(param.key, (Serializable) param.sample);
+            if( format != null ){
+                for (Param param : format.getParametersInfo()) {
+                    params.put(param.key, (Serializable) param.sample);
+                }
             }
         }
         this.connectionParameters = params;
@@ -78,6 +84,12 @@ public class JDataStorePage extends JPage {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+    
+    public void setFormat(DataStoreFactorySpi format) {
+        if( this.format != format ){
+            this.format = format;            
+        }        
     }
 
     @Override
@@ -119,7 +131,7 @@ public class JDataStorePage extends JPage {
             fields.put(param, field);
 
             if (param.description != null) {
-                JLabel info = new JLabel("<html>" + param.description.toString());
+                JLabel info = new JLabel(formatDescription(param.description.toString()));
                 page.add(info, "skip, span, wrap");
             }
         }
@@ -176,5 +188,32 @@ public class JDataStorePage extends JPage {
             }
         }
         return true;
+    }
+
+
+    private String formatDescription(String desc) {
+        String prefix = "<html>";
+        final int LEN = desc.length();
+
+        if (LEN < MAX_DESCRIPTION_WIDTH) {
+            return prefix + desc;
+        } else {
+            StringBuffer sb = new StringBuffer(prefix);
+            StringTokenizer tokenizer = new StringTokenizer(desc);
+
+            int n = 0;
+            while (tokenizer.hasMoreTokens()) {
+                String word = tokenizer.nextToken();
+                if (n + word.length() + 1 > MAX_DESCRIPTION_WIDTH) {
+                    sb.append("<br>");
+                    n = 0;
+                }
+                sb.append(word);
+                sb.append(' ');
+                n += word.length() + 1;
+            }
+
+            return sb.toString();
+        }
     }
 }

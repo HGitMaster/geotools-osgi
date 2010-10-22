@@ -41,7 +41,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/menu/CRSPopupMenu.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/menu/CRSPopupMenu.java $
  * @version $Id: CRSPopupMenu.java 34263 2009-10-27 10:45:47Z mbedward $
  */
 public class CRSPopupMenu extends JPopupMenu {

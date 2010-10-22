@@ -21,7 +21,7 @@ package org.geotools.coverage.processing;
  * Throws when a "resample" operation has been requested
  * but the specified grid coverage can't be reprojected.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/CannotReprojectException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/CannotReprojectException.java $
  * @version $Id: CannotReprojectException.java 30643 2008-06-12 18:27:03Z acuster $
  * @author  Martin Desruisseaux
  *

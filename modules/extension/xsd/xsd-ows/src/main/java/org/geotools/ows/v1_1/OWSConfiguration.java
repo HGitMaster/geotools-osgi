@@ -35,7 +35,7 @@ import org.picocontainer.MutablePicoContainer;
  * 
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/v1_1/OWSConfiguration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/v1_1/OWSConfiguration.java $
  */
 public class OWSConfiguration extends Configuration {
 
@@ -60,6 +60,7 @@ public class OWSConfiguration extends Configuration {
         
     }
     
+    @SuppressWarnings("unchecked")
     protected void registerBindings(Map bindings) {
         bindings.put(OWS.AcceptVersionsType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.AcceptVersionsType));        
         bindings.put(OWS.AddressType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.AddressType));

@@ -33,8 +33,8 @@ import com.vividsolutions.jts.geom.Point;
 
 
 public abstract class JDBCGeometryAssociationTestSupport extends JDBCTestSupport {
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
 
         dataStore.setAssociations(true);
     }

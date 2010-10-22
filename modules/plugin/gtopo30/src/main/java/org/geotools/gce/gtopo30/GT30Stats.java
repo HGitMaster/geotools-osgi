@@ -36,7 +36,7 @@ import org.geotools.data.DataUtilities;
  * @author aaime
  * @author simone giannecchini
  * @author mkraemer
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/gtopo30/src/main/java/org/geotools/gce/gtopo30/GT30Stats.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/gtopo30/src/main/java/org/geotools/gce/gtopo30/GT30Stats.java $
  */
 final class GT30Stats {
     /** Minimum value in the data file */

@@ -25,7 +25,7 @@ import org.opengis.filter.IncludeFilter;
  *
  * @deprecated use {@link org.opengis.filter.FilterVisitor}
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/FilterVisitor2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/FilterVisitor2.java $
  */
 public interface FilterVisitor2 extends FilterVisitor {
     void visit(IncludeFilter filter);

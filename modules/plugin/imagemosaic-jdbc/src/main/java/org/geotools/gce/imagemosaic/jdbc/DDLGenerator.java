@@ -42,6 +42,8 @@ class DDLGenerator extends AbstractCmd {
 	private final static String UsageInfo = "Generating DDL scripts\n"
 			+ "-config URLOrFile -spatialTNPrefix spatialTNPrefix [-tileTNPrefix tileTNPrefix]\n"
 			+ "  [-pyramids pyramids] -statementDelim statementDelim [-srs srs ] -targetDir directory";
+	
+	private final static String NotSuppord = "DDL generation not supported for type ";
 
 	private Config config;
 
@@ -118,7 +120,11 @@ class DDLGenerator extends AbstractCmd {
 					e.printStackTrace();
 					System.exit(1);
 				}
-
+		                if (config !=null && (config.getSpatialExtension()==SpatialExtension.GEORASTER ||
+		                        config.getSpatialExtension()==SpatialExtension.CUSTOM)) {
+		                    System.out.println(NotSuppord+config.getSpatialExtension());
+		                    System.exit(1);
+		                }
 				i++;
 			} else if (args[i].equals(SPATIALTNPREFIXPARAM)) {
 				spatialTNPrefix = args[i + 1];
@@ -145,6 +151,8 @@ class DDLGenerator extends AbstractCmd {
 			}
 		}
 
+
+		
 		if ((config == null) || (spatialTNPrefix == null)
 				|| (statementDelim == null)) {
 			System.out.println(UsageInfo);

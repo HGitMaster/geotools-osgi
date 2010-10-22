@@ -38,8 +38,9 @@ import org.opengis.parameter.ParameterValueGroup;
  * 
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridReadWriteTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridReadWriteTest.java $
  */
+@SuppressWarnings("deprecation")
 public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	private final Random generator = new Random();
 
@@ -93,7 +94,7 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	 * @throws Exception
 	 *             If Coverages are not equal
 	 */
-	void compare(GridCoverage2D gc1, GridCoverage2D gc2) throws Exception {
+	static void compare(GridCoverage2D gc1, GridCoverage2D gc2) throws Exception {
 		final GeneralEnvelope e1 = (GeneralEnvelope) gc1.getEnvelope();
 		final GeneralEnvelope e2 = (GeneralEnvelope) gc2.getEnvelope();
 
@@ -123,8 +124,8 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 		final Double noData2 = new Double(ArcGridWriter.getCandidateNoData(gc2));
 		final int minTileX1 = gc1.getRenderedImage().getMinTileX();
 		final int minTileY1 = gc1.getRenderedImage().getMinTileY();
-		final int width = gc1.getRenderedImage().getWidth();
-		final int height = gc1.getRenderedImage().getHeight();
+		final int width = gc1.getRenderedImage().getTileWidth();
+		final int height = gc1.getRenderedImage().getTileHeight();
 		final int maxTileX1 = minTileX1 + gc1.getRenderedImage().getNumXTiles();
 		final int maxTileY1 = minTileY1 + gc1.getRenderedImage().getNumYTiles();
 		double value1 = 0, value2 = 0;
@@ -142,8 +143,7 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 						value1 = r1.getSampleDouble(i, j, 0);
 						value2 = r2.getSampleDouble(i, j, 0);
 
-						if (!((noData1.compareTo(new Double(value1))) == 0 && (noData2
-								.compareTo(new Double(value2))) == 0)
+						if (!(noData1.compareTo(value1) == 0 && noData2.compareTo(value2) == 0)
 								&& (value1 != value2)) {
 							throw new Exception(
 									"GridCoverage Values are not equal: "

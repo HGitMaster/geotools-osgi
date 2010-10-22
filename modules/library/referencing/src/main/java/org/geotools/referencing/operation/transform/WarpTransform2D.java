@@ -76,7 +76,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Image Manipulation</A> in the <cite>Programming in Java Advanced Imaging</cite> guide.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/WarpTransform2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/WarpTransform2D.java $
  * @version $Id: WarpTransform2D.java 34939 2010-02-23 09:17:28Z simonegiannecchini $
  * @author Martin Desruisseaux
  * @author Alessio Fabiani

@@ -51,7 +51,7 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  * by the EPSG property file. This gives most of the benifits of using the EPSG 
  * database backed authority factory, in a nice, portable property file.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-wkt/src/main/java/org/geotools/referencing/crs/EPSGCRSAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-wkt/src/main/java/org/geotools/referencing/crs/EPSGCRSAuthorityFactory.java $
  * @version $Id: EPSGCRSAuthorityFactory.java 31049 2008-07-22 20:27:03Z desruisseaux $
  * @author Jody Garnett
  * @author Rueben Schulz

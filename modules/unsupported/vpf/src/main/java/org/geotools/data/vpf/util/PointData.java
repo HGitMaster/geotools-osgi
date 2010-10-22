@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * Created on July 4, 2004, 5:35 PM 
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/util/PointData.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/util/PointData.java $
  */
 public class PointData extends HashMap {
     public Object put(Object key, Object value) {

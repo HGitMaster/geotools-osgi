@@ -36,7 +36,7 @@ import org.geotools.caching.spatialindex.Shape;
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/GridNode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/GridNode.java $
  */
 public class GridNode implements Node, Serializable {
     private static final long serialVersionUID = 7786313461725794946L;

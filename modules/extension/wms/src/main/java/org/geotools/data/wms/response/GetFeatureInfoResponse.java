@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/response/GetFeatureInfoResponse.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/response/GetFeatureInfoResponse.java $
  */
 public class GetFeatureInfoResponse extends Response {
     /**

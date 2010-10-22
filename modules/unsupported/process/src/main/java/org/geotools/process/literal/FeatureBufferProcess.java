@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Lucas Reed, Refractions Research Inc
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/literal/FeatureBufferProcess.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/literal/FeatureBufferProcess.java $
  */
 public class FeatureBufferProcess extends AbstractProcess
 {

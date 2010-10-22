@@ -37,7 +37,7 @@ import org.opengis.filter.Not;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLIDPredicateTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLIDPredicateTest.java $
  */
 public class ECQLIDPredicateTest {
     
@@ -105,6 +105,35 @@ public class ECQLIDPredicateTest {
         Assert.assertTrue(strId3 + " was expected", resultIdentifiers.contains(strId3));
     }
 
+    @Test
+    public void notIdUsingIntegerValues() throws Exception {
+
+        Filter filter;
+        
+        final String strId1 = "1";
+        final String strId2 = "2";
+        final String strId3 = "3";
+        filter = ECQL.toFilter("NOT ID IN (" + strId1 + "," + strId2
+                + ", " + strId3 + ")");
+        
+        Assert.assertNotNull(filter);
+        Assert.assertTrue("Not filter was expected",  filter instanceof Not);
+        
+        Not notFilter = (Not) filter;
+        filter = notFilter.getFilter();
+
+        Id filterId = (Id) filter;
+        Set<?> resultIdentifiers = filterId.getIDs();
+        Assert.assertTrue("one id in filter Id was expected",
+                resultIdentifiers.size() == 3);
+
+        Assert.assertTrue(strId1 + " was expected", resultIdentifiers.contains(strId1));
+
+        Assert.assertTrue(strId2 + " was expected", resultIdentifiers.contains(strId2));
+
+        Assert.assertTrue(strId3 + " was expected", resultIdentifiers.contains(strId3));
+    }
+    
     
     /**
      * <pre>

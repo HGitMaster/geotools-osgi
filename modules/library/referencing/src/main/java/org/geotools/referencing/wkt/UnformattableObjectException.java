@@ -32,7 +32,7 @@ import org.geotools.resources.i18n.Errors;
  * implementations can be formatted as WKT.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/UnformattableObjectException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/UnformattableObjectException.java $
  * @version $Id: UnformattableObjectException.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

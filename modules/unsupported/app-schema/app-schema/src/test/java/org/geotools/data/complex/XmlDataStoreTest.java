@@ -87,7 +87,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 /**
  * 
  * @author Russell Petty
- * @version $Id: XmlDataStoreTest.java 34894 2010-02-16 07:51:16Z bencaradocdavies $
+ * @version $Id: XmlDataStoreTest.java 35182 2010-04-07 06:58:28Z ang05a $
  * @source $URL: http://svn.geotools.org/trunk/modules/library/main/src/test/java/org/geotools/data/
  *         DataAccessFinderTest.java $
  */
@@ -97,7 +97,7 @@ public class XmlDataStoreTest extends TestCase {
 
     private static final SAXBuilder sax = new SAXBuilder();
 
-    private static final XmlDataStore MOCK_DATASTORE = new XmlDataStore();
+    static final XmlDataStore MOCK_DATASTORE = new XmlDataStore();
     
     private static final String schemaBase = "/test-data/";
 
@@ -125,6 +125,7 @@ public class XmlDataStoreTest extends TestCase {
 
     protected void tearDown() throws Exception {
         super.tearDown();
+        DataAccessRegistry.unregisterAll();
     }
 
     public void testDataStoreCreated() throws Exception {
@@ -394,7 +395,7 @@ public class XmlDataStoreTest extends TestCase {
         }
     }
 
-    private static final class XmlDataStore implements DataStore {
+    public static final class XmlDataStore implements DataStore {
 
         private String fileName;
 

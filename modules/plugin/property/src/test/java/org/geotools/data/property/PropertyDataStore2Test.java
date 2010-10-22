@@ -25,21 +25,28 @@ import junit.framework.TestCase;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Test non functionality of PropertyDataStore.
  * 
  * @author Jody Garnett, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStore2Test.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStore2Test.java $
  */
 public class PropertyDataStore2Test extends TestCase {
     PropertyDataStore store;
+    
+    PropertyDataStore sridStore;
     /**
      * Constructor for SimpleDataStoreTest.
      * @param arg0
@@ -63,6 +70,27 @@ public class PropertyDataStore2Test extends TestCase {
         writer.write("fid4=4|LINESTRING(0 5, 5 0, 10 5, 5 10, 0 5)|justin");
         writer.close();
         store = new PropertyDataStore( dir );
+        
+        // Create a similar data store but with srid in the geometry column
+        File dir2 = new File(".", "propertyTestData2");
+        dir2.mkdir();
+        File file2 = new File(dir2, "road2.properties");
+        if (file2.exists()) {
+            file2.delete();
+        }
+        BufferedWriter writer2 = new BufferedWriter(new FileWriter(file2));
+        writer2.write("_=id:Integer,geom:Geometry:srid=4283");
+        writer2.newLine();
+        writer2.write("fid1=1|LINESTRING(0 0,10 10)");
+        writer2.newLine();
+        writer2.write("fid2=2|LINESTRING(20 20,30 30)");
+        writer2.newLine();
+        writer2.write("fid3=3|LINESTRING(5 0, 5 10)");
+        writer2.newLine();
+        writer2.write("fid4=4|LINESTRING(0 5, 5 0, 10 5, 5 10, 0 5)");
+        writer2.close();
+        sridStore = new PropertyDataStore(dir2);
+
         super.setUp();
     }
     protected void tearDown() throws Exception {
@@ -72,10 +100,49 @@ public class PropertyDataStore2Test extends TestCase {
             list[i].delete();
         }
         dir.delete();
+        
+        dir = new File( "propertyTestData2" );
+        File list2[] = dir.listFiles();
+        for( int i=0; i<list2.length;i++){
+            list2[i].delete();
+        }
+        dir.delete();
+        
         super.tearDown();                
     }
+    
+    /**
+     * Test CRS being passed into Geometry user data.
+     * 
+     * @throws Exception
+     */
+    public void testCRS() throws Exception {
+    	FeatureSource<SimpleFeatureType, SimpleFeature> road = sridStore.getFeatureSource("road2");
+    	FeatureCollection<SimpleFeatureType, SimpleFeature> features = road.getFeatures();
+        assertEquals(4, features.size());
 
- 
+        SimpleFeature feature;
+        Geometry geom;
+        Property prop;
+        GeometryType geomType;
+        FeatureIterator<SimpleFeature> iterator = features.features();
+        while (iterator.hasNext()) {
+            feature = iterator.next();
+            prop = feature.getProperty("geom");
+            assertTrue(prop.getType() instanceof GeometryType);
+            geomType = (GeometryType) prop.getType();
+
+            Object val = prop.getValue();
+            assertTrue(val != null && val instanceof Geometry);
+            geom = (Geometry) val;
+
+            Object userData = geom.getUserData();
+            assertTrue(userData != null && userData instanceof CoordinateReferenceSystem);
+            // ensure the same CRS is passed on to userData for encoding
+            assertEquals(userData, geomType.getCoordinateReferenceSystem());
+        }
+    }
+      
     public void testSimple() throws Exception {
         FeatureSource<SimpleFeatureType, SimpleFeature> road = store.getFeatureSource( "road" );
         FeatureCollection<SimpleFeatureType, SimpleFeature> features = road.getFeatures();

@@ -23,7 +23,7 @@ import org.opengis.filter.expression.Expression;
  * 
  * @author dzwiers
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/LengthFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/LengthFunction.java $
  */
 public class LengthFunction extends FunctionExpressionImpl {
 

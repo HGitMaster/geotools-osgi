@@ -19,7 +19,7 @@ package org.geotools.caching.featurecache;
 /**
  * Exception thrown by the FeatureCache when unexpected error occurs.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/featurecache/FeatureCacheException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/featurecache/FeatureCacheException.java $
  */
 public class FeatureCacheException extends Exception {
 

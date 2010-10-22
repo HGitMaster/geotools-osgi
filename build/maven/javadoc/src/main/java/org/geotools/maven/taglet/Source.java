@@ -27,7 +27,7 @@ import com.sun.tools.doclets.Taglet;
  * The <code>@source</code> tag. This tag expects an URL to the source in the SVN repository.
  * The SVN URL keyword is ignored.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/main/java/org/geotools/maven/taglet/Source.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/build/maven/javadoc/src/main/java/org/geotools/maven/taglet/Source.java $
  * @version $Id: Source.java 34136 2009-10-13 04:18:45Z mbedward $
  * @author Martin Desruisseaux
  */

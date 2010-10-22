@@ -60,7 +60,7 @@ import junit.framework.TestSuite;
  *     </ol>
  *   </li>
  * </ul>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/test/java/org/geotools/data/vpf/io/VPFDateTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/test/java/org/geotools/data/vpf/io/VPFDateTest.java $
  */
 public class VPFDateTest extends TestCase
 {

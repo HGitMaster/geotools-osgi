@@ -36,7 +36,7 @@ import org.geotools.resources.XArray;
  * {@link ImageReader} instance is not yet know or available.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/image/io/IIOListeners.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/image/io/IIOListeners.java $
  * @version $Id: IIOListeners.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

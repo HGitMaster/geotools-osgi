@@ -27,7 +27,7 @@ import java.util.EventObject;
  * @author Andrea Aime
  * @author Ian Turton
  * @author Martin Desruisseaux
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/event/MapLayerEvent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/map/event/MapLayerEvent.java $
  * @version $Id: MapLayerEvent.java 33005 2009-05-14 09:21:34Z mbedward $
  *
  * @see Layer

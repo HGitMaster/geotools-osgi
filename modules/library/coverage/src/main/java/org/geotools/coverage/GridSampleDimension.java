@@ -76,7 +76,7 @@ import org.geotools.util.Utilities;
  * in the class name.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/GridSampleDimension.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/GridSampleDimension.java $
  * @version $Id: GridSampleDimension.java 33941 2009-09-21 12:26:52Z mbedward $
  * @author Martin Desruisseaux (IRD)
  */

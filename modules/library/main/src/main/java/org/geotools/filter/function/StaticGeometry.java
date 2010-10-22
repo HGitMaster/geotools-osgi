@@ -46,7 +46,7 @@ import com.vividsolutions.jts.io.WKTReader;
 /**
  * @author David Blasby (The Open Planning Project)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/StaticGeometry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/function/StaticGeometry.java $
  */
  public class StaticGeometry {
 

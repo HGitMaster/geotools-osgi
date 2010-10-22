@@ -31,7 +31,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * An envlope represents the bounding box of a geometric object.
  * Regardless to the dimension, the envelope can be encoded by two <code>DirectPosition</code>s. 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/EnvelopeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/EnvelopeImpl.java $
  */
 public class EnvelopeImpl implements Envelope, Serializable {
     private static final long serialVersionUID = -6397319034308589090L;

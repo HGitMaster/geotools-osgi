@@ -25,7 +25,7 @@ import org.opengis.referencing.operation.MathTransform1D;
  * @author Simone Giannecchini, GeoSolutions.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/referencing/piecewise/PiecewiseTransform1D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/referencing/piecewise/PiecewiseTransform1D.java $
  */
 public interface PiecewiseTransform1D<T extends PiecewiseTransform1DElement> extends Domain1D<T>, MathTransform1D {
 

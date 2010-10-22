@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -40,19 +41,22 @@ import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.filter.identity.FeatureIdImpl;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.identity.FeatureId;
 
 /**
  * Test functioning of PropertyDataStore.
  * 
  * @author Jody Garnett, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
  */
 public class PropertyDataStoreTest extends TestCase {
     PropertyDataStore store;
@@ -430,5 +434,26 @@ public class PropertyDataStoreTest extends TestCase {
         assertEquals( "auto after client 2 commits addition of fid5 (fid1 previously removed)", 4, roadAuto.getFeatures().size() );
         assertEquals( "client 1 after client 2 commits addition of fid5 (fid1 previously removed)", 4, roadFromClient1.getFeatures().size() );
         assertEquals( "client 2 after commiting addition of fid5 (fid1 previously removed)", 4, roadFromClient2.getFeatures().size() );
+    }
+    
+    public void testUseExistingFid() throws Exception {
+        SimpleFeatureType ROAD = store.getSchema( "road" );
+        SimpleFeature chrisFeature = SimpleFeatureBuilder.build(ROAD, new Object[]{ new Integer(5), "chris"}, "fid5" );
+        chrisFeature.getUserData().put(Hints.USE_PROVIDED_FID, Boolean.TRUE);
+        
+        FeatureStore roadAuto = (FeatureStore) store.getFeatureSource("road");
+        List<FeatureId> fids = roadAuto.addFeatures(DataUtilities.collection(chrisFeature));
+        
+        // checke the id was preserved
+        assertEquals(1, fids.size());
+        FeatureId fid = SimpleFeatureBuilder.createDefaultFeatureIdentifier("fid5");
+        assertTrue(fids.contains(fid));
+        
+        // manually check the feature with the proper id is actually there
+        FeatureIterator it = roadAuto.getFeatures(ff.id(Collections.singleton(fid))).features();
+        assertTrue(it.hasNext());
+        SimpleFeature sf = (SimpleFeature) it.next();
+        it.close();
+        assertEquals(fid, sf.getIdentifier());
     }
 }

@@ -58,7 +58,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the <code>org.geotools.parameter</code> package.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/parameter/ParametersTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/parameter/ParametersTest.java $
  * @version $Id: ParametersTest.java 33897 2009-09-13 09:17:55Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

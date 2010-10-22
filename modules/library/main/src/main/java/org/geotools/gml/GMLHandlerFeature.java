@@ -29,7 +29,7 @@ import org.xml.sax.ContentHandler;
  * </p>
  *
  * @author Rob Hranac, Vision for New York
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/GMLHandlerFeature.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/gml/GMLHandlerFeature.java $
  * @version $Id: GMLHandlerFeature.java 30648 2008-06-12 19:22:35Z acuster $
  */
 public interface GMLHandlerFeature extends ContentHandler {

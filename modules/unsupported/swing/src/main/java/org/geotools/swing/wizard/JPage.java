@@ -25,7 +25,7 @@ import javax.swing.JPanel;
  * @author Jody Garnett (LISAsoft)
  * @author Graham Davis (Refractions Research)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JPage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JPage.java $
  */
 public abstract class JPage {
     /**

@@ -37,7 +37,7 @@ import junit.framework.TestCase;
  * @
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/GMLParser2Test.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/test/java/org/geotools/xml/GMLParser2Test.java $
  */
 public class GMLParser2Test extends TestCase {
     public void testBlank(){

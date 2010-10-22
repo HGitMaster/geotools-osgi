@@ -33,7 +33,7 @@ package org.geotools.util;
  * 
  * @author Jody
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/util/SubProgressListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/util/SubProgressListener.java $
  */
 public class SubProgressListener extends DelegateProgressListener {
     /** Initial starting value */
@@ -72,6 +72,6 @@ public class SubProgressListener extends DelegateProgressListener {
     }
     public void progress( float progress ) {
         this.progress = progress;
-        super.progress(start + progress);
+        super.progress(start + (scale * progress));
     }
 }

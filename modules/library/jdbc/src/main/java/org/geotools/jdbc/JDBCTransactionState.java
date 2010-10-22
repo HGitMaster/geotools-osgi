@@ -27,9 +27,9 @@ import org.geotools.data.Transaction.State;
 /**
  * Responsible for flow control; issues commit and rollback on the managed connection.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCTransactionState.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCTransactionState.java $
  */
-public final class JDBCTransactionState implements State {
+final class JDBCTransactionState implements State {
     /**
      * The datastore
      */
@@ -42,10 +42,20 @@ public final class JDBCTransactionState implements State {
      * The current connection
      */
     Connection cx;
+    /**
+     * Whether the connection is internally managed, or externally provided (in the latter
+     * case no attempt to commit, rollback or close will be done)
+     */
+    boolean external;
 
     public JDBCTransactionState(Connection cx, JDBCDataStore dataStore) {
+        this(cx, dataStore, false);
+    }
+    
+    public JDBCTransactionState(Connection cx, JDBCDataStore dataStore, boolean external) {
         this.cx = cx;
         this.dataStore = dataStore;
+        this.external = external;
     }
 
     public void setTransaction(Transaction tx) {
@@ -55,15 +65,9 @@ public final class JDBCTransactionState implements State {
         }
             
         if ( tx == null ) {
-            if ( cx != null ) {
-                try {
-                    cx.close();
-                }
-                catch( SQLException e ) {
-                    //TODO: perhaps we should log this at the finest level
-                }
-            }
-            else {
+            if ( cx != null && !external) {
+                dataStore.closeSafe(cx);
+            }  else {
                 dataStore.getLogger().warning("Transaction is attempting to " +
                     "close an already closed connection");
             }
@@ -77,29 +81,32 @@ public final class JDBCTransactionState implements State {
     }
 
     public void commit() throws IOException {
-        try {
-            cx.commit();
-        } catch (SQLException e) {
-            String msg = "Error occured on commit";
-            throw (IOException) new IOException(msg).initCause(e);
-        }        
-        //state.fireBatchFeatureEvent( true );
+        if(!external) {        
+            try {
+                cx.commit();
+            } catch (SQLException e) {
+                String msg = "Error occured on commit";
+                throw (IOException) new IOException(msg).initCause(e);
+            }        
+        }
     }
 
     public void rollback() throws IOException {
-        try {
-            cx.rollback();
-        } catch (SQLException e) {
-            String msg = "Error occured on rollback";
-            throw (IOException) new IOException(msg).initCause(e);
+        if(!external) {
+            try {
+                cx.rollback();
+            } catch (SQLException e) {
+                String msg = "Error occured on rollback";
+                throw (IOException) new IOException(msg).initCause(e);
+            }
         }
-        //state.fireBatchFeatureEvent( false );
     }
     
     @Override
     protected void finalize() throws Throwable {
-        if ( cx != null && !cx.isClosed()) {
+        if ( !external && cx != null && !cx.isClosed()) {
             Logger.getLogger( "org.geotools.jdbc").severe("State finalized with open connection.");
+            dataStore.closeSafe(cx);
         }
     }
 }

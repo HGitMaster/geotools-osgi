@@ -25,7 +25,7 @@ import static org.geotools.resources.XMath.previous;
  * Simple mathematical functions in addition to the ones provided in {@link Math}.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/math/XMath.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/math/XMath.java $
  * @version $Id: XMath.java 30725 2008-06-13 19:29:06Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

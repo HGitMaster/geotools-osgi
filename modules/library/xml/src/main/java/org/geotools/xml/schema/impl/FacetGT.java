@@ -24,7 +24,7 @@ import org.geotools.xml.schema.Facet;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/FacetGT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/FacetGT.java $
  */
 public class FacetGT implements Facet {
     private int type;

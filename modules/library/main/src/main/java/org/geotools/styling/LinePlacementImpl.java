@@ -32,7 +32,7 @@ import org.opengis.util.Cloneable;
  *
  * @author Ian Turton, CCG
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/LinePlacementImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/LinePlacementImpl.java $
  * @version $Id: LinePlacementImpl.java 33813 2009-08-28 14:45:11Z jive $
  */
 public class LinePlacementImpl implements LinePlacement, Cloneable {

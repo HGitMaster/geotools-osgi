@@ -39,7 +39,7 @@ import java.util.Iterator;
  * process SimpleGeometries.
  *
  * @author Jesse
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/ReplaceGeometryFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/ReplaceGeometryFilter.java $
  */
 public class ReplaceGeometryFilter implements FilterVisitor {
     /* (non-Javadoc)

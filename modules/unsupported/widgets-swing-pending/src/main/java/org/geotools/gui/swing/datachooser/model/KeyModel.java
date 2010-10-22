@@ -30,7 +30,7 @@ import org.geotools.data.DataAccessFactory.Param;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/datachooser/model/KeyModel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/datachooser/model/KeyModel.java $
  */
 public class KeyModel implements TableModel {
 

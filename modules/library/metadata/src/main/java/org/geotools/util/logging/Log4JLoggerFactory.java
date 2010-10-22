@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * <A HREF="http://logging.apache.org/log4j">Log4J</A> framework.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/logging/Log4JLoggerFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/logging/Log4JLoggerFactory.java $
  * @version $Id: Log4JLoggerFactory.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

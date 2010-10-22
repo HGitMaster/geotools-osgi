@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -232,21 +233,21 @@ public final class JP2KReader extends AbstractGridCoverage2DReader implements
         final List<IIOMetadataNode> uuidBoxMetadataNodes = ((JP2KStreamMetadata) metadata).searchOccurrencesNode(UUIDBox.BOX_TYPE);
         UUIDBoxMetadataNode geoJP2uuid = null;
         UUIDBoxMetadataNode worldBoxuuid = null;
-        if (uuidBoxMetadataNodes != null && !uuidBoxMetadataNodes.isEmpty()){
-        	for (IIOMetadataNode node: uuidBoxMetadataNodes){
-        		if (node instanceof UUIDBoxMetadataNode) {
+        if (uuidBoxMetadataNodes != null && !uuidBoxMetadataNodes.isEmpty()) {
+            for (IIOMetadataNode node : uuidBoxMetadataNodes) {
+                if (node instanceof UUIDBoxMetadataNode) {
                     final UUIDBoxMetadataNode uuid = (UUIDBoxMetadataNode) node;
                     final byte[] id = uuid.getUuid();
                     if (isGeoJP2(id)) {
-                       geoJP2uuid = uuid;
-                       continue;
+                        geoJP2uuid = uuid;
+                        continue;
                     }
-                    
-                	if (isWorldBox(id)){
-                    	worldBoxuuid = uuid;
+
+                    if (isWorldBox(id)) {
+                        worldBoxuuid = uuid;
                     }
                 }
-        	}
+            }
         }
 
         if (geoJP2uuid!=null)
@@ -499,6 +500,9 @@ public final class JP2KReader extends AbstractGridCoverage2DReader implements
 			if(reader != null)
 				cachedSPI = reader.getOriginatingProvider();
 		}
+        
+        if (reader == null)
+            throw new DataSourceException("No reader found for that source " + sourceURL);            
         reader.setInput(stream);
         
 		coverageName = inputFile.getName();
@@ -578,10 +582,7 @@ public final class JP2KReader extends AbstractGridCoverage2DReader implements
 		return super.highestRes;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
+
 	double[][] getOverviewsResolution(){
 		return super.overViewResolutions;
 	}
@@ -606,9 +607,9 @@ public final class JP2KReader extends AbstractGridCoverage2DReader implements
     	return coverageFactory;
     }
 
-	String getName() {
-		return super.coverageName;
-	}
+    String getName() {
+        return super.coverageName;
+    }
 	
 	
 	/**
@@ -617,45 +618,52 @@ public final class JP2KReader extends AbstractGridCoverage2DReader implements
 	 * @throws UnsupportedEncodingException 
      */
     protected void parsePRJFile() throws UnsupportedEncodingException {
-        String prjPath = null;
-        prjPath = new StringBuilder(parentPath).append(SEPARATOR)
+        String prjPath = new StringBuilder(parentPath).append(SEPARATOR)
                 .append(coverageName).append(".prj").toString();
 
-        // read the prj info from the file
-        PrjFileReader projReader = null;
-
-        try {
-            final File prj = new File(prjPath);
-
-            if (prj.exists()) {
-                projReader = new PrjFileReader(new FileInputStream(prj)
-                        .getChannel());
-                this.crs = projReader.getCoordinateReferenceSystem();
-            }
-            // If some exception occurs, warn about the error but proceed
-            // using a default CRS
-        } catch (FileNotFoundException e) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            }
-        } catch (IOException e) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            }
-        } catch (FactoryException e) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            }
-        } finally {
-            if (projReader != null) {
-                try {
-                    projReader.close();
-                } catch (IOException e) {
-                    if (LOGGER.isLoggable(Level.WARNING)) {
-                        LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+        // does it exist?
+        final File prjFile = new File(prjPath);
+        if (prjFile.exists()) {
+            // it exists then we have top read it
+            PrjFileReader projReader = null;
+            FileInputStream instream=null;
+            try {
+            	instream=new FileInputStream(prjFile);
+                final FileChannel channel = instream.getChannel();
+                projReader = new PrjFileReader(channel);
+                crs = projReader.getCoordinateReferenceSystem();
+            } catch (FileNotFoundException e) {
+                // warn about the error but proceed, it is not fatal
+                // we have at least the default crs to use
+                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            } catch (IOException e) {
+                // warn about the error but proceed, it is not fatal
+                // we have at least the default crs to use
+                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            } catch (FactoryException e) {
+                // warn about the error but proceed, it is not fatal
+                // we have at least the default crs to use
+                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            } finally {
+                if (projReader != null)
+                    try {
+                        projReader.close();
+                    } catch (IOException e) {
+                        // warn about the error but proceed, it is not fatal
+                        // we have at least the default crs to use
+                        LOGGER .log(Level.FINE, e.getLocalizedMessage(),e);
                     }
-                }
+                    
+                    if (instream != null)
+                        try {
+                            instream.close();
+                        } catch (IOException e) {
+                            // warn about the error but proceed, it is not fatal
+                            // we have at least the default crs to use
+                            LOGGER.log(Level.FINE, e.getLocalizedMessage(),e);
+                        }                        
             }
+
         }
     }
     

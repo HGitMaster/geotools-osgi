@@ -24,11 +24,37 @@ import static org.geotools.util.Utilities.*;
 /**
  * Tests the {@link Utilities} static methods.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/UtilitiesTest.java $
- * @version $Id: UtilitiesTest.java 30640 2008-06-12 17:34:32Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/UtilitiesTest.java $
+ * @version $Id: UtilitiesTest.java 35332 2010-05-03 07:34:09Z danieleromagnoli $
  * @author Martin Desruisseaux
  */
 public final class UtilitiesTest {
+    
+    /**
+     * Tests {@link Utilities#ensureNonNull}.
+     */
+    @Test
+    public void testEnsureNonNull() {
+        boolean isNull = false;
+        Object sampleObject = null;
+        try {
+            assertNull(sampleObject);
+            Utilities.ensureNonNull("sampleObject", sampleObject);
+        } catch (NullPointerException npe){
+            isNull = true;
+        }
+        assertTrue(isNull);
+        sampleObject = "";
+        try {
+            assertNotNull(sampleObject);
+            Utilities.ensureNonNull("sampleObject", sampleObject);
+            isNull = false;
+        } catch (NullPointerException npe){
+            isNull = true;
+        }
+        assertFalse(isNull);
+    }
+    
     /**
      * Tests {@link Utilities#equals}.
      */

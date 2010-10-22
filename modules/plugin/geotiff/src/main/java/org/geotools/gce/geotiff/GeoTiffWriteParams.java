@@ -83,7 +83,7 @@ import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
  * @since 2.3.x
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/GeoTiffWriteParams.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/GeoTiffWriteParams.java $
  */
 public final class GeoTiffWriteParams extends GeoToolsWriteParams {
 

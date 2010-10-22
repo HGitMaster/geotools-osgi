@@ -22,7 +22,7 @@ import java.awt.Color;
 /**
  * A generic palette containing colours.
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/brewer/color/ColorPalette.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/brewer/color/ColorPalette.java $
  */
 public class ColorPalette {
     private Color[] colors = new Color[0]; //15

@@ -48,7 +48,7 @@ import org.geotools.util.Utilities;
  * used as a bridge between Java2D and the referencing module.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/AffineTransform2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/AffineTransform2D.java $
  * @version $Id: AffineTransform2D.java 34082 2009-10-06 11:00:21Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

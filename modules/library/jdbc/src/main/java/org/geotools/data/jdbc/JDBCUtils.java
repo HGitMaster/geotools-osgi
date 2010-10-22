@@ -29,7 +29,7 @@ import org.geotools.data.Transaction;
 /**
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCUtils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCUtils.java $
  * @version $Id: JDBCUtils.java 33484 2009-07-06 02:17:34Z jdeolive $
  * Last Modified: $Date: 2003/11/28 08:49:51 $
  * 

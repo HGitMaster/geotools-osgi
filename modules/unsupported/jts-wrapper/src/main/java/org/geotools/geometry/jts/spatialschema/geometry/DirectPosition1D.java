@@ -37,7 +37,7 @@ import org.geotools.geometry.jts.GeometryUtils;
  * Holds the coordinates for a one-dimensional position within some coordinate reference system.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/DirectPosition1D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/DirectPosition1D.java $
  * @version $Id: DirectPosition1D.java 34133 2009-10-12 08:14:05Z mbedward $
  * @author Martin Desruisseaux
  */

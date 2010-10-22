@@ -56,7 +56,7 @@ import org.geotools.validation.dto.TestSuiteDTO;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/xml/XMLReaderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/test/java/org/geotools/validation/xml/XMLReaderTest.java $
  * @version $Id: XMLReaderTest.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class XMLReaderTest extends TestCase {

@@ -42,7 +42,7 @@ import org.geotools.factory.CommonFactoryFinder;
  * @author dzwiers
  *
  * @see DataStoreFinder
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/FileDataStoreFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/FileDataStoreFinder.java $
  */
 public class FileDataStoreFinder {
     /** The logger for the filter module. */

@@ -23,7 +23,7 @@ import java.io.IOException;
  * Indicates a FeatureType could not be found.
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/SchemaNotFoundException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/SchemaNotFoundException.java $
  */
 public class SchemaNotFoundException extends IOException {
     private static final long serialVersionUID = 1L;

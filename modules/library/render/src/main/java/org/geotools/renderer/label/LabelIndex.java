@@ -30,7 +30,7 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
  * @author Andrea Aime
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/label/LabelIndex.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/label/LabelIndex.java $
  */
 public class LabelIndex {
 

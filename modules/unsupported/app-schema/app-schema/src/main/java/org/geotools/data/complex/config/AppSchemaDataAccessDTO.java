@@ -40,7 +40,7 @@ import org.geotools.util.CheckedHashSet;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id: AppSchemaDataAccessDTO.java 33496 2009-07-06 10:01:56Z ang05a $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AppSchemaDataAccessDTO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/AppSchemaDataAccessDTO.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessDTO implements Serializable {

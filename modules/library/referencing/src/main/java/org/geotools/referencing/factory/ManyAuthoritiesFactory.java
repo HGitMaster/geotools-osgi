@@ -54,8 +54,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * a set of names determined from all available authority factories.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/ManyAuthoritiesFactory.java $
- * @version $Id: ManyAuthoritiesFactory.java 30641 2008-06-12 17:42:27Z acuster $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/ManyAuthoritiesFactory.java $
+ * @version $Id: ManyAuthoritiesFactory.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
 public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements CRSAuthorityFactory,
@@ -585,8 +585,8 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
         final Set<String> codes = new LinkedHashSet<String>();
         final Set<AuthorityFactory> done = new HashSet<AuthorityFactory>();
         done.add(this); // Safety for avoiding recursive calls.
-        inProgress.set(Boolean.TRUE);
         try {
+            inProgress.set(Boolean.TRUE);
             for (String authority : getAuthorityNames()) {
                 authority = authority.trim();
                 final char separator = getSeparator(authority);

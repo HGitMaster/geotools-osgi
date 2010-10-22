@@ -35,7 +35,7 @@ import org.osgeo.geometry.primitive.GeometricPrimitive;
  * @author <a href="mailto:schneider@lat-lon.de">Markus Schneider</a>
  * @author last edited by: $Author: markusschneider $
  * 
- * @version. $Revision: 33706 $, $Date: 2009-08-07 08:49:16 +1000 (Fri, 07 Aug 2009) $
+ * @version. $Revision: 33706 $, $Date: 2009-08-07 01:49:16 +0300 (Fri, 07 Aug 2009) $
  */
 public interface CompositeGeometry<T extends GeometricPrimitive> extends Geometry, List<T> {
 

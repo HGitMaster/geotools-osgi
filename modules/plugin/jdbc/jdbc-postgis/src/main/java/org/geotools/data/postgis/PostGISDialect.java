@@ -70,6 +70,7 @@ public class PostGISDialect extends BasicSQLDialect {
             put("MULTIPOLYGONM", MultiPolygon.class);
             put("GEOMETRYCOLLECTION", GeometryCollection.class);
             put("GEOMETRYCOLLECTIONM", GeometryCollection.class);
+            put("BYTEA", byte[].class);
         }
     };
 
@@ -83,6 +84,7 @@ public class PostGISDialect extends BasicSQLDialect {
             put(MultiLineString.class, "MULTILINESTRING");
             put(MultiPolygon.class, "MULTIPOLYGON");
             put(GeometryCollection.class, "GEOMETRYCOLLECTION");
+            put(byte[].class, "BYTEA");
         }
     };
 
@@ -588,5 +590,37 @@ public class PostGISDialect extends BasicSQLDialect {
             sql.append(" OFFSET " + offset);
         }
     }
-
+    
+    @Override
+    public void encodeValue(Object value, Class type, StringBuffer sql) {
+        if(byte[].class.equals(type)) {
+            // escape the into bytea representation
+            StringBuffer sb = new StringBuffer();
+            byte[] input = (byte[]) value;
+            for (int i = 0; i < input.length; i++) {
+                byte b = input[i];
+                if(b == 0) {
+                    sb.append("\\\\000");
+                } else if(b == 39) {
+                    sb.append("\\'");
+                } else if(b == 92) {
+                    sb.append("\\\\134'");
+                } else if(b < 31 || b >= 127) {
+                    sb.append("\\\\");
+                    String octal = Integer.toOctalString(b);
+                    if(octal.length() == 1) {
+                        sb.append("00");
+                    } else if(octal.length() == 2) {
+                        sb.append("0");
+                    }
+                    sb.append(octal);
+                } else {
+                    sb.append((char) b);
+                }
+            }
+            super.encodeValue(sb.toString(), String.class, sql);
+        } else {
+            super.encodeValue(value, type, sql);
+        }
+    }
 }

@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link XAffineTransform} static methods.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/matrix/XAffineTransformTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/operation/matrix/XAffineTransformTest.java $
  * @version $Id: XAffineTransformTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux
  */

@@ -27,7 +27,7 @@ import org.opengis.util.InternationalString;
  * 
  * @author Mehdi Sidhoum (Geomatys)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultPeriodDuration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultPeriodDuration.java $
  */
 public class DefaultPeriodDuration extends DefaultDuration implements PeriodDuration {
 

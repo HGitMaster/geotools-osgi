@@ -36,7 +36,7 @@ package org.geotools.factory;
  *       Retaining all hints will prevents their garbage collection.<p></li>
  * </ul>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/FactoryUsingVolatileDependencies.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/FactoryUsingVolatileDependencies.java $
  * @version $Id: FactoryUsingVolatileDependencies.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  *

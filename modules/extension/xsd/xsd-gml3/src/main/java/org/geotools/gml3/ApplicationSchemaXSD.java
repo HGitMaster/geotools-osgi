@@ -33,7 +33,7 @@ import org.geotools.xml.XSD;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/ApplicationSchemaXSD.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/ApplicationSchemaXSD.java $
  */
 public class ApplicationSchemaXSD extends XSD {
     /** application schema namespace */

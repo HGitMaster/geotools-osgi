@@ -36,7 +36,7 @@ import java.util.TreeSet;
  * @author Christian Mueller
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/info/GeneralizationInfo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/info/GeneralizationInfo.java $
  */
 public class GeneralizationInfo {
 

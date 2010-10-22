@@ -56,7 +56,7 @@ import org.opengis.geometry.BoundingBox;
  * </p>
  * 
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/DefaultFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/DefaultFeatureCollection.java $
  * @version $Id: DefaultFeatureCollection.java 31083 2008-07-26 19:17:27Z jgarnett $
  */
 public class DefaultFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {

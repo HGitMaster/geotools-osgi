@@ -31,7 +31,7 @@ import org.opengis.util.Cloneable;
  *
  * @author James Macgill
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/LineSymbolizerImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/LineSymbolizerImpl.java $
  * @version $Id: LineSymbolizerImpl.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public class LineSymbolizerImpl extends AbstractSymbolizer implements LineSymbolizer, Cloneable {

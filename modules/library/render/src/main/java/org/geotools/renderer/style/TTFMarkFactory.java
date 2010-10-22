@@ -48,7 +48,7 @@ import org.opengis.filter.expression.Expression;
  * @author Andrea Aime - TOPP
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/TTFMarkFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/TTFMarkFactory.java $
  */
 public class TTFMarkFactory implements MarkFactory {
 

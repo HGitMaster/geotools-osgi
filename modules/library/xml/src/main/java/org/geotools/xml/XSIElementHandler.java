@@ -40,7 +40,7 @@ import org.xml.sax.SAXNotSupportedException;
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
  * @author $Author:$ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/XSIElementHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/XSIElementHandler.java $
  * @version $Id: XSIElementHandler.java 30650 2008-06-12 19:53:40Z acuster $
  */
 public abstract class XSIElementHandler implements Serializable {

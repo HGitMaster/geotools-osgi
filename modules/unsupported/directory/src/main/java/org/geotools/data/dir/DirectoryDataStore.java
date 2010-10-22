@@ -59,7 +59,7 @@ import org.opengis.filter.Filter;
  * </p>
  *
  * @author David Zwiers, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/directory/src/main/java/org/geotools/data/dir/DirectoryDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/directory/src/main/java/org/geotools/data/dir/DirectoryDataStore.java $
  * @deprecated Use {@link org.geotools.data.directory.DirectoryDataStore} instead
  */
 public class DirectoryDataStore implements DataStore, LockingManager {

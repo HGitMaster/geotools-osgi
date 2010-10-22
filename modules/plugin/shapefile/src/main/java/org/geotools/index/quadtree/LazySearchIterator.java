@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/index/quadtree/LazySearchIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/index/quadtree/LazySearchIterator.java $
  */
 public class LazySearchIterator implements Iterator<Data> {
 

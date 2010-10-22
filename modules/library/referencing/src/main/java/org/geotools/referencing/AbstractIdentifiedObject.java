@@ -76,7 +76,7 @@ import org.geotools.util.Utilities;
  * situation, a plain {@link org.geotools.referencing.cs.AbstractCS} object may be instantiated.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/AbstractIdentifiedObject.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/AbstractIdentifiedObject.java $
  * @version $Id: AbstractIdentifiedObject.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

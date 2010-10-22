@@ -44,7 +44,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/test/java/org/geotools/ml/bindings/MLAttachmentTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/test/java/org/geotools/ml/bindings/MLAttachmentTypeBinding.java $
  */
 public class MLAttachmentTypeBinding extends AbstractComplexBinding {
     /**

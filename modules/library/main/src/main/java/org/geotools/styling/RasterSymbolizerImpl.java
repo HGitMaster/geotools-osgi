@@ -34,7 +34,7 @@ import org.opengis.style.StyleVisitor;
  *
  * @author iant
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/RasterSymbolizerImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/RasterSymbolizerImpl.java $
  */
 public class RasterSymbolizerImpl extends AbstractSymbolizer implements RasterSymbolizer {
     
@@ -45,7 +45,7 @@ public class RasterSymbolizerImpl extends AbstractSymbolizer implements RasterSy
     private ChannelSelection channelSelection = new ChannelSelectionImpl();
     private ColorMapImpl colorMap = new ColorMapImpl();
     private ContrastEnhancementImpl contrastEnhancement = new ContrastEnhancementImpl();
-    private ShadedReliefImpl shadedRelief = new ShadedReliefImpl();
+    private ShadedReliefImpl shadedRelief;
     private String geometryName = "geom";
     private Symbolizer symbolizer;
     private Expression opacity;
@@ -60,7 +60,7 @@ public class RasterSymbolizerImpl extends AbstractSymbolizer implements RasterSy
     }
     
     public RasterSymbolizerImpl(FilterFactory factory, Description desc, String name, Unit<Length> uom, OverlapBehavior behavior) {
-        super(name, desc, "raster", uom);
+        super(name, desc, "grid", uom);
         this.filterFactory = factory;
         this.opacity = filterFactory.literal(1.0);
         this.overlap = filterFactory.literal(OverlapBehavior.RANDOM);

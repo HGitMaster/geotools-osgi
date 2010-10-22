@@ -18,7 +18,6 @@ package org.geotools.gce.imagepyramid;
 
 import java.awt.Color;
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -29,6 +28,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataUtilities;
@@ -190,13 +190,26 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements Form
 			//
 			// //
 			final URL prjURL = DataUtilities.changeUrlExt(sourceURL, "prj"); 
-			PrjFileReader crsReader;
+			PrjFileReader crsReader=null;
+			InputStream inStream=null;
+			CoordinateReferenceSystem tempcrs = null;
 			try {
-				crsReader = new PrjFileReader(Channels.newChannel(prjURL.openStream()));
+				inStream=prjURL.openStream();
+				crsReader = new PrjFileReader(Channels.newChannel(inStream));
+				tempcrs = crsReader.getCoordinateReferenceSystem();
 			} catch (FactoryException e) {
 				return false;
+			}finally{
+				if(inStream!=null)
+					IOUtils.closeQuietly(inStream);
+				try{
+					if(crsReader!=null)
+						crsReader.close();
+				}catch (Throwable e) {
+					// TODO: handle exception
+				}
 			}
-			CoordinateReferenceSystem tempcrs = crsReader.getCoordinateReferenceSystem();
+			
 			if (tempcrs == null) {
 				// use the default crs
 				tempcrs = AbstractGridFormat.getDefaultCRS();
@@ -223,8 +236,7 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements Form
 					propertyStream.close();
 				return false;
 			} finally {
-				if (openStream != null) 
-					openStream.close();
+				IOUtils.closeQuietly(openStream);
 			}
 
 			// load the envelope

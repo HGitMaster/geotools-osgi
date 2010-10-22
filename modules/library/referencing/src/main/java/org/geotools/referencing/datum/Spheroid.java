@@ -28,7 +28,7 @@ import javax.measure.quantity.Length;
  * A ellipsoid which is spherical. This ellipsoid implements a faster
  * {@link #orthodromicDistance} method.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/datum/Spheroid.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/datum/Spheroid.java $
  * @version $Id: Spheroid.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

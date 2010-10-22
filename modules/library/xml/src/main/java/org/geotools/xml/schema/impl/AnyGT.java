@@ -29,7 +29,7 @@ import org.geotools.xml.schema.ElementGrouping;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/AnyGT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/impl/AnyGT.java $
  */
 public class AnyGT implements Any {
     private String id = null;

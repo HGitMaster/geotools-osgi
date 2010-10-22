@@ -37,7 +37,7 @@ import org.geotools.resources.i18n.Errors;
  * It may change in incompatible way in any future version.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/resources/image/ColorUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/resources/image/ColorUtilities.java $
  * @version $Id: ColorUtilities.java 34937 2010-02-22 12:30:31Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini

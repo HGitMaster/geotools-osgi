@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/spatial/IsValidGeometryValidation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/spatial/IsValidGeometryValidation.java $
  * @version $Id: IsValidGeometryValidation.java 30921 2008-07-05 07:51:23Z jgarnett $
  */
 public class IsValidGeometryValidation extends DefaultFeatureValidation {

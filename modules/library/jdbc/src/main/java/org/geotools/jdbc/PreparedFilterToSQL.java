@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Andrea Aime, OpenGEO
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/PreparedFilterToSQL.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/PreparedFilterToSQL.java $
  */
 public class PreparedFilterToSQL extends FilterToSQL {
     /**
@@ -104,10 +104,10 @@ public class PreparedFilterToSQL extends FilterToSQL {
         SRIDs.add(currentSRID);
         
         Class clazz = null;
-        if(literalValue != null)
-            clazz = literalValue.getClass();
-        else if(context instanceof Class)
+        if(context instanceof Class)
             clazz = (Class) context;
+        else if(literalValue != null)
+            clazz = literalValue.getClass();
         literalTypes.add( clazz );
         
         try {

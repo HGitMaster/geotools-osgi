@@ -58,8 +58,8 @@ import org.geotools.util.Version;
  * </ul>
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/factory/GeoTools.java $
- * @version $Id: GeoTools.java 34965 2010-03-03 01:36:20Z jive $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/factory/GeoTools.java $
+ * @version $Id: GeoTools.java 36008 2010-08-08 09:21:03Z jive $
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
@@ -67,7 +67,7 @@ public final class GeoTools {
     /**
      * The current GeoTools version. The separator character must be the dot.
      */
-    private static final Version VERSION = new Version("2.6.2");
+    private static final Version VERSION = new Version("2.6.5");
 
     /**
      * Object to inform about system-wide configuration changes.

@@ -37,7 +37,7 @@ import org.opengis.util.InternationalString;
  * @author gabriel
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/FeatureTypeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/type/FeatureTypeImpl.java $
  */
 public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	
@@ -100,10 +100,10 @@ public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	        return false;
 	    }
 	    if (getClass() != o.getClass()) {
-	        return false;
-	    }
+            return false;
+        }
 	    FeatureType other = (FeatureType) o;
-	    if (!Utilities.equals( defaultGeometry, other.getGeometryDescriptor())) {
+	    if (!Utilities.equals( getGeometryDescriptor(), other.getGeometryDescriptor())) {
 	        return false;
 	    }
 	    return true;

@@ -22,7 +22,7 @@ package org.geotools.styling;
  * Default implementation of StyledLayer.
  *
  * @author jamesm
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/StyledLayerImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/StyledLayerImpl.java $
  */
 public class StyledLayerImpl implements StyledLayer {
     protected String name;

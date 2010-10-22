@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/literal/BufferFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/literal/BufferFactory.java $
  */
 public class BufferFactory extends SingleProcessFactory {
     // making parameters available as static constants to help java programmers
@@ -70,7 +70,7 @@ public class BufferFactory extends SingleProcessFactory {
     }
     
     public BufferFactory() {
-        super(new NameImpl(GT_NAMESPACE, "buffer"));
+        super(new NameImpl("gt", "buffer"));
     }
     
 	public Process create(Map<String, Object> parameters)

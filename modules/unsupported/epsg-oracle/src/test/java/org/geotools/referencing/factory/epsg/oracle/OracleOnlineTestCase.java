@@ -55,7 +55,7 @@ import org.geotools.test.OnlineTestCase;
  * <p>
  * @author Jody Garnett (Refractions Research)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/epsg/oracle/OracleOnlineTestCase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-oracle/src/test/java/org/geotools/referencing/factory/epsg/oracle/OracleOnlineTestCase.java $
  */
 public class OracleOnlineTestCase extends OnlineTestCase {
     protected DataSource datasource;

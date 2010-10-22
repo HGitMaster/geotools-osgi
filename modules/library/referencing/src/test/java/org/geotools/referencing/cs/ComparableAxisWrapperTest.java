@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * Tests the {@link ComparableAxisWrapper} class.
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/cs/ComparableAxisWrapperTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/cs/ComparableAxisWrapperTest.java $
  * @version $Id: ComparableAxisWrapperTest.java 34126 2009-10-12 06:35:18Z mbedward $
  * @author Martin Desruisseaux
  */

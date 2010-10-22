@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin Deoliveira, The Open Planning Project
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/expression/SimpleFeaturePropertyAccessorFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/expression/SimpleFeaturePropertyAccessorFactory.java $
  */
 public class SimpleFeaturePropertyAccessorFactory implements
         PropertyAccessorFactory {
@@ -190,7 +190,7 @@ public class SimpleFeaturePropertyAccessorFactory implements
         	xpath = stripPrefix(xpath);
         	
         	if ( object instanceof SimpleFeature ) {
-        		return ((SimpleFeature) object).getAttribute( xpath ) != null;
+        		return ((SimpleFeature) object).getType().getDescriptor(xpath) != null;
         	}
         	
         	if ( object instanceof SimpleFeatureType ) {

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: DefaultType1Impl.java 34031 2009-10-01 14:33:01Z jive $
+ * $Id: DefaultType1Impl.java 35777 2010-06-29 01:03:16Z jive $
  */
 package net.opengis.wps10.impl;
 
@@ -124,7 +124,10 @@ public class DefaultType1Impl extends EObjectImpl implements DefaultType1 {
     public void eSet(int featureID, Object newValue) {
         switch (featureID) {
             case Wps10Package.DEFAULT_TYPE1__UOM:
-                setUOM((Unit)newValue);
+                if (newValue instanceof String) {
+                    throw new ClassCastException("Unable to cast String \"" + newValue + "\" to a Unit");
+                }
+                setUOM((Unit) newValue);
                 return;
         }
         super.eSet(featureID, newValue);

@@ -13,7 +13,7 @@ import org.opengis.filter.expression.Expression;
  * @param <P>
  *            parent builder
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/filter/expression/ChildExpressionBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/filter/expression/ChildExpressionBuilder.java $
  */
 public class ChildExpressionBuilder<P extends Builder<?>> extends ExpressionBuilder {
 

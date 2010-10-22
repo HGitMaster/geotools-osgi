@@ -31,7 +31,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * 
  * @author Simone Giannecchini
  * @author ian
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ServiceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ServiceTest.java $
  */
 public class ServiceTest extends TestCase {
 
@@ -46,7 +46,7 @@ public class ServiceTest extends TestCase {
 	public void testIsAvailable() throws NoSuchAuthorityCodeException,
 			FactoryException {
 		GridFormatFinder.scanForPlugins();
-		Iterator list = GridFormatFinder.getAvailableFormats().iterator();
+		Iterator<GridFormatFactorySpi> list = GridFormatFinder.getAvailableFormats().iterator();
 		boolean found = false;
 		GridFormatFactorySpi fac = null;
 		while (list.hasNext()) {

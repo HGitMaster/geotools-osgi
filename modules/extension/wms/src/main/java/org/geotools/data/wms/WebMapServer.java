@@ -87,7 +87,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </pre></code>
  * 
  * @author Richard Gould, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/WebMapServer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/WebMapServer.java $
  */
 public class WebMapServer extends AbstractOpenWebService<WMSCapabilities,Layer> {
 

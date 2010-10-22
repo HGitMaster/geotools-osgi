@@ -59,7 +59,7 @@ import org.opengis.filter.expression.Expression;
  * </p>
  * @since 2.5.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/charts/src/main/java/org/geotools/renderer/chart/ChartGraphicFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/charts/src/main/java/org/geotools/renderer/chart/ChartGraphicFactory.java $
  */
 public class ChartGraphicFactory implements ExternalGraphicFactory {
 

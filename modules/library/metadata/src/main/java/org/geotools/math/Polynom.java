@@ -34,7 +34,7 @@ import org.geotools.resources.Classes;
  * equation without creating a {@code Polygon} object.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/math/Polynom.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/math/Polynom.java $
  * @version $Id: Polynom.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Ken Turkiwski, for algorithmic inspiration

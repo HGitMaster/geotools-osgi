@@ -77,8 +77,7 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         assertTrue(authorityCodes.size() > 3000);
     }
 
-    // hwellmann: Fails on Java 1.6.0
-    public void __testFindWSG84() throws FactoryException {
+    public void testFindWSG84() throws FactoryException {
         String wkt;
         wkt = "GEOGCS[\"WGS 84\",\n"                                    +
               "  DATUM[\"World Geodetic System 1984\",\n"               +

@@ -16,6 +16,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.test.TestData;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
@@ -29,7 +30,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
  * @author Stefan Alfons Krueger (alfonx), Wikisquare.de : Support for jar:file:foo.jar/bar.properties URLs
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic/src/test/java/org/geotools/gce/imagemosaic/GranuleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic/src/test/java/org/geotools/gce/imagemosaic/GranuleTest.java $
  */
 public class GranuleTest extends Assert {
 
@@ -128,16 +129,21 @@ public class GranuleTest extends Assert {
 		
 		final AffineTransform2D gridToWorldTransform = level.getGridToWorldTransform();
 		
-		final RenderedImage raster = granule.loadRaster(readParameters, 0, TEST_BBOX, gridToWorldTransform.inverse(), request, new Dimension(10,10));
+		final RenderedImage raster = granule.loadRaster(readParameters, 0, TEST_BBOX, gridToWorldTransform.inverse(), request, new Dimension(10,10)).getRaster();
 		assertEquals(raster.getWidth(), 50);
 		assertEquals(raster.getHeight(), 50);
 		
 		AffineTransform translate = new AffineTransform(gridToWorldTransform);
 		translate.preConcatenate(AffineTransform.getTranslateInstance(2, 2));
 		
-		final RenderedImage translatedRaster = granule.loadRaster(readParameters, 0, TEST_BBOX, new AffineTransform2D(translate).inverse(), request, new Dimension(10,10));
+		final RenderedImage translatedRaster = granule.loadRaster(readParameters, 0, TEST_BBOX, new AffineTransform2D(translate).inverse(), request, new Dimension(10,10)).getRaster();
 		assertEquals(translatedRaster.getWidth(), 50);
 		assertEquals(translatedRaster.getHeight(), 50);
 	}
+	@Before
+	public void setUp() throws Exception {
+		//force initial ImageIO set up and reordering
+		new ImageMosaicFormatFactory();
 	
+	}
 }

@@ -28,7 +28,7 @@ import org.opengis.filter.Filter;
 /**
  * Records FeatureEvents and provides a record that we can check.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/FeatureEventWatcher.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/FeatureEventWatcher.java $
  */
 public class FeatureEventWatcher implements FeatureListener {
     /** Last known type */

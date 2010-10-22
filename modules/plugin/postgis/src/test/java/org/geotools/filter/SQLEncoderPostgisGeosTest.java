@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.LineString;
  * 
  * TODO: roll into SQLEncoderPostgisTest (SQLEncoderPostgisGeos is deprecated)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/test/java/org/geotools/filter/SQLEncoderPostgisGeosTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/test/java/org/geotools/filter/SQLEncoderPostgisGeosTest.java $
  */
 public class SQLEncoderPostgisGeosTest extends TestCase {
 	   /** Standard logging instance */

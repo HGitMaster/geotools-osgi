@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * tests for between filters.
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/BetweenTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/BetweenTest.java $
  */
 public class BetweenTest extends TestCase {
     /** Standard logging instance */

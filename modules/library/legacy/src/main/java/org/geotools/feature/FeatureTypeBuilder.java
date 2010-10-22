@@ -64,7 +64,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * </p>
  *
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/FeatureTypeBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/FeatureTypeBuilder.java $
  * @version $Id: FeatureTypeBuilder.java 30647 2008-06-12 18:58:42Z acuster $
  */
 public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory {

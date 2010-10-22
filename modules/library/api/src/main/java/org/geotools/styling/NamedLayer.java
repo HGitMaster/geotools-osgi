@@ -46,7 +46,7 @@ import java.util.List;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/NamedLayer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/NamedLayer.java $
  */
 public interface NamedLayer extends StyledLayer {
 	

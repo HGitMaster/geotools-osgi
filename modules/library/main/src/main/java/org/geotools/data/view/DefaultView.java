@@ -74,7 +74,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * 
  * @author Gabriel Roldï¿½n
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/view/DefaultView.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/view/DefaultView.java $
  */
 public class DefaultView implements FeatureSource<SimpleFeatureType, SimpleFeature> {
 

@@ -31,7 +31,7 @@ import org.geotools.util.logging.Logging;
  * are fetched consecutivly for the same record, then the same {@link ResultSet} is reused.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/sql/MetadataResult.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/sql/MetadataResult.java $
  * @version $Id: MetadataResult.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

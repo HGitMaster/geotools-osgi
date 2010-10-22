@@ -62,7 +62,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Justin Deoliveira, OpenGEO
  * @author Andrea Aime, OpenGEO
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/OracleFilterToSQL.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/OracleFilterToSQL.java $
  */
 public class OracleFilterToSQL extends PreparedFilterToSQL {
     

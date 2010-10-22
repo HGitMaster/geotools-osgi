@@ -65,7 +65,7 @@ import org.geotools.resources.image.ImageUtilities;
  * {@link java.awt.image.renderable.ContextualRenderedImageFactory}. The image
  * operation name is "org.geotools.gce.NoDataReplacer".
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/gtopo30/src/main/java/org/geotools/gce/gtopo30/NoDataReplacerOpImage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/gtopo30/src/main/java/org/geotools/gce/gtopo30/NoDataReplacerOpImage.java $
  * @version $Id: NoDataReplacerOpImage.java 30718 2008-06-13 17:41:11Z acuster $
  * @author Simone Giannecchini
  *

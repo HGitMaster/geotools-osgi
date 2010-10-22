@@ -36,7 +36,7 @@ import org.geotools.xml.impl.InstanceBinding;
  *
  * @see Configuration#registerBindings(java.util.Map)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/ComplexEMFBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/ComplexEMFBinding.java $
  */
 public class ComplexEMFBinding extends AbstractComplexEMFBinding
     implements InstanceBinding {

@@ -29,7 +29,7 @@ import org.opengis.filter.identity.FeatureId;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/identity/FeatureIdImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/identity/FeatureIdImpl.java $
  */
 public class FeatureIdImpl implements FeatureId {
 
@@ -48,17 +48,15 @@ public class FeatureIdImpl implements FeatureId {
 	}
 
 	public void setID( String id ){
-		if ( fid == null ) {
+		if ( id == null ) {
 			throw new NullPointerException( "fid must not be null" );
-		}		
+		}	
 		if( origionalFid == null ){
-			origionalFid = fid;
-			fid = id;			
-		}
-		else {
-			throw new IllegalStateException("You can only assign a real id once during a commit");
-		}
+                    origionalFid = fid;
+                }
+		fid = id;			
 	}
+	
 	public boolean matches(Feature feature) {
 		return feature != null && fid.equals( feature.getIdentifier().getID() );
 	}

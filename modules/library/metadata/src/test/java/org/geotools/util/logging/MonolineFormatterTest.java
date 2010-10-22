@@ -26,7 +26,7 @@ import static org.junit.Assume.*;
 /**
  * Test the {@link MonolineFormatter} class.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/logging/MonolineFormatterTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/logging/MonolineFormatterTest.java $
  * @version $Id: MonolineFormatterTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

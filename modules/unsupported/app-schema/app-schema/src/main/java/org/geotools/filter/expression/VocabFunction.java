@@ -50,7 +50,7 @@ import org.opengis.filter.expression.Literal;
  * 
  * @author Jody Garnett (GeoServer)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/VocabFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/VocabFunction.java $
  */
 public class VocabFunction implements Function {    
     private final List<Expression> parameters;

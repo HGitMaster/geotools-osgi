@@ -24,7 +24,7 @@ import java.util.Iterator;
  * by {@link java.util.Collections#synchronizedSet}'s iterator, except that the synchronization is
  * performed on an arbitrary lock.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/SynchronizedIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/SynchronizedIterator.java $
  * @version $Id: SynchronizedIterator.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

@@ -26,7 +26,7 @@ import org.opengis.temporal.IntervalLength;
  * 
  * @author Mehdi Sidhoum (Geomatys)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultIntervalLength.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultIntervalLength.java $
  */
 public class DefaultIntervalLength extends DefaultDuration implements IntervalLength {
 

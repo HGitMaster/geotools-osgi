@@ -16,9 +16,16 @@
  */
 package org.geotools.renderer.lite;
 
+import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
+
 import org.geotools.filter.FilterAttributeExtractor;
+import org.geotools.renderer.style.DynamicSymbolFactoryFinder;
+import org.geotools.renderer.style.ExpressionExtractor;
+import org.geotools.renderer.style.ExternalGraphicFactory;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.ChannelSelection;
 import org.geotools.styling.ColorMap;
@@ -52,13 +59,16 @@ import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.UserLayer;
+import org.opengis.feature.Feature;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
+import org.opengis.style.GraphicalSymbol;
 
 /**
  * Parses a style or part of it and returns the size of the largest stroke and the biggest point symbolizer whose width is specified with a literal expression.<br> Also provides an indication whether the stroke width is accurate, or if a non literal width has been found.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/MetaBufferEstimator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/MetaBufferEstimator.java $
  */
 
 public class MetaBufferEstimator extends FilterAttributeExtractor implements StyleVisitor {
@@ -266,11 +276,57 @@ public class MetaBufferEstimator extends FilterAttributeExtractor implements Sty
                     estimateAccurate = false;
                 }
             } else {
+                for (GraphicalSymbol gs : gr.graphicalSymbols()) {
+                    if(gs instanceof ExternalGraphic) {
+                        ExternalGraphic eg = (ExternalGraphic) gs;
+                        String location = eg.getLocation().toExternalForm();
+                        // expand embedded cql expression
+                        Expression expanded = ExpressionExtractor.extractCqlExpressions(location);
+                        // if not a literal there is an attribute dependency
+                        if(!(expanded instanceof Literal)) {
+                            estimateAccurate = false;
+                            return;
+                        }
+                        
+                        Iterator<ExternalGraphicFactory> it  = DynamicSymbolFactoryFinder.getExternalGraphicFactories();
+                        while(it.hasNext()) {
+                            try {
+                                Icon icon = it.next().getIcon(null, expanded, eg.getFormat(), -1);
+                                if(icon != null) {
+                                    int size = Math.max(icon.getIconHeight(), icon.getIconWidth());
+                                    if(size > buffer) {
+                                        buffer = size;
+                                    }
+                                    return;
+                                }
+                            } catch(Exception e) {
+                                LOGGER.log(Level.FINE, "Error occurred evaluating external graphic", e);
+                            }
+                        }
+                    } else if(gs instanceof Mark) {
+                        Mark m = (Mark) gs;
+                        if(m.getSize() instanceof Literal) {
+                            int size = (int) Math.ceil(m.getSize().evaluate(null, Double.class));
+                            if(size > buffer) {
+                                buffer = size;
+                            }
+                            return;
+                        } else {
+                            estimateAccurate = false;
+                            return;
+                        }
+                    }
+                } 
+                // if we got here we could not find a way to actually estimate the graphic size
                 estimateAccurate = false;
             }
         } catch (ClassCastException e) {
             estimateAccurate = false;
             LOGGER.info("Could not parse graphic size, " + "it's a literal but not a Number...");
+        } catch (Exception e) {
+            estimateAccurate = false;
+            LOGGER.log(Level.INFO, "Error occured during the graphic size estimation, " +
+            		"meta buffer estimate cannot be performed", e);
         }
     }
 

@@ -26,7 +26,7 @@ import org.geotools.filter.text.generated.parsers.ParseException;
  * @author Mauricio Pazos (Axios Engineering)
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQLException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQLException.java $
  * @version $Id: CQLException.java 34126 2009-10-12 06:35:18Z mbedward $
  * @since 2.4
  */

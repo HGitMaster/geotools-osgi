@@ -30,7 +30,7 @@ import org.geotools.util.logging.Logging;
  * is invoked.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/WeakCollectionCleaner.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/WeakCollectionCleaner.java $
  * @version $Id: WeakCollectionCleaner.java 34812 2010-01-18 09:10:00Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

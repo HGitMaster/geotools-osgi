@@ -16,11 +16,23 @@
  */
 package org.geotools.gml3;
 
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.xml.namespace.QName;
+
+import org.eclipse.emf.common.notify.Adapter;
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.Notifier;
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDPackage;
+import org.eclipse.xsd.XSDSchema;
+import org.geotools.gml2.ReferencingDirectiveLeakPreventer;
+import org.geotools.gml2.SubstitutionGroupLeakPreventer;
 import org.geotools.gml3.smil.SMIL20;
 import org.geotools.gml3.smil.SMIL20LANG;
+import org.geotools.util.Utilities;
 import org.geotools.xlink.XLINK;
 import org.geotools.xml.XSD;
 import org.opengis.feature.type.Schema;
@@ -32,7 +44,7 @@ import org.opengis.feature.type.Schema;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/GML.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/GML.java $
  */
 public final class GML extends XSD {
     
@@ -3439,5 +3451,15 @@ public final class GML extends XSD {
      */
     public String getSchemaLocation() {
         return getClass().getResource("gml.xsd").toString();
+    }
+    
+    @Override
+    protected XSDSchema buildSchema() throws IOException {
+        XSDSchema schema =  super.buildSchema();
+        
+        schema.resolveElementDeclaration(NAMESPACE, "_Feature").eAdapters()
+            .add(new SubstitutionGroupLeakPreventer());
+        schema.eAdapters().add(new ReferencingDirectiveLeakPreventer());
+        return schema;
     }
 }

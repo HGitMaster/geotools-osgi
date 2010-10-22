@@ -19,11 +19,11 @@ package org.geotools.swing.data;
 import java.awt.Component;
 import java.awt.HeadlessException;
 import java.io.File;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -48,8 +48,8 @@ import org.geotools.data.FileDataStoreFinder;
  *
  * @author Jody Garnett
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JFileDataStoreChooser.java $
- * @version $Id: JFileDataStoreChooser.java 34254 2009-10-26 12:54:24Z mbedward $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JFileDataStoreChooser.java $
+ * @version $Id: JFileDataStoreChooser.java 35249 2010-04-20 02:14:23Z jive $
  */
 public class JFileDataStoreChooser extends JFileChooser {
     private static final long serialVersionUID = -7482109609487216939L;

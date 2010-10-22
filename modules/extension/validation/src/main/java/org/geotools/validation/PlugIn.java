@@ -40,7 +40,7 @@ import org.geotools.validation.xml.ValidationException;
  *
  * @see <a http://vwfs.refractions.net/docs/Validating_Web_Feature_Server.pdf>A 
  *      PDF on Validating Web Feature Servers</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/PlugIn.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/PlugIn.java $
  */
 public class PlugIn {
     Map defaults;

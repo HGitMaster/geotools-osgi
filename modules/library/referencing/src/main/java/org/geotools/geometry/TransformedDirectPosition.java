@@ -87,7 +87,7 @@ import org.geotools.resources.i18n.Errors;
  *
  * @since 2.2
  * @author Martin Desruisseaux (IRD)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/geometry/TransformedDirectPosition.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/geometry/TransformedDirectPosition.java $
  * @version $Id: TransformedDirectPosition.java 30892 2008-07-04 15:17:36Z desruisseaux $
  */
 public class TransformedDirectPosition extends GeneralDirectPosition {

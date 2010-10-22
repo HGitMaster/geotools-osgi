@@ -37,7 +37,7 @@ import org.opengis.referencing.operation.TransformException;
  * Service object that takes a geometry an applies a MathTransform on top
  * of it.
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/geometry/jts/GeometryCoordinateSequenceTransformer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/geometry/jts/GeometryCoordinateSequenceTransformer.java $
  */
 public class GeometryCoordinateSequenceTransformer {
     private MathTransform transform;

@@ -96,7 +96,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/data/src/main/java/org/geotools/data/store/ContentDataStore.java $
  */
 public abstract class ContentDataStore implements DataStore {
 

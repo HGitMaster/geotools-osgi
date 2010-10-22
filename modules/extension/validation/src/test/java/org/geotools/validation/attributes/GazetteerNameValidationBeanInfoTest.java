@@ -30,7 +30,7 @@ import junit.framework.TestCase;
  * 
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/attributes/GazetteerNameValidationBeanInfoTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/test/java/org/geotools/validation/attributes/GazetteerNameValidationBeanInfoTest.java $
  * @version $Id: GazetteerNameValidationBeanInfoTest.java 30662 2008-06-12 21:44:16Z acuster $
  */
 public class GazetteerNameValidationBeanInfoTest extends TestCase {

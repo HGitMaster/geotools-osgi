@@ -33,11 +33,15 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.process.Process;
+import org.geotools.process.ProcessFactory;
+import org.geotools.process.Processors;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -52,18 +56,22 @@ import static org.junit.Assert.*;
  *
  * @author Michael Bedward
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/test/java/org/geotools/process/raster/VectorToRasterProcessTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/test/java/org/geotools/process/raster/VectorToRasterProcessTest.java $
  */
 public class VectorToRasterProcessTest {
 
-    public VectorToRasterProcessTest() {
+    private FeatureCollection<SimpleFeatureType, SimpleFeature> features;
+    private ReferencedEnvelope bounds;
+
+    @Before
+    public void setup() {
+        features = createTestFeatures();
+        bounds = features.getBounds();
     }
 
     @Test
     public void testProcess() throws Exception {
-        System.out.println("process");
-        FeatureCollection<SimpleFeatureType, SimpleFeature> features = createTestFeatures();
-        ReferencedEnvelope bounds = features.getBounds();
+        System.out.println("   process");
 
         Dimension gridDim = new Dimension(
                 (int)bounds.getWidth(),
@@ -109,10 +117,12 @@ public class VectorToRasterProcessTest {
 
     }
 
-    @Ignore
     @Test
-    public void testExecute() throws Exception {
-        /* WRITE ME ! */
+    public void testCreateProcess() throws Exception {
+        System.out.println("   create process");
+        Process p = Processors.createProcess(new NameImpl("gt", "VectorToRaster"));
+        assertNotNull(p);
+        assertTrue(p instanceof VectorToRasterProcess);
     }
 
     /**

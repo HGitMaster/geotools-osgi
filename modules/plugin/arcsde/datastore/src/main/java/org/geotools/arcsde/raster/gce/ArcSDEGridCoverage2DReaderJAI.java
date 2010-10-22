@@ -19,13 +19,9 @@ package org.geotools.arcsde.raster.gce;
 
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
-import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel;
-import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +35,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
@@ -55,7 +50,7 @@ import org.geotools.arcsde.raster.io.RasterReaderFactory;
 import org.geotools.arcsde.raster.io.TiledRasterReader;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.TypeMap; //import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.TypeMap;
 import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridEnvelope2D;
@@ -72,6 +67,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.ColorInterpretation;
 import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
@@ -79,15 +75,13 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 
 /**
  * 
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.4
- * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 34789 2010-01-13 16:44:32Z groldan $
+ * @version $Id: ArcSDEGridCoverage2DReaderJAI.java 35100 2010-03-23 15:02:18Z groldan $
  * @source $URL:
  *         http://svn.osgeo.org/geotools/trunk/modules/plugin/arcsde/datastore/src/main/java/org
  *         /geotools/arcsde/gce/ArcSDEGridCoverage2DReaderJAI.java $
@@ -189,6 +183,8 @@ public final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DR
 
     /**
      * @see GridCoverageReader#read(GeneralParameterValue[])
+     * @return A new {@linkplain GridCoverage grid coverage} from the input source, or {@code null}
+     *         if the requested envelope is outside the data bounds
      */
     public GridCoverage2D read(GeneralParameterValue[] params) throws IOException {
         final GeneralEnvelope requestedEnvelope;
@@ -209,10 +205,9 @@ public final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DR
         queries = findMatchingRasters(requestedEnvelope, requestedDim, overviewPolicy);
         if (queries.isEmpty()) {
             /*
-             * none of the rasters match the requested envelope. This may happen by the tiled nature
-             * of the raster dataset
+             * none of the rasters match the requested envelope.
              */
-            return createFakeCoverage(requestedEnvelope, requestedDim);
+            return null;
         }
 
         final GeneralEnvelope resultEnvelope = getResultEnvelope(queries);
@@ -232,7 +227,7 @@ public final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DR
         if (mosaicGeometry.width == 0 || mosaicGeometry.height == 0) {
             LOGGER.finer("Mosaic geometry width or height is zero,"
                     + " returning fake coverage for pixels " + mosaicGeometry);
-            return createFakeCoverage(requestedEnvelope, requestedDim);
+            return null;
         }
         /*
          * Gather the rendered images for each of the rasters that match the requested envelope
@@ -337,26 +332,6 @@ public final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DR
         }
     }
 
-    /**
-     * Called when the requested envelope do overlap the coverage envelope but none of the rasters
-     * in the dataset do
-     * 
-     * @param requestedEnvelope
-     * @param requestedDim
-     * @return
-     */
-    private GridCoverage2D createFakeCoverage(GeneralEnvelope requestedEnvelope,
-            Rectangle requestedDim) {
-
-        ImageTypeSpecifier its = rasterInfo.getRenderedImageSpec(0);
-        SampleModel sampleModel = its.getSampleModel(requestedDim.width, requestedDim.height);
-        ColorModel colorModel = its.getColorModel();
-
-        WritableRaster raster = Raster.createWritableRaster(sampleModel, null);
-        BufferedImage image = new BufferedImage(colorModel, raster, false, null);
-        return coverageFactory.create(coverageName, image, requestedEnvelope);
-    }
-
     private List<RasterQueryInfo> findMatchingRasters(final GeneralEnvelope requestedEnvelope,
             final Rectangle requestedDim, final OverviewPolicy overviewPolicy) {
 
@@ -420,11 +395,24 @@ public final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DR
         for (RasterQueryInfo query : queries) {
             RenderedImage image = query.getResultImage();
             log.log(image, query.getRasterId(), "01_original");
+            if (expandCM) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    LOGGER.finer("Creating color expanded version of tile for raster #"
+                            + query.getRasterId());
+                }
+
+                /*
+                 * reformat the image as a 4 band rgba backed by byte data
+                 */
+                image = FormatDescriptor.create(image, Integer.valueOf(DataBuffer.TYPE_BYTE), null);
+
+                log.log(image, query.getRasterId(), "04_1_colorExpanded");
+            }
 
             image = cropToRequiredDimension(image, query.getTiledImageSize(), query
                     .getResultDimensionInsideTiledImage());
             log.log(image, query.getRasterId(), "02_crop");
-            if(queries.size() == 1){
+            if (queries.size() == 1) {
                 return image;
             }
             final Rectangle mosaicLocation = query.getMosaicLocation();
@@ -474,20 +462,6 @@ public final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DR
                         + mosaicLocation.height;
             }
 
-            if (expandCM) {
-                if (LOGGER.isLoggable(Level.FINER)) {
-                    LOGGER.finer("Creating color expanded version of tile for raster #"
-                            + query.getRasterId());
-                }
-
-                /*
-                 * reformat the image as a 4 band rgba backed by byte data
-                 */
-                image = FormatDescriptor.create(image, Integer.valueOf(DataBuffer.TYPE_BYTE), null);
-
-                log.log(image, query.getRasterId(), "04_1_colorExpanded");
-            }
-
             transformed.add(image);
         }
 
@@ -505,21 +479,32 @@ public final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DR
              * adapted from RasterLayerResponse.java in the imagemosaic module
              */
             ParameterBlockJAI mosaicParams = new ParameterBlockJAI("Mosaic");
-
-            // TODO: set background values to raster's no-data
-            // mosaicParams.setParameter("backgroundValues",backgroundValues);
-
             mosaicParams.setParameter("mosaicType", MosaicDescriptor.MOSAIC_TYPE_OVERLAY);
+
+            // set background values to raster's no-data
+            double[] backgroundValues;
+            if (expandCM) {
+                backgroundValues = new double[] { 0, 0, 0, 0 };
+            } else {
+                final int numBands = rasterInfo.getNumBands();
+                backgroundValues = new double[numBands];
+                final int rasterIndex = 0;
+                Number noDataValue;
+                for (int bn = 0; bn < numBands; bn++) {
+                    noDataValue = rasterInfo.getNoDataValue(rasterIndex, bn);
+                    backgroundValues[bn] = noDataValue.doubleValue();
+                }
+            }
+            mosaicParams.setParameter("backgroundValues", backgroundValues);
 
             final ImageLayout layout = new ImageLayout(mosaicGeometry.x, mosaicGeometry.y,
                     mosaicGeometry.width, mosaicGeometry.height);
-            // layout.setTileWidth(mosaicGeometry.width);
-            // layout.setTileHeight(mosaicGeometry.height);
-            //layout.setTileWidth(128);
-            //layout.setTileHeight(128);
+            final int tileWidth = rasterInfo.getTileDimension(0).width;
+            final int tileHeight = rasterInfo.getTileDimension(0).height;
+            layout.setTileWidth(tileWidth);
+            layout.setTileHeight(tileHeight);
 
             final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-            // hints.put(JAI.KEY_SERIALIZE_DEEP_COPY, Boolean.TRUE);
 
             for (RenderedImage img : transformed) {
                 mosaicParams.addSource(img);
@@ -582,7 +567,8 @@ public final class ArcSDEGridCoverage2DReaderJAI extends AbstractGridCoverage2DR
         cropParams.add(Float.valueOf(cropTo.width));// width for each band
         cropParams.add(Float.valueOf(cropTo.height));// height for each band
 
-        final RenderingHints hints = new RenderingHints(JAI.KEY_OPERATION_BOUND, OpImage.OP_NETWORK_BOUND);
+        final RenderingHints hints = new RenderingHints(JAI.KEY_OPERATION_BOUND,
+                OpImage.OP_NETWORK_BOUND);
         RenderedImage image = JAI.create("Crop", cropParams, hints);
 
         // assert cropTo.x - tiledImageGridRange.x == image.getMinX();

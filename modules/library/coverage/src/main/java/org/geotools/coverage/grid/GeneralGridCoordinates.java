@@ -29,7 +29,7 @@ import org.geotools.resources.Classes;
  * {@linkplain GridPoint grid point} within the {@linkplain Grid grid}.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GeneralGridCoordinates.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GeneralGridCoordinates.java $
  * @version $Id: GeneralGridCoordinates.java 30776 2008-06-20 17:00:11Z desruisseaux $
  * @author Martin Desruisseaux
  *
@@ -215,7 +215,7 @@ public class GeneralGridCoordinates implements GridCoordinates, Serializable {
      * final in order to prevent subclasses from making it mutable again.
      *
      * @since 2.5
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GeneralGridCoordinates.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GeneralGridCoordinates.java $
      * @version $Id: GeneralGridCoordinates.java 30776 2008-06-20 17:00:11Z desruisseaux $
      * @author Martin Desruisseaux
      */

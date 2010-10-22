@@ -46,7 +46,7 @@ import org.geotools.resources.Classes;
  * which match the primitive types expected by the {@link java.awt.image.Raster} API.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/SampleConverter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/SampleConverter.java $
  * @version $Id: SampleConverter.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux
  */

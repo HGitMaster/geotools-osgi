@@ -81,12 +81,169 @@ import org.opengis.filter.expression.Expression;
  * </li>
  * </ul>
  * </p>
- * $Id: TextSymbolizer.java 34564 2009-11-30 16:08:45Z aaime $
+ * $Id: TextSymbolizer.java 35746 2010-06-21 17:25:23Z aaime $
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/TextSymbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/TextSymbolizer.java $
  */
 public interface TextSymbolizer extends org.opengis.style.TextSymbolizer,Symbolizer {
+    
+    
+    /**
+     * If true, geometries with the same labels are grouped and considered a single entity to be
+     * labeled. This allows to avoid or control repeated labels
+     */
+    public static String GROUP_KEY = "group";
+    
+    /**
+     * Default grouping value, false
+     */
+    public boolean DEFAULT_GROUP = false;
+    
+    /**
+     * The minimum distance between two labels, in pixels
+     */
+    public static String SPACE_AROUND_KEY = "spaceAround";
+
+    /**
+     * By default, don't add space around labels
+     */
+    public static int DEFAULT_SPACE_AROUND = 0;
+    
+    /**
+     * The distance, in pixel, a label can be displaced from its natural position in an attempt to
+     * find a position that does not conflict with already drawn labels.
+     */
+    public static String MAX_DISPLACEMENT_KEY = "maxDisplacement";
+
+    /**
+     * Default max displacement
+     */
+    public static int DEFAULT_MAX_DISPLACEMENT = 0;
+    
+    /**
+     * Minimum distance between two labels in the same label group. To be used when both
+     * displacement and repeat are used to avoid having two labels too close to each other
+     */
+    public static String MIN_GROUP_DISTANCE_KEY = "minGroupDistance"; 
+    
+    /**
+     * Default min distance between labels in the same group (-1 means no min
+     * distance)
+     */
+    public static int DEFAULT_MIN_GROUP_DISTANCE = -1;
+    
+    /**
+     * When positive it's the desired distance between two subsequent labels on a "big" geometry.
+     * Works only on lines at the moment. If zero only one label is drawn no matter how big the
+     * geometry is
+     */
+    public static String LABEL_REPEAT_KEY = "repeat";
+
+    /**
+     * Default repetition distance for labels (<= 0 -> no repetition)
+     */
+    public static int DEFAULT_LABEL_REPEAT = 0;
+    
+    /**
+     * When false,  only the biggest geometry in a group is labelled (the biggest is obtained by
+     * merging, when possible, the original geometries). When true, also the smaller items in the
+     * group are labeled. Works only on lines at the moment.
+     */
+    public static String LABEL_ALL_GROUP_KEY = "labelAllGroup";
+    
+    /**
+     * If in case of grouping all resulting lines have to be labelled
+     */
+    public static boolean DEFAULT_LABEL_ALL_GROUP = false;
+    
+    /**
+     * When false does not allow labels on lines to get beyond the beginning/end of the line. 
+     * By default a partial overrun is tolerated, set to false to disallow it.
+     */
+    public static String ALLOW_OVERRUNS_KEY = "allowOverruns";
+
+    /**
+     * We allow labels that are longer than the line to appear by default
+     */
+    public static boolean DEFAULT_ALLOW_OVERRUNS = true;
+
+    /**
+     * If, in case of grouping, self overlaps have to be taken into account and
+     * removed (expensive!)
+     */
+    public static boolean DEFAULT_REMOVE_OVERLAPS = false;
+    
+    /**
+     * When true activates curved labels on linear geometries. The label will follow the shape of 
+     * the current line, as opposed to being drawn a tangent straight line
+     */
+    public static String FOLLOW_LINE_KEY = "followLine";
+
+    /**
+     * If labels with a line placement should follow the line shape or be just
+     * tangent
+     */
+    public static boolean DEFAULT_FOLLOW_LINE = false;
+    
+    /**
+     * When drawing curved labels, max allowed angle between two subsequent characters. Higher
+     * angles may cause disconnected words or overlapping characters
+     */
+    public static String MAX_ANGLE_DELTA_KEY = "maxAngleDelta";
+
+    /**
+     * When label follows line, the max angle change between two subsequent characters, keeping it
+     * low avoids chars overlaps. When the angle is exceeded the label placement will fail.
+     */
+    public static double DEFAULT_MAX_ANGLE_DELTA = 22.5;
+    
+    /**
+     * Number of pixels are which a long label should be split into multiple lines. Works on all
+     * geometries, on lines it is mutually exclusive with the followLine option
+     */
+    public static String AUTO_WRAP_KEY = "autoWrap";
+
+    /**
+     * Auto wrapping long labels default
+     */
+    public static final int DEFAULT_AUTO_WRAP = 0;
+    
+    /**
+     * When true forces labels to a readable orientation, when false they make follow the line
+     * orientation even if that means the label will look upside down (useful when using
+     * TTF symbol fonts to add direction markers along a line) 
+     */
+    public static String FORCE_LEFT_TO_RIGHT_KEY = "forceLeftToRight";
+    
+    /**
+     * Force labels to a readable orientation (so that they don't look "upside down")
+     */
+    public static final boolean DEFAULT_FORCE_LEFT_TO_RIGHT = true;
+    
+    /**
+     * Enables conflict resolution (default, true) meaning no two labels will be allowed to
+     * overlap. Symbolizers with conflict resolution off are considered outside of the
+     * conflict resolution game, they don't reserve area and can overlap with other labels.
+     */
+    public static String CONFLICT_RESOLUTION_KEY = "conflictResolution";
+    
+    /**
+     * By default, put each label in the conflict resolution map
+     */
+    public static final boolean DEFAULT_CONFLICT_RESOLUTION = true;
+    
+    /**
+     * Sets the percentage of the label that must sit inside the geometry to allow drawing
+     * the label. Works only on polygons.
+     */
+    public static String GOODNESS_OF_FIT_KEY = "goodnessOfFit";
+    
+    /**
+     * Default value for the goodness of fit threshold
+     */
+    public static final double DEFAULT_GOODNESS_OF_FIT = 0.5;
+    
     /**
      * Returns the expression that will be evaluated to determine what text is
      * displayed.

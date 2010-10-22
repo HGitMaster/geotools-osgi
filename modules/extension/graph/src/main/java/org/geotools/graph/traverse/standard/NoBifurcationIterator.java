@@ -39,7 +39,7 @@ import org.geotools.graph.traverse.basic.SourceGraphIterator;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/NoBifurcationIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/NoBifurcationIterator.java $
  */
 public class NoBifurcationIterator extends SourceGraphIterator {
   

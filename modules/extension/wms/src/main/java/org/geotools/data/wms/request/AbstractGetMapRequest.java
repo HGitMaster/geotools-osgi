@@ -36,7 +36,7 @@ import org.opengis.geometry.BoundingBox;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractGetMapRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/AbstractGetMapRequest.java $
  */
 public abstract class AbstractGetMapRequest extends AbstractWMSRequest implements GetMapRequest {
 

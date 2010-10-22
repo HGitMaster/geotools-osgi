@@ -31,7 +31,7 @@ import org.opengis.util.InternationalString;
  * or use static convenience methods instead.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/i18n/Vocabulary.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/i18n/Vocabulary.java $
  * @version $Id: Vocabulary.java 30649 2008-06-12 19:44:08Z acuster $
  * @author Martin Desruisseaux (IRD, Geomatys)
  */

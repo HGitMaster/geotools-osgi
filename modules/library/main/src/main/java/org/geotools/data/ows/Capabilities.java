@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author rgould
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/ows/Capabilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/ows/Capabilities.java $
  */
 public class Capabilities {
     private Service service;

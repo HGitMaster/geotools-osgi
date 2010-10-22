@@ -90,7 +90,7 @@ import org.opengis.style.GraphicalSymbol;
  *
  * @task REVISIT: There are no setter methods in this interface, is this a
  *       problem?
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Graphic.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Graphic.java $
  */
 public interface Graphic extends GraphicLegend,
                                  org.opengis.style.Graphic,

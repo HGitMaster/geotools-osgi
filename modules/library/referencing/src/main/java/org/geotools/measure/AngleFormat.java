@@ -85,7 +85,7 @@ import org.geotools.math.XMath;
  * @see Longitude
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/measure/AngleFormat.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/measure/AngleFormat.java $
  * @version $Id: AngleFormat.java 34518 2009-11-27 00:09:17Z mbedward $
  * @author Martin Desruisseaux (PMO, IRD)
  */

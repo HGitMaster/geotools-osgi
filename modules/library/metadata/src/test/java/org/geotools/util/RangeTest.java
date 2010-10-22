@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  *
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/RangeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/RangeTest.java $
  */
 public final class RangeTest {
     /** [-1,1] */

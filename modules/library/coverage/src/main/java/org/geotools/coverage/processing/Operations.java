@@ -47,7 +47,7 @@ import org.opengis.referencing.operation.TransformException;
  * selected by users in some widget), use the {@linkplain AbstractProcessor processor} directly.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/Operations.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/Operations.java $
  * @version $Id: Operations.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *

@@ -27,7 +27,7 @@ import java.util.ArrayList;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/NullPrimaryKey.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/NullPrimaryKey.java $
  */
 public class NullPrimaryKey extends PrimaryKey {
 

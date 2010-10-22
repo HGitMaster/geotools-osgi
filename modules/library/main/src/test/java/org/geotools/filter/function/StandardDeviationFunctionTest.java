@@ -30,7 +30,7 @@ import org.opengis.filter.expression.PropertyName;
 /**
  *
  * @author Cory Horner, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/function/StandardDeviationFunctionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/function/StandardDeviationFunctionTest.java $
  */
 public class StandardDeviationFunctionTest extends FunctionTestSupport {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(

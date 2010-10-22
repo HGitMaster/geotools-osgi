@@ -37,7 +37,7 @@ import org.geotools.io.ExpandedTabWriter;
  * module toward the GUI one, especially since the extracted methods are not Swing specific.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/GraphicsUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/GraphicsUtilities.java $
  * @version $Id: GraphicsUtilities.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

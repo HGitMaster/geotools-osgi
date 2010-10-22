@@ -50,7 +50,7 @@ import org.opengis.filter.expression.Expression;
  * </p>
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/LinePlacement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/LinePlacement.java $
  */
 public interface LinePlacement extends org.opengis.style.LinePlacement, LabelPlacement {
     /**

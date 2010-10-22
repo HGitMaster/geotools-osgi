@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * JTS Geometries with additional ordinates beyond xyz.
  * </p>
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/GeometryConverter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/sdo/GeometryConverter.java $
  */
 public class GeometryConverter {
 	protected OracleConnection connection;

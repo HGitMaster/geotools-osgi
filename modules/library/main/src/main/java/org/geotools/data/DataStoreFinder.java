@@ -50,7 +50,7 @@ import org.opengis.feature.type.FeatureType;
  * <p>
  * Example:<br/><code>org.geotools.data.mytype.MyTypeDataStoreFacotry</code>
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/DataStoreFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/DataStoreFinder.java $
  */
 public final class DataStoreFinder {
 	/** The logger for the filter module. */
@@ -143,5 +143,16 @@ public final class DataStoreFinder {
 		getServiceRegistry().scanForPlugins();
 
 	}
+	
+	/**
+	     * Resets the factory finder and prepares for a new full scan of the SPI subsystems
+	     */
+	    public static void reset() {
+	        FactoryRegistry copy = registry;
+	        registry = null;
+	        if(copy != null) {
+	            copy.deregisterAll();
+	        }
+	    }
     
 }

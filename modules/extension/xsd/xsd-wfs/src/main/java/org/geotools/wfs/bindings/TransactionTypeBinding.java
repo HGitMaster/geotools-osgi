@@ -110,7 +110,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/TransactionTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/TransactionTypeBinding.java $
  */
 public class TransactionTypeBinding extends AbstractComplexEMFBinding {
     public TransactionTypeBinding(WfsFactory factory) {

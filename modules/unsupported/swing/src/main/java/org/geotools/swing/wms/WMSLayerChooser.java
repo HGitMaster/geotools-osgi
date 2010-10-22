@@ -36,7 +36,7 @@ import org.geotools.data.wms.WebMapServer;
  * Initially we are going to work with a JList, we will switch
  * to a JTree when we get a chance.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/wms/WMSLayerChooser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/wms/WMSLayerChooser.java $
  */
 public class WMSLayerChooser extends JDialog implements ActionListener {
     private static final long serialVersionUID = -409825958139086013L;

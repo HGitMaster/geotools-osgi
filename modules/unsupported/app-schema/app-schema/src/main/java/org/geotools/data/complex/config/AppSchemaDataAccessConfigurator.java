@@ -39,7 +39,6 @@ import java.util.logging.Logger;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
-import org.apache.xml.resolver.Catalog;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.DataSourceException;
@@ -61,6 +60,9 @@ import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.expression.FeaturePropertyAccessorFactory;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.xml.AppSchemaCache;
+import org.geotools.xml.AppSchemaCatalog;
+import org.geotools.xml.AppSchemaResolver;
 import org.geotools.xml.SchemaIndex;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -78,7 +80,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
  * @author Russell Petty, GSV
- * @version $Id: AppSchemaDataAccessConfigurator.java 34495 2009-11-25 12:24:06Z ang05a $
+ * @version $Id: AppSchemaDataAccessConfigurator.java 35576 2010-05-25 05:47:07Z bencaradocdavies $
  * @source $URL:
  *         http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main
  *         /java/org/geotools/data/complex/config/AppSchemaDataAccessConfigurator.java $
@@ -177,7 +179,7 @@ public class AppSchemaDataAccessConfigurator {
         parseGmlSchemas();
 
         // -create source datastores
-        sourceDataStores = aquireSourceDatastores();
+        sourceDataStores = acquireSourceDatastores();
 
         // -create FeatureType mappings
         Set featureTypeMappings = createFeatureTypeMappings();
@@ -216,6 +218,11 @@ public class AppSchemaDataAccessConfigurator {
 
             mapping = FeatureTypeMappingFactory.getInstance(featureSource, target, attMappings, namespaces,
                     dto.getItemXpath(), dto.isXmlDataStore());
+            
+            String mappingName = dto.getMappingName();
+            if (mappingName != null) {
+                mapping.setName(Types.degloseName(mappingName, namespaces));
+            }
 
             featureTypeMappings.add(mapping);
         }
@@ -225,7 +232,7 @@ public class AppSchemaDataAccessConfigurator {
     private AttributeDescriptor getTargetDescriptor(TypeMapping dto, GeometryType geomType)
             throws IOException {
         String prefixedTargetName = dto.getTargetElementName();
-        Name targetNodeName = degloseName(prefixedTargetName);
+        Name targetNodeName = Types.degloseName(prefixedTargetName, namespaces);
 
         AttributeDescriptor targetDescriptor = typeRegistry.getDescriptor(targetNodeName, geomType,
                 dto.getAttributeMappings());
@@ -299,7 +306,7 @@ public class AppSchemaDataAccessConfigurator {
             final Map clientProperties = getClientProperties(attDto, itemXpath);
 
             if (expectedInstanceTypeName != null) {
-                Name expectedNodeTypeName = degloseTypeName(expectedInstanceTypeName);
+                Name expectedNodeTypeName = Types.degloseName(expectedInstanceTypeName, namespaces);
                 expectedInstanceOf = typeRegistry
                         .getAttributeType(expectedNodeTypeName, null, null);
                 if (expectedInstanceOf == null) {
@@ -319,15 +326,19 @@ public class AppSchemaDataAccessConfigurator {
                         attDto.getParentLabel(), attDto.getTargetQueryString(), attDto.getInstancePath());
             } else
             if (sourceElement != null) {
-                // nested complex attributes
+                // nested complex attributes, this could be a function expression for polymorphic types
+                Expression elementExpr = parseOgcCqlExpression(sourceElement);
                 String sourceField = attDto.getLinkField();
-                assert sourceField != null; // source field must be specified
-
-                final StepList sourceFieldSteps = XPath.steps(root, sourceField, namespaces);
+                StepList sourceFieldSteps = null;
+                if (sourceField != null) {
+                    // it could be null for polymorphism mapping, 
+                    // i.e. when the linked element maps to the same table as the container mapping
+                    sourceFieldSteps = XPath.steps(root, sourceField, namespaces);
+                }
                 // a nested feature
                 attMapping = new NestedAttributeMapping(idExpression, sourceExpression,
                         targetXPathSteps, isMultiValued, clientProperties,
-                        degloseTypeName(sourceElement), sourceFieldSteps, namespaces);
+                        elementExpr, sourceFieldSteps, namespaces);
             } else {
                 attMapping = new AttributeMapping(idExpression, sourceExpression, targetXPathSteps,
                         expectedInstanceOf, isMultiValued, clientProperties);
@@ -396,7 +407,7 @@ public class AppSchemaDataAccessConfigurator {
         for (Iterator it = dto.getClientProperties().entrySet().iterator(); it.hasNext();) {
             Map.Entry entry = (Map.Entry) it.next();
             String name = (String) entry.getKey();
-            Name qName = degloseName(name);
+            Name qName = Types.degloseName(name, namespaces);
             String cqlExpression = (String) entry.getValue();
             
             final Expression expression;
@@ -427,7 +438,7 @@ public class AppSchemaDataAccessConfigurator {
 
         AppSchemaDataAccessConfigurator.LOGGER.fine("asking datastore " + sourceDataStore
                 + " for source type " + typeName);
-        Name name = degloseName(typeName);
+        Name name = Types.degloseName(typeName, namespaces);
         FeatureSource fSource = (FeatureSource) sourceDataStore.getFeatureSource(name);
 
         if (inputDataAccessIds.contains(dsId)) {
@@ -461,10 +472,9 @@ public class AppSchemaDataAccessConfigurator {
 
         final List schemaFiles = config.getTargetSchemasUris();
 
-        final Catalog oasisCatalog = getCatalog();
         EmfAppSchemaReader schemaParser;
         schemaParser = EmfAppSchemaReader.newInstance();
-        schemaParser.setCatalog(oasisCatalog);
+        schemaParser.setResolver(buildResolver());
 
         // create a single type registry for all the schemas in the config
         typeRegistry = new FeatureTypeRegistry(namespaces);
@@ -482,15 +492,46 @@ public class AppSchemaDataAccessConfigurator {
         }
     }
 
-    private Catalog getCatalog() throws MalformedURLException, IOException {
+    /**
+     * Build the catalog for this data access.
+     */
+    private AppSchemaCatalog buildCatalog() {
         String catalogLocation = config.getCatalog();
         if (catalogLocation == null) {
             return null;
         } else {
-            URL baseUrl = new URL(config.getBaseSchemasUrl());
-            URL resolvedCatalogLocation = resolveResourceLocation(baseUrl, catalogLocation);
-            return CatalogUtilities.buildPrivateCatalog(resolvedCatalogLocation);
+            URL baseUrl;
+            try {
+                baseUrl = new URL(config.getBaseSchemasUrl());
+                URL resolvedCatalogLocation = resolveResourceLocation(baseUrl, catalogLocation);
+                return AppSchemaCatalog.build(resolvedCatalogLocation);
+            } catch (MalformedURLException e) {
+                LOGGER.warning("Malformed URL encountered while setting OASIS catalog location. "
+                        + "Mapping file URL: " + config.getBaseSchemasUrl() + " Catalog location: "
+                        + config.getCatalog() + " Detail: " + e.getMessage());
+                return null;
+            }
         }
+    }
+    
+    /**
+     * Build the cache for this data access.
+     */
+    private AppSchemaCache buildCache() {
+        try {
+            return AppSchemaCache.buildFromGeoserverUrl(new URL(config.getBaseSchemasUrl()));
+        } catch (MalformedURLException e) {
+            LOGGER.warning("Malformed mapping file URL: " + config.getBaseSchemasUrl() + " Detail: "
+                    + e.getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Build the resolver (catalog plus cache) for this data access.
+     */
+    private AppSchemaResolver buildResolver() {
+        return new AppSchemaResolver(buildCatalog(), buildCache());
     }
 
     private URL resolveResourceLocation(final URL baseUrl, String schemaLocation)
@@ -525,9 +566,9 @@ public class AppSchemaDataAccessConfigurator {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    private Map/* <String, FeatureAccess> */aquireSourceDatastores() throws IOException {
+    private Map/* <String, FeatureAccess> */acquireSourceDatastores() throws IOException {
         AppSchemaDataAccessConfigurator.LOGGER.entering(getClass().getName(),
-                "aquireSourceDatastores");
+                "acquireSourceDatastores");
 
         final Map datastores = new HashMap();
         final List dsParams = config.getSourceDataStores();
@@ -645,60 +686,5 @@ public class AppSchemaDataAccessConfigurator {
             resolvedParams.put(key, value);
         }
         return resolvedParams;
-    }
-
-    /**
-     * Takes a prefixed attribute name and returns an {@link Name} by looking which namespace
-     * belongs the prefix to in {@link AppSchemaDataAccessDTO#getNamespaces()}.
-     * 
-     * @param prefixedName
-     * @return
-     * @throws IllegalArgumentException
-     *             if <code>prefixedName</code> has no prefix.
-     */
-    private Name degloseTypeName(String prefixedName) throws IllegalArgumentException {
-        Name name = null;
-
-        if (prefixedName == null) {
-            return null;
-        }
-
-        int prefixIdx = prefixedName.indexOf(':');
-        if (prefixIdx == -1) {
-            return Types.typeName(prefixedName);
-            // throw new IllegalArgumentException(prefixedName + " is not
-            // prefixed");
-        }
-
-        String nsPrefix = prefixedName.substring(0, prefixIdx);
-        String localName = prefixedName.substring(prefixIdx + 1);
-        String nsUri = namespaces.getURI(nsPrefix);
-
-        name = Types.typeName(nsUri, localName);
-
-        return name;
-    }
-
-    private Name degloseName(String prefixedName) throws IllegalArgumentException {
-        Name name = null;
-
-        if (prefixedName == null) {
-            return null;
-        }
-
-        int prefixIdx = prefixedName.indexOf(':');
-        if (prefixIdx == -1) {
-            return Types.typeName(prefixedName);
-            // throw new IllegalArgumentException(prefixedName + " is not
-            // prefixed");
-        }
-
-        String nsPrefix = prefixedName.substring(0, prefixIdx);
-        String localName = prefixedName.substring(prefixIdx + 1);
-        String nsUri = namespaces.getURI(nsPrefix);
-
-        name = Types.typeName(nsUri, localName);
-
-        return name;
     }
 }

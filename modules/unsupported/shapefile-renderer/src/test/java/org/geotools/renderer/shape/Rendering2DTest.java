@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * DOCUMENT ME!
  *
  * @author jamesm
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/Rendering2DTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/Rendering2DTest.java $
  */
 public class Rendering2DTest extends TestCase {
     /** path for test data */

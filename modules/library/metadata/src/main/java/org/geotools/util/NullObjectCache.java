@@ -26,7 +26,7 @@ import java.util.Set;
  * 
  * @since 2.5
  * @version $Id: NullObjectCache.java 31618 2008-10-03 20:30:40Z egouge $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/NullObjectCache.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/NullObjectCache.java $
  * @author Cory Horner (Refractions Research)
  */
 final class NullObjectCache implements ObjectCache {

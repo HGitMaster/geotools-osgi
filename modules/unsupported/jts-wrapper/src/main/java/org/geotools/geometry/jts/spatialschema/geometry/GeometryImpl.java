@@ -43,7 +43,7 @@ import org.geotools.factory.BasicFactories;
  * Base class for our JTS-based implementation of the various ISO 19107 geometry
  * classes.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/GeometryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/GeometryImpl.java $
  */
 public abstract class GeometryImpl 
 	implements Geometry, Serializable, Cloneable, JTSGeometry {

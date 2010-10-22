@@ -17,7 +17,6 @@
 package org.geotools.gml2;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -35,7 +34,7 @@ import org.opengis.feature.type.Schema;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/GML.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/GML.java $
  */
 public final class GML extends XSD {
 
@@ -613,5 +612,15 @@ public final class GML extends XSD {
      */
     public String getSchemaLocation() {
         return getClass().getResource("feature.xsd").toString();
+    }
+    
+    @Override
+    protected XSDSchema buildSchema() throws IOException {
+        XSDSchema schema =  super.buildSchema();
+        
+        schema.resolveElementDeclaration(NAMESPACE, "_Feature").eAdapters()
+            .add(new SubstitutionGroupLeakPreventer());
+        schema.eAdapters().add(new ReferencingDirectiveLeakPreventer());
+        return schema;
     }
 }

@@ -38,7 +38,7 @@ import org.opengis.filter.Filter;
  * 
  * @author dzwiers
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/type/NestedAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/type/NestedAttributeType.java $
  * 
  * @deprecated Will be removed in geotools 2.6.
  */

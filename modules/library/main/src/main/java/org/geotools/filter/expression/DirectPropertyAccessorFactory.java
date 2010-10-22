@@ -25,7 +25,7 @@ import org.opengis.feature.type.Name;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/expression/DirectPropertyAccessorFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/expression/DirectPropertyAccessorFactory.java $
  */
 public class DirectPropertyAccessorFactory implements PropertyAccessorFactory {
 

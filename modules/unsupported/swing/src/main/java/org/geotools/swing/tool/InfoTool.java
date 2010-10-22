@@ -55,7 +55,7 @@ import org.opengis.feature.Property;
  * @author Michael Bedward
  * @since 2.6
  * @source $Id: InfoTool.java 34954 2010-02-26 10:57:53Z mbedward $
- * @version $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/InfoTool.java $
+ * @version $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/InfoTool.java $
  */
 public class InfoTool extends CursorTool implements TextReporterListener {
 

@@ -33,7 +33,7 @@ import org.opengis.geometry.coordinate.PolyhedralSurface;
  * that the curves are coplanar and the polygon uses planar interpolation in its
  * interior.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/PolygonImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/PolygonImpl.java $
  */
 public class PolygonImpl extends SurfacePatchImpl implements Polygon {
 

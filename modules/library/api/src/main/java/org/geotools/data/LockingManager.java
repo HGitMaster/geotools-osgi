@@ -32,7 +32,7 @@ import java.io.IOException;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/LockingManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/LockingManager.java $
  */
 public interface LockingManager {
     /**

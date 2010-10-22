@@ -77,7 +77,7 @@ import org.opengis.feature.type.FeatureType;
  *
  * @author Ian Schneider
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/FeatureReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/FeatureReader.java $
  * @version $Id: FeatureReader.java 30642 2008-06-12 17:52:06Z acuster $
  */
 public interface FeatureReader<T extends FeatureType, F extends Feature> {

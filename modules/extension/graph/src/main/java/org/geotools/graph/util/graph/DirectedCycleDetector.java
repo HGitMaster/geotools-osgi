@@ -28,7 +28,7 @@ import org.geotools.graph.traverse.standard.DirectedBreadthFirstTopologicalItera
  * @see org.geotools.graph.traverse.standard.DirectedBreadthFirstTopologicalIterator
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/util/graph/DirectedCycleDetector.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/util/graph/DirectedCycleDetector.java $
  */
 
 public class DirectedCycleDetector extends CycleDetector {

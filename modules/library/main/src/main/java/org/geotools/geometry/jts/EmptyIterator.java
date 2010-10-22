@@ -16,14 +16,19 @@
  */
 package org.geotools.geometry.jts;
 
+import java.awt.geom.PathIterator;
+
 /**
  * An iterator for empty geometries
  * 
  * @since 2.4
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/EmptyIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/EmptyIterator.java $
  */
 public class EmptyIterator extends AbstractLiteIterator {
+    
+    public static final EmptyIterator INSTANCE = new EmptyIterator();
+    
     public int getWindingRule() {
         return WIND_NON_ZERO;
     }
@@ -37,6 +42,10 @@ public class EmptyIterator extends AbstractLiteIterator {
     }
 
     public int currentSegment(double[] coords) {
+        return 0;
+    }
+    
+    public int currentSegment(float[] coords) {
         return 0;
     }
 }

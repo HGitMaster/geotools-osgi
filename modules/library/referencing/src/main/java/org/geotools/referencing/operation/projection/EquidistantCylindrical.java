@@ -59,7 +59,7 @@ import org.opengis.referencing.operation.MathTransform;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/equirectangular.html">"Equirectangular" on RemoteSensing.org</A>
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/EquidistantCylindrical.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/EquidistantCylindrical.java $
  * @version $Id: EquidistantCylindrical.java 34859 2010-02-03 19:30:23Z aaime $
  * @author John Grange
  * @author Martin Desruisseaux

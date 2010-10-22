@@ -29,7 +29,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * the resulting fid follow the &ltfeatureTypeName&gt.&ltbasic_fid&gt pattern.
  *
  * @author wolf
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/TypedFIDMapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/fidmapper/TypedFIDMapper.java $
  * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
 public class TypedFIDMapper extends AbstractFIDMapper {

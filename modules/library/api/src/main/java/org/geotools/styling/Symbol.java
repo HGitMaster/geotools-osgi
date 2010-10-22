@@ -28,7 +28,7 @@ package org.geotools.styling;
  * This an empty interface for styling symbol objects to implement
  *
  * @author iant
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Symbol.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Symbol.java $
  */
 public interface Symbol extends org.opengis.style.GraphicalSymbol{
     public static final Symbol[] SYMBOLS_EMPTY = new Symbol[0];

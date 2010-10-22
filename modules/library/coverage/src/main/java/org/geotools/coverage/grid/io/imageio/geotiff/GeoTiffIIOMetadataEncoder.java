@@ -40,7 +40,7 @@ import com.sun.media.imageio.plugins.tiff.TIFFTag;
  * @since 2.3
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/imageio/geotiff/GeoTiffIIOMetadataEncoder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/imageio/geotiff/GeoTiffIIOMetadataEncoder.java $
  */
 public final class GeoTiffIIOMetadataEncoder {
 
@@ -546,8 +546,16 @@ public final class GeoTiffIIOMetadataEncoder {
 		int[] values;
 		int lenght;
 		Element GeoKeyRecord;
-		;
-		for (int i = 0; i < numGeoTiffEntries; i++) {
+		
+		//GeoKey directory root tag
+		values = getGeoKeyEntryAt(0).getValues();
+		data.addContent(createShortElement(values[0]));
+		data.addContent(createShortElement(values[1]));
+		data.addContent(createShortElement(values[3]));
+		data.addContent(createShortElement(values[2]));
+		
+		//GeoKeys
+		for (int i = 1; i < numGeoTiffEntries; i++) {
 			values = getGeoKeyEntryAt(i).getValues();
 			lenght = values.length;
 			for (int j = 0; j < lenght; j++) {

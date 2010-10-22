@@ -37,7 +37,7 @@ import org.geotools.util.NumberRange;
  * the identity transform, or {@code null} if this category is a qualitative one.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/GeophysicsCategory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/GeophysicsCategory.java $
  * @version $Id: GeophysicsCategory.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  */

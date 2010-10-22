@@ -43,7 +43,7 @@ import org.geotools.resources.image.ImageUtilities;
  * can not be processed directly by an {@linkplain IndexColorModel index color model}.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/ViewType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/ViewType.java $
  * @version $Id: ViewType.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux
  *

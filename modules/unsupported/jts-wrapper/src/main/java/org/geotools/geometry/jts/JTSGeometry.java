@@ -24,7 +24,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * system of the geometry is attached as the "userData" property of the
  * returned JTS object.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/JTSGeometry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/JTSGeometry.java $
  */
 public interface JTSGeometry {
     /**

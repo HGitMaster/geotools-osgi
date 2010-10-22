@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link GeocentricTranslation} class.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/GeocentricTranslationTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/GeocentricTranslationTest.java $
  * @version $Id: GeocentricTranslationTest.java 34665 2009-12-13 12:40:59Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

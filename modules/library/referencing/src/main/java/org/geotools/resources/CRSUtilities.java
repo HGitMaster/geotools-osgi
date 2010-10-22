@@ -67,7 +67,7 @@ import org.geotools.resources.i18n.Errors;
  * in any future release.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/resources/CRSUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/resources/CRSUtilities.java $
  * @version $Id: CRSUtilities.java 31487 2008-09-10 08:57:36Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

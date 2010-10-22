@@ -35,12 +35,17 @@ import org.geotools.swing.wizard.JWizard;
  * documenting what file extensions they support; and any additional parameters that may be
  * interesting etc.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JDataStoreWizard.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/data/JDataStoreWizard.java $
  */
 public class JDataStoreWizard extends JWizard {
     private static final long serialVersionUID = -3788708439279424698L;
 
     DataStoreFactorySpi format;
+
+    /**
+     * Optional page used to choose a format if needed.
+     */
+    private JDataChoosePage page0;
 
     /**
      * Initial page of user focused options
@@ -58,6 +63,13 @@ public class JDataStoreWizard extends JWizard {
     protected Map<String, Object> connectionParameters;
 
     /**
+     * Open up a wizard up with an initial page to
+     * choose a datastore factory.
+     */
+    public JDataStoreWizard(){
+        this(null,  new HashMap<String, Object>());
+    }
+    /**
      * Quick transition from JFileDataStoreChooser; allowing applications to migrate to connection
      * parameters.
      * 
@@ -65,7 +77,7 @@ public class JDataStoreWizard extends JWizard {
      *            Extension used to look up FileDataStoreFactory
      */
     public JDataStoreWizard(String extension) {
-        this(FileDataStoreFinder.getDataStoreFactory(extension));
+        this(extension == null ? null : FileDataStoreFinder.getDataStoreFactory(extension));
     }
 
     /**
@@ -79,7 +91,7 @@ public class JDataStoreWizard extends JWizard {
 
     @SuppressWarnings("unchecked")
     public JDataStoreWizard(DataStoreFactorySpi format, Map params) {        
-        super(format == null ? "Connect" : format.getDisplayName());
+        super(format == null ? "Connect" : format == null ? "" : format.getDisplayName());
         
         if (params == null) {
             connectionParameters = new HashMap<String, Object>();
@@ -87,22 +99,24 @@ public class JDataStoreWizard extends JWizard {
         else {
             connectionParameters = params;            
         }
-
+        if( format == null ){
+            page0 = new JDataChoosePage();
+            page0.setPageIdentifier("page0");
+            page0.setNextPageIdentifier("page1");
+            registerWizardPanel( page0 );
+        }
         
         fillInDefaults(format, params);
-        if (format == null) {
-            // GeoTools detects FileDataStoreFactorSpi's on the classpath
-            // if you are getting this error for "shp" perhaps you do not have the
-            // gt-shape jar on your classpath?
-            throw new NullPointerException("Please indicate the data format to connect to");
-        }
 
         this.format = format;
         page1 = new JDataStorePage(format, connectionParameters);
         page1.setLevel("user");
         page1.setPageIdentifier("page1");
+        if( page0 != null ){
+            page1.setBackPageIdentifier("page0");
+        }
         registerWizardPanel(page1);
-
+        
         if (countParamsAtLevel(format, "advanced") != 0) {
             page2 = new JDataStorePage(format, connectionParameters);
             page2.setPageIdentifier("page2");
@@ -113,7 +127,12 @@ public class JDataStoreWizard extends JWizard {
             // link from page 1
             page1.setNextPageIdentifier("page2");
         }
-        setCurrentPanel("page1");
+        if( page0 != null ){
+            setCurrentPanel("page0");
+        }
+        else {
+            setCurrentPanel("page1");
+        }
     }
 
     /**
@@ -163,6 +182,23 @@ public class JDataStoreWizard extends JWizard {
     public File getFile(){
         URL url = (URL) connectionParameters.get("url");
         return DataUtilities.urlToFile(url);
+    }
+    /**
+     * @param format2
+     */
+    public void setFormat(DataStoreFactorySpi format) {
+        if( this.format == format ){
+            return;
+        }
+        if( connectionParameters.isEmpty() ){
+            fillInDefaults(format, connectionParameters);
+        }
+        if( page1 != null ){
+            page1.setFormat( format );
+        }
+        if( page2 != null ){
+            page2.setFormat( format );
+        }
     }
 
 }

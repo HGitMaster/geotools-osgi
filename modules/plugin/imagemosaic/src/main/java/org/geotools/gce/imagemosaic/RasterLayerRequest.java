@@ -128,6 +128,8 @@ class RasterLayerRequest {
 	private GeneralEnvelope approximateRequestedBBoInNativeCRS;
 
 	private Dimension tileDimensions;
+	
+	private boolean footprintManagement;
 
 	private boolean multithreadingAllowed;
 
@@ -162,8 +164,7 @@ class RasterLayerRequest {
         // //
         if (params != null) {
             for (GeneralParameterValue gParam : params) {
-            	if(gParam instanceof ParameterValue<?>)
-            	{                
+            	if(gParam instanceof ParameterValue<?>) {                
             		final ParameterValue<?> param = (ParameterValue<?>) gParam;
                     final ReferenceIdentifier name = param.getDescriptor().getName();
                     extractParameter(param, name);
@@ -184,7 +185,7 @@ class RasterLayerRequest {
     @SuppressWarnings({ "unchecked", "deprecation" })
 	private void setDefaultParameterValues() {
     	final ParameterValueGroup readParams = this.rasterManager.parent.getFormat().getReadParameters();
-    	if(readParams==null){
+    	if (readParams == null) {
     		if(LOGGER.isLoggable(Level.FINE))
     			LOGGER.fine("No default values for the read parameters!");
     		return;
@@ -207,7 +208,7 @@ class RasterLayerRequest {
 	        //
 	        // //
 	        if (descriptor.getName().equals(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName())) {
-	        	if(value==null)
+	        	if (value == null)
 	        		continue;
 	            final GridGeometry2D gg = (GridGeometry2D)value;
 	            
@@ -224,7 +225,7 @@ class RasterLayerRequest {
 	        //
 	        // //
 	        if (name.equals(AbstractGridFormat.USE_JAI_IMAGEREAD.getName())) {
-	        	if(value==null)
+	        	if (value == null)
 	        		continue;
 	            readType = ((Boolean)value)? ReadType.JAI_IMAGEREAD: ReadType.DIRECT_READ;
 	            continue;
@@ -237,14 +238,14 @@ class RasterLayerRequest {
 	        //
 	        // //
 	        if (name.equals(AbstractGridFormat.OVERVIEW_POLICY.getName())) {
-	        	if(value==null)
+	        	if (value == null)
 	        		continue;
 	            overviewPolicy = (OverviewPolicy) value;
 	            continue;
 	        }
 	
 	        if (name.equals(ImageMosaicFormat.INPUT_TRANSPARENT_COLOR.getName())) {
-	        	if(value==null)
+	        	if (value == null)
 	        		continue;
 				inputTransparentColor = (Color) value;
 				// paranoiac check on the provided transparent color
@@ -257,15 +258,14 @@ class RasterLayerRequest {
 			} 
 	
 			if (name.equals(ImageMosaicFormat.FADING.getName())) {
-	        	if(value==null)
+	        	if (value == null)
 	        		continue;
 				blend = ((Boolean) value).booleanValue();
 				continue;
 	
 			} 
-			if (name.equals(
-					ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR.getName())) {
-	        	if(value==null)
+			if (name.equals(ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR.getName())) {
+	        	if (value == null)
 	        		continue;
 				outputTransparentColor = (Color) value;
 				// paranoiac check on the provided transparent color
@@ -277,9 +277,8 @@ class RasterLayerRequest {
 	
 			}
 			
-			if (name.equals(
-					ImageMosaicFormat.BACKGROUND_VALUES.getName())) {
-	        	if(value==null)
+			if (name.equals(ImageMosaicFormat.BACKGROUND_VALUES.getName())) {
+	        	if (value == null)
 	        		continue;
 				backgroundValues = (double[]) value;
 				continue;
@@ -287,7 +286,7 @@ class RasterLayerRequest {
 			}		
 		
 			if (name.equals(ImageMosaicFormat.MAX_ALLOWED_TILES.getName())) {
-	        	if(value==null)
+	        	if (value == null)
 	        		continue;
 				maximumNumberOfGranules=(Integer)value;
 				continue;
@@ -295,11 +294,18 @@ class RasterLayerRequest {
 			
 			
 			if (name.equals(ImageMosaicFormat.ALLOW_MULTITHREADING.getName())) {
-	        	if(value==null)
+	        	if (value == null)
 	        		continue;
 				multithreadingAllowed = ((Boolean) value).booleanValue();
 				continue;
-			}	 		
+			}	
+			
+			if (name.equals(ImageMosaicFormat.HANDLE_FOOTPRINT.getName())) {
+				if (value == null)
+					continue;
+				footprintManagement = ((Boolean) value).booleanValue();
+				continue;
+	        }       
 	       
 	        // //
 	        //
@@ -315,10 +321,8 @@ class RasterLayerRequest {
 	            if ((suggestedTileSize != null)
 	                    && (suggestedTileSize.trim().length() > 0)) {
 	
-	                if (suggestedTileSize
-	                        .contains(ImageMosaicFormat.TILE_SIZE_SEPARATOR)) {
-	                    final String[] tilesSize = suggestedTileSize
-	                            .split(ImageMosaicFormat.TILE_SIZE_SEPARATOR);
+	                if (suggestedTileSize.contains(ImageMosaicFormat.TILE_SIZE_SEPARATOR)) {
+	                    final String[] tilesSize = suggestedTileSize.split(ImageMosaicFormat.TILE_SIZE_SEPARATOR);
 	                    if (tilesSize.length == 2) {
 	                        try {
 	                            // Getting suggested tile size
@@ -356,8 +360,9 @@ class RasterLayerRequest {
         // //
         if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName())) {
         	final Object value = param.getValue();
-        	if(value==null)
+        	if (value == null) {
         		return;
+			}
             final GridGeometry2D gg = (GridGeometry2D) param.getValue();
             if (gg == null) {
                 return;
@@ -376,8 +381,9 @@ class RasterLayerRequest {
         // //
         if (name.equals(AbstractGridFormat.USE_JAI_IMAGEREAD.getName())) {
         	final Object value = param.getValue();
-        	if(value==null)
+        	if (value == null) {
         		return;
+			}
             readType = param.booleanValue() ? ReadType.JAI_IMAGEREAD: ReadType.DIRECT_READ;
             return;
         }
@@ -390,16 +396,18 @@ class RasterLayerRequest {
         // //
         if (name.equals(AbstractGridFormat.OVERVIEW_POLICY.getName())) {
         	final Object value = param.getValue();
-        	if(value==null)
+        	if (value == null) {
         		return;
+        	}
             overviewPolicy = (OverviewPolicy) param.getValue();
             return;
         }
 
         if (name.equals(ImageMosaicFormat.INPUT_TRANSPARENT_COLOR.getName())) {
         	final Object value = param.getValue();
-        	if(value==null)
+        	if (value == null) {
         		return;
+        	}
 			inputTransparentColor = (Color) param.getValue();
 			// paranoiac check on the provided transparent color
 			inputTransparentColor = new Color(
@@ -412,17 +420,18 @@ class RasterLayerRequest {
 
 		if (name.equals(ImageMosaicFormat.FADING.getName())) {
         	final Object value = param.getValue();
-        	if(value==null)
+        	if (value == null) {
         		return;
+        	}
 			blend = ((Boolean) param.getValue()).booleanValue();
 			return;
 
 		} 
-		if (name.equals(
-				ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR.getName())) {
+		if (name.equals(ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR.getName())) {
         	final Object value = param.getValue();
-        	if(value==null)
+        	if (value == null) {
         		return;
+        	}
 			outputTransparentColor = (Color) param.getValue();
 			// paranoiac check on the provided transparent color
 			outputTransparentColor = new Color(
@@ -433,11 +442,11 @@ class RasterLayerRequest {
 
 		}
 		
-		if (name.equals(
-				ImageMosaicFormat.BACKGROUND_VALUES.getName())) {
+		if (name.equals(ImageMosaicFormat.BACKGROUND_VALUES.getName())) {
         	final Object value = param.getValue();
-        	if(value==null)
+        	if (value == null) {
         		return;
+        	}
 			backgroundValues = (double[]) param.getValue();
 			return;
 
@@ -445,8 +454,9 @@ class RasterLayerRequest {
 	
 		if (name.equals(ImageMosaicFormat.MAX_ALLOWED_TILES.getName())) {
         	final Object value = param.getValue();
-        	if(value==null)
+        	if (value == null) {
         		return;
+        	}
 			maximumNumberOfGranules=param.intValue();
 			return;
 		}	 
@@ -454,11 +464,21 @@ class RasterLayerRequest {
 		
 		if (name.equals(ImageMosaicFormat.ALLOW_MULTITHREADING.getName())) {
         	final Object value = param.getValue();
-        	if(value==null)
+        	if (value == null) {
         		return;
+        	}
 			multithreadingAllowed = ((Boolean) param.getValue()).booleanValue();
 			return;
-		}	 		
+		}	 	
+			
+		if (name.equals(ImageMosaicFormat.HANDLE_FOOTPRINT.getName())) {
+	    	final Object value = param.getValue();
+        	if (value == null) {
+        		return;
+        	}
+	        footprintManagement = ((Boolean) param.getValue()).booleanValue();
+			return;
+		}       
        
         // //
         //
@@ -474,10 +494,8 @@ class RasterLayerRequest {
             if ((suggestedTileSize != null)
                     && (suggestedTileSize.trim().length() > 0)) {
 
-                if (suggestedTileSize
-                        .contains(ImageMosaicFormat.TILE_SIZE_SEPARATOR)) {
-                    final String[] tilesSize = suggestedTileSize
-                            .split(ImageMosaicFormat.TILE_SIZE_SEPARATOR);
+                if (suggestedTileSize.contains(ImageMosaicFormat.TILE_SIZE_SEPARATOR)) {
+                    final String[] tilesSize = suggestedTileSize.split(ImageMosaicFormat.TILE_SIZE_SEPARATOR);
                     if (tilesSize.length == 2) {
                         try {
                             // Getting suggested tile size
@@ -523,7 +541,6 @@ class RasterLayerRequest {
                     return;
             }
             
-            
             //
             // Adjust requested bounding box and source region in order to fall within the source coverage
             //
@@ -545,10 +562,9 @@ class RasterLayerRequest {
 					throw new DataSourceException("Unable to inspect request CRS",e);
 				}
             // now transform the requested envelope to source crs
-            if (destinationToSourceTransform != null && destinationToSourceTransform.isIdentity())
-            	destinationToSourceTransform=null;// the CRS is basically the same
-            else if(destinationToSourceTransform instanceof AffineTransform)
-            {
+            if (destinationToSourceTransform != null && destinationToSourceTransform.isIdentity()) {
+				destinationToSourceTransform = null;// the CRS is basically the same
+			} else if(destinationToSourceTransform instanceof AffineTransform) {
 	            //
 				// k, the transformation between the various CRS is not null or the
 				// Identity, let's see if it is an affine transform, which case we
@@ -577,8 +593,6 @@ class RasterLayerRequest {
 				// now clean up all the traces of the transformations
 				destinationToSourceTransform=null;
             }
-          
-
 	}
 
 	/**
@@ -632,13 +646,11 @@ class RasterLayerRequest {
      *                 in case a problem occurs when going back to raster space.
      * @throws DataSourceException 
      */
-    private void computeCropRasterArea()
-            throws  DataSourceException {
+    private void computeCropRasterArea() throws  DataSourceException {
     	
     	//we have nothing to crop
-    	if(cropBBox==null)
-    	{
-    		destinationRasterArea=null;
+    	if (cropBBox == null) {
+    		destinationRasterArea = null;
     		return;
     	}
     	
@@ -656,7 +668,7 @@ class RasterLayerRequest {
 		}
 			
 		
-    	if(destinationToSourceTransform==null||destinationToSourceTransform.isIdentity()){
+    	if (destinationToSourceTransform==null||destinationToSourceTransform.isIdentity()) {
 
 			
 			// now get the requested bbox which have been already adjusted and project it back to raster space
@@ -667,9 +679,7 @@ class RasterLayerRequest {
 			} catch (TransformException e) { 
 				throw new DataSourceException(e);
 			}
-    	}
-    	else
-    	{
+    	} else {
     		//
     		// reproject the crop bbox back and then crop, notice that we are imposing 
     		//
@@ -690,8 +700,7 @@ class RasterLayerRequest {
 			}
     	}
 		//is it empty??
-        if (destinationRasterArea.isEmpty()) 
-        {
+        if (destinationRasterArea.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) 
                 LOGGER.log(Level.FINE, "Requested envelope too small resulting in empty cropped raster region");
             // TODO: Future versions may define a 1x1 rectangle starting
@@ -735,7 +744,6 @@ class RasterLayerRequest {
      *                 in case something bad occurs
      */
     private void computeRequestSpatialElements() throws DataSourceException{
-
         
         //
 		// Inspect the request and precompute transformation between CRS. We
@@ -748,24 +756,20 @@ class RasterLayerRequest {
 		// operation to change CRS
         //
         inspectCoordinateReferenceSystems();
-    
             
         //
         // WE DO HAVE A REQUESTED AREA!
     	//
-
-
         //
 		// Create the crop bbox in the coverage CRS for cropping it later
 		// on. 
         //
         computeCropBBOX();
-        if (empty||(cropBBox!=null&&cropBBox.isEmpty()))
-        {	  	
+        if (empty||(cropBBox!=null&&cropBBox.isEmpty())) {	  	
             if (LOGGER.isLoggable(Level.FINE)) 
                 LOGGER.log(Level.FINE, "RequestedBBox empty or null");
         	//this means that we do not have anything to load at all!
-            empty=true;
+            empty = true;
             return;
         }
         
@@ -773,8 +777,7 @@ class RasterLayerRequest {
         // CROP SOURCE REGION using the refined requested envelope
         //
         computeCropRasterArea();     
-        if (empty||(destinationRasterArea!=null&&destinationRasterArea.isEmpty()))
-        {	  	
+        if (empty || (destinationRasterArea != null && destinationRasterArea.isEmpty())) {	  	
             if (LOGGER.isLoggable(Level.FINE)) 
                 LOGGER.log(Level.FINE, "CropRasterArea empty or null");
         	//this means that we do not have anything to load at all!
@@ -790,19 +793,13 @@ class RasterLayerRequest {
                     .append(requestedRasterArea.toString())
                     .append("\n")
                     .append("Corresponding raster source region = ")
-                            .append(requestedRasterArea.toString());
+                    .append(requestedRasterArea.toString());
                     LOGGER.log(Level.FINE, sb.toString());
                 }
- 
-
-            //
+         //
         // Compute the request resolution from the request
         //
         computeRequestedResolution();
-
-
-
-
     }
 
 	/**
@@ -822,21 +819,18 @@ class RasterLayerRequest {
 	 *             in case something bad happens during reprojections and/or
 	 *             intersections.
 	 */
-	private void computeRequestedResolution() throws DataSourceException
-	{
+	private void computeRequestedResolution() throws DataSourceException {
 			
-		try{
+		try {
 	
 			// let's try to get the resolution from the requested gridToWorld
-			if(requestedGridToWorld instanceof LinearTransform)
-			{
+			if(requestedGridToWorld instanceof LinearTransform) {
 
 				//
 				// the crs of the request and the one of the coverage are NOT the
 				// same and the conversion is not , we can get the resolution from envelope + raster directly
 				//
-				if(destinationToSourceTransform!=null&&!destinationToSourceTransform.isIdentity())
-				{
+				if (destinationToSourceTransform != null && !destinationToSourceTransform.isIdentity()) {
 
 					
 			        //
@@ -844,66 +838,34 @@ class RasterLayerRequest {
 					// assuming a reprojection that keeps the raster area unchanged hence
 					// the effect is a degradation of quality, but we might take that into account emprically
 			        //
-					requestedResolution=null;
-//					
-//					// compute the raster that correspond to the crop bbox at the highest resolution
-//					final Rectangle sourceRasterArea = new GeneralGridEnvelope(
-//							 CRS.transform(
-//									 PixelTranslation.translate(rasterManager.getRaster2Model(),PixelInCell.CELL_CENTER,PixelInCell.CELL_CORNER).inverse(),
-//									 cropBBox),PixelInCell.CELL_CORNER,false).toRectangle();
-//					XRectangle2D.intersect(sourceRasterArea, rasterManager.spatialDomainManager.coverageRasterArea, sourceRasterArea);
-//					if(sourceRasterArea.isEmpty())
-//						throw new DataSourceException("The request source raster area is empty");
-					
-
+					requestedResolution = null;
 	        
 			        final GridToEnvelopeMapper geMapper= new GridToEnvelopeMapper(new GridEnvelope2D(requestedRasterArea),cropBBox);
 			        final AffineTransform tempTransform = geMapper.createAffineTransform();
-//			        final double scaleX=XAffineTransform.getScaleX0((AffineTransform) requestedGridToWorld)/XAffineTransform.getScaleX0(tempTransform);
-//			        final double scaleY=XAffineTransform.getScaleY0((AffineTransform) requestedGridToWorld)/XAffineTransform.getScaleY0(tempTransform);
-//					//
-//					// empiric adjustment to get a finer resolution to have better quality when reprojecting
-//			        // TODO make it parametric
-//					//
-//			        requestedRasterScaleFactors= new double[2];
-//			        requestedRasterScaleFactors[0]=scaleX*1.0;
-//			        requestedRasterScaleFactors[1]=scaleY*1.0;
-			        
-			        requestedResolution= new double[]
-					                                {
-														XAffineTransform.getScaleX0(tempTransform),
-														XAffineTransform.getScaleY0(tempTransform)
-													};
-//					
-//			        
-//			        // adjust the final grid to world
-//			        final GridToEnvelopeMapper geMapper1= new GridToEnvelopeMapper(new GridEnvelope2D(destinationRasterArea),cropBBox);
-//			        requestedGridToWorld= geMapper1.createAffineTransform();
-
-
+			        requestedResolution= new double[] {
+							XAffineTransform.getScaleX0(tempTransform),
+							XAffineTransform.getScaleY0(tempTransform)
+						};
 					
-				}
-				else
-				{
+				} else {
 
 					//
 					// the crs of the request and the one of the coverage are the
 					// same, we can get the resolution from the grid to world
 					//					
-					requestedResolution= new double[]
-					                                {
-														XAffineTransform.getScaleX0(requestedGridToWorld),
-														XAffineTransform.getScaleY0(requestedGridToWorld)
+					requestedResolution= new double[] {
+							XAffineTransform.getScaleX0(requestedGridToWorld),
+							XAffineTransform.getScaleY0(requestedGridToWorld)
 													};
 				}
-			}
-			else
+			} else {
 				// should not happen
 				throw new UnsupportedOperationException(Errors.format(ErrorKeys.UNSUPPORTED_OPERATION_$1,requestedGridToWorld.toString()));
+			}
 				
 			//leave
 			return;
-		}catch (Throwable e) {
+		} catch (Throwable e) {
 			if(LOGGER.isLoggable(Level.INFO))
 				LOGGER.log(Level.INFO,"Unable to compute requested resolution",e);
 		}
@@ -913,11 +875,7 @@ class RasterLayerRequest {
 		//
 		LOGGER.log(Level.WARNING,"Unable to compute requested resolution, using highest available");
 		requestedResolution=rasterManager.spatialDomainManager.coverageFullResolution;
-					
 	}
-
-
-
 
     private void computeCropBBOX() throws DataSourceException  {
 
@@ -936,15 +894,12 @@ class RasterLayerRequest {
             if (!CRS.equalsIgnoreMetadata(requestCRS,rasterManager.spatialDomainManager.coverageCRS2D))
                 destinationToSourceTransform = CRS.findMathTransform(requestCRS,rasterManager.spatialDomainManager.coverageCRS2D, true);
             // now transform the requested envelope to source crs
-            if (destinationToSourceTransform != null && !destinationToSourceTransform.isIdentity())
-            {
+            if (destinationToSourceTransform != null && !destinationToSourceTransform.isIdentity()) {
             	final GeneralEnvelope temp = CRS.transform(destinationToSourceTransform,requestedBBox);
             	temp.setCoordinateReferenceSystem(rasterManager.spatialDomainManager.coverageCRS2D);
             	cropBBox= new ReferencedEnvelope(temp);
             	
-            }
-            else
-            {
+            } else {
             	//we do not need to do anything, but we do this in order to aboid problems with the envelope checks
             	cropBBox=new ReferencedEnvelope(
             			requestedBBox.getMinX(),
@@ -952,7 +907,6 @@ class RasterLayerRequest {
             			requestedBBox.getMinY(),
             			requestedBBox.getMaxY(),
             			rasterManager.spatialDomainManager.coverageCRS2D);
-            	
             }            
 
 
@@ -961,8 +915,7 @@ class RasterLayerRequest {
         	//
             // intersect the requested area with the bounds of this
             // layer in native crs
-            if (!cropBBox.intersects((BoundingBox)rasterManager.spatialDomainManager.coverageBBox))
-            {
+            if (!cropBBox.intersects((BoundingBox)rasterManager.spatialDomainManager.coverageBBox)) {
                 cropBBox=null;
                 empty=true;
             	return;
@@ -998,19 +951,18 @@ class RasterLayerRequest {
 	        if(!CRS.equalsIgnoreMetadata(rasterManager.spatialDomainManager.coverageGeographicCRS2D, requestCRS)){
 	        	//try to convert the requested bbox to the coverage geocrs
 	        	requestCRSToCoverageGeographicCRS2D=CRS.findMathTransform(requestCRS, rasterManager.spatialDomainManager.coverageGeographicCRS2D,true);
-	        	if(!requestCRSToCoverageGeographicCRS2D.isIdentity())
-	        	{
+	        	if (!requestCRSToCoverageGeographicCRS2D.isIdentity()) {
 	        		requestedBBOXInCoverageGeographicCRS=CRS.transform(requestCRSToCoverageGeographicCRS2D,requestedBBox);
 	        		requestedBBOXInCoverageGeographicCRS.setCoordinateReferenceSystem(rasterManager.spatialDomainManager.coverageGeographicCRS2D);
 	        	}
 	        }
-	        if(requestedBBOXInCoverageGeographicCRS==null)
+	        if (requestedBBOXInCoverageGeographicCRS == null) {
 	        	requestedBBOXInCoverageGeographicCRS= new GeneralEnvelope(requestCRS);
+			}
 	
 	
 	        // STEP 2 intersection with the geographic bbox for this coverage
-	        if (!requestedBBOXInCoverageGeographicCRS.intersects(rasterManager.spatialDomainManager.coverageGeographicBBox,true))
-	        {
+	        if (!requestedBBOXInCoverageGeographicCRS.intersects(rasterManager.spatialDomainManager.coverageGeographicBBox,true)) {
 	            cropBBox=null;
 	            empty=true;
 	        	return;
@@ -1043,12 +995,6 @@ class RasterLayerRequest {
         cropBBox=null;
     }
 
-
-
-    /**
-     * @return
-     * @uml.property name="empty"
-     */
     public boolean isEmpty() {
         return empty;
     }
@@ -1085,7 +1031,11 @@ class RasterLayerRequest {
 		return blend;
 	}
 	
-	public ReadType getReadType() {
+	public boolean isFootprintManagement() {
+        return footprintManagement;
+    }
+
+    public ReadType getReadType() {
 		return readType;
 	}
 
@@ -1109,19 +1059,15 @@ class RasterLayerRequest {
 	public Dimension getTileDimensions() {
 		return tileDimensions;
 	}
-//
-//	public double[] getRequestedRasterScaleFactors() {
-//		return requestedRasterScaleFactors!=null?requestedRasterScaleFactors.clone():requestedRasterScaleFactors;
-//	}
 	
-	@Override
-	public String toString() {
-		final StringBuilder builder= new StringBuilder();
-		builder.append("RasterLayerRequest description: \n");
-		builder.append("\tRequestedBBox=").append(requestedBBox).append("\n");
-		builder.append("\tRequestedRasterArea=").append(requestedRasterArea).append("\n");
-		builder.append("\tRequestedGridToWorld=").append(requestedGridToWorld).append("\n");
-		builder.append("\tReadType=").append(readType);
-		return builder.toString();
-	}	
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("RasterLayerRequest description: \n")
+        .append("\tRequestedBBox=").append(requestedBBox).append("\n")
+        .append("\tRequestedRasterArea=").append(requestedRasterArea).append("\n")
+        .append("\tRequestedGridToWorld=").append(requestedGridToWorld).append("\n")
+        .append("\tReadType=").append(readType);
+        return builder.toString();
+    }
 }

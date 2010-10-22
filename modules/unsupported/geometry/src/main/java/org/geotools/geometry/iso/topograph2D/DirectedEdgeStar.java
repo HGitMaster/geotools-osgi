@@ -29,7 +29,7 @@ import org.geotools.geometry.iso.util.Assert;
  * around a node. It supports labelling the edges as well as linking the edges
  * to form both MaximalEdgeRings and MinimalEdgeRings.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/DirectedEdgeStar.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/DirectedEdgeStar.java $
  */
 public class DirectedEdgeStar extends EdgeEndStar {
 

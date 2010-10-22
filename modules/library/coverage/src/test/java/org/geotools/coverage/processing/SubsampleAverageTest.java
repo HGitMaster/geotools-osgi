@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the Subsample Average operation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/test/java/org/geotools/coverage/processing/SubsampleAverageTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/test/java/org/geotools/coverage/processing/SubsampleAverageTest.java $
  * @version $Id: SubsampleAverageTest.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Simone Giannecchini (GeoSolutions)
  * @author Martin Desruisseaux (Geomatys)

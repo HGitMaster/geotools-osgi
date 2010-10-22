@@ -93,7 +93,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * 
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/ActiveTypeEntry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/store/ActiveTypeEntry.java $
  */
 public abstract class ActiveTypeEntry implements TypeEntry {
     protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.store");

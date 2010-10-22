@@ -60,7 +60,7 @@ import javax.xml.namespace.QName;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/xml-po/src/main/java/org/geotools/po/bindings/ItemsBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/xml-po/src/main/java/org/geotools/po/bindings/ItemsBinding.java $
  */
 public class ItemsBinding extends AbstractComplexBinding {
 

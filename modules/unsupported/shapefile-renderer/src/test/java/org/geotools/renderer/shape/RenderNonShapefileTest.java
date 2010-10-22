@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Jesse
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/RenderNonShapefileTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/RenderNonShapefileTest.java $
  */
 public class RenderNonShapefileTest extends TestCase {
     

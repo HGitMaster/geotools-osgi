@@ -34,7 +34,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Lucas Reed, Refractions Research Inc
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/literal/FeatureBufferFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/literal/FeatureBufferFactory.java $
  */
 public class FeatureBufferFactory extends SingleProcessFactory  {
 	static final Parameter<Feature> INPUT_A = new Parameter<Feature>("input_a",
@@ -59,7 +59,7 @@ public class FeatureBufferFactory extends SingleProcessFactory  {
     }
 	
 	public FeatureBufferFactory() {
-        super(new NameImpl(GT_NAMESPACE, "FeatureBuffer"));
+        super(new NameImpl("gt", "FeatureBuffer"));
     }
 
 	public Process create(Map<String, Object> parameters) throws IllegalArgumentException

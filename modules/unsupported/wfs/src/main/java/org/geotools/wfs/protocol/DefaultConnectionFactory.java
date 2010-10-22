@@ -18,6 +18,8 @@ package org.geotools.wfs.protocol;
 
 import static org.geotools.data.wfs.protocol.http.HttpMethod.POST;
 
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -146,25 +148,40 @@ public class DefaultConnectionFactory implements ConnectionFactory {
             connection.setRequestMethod("GET");
         }
         connection.setDoInput(true);
-        /*
-         * FIXME this could breaks uDig. Not quite sure what to do otherwise.
-         * Maybe have a mechanism that would allow an authenticator to ask the
-         * datastore itself for a previously supplied user/pass.
-         */
-        if (auth != null) {
-            synchronized (Authenticator.class) {
-                Authenticator.setDefault(auth);
-                connection.connect();
-//                Authenticator.setDefault(null);
-            }
-        }
-
         if (tryGzip) {
             connection.addRequestProperty("Accept-Encoding", "gzip");
         }
-
+        
         connection.setConnectTimeout(timeoutMillis);
         connection.setReadTimeout(timeoutMillis);
+        
+        
+        // auth must be after connection because one branch makes the connection
+        if (auth != null) {
+            if (auth instanceof WFSAuthenticator) {
+                WFSAuthenticator wfsAuth = (WFSAuthenticator) auth;
+                String user = wfsAuth.pa.getUserName();
+                char[] pass = wfsAuth.pa.getPassword();
+                
+                String combined = String.format("%s:%s", user, String.valueOf(pass));
+                byte[] authBytes = combined.getBytes("US-ASCII");
+                String encoded = new String(Base64.encodeBase64(authBytes));
+                String authorization = "Basic " + encoded;
+                connection.setRequestProperty("Authorization" ,authorization);
+            } else {
+                /*
+                 * FIXME this could breaks uDig. Not quite sure what to do otherwise.
+                 * Maybe have a mechanism that would allow an authenticator to ask the
+                 * datastore itself for a previously supplied user/pass.
+                 */
+                synchronized (Authenticator.class) {
+                    Authenticator.setDefault(auth);
+                    connection.connect();
+    //                Authenticator.setDefault(null);
+                }
+            }
+        }
+
         return connection;
     }
 

@@ -42,7 +42,7 @@ import org.geotools.factory.Hints;
  * @author Justin Deoliveira, The Open Planning Project
  * @since 2.4
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/util/NumericConverterFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/util/NumericConverterFactory.java $
  */
 public class NumericConverterFactory implements ConverterFactory {
 

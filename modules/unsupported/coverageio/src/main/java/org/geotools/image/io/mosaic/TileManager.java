@@ -46,7 +46,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * But subclasses can make such assumption for better performances.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/TileManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/TileManager.java $
  * @version $Id: TileManager.java 31037 2008-07-21 11:31:27Z desruisseaux $
  * @author Martin Desruisseaux
  */

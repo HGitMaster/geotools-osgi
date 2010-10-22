@@ -48,7 +48,7 @@ import org.geotools.resources.Classes;
  * {@code plugin/epsg-hsql} module since the HSQL plugin is the only one which
  * is garantee to work on any machine running Maven.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-h2/src/test/java/org/geotools/referencing/factory/epsg/OperationFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-h2/src/test/java/org/geotools/referencing/factory/epsg/OperationFactoryTest.java $
  * @version $Id: OperationFactoryTest.java 34133 2009-10-12 08:14:05Z mbedward $
  * @author Martin Desruisseaux (IRD)
  */

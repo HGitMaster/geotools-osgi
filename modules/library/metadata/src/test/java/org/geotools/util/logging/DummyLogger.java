@@ -23,7 +23,7 @@ import java.util.logging.Level;
  * A dummy implementation of {@link LoggingAdapter} class for testing purpose.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/logging/DummyLogger.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/logging/DummyLogger.java $
  * @version $Id: DummyLogger.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

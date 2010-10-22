@@ -104,7 +104,7 @@ import org.opengis.filter.Filter;
  * </p>
  *
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/store/AbstractDataStore2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/store/AbstractDataStore2.java $
  */
 public class AbstractDataStore2 implements DataStore {
     /** The logger for the data module. */

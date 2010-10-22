@@ -92,7 +92,7 @@ import org.opengis.util.ProgressListener;
  * @author Rob Hranac, VFNY
  * @author Ian Schneider, USDA-ARS
  * @author Jody Garnett, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/feature/FeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/feature/FeatureCollection.java $
  * @version $Id: FeatureCollection.java 34003 2009-09-27 18:12:13Z jive $
  *
  */

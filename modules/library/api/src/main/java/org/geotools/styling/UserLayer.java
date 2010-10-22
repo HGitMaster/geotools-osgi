@@ -48,7 +48,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/UserLayer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/UserLayer.java $
  */
 public interface UserLayer extends StyledLayer {
     public RemoteOWS getRemoteOWS();

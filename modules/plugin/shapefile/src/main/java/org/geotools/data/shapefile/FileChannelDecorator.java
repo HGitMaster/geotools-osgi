@@ -32,7 +32,7 @@ import java.nio.channels.WritableByteChannel;
  * 
  * @author jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/FileChannelDecorator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/FileChannelDecorator.java $
  */
 public class FileChannelDecorator extends FileChannel implements
         ReadableByteChannel {

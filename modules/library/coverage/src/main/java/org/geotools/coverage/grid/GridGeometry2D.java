@@ -63,7 +63,7 @@ import org.opengis.referencing.operation.TransformException;
  * ambiguity.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridGeometry2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/GridGeometry2D.java $
  * @version $Id: GridGeometry2D.java 33828 2009-09-03 06:44:06Z mbedward $
  * @author Martin Desruisseaux (IRD)
  *

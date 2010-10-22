@@ -22,7 +22,7 @@ import org.geotools.graph.util.Stack;
 
 
 /**
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/DirectedDepthFirstTopologicalIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/DirectedDepthFirstTopologicalIterator.java $
  */
 public class DirectedDepthFirstTopologicalIterator 
   extends DirectedBreadthFirstTopologicalIterator {

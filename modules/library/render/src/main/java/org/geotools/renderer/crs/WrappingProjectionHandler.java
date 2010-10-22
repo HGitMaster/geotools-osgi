@@ -128,6 +128,11 @@ public class WrappingProjectionHandler extends ProjectionHandler {
 
             min += radius * 2;
         }
+        
+        // if we could not find any geom type we stumbled int an empty geom collection
+        if(geomType == null) {
+            return null;
+        }
 
         // rewrap all the clones into a single geometry
         if (Point.class.equals(geomType)) {

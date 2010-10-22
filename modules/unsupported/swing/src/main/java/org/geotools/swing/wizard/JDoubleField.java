@@ -27,7 +27,7 @@ import org.geotools.swing.wizard.JWizard.Controller;
  * 
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JDoubleField.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/JDoubleField.java $
  */
 public class JDoubleField extends ParamField {
 

@@ -63,7 +63,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * file, with some spaces trimmed.
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/EarthGravitationalModel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/EarthGravitationalModel.java $
  * @version $Id: EarthGravitationalModel.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
  * @author Pierre Cardinal
  * @author Martin Desruisseaux
@@ -371,7 +371,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
     /**
      * The provider for {@link EarthGravitationalModel}.
      *
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/EarthGravitationalModel.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/referencing3D/src/main/java/org/geotools/referencing/operation/transform/EarthGravitationalModel.java $
      * @version $Id: EarthGravitationalModel.java 33894 2009-09-11 10:51:02Z simonegiannecchini $
      * @author Martin Desruisseaux
      */

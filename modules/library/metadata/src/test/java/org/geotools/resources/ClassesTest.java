@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link Classes} static methods.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/resources/ClassesTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/resources/ClassesTest.java $
  * @version $Id: ClassesTest.java 30852 2008-07-03 15:59:42Z desruisseaux $
  * @author Martin Desruisseaux
  */

@@ -31,7 +31,7 @@ import org.opengis.filter.FilterFactory;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/main/java/org/geotools/filter/text/commons/AbstractCompilerFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/main/java/org/geotools/filter/text/commons/AbstractCompilerFactory.java $
  */
 public abstract class AbstractCompilerFactory {
 

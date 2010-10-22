@@ -65,7 +65,7 @@ import org.geotools.gml2.GML;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/test/java/org/geotools/filter/v1_0/FilterMockData.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-filter/src/test/java/org/geotools/filter/v1_0/FilterMockData.java $
  */
 public class FilterMockData {
     static FilterFactory2 f = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);

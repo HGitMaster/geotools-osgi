@@ -88,7 +88,7 @@ import java.util.Set;
  * @author Joel Skelton
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/text/WKTParser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/text/WKTParser.java $
  * @version $Id: WKTParser.java 34126 2009-10-12 06:35:18Z mbedward $
  */
 public class WKTParser {

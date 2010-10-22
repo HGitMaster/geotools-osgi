@@ -31,7 +31,7 @@ import org.opengis.filter.capability.SpatialOperators;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/capability/SpatialOperatorsImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/capability/SpatialOperatorsImpl.java $
  */
 public class SpatialOperatorsImpl implements SpatialOperators {
     

@@ -26,7 +26,7 @@ import org.opengis.style.StyleVisitor;
  * "anchor" for positioning it relative to a point geometry.
  * 
  * @author Ian Turton
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/AnchorPoint.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/AnchorPoint.java $
  * @version $Id: AnchorPoint.java 33898 2009-09-13 15:39:05Z jive $
  */
 public interface AnchorPoint extends org.opengis.style.AnchorPoint{

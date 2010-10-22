@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * ValidatorTest<br>
  *
  * @author bowens<br> Created Jun 28, 2004<br>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/ValidatorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/test/java/org/geotools/validation/ValidatorTest.java $
  * @version <br><b>Puropse:</b><br><p><b>Description:</b><br><p><b>Usage:</b><br><p>
  */
 public class ValidatorTest extends TestCase {

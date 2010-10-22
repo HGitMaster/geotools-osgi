@@ -46,7 +46,7 @@ import org.geotools.referencing.datum.DefaultTemporalDatum;
  * </TD></TR></TABLE>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/crs/DefaultTemporalCRS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/crs/DefaultTemporalCRS.java $
  * @version $Id: DefaultTemporalCRS.java 31000 2008-07-10 21:11:13Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

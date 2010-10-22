@@ -27,7 +27,7 @@ import org.geotools.xml.XSD;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/KML.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-kml/src/main/java/org/geotools/kml/KML.java $
  */
 public final class KML extends XSD {
     /** singleton instance */

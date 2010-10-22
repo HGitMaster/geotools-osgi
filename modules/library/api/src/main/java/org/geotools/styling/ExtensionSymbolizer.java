@@ -9,7 +9,7 @@ import org.opengis.filter.expression.Expression;
  * <p>
  * This facility is used to allow you to work on your "vendor specific" symbolizer.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/ExtensionSymbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/ExtensionSymbolizer.java $
  */
 public interface ExtensionSymbolizer extends org.opengis.style.ExtensionSymbolizer, Symbolizer {
 

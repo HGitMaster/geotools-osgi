@@ -33,7 +33,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @author Russell Petty, GSV
 * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/XmlXPathPropertyAccessorFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/XmlXPathPropertyAccessorFactory.java $
  */
 public class XmlXPathPropertyAccessorFactory implements PropertyAccessorFactory {
     /**

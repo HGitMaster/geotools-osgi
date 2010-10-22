@@ -21,7 +21,7 @@ package org.geotools.coverage.grid.io;
  * Overview policies.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/OverviewPolicy.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/io/OverviewPolicy.java $
  * @version $Id: OverviewPolicy.java 31065 2008-07-23 23:27:32Z simboss $
  * @author Andrea Aimes
  * @author Simone Giannecchini

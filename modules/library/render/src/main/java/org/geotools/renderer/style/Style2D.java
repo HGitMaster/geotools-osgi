@@ -22,7 +22,7 @@ import java.awt.Graphics2D;
 /**
  * Base class for all style targeting {@link Graphics2D}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/Style2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/Style2D.java $
  * @version $Id: Style2D.java 30649 2008-06-12 19:44:08Z acuster $
  */
 public abstract class Style2D extends Style {

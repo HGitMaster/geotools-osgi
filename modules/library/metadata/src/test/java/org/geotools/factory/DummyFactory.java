@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
  * just need a {@code InternalFactory.class} value different
  * than {@code DummyFactory.class}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/factory/DummyFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/factory/DummyFactory.java $
  * @version $Id: DummyFactory.java 34126 2009-10-12 06:35:18Z mbedward $
  * @author Martin Desruisseaux
  */
@@ -39,7 +39,7 @@ interface InternalFactory extends Factory {
  * Dummy factory interface for {@link FactoryRegistryTest}.
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/factory/DummyFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/factory/DummyFactory.java $
  * @version $Id: DummyFactory.java 34126 2009-10-12 06:35:18Z mbedward $
  * @author Martin Desruisseaux
  */

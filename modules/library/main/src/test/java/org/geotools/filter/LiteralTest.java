@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * Tests the literal expressions.
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/LiteralTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/LiteralTest.java $
  */
 public class LiteralTest extends TestCase {
     

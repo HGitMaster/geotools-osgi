@@ -26,7 +26,7 @@ import java.util.Properties;
  * 
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wps/src/main/java/org/geotools/data/wps/request/AbstractDescribeProcessRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wps/src/main/java/org/geotools/data/wps/request/AbstractDescribeProcessRequest.java $
  */
 public abstract class AbstractDescribeProcessRequest extends AbstractWPSRequest implements DescribeProcessRequest {
 

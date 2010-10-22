@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /*
  * Utilities for gml and xml;
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/producer/GMLUtils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/gml/producer/GMLUtils.java $
  */
 final class GMLUtils {
     /** The logger for the filter module. */

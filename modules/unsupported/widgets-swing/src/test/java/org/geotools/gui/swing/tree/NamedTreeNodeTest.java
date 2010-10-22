@@ -28,7 +28,7 @@ import org.geotools.metadata.iso.citation.Citations;
 /**
  * Tests {@link NamedTreeNode}, especially the part that instantiate them using Java reflection.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/tree/NamedTreeNodeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/tree/NamedTreeNodeTest.java $
  * @version $Id: NamedTreeNodeTest.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (Geomatys)
  */

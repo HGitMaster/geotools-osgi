@@ -36,8 +36,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public abstract class JDBCFeatureCollectionTest extends JDBCTestSupport {
     FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
 
         JDBCFeatureStore source = (JDBCFeatureStore) dataStore.getFeatureSource(tname("ft1"));
         collection = source.getFeatures(); 

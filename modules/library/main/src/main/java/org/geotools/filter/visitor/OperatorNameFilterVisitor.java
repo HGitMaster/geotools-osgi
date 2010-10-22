@@ -53,7 +53,7 @@ import org.opengis.filter.spatial.Within;
  * <p>
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/OperatorNameFilterVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/visitor/OperatorNameFilterVisitor.java $
  */
 public class OperatorNameFilterVisitor implements FilterVisitor {
     public Object visit( ExcludeFilter filter, Object extraData ) {

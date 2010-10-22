@@ -86,7 +86,7 @@ import org.opengis.filter.expression.Literal;
  * @author Andrea Aime
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/EnvFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/function/EnvFunction.java $
  * @version $Id $
  */
 public class EnvFunction extends FunctionExpressionImpl {

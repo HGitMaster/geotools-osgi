@@ -63,7 +63,7 @@ import org.geotools.graph.util.PriorityQueue;
 *
 * @author Germán E. Trouillet, Francisco G. Malbrán. Universidad Nacional de Córdoba (UNC)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/AStarIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/traverse/standard/AStarIterator.java $
 */
 public class AStarIterator extends SourceGraphIterator{
         /** function necesaries for A Star algorithm*/

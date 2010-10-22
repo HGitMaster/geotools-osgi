@@ -26,7 +26,7 @@ import org.geotools.geometry.iso.util.Assert;
  * spatial extent corresponding to the node's position in the quadtree.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/Node.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/Node.java $
  * @version 1.7.2
  */
 public class Node extends NodeBase {

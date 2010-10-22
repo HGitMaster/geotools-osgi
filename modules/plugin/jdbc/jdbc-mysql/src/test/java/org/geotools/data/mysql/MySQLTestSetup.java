@@ -31,7 +31,7 @@ import org.geotools.jdbc.JDBCTestSetup;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-mysql/src/test/java/org/geotools/data/mysql/MySQLTestSetup.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-mysql/src/test/java/org/geotools/data/mysql/MySQLTestSetup.java $
  */
 public class MySQLTestSetup extends JDBCTestSetup {
   

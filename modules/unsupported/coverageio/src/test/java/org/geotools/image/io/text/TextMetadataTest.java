@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
  * Tests the {@link DefaultTextMetadataParser} class.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/text/TextMetadataTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/text/TextMetadataTest.java $
  * @version $Id: TextMetadataTest.java 30966 2008-07-09 10:33:11Z cedricbr $
  * @author Cédric Briançon
  */

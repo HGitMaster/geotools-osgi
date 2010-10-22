@@ -49,7 +49,7 @@ import org.geotools.referencing.CRS;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/test/java/org/geotools/gml3/bindings/GML3MockData.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/test/java/org/geotools/gml3/bindings/GML3MockData.java $
  */
 public class GML3MockData {
     static GeometryFactory gf = new GeometryFactory();

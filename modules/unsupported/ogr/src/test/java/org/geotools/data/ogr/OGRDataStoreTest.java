@@ -60,7 +60,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author aaime
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/ogr/src/test/java/org/geotools/data/ogr/OGRDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/ogr/src/test/java/org/geotools/data/ogr/OGRDataStoreTest.java $
  */
 public class OGRDataStoreTest extends TestCaseSupport {
 

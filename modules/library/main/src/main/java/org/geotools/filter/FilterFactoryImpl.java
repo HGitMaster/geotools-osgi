@@ -120,7 +120,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * defaultcore.
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FilterFactoryImpl.java $
  * @version $Id: FilterFactoryImpl.java 34797 2010-01-15 09:42:08Z ang05a $
  */
 public class FilterFactoryImpl implements FilterFactory {

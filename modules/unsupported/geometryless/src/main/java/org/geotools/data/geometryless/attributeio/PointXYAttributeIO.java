@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * </p>
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/attributeio/PointXYAttributeIO.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/attributeio/PointXYAttributeIO.java $
  * @version $Id: PointXYAttributeIO.java 30692 2008-06-13 13:41:09Z acuster $
  */
 public class PointXYAttributeIO implements AttributeIO {

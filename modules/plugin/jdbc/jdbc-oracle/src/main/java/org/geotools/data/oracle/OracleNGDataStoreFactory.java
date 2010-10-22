@@ -29,7 +29,7 @@ import org.geotools.jdbc.SQLDialect;
  * @author Justin Deoliveira, OpenGEO
  * @author Andrea Aime, OpenGEO
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/OracleNGDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-oracle/src/main/java/org/geotools/data/oracle/OracleNGDataStoreFactory.java $
  */
 public class OracleNGDataStoreFactory extends JDBCDataStoreFactory {
     private static final String JDBC_PATH = "jdbc:oracle:thin:@";

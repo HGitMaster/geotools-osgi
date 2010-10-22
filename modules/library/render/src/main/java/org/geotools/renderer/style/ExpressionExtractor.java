@@ -53,7 +53,7 @@ import org.opengis.filter.expression.Expression;
  * @author Andrea Aime - TOPP
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/ExpressionExtractor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/ExpressionExtractor.java $
  */
 public class ExpressionExtractor {
     static final FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);

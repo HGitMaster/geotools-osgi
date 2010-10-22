@@ -29,7 +29,7 @@ import org.eclipse.xsd.XSDAttributeDeclaration;
  *
  * @author Justin Deoliveira,Refractions Research Inc.,jdeolive@refractions.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/AttributeHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/AttributeHandler.java $
  */
 public interface AttributeHandler extends Handler {
     /**

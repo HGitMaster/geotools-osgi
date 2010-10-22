@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * An XMLEncoder for Filters and Expressions.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterTransformer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FilterTransformer.java $
  * @version $Id: FilterTransformer.java 33372 2009-06-26 16:38:47Z jive $
  * @author Ian Schneider
  *

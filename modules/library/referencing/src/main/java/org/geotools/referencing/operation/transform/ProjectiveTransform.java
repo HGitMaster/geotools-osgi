@@ -82,7 +82,7 @@ import org.geotools.resources.i18n.Errors;
  * values except in the last column, which contains 1.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ProjectiveTransform.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ProjectiveTransform.java $
  * @version $Id: ProjectiveTransform.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

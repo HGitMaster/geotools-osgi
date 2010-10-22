@@ -23,7 +23,7 @@ package org.osgeo.geometry.primitive.segments;
  * @author <a href="mailto:schneider@lat-lon.de">Markus Schneider </a>
  * @author last edited by: $Author: markusschneider $
  * 
- * @version $Revision: 33721 $, $Date: 2009-08-08 03:07:03 +1000 (Sat, 08 Aug 2009) $
+ * @version $Revision: 33721 $, $Date: 2009-08-07 20:07:03 +0300 (Fri, 07 Aug 2009) $
  */
 public class Knot {
 

@@ -24,7 +24,7 @@ import java.util.List;
  * Represents a base object for a WMS getCapabilities response.
  *
  * @author Richard Gould, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/ows/WMSCapabilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/ows/WMSCapabilities.java $
  */
 public class WMSCapabilities extends Capabilities {
     private WMSRequest request;

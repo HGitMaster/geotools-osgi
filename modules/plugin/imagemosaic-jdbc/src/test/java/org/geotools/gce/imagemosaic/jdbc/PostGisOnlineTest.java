@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
  * @author mcr
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic-jdbc/src/test/java/org/geotools/gce/imagemosaic/jdbc/PostGisOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic-jdbc/src/test/java/org/geotools/gce/imagemosaic/jdbc/PostGisOnlineTest.java $
  */
 public class PostGisOnlineTest extends AbstractTest {
 	static DBDialect dialect = null;

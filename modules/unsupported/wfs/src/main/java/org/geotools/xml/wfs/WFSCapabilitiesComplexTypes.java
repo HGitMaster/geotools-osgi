@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author Norman Barker www.comsine.com
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/main/java/org/geotools/xml/wfs/WFSCapabilitiesComplexTypes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/main/java/org/geotools/xml/wfs/WFSCapabilitiesComplexTypes.java $
  */
 public class WFSCapabilitiesComplexTypes {
     /**

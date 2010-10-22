@@ -45,7 +45,7 @@ import java.util.Arrays;
  * returned ranks are not used.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/Ranks.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/Ranks.java $
  * @version $Id: Ranks.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux
  */

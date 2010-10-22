@@ -120,7 +120,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/UpdateElementTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/UpdateElementTypeBinding.java $
  */
 public class UpdateElementTypeBinding extends AbstractComplexEMFBinding {
     public UpdateElementTypeBinding(WfsFactory factory) {

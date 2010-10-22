@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * AbstractDataStore.
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/TransactionStateDiff.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/TransactionStateDiff.java $
  */
 public class TransactionStateDiff implements State {
     /**

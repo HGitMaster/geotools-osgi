@@ -49,6 +49,7 @@ public class GML3EncodingTest extends TestCase {
 
         try {
             URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(2000);
             conn.getInputStream().read();
         } catch (Exception e) {
             return true;

@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * to the cache.</p>
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/featurecache/GridFeatureCache.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/featurecache/GridFeatureCache.java $
  */
 public class GridFeatureCache extends AbstractFeatureCache {
 	protected int max_tiles = 10;			//number of tiles to insert data into before written to "root" node

@@ -39,7 +39,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  *  {@linkplain #getDescription description}.
  *  At least one of the four shall be used.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/extent/ExtentImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/extent/ExtentImpl.java $
  * @version $Id: ExtentImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

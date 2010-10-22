@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  *
  * @author Martin Desruisseaux (Geomatys)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/measure/UnitsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/measure/UnitsTest.java $
  */
 public class UnitsTest {
     /**

@@ -31,7 +31,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  * @author Martin Desruisseaux
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/TelephoneImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/citation/TelephoneImpl.java $
  */
 public class TelephoneImpl extends MetadataEntity implements Telephone {
     /**

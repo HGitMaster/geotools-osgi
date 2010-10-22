@@ -36,7 +36,7 @@ import org.geotools.data.postgis.VersionedPostgisDataStore;
  * @author aaime
  * @since 2.4
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/fidmapper/VersionedFIDMapperFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/postgis-versioned/src/main/java/org/geotools/data/postgis/fidmapper/VersionedFIDMapperFactory.java $
  */
 public class VersionedFIDMapperFactory extends DefaultFIDMapperFactory {
 
@@ -93,9 +93,8 @@ public class VersionedFIDMapperFactory extends DefaultFIDMapperFactory {
                     // ok, it wasn't a versioned feature collection view
                 }
             }
-                
-            return unversionedFactory.getMapper(catalog, schema, tableName, connection);
             
+            return unversionedFactory.getMapper(catalog, schema, tableName, connection);
         }
 
         ColumnInfo[] colInfos = getPkColumnInfo(catalog, schema, tableName, connection);
@@ -114,10 +113,13 @@ public class VersionedFIDMapperFactory extends DefaultFIDMapperFactory {
 
     protected FIDMapper buildSingleColumnVersionedFidMapper(String schema, String tableName,
             Connection connection, ColumnInfo[] colInfos) {
-        if (colInfos[1].isAutoIncrement() && colInfos.length == 2) {
-            return new VersionedAutoincrementFIDMapper(schema, tableName, colInfos[1].colName,
-                    colInfos[1].dataType, colInfos[0].decimalDigits);
-        } else if (isIntegralType(colInfos[1].dataType)) {
+        ColumnInfo col = colInfos[1];
+        if (col.isAutoIncrement() && colInfos.length == 2) {
+            return new VersionedAutoincrementFIDMapper(schema, tableName, col.colName,
+                    col.dataType, colInfos[0].decimalDigits);
+        }  if("uuid".equals(col.getTypeName())) {
+            return new VersionedUUIDFIDMapper(schema, tableName, col.getColName(), col.dataType, col.size);
+        } else if (isIntegralType(col.dataType)) {
             return buildMultiColumnFIDMapper(schema, tableName, connection, colInfos);
         } else {
             return buildMultiColumnFIDMapper(schema, tableName, connection, colInfos);

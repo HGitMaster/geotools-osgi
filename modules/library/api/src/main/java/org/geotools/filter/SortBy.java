@@ -23,7 +23,7 @@ package org.geotools.filter;
  * @deprecated Please use org.opengis.filter.sort.SortBy
  * @since GeoTools 2.2, Filter 1.1
  * @author Jody Garnett, Refractions Research, Inc.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/SortBy.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/SortBy.java $
  */
 public interface SortBy extends org.opengis.filter.sort.SortBy {
     /**

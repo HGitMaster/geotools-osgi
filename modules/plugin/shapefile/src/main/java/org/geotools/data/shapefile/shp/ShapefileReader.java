@@ -38,7 +38,10 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * The general use of this class is: <CODE><PRE>
@@ -124,18 +127,18 @@ public class ShapefileReader implements FileReader {
         
         public Object getSimplifiedShape() {
             CoordinateSequenceFactory csf = geometryFactory.getCoordinateSequenceFactory();
-            if(type.isMultiPointType()) {
+            if(type.isPointType()) {
                 CoordinateSequence cs = csf.create(1, 2);
                 cs.setOrdinate(0, 0, (minX + maxX) / 2);
                 cs.setOrdinate(0, 1, (minY + maxY) / 2);
-                return geometryFactory.createPoint(cs);
+                return geometryFactory.createMultiPoint(new Point[] {geometryFactory.createPoint(cs)});
             } else if(type.isLineType()) {
                 CoordinateSequence cs = csf.create(2, 2);
                 cs.setOrdinate(0, 0, minX);
                 cs.setOrdinate(0, 1, minY);
                 cs.setOrdinate(1, 0, maxX);
                 cs.setOrdinate(1, 1, maxY);
-                return geometryFactory.createLineString(cs);
+                return geometryFactory.createMultiLineString(new LineString[] {geometryFactory.createLineString(cs)});
             } else if(type.isPolygonType()) {
                 CoordinateSequence cs = csf.create(5, 2);
                 cs.setOrdinate(0, 0, minX);
@@ -149,7 +152,7 @@ public class ShapefileReader implements FileReader {
                 cs.setOrdinate(4, 0, minX);
                 cs.setOrdinate(4, 1, minY);
                 LinearRing ring = geometryFactory.createLinearRing(cs);
-                return geometryFactory.createPolygon(ring, null);
+                return geometryFactory.createMultiPolygon(new Polygon[] {geometryFactory.createPolygon(ring, null)});
             } else {
                 return shape();
             }
@@ -212,7 +215,7 @@ public class ShapefileReader implements FileReader {
         streamLogger.open();
         randomAccessEnabled = channel instanceof FileChannel;
         try {
-            shxReader = new IndexFile(shapefileFiles, true);
+            shxReader = new IndexFile(shapefileFiles, useMemoryMapped);
         } catch(Exception e) {
             LOGGER.log(Level.WARNING, "Could not open the .shx file, continuing " +
             		"assuming the .shp file is not sparse", e);

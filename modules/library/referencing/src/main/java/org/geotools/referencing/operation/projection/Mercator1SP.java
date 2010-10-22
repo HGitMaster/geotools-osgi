@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"Mercator 1SP" on RemoteSensing.org</A>
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Mercator1SP.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Mercator1SP.java $
  * @version $Id: Mercator1SP.java 34715 2009-12-21 17:11:00Z aaime $
  * @author Martin Desruisseaux
  * @author Rueben Schulz

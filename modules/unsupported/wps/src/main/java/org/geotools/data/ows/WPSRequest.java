@@ -22,7 +22,7 @@ package org.geotools.data.ows;
  *
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wps/src/main/java/org/geotools/data/ows/WPSRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wps/src/main/java/org/geotools/data/ows/WPSRequest.java $
  */
 public class WPSRequest {
     private OperationType getCapabilities;

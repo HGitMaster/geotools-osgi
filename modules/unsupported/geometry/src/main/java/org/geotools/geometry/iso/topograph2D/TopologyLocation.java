@@ -38,7 +38,7 @@ package org.geotools.geometry.iso.topograph2D;
  * The labelling is stored in an array location[j] where where j has the values
  * ON, LEFT, RIGHT
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/TopologyLocation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/TopologyLocation.java $
  */
 public class TopologyLocation {
 

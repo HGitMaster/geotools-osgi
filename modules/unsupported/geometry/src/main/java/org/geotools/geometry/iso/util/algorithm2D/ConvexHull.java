@@ -66,7 +66,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * <p>
  * Uses the Graham Scan algorithm. Asymptotic running time: O(n*log(n))
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/ConvexHull.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/util/algorithm2D/ConvexHull.java $
  */
 public class ConvexHull {
 	//private FeatGeomFactoryImpl geomFactory;

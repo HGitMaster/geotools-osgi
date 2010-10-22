@@ -47,7 +47,7 @@ import org.geotools.referencing.factory.DirectAuthorityFactory;
  * space.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/AutoCRSFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/wms/AutoCRSFactory.java $
  * @version $Id: AutoCRSFactory.java 34859 2010-02-03 19:30:23Z aaime $
  * @author Jody Garnett
  * @author Rueben Schulz

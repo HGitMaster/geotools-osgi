@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * out-of-bounds ordinate is known.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/OrdinateOutsideCoverageException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/OrdinateOutsideCoverageException.java $
  * @version $Id: OrdinateOutsideCoverageException.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Justin Deoliveira, OpenGEO
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/feature/BufferFeatureCollectionProcess.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/feature/BufferFeatureCollectionProcess.java $
  */
 public class BufferFeatureCollectionProcess extends FeatureToFeatureProcess {
 

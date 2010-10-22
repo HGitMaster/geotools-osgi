@@ -44,7 +44,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  *
  * Testing {@link JP2KReader}
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/jp2kak/JP2KTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/jp2kak/JP2KTest.java $
  */
 public final class JP2KTest extends GDALTestCase {
     protected final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(

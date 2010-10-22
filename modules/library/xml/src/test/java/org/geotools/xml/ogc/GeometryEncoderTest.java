@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Jesse
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/ogc/GeometryEncoderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/test/java/org/geotools/xml/ogc/GeometryEncoderTest.java $
  */
 public class GeometryEncoderTest extends TestCase {
 

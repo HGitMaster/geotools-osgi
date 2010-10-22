@@ -20,7 +20,7 @@ package org.geotools.resources;
 /**
  * Escape codes from ANSI X3.64 standard (aka ECMA-48 and ISO/IEC 6429).
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/X364.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/X364.java $
  * @version $Id: X364.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  *

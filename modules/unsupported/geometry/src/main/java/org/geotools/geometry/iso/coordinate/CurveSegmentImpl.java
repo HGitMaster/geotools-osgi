@@ -35,7 +35,7 @@ import org.opengis.geometry.primitive.CurveSegment;
  * 
  * @author Jackson Roehrig & Sanjay Jena
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/CurveSegmentImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/coordinate/CurveSegmentImpl.java $
  */
 public abstract class CurveSegmentImpl implements CurveSegment, Serializable {
 

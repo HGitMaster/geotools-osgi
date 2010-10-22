@@ -32,7 +32,7 @@ import org.opengis.util.InternationalString;
  * @author Simone Giannecchini, GeoSolutions
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/referencing/piecewise/DomainElement1D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/referencing/piecewise/DomainElement1D.java $
  */
 public interface DomainElement1D extends Serializable, Comparable<DomainElement1D> {
 

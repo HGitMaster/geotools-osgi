@@ -22,7 +22,7 @@ package org.geotools.swing.wizard;
  * 
  * @author Graham Davis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/ParamWidgetFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/wizard/ParamWidgetFactory.java $
  */
 public class ParamWidgetFactory {
 

@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  * @author Jesse Eichar
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileFeatureWriter.java $
  */
 public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 

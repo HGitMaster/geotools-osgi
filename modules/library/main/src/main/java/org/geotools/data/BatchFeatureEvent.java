@@ -43,7 +43,7 @@ import org.opengis.filter.identity.Identifier;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/BatchFeatureEvent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/BatchFeatureEvent.java $
  */
 public class BatchFeatureEvent extends FeatureEvent {
     private static final long serialVersionUID = 3154238322369916486L;

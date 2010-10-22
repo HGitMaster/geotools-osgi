@@ -36,7 +36,10 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.simple.SimpleFeatureImpl;
+import org.geotools.filter.identity.FeatureIdImpl;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -78,7 +81,7 @@ import org.opengis.filter.identity.FeatureId;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentFeatureStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/data/src/main/java/org/geotools/data/store/ContentFeatureStore.java $
  */
 public abstract class ContentFeatureStore extends ContentFeatureSource implements
         FeatureStore<SimpleFeatureType, SimpleFeature>,
@@ -189,35 +192,16 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
     public final List<FeatureId> addFeatures(Collection collection)
         throws IOException {
         
-        //gather up id's
+        // gather up id's
     	List<FeatureId> ids = new LinkedList<FeatureId>();
         
         FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriter( Filter.INCLUDE, WRITER_ADD );
         try {
             for ( Iterator f = collection.iterator(); f.hasNext(); ) {
-                SimpleFeature feature = (SimpleFeature) f.next();
-                
-                // grab next feature and populate it
-                // JD: worth a note on how we do this... we take a "pull" approach 
-                // because the raw schema we are inserting into may not match the 
-                // schema of the features we are inserting
-                SimpleFeature toWrite = writer.next();
-                for ( int i = 0; i < toWrite.getAttributeCount(); i++ ) {
-                    String name = toWrite.getType().getDescriptor(i).getLocalName();
-                    toWrite.setAttribute( name, feature.getAttribute(name));
-                }
-                
-                //perform the write
-                writer.write();
-                
-                //add the id to the set of inserted
-                ids.add( toWrite.getIdentifier() );
-                
-                //copy any metadata from teh feature that was actually written
-                feature.getUserData().putAll( toWrite.getUserData() );
+                FeatureId id = addFeature((SimpleFeature) f.next(), writer);
+                ids.add( id );
             }
-        } 
-        finally {
+        } finally {
             writer.close();
         }
         
@@ -232,37 +216,54 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      */
     public final List<FeatureId> addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
         throws IOException {
-        //gather up id's
+        // gather up id's
         List<FeatureId> ids = new LinkedList<FeatureId>();
         
         FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriter( Filter.INCLUDE, WRITER_ADD );
         Iterator f = collection.iterator();
         try {
             while (f.hasNext()) {
-                SimpleFeature feature = (SimpleFeature) f.next();
-                
-                // grab next feature and populate it
-                // JD: worth a note on how we do this... we take a "pull" approach 
-                // because the raw schema we are inserting into may not match the 
-                // schema of the features we are inserting
-                SimpleFeature toWrite = writer.next();
-                for ( int i = 0; i < toWrite.getAttributeCount(); i++ ) {
-                    String name = toWrite.getType().getDescriptor(i).getLocalName();
-                    toWrite.setAttribute( name, feature.getAttribute(name));
-                }
-                
-                //perform the write
-                writer.write();
-                
-                //add the id to the set of inserted
-                ids.add( toWrite.getIdentifier() );
+                FeatureId id = addFeature((SimpleFeature) f.next(), writer);
+                ids.add( id );
             }
-        } 
-        finally {
+        } finally {
             writer.close();
             collection.close( f );
         }        
         return ids;
+    }
+
+    FeatureId addFeature(SimpleFeature feature, FeatureWriter<SimpleFeatureType, SimpleFeature> writer) throws IOException {
+        // grab next feature and populate it
+        // JD: worth a note on how we do this... we take a "pull" approach 
+        // because the raw schema we are inserting into may not match the 
+        // schema of the features we are inserting
+        SimpleFeature toWrite = writer.next();
+        for ( int i = 0; i < toWrite.getAttributeCount(); i++ ) {
+            String name = toWrite.getType().getDescriptor(i).getLocalName();
+            toWrite.setAttribute( name, feature.getAttribute(name));
+        }
+        
+        // copy over the user data
+        if(feature.getUserData().size() > 0) {
+            toWrite.getUserData().putAll(feature.getUserData());
+        }
+        
+        // pass through the fid if the user asked so
+        boolean useExisting = Boolean.TRUE.equals(feature.getUserData().get(Hints.USE_PROVIDED_FID));
+        if(getQueryCapabilities().isUseProvidedFIDSupported() && useExisting) {
+            ((FeatureIdImpl) toWrite.getIdentifier()).setID(feature.getID());
+        }
+        
+        //perform the write
+        writer.write();
+        
+        // copy any metadata from the feature that was actually written
+        feature.getUserData().putAll( toWrite.getUserData() );
+        
+        // add the id to the set of inserted
+        FeatureId id = toWrite.getIdentifier();
+        return id;
     }
 
     /**
@@ -487,4 +488,5 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
             reader.close();
         }
     }
+    
 }

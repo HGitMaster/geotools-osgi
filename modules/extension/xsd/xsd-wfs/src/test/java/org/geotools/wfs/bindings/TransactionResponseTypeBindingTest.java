@@ -43,7 +43,7 @@ import org.w3c.dom.NodeList;
  * @author Gabriel Roldan (TOPP)
  * @version $Id: TransactionResponseTypeBindingTest.java 30665 2008-06-12 22:48:07Z acuster $
  * @since 2.5.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/test/java/org/geotools/wfs/bindings/TransactionResponseTypeBindingTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/test/java/org/geotools/wfs/bindings/TransactionResponseTypeBindingTest.java $
  */
 public class TransactionResponseTypeBindingTest extends WFSTestSupport {
 

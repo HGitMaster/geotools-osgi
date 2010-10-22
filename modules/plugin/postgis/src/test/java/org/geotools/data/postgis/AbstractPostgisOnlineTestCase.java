@@ -26,7 +26,7 @@ import java.sql.Statement;
  * 
  * @author Cory Horner, Refractions Research
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/AbstractPostgisOnlineTestCase.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/AbstractPostgisOnlineTestCase.java $
  */
 public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
     

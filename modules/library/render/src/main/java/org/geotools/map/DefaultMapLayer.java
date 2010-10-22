@@ -49,28 +49,28 @@ import org.opengis.referencing.operation.TransformException;
  * Default implementation of the MapLayer implementation
  * 
  * @author wolf
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/DefaultMapLayer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/map/DefaultMapLayer.java $
  */
 public class DefaultMapLayer implements MapLayer {
     
 
-	/** Simple wrapper around a raw collection */
+    /** Simple wrapper around a raw collection */
     private CollectionSource source = null;
 
-	/** Holds value of property FeatureSource. */
-	protected FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
+    /** Holds value of property FeatureSource. */
+    protected FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
 
-	/** The style to symbolize the features of this layer */
-	protected Style style;
+    /** The style to symbolize the features of this layer */
+    protected Style style;
 
-	/** The query to limit the number of rendered features based on its filter */
-	protected Query query = Query.ALL;
+    /** The query to limit the number of rendered features based on its filter */
+    protected Query query = Query.ALL;
 
-	/** Holds value of property title. */
-	protected String title;
+    /** Holds value of property title. */
+    protected String title;
 
-	/** Whether this layer is visible or not. */
-	protected boolean visible;
+    /** Whether this layer is visible or not. */
+    protected boolean visible;
 
     /** Whether this layer is selected or not. */
     protected boolean selected;
@@ -141,21 +141,19 @@ public class DefaultMapLayer implements MapLayer {
 	}
 
     
-	/**
-	 * Creates a new instance of DefaultMapLayer using a non-emtpy feature
-	 * collection as a parameter
-	 * 
-	 * @param collection
-	 *            the source feature collection
-	 * @param style
-	 *            the style used to represent this layer
-	 * @param title
-	 *            DOCUMENT ME!
-	 */
-	public DefaultMapLayer(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, Style style,
-			String title) {
-		this(DataUtilities.source(collection), style, title);
-	}
+    /**
+     * Creates a new instance of DefaultMapLayer using a non-emtpy feature collection as a parameter
+     * 
+     * @param collection
+     *            the source feature collection
+     * @param style
+     *            the style used to represent this layer
+     * @param title layer title
+     */
+    public DefaultMapLayer(FeatureCollection<SimpleFeatureType, SimpleFeature> collection,
+            Style style, String title) {
+        this(DataUtilities.source(collection), style, title);
+    }
 
     public DefaultMapLayer(Collection collection, Style style,
             String title) {
@@ -426,7 +424,7 @@ public class DefaultMapLayer implements MapLayer {
 	 * If present (other than <code>Query.ALL</code>, a renderer or consumer
 	 * must use it to limit the number of returned features based on the filter
 	 * it holds and the value of the maxFeatures attributes, and also can use it
-	 * as a performance hto limit the number of requested attributes
+	 * as a performance control to limit the number of requested attributes
 	 * </p>
 	 * 
 	 * @param query

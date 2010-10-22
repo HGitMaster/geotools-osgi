@@ -73,4 +73,13 @@ public class SVGGraphicFactoryTest extends TestCase {
         assertNotNull(icon);
         assertEquals(500, icon.getIconHeight());
     }
+    
+    public void testSizeWithPixels() throws Exception {
+        URL url = SVGGraphicFactory.class.getResource("gradient-pixels.svg");
+        assertNotNull(url);
+        // first call, non cached path
+        Icon icon = svg.getIcon(null, ff.literal(url), "image/svg", -1);
+        assertNotNull(icon);
+        assertEquals(500, icon.getIconHeight());
+    }
 }

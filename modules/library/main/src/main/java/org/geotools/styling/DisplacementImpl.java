@@ -31,7 +31,7 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/DisplacementImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/DisplacementImpl.java $
  * @version $Id: DisplacementImpl.java 33813 2009-08-28 14:45:11Z jive $
  */
 public class DisplacementImpl implements Displacement, Cloneable {

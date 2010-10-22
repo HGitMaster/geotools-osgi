@@ -61,7 +61,7 @@ import org.opengis.filter.expression.PropertyName;
  * <p></p>
  *
  * @author James Macgill, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Symbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Symbolizer.java $
  * @version $Id: Symbolizer.java 34564 2009-11-30 16:08:45Z aaime $
  */
 public interface Symbolizer extends org.opengis.style.Symbolizer{

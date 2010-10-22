@@ -61,7 +61,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * </p>
  *
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/DocumentWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/DocumentWriter.java $
  */
 public class DocumentWriter {
     /** DOCUMENT ME! */

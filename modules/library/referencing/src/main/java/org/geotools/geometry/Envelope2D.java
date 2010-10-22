@@ -44,7 +44,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * context}.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/geometry/Envelope2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/geometry/Envelope2D.java $
  * @version $Id: Envelope2D.java 30920 2008-07-04 23:56:32Z jgarnett $
  * @author Martin Desruisseaux (IRD)
  *

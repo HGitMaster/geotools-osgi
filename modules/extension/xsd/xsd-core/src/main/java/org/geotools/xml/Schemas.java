@@ -57,6 +57,7 @@ import org.picocontainer.PicoVisitor;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import org.eclipse.xsd.XSDWildcard;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,7 +94,7 @@ import org.geotools.xml.impl.TypeWalker.Visitor;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/Schemas.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/Schemas.java $
  */
 public class Schemas {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(Schemas.class.getPackage()
@@ -569,64 +570,183 @@ public class Schemas {
     }
 
     /**
-     * Returns a list of all child element particles that corresponde to element declarations of
-     * the specified type, no order is guaranteed.
+     * Returns a list of all child element particles that corresponde to element declarations of the
+     * specified type, no order is guaranteed.
      * <p>
-     * The <code>includeParents</code> flag controls if this method should
-     * returns those elements defined on parent types.
+     * The <code>includeParents</code> flag controls if this method should returns those elements
+     * defined on parent types.
      * </p>
-     *
-     * @param type THe type.
-     * @param includeParents flag indicating if parent types should be processed
-     *
+     * 
+     * @param type
+     *            THe type.
+     * @param includeParents
+     *            flag indicating if parent types should be processed
+     * 
      * @return A list of {@link XSDParticle}.
-     *
+     * 
      */
     public static final List getChildElementParticles(XSDTypeDefinition type, boolean includeParents) {
         final HashSet contents = new HashSet();
         final ArrayList particles = new ArrayList();
         TypeWalker.Visitor visitor = new TypeWalker.Visitor() {
-                public boolean visit(XSDTypeDefinition type) {
-                    //simple types dont have children
-                    if (type instanceof XSDSimpleTypeDefinition) {
-                        return true;
-                    }
-
-                    XSDComplexTypeDefinition cType = (XSDComplexTypeDefinition) type;
-
-                    ElementVisitor visitor = new ElementVisitor() {
-                            public void visit(XSDParticle particle) {
-                                XSDElementDeclaration element = (XSDElementDeclaration) particle
-                                    .getContent();
-
-                                if (element.isElementDeclarationReference()) {
-                                    element = element.getResolvedElementDeclaration();
-                                }
-
-                                //make sure unique
-                                if (!contents.contains(element)) {
-                                    contents.add(element);
-                                    particles.add(particle);
-                                }
-                            }
-                        };
-
-                    visitElements(cType, visitor);
-
+            public boolean visit(XSDTypeDefinition type) {
+                // simple types dont have children
+                if (type instanceof XSDSimpleTypeDefinition) {
                     return true;
                 }
-            };
+
+                XSDComplexTypeDefinition cType = (XSDComplexTypeDefinition) type;
+
+                ElementVisitor visitor = new ElementVisitor() {
+                    public void visit(XSDParticle particle) {
+                        XSDElementDeclaration element = (XSDElementDeclaration) particle
+                                .getContent();
+
+                        if (element.isElementDeclarationReference()) {
+                            element = element.getResolvedElementDeclaration();
+                        }
+
+                        // make sure unique
+                        if (!contents.contains(element)) {
+                            contents.add(element);
+                            particles.add(particle);
+                        }
+                    }
+                };
+
+                visitElements(cType, visitor);
+
+                return true;
+            }
+        };
 
         if (includeParents) {
-            //walk up the type hierarchy of the element to generate a list of 
+            // walk up the type hierarchy of the element to generate a list of
             // possible elements
             new TypeWalker().rwalk(type, visitor);
         } else {
-            //just visit this type
+            // just visit this type
             visitor.visit(type);
         }
 
         return new ArrayList(particles);
+    }
+
+    /**
+     * Returns a list of all xs:any element particles that correspond to element declarations of the
+     * specified type.
+     * 
+     * @param type
+     *            The type.
+     * 
+     * @return A list of {@link XSDParticle}.
+     * 
+     */
+    public static final List getAnyElementParticles(XSDTypeDefinition type) {
+        final HashSet contents = new HashSet();
+        final ArrayList particles = new ArrayList();
+        TypeWalker.Visitor visitor = new TypeWalker.Visitor() {
+            public boolean visit(XSDTypeDefinition type) {
+                // simple types doesn't have children
+                if (type instanceof XSDSimpleTypeDefinition) {
+                    return true;
+                }
+
+                XSDComplexTypeDefinition cType = (XSDComplexTypeDefinition) type;
+
+                ElementVisitor visitor = new ElementVisitor() {
+                    public void visit(XSDParticle particle) {
+                        XSDWildcard element = (XSDWildcard) particle.getContent();
+
+                        // make sure unique
+                        if (!contents.contains(element)) {
+                            contents.add(element);
+                            particles.add(particle);
+                        }
+                    }
+                };
+
+                visitAnyElements(cType, visitor);
+
+                return true;
+            }
+        };
+
+        // just visit this type
+        visitor.visit(type);
+
+        return new ArrayList(particles);
+    }
+
+    /**
+     * Method to visit xs:any element. The method differs from visitElements only by the fact that
+     * it visits xs:any rather than <element>
+     * 
+     * @param cType
+     *            XSDComplexTypeDefinition
+     * @param visitor
+     *            ElementVisitor
+     */
+    private static void visitAnyElements(XSDComplexTypeDefinition cType, ElementVisitor visitor) {
+        // simple content cant define children
+        if ((cType.getContent() == null) || (cType.getContent() instanceof XSDSimpleTypeDefinition)) {
+            return;
+        }
+
+        // use a queue to simulate the recursion
+        LinkedList queue = new LinkedList();
+        queue.addLast(cType.getContent());
+
+        while (!queue.isEmpty()) {
+            XSDParticle particle = (XSDParticle) queue.removeFirst();
+
+            // analyze type of particle content
+            int pType = XSDUtil.nodeType(particle.getElement());
+
+            if (pType == XSDConstants.ANY_ELEMENT) {
+                visitor.visit(particle);
+            } else {
+                // model group
+                XSDModelGroup grp = null;
+
+                switch (pType) {
+                case XSDConstants.GROUP_ELEMENT:
+
+                    XSDModelGroupDefinition grpDef = (XSDModelGroupDefinition) particle
+                            .getContent();
+
+                    if (grpDef.isModelGroupDefinitionReference()) {
+                        grpDef = grpDef.getResolvedModelGroupDefinition();
+                    }
+
+                    grp = grpDef.getModelGroup();
+
+                    break;
+
+                case XSDConstants.CHOICE_ELEMENT:
+                case XSDConstants.ALL_ELEMENT:
+                case XSDConstants.SEQUENCE_ELEMENT:
+                    grp = (XSDModelGroup) particle.getContent();
+
+                    break;
+                }
+
+                if (grp != null) {
+                    // enque all particles in the group
+                    List parts = grp.getParticles();
+
+                    // TODO: this check isa bit hacky.. .figure out why this is the case
+                    if (parts.isEmpty()) {
+                        parts = grp.getContents();
+                    }
+
+                    // add in reverse order to front of queue to maintain order
+                    for (int i = parts.size() - 1; i >= 0; i--) {
+                        queue.addFirst(parts.get(i));
+                    }
+                }
+            }
+        } // while
     }
 
     /**
@@ -1412,7 +1532,7 @@ public class Schemas {
         List /*<XSDSchemaLocator>*/ locators;
 
         public SchemaLocatorAdapter(List /*<XSDSchemaLocator>*/ locators) {
-            this.locators = locators;
+            this.locators = new ArrayList(locators);
         }
 
         public boolean isAdapterForType(Object type) {
@@ -1460,7 +1580,7 @@ public class Schemas {
         List /*<XSDSchemaLocationResolver>*/ resolvers;
 
         public SchemaLocationResolverAdapter(List /*<XSDSchemaLocationResolver>*/ resolvers) {
-            this.resolvers = resolvers;
+            this.resolvers = new ArrayList(resolvers);
         }
 
         public boolean isAdapterForType(Object type) {

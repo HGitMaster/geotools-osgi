@@ -5,7 +5,7 @@
         The Geotools Project
             http://www.geotools.org/
 
-        Version: $Id: pom.xml 34965 2010-03-03 01:36:20Z jive $
+        Version: $Id: pom.xml 36008 2010-08-08 09:21:03Z jive $
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>modules</artifactId>
-    <version>2.6.2.osgi1</version>
+    <version>2.6.5.osgi1</version>
   </parent>
 
 

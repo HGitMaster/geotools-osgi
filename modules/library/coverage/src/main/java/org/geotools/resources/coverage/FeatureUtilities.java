@@ -60,7 +60,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * should be seen as temporary implementations.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/resources/coverage/FeatureUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/resources/coverage/FeatureUtilities.java $
  * @version $Id: FeatureUtilities.java 34917 2010-02-18 18:02:26Z aaime $
  * @author Simone Giannecchini
  */

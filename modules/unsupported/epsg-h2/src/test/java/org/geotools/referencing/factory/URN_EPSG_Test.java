@@ -34,7 +34,7 @@ import org.geotools.referencing.CRS;
 /**
  * Tests the {@link org.geotools.referencing.factory.URN_AuthorityFactory} with EPSG codes.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-h2/src/test/java/org/geotools/referencing/factory/URN_EPSG_Test.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-h2/src/test/java/org/geotools/referencing/factory/URN_EPSG_Test.java $
  * @version $Id: URN_EPSG_Test.java 34133 2009-10-12 08:14:05Z mbedward $
  * @author Justin Deoliveira
  * @author Martin Desruisseaux

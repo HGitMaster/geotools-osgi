@@ -61,7 +61,7 @@ import org.opengis.filter.Filter;
  *
  * @author Rob Hranac, VFNY
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/AttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/AttributeType.java $
  * @version $Id: AttributeType.java 30647 2008-06-12 18:58:42Z acuster $
  *
  * @deprecated use {@link AttributeDescriptor}.

@@ -17,6 +17,7 @@
 package org.geotools.data.db2;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.geotools.jdbc.JDBCFeatureStoreTest;
 import org.geotools.jdbc.JDBCTestSetup;
@@ -28,7 +29,7 @@ import org.geotools.jdbc.JDBCTestSetup;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-db2/src/test/java/org/geotools/data/db2/DB2FeatureStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-db2/src/test/java/org/geotools/data/db2/DB2FeatureStoreTest.java $
  */
 public class DB2FeatureStoreTest extends JDBCFeatureStoreTest {
     protected JDBCTestSetup createTestSetup() {
@@ -39,5 +40,11 @@ public class DB2FeatureStoreTest extends JDBCFeatureStoreTest {
     public void testAddInTransaction() throws IOException {
         // Skip, DB2 does a lock escalation resulting in a table lock
     }
+    
+    @Override
+    public void testExternalConnection() throws IOException, SQLException {
+        // skip, never comes back
+    }
+
 
 }

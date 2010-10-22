@@ -12,7 +12,7 @@ import org.junit.Test;
  * 
  * @author Emily Gouge (Refractions Research)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/SoftObjectCacheTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/SoftObjectCacheTest.java $
  */
 public class SoftObjectCacheTest {
 	

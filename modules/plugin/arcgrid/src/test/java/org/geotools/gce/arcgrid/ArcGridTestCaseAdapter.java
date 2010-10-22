@@ -25,7 +25,7 @@ import java.io.File;
  * @since 2.3.x
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridTestCaseAdapter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/arcgrid/src/test/java/org/geotools/gce/arcgrid/ArcGridTestCaseAdapter.java $
  */
 public class ArcGridTestCaseAdapter extends ArcGridBaseTestCase {
 

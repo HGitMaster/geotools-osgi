@@ -37,7 +37,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 /**
  * The translation to apply for different values of {@link PixelOrientation}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/metadata/iso/spatial/PixelTranslation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/metadata/iso/spatial/PixelTranslation.java $
  * @version $Id: PixelTranslation.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

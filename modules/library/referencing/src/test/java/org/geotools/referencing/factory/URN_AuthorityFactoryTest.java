@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link URN_AuthorityFactory} class backed by WMS or AUTO factories.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/factory/URN_AuthorityFactoryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/factory/URN_AuthorityFactoryTest.java $
  * @version $Id: URN_AuthorityFactoryTest.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux
  */

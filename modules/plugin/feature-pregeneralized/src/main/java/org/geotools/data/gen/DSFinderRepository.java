@@ -48,7 +48,7 @@ import org.opengis.feature.type.Name;
  * @author Christian Mueller
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/DSFinderRepository.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/DSFinderRepository.java $
  */
 public class DSFinderRepository implements Repository {
 

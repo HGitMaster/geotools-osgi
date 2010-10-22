@@ -41,7 +41,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 /**
  * An implementation of FeatureWriter that will work over a result set.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureWriter.java $
  */
 public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
 

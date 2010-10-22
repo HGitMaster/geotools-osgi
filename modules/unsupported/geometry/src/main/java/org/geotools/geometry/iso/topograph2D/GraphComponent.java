@@ -23,7 +23,7 @@ import org.geotools.geometry.iso.util.Assert;
  * A GraphComponent is the parent class for the objects' that form a graph. Each
  * GraphComponent can carry a Label.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/GraphComponent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/GraphComponent.java $
  */
 abstract public class GraphComponent {
 

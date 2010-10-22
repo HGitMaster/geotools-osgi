@@ -22,7 +22,7 @@ package org.geotools.swing.event;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/event/MapPaneListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/event/MapPaneListener.java $
  * @version $Id: MapPaneListener.java 34243 2009-10-26 07:07:08Z mbedward $
  */
 public interface MapPaneListener {

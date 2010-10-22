@@ -39,7 +39,7 @@ import org.opengis.util.InternationalString;
  * @deprecated
  * @since 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/DefaultFeatureTypeFactory2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/DefaultFeatureTypeFactory2.java $
  */
 public class DefaultFeatureTypeFactory2 extends FeatureTypeFactoryImpl {
 

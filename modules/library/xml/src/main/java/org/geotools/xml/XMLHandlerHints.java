@@ -26,7 +26,7 @@ import java.util.Set;
  * 
  * @author Jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/XMLHandlerHints.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/XMLHandlerHints.java $
  */
 public class XMLHandlerHints implements Map {
 

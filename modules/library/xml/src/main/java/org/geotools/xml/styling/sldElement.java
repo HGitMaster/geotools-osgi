@@ -19,7 +19,7 @@ package org.geotools.xml.styling;
 /**
  * This code generated using Refractions SchemaCodeGenerator For more information, view the attached
  * licensing information. CopyRight 105
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/styling/sldElement.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/styling/sldElement.java $
  */
 
 import org.geotools.xml.schema.Element;

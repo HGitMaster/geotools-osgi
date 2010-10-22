@@ -60,7 +60,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * drawing box characters (e.g. unicode).
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/parameter/ParameterWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/parameter/ParameterWriter.java $
  * @version $Id: ParameterWriter.java 31148 2008-08-07 13:37:58Z desruisseaux $
  * @author Martin Desruisseaux
  */

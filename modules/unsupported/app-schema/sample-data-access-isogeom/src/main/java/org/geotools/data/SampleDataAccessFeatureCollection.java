@@ -37,7 +37,7 @@ import org.opengis.util.ProgressListener;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @version $Id: SampleDataAccessFeatureCollection.java 32358 2009-01-28 07:28:02Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/sample-data-access-isogeom/src/main/java/org/geotools/data/SampleDataAccessFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/sample-data-access-isogeom/src/main/java/org/geotools/data/SampleDataAccessFeatureCollection.java $
  * @since 2.6
  */
 @SuppressWarnings("serial")

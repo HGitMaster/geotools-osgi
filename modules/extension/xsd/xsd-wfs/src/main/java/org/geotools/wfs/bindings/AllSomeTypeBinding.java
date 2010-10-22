@@ -46,7 +46,7 @@ import org.geotools.xml.impl.AttributeImpl;
  * 
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/AllSomeTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/AllSomeTypeBinding.java $
  */
 public class AllSomeTypeBinding extends AbstractSimpleBinding {
     private final WfsFactory factory;

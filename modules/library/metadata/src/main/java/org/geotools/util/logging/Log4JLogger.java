@@ -24,7 +24,7 @@ import java.util.logging.Level;
  * <A HREF="http://logging.apache.org/log4j">Log4J</A> framework.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/logging/Log4JLogger.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/logging/Log4JLogger.java $
  * @version $Id: Log4JLogger.java 30937 2008-07-07 16:19:04Z acuster $
  * @author Martin Desruisseaux
  * @author Saul Farber (MassGIS)

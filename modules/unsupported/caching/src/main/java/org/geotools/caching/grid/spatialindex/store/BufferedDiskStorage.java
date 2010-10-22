@@ -39,7 +39,7 @@ import org.opengis.feature.type.FeatureType;
  * 
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/store/BufferedDiskStorage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/grid/spatialindex/store/BufferedDiskStorage.java $
  */
 public class BufferedDiskStorage implements Storage {
     public final static String BUFFER_SIZE_PROPERTY = "BufferedDiskStorage.BufferSize";

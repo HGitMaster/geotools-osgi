@@ -40,7 +40,7 @@ import org.geotools.resources.NIOUtilities;
  * 
  * @author Jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/IndexedFidReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/IndexedFidReader.java $
  */
 public class IndexedFidReader implements FIDReader, FileReader {
     private static final Logger LOGGER = org.geotools.util.logging.Logging
@@ -54,6 +54,8 @@ public class IndexedFidReader implements FIDReader, FileReader {
     private int currentShxIndex = -1;
     private RecordNumberTracker reader;
     private long currentId;
+    private StringBuilder fidBuilder;
+    
     /**
      * move the reader to the recno-th entry in the file.
      * 
@@ -80,6 +82,7 @@ public class IndexedFidReader implements FIDReader, FileReader {
 
     private void init( ShpFiles shpFiles, ReadableByteChannel in ) throws IOException {
         this.typeName = shpFiles.getTypeName() + ".";
+        this.fidBuilder = new StringBuilder(typeName);
         this.readChannel = in;
         streamLogger.open();
         getHeader(shpFiles);
@@ -311,7 +314,9 @@ public class IndexedFidReader implements FIDReader, FileReader {
         currentId = buffer.getLong();
         currentShxIndex = buffer.getInt();
 
-        return typeName + currentId;
+        fidBuilder.setLength(typeName.length());
+        fidBuilder.append(currentId);
+        return fidBuilder.toString();
     }
 
     /**

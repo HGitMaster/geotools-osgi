@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  * 
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wps/src/main/java/org/geotools/data/wps/response/DescribeProcessResponse.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wps/src/main/java/org/geotools/data/wps/response/DescribeProcessResponse.java $
  */
 public class DescribeProcessResponse extends Response {
 

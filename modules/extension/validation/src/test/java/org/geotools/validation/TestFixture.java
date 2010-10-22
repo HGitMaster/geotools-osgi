@@ -48,7 +48,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * The complete confDemo also includes a large road and building shapefile.
  * </p>
  * @author Jody Garnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/test/java/org/geotools/validation/TestFixture.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/test/java/org/geotools/validation/TestFixture.java $
  */
 public class TestFixture {
     Repository data = new DefaultRepository();

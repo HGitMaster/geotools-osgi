@@ -73,7 +73,7 @@ import org.geotools.resources.Utilities;
      * 
      *   This replaces the old behavior which converted a LinePlacement -> pointplacement and set the absoluteLineDisplacement flag!
 	 * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/style/TextStyle2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/style/TextStyle2D.java $
 	 * */
 	 
 public class TextStyle2D extends Style2D {

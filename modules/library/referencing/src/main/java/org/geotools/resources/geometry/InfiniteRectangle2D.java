@@ -31,7 +31,7 @@ import java.io.Serializable;
  * This rectangle can be used as argument in the {@link XRectangle2D} constructor for
  * initializing a new {@code XRectangle2D} to infinite bounds.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/resources/geometry/InfiniteRectangle2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/resources/geometry/InfiniteRectangle2D.java $
  * @version $Id: InfiniteRectangle2D.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

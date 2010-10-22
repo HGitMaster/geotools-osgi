@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
  * @todo Most methods of this class need to move as a {@code Trees} class in a {@code util} module.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/OptionalDependencies.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/OptionalDependencies.java $
  * @version $Id: OptionalDependencies.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

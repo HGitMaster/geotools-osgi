@@ -40,8 +40,8 @@ import org.geotools.resources.i18n.LoggingKeys;
  * automatically disposed after a timeout and recreated when needed again.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/DeferredAuthorityFactory.java $
- * @version $Id: DeferredAuthorityFactory.java 31445 2008-09-07 18:14:23Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/DeferredAuthorityFactory.java $
+ * @version $Id: DeferredAuthorityFactory.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Martin Desruisseaux (IRD)
  *
  * @todo Extends {@link BufferedAuthorityFactory} for now in order to improve the trunk stability
@@ -52,10 +52,8 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
 {
     /**
      * The timer for {@linkplain AbstractAuthorityFactory#dispose disposing} backing stores.
-     *
-     * @todo Give a name to this timer when we will be allowed to compile for J2SE 1.5.
      */
-    private static final Timer TIMER = new Timer(true);
+    private static Timer TIMER = new Timer("GT authority factory disposer", true);
 
     /**
      * The task for disposing the backing store, or {@code null} if none.
@@ -170,6 +168,10 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      *        much as twice that time before to be closed.
      */
     public synchronized void setTimeout(final long delay) {
+        // if we have been disposed, don't do anything
+        if(TIMER == null)
+            return;
+        
         if (disposer != null) {
             disposer.cancel();
         }
@@ -201,6 +203,16 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
             disposer = null;
         }
         super.dispose();
+    }
+    
+    /**
+     * Gets rid of the timer thread at application shutdown
+     */
+    public static void exit() {
+        if(TIMER != null) {
+            TIMER.cancel();
+            TIMER = null;
+        }
     }
 
     /**

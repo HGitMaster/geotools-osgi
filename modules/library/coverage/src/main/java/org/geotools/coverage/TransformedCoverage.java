@@ -45,7 +45,7 @@ import org.opengis.referencing.operation.TransformException;
  * <strong>Note:</strong> This class is not thread safe for performance reasons. If desired,
  * users should create one instance of {@code TransformedCoverage} for each thread.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/TransformedCoverage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/TransformedCoverage.java $
  * @version $Id: TransformedCoverage.java 33885 2009-09-10 17:35:27Z simonegiannecchini $
  * @author Martin Desruisseaux (IRD)
  *

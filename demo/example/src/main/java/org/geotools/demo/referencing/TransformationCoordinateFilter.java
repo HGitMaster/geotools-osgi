@@ -22,7 +22,7 @@ import com.vividsolutions.jts.geom.CoordinateFilter;
  * or 90 + lat of origin. There are also some problems with projections that
  * have issues with 90 lat. 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/referencing/TransformationCoordinateFilter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/referencing/TransformationCoordinateFilter.java $
  * @version $Id:
  * @author rschulz
  */

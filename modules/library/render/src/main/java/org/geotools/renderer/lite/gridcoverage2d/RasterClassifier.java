@@ -48,11 +48,12 @@ import org.geotools.renderer.i18n.Errors;
 /**
  * Images are created using the        {@code                LinearClassifier.CRIF}        inner class, where "CRIF" stands for       {@link java.awt.image.renderable.ContextualRenderedImageFactory}        . The image operation name is "org.geotools.RasterClassifier".
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/RasterClassifier.java $
- * @version        $Id: RasterClassifier.java 34126 2009-10-12 06:35:18Z mbedward $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/RasterClassifier.java $
+ * @version        $Id: RasterClassifier.java 35498 2010-05-17 07:27:20Z simonegiannecchini $
  * @author        Simone Giannecchini - GeoSolutions
  * @since        2.4
  */
+@SuppressWarnings("unchecked")
 public class RasterClassifier extends PointOpImage {
 
 	/**

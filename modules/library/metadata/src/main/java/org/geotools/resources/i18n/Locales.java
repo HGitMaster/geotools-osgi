@@ -26,7 +26,7 @@ import org.geotools.resources.XArray;
  * Static i18n methods.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/i18n/Locales.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/i18n/Locales.java $
  * @version $Id: Locales.java 31007 2008-07-11 17:33:53Z desruisseaux $
  * @author Martin Desruisseaux
  */

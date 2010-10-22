@@ -43,7 +43,7 @@ import org.geotools.styling.TextSymbolizer2;
  *     use this (StyleAttributeExtractorTruncated).
  *
  * @author dblasby
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/styling/StyleAttributeExtractorTruncated.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/styling/StyleAttributeExtractorTruncated.java $
  */
 public class StyleAttributeExtractorTruncated extends StyleAttributeExtractor
     implements StyleVisitor {

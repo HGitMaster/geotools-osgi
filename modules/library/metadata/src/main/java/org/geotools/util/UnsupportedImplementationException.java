@@ -27,7 +27,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * <A HREF="http://geoapi.sourceforge.net">GeoAPI</A> interface.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/UnsupportedImplementationException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/UnsupportedImplementationException.java $
  * @version $Id: UnsupportedImplementationException.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  */

@@ -27,7 +27,7 @@ import org.geotools.data.ows.OperationType;
  * having to cast them.
  *
  * @author Richard Gould
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/WMSOperationType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/WMSOperationType.java $
  * @deprecated Use of OperationType should be sufficient
  */
 public class WMSOperationType extends OperationType {

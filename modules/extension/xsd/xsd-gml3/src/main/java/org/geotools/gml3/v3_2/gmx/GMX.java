@@ -30,7 +30,7 @@ import org.geotools.xml.XSD;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/v3_2/gmx/GMX.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/v3_2/gmx/GMX.java $
  */
 public final class GMX extends XSD {
 

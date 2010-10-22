@@ -75,7 +75,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * users should create one instance of {@code SpatioTemporalCoverage3D} for each thread.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/SpatioTemporalCoverage3D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/SpatioTemporalCoverage3D.java $
  * @version $Id: SpatioTemporalCoverage3D.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

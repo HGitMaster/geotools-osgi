@@ -55,7 +55,7 @@ import org.opengis.metadata.citation.OnLineResource;
  * &lt;/xsd:element&gt;
  * </code></pre>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/FeatureTypeStyle.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/FeatureTypeStyle.java $
  * @version $Id: FeatureTypeStyle.java 32919 2009-05-03 14:18:31Z jive $
  * @author James Macgill, CCG
  */

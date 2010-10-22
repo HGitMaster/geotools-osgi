@@ -53,7 +53,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *       This is now fixed, but the loop to do it is really damn complex.
  *       I'm not sure of the solution, but there should be something that is
  *       less confusing.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/data/InProcessLockingManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/data/InProcessLockingManager.java $
  */
 public class InProcessLockingManager implements LockingManager {
     /** The logger for the postgis module. */

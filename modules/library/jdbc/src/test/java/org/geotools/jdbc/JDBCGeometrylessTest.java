@@ -31,7 +31,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Andrea Aime - OpenGeo
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCGeometrylessTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCGeometrylessTest.java $
  */
 public abstract class JDBCGeometrylessTest extends JDBCTestSupport {
 
@@ -47,8 +47,8 @@ public abstract class JDBCGeometrylessTest extends JDBCTestSupport {
     protected abstract JDBCGeometrylessTestSetup createTestSetup();
     
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void connect() throws Exception {
+        super.connect();
         
         personSchema = DataUtilities.createType(dataStore.getNamespaceURI() + "." + PERSON, ID + ":0," + NAME+":String," + AGE + ":0");
         zipCodeSchema = DataUtilities.createType(dataStore.getNamespaceURI() + "." + ZIPCODE, ID + ":0," + CODE + ":String");

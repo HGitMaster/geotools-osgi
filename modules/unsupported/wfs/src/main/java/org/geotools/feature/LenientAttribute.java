@@ -18,8 +18,8 @@ package org.geotools.feature;
 
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.filter.identity.GmlObjectIdImpl;
-import org.geotools.resources.Utilities;
 import org.geotools.util.Converters;
+import org.geotools.util.Utilities;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.IllegalAttributeException;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -31,8 +31,8 @@ import org.opengis.filter.identity.Identifier;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/wfs/src/main/java/org/geotools/feature/LenientAttribute.java $
- * @version $Id: LenientAttribute.java 34133 2009-10-12 08:14:05Z mbedward $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/wfs/src/main/java/org/geotools/feature/LenientAttribute.java $
+ * @version $Id: LenientAttribute.java 35134 2010-03-29 14:25:33Z groldan $
  */
 public class LenientAttribute extends PropertyImpl implements Attribute {
 

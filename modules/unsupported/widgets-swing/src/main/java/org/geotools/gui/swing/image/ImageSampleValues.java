@@ -53,7 +53,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * and scroll bars for the table.
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/image/ImageSampleValues.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/image/ImageSampleValues.java $
  * @version $Id: ImageSampleValues.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

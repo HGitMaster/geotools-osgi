@@ -33,7 +33,7 @@ import org.geotools.data.DataAccessFactory.Param;
  * @author Andrea Aime - TOPP
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/DBCPDataSourceFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/DBCPDataSourceFactory.java $
  */
 public class DBCPDataSourceFactory extends AbstractDataSourceFactorySpi {
 

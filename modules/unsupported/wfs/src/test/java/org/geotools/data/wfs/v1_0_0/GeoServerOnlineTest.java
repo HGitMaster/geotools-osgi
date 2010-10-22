@@ -54,16 +54,20 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.Id;
 import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.FeatureId;
+import org.opengis.filter.spatial.BBOX;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -230,6 +234,77 @@ public class GeoServerOnlineTest {
     public void testFeatureReaderWithFilterGET() throws NoSuchElementException,
             IllegalAttributeException, IOException, SAXException {
         WFSDataStoreReadTest.doFeatureReaderWithQuery(url, true, false, 0);
+    }
+
+    /**
+     * {@link BBOX} support?
+     */
+    @Test
+    public void testDataStoreSupportsPlainBBOXInterface() throws Exception {
+        if( url == null) return;
+        final WFS_1_0_0_DataStore wfs = WFSDataStoreReadTest.getDataStore(url);
+        final SimpleFeatureType ft = wfs.getSchema(TO_EDIT_TYPE);
+        final ReferencedEnvelope bounds = wfs.getFeatureSource(TO_EDIT_TYPE).getBounds();
+        
+        final FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
+        final BBOX bbox = ff.bbox("the_geom", bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY(), null);
+        
+        /**
+         * This one does not implement the deprecated geotools filter interfaces
+         */
+        final BBOX strictBBox = new BBOX() {
+            
+            public boolean evaluate(Object object) {
+                return bbox.evaluate(object);
+            }
+            
+            public Object accept(FilterVisitor visitor, Object extraData) {
+                return bbox.accept(visitor, extraData);
+            }
+            
+            public Expression getExpression2() {
+                return bbox.getExpression2();
+            }
+            
+            public Expression getExpression1() {
+                return bbox.getExpression1();
+            }
+            
+            public String getSRS() {
+                return bbox.getSRS();
+            }
+            
+            public String getPropertyName() {
+                return bbox.getPropertyName();
+            }
+            
+            public double getMinY() {
+                return bbox.getMinY();
+            }
+            
+            public double getMinX() {
+                return bbox.getMinX();
+            }
+            
+            public double getMaxY() {
+                return bbox.getMaxY();
+            }
+            
+            public double getMaxX() {
+                return bbox.getMaxX();
+            }
+        };
+        
+        final DefaultQuery query = new DefaultQuery(ft.getTypeName());
+        query.setFilter(strictBBox);
+        
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+        
+        reader = wfs.getFeatureReaderGet(query, Transaction.AUTO_COMMIT);        
+        assertNotNull(reader);
+
+        reader = wfs.getFeatureReaderPost(query, Transaction.AUTO_COMMIT);        
+        assertNotNull(reader);
     }
 
     @Test

@@ -28,7 +28,7 @@ import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
  * point. EdgeEnds are comparable under the ordering "a has a greater angle with
  * the x-axis than b". This ordering is used to sort EdgeEnds around a node.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/EdgeEnd.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/EdgeEnd.java $
  */
 public class EdgeEnd implements Comparable {
 	protected Edge edge; // the parent edge of this edge end

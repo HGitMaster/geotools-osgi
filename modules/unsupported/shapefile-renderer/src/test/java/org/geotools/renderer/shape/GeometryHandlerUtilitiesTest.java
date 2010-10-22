@@ -33,7 +33,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/GeometryHandlerUtilitiesTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/renderer/shape/GeometryHandlerUtilitiesTest.java $
  */
 public class GeometryHandlerUtilitiesTest extends TestCase {
     private static final double ACCURACY = 0.00000001;

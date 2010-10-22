@@ -27,7 +27,7 @@ import org.geotools.data.vpf.util.DataUtils;
  * 2003
  *
  * @author <a href="mailto:kobit@users.fs.net">Artur Hefczyc</a>
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/TableColumnDef.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/vpf/src/main/java/org/geotools/data/vpf/io/TableColumnDef.java $
  * @version 1.0
  */
 public class TableColumnDef implements DataTypesDefinition {

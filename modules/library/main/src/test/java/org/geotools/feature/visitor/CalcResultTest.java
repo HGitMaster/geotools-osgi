@@ -41,7 +41,7 @@ import junit.framework.TestCase;
 
 /**
  * Purpose: these tests ensure that the output of CalcResult converts as expected.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/feature/visitor/CalcResultTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/feature/visitor/CalcResultTest.java $
  */
 public class CalcResultTest extends TestCase {
     MockCalcResult result = new MockCalcResult();

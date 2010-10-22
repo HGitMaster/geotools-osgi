@@ -27,7 +27,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Checks the datastore can work against unknown columns
  * @author Andrea Aime - OpenGeo
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCSkipColumnTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCSkipColumnTest.java $
  */
 public abstract class JDBCSkipColumnTest extends JDBCTestSupport {
 
@@ -41,9 +41,8 @@ public abstract class JDBCSkipColumnTest extends JDBCTestSupport {
     protected abstract JDBCSkipColumnTestSetup createTestSetup();
     
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        
+    protected void connect() throws Exception {
+        super.connect();
         schema = DataUtilities.createType(dataStore.getNamespaceURI() + "." + SKIPCOLUMN, ID + ":0," + GEOM + ":Point," + NAME + ":String");
     }
 

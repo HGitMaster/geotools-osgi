@@ -24,7 +24,7 @@ import org.geotools.data.ows.Request;
  * 
  * The only parameter it takes is a list of named layers which it uses to 
  * return the information about.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/main/java/org/geotools/data/wms/request/DescribeLayerRequest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/main/java/org/geotools/data/wms/request/DescribeLayerRequest.java $
  */
 public interface DescribeLayerRequest extends Request {
     /** Represents the LAYERS parameter */

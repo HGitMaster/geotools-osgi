@@ -176,7 +176,7 @@ public class DbaseFileWriter {
             break;
         case 'L':
         case 'l':
-            o = (obj == null ? "F" : obj == Boolean.TRUE ? "T" : "F");
+            o = (obj == null ? " " : obj == Boolean.TRUE ? "T" : "F");
             // o = formatter.getFieldString(
             // fieldLen,
             // o

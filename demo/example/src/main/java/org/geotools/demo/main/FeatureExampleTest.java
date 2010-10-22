@@ -31,7 +31,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * </p>
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/main/FeatureExampleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/main/FeatureExampleTest.java $
  */
 public class FeatureExampleTest extends TestCase {
 

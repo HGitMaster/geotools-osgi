@@ -83,7 +83,7 @@ import org.opengis.filter.identity.FeatureId;
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/data/src/main/java/org/geotools/data/store/ContentState.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/data/src/main/java/org/geotools/data/store/ContentState.java $
  */
 public class ContentState {
 

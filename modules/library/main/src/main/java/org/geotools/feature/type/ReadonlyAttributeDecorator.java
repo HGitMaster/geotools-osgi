@@ -30,7 +30,7 @@ import org.opengis.filter.identity.Identifier;
  * This class is used by Types in order to protect provided attributes from modification
  * during evaluation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/type/ReadonlyAttributeDecorator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/type/ReadonlyAttributeDecorator.java $
  */
 public final class ReadonlyAttributeDecorator implements Attribute {
     private final Attribute delegate;

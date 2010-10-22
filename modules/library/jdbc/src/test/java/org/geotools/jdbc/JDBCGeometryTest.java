@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Point;
  * database. You might need to override some of the tests method to fix the expectations
  * for specific geometry class types.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCGeometryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCGeometryTest.java $
  */
 public abstract class JDBCGeometryTest extends JDBCTestSupport {
 

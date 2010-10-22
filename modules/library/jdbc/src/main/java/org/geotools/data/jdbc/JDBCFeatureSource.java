@@ -33,6 +33,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
@@ -84,7 +85,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureSource.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureSource.java $
  * 
  * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */
@@ -104,7 +105,7 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
      * </p>
      * 
      * @author Gabriel Roldan (TOPP)
-     * @version $Id: JDBCFeatureSource.java 33484 2009-07-06 02:17:34Z jdeolive $
+     * @version $Id: JDBCFeatureSource.java 35735 2010-06-19 15:17:07Z aaime $
      * @since 2.4.3
      * @see #supportsNaturalOrderSorting()
      * @see #supportsReverseOrderSorting()
@@ -225,6 +226,11 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
             }
             
             return mapper instanceof NullFIDMapper;
+        }
+        
+        @Override
+        public boolean isUseProvidedFIDSupported() {
+            return this instanceof FeatureStore;
         }
     }
     

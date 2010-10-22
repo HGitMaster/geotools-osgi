@@ -24,7 +24,7 @@ import javax.measure.unit.Unit;
  * A graduation using numbers on a logarithmic axis.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/LogarithmicNumberGraduation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/LogarithmicNumberGraduation.java $
  * @version $Id: LogarithmicNumberGraduation.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (PMO, IRD)
  */

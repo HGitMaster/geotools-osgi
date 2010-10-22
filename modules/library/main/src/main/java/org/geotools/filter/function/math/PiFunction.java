@@ -26,7 +26,7 @@ import org.geotools.filter.FunctionExpressionImpl;
  * @author Jody Garnett
  * @since 2.2, 2.5
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/function/math/PiFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/function/math/PiFunction.java $
  */
 public class PiFunction extends FunctionExpressionImpl {
 

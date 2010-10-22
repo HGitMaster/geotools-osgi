@@ -28,7 +28,7 @@ import org.geotools.coverage.processing.operation.SubsampleAverage;
  * @author Simone Giannecchini, GeoSolutions.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/CoverageToolsConstants.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/CoverageToolsConstants.java $
  */
 public class CoverageToolsConstants {
 

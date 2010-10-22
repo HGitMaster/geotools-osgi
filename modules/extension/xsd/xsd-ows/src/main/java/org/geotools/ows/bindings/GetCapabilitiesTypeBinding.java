@@ -63,7 +63,7 @@ import org.geotools.xml.*;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/GetCapabilitiesTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-ows/src/main/java/org/geotools/ows/bindings/GetCapabilitiesTypeBinding.java $
  */
 public class GetCapabilitiesTypeBinding extends AbstractComplexEMFBinding {
     public GetCapabilitiesTypeBinding(Ows10Factory factory) {

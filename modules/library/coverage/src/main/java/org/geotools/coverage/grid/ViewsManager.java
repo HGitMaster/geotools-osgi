@@ -72,8 +72,8 @@ import org.geotools.util.logging.Logging;
  * views are associated with potentially big images, sharing them when possible is a big memory
  * and CPU saver.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/grid/ViewsManager.java $
- * @version $Id: ViewsManager.java 34804 2010-01-15 18:13:52Z simonegiannecchini $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/grid/ViewsManager.java $
+ * @version $Id: ViewsManager.java 34992 2010-03-08 14:23:33Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  */
 final class ViewsManager {
@@ -159,7 +159,9 @@ scan:   for (int i=0; i<numBands; i++) {
                             return candidate.copyViewsTo(coverage);
                         }
                     }
-                    if(source == null) continue;
+                    if (source == null) { 
+                        continue;
+                    }
                     final Collection<GridCoverage> more = source.getSources();
                     if (more != null && !more.isEmpty()) {
                         if (next == null) {

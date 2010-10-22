@@ -52,7 +52,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * 
  * Testing {@link MrSIDReader}
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/mrsid/MrSIDTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imageio-ext-gdal/src/test/java/org/geotools/coverageio/gdal/mrsid/MrSIDTest.java $
  */
 public final class MrSIDTest extends GDALTestCase {
     /**

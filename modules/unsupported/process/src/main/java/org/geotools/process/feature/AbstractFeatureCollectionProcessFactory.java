@@ -41,7 +41,7 @@ import org.geotools.text.Text;
  * @author Justin Deoliveira, OpenGEO
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/feature/AbstractFeatureCollectionProcessFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/feature/AbstractFeatureCollectionProcessFactory.java $
  */
 public abstract class AbstractFeatureCollectionProcessFactory extends SingleProcessFactory {
     /** Features for operation */

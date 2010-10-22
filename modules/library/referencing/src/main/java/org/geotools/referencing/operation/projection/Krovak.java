@@ -96,7 +96,7 @@ import static java.lang.Math.*;
  *
  * @since 2.4
  * @version $Id: Krovak.java 34723 2009-12-22 10:55:34Z aaime $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Krovak.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Krovak.java $
  * @author Jan Jezek
  * @author Martin Desruisseaux
  */

@@ -30,7 +30,7 @@ import org.geotools.data.jdbc.datasource.DataSourceFinder;
  * @since 2.5
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/DBDialect.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic-jdbc/src/main/java/org/geotools/gce/imagemosaic/jdbc/DBDialect.java $
  */
 public abstract class DBDialect {
 	protected DataSource dataSource;
@@ -54,7 +54,7 @@ public abstract class DBDialect {
 	 * @param config
 	 * @return
 	 */
-	static DBDialect getDBDialect(Config config) {
+	public static DBDialect getDBDialect(Config config) {
 		SpatialExtension type = config.getSpatialExtension();
 
 		if (type == null) {
@@ -69,7 +69,7 @@ public abstract class DBDialect {
 			return new MySqlDialect(config);
 		} else if (type == SpatialExtension.UNIVERSAL) {
 			return new UniversalDialect(config);
-		} else if (type == SpatialExtension.ORACLE) {
+		} else if (type == SpatialExtension.ORACLE || type==SpatialExtension.GEORASTER) {
 			return new OracleDialect(config);
 		} else {
 			return null;
@@ -113,7 +113,7 @@ public abstract class DBDialect {
 	 * @return jdbc connection
 	 * @throws Exception
 	 */
-	protected Connection getConnection() throws Exception {
+	public Connection getConnection() throws Exception {
 		Connection con = getDataSource().getConnection();
 		con.setAutoCommit(false);
 

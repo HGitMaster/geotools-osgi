@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the {@link CRS} utilities methods.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/CrsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/CrsTest.java $
  * @version $Id: CrsTest.java 34842 2010-01-27 16:44:20Z aaime $
  * @author Martin Desruisseaux (IRD)
  */

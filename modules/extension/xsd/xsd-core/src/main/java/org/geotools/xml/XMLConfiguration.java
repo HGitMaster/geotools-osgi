@@ -22,7 +22,7 @@ import org.picocontainer.MutablePicoContainer;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/XMLConfiguration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/XMLConfiguration.java $
  */
 public class XMLConfiguration extends Configuration {
 

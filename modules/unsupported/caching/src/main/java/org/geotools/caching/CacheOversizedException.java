@@ -23,7 +23,7 @@ import org.geotools.caching.featurecache.FeatureCacheException;
  * size of the features being added to the cache exceeds the
  * size of the cache.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/CacheOversizedException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/CacheOversizedException.java $
  */
 public class CacheOversizedException extends FeatureCacheException {
     /**

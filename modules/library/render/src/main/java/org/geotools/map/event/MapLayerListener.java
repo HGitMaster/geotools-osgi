@@ -30,7 +30,7 @@ import org.geotools.map.MapLayer;
  *
  * @see MapLayer
  * @see MapLayerEvent
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/event/MapLayerListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/map/event/MapLayerListener.java $
  */
 public interface MapLayerListener extends EventListener {
     /**

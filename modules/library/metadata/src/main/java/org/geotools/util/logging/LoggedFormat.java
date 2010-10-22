@@ -44,7 +44,7 @@ import org.geotools.resources.i18n.Errors;
  * </ul>
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/logging/LoggedFormat.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/logging/LoggedFormat.java $
  * @version $Id: LoggedFormat.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux
  */

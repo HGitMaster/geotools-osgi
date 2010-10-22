@@ -36,7 +36,7 @@ import org.geotools.map.MapLayer;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/MapLayerTableCellRenderer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/MapLayerTableCellRenderer.java $
  * @version $Id: MapLayerTableCellRenderer.java 34153 2009-10-15 13:57:54Z mbedward $
  */
 public class MapLayerTableCellRenderer extends JPanel implements ListCellRenderer {

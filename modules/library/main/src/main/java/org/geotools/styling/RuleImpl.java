@@ -36,7 +36,7 @@ import org.opengis.util.Cloneable;
  *
  * @author James Macgill
  * @author Johann Sorel (Geomatys)
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/RuleImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/RuleImpl.java $
  * @version $Id: RuleImpl.java 33833 2009-09-04 12:26:28Z jive $
  */
 public class RuleImpl implements org.geotools.styling.Rule, Cloneable {

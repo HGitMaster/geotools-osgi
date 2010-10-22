@@ -8,7 +8,7 @@ import org.geotools.referencing.CRS;
 /**
  * Does a full scan of the known SRS codes
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-h2/src/test/java/org/geotools/referencing/tools/LoadStresser.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-h2/src/test/java/org/geotools/referencing/tools/LoadStresser.java $
  */
 public class LoadStresser {
     static Pattern p = Pattern.compile("\\d+");

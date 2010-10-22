@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/data/shapefile/shp/createTestData.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/test/java/org/geotools/data/shapefile/shp/createTestData.java $
  */
 public class createTestData {
     public static URL createLineData(final Dimension d)

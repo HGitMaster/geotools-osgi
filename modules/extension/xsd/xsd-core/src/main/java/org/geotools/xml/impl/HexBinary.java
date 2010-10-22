@@ -18,7 +18,7 @@ package org.geotools.xml.impl;
 
 /** <p>Utility class for xs:hexbinary.</p>
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/HexBinary.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/HexBinary.java $
  */
 public class HexBinary {
 	/** Creates a clone of the given byte array.

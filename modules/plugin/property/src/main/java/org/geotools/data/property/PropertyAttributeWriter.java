@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * fid3=3|Dave|<i>well known text</i>
  * </code></pre>
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyAttributeWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyAttributeWriter.java $
  */
 public class PropertyAttributeWriter implements AttributeWriter {
     BufferedWriter writer;    

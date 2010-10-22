@@ -35,8 +35,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Known Text</cite> (WKT)</A>.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Formattable.java $
- * @version $Id: Formattable.java 31531 2008-09-16 19:37:27Z desruisseaux $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/wkt/Formattable.java $
+ * @version $Id: Formattable.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Martin Desruisseaux (IRD)
  *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
@@ -243,4 +243,13 @@ public class Formattable {
     static void setIndentation(final int indentation) throws SecurityException {
         Preferences.userNodeForPackage(Formattable.class).putInt(INDENTATION, indentation);
     }
+    
+    /**
+     * Cleans up the thread local set in this thread. They can prevent web applications from
+     * proper shutdown
+     */
+    public static void cleanupThreadLocals() {
+        FORMATTER.remove();
+    }
+
 }

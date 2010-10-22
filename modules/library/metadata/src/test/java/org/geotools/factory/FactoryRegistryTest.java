@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link FactoryRegistry} implementation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/factory/FactoryRegistryTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/factory/FactoryRegistryTest.java $
  * @version $Id: FactoryRegistryTest.java 30640 2008-06-12 17:34:32Z acuster $
  * @author Martin Desruisseaux
  */

@@ -49,7 +49,7 @@ import org.opengis.filter.Filter;
  * <p></p>
  *
  * @author James Macgill
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/FeatureTypeConstraint.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/FeatureTypeConstraint.java $
  */
 public interface FeatureTypeConstraint {
     public String getFeatureTypeName();

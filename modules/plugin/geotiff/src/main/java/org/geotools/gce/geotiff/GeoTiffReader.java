@@ -91,7 +91,6 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.Envelope;
-import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
@@ -164,8 +163,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			// prevent the use from reordering axes
 			uHints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
 			this.hints.add(uHints);
-			this.hints.add(new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
-				Boolean.TRUE));
+			this.hints.add(new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,Boolean.TRUE));
 			
 		}
 		this.coverageFactory= CoverageFactoryFinder.getGridCoverageFactory(this.hints);
@@ -192,15 +190,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			// setting source
 			if (input instanceof URL) {
 				final URL sourceURL = (URL) input;
-				if (sourceURL.getProtocol().equalsIgnoreCase("http")
-						|| sourceURL.getProtocol().equalsIgnoreCase("ftp")) {
-					try {
-						source = sourceURL.openStream();
-					} catch (IOException e) {
-						new RuntimeException(e);
-					}
-				} else if (sourceURL.getProtocol().equalsIgnoreCase("file"))
-					source = DataUtilities.urlToFile(sourceURL);
+				source = DataUtilities.urlToFile(sourceURL);
 			}
 
 			closeMe = true;
@@ -210,16 +200,14 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			// information for this coverage
 			//
 			// /////////////////////////////////////////////////////////////////////
-			if ((source instanceof InputStream)
-					|| (source instanceof ImageInputStream))
+			if ((source instanceof InputStream)|| (source instanceof ImageInputStream))
 				closeMe = false;
 			if(source instanceof ImageInputStream )
 				inStream=(ImageInputStream) source;
 			else
 				inStream = ImageIO.createImageInputStream(source);
 			if (inStream == null)
-				throw new IllegalArgumentException(
-						"No input stream for the provided source");
+				throw new IllegalArgumentException("No input stream for the provided source");
 
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -233,148 +221,157 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			// Coverage name
 			//
 			// /////////////////////////////////////////////////////////////////////
-			coverageName = source instanceof File ? ((File) source).getName()
-					: "geotiff_coverage";
+			coverageName = source instanceof File ? ((File) source).getName(): "geotiff_coverage";
 			final int dotIndex = coverageName.lastIndexOf('.');
 			if (dotIndex != -1 && dotIndex != coverageName.length())
 				coverageName = coverageName.substring(0, dotIndex);
 
+		} catch (IOException e) {
+			throw new DataSourceException(e);
+		}finally{
 			// /////////////////////////////////////////////////////////////////////
 			// 
 			// Freeing streams
 			//
 			// /////////////////////////////////////////////////////////////////////
-			if (closeMe)// 
-				inStream.close();
-		} catch (IOException e) {
-			throw new DataSourceException(e);
-		} catch (TransformException e) {
-			throw new DataSourceException(e);
-		} catch (FactoryException e) {
-			throw new DataSourceException(e);
+			if (closeMe&&inStream!=null)// 
+				try{
+					inStream.close();
+				}catch (Throwable t) {
+				}
 		}
 	}
 
 	/**
-	 * 
+	 * Collect georeferencing information about this geotiff.
 	 * @param hints
-	 * @throws IOException
-	 * @throws FactoryException
-	 * @throws GeoTiffException
-	 * @throws TransformException
-	 * @throws MismatchedDimensionException
 	 * @throws DataSourceException
 	 */
-	private void getHRInfo(Hints hints) throws IOException, FactoryException,
-			GeoTiffException, TransformException, MismatchedDimensionException,
-			DataSourceException {
-		// //
-		//
-		// Get a reader for this format
-		//
-		// //
-		final ImageReader reader = readerSPI.createReaderInstance();
-
-		// //
-		//
-		// get the METADATA
-		//
-		// //
-		reader.setInput(inStream);
-		final IIOMetadata iioMetadata = reader.getImageMetadata(0);
+	private void getHRInfo(Hints hints) throws DataSourceException {
+		ImageReader reader=null;
 		CoordinateReferenceSystem foundCrs = null;
 		boolean useWorldFile = false;
 		
 		try{
-		    metadata = new GeoTiffIIOMetadataDecoder(iioMetadata);
-		    gtcs = (GeoTiffMetadata2CRSAdapter) GeoTiffMetadata2CRSAdapter.get(hints);
-		    if (gtcs != null){
-                        foundCrs = gtcs.createCoordinateSystem(metadata);
-                    }
-		    else 
-		        useWorldFile = true;
-		    
-		    if (metadata.hasNoData())
-	                    noData = metadata.getNoData();
-		}catch (IllegalArgumentException iae){
-		    useWorldFile = true;
-		}catch (UnsupportedOperationException uoe){
-		    useWorldFile = true;
-		}
-		
-		
-		// //
-		//
-		// get the CRS INFO
-		//
-		// //
-		final Object tempCRS = this.hints
-				.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
-		if (tempCRS != null) {
-			this.crs = (CoordinateReferenceSystem) tempCRS;
-			LOGGER.log(Level.WARNING, new StringBuilder(
-					"Using forced coordinate reference system ").append(
-					crs.toWKT()).toString());
-		} else{
-		    if (useWorldFile)
-		        foundCrs = getCRS(source);
-		    crs = foundCrs;
-		}
-		
-		if (crs == null){
-                    throw new DataSourceException ("Coordinate Reference System is not available");
-                }
-			
-
-		// //
-		//
-		// get the dimension of the hr image and build the model as well as
-		// computing the resolution
-		// //
-		numOverviews = reader.getNumImages(true) - 1;
-		int hrWidth = reader.getWidth(0);
-		int hrHeight = reader.getHeight(0);
-		final Rectangle actualDim = new Rectangle(0, 0, hrWidth, hrHeight);
-		originalGridRange = new GridEnvelope2D(actualDim);
-
-		if (!useWorldFile && gtcs != null) {
-		    this.raster2Model = gtcs.getRasterToModel(metadata);
-                }
-                else {
-                    this.raster2Model = parseWorldFile(source);
-                }
-		
-		if (this.raster2Model == null){
-                    throw new DataSourceException ("Raster to Model Transformation is not available");
-                }
-		
-		final AffineTransform tempTransform = new AffineTransform((AffineTransform) raster2Model);
-		tempTransform.translate(-0.5, -0.5);
-		originalEnvelope = CRS.transform(ProjectiveTransform.create(tempTransform), new GeneralEnvelope(actualDim));
-		originalEnvelope.setCoordinateReferenceSystem(crs);
-
-		// ///
-		// 
-		// setting the higher resolution available for this coverage
-		//
-		// ///
-		highestRes = new double[2];
-		highestRes[0]=XAffineTransform.getScaleX0(tempTransform);
-		highestRes[1]=XAffineTransform.getScaleY0(tempTransform);
-
-		// //
-		//
-		// get information for the successive images
-		//
-		// //
-		if (numOverviews >= 1) {
-			overViewResolutions = new double[numOverviews][2];
-			for (int i = 0; i < numOverviews; i++) {
-				overViewResolutions[i][0] = (highestRes[0]*this.originalGridRange.getSpan(0))/reader.getWidth(i+1);
-				overViewResolutions[i][1] = (highestRes[1]*this.originalGridRange.getSpan(1))/reader.getHeight(i+1);
+			// //
+			//
+			// Get a reader for this format
+			//
+			// //
+			reader = readerSPI.createReaderInstance();
+	
+			// //
+			//
+			// get the METADATA
+			//
+			// //
+			inStream.mark();
+			reader.setInput(inStream);
+			final IIOMetadata iioMetadata = reader.getImageMetadata(0);
+			try{
+			    metadata = new GeoTiffIIOMetadataDecoder(iioMetadata);
+			    gtcs = (GeoTiffMetadata2CRSAdapter) GeoTiffMetadata2CRSAdapter.get(hints);
+			    if (gtcs != null)
+	                foundCrs = gtcs.createCoordinateSystem(metadata);
+			    else 
+			        useWorldFile = true;
+			    
+			    if (metadata.hasNoData())
+		                    noData = metadata.getNoData();
+			}catch (IllegalArgumentException iae){
+			    useWorldFile = true;
+			}catch (UnsupportedOperationException uoe){
+			    useWorldFile = true;
 			}
-		} else
-			overViewResolutions = null;
+			
+			
+			// //
+			//
+			// get the CRS INFO
+			//
+			// //
+			final Object tempCRS = this.hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+			if (tempCRS != null) {
+				this.crs = (CoordinateReferenceSystem) tempCRS;
+				LOGGER.log(Level.WARNING,"Using forced coordinate reference system "+crs.toWKT());
+			} else{
+			    if (useWorldFile)
+			        foundCrs = getCRS(source);
+			    crs = foundCrs;
+			}
+			
+			if (crs == null)
+	                    throw new DataSourceException ("Coordinate Reference System is not available");
+				
+	
+			// //
+			//
+			// get the dimension of the hr image and build the model as well as
+			// computing the resolution
+			// //
+			numOverviews = reader.getNumImages(true) - 1;
+			int hrWidth = reader.getWidth(0);
+			int hrHeight = reader.getHeight(0);
+			final Rectangle actualDim = new Rectangle(0, 0, hrWidth, hrHeight);
+			originalGridRange = new GridEnvelope2D(actualDim);
+	
+			if (!useWorldFile && gtcs != null) {
+			    this.raster2Model = gtcs.getRasterToModel(metadata);
+	        }
+	        else {
+	                    this.raster2Model = parseWorldFile(source);
+	        }
+			
+			if (this.raster2Model == null){
+	            throw new DataSourceException ("Raster to Model Transformation is not available");
+	        }
+			
+			final AffineTransform tempTransform = new AffineTransform((AffineTransform) raster2Model);
+			tempTransform.translate(-0.5, -0.5);
+			originalEnvelope = CRS.transform(ProjectiveTransform.create(tempTransform), new GeneralEnvelope(actualDim));
+			originalEnvelope.setCoordinateReferenceSystem(crs);
+	
+			// ///
+			// 
+			// setting the higher resolution available for this coverage
+			//
+			// ///
+			highestRes = new double[2];
+			highestRes[0]=XAffineTransform.getScaleX0(tempTransform);
+			highestRes[1]=XAffineTransform.getScaleY0(tempTransform);
+	
+			// //
+			//
+			// get information for the successive images
+			//
+			// //
+			if (numOverviews >= 1) {
+				overViewResolutions = new double[numOverviews][2];
+				for (int i = 0; i < numOverviews; i++) {
+					overViewResolutions[i][0] = (highestRes[0]*this.originalGridRange.getSpan(0))/reader.getWidth(i+1);
+					overViewResolutions[i][1] = (highestRes[1]*this.originalGridRange.getSpan(1))/reader.getHeight(i+1);
+				}
+			} else
+				overViewResolutions = null;
+		}catch (Throwable e) {
+			throw new DataSourceException(e);
+		}
+		finally{
+			if(reader!=null)
+				try{
+					reader.dispose();
+				}
+				catch (Throwable t) {
+				}
+				
+			if(inStream!=null)
+				try{
+					inStream.reset();
+				}
+				catch (Throwable t) {
+				}	
+				
+		}
 	}
 
 	/**
@@ -595,9 +592,10 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
             if (prjFile.exists()) {
                 // it exists then we have top read it
                 PrjFileReader projReader = null;
+                FileInputStream instream=null;
                 try {
-                    final FileChannel channel = new FileInputStream(prjFile)
-                            .getChannel();
+                	instream=new FileInputStream(prjFile);
+                    final FileChannel channel = instream.getChannel();
                     projReader = new PrjFileReader(channel);
                     crs = projReader.getCoordinateReferenceSystem();
                 } catch (FileNotFoundException e) {
@@ -619,9 +617,17 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
                         } catch (IOException e) {
                             // warn about the error but proceed, it is not fatal
                             // we have at least the default crs to use
-                            LOGGER
-                                    .log(Level.SEVERE, e.getLocalizedMessage(),e);
+                            LOGGER .log(Level.FINE, e.getLocalizedMessage(),e);
                         }
+                        
+                        if (instream != null)
+                            try {
+                                instream.close();
+                            } catch (IOException e) {
+                                // warn about the error but proceed, it is not fatal
+                                // we have at least the default crs to use
+                                LOGGER.log(Level.FINE, e.getLocalizedMessage(),e);
+                            }                        
                 }
 
             }

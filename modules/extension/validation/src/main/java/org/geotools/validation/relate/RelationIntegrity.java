@@ -23,7 +23,7 @@ import org.geotools.validation.DefaultIntegrityValidation;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelationIntegrity.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/validation/src/main/java/org/geotools/validation/relate/RelationIntegrity.java $
  */
 public abstract class RelationIntegrity extends DefaultIntegrityValidation 
 {

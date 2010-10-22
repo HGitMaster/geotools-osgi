@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Rob Atkinson , SCO
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/filter/SQLEncoderBBOX.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/filter/SQLEncoderBBOX.java $
  */
 public class SQLEncoderBBOX extends FilterToSQL {
     /** Standard java logger */

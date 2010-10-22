@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  * @author jones
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/BoundsExtractor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/BoundsExtractor.java $
  */
 public class BoundsExtractor extends AbstractFilterVisitor{
     private Stack/*<Envelope>*/ envelopeStack=new Stack/*<Envelope>*/();

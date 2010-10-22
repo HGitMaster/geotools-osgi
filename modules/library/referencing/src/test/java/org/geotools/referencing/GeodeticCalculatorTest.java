@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the geodetic calculator.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/GeodeticCalculatorTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/GeodeticCalculatorTest.java $
  * @version $Id: GeodeticCalculatorTest.java 30760 2008-06-18 14:28:24Z desruisseaux $
  */
 public final class GeodeticCalculatorTest {

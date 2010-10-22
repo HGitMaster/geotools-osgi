@@ -25,7 +25,7 @@ import java.util.Collection;
  * Helper class that notifies the containing geometry when the list has changed
  * so that it can invalidate any cached JTS objects it had.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/NotifyingArrayList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/jts-wrapper/src/main/java/org/geotools/geometry/jts/spatialschema/geometry/NotifyingArrayList.java $
  */
 public class NotifyingArrayList<T> extends ArrayList<T> {
     private JTSGeometry parent;

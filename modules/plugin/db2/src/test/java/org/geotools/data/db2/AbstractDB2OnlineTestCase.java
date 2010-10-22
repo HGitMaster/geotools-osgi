@@ -34,17 +34,6 @@ public abstract class AbstractDB2OnlineTestCase extends OnlineTestCase {
     protected String getFixtureId() {
             return "db2.localType4";
     }
-    public void setUp() throws Exception {
-    	super.setUp();
-    	if (fixture == null) {
-    		System.out.println("DB2 fixture not found - make sure properties file copied from build tree resources directory");
-    		System.out.println("to Documents and Settings / userid / .geotools / db2");    		
-    		throw new IOException("DB2 fixture not found");
-    	}    	
-    	if (ds == null) {
-    		throw new IOException("DB2 Data Store not available");
-    	}
-    }
     public Connection getConnection() throws Exception {
     	DataSource d =  ds.getDataSource();
         return d.getConnection();
@@ -82,9 +71,16 @@ public abstract class AbstractDB2OnlineTestCase extends OnlineTestCase {
         	throw (new Exception("Datastore not found"));
         }
         resetTables();
-
-
+        if (fixture == null) {
+            System.out.println("DB2 fixture not found - make sure properties file copied from build tree resources directory");
+            System.out.println("to Documents and Settings / userid / .geotools / db2");             
+            throw new IOException("DB2 fixture not found");
+        }       
+        if (ds == null) {
+                throw new IOException("DB2 Data Store not available");
+        }
     }
+    
     protected void dropTables(Statement st) throws Exception {
 
     }

@@ -33,7 +33,7 @@ import org.opengis.referencing.operation.TransformException;
  * Super class for implementing interpolation algorithms. Subclass has to implement just the 
  * {@link #getValue(DirectPosition)} method.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/spike/jan/gsoc-transformations/src/main/java/org/geotools/referencing/operation/builder/algorithm/AbstractInterpolation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/spike/jan/gsoc-transformations/src/main/java/org/geotools/referencing/operation/builder/algorithm/AbstractInterpolation.java $
  * @version $Id: AbstractInterpolation.java 30731 2008-06-16 16:56:12Z acuster $
  * @author jezekjan
  *

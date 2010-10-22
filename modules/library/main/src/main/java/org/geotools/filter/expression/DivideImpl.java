@@ -29,7 +29,7 @@ import org.opengis.filter.expression.ExpressionVisitor;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/expression/DivideImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/expression/DivideImpl.java $
  */
 public class DivideImpl extends MathExpressionImpl implements Divide {
 

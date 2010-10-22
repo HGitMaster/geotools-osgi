@@ -55,7 +55,7 @@ import org.geotools.styling.Rule;
  *  NOTE: a) this also sets up the image -- clears it et al.
  * 
  * @author dblasby
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/LiteFeatureTypeStyle.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/LiteFeatureTypeStyle.java $
  */
 public final class LiteFeatureTypeStyle {
      public BufferedImage         myImage;

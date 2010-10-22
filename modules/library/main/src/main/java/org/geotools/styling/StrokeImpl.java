@@ -33,7 +33,7 @@ import org.opengis.util.Cloneable;
  * stroke defines how a line is rendered.
  *
  * @author James Macgill, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/StrokeImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/StrokeImpl.java $
  * @version $Id: StrokeImpl.java 33834 2009-09-04 13:20:54Z jive $
  */
 public class StrokeImpl implements Stroke, Cloneable {

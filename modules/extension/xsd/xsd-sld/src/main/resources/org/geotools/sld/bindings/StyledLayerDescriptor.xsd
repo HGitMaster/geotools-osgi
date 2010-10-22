@@ -297,6 +297,7 @@
         types are derived from this base type.
       </xsd:documentation>
     </xsd:annotation>
+    <xsd:attribute name="uom" type="xsd:anyURI"/>
   </xsd:complexType>
 
 <!-- *********************************************************************** -->
@@ -830,6 +831,8 @@
       <xsd:choice minOccurs="0" maxOccurs="unbounded">
         <xsd:element ref="sld:ColorMapEntry"/>
       </xsd:choice>
+      <xsd:attribute name="type" type="xsd:string"/>
+      <xsd:attribute name="extended" type="xsd:boolean"/>
     </xsd:complexType>
   </xsd:element>
   <xsd:element name="ColorMapEntry">

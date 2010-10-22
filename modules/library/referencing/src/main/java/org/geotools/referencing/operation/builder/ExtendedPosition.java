@@ -24,7 +24,7 @@ import org.opengis.geometry.DirectPosition;
  * DirectPosition associated with another DirectPosition.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/ExtendedPosition.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/ExtendedPosition.java $
  * @version $Id: ExtendedPosition.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Jan Jezek
  */

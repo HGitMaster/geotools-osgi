@@ -16,6 +16,8 @@
  */
 package org.geotools.data.postgis;
 
+import java.util.Properties;
+
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCTestSetup;
@@ -33,6 +35,19 @@ public class PostGISTestSetup extends JDBCTestSetup {
         dataStore.setDatabaseSchema("public");
     }
 
+    @Override
+    protected Properties createExampleFixture() {
+        Properties fixture = new Properties();
+        fixture.put("driver", "org.postgresql.Driver");
+        fixture.put("url", "jdbc:postgresql://localhost/mydbname");
+        fixture.put("host", "localhost");
+        fixture.put("database", "mydbname");
+        fixture.put("port", "5432");
+        fixture.put("user", "myuser");
+        fixture.put("password", "mypassword");
+        return fixture;
+    }
+    
     @Override
     protected void setUpData() throws Exception {
         runSafe("DELETE FROM GEOMETRY_COLUMNS WHERE F_TABLE_NAME = 'ft1'");

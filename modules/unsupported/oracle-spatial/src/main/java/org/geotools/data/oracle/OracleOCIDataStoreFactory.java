@@ -56,7 +56,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  *
  * @author Chris Holmes, TOPP
  * @author Bernard de Terwangne, star.be
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleOCIDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleOCIDataStoreFactory.java $
  */
 public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
     private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";

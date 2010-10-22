@@ -74,7 +74,7 @@ import java.util.List;
  * @author Ian Turton, CCG
  * @author James Macgill, CCG
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/StyledLayerDescriptor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/StyledLayerDescriptor.java $
  * @version SLD 1.0
  *
  * @since GeoTools 2.0

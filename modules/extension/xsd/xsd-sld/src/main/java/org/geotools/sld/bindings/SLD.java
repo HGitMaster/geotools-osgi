@@ -28,7 +28,7 @@ import org.geotools.xml.XSD;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-sld/src/main/java/org/geotools/sld/bindings/SLD.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-sld/src/main/java/org/geotools/sld/bindings/SLD.java $
  */
 public final class SLD extends XSD {
     /**

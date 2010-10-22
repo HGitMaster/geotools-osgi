@@ -110,8 +110,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Chris Holmes, TOPP
  * @author Andrea Aime
  * @author Paolo Rizzi
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStore.java $
- * @version $Id: PostgisDataStore.java 33328 2009-06-19 17:48:05Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStore.java $
+ * @version $Id: PostgisDataStore.java 35139 2010-03-30 13:28:53Z aaime $
  *
  * @task REVISIT: So Paolo Rizzi has a number of improvements in
  *       http://jira.codehuas.org/browse/GEOT-379  I rolled in a few of them,
@@ -981,28 +981,47 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 
                 // check for nullability
                 int nullCode = metadataRs.getInt( NULLABLE );
-                boolean nillable = true;
-                switch( nullCode ) {
-                    case DatabaseMetaData.columnNoNulls:
-                        nillable = false;
-                        break;
-                        
-                    case DatabaseMetaData.columnNullable:
-                        nillable = true;
-                        break;
-                        
-                    case DatabaseMetaData.columnNullableUnknown:
-                        nillable = true;
-                        break;
-                }
+                boolean nillable = isNullable(nullCode);
 
                 return getGeometryAttribute(tableName, columnName, nillable);
+            } else if("uuid".equals(typeName)) {
+                String tableName = metadataRs.getString(TABLE_NAME);
+                String columnName = metadataRs.getString(COLUMN_NAME);
+                
+                // check for nullability
+                int nullCode = metadataRs.getInt( NULLABLE );
+                boolean nillable = isNullable(nullCode);
+                
+                AttributeTypeBuilder atb = new AttributeTypeBuilder();
+                atb.setName(columnName);
+                atb.setBinding(String.class);
+                atb.setMinOccurs(nillable ? 0 : 1);
+                atb.setMaxOccurs(1);
+                return atb.buildDescriptor(columnName); 
             } else {
                 return super.buildAttributeType(metadataRs);
             }
         } catch (SQLException e) {
             throw new IOException("Sql error occurred: " + e.getMessage());
         }
+    }
+
+    private boolean isNullable(int nullCode) {
+        boolean nillable = true;
+        switch( nullCode ) {
+            case DatabaseMetaData.columnNoNulls:
+                nillable = false;
+                break;
+                
+            case DatabaseMetaData.columnNullable:
+                nillable = true;
+                break;
+                
+            case DatabaseMetaData.columnNullableUnknown:
+                nillable = true;
+                break;
+        }
+        return nillable;
     }
 
     /**

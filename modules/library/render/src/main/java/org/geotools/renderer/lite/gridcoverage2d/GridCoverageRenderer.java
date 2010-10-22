@@ -74,7 +74,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author  Simone Giannecchini
  * @author  Andrea Aime
  * @author  Alessio Fabiani
- * @source  $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
+ * @source  $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
  * @version  $Id: GridCoverageRenderer.java 33831 2009-09-03 10:49:54Z simonegiannecchini $
  * @task  Add support for SLD styles
  */
@@ -248,18 +248,6 @@ public final class GridCoverageRenderer {
      * 
      * @param destinationCRS
      *                the CRS of the {@link GridCoverage2D} to render.
-     * @param envelope
-     *                delineating the area to be rendered.
-     * @param screenSize
-     *                at which we want to rendere the source
-     *                {@link GridCoverage2D}.
-     * @param worldToScreen if not <code>null</code> and if it contains a rotation,
-     * this Affine Tranform is used directly to convert from world coordinates
-     * to screen coordinates. Otherwise, a standard {@link GridToEnvelopeMapper}
-     * is used to calculate the affine transform.
-     * 
-     * @param java2dHints
-     *                to control this rendering process.
      * @param envelope
      *                delineating the area to be rendered.
      * @param screenSize

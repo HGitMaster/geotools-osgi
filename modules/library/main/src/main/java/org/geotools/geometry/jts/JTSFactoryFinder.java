@@ -37,7 +37,7 @@ import org.geotools.resources.LazySet;
  * {@linkplain CoordinateSequenceFactory coordinate sequence} or
  * {@linkplain PrecisionModel precision model} factories.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/JTSFactoryFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/JTSFactoryFinder.java $
  * @version $Id: JTSFactoryFinder.java 31235 2008-08-26 21:23:18Z jgarnett $
  * @author Martin Desruisseaux
  */

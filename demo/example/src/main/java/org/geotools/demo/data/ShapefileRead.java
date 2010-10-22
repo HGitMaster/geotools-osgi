@@ -36,7 +36,7 @@ import org.geotools.swing.data.JFileDataStoreChooser;
  * @author Jody Garnett (Refractions Research)
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/data/ShapefileRead.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/data/ShapefileRead.java $
  */
 public class ShapefileRead {
 

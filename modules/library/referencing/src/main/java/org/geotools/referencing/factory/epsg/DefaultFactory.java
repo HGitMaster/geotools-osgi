@@ -23,7 +23,7 @@ import org.geotools.factory.Hints;
  * Base class for EPSG factories to be registered in {@link GeometryFactoryFinder}.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DefaultFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DefaultFactory.java $
  * @version $Id: DefaultFactory.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

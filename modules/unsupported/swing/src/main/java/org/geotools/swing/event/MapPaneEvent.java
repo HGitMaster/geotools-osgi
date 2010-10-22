@@ -28,7 +28,7 @@ import org.geotools.swing.JMapPane;
  * 
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/event/MapPaneEvent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/event/MapPaneEvent.java $
  * @version $Id: MapPaneEvent.java 34243 2009-10-26 07:07:08Z mbedward $
  */
 public class MapPaneEvent extends EventObject {

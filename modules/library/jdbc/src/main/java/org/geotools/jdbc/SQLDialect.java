@@ -112,7 +112,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/SQLDialect.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/SQLDialect.java $
  */
 public abstract class SQLDialect {
     protected static final Logger LOGGER = Logging.getLogger(SQLDialect.class);
@@ -259,6 +259,10 @@ public abstract class SQLDialect {
         mappings.put(new Integer(Types.DATE), Date.class);
         mappings.put(new Integer(Types.TIME), Time.class);
         mappings.put(new Integer(Types.TIMESTAMP), Timestamp.class);
+        
+        mappings.put(new Integer(Types.BLOB), byte[].class);
+        mappings.put(new Integer(Types.BINARY), byte[].class);
+        mappings.put(new Integer(Types.CLOB), String.class);
 
         //subclasses should extend to provide additional
     }
@@ -291,6 +295,8 @@ public abstract class SQLDialect {
         mappings.put(Time.class, new Integer(Types.TIME));
         mappings.put(java.util.Date.class, new Integer(Types.TIMESTAMP));
         mappings.put(Timestamp.class, new Integer(Types.TIMESTAMP));
+        
+        mappings.put(byte[].class, new Integer(Types.BLOB));
 
         //subclasses should extend and provide additional
     }

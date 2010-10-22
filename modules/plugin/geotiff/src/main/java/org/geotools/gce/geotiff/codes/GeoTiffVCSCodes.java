@@ -22,7 +22,7 @@ package org.geotools.gce.geotiff.codes;
  * @since 2.3
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/codes/GeoTiffVCSCodes.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/codes/GeoTiffVCSCodes.java $
  */
 public final class GeoTiffVCSCodes {
 

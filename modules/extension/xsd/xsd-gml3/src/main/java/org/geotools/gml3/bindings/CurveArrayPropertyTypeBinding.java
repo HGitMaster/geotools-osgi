@@ -50,7 +50,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/CurveArrayPropertyTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml3/src/main/java/org/geotools/gml3/bindings/CurveArrayPropertyTypeBinding.java $
  */
 public class CurveArrayPropertyTypeBinding extends AbstractComplexBinding {
     /**

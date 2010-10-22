@@ -21,7 +21,7 @@ package org.geotools.filter;
  * DOCUMENT ME!
  *
  * @author James
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/filter/MapScaleDenominator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/filter/MapScaleDenominator.java $
  */
 public interface MapScaleDenominator extends EnvironmentVariable {
     static final String EV_NAME = "sld:MapScaleDenominator";

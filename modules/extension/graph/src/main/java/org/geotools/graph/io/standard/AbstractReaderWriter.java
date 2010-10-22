@@ -25,7 +25,7 @@ import org.geotools.graph.io.GraphReaderWriter;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/io/standard/AbstractReaderWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/io/standard/AbstractReaderWriter.java $
  */
 public abstract class AbstractReaderWriter implements GraphReaderWriter {
   private HashMap m_properties;

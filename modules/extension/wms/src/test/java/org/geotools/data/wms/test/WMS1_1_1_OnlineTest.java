@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/wms/src/test/java/org/geotools/data/wms/test/WMS1_1_1_OnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/wms/src/test/java/org/geotools/data/wms/test/WMS1_1_1_OnlineTest.java $
  */
 public class WMS1_1_1_OnlineTest extends WMS1_1_0_OnlineTest {
     

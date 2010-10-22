@@ -74,7 +74,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Simone Giannecchini, GeoSolutions
  * @author Alessio Fabiani, GeoSolutions
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/coveragetiler/CoverageTiler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/coveragetiler/CoverageTiler.java $
  * @version 0.3
  * 
  */

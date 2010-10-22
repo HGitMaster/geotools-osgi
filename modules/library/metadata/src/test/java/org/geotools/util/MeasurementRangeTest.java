@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
  * Tests the {@link MeasurementRange}.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/MeasurementRangeTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/MeasurementRangeTest.java $
  * @version $Id: MeasurementRangeTest.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux
  */

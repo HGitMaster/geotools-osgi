@@ -28,7 +28,7 @@ import org.geotools.xml.XSD;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_1/OGC.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_1/OGC.java $
  */
 public final class OGC extends XSD {
     /**

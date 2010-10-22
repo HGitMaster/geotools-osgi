@@ -32,7 +32,7 @@ package org.geotools.geometry.iso.topograph2D.index;
  * segment comparisons, producing substantial speed gains.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/index/MonotoneChain.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/index/MonotoneChain.java $
  */
 public class MonotoneChain {
 

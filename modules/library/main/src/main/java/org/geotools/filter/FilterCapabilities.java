@@ -62,7 +62,7 @@ import org.opengis.filter.spatial.Within;
  * This class is used as one big mask to detect filters that cannot be performed
  * 
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterCapabilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FilterCapabilities.java $
  * 
  * @deprecated use {@link org.opengis.filter.capability.FilterCapabilities}.
  */

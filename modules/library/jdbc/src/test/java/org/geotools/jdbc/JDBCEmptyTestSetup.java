@@ -24,7 +24,7 @@ import java.sql.SQLException;
  * @author Justin Deoliveira, OpenGEO
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCEmptyTestSetup.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/jdbc/JDBCEmptyTestSetup.java $
  */
 public abstract class JDBCEmptyTestSetup extends JDBCDelegatingTestSetup {
 

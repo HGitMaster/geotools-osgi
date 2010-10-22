@@ -28,7 +28,7 @@ import org.apache.commons.dbcp.DelegatingStatement;
  * @author Andrea Aime - TOPP
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/DBCPUnWrapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/datasource/DBCPUnWrapper.java $
  */
 public class DBCPUnWrapper implements UnWrapper {
 

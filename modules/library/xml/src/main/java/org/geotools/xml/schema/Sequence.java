@@ -28,7 +28,7 @@ package org.geotools.xml.schema;
  * @author dzwiers www.refractions.net
  *
  * @see ElementGrouping
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/Sequence.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/Sequence.java $
  */
 public interface Sequence extends ElementGrouping {
     /**

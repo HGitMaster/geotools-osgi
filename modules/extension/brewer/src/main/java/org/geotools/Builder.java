@@ -6,7 +6,7 @@ package org.geotools;
  * @param <T>
  *            class of object under construction
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/main/java/org/geotools/Builder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/main/java/org/geotools/Builder.java $
  */
 public interface Builder<T> {
     /**

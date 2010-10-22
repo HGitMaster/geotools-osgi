@@ -68,7 +68,7 @@ import org.opengis.filter.sort.SortBy;
  * 
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/PreGeneralizedFeatureSource.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/PreGeneralizedFeatureSource.java $
  */
 public class PreGeneralizedFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
 

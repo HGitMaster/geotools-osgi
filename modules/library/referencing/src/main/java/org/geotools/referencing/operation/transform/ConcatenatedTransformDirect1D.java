@@ -25,7 +25,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
  * Concatenated transform where both transforms are one-dimensional.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ConcatenatedTransformDirect1D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ConcatenatedTransformDirect1D.java $
  * @version $Id: ConcatenatedTransformDirect1D.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

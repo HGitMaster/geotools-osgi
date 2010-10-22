@@ -28,7 +28,7 @@ import junit.framework.TestCase;
  * @author Jody
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/SLDTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/styling/SLDTest.java $
  */
 public class SLDTest extends TestCase {
     StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);

@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * 
  * @since GeoTools 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/data/FeatureEvent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/data/FeatureEvent.java $
  */
 public class FeatureEvent extends EventObject {
     private static final long serialVersionUID = 3154238322369916485L;

@@ -29,7 +29,7 @@ import org.opengis.referencing.FactoryException;
  * 
  * @author Cory Horner (Refractions Research)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/epsg-oracle/src/main/java/org/geotools/referencing/factory/epsg/OracleDialectEpsgMediator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/epsg-oracle/src/main/java/org/geotools/referencing/factory/epsg/OracleDialectEpsgMediator.java $
  */
 public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
 

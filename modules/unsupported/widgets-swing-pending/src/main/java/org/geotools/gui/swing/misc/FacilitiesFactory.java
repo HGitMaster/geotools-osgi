@@ -34,7 +34,7 @@ import org.opengis.referencing.operation.MathTransform;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/misc/FacilitiesFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/misc/FacilitiesFactory.java $
  */
 public class FacilitiesFactory {
 

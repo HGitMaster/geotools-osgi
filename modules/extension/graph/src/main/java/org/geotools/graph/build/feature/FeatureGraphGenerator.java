@@ -32,7 +32,7 @@ import org.geotools.graph.structure.Graphable;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/build/feature/FeatureGraphGenerator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/build/feature/FeatureGraphGenerator.java $
  */
 public class FeatureGraphGenerator extends BasicGraphGenerator {
 

@@ -117,7 +117,7 @@ import org.opengis.style.OverlapBehavior;
  * </p>
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/RasterSymbolizer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/RasterSymbolizer.java $
  */
 public interface RasterSymbolizer extends org.opengis.style.RasterSymbolizer,Symbolizer {
     /**

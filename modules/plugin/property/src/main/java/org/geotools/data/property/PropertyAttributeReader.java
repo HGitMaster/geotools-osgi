@@ -29,10 +29,11 @@ import org.geotools.feature.SchemaException;
 import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
 
@@ -67,7 +68,7 @@ import com.vividsolutions.jts.io.WKTReader;
  *  </code>
  *</pre>
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyAttributeReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/property/src/main/java/org/geotools/data/property/PropertyAttributeReader.java $
  */
 public class PropertyAttributeReader implements AttributeReader {
     /** DOCUMENT ME!  */
@@ -258,32 +259,46 @@ public class PropertyAttributeReader implements AttributeReader {
         AttributeDescriptor attType = type.getDescriptor(index);
 
         String stringValue = null;
-		try {
-			// read the value
-			stringValue = text[index];
-			
-			//trim off any whitespace
-			if ( stringValue != null ) { 
-				stringValue = stringValue.trim();
-			}
-			if ( "".equals( stringValue ) ) {
-				stringValue = null;
-			}
-		} catch (RuntimeException e1) {
-			e1.printStackTrace();
-			stringValue = null;
-		}
+        try {
+            // read the value
+            stringValue = text[index];
 
-		//check for special <null> flag
-		if ( "<null>".equals( stringValue ) ) {
-			stringValue = null;
-		}
-		if ( stringValue == null ) {
-			if( attType.isNillable() ){
-				return null;
-			}
-		}
-        return Converters.convert( stringValue, attType.getType().getBinding() );        
+            // trim off any whitespace
+            if (stringValue != null) {
+                stringValue = stringValue.trim();
+            }
+            if ("".equals(stringValue)) {
+                stringValue = null;
+            }
+        } catch (RuntimeException e1) {
+            e1.printStackTrace();
+            stringValue = null;
+        }
+
+        // check for special <null> flag
+        if ("<null>".equals(stringValue)) {
+            stringValue = null;
+        }
+        if (stringValue == null) {
+            if (attType.isNillable()) {
+                return null;
+            }
+        }
+
+        Object value = Converters.convert(stringValue, attType.getType().getBinding());
+
+        if (attType.getType() instanceof GeometryType) {
+            // this is to be passed on in the geometry objects so the srs name gets encoded
+            CoordinateReferenceSystem crs = ((GeometryType) attType.getType())
+                    .getCoordinateReferenceSystem();
+            if (crs != null) {
+                // must be geometry, but check anyway
+                if (value != null && value instanceof Geometry) {
+                    ((Geometry) value).setUserData(crs);
+                }
+            }
+        }
+        return value;
     }
 }
 

@@ -116,7 +116,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @author Alessio Fabiani, GeoSolutions
  * @author Blaz Repnik
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/imagemosaic/MosaicIndexBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coveragetools/src/main/java/org/geotools/utils/imagemosaic/MosaicIndexBuilder.java $
  * @version 0.3
  * 
  */

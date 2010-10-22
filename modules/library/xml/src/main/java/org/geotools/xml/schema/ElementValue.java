@@ -25,7 +25,7 @@ package org.geotools.xml.schema;
  * </p>
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/ElementValue.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/ElementValue.java $
  */
 public interface ElementValue {
     /**

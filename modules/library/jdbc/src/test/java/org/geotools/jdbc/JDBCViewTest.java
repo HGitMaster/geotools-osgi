@@ -31,11 +31,11 @@ public abstract class JDBCViewTest extends JDBCTestSupport {
 
     @Override
     protected abstract JDBCViewTestSetup createTestSetup();
-   
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
 
+    @Override
+    protected void connect() throws Exception {
+        super.connect();
+        
         // we need to use the type builder because the pk has min occurs = 1 on Oracle
         AttributeTypeBuilder atb = new AttributeTypeBuilder();
         atb.setMinOccurs(isPkNillable() ? 0 : 1);

@@ -66,7 +66,7 @@ import org.opengis.filter.expression.Expression;
  * $Id: Halo.java 33833 2009-09-04 12:26:28Z jive $
  *
  * @author Ian Turton, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/Halo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/Halo.java $
  */
 public interface Halo extends org.opengis.style.Halo{
 

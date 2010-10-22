@@ -46,7 +46,7 @@ import org.geotools.resources.i18n.Errors;
  * for interoperability with GeoAPI.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/geometry/jts/ReferencedEnvelope.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/geometry/jts/ReferencedEnvelope.java $
  * @version $Id: ReferencedEnvelope.java 33956 2009-09-23 00:49:00Z mbedward $
  * @author Jody Garnett
  * @author Martin Desruisseaux

@@ -46,7 +46,7 @@ import org.geotools.util.Utilities;
  * serializable if all their step transforms are serializables.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ConcatenatedTransform.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/transform/ConcatenatedTransform.java $
  * @version $Id: ConcatenatedTransform.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

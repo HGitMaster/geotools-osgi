@@ -63,7 +63,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * coordinates are extrapolated.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/LocalizationGridTransform2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/builder/LocalizationGridTransform2D.java $
  * @version $Id: LocalizationGridTransform2D.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)

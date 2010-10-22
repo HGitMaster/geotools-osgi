@@ -16,9 +16,12 @@
  */
 package org.geotools.data.shapefile;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 class ShpFilesLocker {
+    final URI uri;
     final URL url;
     final FileReader reader;
     final FileWriter writer;
@@ -31,6 +34,18 @@ class ShpFilesLocker {
         this.writer = null;
         ShapefileDataStoreFactory.LOGGER.fine("Read lock: " + url + " by " + reader.id());
         setTraceException();
+        
+    	// extracts the URI from the URL, if possible
+        this.uri = getURI(url);
+    }
+
+    URI getURI(URL url) {
+        try {
+    		return url.toURI();
+    	} catch (URISyntaxException e) {
+    		// may fail if URL does not conform to RFC 2396
+ 		}
+        return null;
     }
 
     public ShpFilesLocker( URL url, FileWriter writer ) {
@@ -39,6 +54,9 @@ class ShpFilesLocker {
         this.writer = writer;
         ShapefileDataStoreFactory.LOGGER.fine("Write lock: " + url + " by " + writer.id());
         setTraceException();
+        
+    	// extracts the URI from the URL, if possible
+        this.uri = getURI(url);
     }
 
     private void setTraceException() {
@@ -113,8 +131,16 @@ class ShpFilesLocker {
         if (url == null) {
             if (other.url != null)
                 return false;
-        } else if (!url.equals(other.url))
-            return false;
+        } else {
+        	// calls URI.equals if a valid URI is available  
+        	if (uri != null) {
+        		if (!uri.equals(other.uri))
+            		return false;
+        	}
+        	// if URI is not available, calls URL.equals (which may take a long time)  
+        	else if (!url.equals(other.url))
+                return false;
+        }
         if (writer == null) {
             if (other.writer != null)
                 return false;

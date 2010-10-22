@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.LineSegment;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/build/line/OptLineGraphGenerator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/build/line/OptLineGraphGenerator.java $
  */
 public class OptLineGraphGenerator implements LineGraphGenerator {
 

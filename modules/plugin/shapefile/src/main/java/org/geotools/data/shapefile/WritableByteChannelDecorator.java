@@ -28,7 +28,7 @@ import java.nio.channels.WritableByteChannel;
  * 
  * @author jesse
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/WritableByteChannelDecorator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/WritableByteChannelDecorator.java $
  */
 public class WritableByteChannelDecorator implements WritableByteChannel {
 

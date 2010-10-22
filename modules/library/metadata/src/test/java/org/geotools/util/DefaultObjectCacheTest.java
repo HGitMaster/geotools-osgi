@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  *
  * @author Cory Horner
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/test/java/org/geotools/util/DefaultObjectCacheTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/test/java/org/geotools/util/DefaultObjectCacheTest.java $
  */
 public final class DefaultObjectCacheTest {
     /**

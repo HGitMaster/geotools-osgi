@@ -26,7 +26,7 @@ import org.geotools.geometry.iso.topograph2D.Envelope;
  * the size of the node envelope
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/Key.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/quadtree/Key.java $
  * @version 1.7.2
  */
 public class Key {

@@ -25,7 +25,7 @@ import java.io.IOException;
  * @author rpetty
  * @version $Id: WSException.java 34133 2009-10-12 08:14:05Z mbedward $
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/protocol/ws/WSException.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/protocol/ws/WSException.java $
  */
 public class WSException extends IOException {
 

@@ -87,7 +87,7 @@ import org.geotools.resources.coverage.CoverageUtilities;
  * way to check if a grid coverages is a result of a resample operation.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Resampler2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/Resampler2D.java $
  * @version $Id: Resampler2D.java 33828 2009-09-03 06:44:06Z mbedward $
  * @author Martin Desruisseaux (IRD)
  */

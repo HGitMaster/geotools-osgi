@@ -44,7 +44,7 @@ import org.geotools.test.TestData;
  * 
  * @author Simone Giannecchini
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/RendererBaseTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/renderer/lite/RendererBaseTest.java $
  */
 public abstract class RendererBaseTest {
 

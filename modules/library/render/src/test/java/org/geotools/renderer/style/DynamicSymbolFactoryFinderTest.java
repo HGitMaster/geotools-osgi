@@ -27,7 +27,7 @@ import junit.framework.TestCase;
  * @author Andrea Aime - TOPP
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/style/DynamicSymbolFactoryFinderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/renderer/style/DynamicSymbolFactoryFinderTest.java $
  */
 public class DynamicSymbolFactoryFinderTest extends TestCase {
 

@@ -325,9 +325,9 @@ class FilterToCQL implements FilterVisitor, ExpressionVisitor {
         output.append( ", ");
         output.append( filter.getMinX() );
         output.append( ",");
-        output.append( filter.getMaxX() );
-        output.append( ",");
         output.append( filter.getMinY() );
+        output.append( ",");
+        output.append( filter.getMaxX() );
         output.append( ",");
         output.append( filter.getMaxY() );
         output.append( ")");

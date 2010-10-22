@@ -32,7 +32,7 @@ import org.opengis.referencing.operation.MathTransform;
  * Supports the popular visualisation projection used by Google, Microsoft, Yahoo, OSM and others
  * @author Andrea Aime - OpenGeo
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/MercatorPseudoProvider.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/MercatorPseudoProvider.java $
  */
 public class MercatorPseudoProvider extends AbstractProvider {
     /**

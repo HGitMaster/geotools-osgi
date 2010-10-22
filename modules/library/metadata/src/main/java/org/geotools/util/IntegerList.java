@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * reponsability.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/util/IntegerList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/util/IntegerList.java $
  * @version $Id: IntegerList.java 30792 2008-06-23 19:19:58Z desruisseaux $
  * @author Martin Desruisseaux (Geomatys)
  */

@@ -29,7 +29,7 @@ import org.geotools.test.OnlineTestCase;
  * 
  * @author Andrea Aime
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/OracleDataStoreFactoryOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/OracleDataStoreFactoryOnlineTest.java $
  */
 public class OracleDataStoreFactoryOnlineTest extends OnlineTestCase {
     /** The Oracle driver class name */

@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * 
  * @author Rini Angreani, Curtin University of Technology
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/ToPointFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/ToPointFunction.java $
  */
 public class ToPointFunction implements Function {
     private final List<Expression> parameters;

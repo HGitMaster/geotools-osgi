@@ -32,7 +32,7 @@ import org.geotools.referencing.factory.epsg.HsqlDialectEpsgMediatorStressTest.C
  * 
  * @author Cory Horner (Refractions Research)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/HsqlDialectEpsgMediatorConnectionLeakTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-hsql/src/test/java/org/geotools/referencing/factory/epsg/HsqlDialectEpsgMediatorConnectionLeakTest.java $
  */
 public class HsqlDialectEpsgMediatorConnectionLeakTest extends TestCase {
 

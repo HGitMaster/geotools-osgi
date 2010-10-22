@@ -115,8 +115,8 @@ import org.geotools.util.logging.Logging;
  * {@link #isPrimaryKey} method.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DirectEpsgFactory.java $
- * @version $Id: DirectEpsgFactory.java 34665 2009-12-13 12:40:59Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/DirectEpsgFactory.java $
+ * @version $Id: DirectEpsgFactory.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Yann Cézard
  * @author Martin Desruisseaux (IRD)
  * @author Rueben Schulz
@@ -2988,7 +2988,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      */
     @Override
     public synchronized void dispose() throws FactoryException {
-        final boolean shutdown = SHUTDOWN_THREAD.equals(Thread.currentThread().getName());
         final boolean isClosed;
         try {
             Connection connection = getConnection();
@@ -3006,16 +3005,14 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 ((PreparedStatement) it.next()).close();
                 it.remove();
             }
-            if (shutdown) {
-                shutdown(true);
-            }
+            shutdown(true);
             connection.close();
             dataSource = null;
         } catch (SQLException exception) {
             throw new FactoryException(exception);
         }
         super.dispose();
-        if (shutdown) try {
+        try {
             shutdown(false);
         } catch (SQLException exception) {
             throw new FactoryException(exception);

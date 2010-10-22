@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 /**
  *
  * @author James
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/function/FunctionTestSupport.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/function/FunctionTestSupport.java $
  */
 public class FunctionTestSupport extends TestCase {
     

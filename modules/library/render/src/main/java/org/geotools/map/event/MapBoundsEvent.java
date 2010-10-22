@@ -28,7 +28,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * Event object for MapContext area of interest and coordinate system changes.
  *
  * @author wolf
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/map/event/MapBoundsEvent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/map/event/MapBoundsEvent.java $
  */
 public class MapBoundsEvent extends EventObject {
     /** Area of interest changed */

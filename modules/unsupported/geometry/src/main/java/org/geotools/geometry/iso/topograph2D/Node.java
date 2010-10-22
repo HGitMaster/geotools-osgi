@@ -25,7 +25,7 @@ import java.util.Iterator;
  * meet. A node is connected to each of its incident Edges via an outgoing
  * DirectedEdge.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Node.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/topograph2D/Node.java $
  */
 public class Node extends GraphComponent {
 

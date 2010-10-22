@@ -30,7 +30,7 @@ import org.opengis.util.RecordType;
  * Information about the content of a grid data cell.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/content/CoverageDescriptionImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/content/CoverageDescriptionImpl.java $
  * @version $Id: CoverageDescriptionImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

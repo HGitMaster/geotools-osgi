@@ -39,7 +39,7 @@ import org.geotools.factory.GeoTools;
  * 
  * @author Christian Mueller
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCJNDIDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/JDBCJNDIDataStoreFactory.java $
  */
 public abstract class JDBCJNDIDataStoreFactory extends JDBCDataStoreFactory {
 

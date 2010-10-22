@@ -18,7 +18,7 @@ import junit.framework.TestSuite;
  * DOCUMENT ME!
  *
  * @author James
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/svgsupport/src/test/java/org/geotools/svg/SVGTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/svgsupport/src/test/java/org/geotools/svg/SVGTest.java $
  */
 public class SVGTest extends TestCase {    
     public SVGTest(java.lang.String testName) throws Exception{

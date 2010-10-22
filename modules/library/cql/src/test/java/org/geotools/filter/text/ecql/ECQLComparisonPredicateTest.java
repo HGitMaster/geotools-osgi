@@ -41,7 +41,7 @@ import org.opengis.filter.Filter;
  * @author Mauricio Pazos (Axios Engineering)
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLComparisonPredicateTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/cql/src/test/java/org/geotools/filter/text/ecql/ECQLComparisonPredicateTest.java $
  */
 public class ECQLComparisonPredicateTest extends CQLComparisonPredicateTest {
 

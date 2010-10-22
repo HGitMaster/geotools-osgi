@@ -31,7 +31,7 @@ import org.geotools.geometry.iso.topograph2D.Envelope;
  * spatial relationships.
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/SpatialIndex.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometry/src/main/java/org/geotools/geometry/iso/index/SpatialIndex.java $
  */
 public interface SpatialIndex {
 	/**

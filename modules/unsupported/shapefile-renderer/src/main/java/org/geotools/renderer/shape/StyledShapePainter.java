@@ -62,7 +62,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * out since both renderers do use the same painting logic.
  *
  * @author Andrea Aime
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/StyledShapePainter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/StyledShapePainter.java $
  */
 public class StyledShapePainter {
     private static AffineTransform IDENTITY_TRANSFORM = new AffineTransform();

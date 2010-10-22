@@ -42,7 +42,7 @@ import org.geotools.resources.image.ColorUtilities;
  * operation name still appropriate in this context.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/BandSelector2D.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/BandSelector2D.java $
  * @version $Id: BandSelector2D.java 31073 2008-07-25 08:14:47Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Andrea Aimes

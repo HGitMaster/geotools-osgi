@@ -17,6 +17,7 @@
 package org.geotools.data.db2;
 
 import java.sql.Connection;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 
@@ -31,7 +32,7 @@ import org.geotools.jdbc.JDBCTestSetup;
  * @author Christian Mueller
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-db2/src/test/java/org/geotools/data/db2/DB2TestSetup.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-db2/src/test/java/org/geotools/data/db2/DB2TestSetup.java $
  */
 public class DB2TestSetup extends JDBCTestSetup {
 	
@@ -45,6 +46,20 @@ public class DB2TestSetup extends JDBCTestSetup {
 //    }
 
     
+     @Override
+     protected Properties createExampleFixture() {
+         Properties fixture = new Properties();
+         fixture.put("driver", "com.ibm.db2.jcc.DB2Driver");
+         fixture.put("url", "jdbc:db2://localhost:50001/geotools");
+         fixture.put("user", "db2inst1");
+         fixture.put("passwd", "db2inst1");
+         fixture.put("database", "geotools");
+         fixture.put("port", "50001");
+         fixture.put("host", "localhost");
+         
+         return fixture;
+     }
+     
     protected void setUpData() throws Exception {
     	
     	Connection con = getDataSource().getConnection();

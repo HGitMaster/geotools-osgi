@@ -22,7 +22,7 @@ import org.opengis.style.Description;
  * symbolizers and rules.
  *
  * @author James Macgill, CCG
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/BasicLineStyle.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/BasicLineStyle.java $
  * @version $Id: BasicLineStyle.java 31133 2008-08-05 15:20:33Z johann.sorel $
  */
 public class BasicLineStyle extends StyleImpl

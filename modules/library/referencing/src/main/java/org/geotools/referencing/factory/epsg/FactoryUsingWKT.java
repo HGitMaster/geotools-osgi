@@ -76,7 +76,7 @@ import org.geotools.util.logging.Logging;
  * so it's used as an extension).
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingWKT.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/FactoryUsingWKT.java $
  * @version $Id: FactoryUsingWKT.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Martin Desruisseaux
  * @author Jody Garnett

@@ -50,7 +50,7 @@ import org.opengis.style.SemanticType;
  * Rule, Symbolizer, Stroke and Fill).
  *
  * @author Jody Garnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/styling/SLD.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/styling/SLD.java $
  * @version $Id: SLD.java 33977 2009-09-24 07:58:32Z mbedward $
  */
 public class SLD {

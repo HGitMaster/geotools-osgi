@@ -25,7 +25,7 @@ import java.io.InputStream;
  * @author Gabriel Roldan (OpenGeo)
  * @version $Id: HTTPResponse.java 34133 2009-10-12 08:14:05Z mbedward $
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/protocol/http/HTTPResponse.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/webservice/src/main/java/org/geotools/data/ws/protocol/http/HTTPResponse.java $
  */
 public interface HTTPResponse {
 

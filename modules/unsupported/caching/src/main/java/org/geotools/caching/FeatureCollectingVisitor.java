@@ -29,7 +29,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * a In-Memory FeatureCollection 
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/caching/src/main/java/org/geotools/caching/FeatureCollectingVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/caching/src/main/java/org/geotools/caching/FeatureCollectingVisitor.java $
  */
 public class FeatureCollectingVisitor implements Visitor {
     FeatureCollection<SimpleFeatureType, SimpleFeature> fc;

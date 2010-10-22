@@ -103,7 +103,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin Deolivera
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/simple/SimpleFeatureTypeBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/simple/SimpleFeatureTypeBuilder.java $
  */
 public class SimpleFeatureTypeBuilder {
 	/**

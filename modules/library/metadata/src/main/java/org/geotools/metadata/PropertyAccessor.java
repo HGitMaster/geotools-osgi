@@ -49,7 +49,7 @@ import org.geotools.util.SimpleInternationalString;
  * The getters declared in a GeoAPI interface, together with setters (if any)
  * declared in the Geotools implementation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/PropertyAccessor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/PropertyAccessor.java $
  * @version $Id: PropertyAccessor.java 31451 2008-09-08 08:27:50Z desruisseaux $
  * @author Martin Desruisseaux
  */

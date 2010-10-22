@@ -32,7 +32,7 @@ import org.opengis.filter.expression.PropertyName;
  * 
  * @author Cory Horner, Refractions Research Inc.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/function/QuantileFunctionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/function/QuantileFunctionTest.java $
  */
 public class QuantileFunctionTest extends FunctionTestSupport {
    

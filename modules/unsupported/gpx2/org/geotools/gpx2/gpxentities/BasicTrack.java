@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * Provides the default implementation of the Track interface.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/gpx2/org/geotools/gpx2/gpxentities/BasicTrack.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/gpx2/org/geotools/gpx2/gpxentities/BasicTrack.java $
  */
 public class BasicTrack implements Track
 {

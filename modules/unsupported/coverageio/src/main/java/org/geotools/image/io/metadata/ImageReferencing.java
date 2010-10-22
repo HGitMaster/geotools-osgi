@@ -33,7 +33,7 @@ import org.opengis.referencing.operation.Projection;
  * {@code <CoordinateSystem>} and {@code <Datum>} child elements.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/ImageReferencing.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/ImageReferencing.java $
  * @version $Id: ImageReferencing.java 30996 2008-07-10 13:28:59Z cedricbr $
  * @author Martin Desruisseaux
  * @author Cédric Briançon

@@ -68,7 +68,7 @@ import com.sun.media.jai.operator.ImageReadDescriptor;
  * It may change in incompatible way in any future version.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/resources/image/ImageUtilities.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/resources/image/ImageUtilities.java $
  * @version $Id: ImageUtilities.java 34823 2010-01-19 18:47:51Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini

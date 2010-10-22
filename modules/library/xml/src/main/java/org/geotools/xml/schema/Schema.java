@@ -48,7 +48,7 @@ import org.geotools.factory.Factory;
  * </p>
  *
  * @author dzwiers www.refractions.net
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/main/java/org/geotools/xml/schema/Schema.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/main/java/org/geotools/xml/schema/Schema.java $
  */
 public interface Schema extends Factory {
     /**

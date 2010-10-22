@@ -28,7 +28,7 @@ import org.geotools.jdbc.JDBCTransactionTest;
  * @author Justin Deoliveira, The Open Planning Project
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/jdbc/jdbc-h2/src/test/java/org/geotools/data/h2/H2JDBCTransactionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/jdbc/jdbc-h2/src/test/java/org/geotools/data/h2/H2JDBCTransactionTest.java $
  */
 public class H2JDBCTransactionTest extends JDBCTransactionTest {
     protected JDBCTestSetup createTestSetup() {

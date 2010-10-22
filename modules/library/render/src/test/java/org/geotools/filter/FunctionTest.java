@@ -24,7 +24,7 @@ import junit.framework.TestCase;
  * 
  * @author Jody
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/filter/FunctionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/filter/FunctionTest.java $
  */
 public class FunctionTest extends TestCase {
 	

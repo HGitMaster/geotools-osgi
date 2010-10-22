@@ -64,7 +64,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/NativeTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/main/java/org/geotools/wfs/bindings/NativeTypeBinding.java $
  */
 public class NativeTypeBinding extends AbstractComplexEMFBinding {
     public NativeTypeBinding(WfsFactory factory) {

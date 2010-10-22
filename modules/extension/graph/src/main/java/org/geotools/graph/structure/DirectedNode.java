@@ -26,7 +26,7 @@ import java.util.List;
  * 
  * @see DirectedGraph
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/structure/DirectedNode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/structure/DirectedNode.java $
  */
 public interface DirectedNode extends Node, DirectedGraphable {
   

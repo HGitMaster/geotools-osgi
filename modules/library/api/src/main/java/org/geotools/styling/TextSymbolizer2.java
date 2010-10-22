@@ -22,7 +22,7 @@ import org.opengis.style.Description;
 
 /**
  * Contains label shield hack
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/TextSymbolizer2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/TextSymbolizer2.java $
  */
 public interface TextSymbolizer2 extends TextSymbolizer {
     /**

@@ -119,7 +119,7 @@ import org.geotools.util.NumberRange;
  *  </table>
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/GradientMagnitude.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/operation/GradientMagnitude.java $
  * @version $Id: GradientMagnitude.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  *

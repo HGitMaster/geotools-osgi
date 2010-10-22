@@ -17,9 +17,8 @@
 package org.geotools.gml2.bindings;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,7 @@ import org.geotools.xml.Schemas;
 import org.geotools.xs.XS;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
+import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -88,7 +88,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GML2EncodingUtils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-gml2/src/main/java/org/geotools/gml2/bindings/GML2EncodingUtils.java $
  */
 public class GML2EncodingUtils {
     
@@ -387,6 +387,16 @@ public class GML2EncodingUtils {
                 }
                 // get the value
                 Object attributeValue = ((SimpleFeature) feature).getAttribute(attribute.getName());
+                if (attributeValue != null && attributeValue instanceof Geometry) {
+                    Object obj = ((Geometry) attributeValue).getUserData();
+                    Map<Object, Object> userData = new HashMap<Object, Object>();
+                    if (obj != null && obj instanceof Map) {
+                        userData.putAll((Map) obj);
+                    }
+                    userData.put(CoordinateReferenceSystem.class, featureType
+                            .getCoordinateReferenceSystem());
+                    ((Geometry) attributeValue).setUserData(userData);
+                }
                 properties.add(new Object[] { particle, attributeValue });
             } else {
                 // namespaces matter for non-simple feature types
@@ -403,6 +413,22 @@ public class GML2EncodingUtils {
                         // do not unpack complex attributes as these may have their own bindings, which
                         // will be applied by the encoder
                         value = property;
+                    } else if (property instanceof GeometryAttribute) {
+                        value = property.getValue();
+                        if (value != null) {
+                            // ensure CRS is passed to the Geometry object
+                            Geometry geometry = (Geometry) value;
+                            CoordinateReferenceSystem crs = ((GeometryAttribute) property)
+                                    .getDescriptor().getCoordinateReferenceSystem();
+                            Map<Object, Object> userData = new HashMap<Object, Object>();
+                            Object obj = geometry.getUserData();
+                            if (obj != null && obj instanceof Map) {
+                                userData.putAll((Map) obj);
+                            }
+                            userData.put(CoordinateReferenceSystem.class, featureType
+                                    .getCoordinateReferenceSystem());
+                            geometry.setUserData(crs);
+                        }
                     } else {
                         // non-complex bindings are unpacked as for simple feature case
                         value = property.getValue();

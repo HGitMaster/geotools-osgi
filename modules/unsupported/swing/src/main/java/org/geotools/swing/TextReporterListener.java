@@ -26,7 +26,7 @@ import java.awt.event.WindowEvent;
  * @author Michael Bedward
  * @since 2.6
  * @source $Id: TextReporterListener.java 34263 2009-10-27 10:45:47Z mbedward $
- * @version $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/TextReporterListener.java $
+ * @version $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/TextReporterListener.java $
  */
 public interface TextReporterListener {
 

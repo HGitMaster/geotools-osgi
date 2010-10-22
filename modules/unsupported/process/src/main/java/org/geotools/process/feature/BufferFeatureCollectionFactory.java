@@ -28,7 +28,7 @@ import org.opengis.util.InternationalString;
  * @author Justin Deoliveira, OpenGEO
  * @since 2.6
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/feature/BufferFeatureCollectionFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/feature/BufferFeatureCollectionFactory.java $
  */
 public class BufferFeatureCollectionFactory extends FeatureToFeatureProcessFactory {
 

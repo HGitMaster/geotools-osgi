@@ -29,7 +29,7 @@ import org.geotools.swing.JMapPane;
  * 
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/action/MapAction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/action/MapAction.java $
  * @version $Id: MapAction.java 33975 2009-09-24 03:28:17Z mbedward $
  */
 public abstract class MapAction extends AbstractAction {

@@ -18,11 +18,14 @@
 package org.geotools.filter.function;
 
 import java.io.ByteArrayOutputStream;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -42,6 +45,7 @@ import static org.junit.Assert.*;
  * @source $URL: $
  * @version $Id $
  */
+
 public class EnvFunctionTest {
 
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -53,6 +57,8 @@ public class EnvFunctionTest {
         EnvFunction.clearLocalValues();
     }
 
+    public EnvFunctionTest() {}
+
     /**
      * Tests the use of two thread-local tables with same var names and different values
      */
@@ -60,135 +66,135 @@ public class EnvFunctionTest {
     public void testSetLocalValues() throws Exception {
         System.out.println("   setLocalValues");
 
-        final Map<String, Object> thread0Values = new LinkedHashMap<String, Object>();
-        thread0Values.put("foo", 1);
-        thread0Values.put("bar", 2);
+        final String key1 = "foo";
+        final String key2 = "bar";
 
-        final Map<String, Object> thread1Values = new LinkedHashMap<String, Object>();
-        thread1Values.put("foo", 10);
-        thread1Values.put("bar", 20);
+        final Map<String, Object> table0 = new HashMap<String, Object>();
+        table0.put(key1, 1);
+        table0.put(key2, 2);
 
-        final CountDownLatch[] latch = new CountDownLatch[2];
-        latch[0] = new CountDownLatch(1);
-        latch[1] = new CountDownLatch(1);
+        final Map<String, Object> table1 = new HashMap<String, Object>();
+        table1.put(key1, 10);
+        table1.put(key2, 20);
 
-        Runnable r0 = new Runnable() {
+        final List<Map<String, Object>> tables = new ArrayList<Map<String, Object>>();
+        tables.add(table0);
+        tables.add(table1);
+
+        final CountDownLatch latch = new CountDownLatch(2);
+
+        class Task implements Runnable {
+            private final int threadIndex;
+
+            public Task(int threadIndex) {
+                this.threadIndex = threadIndex;
+            }
+
             public void run() {
-                EnvFunction.setLocalValues(thread0Values);
+                // set the local values for this thread and then wait for
+                // the other thread to do the same before testing
+                EnvFunction.setLocalValues(tables.get(threadIndex));
+                latch.countDown();
                 try {
-                    latch[0].await();
+                    latch.await();
                 } catch (InterruptedException ex) {
                     throw new IllegalStateException(ex);
                 }
 
-                for (String name : thread0Values.keySet()) {
+                Map<String, Object> table = tables.get(threadIndex);
+                for (String name : table.keySet()) {
                     Object result = ff.function("env", ff.literal(name)).evaluate(null);
                     int value = ((Number) result).intValue();
-                    assertEquals(thread0Values.get(name), value);
+                    assertEquals(table.get(name), value);
                 }
             }
-        };
+        }
 
-        Runnable r1 = new Runnable() {
-            public void run() {
-                EnvFunction.setLocalValues(thread1Values);
-                try {
-                    latch[1].await();
-                } catch (InterruptedException ex) {
-                    throw new IllegalStateException(ex);
-                }
+        Future f1 = executor.submit(new Task(0));
+        Future f2 = executor.submit(new Task(1));
 
-                for (String name : thread1Values.keySet()) {
-                    Object result = ff.function("env", ff.literal(name)).evaluate(null);
-                    int value = ((Number) result).intValue();
-                    assertEquals(thread1Values.get(name), value);
-                }
-            }
-        };
-
-        executor.submit(r0);
-        executor.submit(r1);
-        latch[0].countDown();
-        latch[1].countDown();
+        // calling get on the Futures ensures that this test method
+        // completes before another starts
+        f1.get();
+        f2.get();
     }
 
     /**
      * Tests the use of a single var name with two thread-local values
      */
     @Test
-    public void testSetLocalValue() {
+    public void testSetLocalValue() throws Exception {
         System.out.println("   setLocalValue");
 
         final String varName = "foo";
-        final int thread0Value = 0;
-        final int thread1Value = 1;
+        final int[] values = {1, 2};
 
-        final CountDownLatch[] latch = new CountDownLatch[2];
-        latch[0] = new CountDownLatch(1);
-        latch[1] = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(2);
 
-        Runnable r0 = new Runnable() {
+        class Task implements Runnable {
+            private final int threadIndex;
+
+            public Task(int threadIndex) {
+                this.threadIndex = threadIndex;
+            }
+
             public void run() {
-                EnvFunction.setLocalValue(varName, thread0Value);
+                // set the local var then wait for the other thread
+                // to do the same before testing
+                EnvFunction.setLocalValue(varName, values[threadIndex]);
+                latch.countDown();
                 try {
-                    latch[0].await();
+                    latch.await();
                 } catch (InterruptedException ex) {
                     throw new IllegalStateException(ex);
                 }
 
                 Object result = ff.function("env", ff.literal(varName)).evaluate(null);
                 int value = ((Number) result).intValue();
-                assertEquals(thread0Value, value);
+                assertEquals(values[threadIndex], value);
             }
-        };
+        }
 
-        Runnable r1 = new Runnable() {
-            public void run() {
-                EnvFunction.setLocalValue(varName, thread1Value);
-                try {
-                    latch[1].await();
-                } catch (InterruptedException ex) {
-                    throw new IllegalStateException(ex);
-                }
+        Future f1 = executor.submit(new Task(0));
+        Future f2 = executor.submit(new Task(1));
 
-                Object result = ff.function("env", ff.literal(varName)).evaluate(null);
-                int value = ((Number) result).intValue();
-                assertEquals(thread1Value, value);
-            }
-        };
-
-        executor.submit(r0);
-        executor.submit(r1);
-        latch[0].countDown();
-        latch[1].countDown();
+        // calling get on the Futures ensures that this test method
+        // completes before another starts
+        f1.get();
+        f2.get();
     }
 
     /**
      * Tests setting global values and accessing them from different threads
      */
     @Test
-    public void testSetGlobalValues() {
+    public void testSetGlobalValues() throws Exception {
         System.out.println("   setGlobalValues");
 
-        final Map<String, Object> table = new LinkedHashMap<String, Object>();
+        final Map<String, Object> table = new HashMap<String, Object>();
         table.put("foo", 1);
         table.put("bar", 2);
+        EnvFunction.setGlobalValues(table);
 
-        final CountDownLatch[] latch = new CountDownLatch[2];
-        latch[0] = new CountDownLatch(1);
-        latch[1] = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(2);
 
-        class Runner implements Runnable {
-            int index;
+        class Task implements Runnable {
+            final String key;
 
-            Runner(int index) {
-                this.index = index;
+            Task(String key) {
+                if (!table.containsKey(key)) {
+                    throw new IllegalArgumentException("Invalid arg " + key);
+                }
+                this.key = key;
             }
 
             public void run() {
-                EnvFunction.setGlobalValues(table);
+                // set the global value assigned to this thread then wait for the other
+                // thread to do the same
+                EnvFunction.setGlobalValue(key, table.get(key));
+                latch.countDown();
                 try {
-                    latch[index].await();
+                    latch.await();
                 } catch (InterruptedException ex) {
                     throw new IllegalStateException(ex);
                 }
@@ -201,51 +207,41 @@ public class EnvFunctionTest {
             }
         }
 
-        executor.submit(new Runner(0));
-        executor.submit(new Runner(1));
-        latch[0].countDown();
-        latch[1].countDown();
+        Future f1 = executor.submit(new Task("foo"));
+        Future f2 = executor.submit(new Task("bar"));
+
+        // calling get on the Futures ensures that this test method
+        // completes before another starts
+        f1.get();
+        f2.get();
     }
 
     /**
      * Tests setting a global value and accessing it from different threads
      */
     @Test
-    public void testSetGlobalValue() {
+    public void testSetGlobalValue() throws Exception {
         System.out.println("   setGlobalValue");
 
         final String varName = "foo";
-        final int varValue = 1;
+        final String varValue = "a global value";
+        EnvFunction.setGlobalValue(varName, varValue);
 
-        final CountDownLatch[] latch = new CountDownLatch[2];
-        latch[0] = new CountDownLatch(1);
-        latch[1] = new CountDownLatch(1);
-
-        class Runner implements Runnable {
-            int index;
-
-            Runner(int index) {
-                this.index = index;
-            }
+        class Task implements Runnable {
 
             public void run() {
-                EnvFunction.setGlobalValue(varName, varValue);
-                try {
-                    latch[index].await();
-                } catch (InterruptedException ex) {
-                    throw new IllegalStateException(ex);
-                }
-
                 Object result = ff.function("env", ff.literal(varName)).evaluate(null);
-                int value = ((Number) result).intValue();
-                assertEquals(varValue, value);
+                assertEquals(varValue, result.toString());
             }
         }
 
-        executor.submit(new Runner(0));
-        executor.submit(new Runner(1));
-        latch[0].countDown();
-        latch[1].countDown();
+        Future f1 = executor.submit(new Task());
+        Future f2 = executor.submit(new Task());
+
+        // calling get on the Futures ensures that this test method
+        // completes before another starts
+        f1.get();
+        f2.get();
     }
 
     @Test
@@ -331,7 +327,7 @@ public class EnvFunctionTest {
     }
 
     /**
-     * The setFallback method should log a warning and ignore 
+     * The setFallback method should log a warning and ignore
      * the argument.
      */
     @Test

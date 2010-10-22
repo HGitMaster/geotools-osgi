@@ -27,7 +27,7 @@ import javax.sql.PooledConnection;
  * 
  * @author Rob Atkinson rob@socialchange.net.NOSPAM.au
  * @author Gary Sheppard garysheppard@psu.edu
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/ConnectionPoolFacade.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/ConnectionPoolFacade.java $
  */
 public class ConnectionPoolFacade implements ConnectionPoolDataSource {
 

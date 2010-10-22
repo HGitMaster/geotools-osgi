@@ -51,7 +51,7 @@ import org.opengis.filter.identity.Identifier;
  * @author Gabriel Roldan (OpenGeo)
  * @since 2.5.x
  * @version $Id: SimplifyingFilterVisitor.java 33336 2009-06-22 14:30:42Z aaime $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/visitor/SimplifyingFilterVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/visitor/SimplifyingFilterVisitor.java $
  */
 public class SimplifyingFilterVisitor extends DuplicatingFilterVisitor {
 

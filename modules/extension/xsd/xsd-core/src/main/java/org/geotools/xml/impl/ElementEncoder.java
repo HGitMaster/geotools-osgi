@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  * TODO: rename this class, it is not just for element.s
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/ElementEncoder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-core/src/main/java/org/geotools/xml/impl/ElementEncoder.java $
  */
 public class ElementEncoder {
     /**

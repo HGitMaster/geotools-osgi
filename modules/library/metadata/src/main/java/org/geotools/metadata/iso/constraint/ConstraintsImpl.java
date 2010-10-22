@@ -29,7 +29,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Restrictions on the access and use of a resource or metadata.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/metadata/iso/constraint/ConstraintsImpl.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/metadata/iso/constraint/ConstraintsImpl.java $
  * @version $Id: ConstraintsImpl.java 31557 2008-09-19 20:02:35Z desruisseaux $
  * @author Martin Desruisseaux (IRD)
  * @author Touraïvane

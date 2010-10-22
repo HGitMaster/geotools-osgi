@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  * by Martin Desruisseaux.
  *
  * @author Michael Bedward
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/build/maven/javadoc/src/main/java/org/geotools/maven/tools/InsertSourceTag.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/build/maven/javadoc/src/main/java/org/geotools/maven/tools/InsertSourceTag.java $
  * @version $Id: InsertSourceTag.java 34134 2009-10-12 08:15:21Z mbedward $
  */
 public class InsertSourceTag {

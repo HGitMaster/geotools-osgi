@@ -37,7 +37,7 @@ import org.geotools.graph.traverse.standard.DepthFirstIterator;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/graph/src/main/java/org/geotools/graph/util/graph/GraphPartitioner.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/graph/src/main/java/org/geotools/graph/util/graph/GraphPartitioner.java $
  */
 public class GraphPartitioner implements GraphWalker {
 

@@ -81,7 +81,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
 
 /**
  * @author  jamesm
- * @source  $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/test/java/org/geotools/renderer/lite/Rendering2DTest.java $
+ * @source  $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/test/java/org/geotools/renderer/lite/Rendering2DTest.java $
  */
 public class Rendering2DTest extends TestCase {
 

@@ -45,7 +45,7 @@ import org.geotools.util.Utilities;
  * <p align="center"><img src="../doc-files/BursaWolf.png"></p>
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/datum/BursaWolfParameters.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/datum/BursaWolfParameters.java $
  * @version $Id: BursaWolfParameters.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

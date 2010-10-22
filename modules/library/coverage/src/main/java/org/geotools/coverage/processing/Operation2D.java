@@ -43,8 +43,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * An operation working on {@link GridCoverage2D} sources.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/coverage/processing/Operation2D.java $
- * @version $Id: Operation2D.java 34804 2010-01-15 18:13:52Z simonegiannecchini $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/coverage/processing/Operation2D.java $
+ * @version $Id: Operation2D.java 34992 2010-03-08 14:23:33Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  */
 public abstract class Operation2D extends AbstractOperation {
@@ -152,9 +152,9 @@ public abstract class Operation2D extends AbstractOperation {
         for (int i=0; i<sourceNames.length; i++) {
             Object candidate = parameters.parameter(sourceNames[i]).getValue();
             if (candidate == null) {
-            	// assume it is an optional parameter
-            	continue;
-            }            
+                // assume it is an optional parameter
+                continue;
+            }
             if (!(candidate instanceof GridCoverage2D)) {
                 throw new InvalidParameterValueException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                         Classes.getClass(candidate), GridCoverage2D.class), sourceNames[i], candidate);

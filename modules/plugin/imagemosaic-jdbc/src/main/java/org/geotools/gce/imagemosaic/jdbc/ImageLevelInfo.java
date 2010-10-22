@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author mcr
  * 
  */
-class ImageLevelInfo implements Comparable<ImageLevelInfo> {
+public class ImageLevelInfo implements Comparable<ImageLevelInfo> {
 
 	/**
 	 * Flag if ImageIO.read(InputStream in) does not return a null pointer
@@ -112,81 +112,81 @@ class ImageLevelInfo implements Comparable<ImageLevelInfo> {
 	 */
 	private Envelope envelope = null;
 
-	String getCoverageName() {
+	public String getCoverageName() {
 		return coverageName;
 	}
 
-	void setCoverageName(String coverageName) {
+	public void setCoverageName(String coverageName) {
 		this.coverageName = coverageName;
 	}
 
-	Double getExtentMaxX() {
+	public Double getExtentMaxX() {
 		return extentMaxX;
 	}
 
-	void setExtentMaxX(Double extentMaxX) {
+	public void setExtentMaxX(Double extentMaxX) {
 		this.extentMaxX = extentMaxX;
 		envelope = null;
 	}
 
-	Double getExtentMaxY() {
+	public Double getExtentMaxY() {
 		return extentMaxY;
 	}
 
-	void setExtentMaxY(Double extentMaxY) {
+	public void setExtentMaxY(Double extentMaxY) {
 		this.extentMaxY = extentMaxY;
 		envelope = null;
 	}
 
-	Double getExtentMinX() {
+	public Double getExtentMinX() {
 		return extentMinX;
 	}
 
-	void setExtentMinX(Double extentMinX) {
+	public void setExtentMinX(Double extentMinX) {
 		this.extentMinX = extentMinX;
 		envelope = null;
 	}
 
-	Double getExtentMinY() {
+	public Double getExtentMinY() {
 		return extentMinY;
 	}
 
-	void setExtentMinY(Double extentMinY) {
+	public void setExtentMinY(Double extentMinY) {
 		this.extentMinY = extentMinY;
 		envelope = null;
 	}
 
-	Double getResX() {
+	public Double getResX() {
 		return resX;
 	}
 
-	void setResX(Double resX) {
+	public void setResX(Double resX) {
 		this.resX = resX;
 		resolution = null;
 	}
 
-	Double getResY() {
+	public Double getResY() {
 		return resY;
 	}
 
-	void setResY(Double resY) {
+	public void setResY(Double resY) {
 		this.resY = resY;
 		resolution = null;
 	}
 
-	String getSpatialTableName() {
+	public String getSpatialTableName() {
 		return spatialTableName;
 	}
 
-	void setSpatialTableName(String spatialTableName) {
+	public void setSpatialTableName(String spatialTableName) {
 		this.spatialTableName = spatialTableName;
 	}
 
-	String getTileTableName() {
+	public String getTileTableName() {
 		return tileTableName;
 	}
 
-	void setTileTableName(String tileTableName) {
+	public void setTileTableName(String tileTableName) {
 		this.tileTableName = tileTableName;
 	}
 
@@ -214,7 +214,7 @@ class ImageLevelInfo implements Comparable<ImageLevelInfo> {
 		return 0;
 	}
 
-	double[] getResolution() {
+	public double[] getResolution() {
 		if (resolution != null) {
 			return resolution;
 		}
@@ -232,7 +232,7 @@ class ImageLevelInfo implements Comparable<ImageLevelInfo> {
 		return resolution;
 	}
 
-	Envelope getEnvelope() {
+	public Envelope getEnvelope() {
 		if (envelope != null) {
 			return envelope;
 		}
@@ -249,27 +249,27 @@ class ImageLevelInfo implements Comparable<ImageLevelInfo> {
 		return envelope;
 	}
 
-	Integer getCountFeature() {
+	public Integer getCountFeature() {
 		return countFeature;
 	}
 
-	void setCountFeature(Integer countFeature) {
+	public void setCountFeature(Integer countFeature) {
 		this.countFeature = countFeature;
 	}
 
-	Integer getCountTiles() {
+	public Integer getCountTiles() {
 		return countTiles;
 	}
 
-	void setCountTiles(Integer countTiles) {
+	public void setCountTiles(Integer countTiles) {
 		this.countTiles = countTiles;
 	}
 
-	CoordinateReferenceSystem getCrs() {
+	public CoordinateReferenceSystem getCrs() {
 		return crs;
 	}
 
-	void setCrs(CoordinateReferenceSystem crs) {
+	public void setCrs(CoordinateReferenceSystem crs) {
 		this.crs = crs;
 	}
 
@@ -282,7 +282,7 @@ class ImageLevelInfo implements Comparable<ImageLevelInfo> {
 				|| (getExtentMinX() == null) || (getExtentMinY() == null);
 	}
 
-	String infoString() {
+	public String infoString() {
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		PrintWriter w = new PrintWriter(bout);
 		w.print("Coveragename: ");
@@ -328,15 +328,15 @@ class ImageLevelInfo implements Comparable<ImageLevelInfo> {
 		return bout.toString();
 	}
 
-	Integer getSrsId() {
+	public Integer getSrsId() {
 		return srsId;
 	}
 
-	void setSrsId(Integer srsId) {
+	public void setSrsId(Integer srsId) {
 		this.srsId = srsId;
 	}
 
-	boolean isImplementedAsTableSplit() {
+	public boolean isImplementedAsTableSplit() {
 		return getSpatialTableName().equals(getTileTableName()) == false;
 	}
 

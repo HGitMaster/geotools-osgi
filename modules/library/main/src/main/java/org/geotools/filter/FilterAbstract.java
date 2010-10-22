@@ -25,7 +25,7 @@ import org.opengis.filter.FilterVisitor;
  *
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/filter/FilterAbstract.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/filter/FilterAbstract.java $
  */
 public abstract class FilterAbstract implements org.opengis.filter.Filter 
 	 {

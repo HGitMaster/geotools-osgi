@@ -53,7 +53,7 @@ import org.opengis.referencing.operation.MathTransform;
  * @author Michael Bedward
  * @since 2.6
  * @source $Id: VectorLayerHelper.java 34954 2010-02-26 10:57:53Z mbedward $
- * @version $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/VectorLayerHelper.java $
+ * @version $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/tool/VectorLayerHelper.java $
  */
 public class VectorLayerHelper extends InfoToolHelper<FeatureCollection> {
 

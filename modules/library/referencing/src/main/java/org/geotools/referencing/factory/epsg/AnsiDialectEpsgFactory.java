@@ -44,7 +44,7 @@ import org.opengis.referencing.FactoryException;
  * </ul>
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AnsiDialectEpsgFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/factory/epsg/AnsiDialectEpsgFactory.java $
  * @version $Id: AnsiDialectEpsgFactory.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Rueben Schulz
  * @author Martin Desruisseaux

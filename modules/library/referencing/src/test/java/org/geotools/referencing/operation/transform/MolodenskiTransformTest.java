@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  *
  * @author Tara Athan
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/MolodenskiTransformTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/test/java/org/geotools/referencing/operation/transform/MolodenskiTransformTest.java $
  */
 public final class MolodenskiTransformTest extends TransformTestBase {
     /**

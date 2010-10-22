@@ -27,7 +27,7 @@ import org.opengis.filter.expression.PropertyName;
 /**
  *
  * @author James
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/filter/function/EqualIntervalFunctionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/filter/function/EqualIntervalFunctionTest.java $
  */
 public class EqualIntervalFunctionTest extends FunctionTestSupport {
    

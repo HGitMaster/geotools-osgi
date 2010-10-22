@@ -28,7 +28,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * result of {@linkplain org.opengis.referencing.operation.MathTransform1D} derivative computation.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/Matrix1.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/matrix/Matrix1.java $
  * @version $Id: Matrix1.java 30641 2008-06-12 17:42:27Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

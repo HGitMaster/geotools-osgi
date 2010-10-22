@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @since 2.5
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/feature/collection/DecoratingFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/feature/collection/DecoratingFeatureCollection.java $
  */
 public class DecoratingFeatureCollection<T extends FeatureType, F extends Feature> implements
         FeatureCollection<T, F> {

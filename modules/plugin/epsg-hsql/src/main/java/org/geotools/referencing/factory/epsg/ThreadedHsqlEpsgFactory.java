@@ -41,6 +41,7 @@ import org.geotools.resources.i18n.Loggings;
 import org.geotools.util.Version;
 import org.geotools.util.logging.Logging;
 import org.hsqldb.jdbc.jdbcDataSource;
+import org.opengis.referencing.FactoryException;
 
 
 /**
@@ -64,8 +65,8 @@ import org.hsqldb.jdbc.jdbcDataSource;
  * nammed {@value #DIRECTORY_KEY}.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/ThreadedHsqlEpsgFactory.java $
- * @version $Id: ThreadedHsqlEpsgFactory.java 34669 2009-12-13 18:12:15Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/epsg-hsql/src/main/java/org/geotools/referencing/factory/epsg/ThreadedHsqlEpsgFactory.java $
+ * @version $Id: ThreadedHsqlEpsgFactory.java 35634 2010-05-31 15:11:41Z aaime $
  * @author Martin Desruisseaux
  * @author Didier Richard
  */
@@ -76,7 +77,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
      * additional minor version number if there is some changes related to the EPSG-HSQL
      * plugin rather then the EPSG database itself (for example additional database index).
      */
-    public static final Version VERSION = new Version("7.4.0");
+    public static final Version VERSION = new Version("7.5.0");
 
     /**
      * The key for fetching the database directory from {@linkplain System#getProperty(String)
@@ -226,6 +227,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
                 url.append('/');
             }
             url.append(DATABASE_NAME);
+            url.append(";shutdown=true");
             source.setDatabase(url.toString());
             assert directory.equals(getDirectory(source)) : url;
         }

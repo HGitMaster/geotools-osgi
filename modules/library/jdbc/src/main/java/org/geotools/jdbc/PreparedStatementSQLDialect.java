@@ -16,6 +16,7 @@
  */
 package org.geotools.jdbc;
 
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
@@ -36,7 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin Deoliveira, OpenGEO
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/jdbc/PreparedStatementSQLDialect.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/jdbc/PreparedStatementSQLDialect.java $
  */
 public abstract class PreparedStatementSQLDialect extends SQLDialect {
 
@@ -108,6 +109,60 @@ public abstract class PreparedStatementSQLDialect extends SQLDialect {
             return;
         }
         
+        switch( sqlType ) {
+            case Types.VARCHAR:
+                ps.setString( column, (String) convert(value,String.class) );
+                break;
+            case Types.BOOLEAN:
+                ps.setBoolean( column, (Boolean) convert(value,Boolean.class) );
+                break;
+            case Types.SMALLINT:
+                ps.setShort( column, (Short) convert(value,Short.class) );
+                break;
+            case Types.INTEGER:
+                ps.setInt( column, (Integer) convert(value,Integer.class) );
+                break;
+            case Types.BIGINT:
+                ps.setLong( column, (Long) convert(value,Long.class) );
+                break;
+            case Types.REAL:
+                ps.setFloat( column, (Float) convert(value,Float.class) );
+                break;
+            case Types.DOUBLE:
+                ps.setDouble( column, (Double) convert(value,Double.class) );
+                break;
+            case Types.NUMERIC:
+                ps.setBigDecimal( column, (BigDecimal) convert(value,BigDecimal.class) );
+                break;
+            case Types.DATE:
+                ps.setDate( column, (Date) convert(value,Date.class) );
+                break;
+            case Types.TIME:
+                ps.setTime( column, (Time) convert(value,Time.class) );
+                break;
+            case Types.TIMESTAMP:
+                ps.setTimestamp( column, (Timestamp) convert(value,Timestamp.class) );
+                break;
+            case Types.BLOB:
+                ps.setBytes(column, convert(value, byte[].class));
+                break;
+            case Types.CLOB:
+                String string = convert(value, String.class);
+                ps.setCharacterStream(column, new StringReader(string), string.length());
+                break;
+            default:
+                ps.setObject( column, value );
+        }
+        
+    }
+    
+    /*
+     * Helper method to convert a value.
+     */
+    <T> T convert( Object value, Class<T> binding ) {
+        if (value == null) {
+            return (T) value;
+        }
         //convert the value if necessary
         if ( ! binding.isInstance( value ) ) {
             Object converted = Converters.convert(value, binding);
@@ -118,45 +173,7 @@ public abstract class PreparedStatementSQLDialect extends SQLDialect {
                 dataStore.getLogger().warning( "Unable to convert " + value + " to " + binding.getName() );
             }
         }
-        
-        switch( sqlType ) {
-            case Types.VARCHAR:
-                ps.setString( column, (String) value );
-                break;
-            case Types.BOOLEAN:
-                ps.setBoolean( column, (Boolean) value );
-                break;
-            case Types.SMALLINT:
-                ps.setShort( column, (Short) value );
-                break;
-            case Types.INTEGER:
-                ps.setInt( column, (Integer) value );
-                break;
-            case Types.BIGINT:
-                ps.setLong( column, (Long) value );
-                break;
-            case Types.REAL:
-                ps.setFloat( column, (Float) value );
-                break;
-            case Types.DOUBLE:
-                ps.setDouble( column, (Double) value );
-                break;
-            case Types.NUMERIC:
-                ps.setBigDecimal( column, (BigDecimal) value );
-                break;
-            case Types.DATE:
-                ps.setDate( column, (Date) value );
-                break;
-            case Types.TIME:
-                ps.setTime( column, (Time) value );
-                break;
-            case Types.TIMESTAMP:
-                ps.setTimestamp( column, (Timestamp) value );
-                break;
-            default:
-                ps.setObject( column, value );
-        }
-        
+        return (T) value;
     }
     
     public PreparedFilterToSQL createPreparedFilterToSQL() {

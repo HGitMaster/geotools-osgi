@@ -30,7 +30,7 @@ package org.geotools.resources.i18n;
  *
  * @see org.geotools.resources.IndexedResourceBundle
  * @see org.geotools.resources.IndexedResourceCompiler
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/metadata/src/main/java/org/geotools/resources/i18n/LoggingKeys.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/metadata/src/main/java/org/geotools/resources/i18n/LoggingKeys.java $
  */
 public final class LoggingKeys {
     private LoggingKeys() {

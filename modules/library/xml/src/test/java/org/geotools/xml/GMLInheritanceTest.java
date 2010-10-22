@@ -35,7 +35,7 @@ import junit.framework.TestCase;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/xml/src/test/java/org/geotools/xml/GMLInheritanceTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/xml/src/test/java/org/geotools/xml/GMLInheritanceTest.java $
  */
 public class GMLInheritanceTest extends TestCase {
 

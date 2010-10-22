@@ -39,7 +39,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/OGCSubBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-filter/src/main/java/org/geotools/filter/v1_0/OGCSubBinding.java $
  */
 public class OGCSubBinding extends AbstractComplexBinding {
     FilterFactory filterfactory;

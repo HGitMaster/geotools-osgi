@@ -40,7 +40,7 @@ import org.w3c.dom.NamedNodeMap;
  * @author Gabriel Roldan (TOPP)
  * @version $Id: DeleteElementTypeBindingTest.java 30665 2008-06-12 22:48:07Z acuster $
  * @since 2.5.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/xsd/xsd-wfs/src/test/java/org/geotools/wfs/bindings/DeleteElementTypeBindingTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/xsd/xsd-wfs/src/test/java/org/geotools/wfs/bindings/DeleteElementTypeBindingTest.java $
  */
 public class DeleteElementTypeBindingTest extends WFSTestSupport {
 

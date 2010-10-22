@@ -72,7 +72,7 @@ import static java.lang.Math.*;
  *
  * @since 2.0
  * @version $Id: MapProjection.java 34438 2009-11-22 17:21:43Z aaime $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/MapProjection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/MapProjection.java $
  * @author André Gosselin
  * @author Martin Desruisseaux (PMO, IRD)
  * @author Rueben Schulz

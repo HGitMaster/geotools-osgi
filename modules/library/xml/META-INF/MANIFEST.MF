@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools XML Parsing Support
 Bundle-SymbolicName: org.geotools.xml
-Bundle-Version: 2.6.2.osgi1
+Bundle-Version: 2.6.5.osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.geotools.api;bundle-version="2.6.0",
  org.geotools.main;bundle-version="2.6.0",

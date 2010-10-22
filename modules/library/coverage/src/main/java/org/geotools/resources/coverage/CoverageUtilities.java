@@ -16,6 +16,7 @@
  */
 package org.geotools.resources.coverage;
 
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
@@ -25,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.imageio.ImageReadParam;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationBilinear;
 import javax.media.jai.InterpolationNearest;
@@ -54,6 +56,7 @@ import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.util.NumberRange;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -61,8 +64,8 @@ import org.geotools.util.NumberRange;
  * rigorous; must of them should be seen as temporary implementations.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/resources/coverage/CoverageUtilities.java $
- * @version $Id: CoverageUtilities.java 33830 2009-09-03 07:40:44Z simonegiannecchini $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/resources/coverage/CoverageUtilities.java $
+ * @version $Id: CoverageUtilities.java 35374 2010-05-05 14:41:09Z danieleromagnoli $
  * @author Martin Desruisseaux (IRD)
  * @author Simone Giannecchini
  */
@@ -514,5 +517,31 @@ public final class CoverageUtilities {
         // propagated as NaN by every math functions used here, and (NaN < EPS) returns false.
         final double quadrantRotation = Math.abs(rotation / (Math.PI/2));
         return Math.abs(quadrantRotation - Math.floor(quadrantRotation)) < EPS;
+    }
+    
+    /**
+     * Checks that the provided {@code dimensions} when intersected with the source region used by 
+     * the provided {@link ImageReadParam} instance does not result in an empty {@link Rectangle}.
+     * Finally, in case the region intersection is not empty, set it as new source region for the 
+     * provided {@link ImageReadParam}.  
+     * <p>
+     * Input parameters cannot be null.
+     * 
+     * @param readParameters an instance of {@link ImageReadParam} for which we want to check 
+     *          the source region element.
+     * @param dimensions an instance of {@link Rectangle} to use for the check.
+     * @return {@code true} if the intersection is not empty, {@code false} otherwise.
+     */
+    public static boolean checkEmptySourceRegion(final ImageReadParam readParameters, 
+            final Rectangle dimensions) {
+        Utilities.ensureNonNull("readDimension", dimensions);
+        Utilities.ensureNonNull("readP", readParameters);
+        final Rectangle sourceRegion = readParameters.getSourceRegion();
+        Rectangle.intersect(sourceRegion, dimensions, sourceRegion);
+        if (sourceRegion.isEmpty()) {
+            return true;
+        }
+        readParameters.setSourceRegion(sourceRegion);
+        return false;
     }
 }

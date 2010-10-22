@@ -79,7 +79,7 @@ import org.geotools.resources.image.ImageUtilities;
  * "{@link BandCombineDescriptor BandCombine}" operation.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/image/jai/Combine.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/image/jai/Combine.java $
  * @version $Id: Combine.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Martin Desruisseaux (IRD)
  * @author Remi Eve

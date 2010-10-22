@@ -28,7 +28,7 @@ import org.geotools.swing.tool.ZoomInTool;
  * 
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/swing/src/main/java/org/geotools/swing/action/ZoomInAction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/swing/src/main/java/org/geotools/swing/action/ZoomInAction.java $
  * @version $Id: ZoomInAction.java 34138 2009-10-13 06:35:19Z mbedward $
  */
 public class ZoomInAction extends MapAction {

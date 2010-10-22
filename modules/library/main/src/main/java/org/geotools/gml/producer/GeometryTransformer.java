@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
  * the Coordinate 
  *
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/gml/producer/GeometryTransformer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/gml/producer/GeometryTransformer.java $
  */
 public class GeometryTransformer extends TransformerBase {
     
