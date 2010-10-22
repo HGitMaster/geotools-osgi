@@ -62,7 +62,7 @@ public class ShpFilesLockingTest extends TestCase implements FileWriter {
         // sborodavkin: fails on new Hudson
         //assertEquals( new File(path).getCanonicalPath(), file.getPath());
         if (!file.getPath().equals(new File(path).getCanonicalPath()))
-            return
+            return;
         
         assertEquals(1, shpFiles.numberOfLocks());
         
@@ -88,7 +88,7 @@ public class ShpFilesLockingTest extends TestCase implements FileWriter {
         // sborodavkin: fails on new Hudson
         //assertEquals( new File(path).getCanonicalPath(), file.getPath());
         if (!file.getPath().equals(new File(path).getCanonicalPath()))
-            return
+            return;
           
         assertEquals(1, shpFiles.numberOfLocks());
         
