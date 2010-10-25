@@ -68,7 +68,7 @@
     <dependency>
       <groupId>org.opengeo</groupId>
       <artifactId>geodb</artifactId>
-      <version>0.3</version>
+      <version>0.2</version>
       <exclusions>
         <exclusion>
           <groupId>com.h2database</groupId>
