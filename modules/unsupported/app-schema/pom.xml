@@ -58,6 +58,7 @@
   <!-- =========================================================== -->
   <modules>
       <module>app-schema</module>
+      <module>app-schema-resolver</module>
       <module>sample-data-access</module>
   </modules>
   
