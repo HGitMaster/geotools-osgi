@@ -21,7 +21,7 @@
         <executions>
           <execution>
             <id>unpack-sources</id>
-            <phase>compile</phase>
+            <phase>verifiy</phase>
             <goals>
               <goal>unpack</goal>
             </goals>

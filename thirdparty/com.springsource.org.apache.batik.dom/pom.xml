@@ -20,7 +20,7 @@
         <executions>
           <execution>
             <id>unpack-sources</id>
-            <phase>compile</phase>
+            <phase>verify</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -32,7 +32,7 @@
                   <version>${version}</version>
                   <type>jar</type>
                   <classifier>sources</classifier>
-                  <!--<includes>**/*.java</includes>-->
+                  <includes>**/*.java</includes>
                   <outputDirectory>target/unpacked-sources</outputDirectory>
                 </artifactItem>
               </artifactItems>

@@ -20,7 +20,7 @@
         <executions>
           <execution>
             <id>unpack-sources</id>
-            <phase>compile</phase>
+            <phase>verify</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
