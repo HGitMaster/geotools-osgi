@@ -45,6 +45,9 @@
   <!--                        "StressTest.java"                    -->
   <!--                                                             -->
   <!--     pending            Includes modules that are pending    -->
+  <!--								   -->
+  <!--     custom	      Allows custom deploying to a         -->
+  <!--			      different repository		   -->
   <!--                                                             -->
   <!--   Example:                                                  -->
   <!--       mvn -P extensive.tests install                        -->
@@ -129,6 +132,17 @@
           <url>file:///${java.io.tmpdir}/gtsite</url>
         </site>
       </distributionManagement>
+    </profile>
+    <profile>
+        <id>custom</id>
+        <distributionManagement>
+         <repository>
+          <id>${custom.repo.id}</id>
+          <name>${custom.repo.id} Maven Repository</name>
+          <url>${custom.repo.url}</url>
+          <uniqueVersion>false</uniqueVersion>
+         </repository>
+        </distributionManagement>
     </profile>
   </profiles>
 
