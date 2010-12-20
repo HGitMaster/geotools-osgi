@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools Swing Widgets
 Bundle-SymbolicName: org.geotools.swing
-Bundle-Version: 2.6.5.osgi1
+Bundle-Version: 2.6.5.osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.render;bundle-version="2.6.0",
@@ -14,7 +14,7 @@ Require-Bundle: org.geotools.render;bundle-version="2.6.0",
  org.geotools.cql;bundle-version="2.6.0",
  org.geotools.wms;bundle-version="2.6.0",
  org.geotools.xml;bundle-version="2.6.0",
- com.vividsolutions.osgi.jts;bundle-version="1.10",
+ com.vividsolutions.osgi.jts;bundle-version="1.11",
  java3d.osgi.vecmath;bundle-version="1.3.1",
  com.springsource.org.apache.commons.pool;bundle-version="1.4.0",
  org.opengis.geoapi;bundle-version="2.3.0",
