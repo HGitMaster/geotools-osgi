@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools JDBC Data Access
 Bundle-SymbolicName: org.geotools.jdbc
-Bundle-Version: 2.6.5.osgi1
+Bundle-Version: 2.6.5.osgi2
 Bundle-Vendor: Harman/Becker
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata

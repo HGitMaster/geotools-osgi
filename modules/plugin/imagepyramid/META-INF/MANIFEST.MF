@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools Image Pyramids
 Bundle-SymbolicName: org.geotools.imagepyramid
-Bundle-Version: 2.6.5.osgi1
+Bundle-Version: 2.6.5.osgi2
 Bundle-Vendor: Harman/Becker
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-RegisterBuddy: org.geotools.metadata
