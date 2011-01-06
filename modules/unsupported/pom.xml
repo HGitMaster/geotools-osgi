@@ -96,9 +96,10 @@
          <module>coverageio</module>
          <module>coverageio-netcdf</module>
          <module>coveragetools</module>
+<!-- SBorodavkin: moved to profile workflow
          <module>imagemosaic-sql</module>
          <module>imagemosaic-base</module>
-         <module>imagemosaic-shp</module>
+         <module>imagemosaic-shp</module> -->
        </modules>
      </profile>
      <profile>
@@ -128,6 +129,10 @@
        <modules>
          <module>process</module>
          <module>wps</module>
+<!-- SBorodavkin: we need these modules to build Anaconda platform -->
+         <module>imagemosaic-base</module>
+         <module>imagemosaic-sql</module>
+         <module>imagemosaic-shp</module>
        </modules>
      </profile>
      <profile>
