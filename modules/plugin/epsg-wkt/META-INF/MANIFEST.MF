@@ -6,7 +6,7 @@ Bundle-Version: 2.6.5.osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.metadata;bundle-version="2.6.5.osgi2",
- org.geotools.referencing;bundle-version="2.6.5.osgi2",
+ org.geotools.referencing;bundle-version="2.6.5.osgi2"
 Import-Package: org.opengis.metadata.citation,
  org.opengis.referencing,
  org.opengis.referencing.crs,
