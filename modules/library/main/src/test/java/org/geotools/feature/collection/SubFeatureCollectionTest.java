@@ -16,19 +16,51 @@
  */
 package org.geotools.feature.collection;
 
+<<<<<<< local
+import java.util.Iterator;
+import java.util.Random;
+
+=======
+>>>>>>> other
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.geotools.data.DataTestCase;
+<<<<<<< local
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.FeatureCollection;
+=======
 import org.geotools.data.simple.SimpleFeatureCollection;
+>>>>>>> other
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+<<<<<<< local
+import org.geotools.filter.FidFilterImpl;
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+=======
+>>>>>>> other
 import org.opengis.filter.Filter;
+<<<<<<< local
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
+=======
+>>>>>>> other
 import org.opengis.filter.FilterVisitor;
+<<<<<<< local
+import org.opengis.filter.identity.FeatureId;
+=======
+>>>>>>> other
 
 public class SubFeatureCollectionTest extends DataTestCase {
+<<<<<<< local
+    FeatureCollection<SimpleFeatureType, SimpleFeature> features = FeatureCollections
+=======
     SimpleFeatureCollection features = FeatureCollections
+>>>>>>> other
             .newCollection();
 
     public SubFeatureCollectionTest(String testName) {
@@ -56,7 +88,11 @@ public class SubFeatureCollectionTest extends DataTestCase {
     }
 
     public void testBounds() {
+<<<<<<< local
+        FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection = features
+=======
         SimpleFeatureCollection subCollection = features
+>>>>>>> other
                 .subCollection(new Filter() {
 
                     public Object accept(FilterVisitor arg0, Object arg1) {

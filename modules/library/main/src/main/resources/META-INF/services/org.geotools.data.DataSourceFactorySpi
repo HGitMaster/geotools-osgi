@@ -1,1 +1,5 @@
+<<<<<<< local
 org.geotools.data.gml.GMLDataSourceFactory
+=======
+org.geotools.data.gml.GMLDataSourceFactory
+>>>>>>> other

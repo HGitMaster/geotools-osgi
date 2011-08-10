@@ -1,1 +1,5 @@
+<<<<<<< local
 org.geotools.styling.StyleFactoryImpl
+=======
+org.geotools.styling.StyleFactoryImpl
+>>>>>>> other

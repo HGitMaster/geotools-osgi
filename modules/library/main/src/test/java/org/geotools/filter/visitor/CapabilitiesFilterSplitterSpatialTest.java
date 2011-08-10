@@ -35,8 +35,11 @@ import org.opengis.geometry.Geometry;
  * 
  * @author Jesse
  * @author ported from PostPreProcessFilterSplittingVisitor at 2.5.2 by Gabriel Roldan
+<<<<<<< local
+=======
  *
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/filter/visitor/CapabilitiesFilterSplitterSpatialTest.java $
+>>>>>>> other
  */
 @SuppressWarnings({"nls", "unchecked"})
 public class CapabilitiesFilterSplitterSpatialTest extends AbstractCapabilitiesFilterSplitterTests {

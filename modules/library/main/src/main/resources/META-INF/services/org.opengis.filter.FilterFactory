@@ -1,1 +1,5 @@
+<<<<<<< local
 org.geotools.filter.FilterFactoryImpl
+=======
+org.geotools.filter.FilterFactoryImpl
+>>>>>>> other

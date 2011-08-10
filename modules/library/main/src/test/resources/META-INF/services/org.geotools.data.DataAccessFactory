@@ -1,1 +1,4 @@
+<<<<<<< local
+org.geotools.data.DataAccessFinderTest$MockDataAccessFactory=======
 org.geotools.data.DataAccessFinderTest$MockDataAccessFactory
+>>>>>>> other

@@ -16,16 +16,29 @@
  */
 package org.geotools.styling;
 
+<<<<<<< local
+import java.io.StringReader;
+=======
+>>>>>>> other
 import java.net.URL;
 
+<<<<<<< local
+import org.geotools.factory.CommonFactoryFinder;
+
+=======
+>>>>>>> other
 import junit.framework.TestCase;
 
 /**
  * This test case captures specific problems encountered with the GraphicImpl code.
  *
  *
+<<<<<<< local
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/GraphicImplTest.java $
+=======
  *
  * @source $URL: http://svn.osgeo.org/geotools/tags/8.0-M1/modules/library/main/src/test/java/org/geotools/styling/GraphicImplTest.java $
+>>>>>>> other
  */
 public class GraphicImplTest extends TestCase {
 

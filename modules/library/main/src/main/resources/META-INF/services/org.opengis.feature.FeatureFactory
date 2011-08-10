@@ -1,2 +1,6 @@
+<<<<<<< local
+org.geotools.feature.LenientFeatureFactoryImpl
+org.geotools.feature.ValidatingFeatureFactoryImpl=======
 org.geotools.feature.LenientFeatureFactoryImpl
 org.geotools.feature.ValidatingFeatureFactoryImpl
+>>>>>>> other

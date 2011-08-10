@@ -1,1 +1,4 @@
+<<<<<<< local
+org.geotools.xml.SchemaFactory=======
 org.geotools.xml.SchemaFactory
+>>>>>>> other

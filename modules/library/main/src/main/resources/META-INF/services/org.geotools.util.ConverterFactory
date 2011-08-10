@@ -7,4 +7,7 @@ org.geotools.util.BooleanConverterFactory
 org.geotools.util.ColorConverterFactory
 org.geotools.util.CollectionConverterFactory
 org.geotools.util.CharsetConverterFactory
+<<<<<<< local
+=======
 org.geotools.temporal.TemporalConverterFactory
+>>>>>>> other
